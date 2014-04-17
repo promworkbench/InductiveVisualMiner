@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="org/processmining/inductivevisualminer/alignment/AlignmentArya.java|org/processmining/inductivevisualminer/alignment/AlignmentFelix.java|org/processmining/plugins/inductiveVisualMiner/alignment/AlignmentArya.java|org/processmining/plugins/inductiveVisualMiner/alignment/AlignmentFelix.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="src-test"/>
 	<classpathentry kind="src" output="tests/bin-test" path="tests/src-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
@@ -63,5 +63,16 @@
 	<classpathentry kind="lib" path="stdlib/junit-3.8.2.jar"/>
 	<classpathentry kind="lib" path="stdlib/junit-4.8.1.jar"/>
 	<classpathentry kind="lib" path="stdlib/openide-lookup-1.9-patched-1.0.jar"/>
+	<classpathentry kind="lib" path="packagelib/ProcessTree.jar"/>
+	<classpathentry kind="lib" path="packagelib/Properties.jar"/>
+	<classpathentry kind="lib" path="packagelib/DataAwareReplayer.jar"/>
+	<classpathentry kind="lib" path="packagelib/InductiveMiner.jar"/>
+	<classpathentry kind="lib" path="packagelib/DataPetriNets.jar"/>
+	<classpathentry kind="lib" path="packagelib/PetriNets.jar"/>
+	<classpathentry kind="lib" path="packagelib/PNetReplayer.jar"/>
+	<classpathentry kind="lib" path="packagelib/lib-InductiveMiner/jgrapht-jdk1.6.jar"/>
+	<classpathentry kind="lib" path="packagelib/GraphViz.jar"/>
+	<classpathentry kind="lib" path="packagelib/EvolutionaryTreeMiner.jar"/>
+	<classpathentry kind="lib" path="stdlib/guava-16.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
