@@ -27,8 +27,8 @@ import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.inductiveVisualMiner.InteractiveMinerState.ColourMode;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
@@ -258,7 +258,7 @@ public class InteractiveMinerController {
 
 		//set the default classifier
 		for (int i = 0; i < panel.getClassifiers().getItemCount(); i++) {
-			if (panel.getClassifiers().getItemAt(i).name().equals("Event Name")) {
+			if (((XEventClassifier) panel.getClassifiers().getItemAt(i)).name().equals("Event Name")) {
 				panel.getClassifiers().setSelectedIndex(i);
 				break;
 			}

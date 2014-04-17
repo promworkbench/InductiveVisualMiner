@@ -29,9 +29,9 @@ import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.InteractiveMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
@@ -49,13 +49,13 @@ public class InteractiveMinerPanel extends JPanel {
 
 	//gui elements
 	private final DotPanel graphPanel;
-	private final JComboBox<ColourMode> colourSelection;
+	private final JComboBox colourSelection;
 	private final JLabel statusLabel;
 	private final JTextArea selectionLabel;
 	private final JCheckBox showDirectlyFollowsGraphs;
 	private final NiceDoubleSlider activitiesSlider;
 	private final NiceDoubleSlider noiseSlider;
-	private JComboBox<XEventClassifier> classifiersCombobox;
+	private JComboBox classifiersCombobox;
 
 	private final AlignedLogVisualisation visualiser;
 
@@ -305,7 +305,7 @@ public class InteractiveMinerPanel extends JPanel {
 		return graphPanel;
 	}
 
-	public JComboBox<ColourMode> getColourModeSelection() {
+	public JComboBox getColourModeSelection() {
 		return colourSelection;
 	}
 
@@ -313,11 +313,11 @@ public class InteractiveMinerPanel extends JPanel {
 		return statusLabel;
 	}
 
-	public JComboBox<XEventClassifier> getClassifiers() {
+	public JComboBox getClassifiers() {
 		return classifiersCombobox;
 	}
 
-	public JComboBox<ColourMode> getColourSelection() {
+	public JComboBox getColourSelection() {
 		return colourSelection;
 	}
 

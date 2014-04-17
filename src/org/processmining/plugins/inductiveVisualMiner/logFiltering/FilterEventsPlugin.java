@@ -137,17 +137,20 @@ public class FilterEventsPlugin {
 
 	public XLog filter() {
 		//make set of selected event classes
-		Set<XEventClass> selectedEventClasses = new HashSet<XEventClass>(cEventClasses.getSelectedValuesList());
+		Set<XEventClass> selectedEventClasses = new HashSet<XEventClass>();
+		for (Object e : cEventClasses.getSelectedValues()) {
+			selectedEventClasses.add((XEventClass) e);
+		}
 
 		//copy only the events with event class that was selected
 		XLog result = new XLogImpl(log.getAttributes());
-		
+
 		//create environment event
 		XAttributeMap environmentMap = new XAttributeMapImpl();
 		environmentMap.put("concept:name", new XAttributeLiteralImpl("concept:name", "environment"));
 		environmentMap.put("lifecycle:transition", new XAttributeLiteralImpl("lifecycle:transition", "complete"));
 		environmentMap.put("org:resource", new XAttributeLiteralImpl("org:resource", "artificial"));
-		
+
 		for (XTrace trace : log) {
 			XTrace copyTrace = new XTraceImpl(trace.getAttributes());
 			for (XEvent event : trace) {
