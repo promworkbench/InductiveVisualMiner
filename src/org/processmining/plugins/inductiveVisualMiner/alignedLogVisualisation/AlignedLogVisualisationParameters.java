@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.alignedlogvisualisation;
+package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;

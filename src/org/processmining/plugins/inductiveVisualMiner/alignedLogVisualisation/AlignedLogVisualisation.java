@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.alignedlogvisualisation;
+package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
