@@ -1,4 +1,4 @@
-<project name="NewPackage" default="Compile Sources" basedir=".">
+<project name="InductiveVisualMiner" default="Compile Sources" basedir=".">
 		<!-- set global properties for this build -->
 		<property environment="env" />
 		<property name="src" location="src" />
@@ -8,7 +8,7 @@
 		<property name="dist" location="dist" />
 		<property name="release" location="latestrelease" />
 		<property name="version" value="6.1.${env.BUILD_NUMBER}" />
-		<property name="project" value="NewPackage" />
+		<property name="project" value="InductiveVisualMiner" />
 
 		<!-- Set the os to win32, win64, lin32, lin64, mac, or all -->
 		<property name="os" value="all" />
@@ -125,17 +125,17 @@
 							version="${version}" 
 							os="all" 
 							url="http://www.promtools.org/prom6/packages/${project}/${project}-${version}-${os}.zip"
-							desc="New Package (CHANGE)"
+							desc="Inductive Visual Miner"
 							org="Eindhoven University of Technology" 
 							license="LGPL" 
-							author="Your Name (CHANGE)"
+							author="Sander Leemans"
 							auto="false"
 							hasPlugins="true"
 							logo="http://www.promtools.org/prom6/packages/prom_subtitle_hat_300.png"
 						>
-							<dependency name="Upstream Package 1 (CHANGE)"/>
+							<!--dependency name="Upstream Package 1 (CHANGE)"/>
 							<dependency name="Upstream Package 2 (CHANGE)"/>
-							<dependency name="Upstream Package 3 (CHANGE)"/>
+							<dependency name="Upstream Package 3 (CHANGE)"/-->
 						</package>
 					</packages>
 				</echoxml>
