@@ -26,7 +26,7 @@ import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
-import org.processmining.plugins.inductiveVisualMiner.InteractiveMinerState.ColourMode;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
@@ -46,10 +46,10 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 import com.kitfox.svg.SVGDiagram;
 
-public class InteractiveMinerController {
+public class InductiveVisualMinerController {
 
-	private final InteractiveMinerPanel panel;
-	private final InteractiveMinerState state;
+	private final InductiveVisualMinerPanel panel;
+	private final InductiveVisualMinerState state;
 
 	//make an IMlog out of an XLog
 	private class MakeLog extends ChainLink<Pair<XLog, XEventClassifier>, Pair<IMLog, IMLogInfo>> {
@@ -177,7 +177,7 @@ public class InteractiveMinerController {
 			return Septuple.of(state.getAlignedLog(), state.getSelectedNodes(),
 					AlignedLogMetrics.getAllDfgNodes(new UnfoldedNode(state.getTree().getRoot())),
 					state.getAlignedLogInfo(), state.getDfgLogInfos(), state.getTree(),
-					InteractiveMinerPanel.getViewParameters(state));
+					InductiveVisualMinerPanel.getViewParameters(state));
 		}
 
 		protected Quintuple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> executeLink(
@@ -196,7 +196,7 @@ public class InteractiveMinerController {
 		protected void processResult(
 				Quintuple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> result) {
 			state.setAlignedFilteredLog(result.getA(), result.getB(), result.getC());
-			InteractiveMinerSelectionColourer.colour(panel, result.getD(), result.getB(), result.getC(), result.getE());
+			InductiveVisualMinerSelectionColourer.colour(panel, result.getD(), result.getB(), result.getC(), result.getE());
 			updateSelectionDescription(panel, state.getSelectedNodes());
 			setStatus(" ");
 		}
@@ -205,7 +205,7 @@ public class InteractiveMinerController {
 
 	private final Chain chain;
 
-	public InteractiveMinerController(PluginContext context, InteractiveMinerPanel panel, InteractiveMinerState state) {
+	public InductiveVisualMinerController(PluginContext context, InductiveVisualMinerPanel panel, InductiveVisualMinerState state) {
 		this.panel = panel;
 		this.state = state;
 
@@ -349,7 +349,7 @@ public class InteractiveMinerController {
 		return result;
 	}
 
-	private static void updateSelectionDescription(InteractiveMinerPanel panel, Set<UnfoldedNode> selected) {
+	private static void updateSelectionDescription(InductiveVisualMinerPanel panel, Set<UnfoldedNode> selected) {
 		//show the user which traces are shown
 		if (selected.size() == 0) {
 			panel.getSelectionLabel().setText("Showing all traces\n");

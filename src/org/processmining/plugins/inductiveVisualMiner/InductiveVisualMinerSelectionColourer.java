@@ -24,8 +24,8 @@ import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.SVGException;
 import com.kitfox.svg.Text;
 
-public class InteractiveMinerSelectionColourer {
-	public static void colour(InteractiveMinerPanel panel, ProcessTree tree, AlignedLogInfo alignedFilteredLogInfo,
+public class InductiveVisualMinerSelectionColourer {
+	public static void colour(InductiveVisualMinerPanel panel, ProcessTree tree, AlignedLogInfo alignedFilteredLogInfo,
 			Map<UnfoldedNode, AlignedLogInfo> alignedFilteredDfgLogInfos,
 			AlignedLogVisualisationParameters visualisationParameters) {
 
@@ -55,7 +55,7 @@ public class InteractiveMinerSelectionColourer {
 		panel.repaint();
 	}
 
-	private static void styleUnfoldedNode(UnfoldedNode unode, InteractiveMinerPanel panel, long cardinality,
+	private static void styleUnfoldedNode(UnfoldedNode unode, InductiveVisualMinerPanel panel, long cardinality,
 			long minCardinality, long maxCardinality, AlignedLogVisualisationParameters visualisationParameters)
 			throws SVGException {
 		if (unode.getNode() instanceof Manual) {
@@ -65,7 +65,7 @@ public class InteractiveMinerSelectionColourer {
 		}
 	}
 
-	private static void styleManual(UnfoldedNode unode, InteractiveMinerPanel panel, long cardinality,
+	private static void styleManual(UnfoldedNode unode, InductiveVisualMinerPanel panel, long cardinality,
 			long minCardinality, long maxCardinality, AlignedLogVisualisationParameters visualisationParameters)
 			throws SVGException {
 		DotElement dotNode = panel.getUnfoldedNode2dotNodes().get(unode).iterator().next();
@@ -104,7 +104,7 @@ public class InteractiveMinerSelectionColourer {
 		titleCount.rebuild();
 	}
 
-	private static void styleNonManualNode(UnfoldedNode unode, InteractiveMinerPanel panel, long cardinality) {
+	private static void styleNonManualNode(UnfoldedNode unode, InductiveVisualMinerPanel panel, long cardinality) {
 		//colour non-activity nodes
 		if (panel.getUnfoldedNode2dotNodes().containsKey(unode)) {
 			for (DotNode dotNode : panel.getUnfoldedNode2dotNodes().get(unode)) {
@@ -117,14 +117,14 @@ public class InteractiveMinerSelectionColourer {
 		}
 	}
 
-	private static void styleEdges(InteractiveMinerPanel panel, AlignedLogInfo logInfo,
+	private static void styleEdges(InductiveVisualMinerPanel panel, AlignedLogInfo logInfo,
 			AlignedLogVisualisationParameters parameters, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
 			long minCardinality, long maxCardinality) throws SVGException {
 		styleModelEdges(panel, logInfo, parameters, dfgLogInfos, minCardinality, maxCardinality);
 		styleMoveEdges(panel, logInfo, parameters, dfgLogInfos, minCardinality, maxCardinality);
 	}
 
-	private static void styleModelEdges(InteractiveMinerPanel panel, AlignedLogInfo logInfo,
+	private static void styleModelEdges(InductiveVisualMinerPanel panel, AlignedLogInfo logInfo,
 			AlignedLogVisualisationParameters parameters, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
 			long minCardinality, long maxCardinality) throws SVGException {
 		for (UnfoldedNode unode : panel.getUnfoldedNode2dotEdgesModel().keySet()) {
@@ -145,7 +145,7 @@ public class InteractiveMinerSelectionColourer {
 		}
 	}
 
-	private static void styleMoveEdges(InteractiveMinerPanel panel, AlignedLogInfo logInfo,
+	private static void styleMoveEdges(InductiveVisualMinerPanel panel, AlignedLogInfo logInfo,
 			AlignedLogVisualisationParameters parameters, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
 			long minCardinality, long maxCardinality) throws SVGException {
 		for (UnfoldedNode unode : panel.getUnfoldedNode2dotEdgesMove().keySet()) {

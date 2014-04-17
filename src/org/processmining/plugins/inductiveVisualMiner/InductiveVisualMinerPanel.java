@@ -27,7 +27,7 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMapLightBlue;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
-import org.processmining.plugins.inductiveVisualMiner.InteractiveMinerState.ColourMode;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotNode;
@@ -43,7 +43,7 @@ import com.fluxicon.slickerbox.factory.SlickerFactory;
 import com.kitfox.svg.Group;
 import com.kitfox.svg.SVGElement;
 
-public class InteractiveMinerPanel extends JPanel {
+public class InductiveVisualMinerPanel extends JPanel {
 
 	private static final long serialVersionUID = -1078786029763735572L;
 
@@ -56,13 +56,14 @@ public class InteractiveMinerPanel extends JPanel {
 	private final NiceDoubleSlider activitiesSlider;
 	private final NiceDoubleSlider noiseSlider;
 	private JComboBox classifiersCombobox;
+	private JButton exitButton;
 
 	private final AlignedLogVisualisation visualiser;
 
 	private InputFunction<Set<UnfoldedNode>> onSelectionChanged = null;
 
 	@SuppressWarnings("unchecked")
-	public InteractiveMinerPanel(final PluginContext context, InteractiveMinerState state,
+	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
 			Collection<XEventClassifier> classifiers, boolean enableExitButton) throws IOException {
 		visualiser = new AlignedLogVisualisation();
 		initVisualisationParameters();
@@ -146,7 +147,7 @@ public class InteractiveMinerPanel extends JPanel {
 		}
 
 		if (enableExitButton) {
-			JButton exitButton = SlickerFactory.instance().createButton("Mine this model (exit)");
+			exitButton = SlickerFactory.instance().createButton("Mine this model (exit)");
 			GridBagConstraints cExitButton = new GridBagConstraints();
 			cExitButton.gridx = 2;
 			cExitButton.gridy = gridy++;
@@ -170,16 +171,19 @@ public class InteractiveMinerPanel extends JPanel {
 			add(selectionLabel, cSelectionLabel);
 		}
 
-		statusLabel = SlickerFactory.instance().createLabel(" ");
-		GridBagConstraints cStatus = new GridBagConstraints();
-		cStatus.gridx = 1;
-		cStatus.gridy = gridy++;
-		cStatus.gridwidth = 2;
-		cStatus.anchor = GridBagConstraints.SOUTH;
-		add(statusLabel, cStatus);
+		{
+			statusLabel = SlickerFactory.instance().createLabel(" ");
+			GridBagConstraints cStatus = new GridBagConstraints();
+			cStatus.gridx = 1;
+			cStatus.gridy = gridy++;
+			cStatus.gridwidth = 2;
+			cStatus.anchor = GridBagConstraints.SOUTH;
+			add(statusLabel, cStatus);
+		}
 
 		Dot dot = new Dot();
-		dot.addNode("Interactive miner", "");
+		dot.addNode("Inductive Visual Miner", "");
+		dot.addNode("Mining model...", "");
 		graphPanel = new DotPanel(dot) {
 			private static final long serialVersionUID = -3112819390640390685L;
 
@@ -210,7 +214,7 @@ public class InteractiveMinerPanel extends JPanel {
 		add(graphPanel, cGraphPanel);
 	}
 
-	public synchronized Dot updateModel(InteractiveMinerState state) throws IOException {
+	public synchronized Dot updateModel(InductiveVisualMinerState state) throws IOException {
 		AlignedLogVisualisationParameters parameters = getViewParameters(state);
 		Dot dot = visualiser.fancy(state.getTree(), state.getAlignedFilteredLogInfo(), parameters);
 		graphPanel.changeDot(dot, true);
@@ -247,7 +251,7 @@ public class InteractiveMinerPanel extends JPanel {
 		both.setRepairLogMoves(false);
 	}
 
-	public static AlignedLogVisualisationParameters getViewParameters(InteractiveMinerState state) {
+	public static AlignedLogVisualisationParameters getViewParameters(InductiveVisualMinerState state) {
 		if (!state.isAlignmentReady()) {
 			return withoutAlignment;
 		}
@@ -335,6 +339,10 @@ public class InteractiveMinerPanel extends JPanel {
 
 	public NiceDoubleSlider getActivitiesSlider() {
 		return activitiesSlider;
+	}
+	
+	public JButton getExitButton() {
+		return exitButton;
 	}
 
 	public Map<UnfoldedNode, Set<LocalDotNode>> getUnfoldedNode2DfgdotNodes() {

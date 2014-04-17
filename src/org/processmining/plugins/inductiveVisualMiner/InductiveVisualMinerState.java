@@ -16,9 +16,9 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class InteractiveMinerState {
+public class InductiveVisualMinerState {
 
-	public InteractiveMinerState(XLog xLog) {
+	public InductiveVisualMinerState(XLog xLog) {
 		this.xLog = xLog;
 		miningParameters = new MiningParametersIMStateOfArt();
 		miningParameters.setDebug(false);
