@@ -46,6 +46,8 @@ public abstract class ChainLink<I, O> {
 			}
 		});
 	}
+	
+	public abstract void cancel();
 
 	public void setExecutor(Executor executor, Chain chain) {
 		this.executor = executor;

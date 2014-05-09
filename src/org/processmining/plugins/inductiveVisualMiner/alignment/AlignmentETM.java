@@ -21,7 +21,6 @@ import org.processmining.plugins.etm.CentralRegistry;
 import org.processmining.plugins.etm.fitness.BehaviorCounter;
 import org.processmining.plugins.etm.fitness.metrics.FitnessReplay;
 import org.processmining.plugins.etm.model.narytree.NAryTree;
-import org.processmining.plugins.etm.model.narytree.TreeUtils;
 import org.processmining.plugins.etm.model.narytree.conversion.ProcessTreeToNAryTree;
 import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
@@ -37,10 +36,12 @@ public class AlignmentETM {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Batch compare miners, default", requiredParameterLabels = { 0, 1 })
 	public AlignedLog alignTree(PluginContext context, ProcessTree tree, XLog log) {
-		return alignTree(tree, MiningParametersIM.getDefaultClassifier(), log, new HashSet<XEventClass>()).log;
+		return alignTree(tree, MiningParametersIM.getDefaultClassifier(), log, new HashSet<XEventClass>(),
+				ProMCancelTerminationCondition.buildDummyCanceller()).log;
 	}
 
-	public static AlignmentResult alignTree(ProcessTree tree, XEventClassifier classifier, XLog log, Set<XEventClass> skipActivities) {
+	public static AlignmentResult alignTree(ProcessTree tree, XEventClassifier classifier, XLog log,
+			Set<XEventClass> skipActivities, Canceller canceller) {
 
 		long start = System.nanoTime();
 
@@ -48,10 +49,9 @@ public class AlignmentETM {
 		CentralRegistry registry = new CentralRegistry(log, classifier, new Random());
 		ProcessTreeToNAryTree pt2nt = new ProcessTreeToNAryTree(registry.getEventClasses());
 		NAryTree nTree = pt2nt.convert(tree);
-		
-		Canceller c = ProMCancelTerminationCondition.buildDummyCanceller();
-		FitnessReplay fr = new FitnessReplay(registry, c);
-//		fr.setNrThreads(20);
+
+		FitnessReplay fr = new FitnessReplay(registry, canceller);
+		//		fr.setNrThreads(20);
 		fr.setDetailedAlignmentInfoEnabled(true);
 		double fitness = fr.getFitness(nTree, null);
 		BehaviorCounter behC = registry.getFitness(nTree).behaviorCounter;
@@ -85,7 +85,7 @@ public class AlignmentETM {
 				if (naryMove.getMovedEvent() >= 0) {
 					//an ETM-log-move happened
 					activity = registry.getEventClassByID(naryTrace.get(naryMove.getMovedEvent()));
-					
+
 					//filter log moves that activity filtering has filtered out
 					if (skipActivities.contains(activity)) {
 						continue;
@@ -106,8 +106,8 @@ public class AlignmentETM {
 
 		AlignedLogInfo alignedLogInfo = new AlignedLogInfo(alignedLog);
 
-		System.out.println("ETM alignment done,   took " + String.format("%15d", System.nanoTime() - start) + ", fitness " + fitness);
-		System.out.println(TreeUtils.toString(nTree, registry.getEventClasses()));
+		//		System.out.println("ETM alignment done,   took " + String.format("%15d", System.nanoTime() - start) + ", fitness " + fitness);
+		//		System.out.println(TreeUtils.toString(nTree, registry.getEventClasses()));
 
 		return new AlignmentResult(alignedLog, alignedLogInfo);
 	}

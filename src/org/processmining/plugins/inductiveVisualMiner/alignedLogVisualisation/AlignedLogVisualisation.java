@@ -21,9 +21,9 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
-import org.processmining.plugins.InductiveMiner.mining.metrics.MinerMetrics;
 import org.processmining.plugins.InductiveMiner.mining.metrics.PropertyDirectlyFollowsGraph;
 import org.processmining.plugins.InductiveMiner.plugins.IMiProcessTree;
+import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
@@ -54,13 +54,11 @@ public class AlignedLogVisualisation {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Show deviations", requiredParameterLabels = { 0, 1 })
 	public Dot fancy(PluginContext context, ProcessTree tree, XLog xLog) {
-		AlignmentResult result = AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog, new HashSet<XEventClass>());
-		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = InductiveVisualMinerController.computeDfgAlignment(result.log, tree);
-		return fancy(
-				tree,
-				result.logInfo,
-				dfgLogInfos,
-				new AlignedLogVisualisationParameters());
+		AlignmentResult result = AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog,
+				new HashSet<XEventClass>(), ProMCancelTerminationCondition.buildDummyCanceller());
+		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = InductiveVisualMinerController.computeDfgAlignment(result.log,
+				tree);
+		return fancy(tree, result.logInfo, dfgLogInfos, new AlignedLogVisualisationParameters());
 	}
 
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
@@ -123,7 +121,7 @@ public class AlignedLogVisualisation {
 					}
 
 					public void mousePressed(MouseEvent arg0) {
-						System.out.println(MinerMetrics.statisticsToString(unode.getNode()));
+
 					}
 
 					public void mouseExited(MouseEvent arg0) {
@@ -133,7 +131,7 @@ public class AlignedLogVisualisation {
 					}
 
 					public void mouseClicked(MouseEvent arg0) {
-						System.out.println(MinerMetrics.statisticsToString(unode.getNode()));
+
 					}
 				});
 			}
@@ -216,7 +214,7 @@ public class AlignedLogVisualisation {
 			parameters.setShowFrequenciesOnNodes(false);
 		}
 		this.logInfo = logInfo;
-		
+
 		if (dfgLogInfos == null) {
 			dfgLogInfos = new HashMap<UnfoldedNode, AlignedLogInfo>();
 		}
@@ -445,15 +443,15 @@ public class AlignedLogVisualisation {
 		//add edges
 		unfoldedNode2DfgdotEdges.put(unode, new HashSet<LocalDotEdge>());
 		for (Triple<MaybeString, MaybeString, Long> edge : edges) {
-			
+
 			//get endpoints-names
 			String fromName = edge.getA().get();
 			String toName = edge.getB().get();
-			
+
 			//get dotNodes of the endpoints
 			LocalDotNode fromDotNode = mapName2dotNode.get(fromName);
 			LocalDotNode toDotNode = mapName2dotNode.get(toName);
-			
+
 			//create the edge
 			LocalDotEdge dotEdge;
 			if (fromDotNode != null && toDotNode != null) {
@@ -469,7 +467,7 @@ public class AlignedLogVisualisation {
 				long cardinality = dfgLogInfo.getDfg(fromDotNode.node, null);
 				dotEdge = addModelArc(fromDotNode, sink, unode, directionForward, cardinality);
 			}
-			
+
 			unfoldedNode2DfgdotEdges.get(unode).add(dotEdge);
 		}
 	}
@@ -494,11 +492,7 @@ public class AlignedLogVisualisation {
 
 		if (parameters.getColourModelEdges() != null) {
 			String lineColour = null;
-			try {
-				lineColour = parameters.getColourModelEdges().colour(cardinality, minCardinality, maxCardinality);
-			} catch (IllegalArgumentException e) {
-				System.out.println("");
-			}
+			lineColour = parameters.getColourModelEdges().colour(cardinality, minCardinality, maxCardinality);
 			options += "color=\"" + lineColour + "\", ";
 		}
 

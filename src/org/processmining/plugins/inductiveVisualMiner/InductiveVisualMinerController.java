@@ -12,6 +12,8 @@ import java.util.Set;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import nl.tue.astar.AStarThread.Canceller;
+
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
@@ -25,7 +27,6 @@ import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
-import org.processmining.plugins.InductiveMiner.mining.metrics.MinerMetrics;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotNode;
@@ -41,7 +42,6 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
-import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
@@ -52,6 +52,24 @@ public class InductiveVisualMinerController {
 
 	private final InductiveVisualMinerPanel panel;
 	private final InductiveVisualMinerState state;
+	
+	public class ResettableCanceller implements Canceller {
+		
+		private boolean cancelled = false;
+		
+		public void cancel() {
+			this.cancelled = true;
+		}
+		
+		public void reset() {
+			this.cancelled = false;
+		}
+		
+		public boolean isCancelled() {
+			return cancelled;
+		}
+		
+	}
 
 	//make an IMlog out of an XLog
 	private class MakeLog extends ChainLink<Pair<XLog, XEventClassifier>, Pair<IMLog, IMLogInfo>> {
@@ -71,6 +89,10 @@ public class InductiveVisualMinerController {
 
 		protected void processResult(Pair<IMLog, IMLogInfo> result) {
 			state.setLog(result.getLeft(), result.getRight());
+		}
+
+		public void cancel() {
+			
 		}
 	}
 
@@ -97,6 +119,10 @@ public class InductiveVisualMinerController {
 		protected void processResult(Triple<IMLog, IMLogInfo, Set<XEventClass>> result) {
 			state.setActivityFilteredIMLog(result.getA(), result.getB(), result.getC());
 		}
+
+		public void cancel() {
+			
+		}
 	}
 
 	//mine a model
@@ -115,15 +141,6 @@ public class InductiveVisualMinerController {
 			state.setTree(result);
 			state.setSelectedNodes(new HashSet<UnfoldedNode>());
 			state.resetAlignment();
-			
-			System.out.println(state.getTree());
-			System.out.println("-" + MinerMetrics.getProducer(state.getTree().getRoot()) + "-");
-			System.out.println(state.getActivityFilteredIMLog());
-			System.out.println(state.getActivityFilteredIMLogInfo());
-			
-			for (Node node: state.getTree().getNodes()) {
-				System.out.println(MinerMetrics.statisticsToString(node));
-			}
 
 			//deviation from chain: already show the model, without alignment
 			//this is to not have the user wait for the alignment without visual feedback
@@ -133,6 +150,10 @@ public class InductiveVisualMinerController {
 				e.printStackTrace();
 			}
 		}
+
+		public void cancel() {
+			
+		}
 	}
 
 	//compute alignment
@@ -140,6 +161,8 @@ public class InductiveVisualMinerController {
 			extends
 			ChainLink<Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo>, Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>>> {
 
+		private ResettableCanceller canceller = new ResettableCanceller();
+		
 		protected Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo> generateInput() {
 			return new Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo>(state.getTree(),
 					state.getMiningParameters().getClassifier(), state.getXLog(), state.getFilteredActivities(),
@@ -149,12 +172,16 @@ public class InductiveVisualMinerController {
 		protected Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>> executeLink(
 				Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo> input) {
 			setStatus("Computing alignment..");
-
-			return computeAlignment(input.getA(), input.getB(), input.getC(), input.getD(), input.getE());
+			canceller.reset();
+			return computeAlignment(input.getA(), input.getB(), input.getC(), input.getD(), input.getE(), canceller);
 		}
 
 		protected void processResult(Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>> result) {
 			state.setAlignment(result.getLeft(), result.getRight());
+		}
+
+		public void cancel() {
+			canceller.cancel();
 		}
 
 	}
@@ -177,6 +204,10 @@ public class InductiveVisualMinerController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+
+		public void cancel() {
+			
 		}
 	}
 
@@ -212,6 +243,10 @@ public class InductiveVisualMinerController {
 			setStatus(" ");
 		}
 
+		public void cancel() {
+			
+		}
+
 	}
 
 	private final Chain chain;
@@ -235,10 +270,10 @@ public class InductiveVisualMinerController {
 	}
 
 	private static Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>> computeAlignment(ProcessTree tree,
-			XEventClassifier classifier, XLog xLog, Set<XEventClass> filteredActivities, IMLogInfo logInfo) {
-		System.out.println("");
+			XEventClassifier classifier, XLog xLog, Set<XEventClass> filteredActivities, IMLogInfo logInfo, Canceller canceller) {
+		
 		//ETM
-		AlignmentResult alignment = AlignmentETM.alignTree(tree, classifier, xLog, filteredActivities);
+		AlignmentResult alignment = AlignmentETM.alignTree(tree, classifier, xLog, filteredActivities, canceller);
 
 //		if (alignment.log.size() == 0) {
 //			//Felix
