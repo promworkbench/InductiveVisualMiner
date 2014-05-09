@@ -137,6 +137,7 @@ public class AlignedLogMetrics {
 		UnfoldedNode xorChild = unode.unfoldChild(unode.getBlock().getChildren().get(1));
 		
 		if (xorChild.getBlock() == null) {
+			//structure is xorloop(tau, a, tau)
 			long occurrences = AlignedLogMetrics.getNumberOfTracesRepresented(xorChild, logInfo);
 			return Pair.of(occurrences, occurrences);
 		}

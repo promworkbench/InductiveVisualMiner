@@ -21,6 +21,7 @@ import org.processmining.plugins.etm.CentralRegistry;
 import org.processmining.plugins.etm.fitness.BehaviorCounter;
 import org.processmining.plugins.etm.fitness.metrics.FitnessReplay;
 import org.processmining.plugins.etm.model.narytree.NAryTree;
+import org.processmining.plugins.etm.model.narytree.TreeUtils;
 import org.processmining.plugins.etm.model.narytree.conversion.ProcessTreeToNAryTree;
 import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
@@ -106,6 +107,7 @@ public class AlignmentETM {
 		AlignedLogInfo alignedLogInfo = new AlignedLogInfo(alignedLog);
 
 		System.out.println("ETM alignment done,   took " + String.format("%15d", System.nanoTime() - start) + ", fitness " + fitness);
+		System.out.println(TreeUtils.toString(nTree, registry.getEventClasses()));
 
 		return new AlignmentResult(alignedLog, alignedLogInfo);
 	}

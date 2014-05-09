@@ -15,6 +15,7 @@ import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.plugins.InductiveMiner.MaybeString;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
@@ -28,9 +29,12 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.dot.DotNode;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
@@ -43,7 +47,6 @@ import org.processmining.processtree.impl.AbstractBlock.XorLoop;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
-
 @Plugin(name = "Show deviations", returnLabels = { "dot" }, returnTypes = { Dot.class }, parameterLabels = {
 		"process tree", "event log" }, userAccessible = true)
 public class AlignedLogVisualisation {
@@ -51,28 +54,26 @@ public class AlignedLogVisualisation {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Show deviations", requiredParameterLabels = { 0, 1 })
 	public Dot fancy(PluginContext context, ProcessTree tree, XLog xLog) {
-		//ProcessTree tree = IMiProcessTree.mineProcessTree(xLog);
+		AlignmentResult result = AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog, new HashSet<XEventClass>());
+		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = InductiveVisualMinerController.computeDfgAlignment(result.log, tree);
 		return fancy(
 				tree,
-				AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog, new HashSet<XEventClass>()).logInfo,
+				result.logInfo,
+				dfgLogInfos,
 				new AlignedLogVisualisationParameters());
 	}
 
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Show deviations", requiredParameterLabels = { 0 })
 	public Dot fancy(PluginContext context, ProcessTree tree) {
-		//ProcessTree tree = IMiProcessTree.mineProcessTree(xLog);
-		return fancy(tree, null, new AlignedLogVisualisationParameters());
+		return fancy(tree, null, null, new AlignedLogVisualisationParameters());
 	}
 
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Show deviations", requiredParameterLabels = { 0 })
 	public Dot fancy(PluginContext context, XLog xLog) {
 		ProcessTree tree = IMiProcessTree.mineProcessTree(xLog);
-		return fancy(
-				tree,
-				AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog, new HashSet<XEventClass>()).logInfo,
-				new AlignedLogVisualisationParameters());
+		return fancy(context, tree, xLog);
 	}
 
 	public enum NodeType {
@@ -190,6 +191,7 @@ public class AlignedLogVisualisation {
 
 	private Dot dot;
 	private AlignedLogInfo logInfo;
+	private Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos;
 	private long maxCardinality;
 	private long minCardinality;
 	private AlignedLogVisualisationParameters parameters;
@@ -202,7 +204,8 @@ public class AlignedLogVisualisation {
 	private Map<UnfoldedNode, Set<LocalDotNode>> unfoldedNode2DfgdotNodes;
 	private Map<UnfoldedNode, Set<LocalDotEdge>> unfoldedNode2DfgdotEdges;
 
-	public Dot fancy(ProcessTree tree, AlignedLogInfo logInfo, AlignedLogVisualisationParameters parameters) {
+	public Dot fancy(ProcessTree tree, AlignedLogInfo logInfo, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
+			AlignedLogVisualisationParameters parameters) {
 		this.parameters = parameters;
 		if (logInfo == null) {
 			//use empty logInfo
@@ -213,6 +216,11 @@ public class AlignedLogVisualisation {
 			parameters.setShowFrequenciesOnNodes(false);
 		}
 		this.logInfo = logInfo;
+		
+		if (dfgLogInfos == null) {
+			dfgLogInfos = new HashMap<UnfoldedNode, AlignedLogInfo>();
+		}
+		this.dfgLogInfos = dfgLogInfos;
 
 		//find maximum and mimimum occurrences
 		Pair<Long, Long> p = AlignedLogMetrics.getExtremes(new UnfoldedNode(tree.getRoot()), logInfo, true);
@@ -304,6 +312,9 @@ public class AlignedLogVisualisation {
 		}
 
 		String label = unode.getNode().getName();
+		if (label.length() == 0) {
+			label = " ";
+		}
 		if (cardinality != -1 && parameters.isShowFrequenciesOnNodes()) {
 			label += "\n" + cardinality;
 		}
@@ -423,25 +434,43 @@ public class AlignedLogVisualisation {
 		}
 
 		//get the directly-follows graph
-		List<Triple<String, String, Long>> edges = PropertyDirectlyFollowsGraph.get(unode.getNode());
+		List<Triple<MaybeString, MaybeString, Long>> edges = PropertyDirectlyFollowsGraph.get(unode.getNode());
+
+		//get the logInfo of the directly-follows graph
+		AlignedLogInfo dfgLogInfo = dfgLogInfos.get(unode);
+		if (dfgLogInfo == null) {
+			dfgLogInfo = new AlignedLogInfo(new AlignedLog());
+		}
 
 		//add edges
 		unfoldedNode2DfgdotEdges.put(unode, new HashSet<LocalDotEdge>());
-		for (Triple<String, String, Long> edge : edges) {
-			LocalDotNode from = mapName2dotNode.get(edge.getA());
-			LocalDotNode to = mapName2dotNode.get(edge.getB());
-			LocalDotEdge edge2;
-			if (from != null && to != null) {
+		for (Triple<MaybeString, MaybeString, Long> edge : edges) {
+			
+			//get endpoints-names
+			String fromName = edge.getA().get();
+			String toName = edge.getB().get();
+			
+			//get dotNodes of the endpoints
+			LocalDotNode fromDotNode = mapName2dotNode.get(fromName);
+			LocalDotNode toDotNode = mapName2dotNode.get(toName);
+			
+			//create the edge
+			LocalDotEdge dotEdge;
+			if (fromDotNode != null && toDotNode != null) {
 				//normal edge
-				edge2 = addModelArc(from, to, unode, directionForward, edge.getC());
-			} else if (from == null) {
+				long cardinality = dfgLogInfo.getDfg(fromDotNode.node, toDotNode.node);
+				dotEdge = addModelArc(fromDotNode, toDotNode, unode, directionForward, cardinality);
+			} else if (fromDotNode == null) {
 				//start activity
-				edge2 = addModelArc(source, to, unode, directionForward, edge.getC());
+				long cardinality = dfgLogInfo.getDfg(null, toDotNode.node);
+				dotEdge = addModelArc(source, toDotNode, unode, directionForward, cardinality);
 			} else {
 				//end activity
-				edge2 = addModelArc(from, sink, unode, directionForward, edge.getC());
+				long cardinality = dfgLogInfo.getDfg(fromDotNode.node, null);
+				dotEdge = addModelArc(fromDotNode, sink, unode, directionForward, cardinality);
 			}
-			unfoldedNode2DfgdotEdges.get(unode).add(edge2);
+			
+			unfoldedNode2DfgdotEdges.get(unode).add(dotEdge);
 		}
 	}
 
@@ -464,7 +493,12 @@ public class AlignedLogVisualisation {
 		String options = "";
 
 		if (parameters.getColourModelEdges() != null) {
-			String lineColour = parameters.getColourModelEdges().colour(cardinality, minCardinality, maxCardinality);
+			String lineColour = null;
+			try {
+				lineColour = parameters.getColourModelEdges().colour(cardinality, minCardinality, maxCardinality);
+			} catch (IllegalArgumentException e) {
+				System.out.println("");
+			}
 			options += "color=\"" + lineColour + "\", ";
 		}
 
@@ -484,27 +518,29 @@ public class AlignedLogVisualisation {
 		return edge;
 	}
 
-	private void visualiseLogMove(LocalDotNode from, LocalDotNode to, UnfoldedNode unode,
-			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2,
-			boolean directionForward) {
+	private void visualiseLogMove(LocalDotNode from, LocalDotNode to, UnfoldedNode unode, UnfoldedNode lookupNode1,
+			UnfoldedNode lookupNode2, boolean directionForward) {
 		MultiSet<XEventClass> logMoves = AlignedLogMetrics.getLogMoves(lookupNode1, lookupNode2, logInfo);
 		if (logMoves.size() > 0) {
 			if (parameters.isRepairLogMoves()) {
 				for (XEventClass e : logMoves) {
 					long cardinality = logMoves.getCardinalityOf(e);
 					LocalDotNode dotNode = new LocalDotNode(NodeType.logMoveActivity, e.toString(), unode);
-					addMoveArc(from, dotNode, unode, EdgeType.logMove, lookupNode1, lookupNode2, cardinality, directionForward);
-					addMoveArc(dotNode, to, unode, EdgeType.logMove, lookupNode1, lookupNode2, cardinality, directionForward);
+					addMoveArc(from, dotNode, unode, EdgeType.logMove, lookupNode1, lookupNode2, cardinality,
+							directionForward);
+					addMoveArc(dotNode, to, unode, EdgeType.logMove, lookupNode1, lookupNode2, cardinality,
+							directionForward);
 				}
 			} else {
-				addMoveArc(from, to, unode, EdgeType.logMove, lookupNode1, lookupNode2, logMoves.size(), directionForward);
+				addMoveArc(from, to, unode, EdgeType.logMove, lookupNode1, lookupNode2, logMoves.size(),
+						directionForward);
 			}
 		}
 	}
 
 	private LocalDotEdge addMoveArc(LocalDotNode from, LocalDotNode to, UnfoldedNode unode, EdgeType type,
 			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, long cardinality, boolean directionForward) {
-		
+
 		String options = "style=\"dashed\", arrowsize=.5";
 
 		if (parameters.getColourMoves() != null) {

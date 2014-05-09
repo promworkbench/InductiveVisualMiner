@@ -25,6 +25,7 @@ import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
+import org.processmining.plugins.InductiveMiner.mining.metrics.MinerMetrics;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotNode;
@@ -40,6 +41,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
+import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
@@ -113,6 +115,15 @@ public class InductiveVisualMinerController {
 			state.setTree(result);
 			state.setSelectedNodes(new HashSet<UnfoldedNode>());
 			state.resetAlignment();
+			
+			System.out.println(state.getTree());
+			System.out.println("-" + MinerMetrics.getProducer(state.getTree().getRoot()) + "-");
+			System.out.println(state.getActivityFilteredIMLog());
+			System.out.println(state.getActivityFilteredIMLogInfo());
+			
+			for (Node node: state.getTree().getNodes()) {
+				System.out.println(MinerMetrics.statisticsToString(node));
+			}
 
 			//deviation from chain: already show the model, without alignment
 			//this is to not have the user wait for the alignment without visual feedback
@@ -241,10 +252,10 @@ public class InductiveVisualMinerController {
 
 		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = computeDfgAlignment(alignment.log, tree);
 
-		return new Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>>(alignment, dfgLogInfos);
+		return Pair.of(alignment, dfgLogInfos);
 	}
 
-	private static Map<UnfoldedNode, AlignedLogInfo> computeDfgAlignment(AlignedLog log, ProcessTree tree) {
+	public static Map<UnfoldedNode, AlignedLogInfo> computeDfgAlignment(AlignedLog log, ProcessTree tree) {
 		Map<UnfoldedNode, AlignedLogInfo> result = new HashMap<ProcessTree2Petrinet.UnfoldedNode, AlignedLogInfo>();
 
 		for (UnfoldedNode unode : AlignedLogMetrics.getAllDfgNodes(new UnfoldedNode(tree.getRoot()))) {

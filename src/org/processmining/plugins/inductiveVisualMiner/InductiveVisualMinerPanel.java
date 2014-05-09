@@ -216,7 +216,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public synchronized Dot updateModel(InductiveVisualMinerState state) throws IOException {
 		AlignedLogVisualisationParameters parameters = getViewParameters(state);
-		Dot dot = visualiser.fancy(state.getTree(), state.getAlignedFilteredLogInfo(), parameters);
+		Dot dot = visualiser.fancy(state.getTree(), state.getAlignedFilteredLogInfo(), state.getDfgFilteredLogInfos(), parameters);
 		graphPanel.changeDot(dot, true);
 		return dot;
 	}
