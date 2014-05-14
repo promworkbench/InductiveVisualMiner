@@ -68,7 +68,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 	/*
 	 * find the child that contains a particular grandchild
 	 */
-	private UnfoldedNode findChildWith(UnfoldedNode parent, UnfoldedNode grandChild) {
+	public static UnfoldedNode findChildWith(UnfoldedNode parent, UnfoldedNode grandChild) {
 		//first phase: synchronous moves trough the paths
 		Iterator<Node> itParent = parent.getPath().iterator();
 		Iterator<Node> itGrandChild = grandChild.getPath().iterator();

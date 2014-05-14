@@ -9,9 +9,9 @@ import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
@@ -179,7 +179,7 @@ public class InductiveVisualMinerSelectionColourer {
 		panel.setCSSAttributeOf(arrowHead, "stroke", edgeColour);
 		panel.setCSSAttributeOf(arrowHead, "fill", edgeColour);
 		panel.setCSSAttributeOf(line, "stroke-width", strokeWidth + "");
-
+		
 		//transparency
 		if (cardinality > 0) {
 			panel.setCSSAttributeOf(group, "opacity", "1.0");

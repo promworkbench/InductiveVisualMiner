@@ -68,7 +68,7 @@ public class AlignmentETM {
 
 			TreeRecord tr = behC.getAlignment(naryTrace);
 			List<TreeRecord> naryMoves = TreeRecord.getHistory(tr);
-			long cardinality = registry.getaStarAlgorithm().getTraceFreq(naryTrace);
+			long cardinality = registry.getaStarAlgorithm().getTraceFreq(naryTrace);			
 
 			for (TreeRecord naryMove : naryMoves) {
 

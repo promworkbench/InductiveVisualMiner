@@ -38,6 +38,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogSplitt
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
+import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
@@ -248,6 +249,29 @@ public class InductiveVisualMinerController {
 		}
 
 	}
+	
+	private class Animate extends ChainLink<Pair<AlignedLog, ProcessTree>, String> {
+
+		protected Pair<AlignedLog, ProcessTree> generateInput() {
+			return Pair.of(state.getAlignedFilteredLog(), state.getTree());
+		}
+
+		protected String executeLink(Pair<AlignedLog, ProcessTree> input) {
+			for (IMTraceG<Move> trace : input.getLeft()) {
+				Animation.positionTrace(trace, new UnfoldedNode(input.getRight().getRoot()));
+			}
+			return "";
+		}
+
+		protected void processResult(String result) {
+			
+		}
+
+		public void cancel() {
+
+		}
+		
+	}
 
 	private final Chain chain;
 
@@ -265,6 +289,7 @@ public class InductiveVisualMinerController {
 		chain.add(new Align());
 		chain.add(new Layout());
 		chain.add(new SelectionColouring());
+		chain.add(new Animate());
 
 		chain.execute(MakeLog.class);
 	}
