@@ -73,7 +73,7 @@
 	<classpathentry kind="lib" path="packagelib/lib-InductiveMiner/jgrapht-jdk1.6.jar"/>
 	<classpathentry kind="lib" path="packagelib/EvolutionaryTreeMiner.jar"/>
 	<classpathentry kind="lib" path="stdlib/guava-16.0.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GraphViz"/>
 	<classpathentry kind="lib" path="packagelib/lib-EvolutionaryTreeMiner/trove-3.0.3.jar"/>
-	<classpathentry kind="lib" path="packagelib/GraphViz.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
