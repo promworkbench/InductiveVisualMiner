@@ -39,6 +39,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
+import org.processmining.plugins.inductiveVisualMiner.animation.AnimationSVG;
+import org.processmining.plugins.inductiveVisualMiner.animation.Tokens;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
@@ -250,21 +252,23 @@ public class InductiveVisualMinerController {
 
 	}
 	
-	private class Animate extends ChainLink<Pair<AlignedLog, ProcessTree>, String> {
+	private class Animate extends ChainLink<Pair<AlignedLog, ProcessTree>, Tokens> {
 
 		protected Pair<AlignedLog, ProcessTree> generateInput() {
 			return Pair.of(state.getAlignedFilteredLog(), state.getTree());
 		}
 
-		protected String executeLink(Pair<AlignedLog, ProcessTree> input) {
+		protected Tokens executeLink(Pair<AlignedLog, ProcessTree> input) {
+			Tokens tokens = null;
 			for (IMTraceG<Move> trace : input.getLeft()) {
-				Animation.positionTrace(trace, new UnfoldedNode(input.getRight().getRoot()), panel);
+				tokens = Animation.positionTrace(trace, new UnfoldedNode(input.getRight().getRoot()), panel);
 			}
-			return "";
+			return tokens;
 		}
 
-		protected void processResult(String result) {
-			
+		protected void processResult(Tokens result) {
+			System.out.println(result);
+			System.out.println(AnimationSVG.animateTokens(result, panel));
 		}
 
 		public void cancel() {

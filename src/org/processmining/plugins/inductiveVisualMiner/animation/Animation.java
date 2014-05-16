@@ -36,7 +36,7 @@ public class Animation {
 		return panel.getAttributeOf(path, "d");
 	}
 
-	public static void positionTrace(IMTraceG<Move> trace, UnfoldedNode unode, InductiveVisualMinerPanel panel) {
+	public static Tokens positionTrace(IMTraceG<Move> trace, UnfoldedNode unode, InductiveVisualMinerPanel panel) {
 		//make dummy timestamps
 		TimedTrace timedTrace = new TimedTrace();
 		double t = 1;
@@ -48,13 +48,12 @@ public class Animation {
 
 		//create new token and put it on source/root
 		Tokens tokens = new Tokens();
-		Token token = new Token(panel.getRootSource(), 0.0);
+		Token token = new Token(panel.getRootSource(), 0.0, true);
 		tokens.add(token);
 
 		positionTimedTrace(timedTrace, unode, null, null, token, tokens, panel.getRootSink(), t, panel);
 		
-		System.out.println();
-		System.out.println(tokens);
+		return tokens;
 	}
 
 	public static void positionTimedTrace(TimedTrace trace, UnfoldedNode unode, TimedMove lastMoveBeforeThisTrace,
@@ -185,7 +184,7 @@ public class Animation {
 				//this child does not end last
 				
 				//create a new token
-				Token childToken = new Token(split, splitTime);
+				Token childToken = new Token(split, splitTime, false);
 				tokens.add(childToken);
 				
 				//animate this child on the new token
