@@ -26,30 +26,6 @@ public class Move {
 		this.eventClass = eventClass;
 	}
 
-//	public Move(StepTypes moveType, Object event, Map<Transition, UnfoldedNode> mapTransition2Path) {
-//		if ((moveType == StepTypes.MINVI || moveType == StepTypes.LMGOOD) && event instanceof Transition) {
-//			//synchronous move
-//			type = Type.synchronous;
-//			this.unode = mapTransition2Path.get(event);
-//			this.eventClass = null;
-//		} else if (moveType == StepTypes.L && event instanceof XEventClass) {
-//			//log move
-//			type = Type.log;
-//			this.unode = null;
-//			this.eventClass = (XEventClass) event;
-//		} else if (moveType == StepTypes.MREAL && event instanceof Transition) {
-//			//model move
-//			type = Type.model;
-//			this.unode = mapTransition2Path.get(event);
-//			this.eventClass = null;
-//		} else {
-//			System.out.println("unknown move " + moveType + " " + event);
-//			this.type = null;
-//			this.unode = null;
-//			this.eventClass = null;
-//		}
-//	}
-
 	public Move(XEventClass eventClass, UnfoldedNode unode) {
 		this.unode = unode;
 		this.eventClass = eventClass;

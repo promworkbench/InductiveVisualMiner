@@ -258,7 +258,7 @@ public class InductiveVisualMinerController {
 
 		protected String executeLink(Pair<AlignedLog, ProcessTree> input) {
 			for (IMTraceG<Move> trace : input.getLeft()) {
-				Animation.positionTrace(trace, new UnfoldedNode(input.getRight().getRoot()));
+				Animation.positionTrace(trace, new UnfoldedNode(input.getRight().getRoot()), panel);
 			}
 			return "";
 		}
@@ -288,7 +288,7 @@ public class InductiveVisualMinerController {
 		chain.add(new Mine());
 		chain.add(new Align());
 		chain.add(new Layout());
-		chain.add(new SelectionColouring());
+//		chain.add(new SelectionColouring());
 		chain.add(new Animate());
 
 		chain.execute(MakeLog.class);

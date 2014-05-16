@@ -69,8 +69,8 @@ public class AlignedLogMetrics {
 
 	public static long getNumberOfTimesDfgEdgeTaken(LocalDotEdge edge, AlignedLogInfo dfgLogInfo) {
 		//directly-follows edge
-		UnfoldedNode source = edge.source.node;
-		UnfoldedNode target = edge.target.node;
+		UnfoldedNode source = edge.getSource().node;
+		UnfoldedNode target = edge.getTarget().node;
 
 		if (source.getNode() instanceof Manual && target.getNode() instanceof Manual) {
 			//normal dfg-edge

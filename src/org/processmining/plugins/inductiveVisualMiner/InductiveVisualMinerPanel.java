@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -345,11 +346,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return exitButton;
 	}
 
-	public Map<UnfoldedNode, Set<LocalDotNode>> getUnfoldedNode2DfgdotNodes() {
+	public Map<UnfoldedNode, List<LocalDotNode>> getUnfoldedNode2DfgdotNodes() {
 		return visualiser.getUnfoldedNode2DfgdotNodes();
 	}
 
-	public Map<UnfoldedNode, Set<LocalDotNode>> getUnfoldedNode2dotNodes() {
+	public Map<UnfoldedNode, List<LocalDotNode>> getUnfoldedNode2dotNodes() {
 		return visualiser.getUnfoldedNode2dotNodes();
 	}
 
@@ -361,15 +362,31 @@ public class InductiveVisualMinerPanel extends JPanel {
 		this.onSelectionChanged = onSelectionChanged;
 	}
 
-	public Map<UnfoldedNode, Set<LocalDotEdge>> getUnfoldedNode2DfgdotEdges() {
+	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2DfgdotEdges() {
 		return visualiser.getUnfoldedNode2DfgdotEdges();
 	}
 
-	public Map<UnfoldedNode, Set<LocalDotEdge>> getUnfoldedNode2dotEdgesModel() {
+	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2dotEdgesModel() {
 		return visualiser.getUnfoldedNode2dotEdgesModel();
 	}
 
-	public Map<UnfoldedNode, Set<LocalDotEdge>> getUnfoldedNode2dotEdgesMove() {
+	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2dotEdgesMove() {
 		return visualiser.getUnfoldedNode2dotEdgesMove();
+	}
+	
+	public LocalDotNode getRootSource() {
+		return visualiser.getRootSource();
+	}
+	
+	public LocalDotNode getRootSink() {
+		return visualiser.getRootSink();
+	}
+	
+	public Set<LocalDotNode> getNodes() {
+		return visualiser.getNodes();
+	}
+	
+	public Set<LocalDotEdge> getEdges() {
+		return visualiser.getEdges();
 	}
 }

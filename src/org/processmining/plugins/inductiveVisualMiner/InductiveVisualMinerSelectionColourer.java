@@ -152,10 +152,10 @@ public class InductiveVisualMinerSelectionColourer {
 			for (DotEdge dotEdge : panel.getUnfoldedNode2dotEdgesMove().get(unode)) {
 				LocalDotEdge lDotEdge = (LocalDotEdge) dotEdge; 
 				long cardinality;
-				if (lDotEdge.type.equals(EdgeType.logMove)) {
-					cardinality = AlignedLogMetrics.getLogMoves(lDotEdge.lookupNode1, lDotEdge.lookupNode2, logInfo).size();
+				if (lDotEdge.getType().equals(EdgeType.logMove)) {
+					cardinality = AlignedLogMetrics.getLogMoves(lDotEdge.getLookupNode1(), lDotEdge.getLookupNode2(), logInfo).size();
 				} else {
-					cardinality = AlignedLogMetrics.getModelMovesLocal(lDotEdge.unode, logInfo);
+					cardinality = AlignedLogMetrics.getModelMovesLocal(lDotEdge.getUnode(), logInfo);
 				}
 				styleEdge(dotEdge, panel.getGraph(), cardinality, minCardinality, maxCardinality,
 						parameters.getColourMoves(), parameters.isShowFrequenciesOnMoveEdges(),

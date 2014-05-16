@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -87,9 +88,10 @@ public class AlignedLogVisualisation {
 			super(label, "");
 			dot.addNode(this);
 			if (unfoldedNode2dotNodes.get(unode) == null) {
-				unfoldedNode2dotNodes.put(unode, new HashSet<LocalDotNode>());
+				unfoldedNode2dotNodes.put(unode, new ArrayList<LocalDotNode>());
 			}
 			unfoldedNode2dotNodes.get(unode).add(this);
+			dotNodes.add(this);
 			this.node = unode;
 			this.type = type;
 
@@ -144,47 +146,77 @@ public class AlignedLogVisualisation {
 
 	public class LocalDotEdge extends DotEdge {
 
-		public final EdgeType type;
-		public final UnfoldedNode unode;
-		public final UnfoldedNode lookupNode1;
-		public final UnfoldedNode lookupNode2;
-		public final LocalDotNode source;
-		public final LocalDotNode target;
+		private final EdgeType type;
+		private final UnfoldedNode unode;
+		private final UnfoldedNode lookupNode1;
+		private final UnfoldedNode lookupNode2;
+		private final boolean directionForward;
 
 		//constructor for model edge
-		public LocalDotEdge(LocalDotNode source, LocalDotNode target, String label, String options, UnfoldedNode unode) {
+		public LocalDotEdge(LocalDotNode source, LocalDotNode target, String label, String options, UnfoldedNode unode, boolean directionForward) {
 			super(source, target, label, options);
 			dot.addEdge(this);
 			this.unode = unode;
 			this.lookupNode1 = null;
 			this.lookupNode2 = null;
 			this.type = EdgeType.model;
-			this.source = source;
-			this.target = target;
+			this.directionForward = directionForward;
 
 			if (!unfoldedNode2dotEdgesModel.containsKey(unode)) {
-				unfoldedNode2dotEdgesModel.put(unode, new HashSet<LocalDotEdge>());
+				unfoldedNode2dotEdgesModel.put(unode, new ArrayList<LocalDotEdge>());
 			}
 			unfoldedNode2dotEdgesModel.get(unode).add(this);
+			dotEdges.add(this);
 		}
 
 		public LocalDotEdge(LocalDotNode source, LocalDotNode target, String label, String options, UnfoldedNode unode,
-				EdgeType type, UnfoldedNode lookupNode1, UnfoldedNode lookupNode2) {
+				EdgeType type, UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, boolean directionForward) {
 			super(source, target, label, options);
 			dot.addEdge(this);
 			this.unode = unode;
 			this.lookupNode1 = lookupNode1;
 			this.lookupNode2 = lookupNode2;
 			this.type = type;
-			this.source = source;
-			this.target = target;
+			this.directionForward = directionForward;
 
 			if (!unfoldedNode2dotEdgesMove.containsKey(unode)) {
-				unfoldedNode2dotEdgesMove.put(unode, new HashSet<LocalDotEdge>());
+				unfoldedNode2dotEdgesMove.put(unode, new ArrayList<LocalDotEdge>());
 			}
 			unfoldedNode2dotEdgesMove.get(unode).add(this);
+			dotEdges.add(this);
+		}
+		
+		public LocalDotNode getTarget() {
+			if (directionForward) {
+				return (LocalDotNode) super.getTarget();
+			} else {
+				return (LocalDotNode) super.getSource();
+			}
 		}
 
+		public LocalDotNode getSource() {
+			if (directionForward) {
+				return (LocalDotNode) super.getSource();
+			} else {
+				return (LocalDotNode) super.getTarget();
+			}
+		}
+
+		public EdgeType getType() {
+			return type;
+		}
+
+		public UnfoldedNode getUnode() {
+			return unode;
+		}
+
+		public UnfoldedNode getLookupNode1() {
+			return lookupNode1;
+		}
+		
+		public UnfoldedNode getLookupNode2() {
+			return lookupNode2;
+		}
 	}
 
 	private Dot dot;
@@ -193,14 +225,18 @@ public class AlignedLogVisualisation {
 	private long maxCardinality;
 	private long minCardinality;
 	private AlignedLogVisualisationParameters parameters;
+	private LocalDotNode rootSource;
+	private LocalDotNode rootSink;
 
-	private Map<UnfoldedNode, Set<LocalDotNode>> unfoldedNode2dotNodes;
-	private Map<UnfoldedNode, Set<LocalDotEdge>> unfoldedNode2dotEdgesModel;
-	private Map<UnfoldedNode, Set<LocalDotEdge>> unfoldedNode2dotEdgesMove;
+	private Set<LocalDotEdge> dotEdges;
+	private Set<LocalDotNode> dotNodes;
+	private Map<UnfoldedNode, List<LocalDotNode>> unfoldedNode2dotNodes;
+	private Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2dotEdgesModel;
+	private Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2dotEdgesMove;
 	private Map<UnfoldedNode, LocalDotNode> activity2dotNode;
 	private Map<LocalDotNode, UnfoldedNode> dotNode2DfgUnfoldedNode;
-	private Map<UnfoldedNode, Set<LocalDotNode>> unfoldedNode2DfgdotNodes;
-	private Map<UnfoldedNode, Set<LocalDotEdge>> unfoldedNode2DfgdotEdges;
+	private Map<UnfoldedNode, List<LocalDotNode>> unfoldedNode2DfgdotNodes;
+	private Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2DfgdotEdges;
 
 	public Dot fancy(ProcessTree tree, AlignedLogInfo logInfo, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
 			AlignedLogVisualisationParameters parameters) {
@@ -225,30 +261,32 @@ public class AlignedLogVisualisation {
 		minCardinality = p.getLeft();
 		maxCardinality = p.getRight();
 
-		unfoldedNode2dotNodes = new HashMap<UnfoldedNode, Set<LocalDotNode>>();
-		unfoldedNode2dotEdgesModel = new HashMap<UnfoldedNode, Set<LocalDotEdge>>();
-		unfoldedNode2dotEdgesMove = new HashMap<UnfoldedNode, Set<LocalDotEdge>>();
+		dotNodes = new HashSet<>();
+		dotEdges = new HashSet<>();
+		unfoldedNode2dotNodes = new HashMap<UnfoldedNode, List<LocalDotNode>>();
+		unfoldedNode2dotEdgesModel = new HashMap<UnfoldedNode, List<LocalDotEdge>>();
+		unfoldedNode2dotEdgesMove = new HashMap<UnfoldedNode, List<LocalDotEdge>>();
 		activity2dotNode = new HashMap<UnfoldedNode, LocalDotNode>();
 		dotNode2DfgUnfoldedNode = new HashMap<LocalDotNode, UnfoldedNode>();
-		unfoldedNode2DfgdotNodes = new HashMap<ProcessTree2Petrinet.UnfoldedNode, Set<LocalDotNode>>();
-		unfoldedNode2DfgdotEdges = new HashMap<ProcessTree2Petrinet.UnfoldedNode, Set<LocalDotEdge>>();
+		unfoldedNode2DfgdotNodes = new HashMap<ProcessTree2Petrinet.UnfoldedNode, List<LocalDotNode>>();
+		unfoldedNode2DfgdotEdges = new HashMap<ProcessTree2Petrinet.UnfoldedNode, List<LocalDotEdge>>();
 		dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
 		UnfoldedNode root = new UnfoldedNode(tree.getRoot());
 
 		//source
-		LocalDotNode source = new LocalDotNode(NodeType.source, "", root);
+		rootSource = new LocalDotNode(NodeType.source, "", root);
 
 		//sink
-		LocalDotNode sink = new LocalDotNode(NodeType.sink, "", root);
+		rootSink = new LocalDotNode(NodeType.sink, "", root);
 
 		//convert root node
-		convertNode(root, source, sink, true);
+		convertNode(root, rootSource, rootSink, true);
 
 		//add log-move-arcs to source and sink
 		if (parameters.isShowLogMoves()) {
-			visualiseLogMove(source, source, root, null, root, true);
-			visualiseLogMove(sink, sink, root, root, null, false);
+			visualiseLogMove(rootSource, rootSource, root, null, root, true);
+			visualiseLogMove(rootSink, rootSink, root, root, null, false);
 		}
 
 		return dot;
@@ -420,7 +458,7 @@ public class AlignedLogVisualisation {
 			boolean directionForward) {
 		//make map of activities and add nodes
 		Map<String, LocalDotNode> mapName2dotNode = new HashMap<String, LocalDotNode>();
-		unfoldedNode2DfgdotNodes.put(unode, new HashSet<LocalDotNode>());
+		unfoldedNode2DfgdotNodes.put(unode, new ArrayList<LocalDotNode>());
 		for (UnfoldedNode unode2 : AlignedLogMetrics.unfoldAllNodes(unode)) {
 			if (unode2.getNode() instanceof Manual) {
 				LocalDotNode dotNode = convertActivity(unode2,
@@ -441,7 +479,7 @@ public class AlignedLogVisualisation {
 		}
 
 		//add edges
-		unfoldedNode2DfgdotEdges.put(unode, new HashSet<LocalDotEdge>());
+		unfoldedNode2DfgdotEdges.put(unode, new ArrayList<LocalDotEdge>());
 		for (Triple<MaybeString, MaybeString, Long> edge : edges) {
 
 			//get endpoints-names
@@ -500,9 +538,9 @@ public class AlignedLogVisualisation {
 
 		final LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(from, to, "", options, unode);
+			edge = new LocalDotEdge(from, to, "", options, unode, directionForward);
 		} else {
-			edge = new LocalDotEdge(to, from, "", options + ", dir=\"back\"", unode);
+			edge = new LocalDotEdge(to, from, "", options + ", dir=\"back\"", unode, directionForward);
 		}
 
 		if (parameters.isShowFrequenciesOnModelEdges()) {
@@ -546,10 +584,10 @@ public class AlignedLogVisualisation {
 
 		LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(from, to, "", options, unode, type, lookupNode1, lookupNode2);
+			edge = new LocalDotEdge(from, to, "", options, unode, type, lookupNode1, lookupNode2, directionForward);
 		} else {
 			edge = new LocalDotEdge(to, from, "", options + ", dir=\"back\", " + options, unode, type, lookupNode1,
-					lookupNode2);
+					lookupNode2, directionForward);
 		}
 
 		if (parameters.isShowFrequenciesOnMoveEdges()) {
@@ -574,15 +612,15 @@ public class AlignedLogVisualisation {
 		return 0;
 	}
 
-	public Map<UnfoldedNode, Set<LocalDotNode>> getUnfoldedNode2dotNodes() {
+	public Map<UnfoldedNode, List<LocalDotNode>> getUnfoldedNode2dotNodes() {
 		return unfoldedNode2dotNodes;
 	}
 
-	public Map<UnfoldedNode, Set<LocalDotEdge>> getUnfoldedNode2dotEdgesModel() {
+	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2dotEdgesModel() {
 		return unfoldedNode2dotEdgesModel;
 	}
 
-	public Map<UnfoldedNode, Set<LocalDotEdge>> getUnfoldedNode2dotEdgesMove() {
+	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2dotEdgesMove() {
 		return unfoldedNode2dotEdgesMove;
 	}
 
@@ -590,15 +628,27 @@ public class AlignedLogVisualisation {
 		return activity2dotNode;
 	}
 
-	public Map<UnfoldedNode, Set<LocalDotNode>> getUnfoldedNode2DfgdotNodes() {
+	public Map<UnfoldedNode, List<LocalDotNode>> getUnfoldedNode2DfgdotNodes() {
 		return unfoldedNode2DfgdotNodes;
 	}
 
-	public Map<UnfoldedNode, Set<LocalDotEdge>> getUnfoldedNode2DfgdotEdges() {
+	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2DfgdotEdges() {
 		return unfoldedNode2DfgdotEdges;
 	}
 
-	public List<DotEdge> getEdges() {
-		return dot.getEdgesRecursive();
+	public Set<LocalDotEdge> getEdges() {
+		return dotEdges;
+	}
+	
+	public Set<LocalDotNode> getNodes() {
+		return dotNodes;
+	}
+
+	public LocalDotNode getRootSource() {
+		return rootSource;
+	}
+
+	public LocalDotNode getRootSink() {
+		return rootSink;
 	}
 }
