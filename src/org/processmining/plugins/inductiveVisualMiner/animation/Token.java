@@ -43,4 +43,10 @@ public class Token {
 		points.add(Pair.of(edge, time));
 		System.out.println("  add point to token " + points.get(points.size()-1));
 	}
+	
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		result.append("Token starts at " + startPosition.getId() + " @" + startTime);
+		return result.toString();
+	}
 }
