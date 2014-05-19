@@ -46,7 +46,7 @@ public class AnimationSVG {
 		result.append("from='0' ");
 		result.append("to='1' ");
 		result.append("begin='");
-		result.append(token.getStartTime() - (fadeDuration / 2));
+		result.append(token.getStartTime());
 		result.append("s' ");
 		result.append("dur='");
 		result.append(fadeDuration);
@@ -64,14 +64,14 @@ public class AnimationSVG {
 		result.append("from='1' ");
 		result.append("to='0' ");
 		result.append("begin='");
-		result.append(token.getPoints().get(token.getPoints().size() - 1).getRight() - (fadeDuration / 2));
+		result.append(token.getPoints().get(token.getPoints().size() - 1).getRight() - fadeDuration);
 		result.append("s' ");
 		result.append("dur='");
 		result.append(fadeDuration);
 		result.append("s' ");
 		result.append("fill='freeze'/>");
 
-		svgTokens.addTrace(result.toString(), token.getPoints().get(token.getPoints().size() - 1).getRight() + (fadeDuration / 2));
+		svgTokens.addTrace(result.toString(), token.getPoints().get(token.getPoints().size() - 1).getRight());
 	}
 
 	public static void animatePoint(Token token, int index, StringBuilder result, InductiveVisualMinerPanel panel) {

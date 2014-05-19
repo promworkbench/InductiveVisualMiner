@@ -15,9 +15,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Al
 
 public class ShortestPath {
 
-	public static List<LocalDotEdge> shortestPath(LocalDotNode from, LocalDotNode to,
-			InductiveVisualMinerPanel panel) {
-//		System.out.println("   find shortest path " + from + " -> " + to);
+	public static List<LocalDotEdge> shortestPath(LocalDotNode from, LocalDotNode to, InductiveVisualMinerPanel panel) {
+		//		System.out.println("   find shortest path " + from + " -> " + to);
 		Set<LocalDotNode> nodes = panel.getNodes();
 		Map<DotNode, Integer> dist = new HashMap<>();
 		Map<LocalDotNode, LocalDotNode> previous = new HashMap<>();
@@ -30,8 +29,8 @@ public class ShortestPath {
 		Q.addAll(nodes);
 
 		while (!Q.isEmpty()) {
-//			System.out.println(dist);
-			
+			//			System.out.println(dist);
+
 			//find node with smallest distance in Q
 			LocalDotNode u = null;
 			int min = Integer.MAX_VALUE;

@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
+import org.processmining.processtree.impl.AbstractTask.Manual;
 
 public class TimedMove extends Move {
 	
@@ -17,6 +18,13 @@ public class TimedMove extends Move {
 			return false;
 		}
 		return timestamp == ((TimedMove) obj).timestamp;
+	}
+
+	public Double getTimestamp() {
+		if (this.unode.getNode() instanceof Manual) {
+			return null;
+		}
+		return timestamp;
 	}
 	
 }
