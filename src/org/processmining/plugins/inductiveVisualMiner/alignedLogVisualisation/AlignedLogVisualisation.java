@@ -209,6 +209,10 @@ public class AlignedLogVisualisation {
 		public UnfoldedNode getUnode() {
 			return unode;
 		}
+		
+		public boolean isDirectionForward() {
+			return directionForward;
+		}
 
 		public UnfoldedNode getLookupNode1() {
 			return lookupNode1;

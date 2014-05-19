@@ -15,7 +15,7 @@ public class Token {
 	private List<Pair<LocalDotEdge, Double>> points;
 	
 	public Token(LocalDotNode startPosition, double startTime, boolean fade) {
-		System.out.println("create new token @" + startTime);
+//		System.out.println("create new token @" + startTime);
 		this.startPosition = startPosition;
 		this.startTime = startTime;
 		this.fade = fade;
@@ -43,7 +43,7 @@ public class Token {
 		}
 		
 		points.add(Pair.of(edge, time));
-		System.out.println("  add point to token " + points.get(points.size()-1));
+//		System.out.println("  add point to token " + points.get(points.size()-1));
 	}
 	
 	public List<Pair<LocalDotEdge, Double>> getPoints() {

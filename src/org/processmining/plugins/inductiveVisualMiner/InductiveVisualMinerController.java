@@ -2,7 +2,9 @@ package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,6 +42,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationSVG;
+import org.processmining.plugins.inductiveVisualMiner.animation.ExportAnimation;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.Tokens;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
@@ -55,23 +59,23 @@ public class InductiveVisualMinerController {
 
 	private final InductiveVisualMinerPanel panel;
 	private final InductiveVisualMinerState state;
-	
+
 	public class ResettableCanceller implements Canceller {
-		
+
 		private boolean cancelled = false;
-		
+
 		public void cancel() {
 			this.cancelled = true;
 		}
-		
+
 		public void reset() {
 			this.cancelled = false;
 		}
-		
+
 		public boolean isCancelled() {
 			return cancelled;
 		}
-		
+
 	}
 
 	//make an IMlog out of an XLog
@@ -95,7 +99,7 @@ public class InductiveVisualMinerController {
 		}
 
 		public void cancel() {
-			
+
 		}
 	}
 
@@ -124,7 +128,7 @@ public class InductiveVisualMinerController {
 		}
 
 		public void cancel() {
-			
+
 		}
 	}
 
@@ -155,7 +159,7 @@ public class InductiveVisualMinerController {
 		}
 
 		public void cancel() {
-			
+
 		}
 	}
 
@@ -165,7 +169,7 @@ public class InductiveVisualMinerController {
 			ChainLink<Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo>, Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>>> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
-		
+
 		protected Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo> generateInput() {
 			return new Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo>(state.getTree(),
 					state.getMiningParameters().getClassifier(), state.getXLog(), state.getFilteredActivities(),
@@ -210,7 +214,7 @@ public class InductiveVisualMinerController {
 		}
 
 		public void cancel() {
-			
+
 		}
 	}
 
@@ -241,17 +245,17 @@ public class InductiveVisualMinerController {
 		protected void processResult(
 				Quintuple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> result) {
 			state.setAlignedFilteredLog(result.getA(), result.getB(), result.getC());
-			InductiveVisualMinerSelectionColourer.colour(panel, result.getD(), result.getB(), result.getC(), result.getE());
+			InductiveVisualMinerSelectionColourer.colour(panel, result.getD(), result.getB(), result.getC(),
+					result.getE());
 			updateSelectionDescription(panel, state.getSelectedNodes());
-			setStatus(" ");
 		}
 
 		public void cancel() {
-			
+
 		}
 
 	}
-	
+
 	private class Animate extends ChainLink<Pair<AlignedLog, ProcessTree>, Tokens> {
 
 		protected Pair<AlignedLog, ProcessTree> generateInput() {
@@ -259,27 +263,38 @@ public class InductiveVisualMinerController {
 		}
 
 		protected Tokens executeLink(Pair<AlignedLog, ProcessTree> input) {
-			Tokens tokens = null;
+			setStatus("Creating animation..");
+			double t = 0;
+			Tokens tokens = new Tokens();
 			for (IMTraceG<Move> trace : input.getLeft()) {
-				tokens = Animation.positionTrace(trace, new UnfoldedNode(input.getRight().getRoot()), panel);
+				TimedTrace timedTrace = Animation.addDummyTimestamps(trace, t++);
+				Animation.positionTrace(timedTrace, new UnfoldedNode(input.getRight().getRoot()), tokens, panel);
 			}
 			return tokens;
 		}
 
 		protected void processResult(Tokens result) {
-			System.out.println(result);
-			System.out.println(AnimationSVG.animateTokens(result, panel));
+			//			System.out.println(result);
+			//System.out.println(AnimationSVG.animateTokens(result, panel));
+			try {
+				OutputStream streamOut = new FileOutputStream("D:\\animationTest.svg");
+				ExportAnimation.export(AnimationSVG.animateTokens(result, panel), streamOut, panel);
+			} catch (IOException e) {
+				
+			}
+			setStatus(" ");
 		}
 
 		public void cancel() {
 
 		}
-		
+
 	}
 
 	private final Chain chain;
 
-	public InductiveVisualMinerController(PluginContext context, InductiveVisualMinerPanel panel, InductiveVisualMinerState state) {
+	public InductiveVisualMinerController(PluginContext context, InductiveVisualMinerPanel panel,
+			InductiveVisualMinerState state) {
 		this.panel = panel;
 		this.state = state;
 
@@ -292,23 +307,24 @@ public class InductiveVisualMinerController {
 		chain.add(new Mine());
 		chain.add(new Align());
 		chain.add(new Layout());
-//		chain.add(new SelectionColouring());
+		chain.add(new SelectionColouring());
 		chain.add(new Animate());
 
 		chain.execute(MakeLog.class);
 	}
 
 	private static Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>> computeAlignment(ProcessTree tree,
-			XEventClassifier classifier, XLog xLog, Set<XEventClass> filteredActivities, IMLogInfo logInfo, Canceller canceller) {
-		
+			XEventClassifier classifier, XLog xLog, Set<XEventClass> filteredActivities, IMLogInfo logInfo,
+			Canceller canceller) {
+
 		//ETM
 		AlignmentResult alignment = AlignmentETM.alignTree(tree, classifier, xLog, filteredActivities, canceller);
 
-//		if (alignment.log.size() == 0) {
-//			//Felix
-//			XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(xLog, classifier);
-//			alignment = AlignmentFelix.alignTree(tree, classifier, logInfo, xLog, xLogInfo, filteredActivities);
-//		}
+		//		if (alignment.log.size() == 0) {
+		//			//Felix
+		//			XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(xLog, classifier);
+		//			alignment = AlignmentFelix.alignTree(tree, classifier, logInfo, xLog, xLogInfo, filteredActivities);
+		//		}
 
 		//Arya
 		//		AlignmentResult alignmentArya = AlignmentArya.alignTree(tree, classifier, logInfo, null, xLog,

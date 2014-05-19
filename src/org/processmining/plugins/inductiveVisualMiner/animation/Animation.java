@@ -35,33 +35,33 @@ public class Animation {
 	public static String getPath(DotPanel panel, Path path) {
 		return panel.getAttributeOf(path, "d");
 	}
-
-	public static Tokens positionTrace(IMTraceG<Move> trace, UnfoldedNode unode, InductiveVisualMinerPanel panel) {
-		//make dummy timestamps
+	
+	public static TimedTrace addDummyTimestamps(IMTraceG<Move> trace, double startTime) {
 		TimedTrace timedTrace = new TimedTrace();
-		double t = 1;
+		double t = startTime;
+		timedTrace.setStartTime(t++);
 		for (Move move : trace) {
-			timedTrace.add(new TimedMove(move, t++));
+			timedTrace.add(new TimedMove(move, t));
+			t += 3;
 		}
-
-		System.out.println(" ");
-
-		//create new token and put it on source/root
-		Tokens tokens = new Tokens();
-		Token token = new Token(panel.getRootSource(), 0.0, true);
-		tokens.add(token);
-
-		positionTimedTrace(timedTrace, unode, null, null, token, tokens, panel.getRootSink(), t, panel);
-		
-		return tokens;
+		timedTrace.setEndTime(t);
+		return timedTrace;
 	}
 
-	public static void positionTimedTrace(TimedTrace trace, UnfoldedNode unode, TimedMove lastMoveBeforeThisTrace,
-			TimedMove nextMoveAfterThisTrace, Token token, Tokens tokens, LocalDotNode destination, double destinationTime,
-			InductiveVisualMinerPanel panel) {
+	public static void positionTrace(TimedTrace timedTrace, UnfoldedNode unode, Tokens tokens, InductiveVisualMinerPanel panel) {
+		
+		//create new token and put it on source/root
+		Token token = new Token(panel.getRootSource(), timedTrace.getStartTime(), true);
+		tokens.add(token);
 
-		System.out.println(" enter " + unode + " @" + token.getLastTime() + ": " + lastMoveBeforeThisTrace + " -> "
-				+ trace + " -> " + nextMoveAfterThisTrace);
+		//position the trace
+		positionTimedTrace(timedTrace, unode, token, tokens, panel.getRootSink(), timedTrace.getEndTime(), panel);
+	}
+
+	public static void positionTimedTrace(TimedTrace trace, UnfoldedNode unode, Token token, Tokens tokens,
+			LocalDotNode destination, double destinationTime, InductiveVisualMinerPanel panel) {
+
+//		System.out.println(" enter " + unode + " @" + token.getLastTime());
 
 		//find the length of the path that this token is currently traveling
 		//i.e., from the last known position to the first move
@@ -71,7 +71,7 @@ public class Animation {
 			Pair<LocalDotNode, Double> firstMove = getNextDestination(trace, 0, destination, destinationTime, panel);
 			List<LocalDotEdge> edgesTillDestination = ShortestPath.shortestPath(token.getLastPosition(),
 					firstMove.getLeft(), panel);
-			System.out.println("  " + edgesTillDestination.size() + " edges to go, to arrive @" + firstMove.getRight());
+//			System.out.println("  " + edgesTillDestination.size() + " edges to go, to arrive @" + firstMove.getRight());
 
 			//see if the first edge belongs to this node
 			enterEdge = edgesTillDestination.get(0);
@@ -80,38 +80,35 @@ public class Animation {
 				//compute end time of this node
 				enterTime = token.getLastTime() + (firstMove.getRight() - token.getLastTime())
 						/ (edgesTillDestination.size() * 1.0);
-				System.out.println("  end time of enter edge @" + enterTime);
+//				System.out.println("  end time of enter edge @" + enterTime);
 				token.addPoint(enterEdge, enterTime);
 			} else {
-				System.out.println("  enter edge does not belong to this node");
+//				System.out.println("  enter edge does not belong to this node");
 			}
 		}
 
 		if (unode.getNode() instanceof Manual) {
-			System.out.println("  execute " + unode + " " + getDotNodeFromActivity(trace.get(0), panel).getId() + " @"
-					+ trace.get(0).timestamp);
+//			System.out.println("  execute " + unode + " " + getDotNodeFromActivity(trace.get(0), panel).getId() + " @"
+//					+ trace.get(0).timestamp);
 		} else if (unode.getNode() instanceof Automatic) {
-			System.out.println("  execute tau ");
+//			System.out.println("  execute tau ");
 		} else if (unode.getBlock() instanceof DefLoop || unode.getBlock() instanceof XorLoop) {
-			positionLoop(trace, unode, lastMoveBeforeThisTrace, nextMoveAfterThisTrace, token, tokens, destination,
-					destinationTime, panel);
+			positionLoop(trace, unode, token, tokens, destination, destinationTime, panel);
 		} else if (unode.getBlock() instanceof Seq) {
-			positionSequence(trace, unode, lastMoveBeforeThisTrace, nextMoveAfterThisTrace, token, tokens, destination,
-					destinationTime, panel);
+			positionSequence(trace, unode, token, tokens, destination, destinationTime, panel);
 		} else if (unode.getBlock() instanceof Xor || unode.getBlock() instanceof Def) {
-			positionXor(trace, unode, lastMoveBeforeThisTrace, nextMoveAfterThisTrace, token, tokens, destination,
-					destinationTime, panel);
+			positionXor(trace, unode, token, tokens, destination, destinationTime, panel);
 		} else if (unode.getBlock() instanceof And) {
-			positionParallel(trace, unode, lastMoveBeforeThisTrace, nextMoveAfterThisTrace, token, tokens, destination,
-					destinationTime, enterEdge.getTarget(), enterTime, panel);
+			positionParallel(trace, unode, token, tokens, destination, destinationTime, enterEdge.getTarget(),
+					enterTime, panel);
 		}
 
 		//node exit
 		{
-			System.out.println(" exit " + unode);
+//			System.out.println(" exit " + unode);
 			List<LocalDotEdge> edgesTillDestination = ShortestPath.shortestPath(token.getLastPosition(), destination,
 					panel);
-			System.out.println("  " + edgesTillDestination.size() + " edges to go, to arrive @" + destinationTime);
+//			System.out.println("  " + edgesTillDestination.size() + " edges to go, to arrive @" + destinationTime);
 			//see if we have not reached the destination yet, and whether the first edge belongs to this node
 			if (!edgesTillDestination.isEmpty()) {
 				LocalDotEdge exitEdge = edgesTillDestination.get(0);
@@ -120,18 +117,17 @@ public class Animation {
 					//compute end time of this node
 					double exitEndTime = token.getLastTime() + (destinationTime - token.getLastTime())
 							/ (edgesTillDestination.size() * 1.0);
-					System.out.println("  end time of exit edge @" + exitEndTime);
+//					System.out.println("  end time of exit edge @" + exitEndTime);
 					token.addPoint(exitEdge, exitEndTime);
 				} else {
-					System.out.println("  enter edge does not belong to this node");
+//					System.out.println("  enter edge does not belong to this node");
 				}
 			}
 		}
 	}
 
-	private static void positionXor(TimedTrace trace, UnfoldedNode unode, TimedMove lastMoveBeforeThisTrace,
-			TimedMove nextMoveAfterThisTrace, Token token, Tokens tokens, LocalDotNode destination, double destinationTime,
-			InductiveVisualMinerPanel panel) {
+	private static void positionXor(TimedTrace trace, UnfoldedNode unode, Token token, Tokens tokens,
+			LocalDotNode destination, double destinationTime, InductiveVisualMinerPanel panel) {
 		//only execute the child that produced the trace
 		List<List<TimedTrace>> sublogs = getSublogs(unode, trace);
 		Iterator<List<TimedTrace>> itSublog = sublogs.iterator();
@@ -140,15 +136,14 @@ public class Animation {
 			TimedTrace childSublog = itSublog.next().get(0);
 			UnfoldedNode child = unode.unfoldChild(itChild.next());
 			if (childSublog.size() > 0) {
-				positionTimedTrace(childSublog, child, lastMoveBeforeThisTrace, nextMoveAfterThisTrace, token,
-						tokens, destination, destinationTime, panel);
+				positionTimedTrace(childSublog, child, token, tokens, destination, destinationTime, panel);
 			}
 		}
 	}
 
-	private static void positionParallel(TimedTrace trace, UnfoldedNode unode, TimedMove lastMoveBeforeThisTrace,
-			TimedMove nextMoveAfterThisTrace, Token token, Tokens tokens, LocalDotNode destination, double destinationTime,
-			LocalDotNode split, double splitTime, InductiveVisualMinerPanel panel) {
+	private static void positionParallel(TimedTrace trace, UnfoldedNode unode, Token token, Tokens tokens,
+			LocalDotNode destination, double destinationTime, LocalDotNode split, double splitTime,
+			InductiveVisualMinerPanel panel) {
 		//split the trace
 		List<List<TimedTrace>> sublogs = getSublogs(unode, trace);
 
@@ -164,15 +159,14 @@ public class Animation {
 				}
 			}
 		}
-		
+
 		//first, process the trace that takes longest
 		{
 			TimedTrace childTrace = sublogs.get(lastEndingSubtrace).get(0);
 			UnfoldedNode child = unode.unfoldChild(unode.getBlock().getChildren().get(lastEndingSubtrace));
-			positionTimedTrace(childTrace, child, lastMoveBeforeThisTrace, nextMoveAfterThisTrace, token,
-					tokens, destination, destinationTime, panel);
+			positionTimedTrace(childTrace, child, token, tokens, destination, destinationTime, panel);
 		}
-		
+
 		//record where the token is at the end of the trace that takes longest
 		LocalDotNode join = token.getLastPosition();
 		double joinTime = token.getLastTime();
@@ -182,21 +176,19 @@ public class Animation {
 			UnfoldedNode child = unode.unfoldChild(unode.getBlock().getChildren().get(i));
 			if (i != lastEndingSubtrace) {
 				//this child does not end last
-				
+
 				//create a new token
 				Token childToken = new Token(split, splitTime, false);
 				tokens.add(childToken);
-				
+
 				//animate this child on the new token
-				positionTimedTrace(childTrace, child, lastMoveBeforeThisTrace, nextMoveAfterThisTrace, childToken,
-						tokens, join, joinTime, panel);
+				positionTimedTrace(childTrace, child, childToken, tokens, join, joinTime, panel);
 			}
 		}
 	}
 
-	private static void positionLoop(TimedTrace trace, UnfoldedNode unode, TimedMove lastMoveBeforeThisTrace,
-			TimedMove nextMoveAfterThisTrace, Token token, Tokens tokens, LocalDotNode destination, double destinationTime,
-			InductiveVisualMinerPanel panel) {
+	private static void positionLoop(TimedTrace trace, UnfoldedNode unode, Token token, Tokens tokens,
+			LocalDotNode destination, double destinationTime, InductiveVisualMinerPanel panel) {
 		List<List<TimedTrace>> sublogs = getSublogs(unode, trace);
 
 		List<TimedTrace> sublogBody = sublogs.get(0);
@@ -216,10 +208,9 @@ public class Animation {
 			}
 			Pair<LocalDotNode, Double> bodyDestination = getNextDestination(trace, trace.indexOf(moveAfterBody),
 					destination, destinationTime, panel);
-			positionTimedTrace(sublogBody.get(0), childBody, lastMoveBeforeThisTrace, moveAfterBody, token,
-					tokens, bodyDestination.getLeft(), bodyDestination.getRight(), panel);
+			positionTimedTrace(sublogBody.get(0), childBody, token, tokens, bodyDestination.getLeft(),
+					bodyDestination.getRight(), panel);
 		}
-		TimedMove lastMoveOfBody = sublogBody.get(0).get(sublogBody.get(0).size() - 1);
 
 		//then redo + body
 		for (int i = 0; i < sublogRedo.size(); i++) {
@@ -228,9 +219,10 @@ public class Animation {
 
 			//redo
 			{
-				Pair<LocalDotNode, Double> redoDestination =getNextDestination(trace, trace.indexOf(traceBody.get(0)), destination, destinationTime, panel);
-				positionTimedTrace(traceRedo, childRedo, lastMoveOfBody, traceBody.get(traceBody.size() - 1), token,
-						tokens, redoDestination.getLeft(), redoDestination.getRight(), panel);
+				Pair<LocalDotNode, Double> redoDestination = getNextDestination(trace, trace.indexOf(traceBody.get(0)),
+						destination, destinationTime, panel);
+				positionTimedTrace(traceRedo, childRedo, token, tokens, redoDestination.getLeft(),
+						redoDestination.getRight(), panel);
 			}
 
 			//body
@@ -243,21 +235,17 @@ public class Animation {
 				}
 				Pair<LocalDotNode, Double> bodyDestination = getNextDestination(trace, trace.indexOf(moveAfterBody),
 						destination, destinationTime, panel);
-				positionTimedTrace(traceBody, childBody, traceRedo.get(traceRedo.size() - 1), moveAfterBody, token,
-						tokens, bodyDestination.getLeft(), bodyDestination.getRight(), panel);
+				positionTimedTrace(traceBody, childBody, token, tokens, bodyDestination.getLeft(),
+						bodyDestination.getRight(), panel);
 			}
-
-			lastMoveOfBody = traceBody.get(traceBody.size() - 1);
 		}
 
 		//exit with exit
-		positionTimedTrace(sublogExit.get(0), childExit, lastMoveOfBody, nextMoveAfterThisTrace, token, tokens, destination,
-				destinationTime, panel);
+		positionTimedTrace(sublogExit.get(0), childExit, token, tokens, destination, destinationTime, panel);
 	}
 
-	private static void positionSequence(TimedTrace trace, UnfoldedNode unode, TimedMove lastMoveBeforeThisTrace,
-			TimedMove nextMoveAfterThisTrace, Token token, Tokens tokens, LocalDotNode destination, double destinationTime,
-			InductiveVisualMinerPanel panel) {
+	private static void positionSequence(TimedTrace trace, UnfoldedNode unode, Token token, Tokens tokens,
+			LocalDotNode destination, double destinationTime, InductiveVisualMinerPanel panel) {
 
 		List<List<TimedTrace>> sublogs = getSublogs(unode, trace);
 
@@ -278,23 +266,7 @@ public class Animation {
 						panel);
 			}
 
-			TimedMove before;
-			if (i == 0) {
-				before = lastMoveBeforeThisTrace;
-			} else {
-				IMTraceG<TimedMove> lastTrace = sublogs.get(i - 1).get(0);
-				before = lastTrace.get(lastTrace.size() - 1);
-			}
-
-			TimedMove after;
-			if (i < sublogs.size() - 1) {
-				IMTraceG<TimedMove> nextTrace = sublogs.get(i + 1).get(0);
-				after = nextTrace.get(0);
-			} else {
-				after = nextMoveAfterThisTrace;
-			}
-
-			positionTimedTrace(childTrace, child, before, after, token, tokens, childDestination.getLeft(),
+			positionTimedTrace(childTrace, child, token, tokens, childDestination.getLeft(),
 					childDestination.getRight(), panel);
 		}
 	}
