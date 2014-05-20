@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,7 +19,11 @@ import nl.tue.astar.AStarThread.Canceller;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.info.XLogInfo;
+import org.deckfour.xes.info.XLogInfoFactory;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
@@ -44,6 +49,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationSVG;
 import org.processmining.plugins.inductiveVisualMiner.animation.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.animation.Tokens;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
@@ -79,23 +85,24 @@ public class InductiveVisualMinerController {
 	}
 
 	//make an IMlog out of an XLog
-	private class MakeLog extends ChainLink<Pair<XLog, XEventClassifier>, Pair<IMLog, IMLogInfo>> {
+	private class MakeLog extends ChainLink<Pair<XLog, XEventClassifier>, Triple<XLogInfo, IMLog, IMLogInfo>> {
 
 		protected Pair<XLog, XEventClassifier> generateInput() {
 			return new Pair<XLog, XEventClassifier>(state.getXLog(), state.getMiningParameters().getClassifier());
 		}
 
-		protected Pair<IMLog, IMLogInfo> executeLink(Pair<XLog, XEventClassifier> input) {
+		protected Triple<XLogInfo, IMLog, IMLogInfo> executeLink(Pair<XLog, XEventClassifier> input) {
 			setStatus("Making log..");
 
 			IMLog imLog = new IMLog(input.getLeft(), input.getRight());
 			IMLogInfo imLogInfo = new IMLogInfo(imLog);
+			XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(input.getLeft(), input.getRight());
 
-			return new Pair<IMLog, IMLogInfo>(imLog, imLogInfo);
+			return Triple.of(xLogInfo, imLog, imLogInfo);
 		}
 
-		protected void processResult(Pair<IMLog, IMLogInfo> result) {
-			state.setLog(result.getLeft(), result.getRight());
+		protected void processResult(Triple<XLogInfo, IMLog, IMLogInfo> result) {
+			state.setLog(result.getA(), result.getB(), result.getC());
 		}
 
 		public void cancel() {
@@ -193,6 +200,7 @@ public class InductiveVisualMinerController {
 
 	}
 
+	//perform layout
 	private class Layout extends ChainLink<Object, SVGDiagram> {
 
 		protected Object generateInput() {
@@ -218,6 +226,7 @@ public class InductiveVisualMinerController {
 		}
 	}
 
+	//colour node selection
 	private class SelectionColouring
 			extends
 			ChainLink<Septuple<AlignedLog, Set<UnfoldedNode>, Set<UnfoldedNode>, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters>, Quintuple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters>> {
@@ -256,20 +265,70 @@ public class InductiveVisualMinerController {
 
 	}
 
-	private class Animate extends ChainLink<Pair<AlignedLog, ProcessTree>, Tokens> {
+	//prepare animation
+	private class Animate extends ChainLink<Quadruple<XLog, AlignedLog, ProcessTree, XLogInfo>, Tokens> {
 
-		protected Pair<AlignedLog, ProcessTree> generateInput() {
-			return Pair.of(state.getAlignedFilteredLog(), state.getTree());
+		protected Quadruple<XLog, AlignedLog, ProcessTree, XLogInfo> generateInput() {
+			return Quadruple.of(state.getXLog(), state.getAlignedFilteredLog(), state.getTree(), state.getXLogInfo());
 		}
 
-		protected Tokens executeLink(Pair<AlignedLog, ProcessTree> input) {
+		protected Tokens executeLink(Quadruple<XLog, AlignedLog, ProcessTree, XLogInfo> input) {
 			setStatus("Creating animation..");
-			double t = 0;
-			Tokens tokens = new Tokens();
-			for (IMTraceG<Move> trace : input.getLeft()) {
-				TimedTrace timedTrace = Animation.addDummyTimestamps(trace, t++);
-				Animation.positionTrace(timedTrace, new UnfoldedNode(input.getRight().getRoot()), tokens, panel);
+
+			XLog xLog = input.getA();
+			AlignedLog aLog = input.getB();
+			ProcessTree tree = input.getC();
+			XLogInfo xLogInfo = input.getD();
+
+			long maxTraces = 1000;
+
+			//gather timestamp information
+			double logMin = Double.MAX_VALUE;
+			double logMax = Double.MIN_VALUE;
+			{
+				long indexTrace = 0;
+				for (XTrace trace : xLog) {
+					for (XEvent event : trace) {
+						if (event.getAttributes().containsKey("time:timestamp")) {
+							double t = TimestampsAdder.getTimestamp(event);
+							logMin = Math.min(logMin, t);
+							logMax = Math.max(logMax, t);
+						}
+					}
+					if (indexTrace == maxTraces) {
+						break;
+					}
+					indexTrace++;
+				}
 			}
+
+			//make a log-projection-hashmap
+			HashMap<List<XEventClass>, IMTraceG<Move>> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
+
+			//compute the animation
+			Tokens tokens = new Tokens();
+			{
+				long indexTrace = 0;
+				for (XTrace trace : xLog) {
+
+					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, logMin, logMax);
+					if (timedTrace != null) {
+						Animation.positionTrace(timedTrace, new UnfoldedNode(tree.getRoot()), tokens, panel);
+					}
+
+					if (indexTrace == maxTraces) {
+						break;
+					}
+					indexTrace++;
+				}
+			}
+
+			//			double t = 0;
+			//			for (IMTraceG<Move> trace : input.getB()) {
+			//				TimedTrace timedTrace = Animation.addDummyTimestamps(trace, t++);
+			//				Animation.positionTrace(timedTrace, new UnfoldedNode(input.getC().getRoot()), tokens, panel);
+			//			}
+
 			return tokens;
 		}
 
@@ -280,7 +339,7 @@ public class InductiveVisualMinerController {
 				OutputStream streamOut = new FileOutputStream("D:\\animationTest.svg");
 				ExportAnimation.export(AnimationSVG.animateTokens(result, panel), streamOut, panel);
 			} catch (IOException e) {
-				
+
 			}
 			setStatus(" ");
 		}

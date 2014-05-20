@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClass;
+import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
@@ -27,11 +28,16 @@ public class InductiveVisualMinerState {
 
 	//==log==
 	private final XLog xLog;
+	private XLogInfo xLogInfo;
 	private IMLog imLog;
 	private IMLogInfo imLogInfo;
 
 	public XLog getXLog() {
 		return xLog;
+	}
+	
+	public XLogInfo getXLogInfo() {
+		return xLogInfo;
 	}
 
 	public IMLog getLog() {
@@ -42,9 +48,10 @@ public class InductiveVisualMinerState {
 		return imLogInfo;
 	}
 
-	public synchronized void setLog(IMLog imLog, IMLogInfo imLogInfo) {
+	public synchronized void setLog(XLogInfo xLogInfo, IMLog imLog, IMLogInfo imLogInfo) {
 		this.imLog = imLog;
 		this.imLogInfo = imLogInfo;
+		this.xLogInfo = xLogInfo;
 	}
 
 	//==activity-filtered log==
@@ -195,6 +202,4 @@ public class InductiveVisualMinerState {
 	public synchronized void setSelectedNodes(Set<UnfoldedNode> selectedNodes) {
 		this.selectedNodes = selectedNodes;
 	}
-	
-	
 }
