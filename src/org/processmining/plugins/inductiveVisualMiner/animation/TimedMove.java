@@ -4,7 +4,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
 public class TimedMove extends Move {
 	
-	public final Double timestamp;
+	private final Double timestamp;
 	
 	public TimedMove(Move move, Double timestamp) {
 		super(move.type, move.unode, move.eventClass);

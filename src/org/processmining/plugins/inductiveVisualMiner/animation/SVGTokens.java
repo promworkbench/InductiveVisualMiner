@@ -7,14 +7,8 @@ public class SVGTokens {
 
 	private List<SVGToken> tokens = new ArrayList<SVGToken>();
 
-	public void addTrace(String trace, double endTime) {
-//		for (SVGToken token : tokens) {
-//			if (token.getEndTime() < endTime) {
-//				token.addTrace(trace, endTime);
-//				return;
-//			}
-//		}
-		SVGToken token = new SVGToken();
+	public void addTrace(String trace, double endTime, boolean fade) {
+		SVGToken token = new SVGToken(fade);
 		token.addTrace(trace, endTime);
 		tokens.add(token);
 	}

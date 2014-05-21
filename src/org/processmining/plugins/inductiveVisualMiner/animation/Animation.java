@@ -10,14 +10,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
-import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.NodeType;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
-import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractBlock.And;
@@ -29,23 +26,46 @@ import org.processmining.processtree.impl.AbstractBlock.XorLoop;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
-import com.kitfox.svg.Path;
-
 public class Animation {
-	public static String getPath(DotPanel panel, Path path) {
-		return panel.getAttributeOf(path, "d");
-	}
-
-	public static TimedTrace addDummyTimestamps(IMTraceG<Move> trace, double startTime) {
-		TimedTrace timedTrace = new TimedTrace();
-		double t = startTime;
-		timedTrace.setStartTime(t++);
-		for (Move move : trace) {
-			timedTrace.add(new TimedMove(move, t));
-			t += 3;
+	
+	public static List<LocalDotEdge> getEdgesOnMovePath(List<TimedMove> movePath, InductiveVisualMinerPanel panel, boolean addSource, boolean addSink) {
+				
+		//make a node-path
+		List<LocalDotNode> nodePath = new ArrayList<>();
+		if (addSource) {
+			nodePath.add(panel.getRootSource());
 		}
-		timedTrace.setEndTime(t);
-		return timedTrace;
+		for (TimedMove move : movePath) {
+			LocalDotNode node = getDotNodeFromActivity(move, panel);
+			if (node != null) {
+				nodePath.add(node);
+			} else if (move.unode != null && move.unode.getNode() instanceof Automatic) {
+				nodePath.add(panel.getUnfoldedNode2dotEdgesModel().get(move.unode).get(0).getSource());
+			}
+		}
+		if (addSink) {
+			nodePath.add(panel.getRootSink());
+		}
+		
+		//construct edge-path
+		List<LocalDotEdge> result = new ArrayList<>();
+		Iterator<LocalDotNode> it = nodePath.iterator();
+		
+		if (nodePath.size() < 2) {
+			return result;
+		}
+		
+		LocalDotNode from;
+		LocalDotNode to = it.next();
+		
+		while (it.hasNext()) {
+			from = to;
+			to = it.next();
+			
+			result.addAll(ShortestPath.shortestPath(from, to, panel));
+		}
+		
+		return result;
 	}
 
 	public static void positionTrace(TimedTrace timedTrace, UnfoldedNode unode, Tokens tokens,
@@ -112,7 +132,7 @@ public class Animation {
 
 		if (unode.getNode() instanceof Manual) {
 			debug("  execute " + unode + " " + getDotNodeFromActivity(trace.get(0), panel).getId() + " @"
-					+ trace.get(0).timestamp);
+					+ trace.get(0).getTimestamp());
 		} else if (unode.getNode() instanceof Automatic) {
 			debug("  execute tau ");
 		} else if (unode.getBlock() instanceof Xor || unode.getBlock() instanceof Def) {
@@ -392,8 +412,8 @@ public class Animation {
 		for (int i = offset; i < trace.size(); i++) {
 			TimedMove move = trace.get(i);
 			LocalDotNode node = getDotNodeFromActivity(move, panel);
-			if (node != null && move.timestamp != null) {
-				return Pair.of(node, move.timestamp);
+			if (node != null && move.getTimestamp() != null) {
+				return Pair.of(node, move.getTimestamp());
 			}
 		}
 		return Pair.of(destination, destinationTime);

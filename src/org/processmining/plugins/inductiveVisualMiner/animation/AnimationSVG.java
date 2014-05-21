@@ -19,59 +19,100 @@ import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.SVGException;
 
 public class AnimationSVG {
+
 	public static SVGTokens animateTokens(Tokens tokens, InductiveVisualMinerPanel panel) {
-		
 		SVGTokens svgTokens = new SVGTokens();
 		for (Token token : tokens) {
 			animateToken(token, svgTokens, panel);
 		}
-		
 		return svgTokens;
 	}
 
 	public static void animateToken(Token token, SVGTokens svgTokens, InductiveVisualMinerPanel panel) {
 		StringBuilder result = new StringBuilder();
 
-		double fadeDuration;
-		if (token.getFade()) {
-			fadeDuration = 0.5;
-		} else {
-			fadeDuration = 0.005;
-		}
-
 		//fade in
-		result.append("<animate ");
-		result.append("attributeName='opacity' ");
-		result.append("attributeType='XML' ");
-		result.append("from='0' ");
-		result.append("to='1' ");
-		result.append("begin='");
-		result.append(token.getStartTime());
-		result.append("s' ");
-		result.append("dur='");
-		result.append(fadeDuration);
-		result.append("s' ");
-		result.append("fill='freeze'/>");
+		fade(token.isFade(), true, token.getStartTime(), null, result);
 
 		for (int i = 0; i < token.getPoints().size(); i++) {
 			animatePoint(token, i, result, panel);
 		}
 
 		//fade out
-		result.append("<animate ");
-		result.append("attributeName='opacity' ");
-		result.append("attributeType='XML' ");
-		result.append("from='1' ");
-		result.append("to='0' ");
-		result.append("begin='");
-		result.append(token.getPoints().get(token.getPoints().size() - 1).getRight() - fadeDuration);
-		result.append("s' ");
-		result.append("dur='");
-		result.append(fadeDuration);
-		result.append("s' ");
-		result.append("fill='freeze'/>");
+		fade(token.isFade(), false, null, token.getPoints().get(token.getPoints().size() - 1).getRight(), result);
 
-		svgTokens.addTrace(result.toString(), token.getPoints().get(token.getPoints().size() - 1).getRight());
+		svgTokens.addTrace(result.toString(), token.getPoints().get(token.getPoints().size() - 1).getRight(),
+				token.isFade());
+	}
+
+	public static double fadeDuration = 0.5;
+
+	public static void fade(boolean fade, boolean trueInFalseOut, Double beginTime, Double endTime, StringBuilder result) {
+		//we would use set if svgsalamander would support
+		//it does not, so we have to use an animate tag
+		double fadeDuration2;
+		if (!fade) {
+			fadeDuration2 = 0.05;
+			fade = true;
+		} else {
+			fadeDuration2 = fadeDuration;
+		}
+		
+		if (fade) {
+			result.append("<animate ");
+			result.append("attributeName='opacity' ");
+			result.append("attributeType='XML' ");
+
+			result.append("from='");
+			if (trueInFalseOut) {
+				result.append("0");
+			} else {
+				result.append("1");
+			}
+			result.append("' ");
+
+			result.append("to='");
+			if (trueInFalseOut) {
+				result.append("1");
+			} else {
+				result.append("0");
+			}
+			result.append("' ");
+
+			result.append("begin='");
+			if (beginTime != null) {
+				result.append(beginTime);
+			} else {
+				result.append(endTime - fadeDuration2);
+			}
+			result.append("s' ");
+
+			result.append("dur='");
+			result.append(fadeDuration2);
+			result.append("s' ");
+
+			result.append("fill='freeze'/>");
+		} else {
+			if (trueInFalseOut) {
+				//fade in
+				result.append("<set attributeName='visibility' attributeType='XML' to='visible' begin='");
+				if (beginTime != null) {
+					result.append(beginTime);
+				} else {
+					result.append(endTime);
+				}
+				result.append("s' fill='freeze'/>");
+			} else {
+				//fade out
+				result.append("<set attributeName='visibility' attributeType='XML' to='hidden' begin='");
+				if (beginTime != null) {
+					result.append(beginTime);
+				} else {
+					result.append(endTime);
+				}
+				result.append("s' fill='freeze'/>");
+			}
+		}
 	}
 
 	public static void animatePoint(Token token, int index, StringBuilder result, InductiveVisualMinerPanel panel) {

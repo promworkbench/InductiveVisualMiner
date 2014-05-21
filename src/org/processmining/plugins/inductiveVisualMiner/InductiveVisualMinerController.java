@@ -21,7 +21,6 @@ import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
-import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.framework.plugin.PluginContext;
@@ -283,24 +282,7 @@ public class InductiveVisualMinerController {
 			long maxTraces = 1000;
 
 			//gather timestamp information
-			double logMin = Double.MAX_VALUE;
-			double logMax = Double.MIN_VALUE;
-			{
-				long indexTrace = 0;
-				for (XTrace trace : xLog) {
-					for (XEvent event : trace) {
-						if (event.getAttributes().containsKey("time:timestamp")) {
-							double t = TimestampsAdder.getTimestamp(event);
-							logMin = Math.min(logMin, t);
-							logMax = Math.max(logMax, t);
-						}
-					}
-					if (indexTrace == maxTraces) {
-						break;
-					}
-					indexTrace++;
-				}
-			}
+			Pair<Double, Double> extremeTimstamps = TimestampsAdder.getExtremeTimestamps(xLog, maxTraces);
 
 			//make a log-projection-hashmap
 			HashMap<List<XEventClass>, IMTraceG<Move>> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
@@ -310,24 +292,19 @@ public class InductiveVisualMinerController {
 			{
 				long indexTrace = 0;
 				for (XTrace trace : xLog) {
-
-					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, logMin, logMax);
+					
+					if (indexTrace == maxTraces) {
+						break;
+					}
+					
+					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps, panel);
 					if (timedTrace != null) {
 						Animation.positionTrace(timedTrace, new UnfoldedNode(tree.getRoot()), tokens, panel);
 					}
 
-					if (indexTrace == maxTraces) {
-						break;
-					}
 					indexTrace++;
 				}
 			}
-
-			//			double t = 0;
-			//			for (IMTraceG<Move> trace : input.getB()) {
-			//				TimedTrace timedTrace = Animation.addDummyTimestamps(trace, t++);
-			//				Animation.positionTrace(timedTrace, new UnfoldedNode(input.getC().getRoot()), tokens, panel);
-			//			}
 
 			return tokens;
 		}
