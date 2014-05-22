@@ -8,10 +8,10 @@ import java.util.Random;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;
+import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
-import org.deckfour.xes.model.impl.XAttributeTimestampImpl;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
@@ -216,7 +216,7 @@ public class TimestampsAdder {
 
 	public static Double getTimestamp(XEvent event) {
 		if (event.hasAttributes() && event.getAttributes().containsKey("time:timestamp")) {
-			Date timestamp = ((XAttributeTimestampImpl) event.getAttributes().get("time:timestamp")).getValue();
+			Date timestamp = ((XAttributeTimestamp) event.getAttributes().get("time:timestamp")).getValue();
 			return (double) timestamp.getTime();
 		}
 		return null;
