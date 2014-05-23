@@ -10,7 +10,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
-import org.processmining.plugins.InductiveMiner.mining.MiningParametersIMStateOfArt;
+import org.processmining.plugins.InductiveMiner.mining.MiningParametersIvM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
@@ -21,7 +21,7 @@ public class InductiveVisualMinerState {
 
 	public InductiveVisualMinerState(XLog xLog) {
 		this.xLog = xLog;
-		miningParameters = new MiningParametersIMStateOfArt();
+		miningParameters = new MiningParametersIvM();
 		miningParameters.setDebug(false);
 		miningParameters.setReduce(true);
 	}
