@@ -53,7 +53,7 @@ public class TimestampsAdder {
 	}
 
 	public static TimedTrace timeTrace(HashMap<List<XEventClass>, IMTraceG<Move>> map, XTrace trace, XLogInfo xLogInfo,
-			Pair<Double, Double> extremeTimestamps, InductiveVisualMinerPanel panel) {
+			Pair<Double, Double> extremeTimestamps, long indexTrace, InductiveVisualMinerPanel panel) {
 
 		//create an aligned trace to search for
 		List<XEventClass> lTrace = getTraceLogProjection(trace, xLogInfo);
@@ -66,7 +66,7 @@ public class TimestampsAdder {
 			if (extremeTimestamps != null) {
 				timedTrace = timeTraceFromTimestamps(alignedTrace, trace, xLogInfo, extremeTimestamps, panel);
 			} else {
-				timedTrace = timeTraceDummyTimestamps(alignedTrace, trace, xLogInfo, panel);
+				timedTrace = timeTraceDummyTimestamps(alignedTrace, trace, xLogInfo, indexTrace, panel);
 			}
 			
 			if (timedTrace == null) {
@@ -84,12 +84,18 @@ public class TimestampsAdder {
 	}
 
 	private static TimedTrace timeTraceDummyTimestamps(IMTraceG<Move> alignedTrace, XTrace trace, XLogInfo xLogInfo,
-			InductiveVisualMinerPanel panel) {
+			long indexTrace, InductiveVisualMinerPanel panel) {
 
 		//attach timestamps
 		TimedTrace timedTrace = new TimedTrace();
+		
+		//every second, a trace starts; later traces are distributed randomly
+		double startTime = indexTrace;
+		if (indexTrace >= animationDuration) {
+			startTime = random.nextInt((int) (animationDuration - 10));
+		}
 
-		double startTime = random.nextInt((int) animationDuration);
+		timedTrace.setStartTime(startTime);
 		double traceDuration = random.nextInt((int) (animationDuration - startTime));
 		timedTrace.setEndTime(timedTrace.getStartTime() + traceDuration);
 

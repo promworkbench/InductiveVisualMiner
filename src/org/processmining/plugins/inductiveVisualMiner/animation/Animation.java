@@ -117,6 +117,9 @@ public class Animation {
 					+ firstTimedMove.getLeft());
 
 			//see if the first edge belongs to this node
+			if (edgesTillDestination.size() == 0) {
+				throw new RuntimeException("there are no edges left to traverse");
+			}
 			enterEdge = edgesTillDestination.get(0);
 			if (panel.getUnfoldedNode2dotEdgesModel().get(unode) != null
 					&& panel.getUnfoldedNode2dotEdgesModel().get(unode).contains(enterEdge)) {
@@ -442,6 +445,6 @@ public class Animation {
 	}
 
 	private static void debug(Object s) {
-//		System.out.println(s.toString());
+		System.out.println(s.toString());
 	}
 }

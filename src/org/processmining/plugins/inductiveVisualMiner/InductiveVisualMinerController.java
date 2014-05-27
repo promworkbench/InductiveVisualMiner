@@ -297,7 +297,7 @@ public class InductiveVisualMinerController {
 						break;
 					}
 					
-					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps, panel);
+					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps, indexTrace, panel);
 					if (timedTrace != null) {
 						Animation.positionTrace(timedTrace, new UnfoldedNode(tree.getRoot()), tokens, panel);
 					}
