@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotEdge;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 
 import com.kitfox.svg.Group;
 import com.kitfox.svg.SVGElement;

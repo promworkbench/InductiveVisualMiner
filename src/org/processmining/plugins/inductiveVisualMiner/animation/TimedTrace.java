@@ -23,4 +23,8 @@ public class TimedTrace extends IMTraceG<TimedMove> {
 	public double getStartTime() {
 		return startTime;
 	}
+	
+	public String toString() {
+		return "[@" + getStartTime() + " " + super.toString() + " " + " @" + getEndTime() + "]";
+	}
 }

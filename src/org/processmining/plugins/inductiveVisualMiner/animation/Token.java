@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotEdge;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 
 public class Token {
 	private final LocalDotNode startPosition;

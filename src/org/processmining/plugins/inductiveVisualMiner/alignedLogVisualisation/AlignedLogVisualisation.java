@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,8 +26,6 @@ import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
-import org.processmining.plugins.graphviz.dot.DotEdge;
-import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
@@ -79,164 +75,24 @@ public class AlignedLogVisualisation {
 		source, sink, activity, xor, parallel, logMoveActivity
 	}
 
-	public class LocalDotNode extends DotNode {
-
-		public NodeType type;
-		public final UnfoldedNode node;
-
-		public LocalDotNode(NodeType type, String label, final UnfoldedNode unode) {
-			super(label, "");
-			dot.addNode(this);
-			if (unfoldedNode2dotNodes.get(unode) == null) {
-				unfoldedNode2dotNodes.put(unode, new ArrayList<LocalDotNode>());
-			}
-			unfoldedNode2dotNodes.get(unode).add(this);
-			dotNodes.add(this);
-			this.node = unode;
-			this.type = type;
-
-			switch (type) {
-				case activity :
-					setOptions("shape=\"box\", style=\"rounded,filled\", fontsize=9");
-					break;
-				case logMoveActivity :
-					setOptions("shape=\"box\", style=\"rounded,filled\", fontsize=9, fillcolor=\"red\"");
-					break;
-				case parallel :
-					setOptions("shape=\"diamond\", fixedsize=true, height=0.25, width=0.27");
-					break;
-				case sink :
-					setOptions("width=0.2, shape=\"circle\", style=filled, fillcolor=\"red\"");
-					break;
-				case source :
-					setOptions("width=0.2, shape=\"circle\", style=filled, fillcolor=\"green\"");
-					break;
-				case xor :
-					setOptions("width=0.05, shape=\"circle\"");
-					break;
-			}
-
-			if (parameters.isAddOnClick()) {
-				addMouseListener(new MouseListener() {
-
-					public void mouseReleased(MouseEvent arg0) {
-					}
-
-					public void mousePressed(MouseEvent arg0) {
-
-					}
-
-					public void mouseExited(MouseEvent arg0) {
-					}
-
-					public void mouseEntered(MouseEvent arg0) {
-					}
-
-					public void mouseClicked(MouseEvent arg0) {
-
-					}
-				});
-			}
-		}
-	}
-
 	public enum EdgeType {
 		model, logMove, modelMove
 	};
 
-	public class LocalDotEdge extends DotEdge {
-
-		private final EdgeType type;
-		private final UnfoldedNode unode;
-		private final UnfoldedNode lookupNode1;
-		private final UnfoldedNode lookupNode2;
-		private final boolean directionForward;
-
-		//constructor for model edge
-		public LocalDotEdge(LocalDotNode source, LocalDotNode target, String label, String options, UnfoldedNode unode, boolean directionForward) {
-			super(source, target, label, options);
-			dot.addEdge(this);
-			this.unode = unode;
-			this.lookupNode1 = null;
-			this.lookupNode2 = null;
-			this.type = EdgeType.model;
-			this.directionForward = directionForward;
-
-			if (!unfoldedNode2dotEdgesModel.containsKey(unode)) {
-				unfoldedNode2dotEdgesModel.put(unode, new ArrayList<LocalDotEdge>());
-			}
-			unfoldedNode2dotEdgesModel.get(unode).add(this);
-			dotEdges.add(this);
-		}
-
-		public LocalDotEdge(LocalDotNode source, LocalDotNode target, String label, String options, UnfoldedNode unode,
-				EdgeType type, UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, boolean directionForward) {
-			super(source, target, label, options);
-			dot.addEdge(this);
-			this.unode = unode;
-			this.lookupNode1 = lookupNode1;
-			this.lookupNode2 = lookupNode2;
-			this.type = type;
-			this.directionForward = directionForward;
-
-			if (!unfoldedNode2dotEdgesMove.containsKey(unode)) {
-				unfoldedNode2dotEdgesMove.put(unode, new ArrayList<LocalDotEdge>());
-			}
-			unfoldedNode2dotEdgesMove.get(unode).add(this);
-			dotEdges.add(this);
-		}
-		
-		public LocalDotNode getTarget() {
-			if (directionForward) {
-				return (LocalDotNode) super.getTarget();
-			} else {
-				return (LocalDotNode) super.getSource();
-			}
-		}
-
-		public LocalDotNode getSource() {
-			if (directionForward) {
-				return (LocalDotNode) super.getSource();
-			} else {
-				return (LocalDotNode) super.getTarget();
-			}
-		}
-
-		public EdgeType getType() {
-			return type;
-		}
-
-		public UnfoldedNode getUnode() {
-			return unode;
-		}
-		
-		public boolean isDirectionForward() {
-			return directionForward;
-		}
-
-		public UnfoldedNode getLookupNode1() {
-			return lookupNode1;
-		}
-		
-		public UnfoldedNode getLookupNode2() {
-			return lookupNode2;
-		}
-	}
-
-	private Dot dot;
+	Dot dot;
 	private AlignedLogInfo logInfo;
 	private Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos;
 	private long maxCardinality;
 	private long minCardinality;
-	private AlignedLogVisualisationParameters parameters;
+	AlignedLogVisualisationParameters parameters;
 	private LocalDotNode rootSource;
 	private LocalDotNode rootSink;
 
-	private Set<LocalDotEdge> dotEdges;
-	private Set<LocalDotNode> dotNodes;
-	private Map<UnfoldedNode, List<LocalDotNode>> unfoldedNode2dotNodes;
-	private Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2dotEdgesModel;
-	private Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2dotEdgesMove;
+	Set<LocalDotEdge> dotEdges;
+	Set<LocalDotNode> dotNodes;
+	Map<UnfoldedNode, List<LocalDotNode>> unfoldedNode2dotNodes;
+	Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2dotEdgesModel;
+	Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2dotEdgesMove;
 	private Map<UnfoldedNode, LocalDotNode> activity2dotNode;
 	private Map<LocalDotNode, UnfoldedNode> dotNode2DfgUnfoldedNode;
 	private Map<UnfoldedNode, List<LocalDotNode>> unfoldedNode2DfgdotNodes;
@@ -279,10 +135,10 @@ public class AlignedLogVisualisation {
 		UnfoldedNode root = new UnfoldedNode(tree.getRoot());
 
 		//source
-		rootSource = new LocalDotNode(NodeType.source, "", root);
+		rootSource = new LocalDotNode(this, NodeType.source, "", root);
 
 		//sink
-		rootSink = new LocalDotNode(NodeType.sink, "", root);
+		rootSink = new LocalDotNode(this, NodeType.sink, "", root);
 
 		//convert root node
 		convertNode(root, rootSource, rootSink, true);
@@ -359,7 +215,7 @@ public class AlignedLogVisualisation {
 			label += "\n" + cardinality;
 		}
 
-		final LocalDotNode dotNode = new LocalDotNode(NodeType.activity, label, unode);
+		final LocalDotNode dotNode = new LocalDotNode(this, NodeType.activity, label, unode);
 		dotNode.setOptions(dotNode.getOptions() + ", fillcolor=\"" + fillColour + "\", fontcolor=\"" + fontColour
 				+ "\"");
 
@@ -381,7 +237,7 @@ public class AlignedLogVisualisation {
 
 			split = join;
 			if (it.hasNext()) {
-				join = new LocalDotNode(NodeType.xor, "", unode);
+				join = new LocalDotNode(this, NodeType.xor, "", unode);
 			} else {
 				join = sink;
 			}
@@ -398,11 +254,11 @@ public class AlignedLogVisualisation {
 	private void convertLoop(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(NodeType.xor, "", unode);
+		LocalDotNode split = new LocalDotNode(this, NodeType.xor, "", unode);
 		addArc(source, split, unode, directionForward);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(NodeType.xor, "", unode);
+		LocalDotNode join = new LocalDotNode(this, NodeType.xor, "", unode);
 
 		Node bodyChild = unode.getBlock().getChildren().get(0);
 		convertNode(unode.unfoldChild(bodyChild), split, join, directionForward);
@@ -423,11 +279,11 @@ public class AlignedLogVisualisation {
 	private void convertParallel(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(NodeType.parallel, "+", unode);
+		LocalDotNode split = new LocalDotNode(this, NodeType.parallel, "+", unode);
 		addArc(source, split, unode, directionForward);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(NodeType.parallel, "+", unode);
+		LocalDotNode join = new LocalDotNode(this, NodeType.parallel, "+", unode);
 		addArc(join, sink, unode, directionForward);
 
 		for (Node child : unode.getBlock().getChildren()) {
@@ -443,11 +299,11 @@ public class AlignedLogVisualisation {
 	private void convertXor(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(NodeType.xor, "", unode);
+		LocalDotNode split = new LocalDotNode(this, NodeType.xor, "", unode);
 		addArc(source, split, unode, directionForward);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(NodeType.xor, "", unode);
+		LocalDotNode join = new LocalDotNode(this, NodeType.xor, "", unode);
 		addArc(join, sink, unode, directionForward);
 
 		for (Node child : unode.getBlock().getChildren()) {
@@ -542,9 +398,9 @@ public class AlignedLogVisualisation {
 
 		final LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(from, to, "", options, unode, directionForward);
+			edge = new LocalDotEdge(this, from, to, "", options, unode, directionForward);
 		} else {
-			edge = new LocalDotEdge(to, from, "", options + ", dir=\"back\"", unode, directionForward);
+			edge = new LocalDotEdge(this, to, from, "", options + ", dir=\"back\"", unode, directionForward);
 		}
 
 		if (parameters.isShowFrequenciesOnModelEdges()) {
@@ -561,7 +417,7 @@ public class AlignedLogVisualisation {
 			if (parameters.isRepairLogMoves()) {
 				for (XEventClass e : logMoves) {
 					long cardinality = logMoves.getCardinalityOf(e);
-					LocalDotNode dotNode = new LocalDotNode(NodeType.logMoveActivity, e.toString(), unode);
+					LocalDotNode dotNode = new LocalDotNode(this, NodeType.logMoveActivity, e.toString(), unode);
 					addMoveArc(from, dotNode, unode, EdgeType.logMove, lookupNode1, lookupNode2, cardinality,
 							directionForward);
 					addMoveArc(dotNode, to, unode, EdgeType.logMove, lookupNode1, lookupNode2, cardinality,
@@ -588,9 +444,9 @@ public class AlignedLogVisualisation {
 
 		LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(from, to, "", options, unode, type, lookupNode1, lookupNode2, directionForward);
+			edge = new LocalDotEdge(this, from, to, "", options, unode, type, lookupNode1, lookupNode2, directionForward);
 		} else {
-			edge = new LocalDotEdge(to, from, "", options + ", dir=\"back\", " + options, unode, type, lookupNode1,
+			edge = new LocalDotEdge(this, to, from, "", options + ", dir=\"back\", " + options, unode, type, lookupNode1,
 					lookupNode2, directionForward);
 		}
 

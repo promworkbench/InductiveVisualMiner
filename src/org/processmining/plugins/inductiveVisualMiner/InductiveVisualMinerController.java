@@ -35,8 +35,8 @@ import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
@@ -50,6 +50,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.animation.Tokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
@@ -286,20 +287,23 @@ public class InductiveVisualMinerController {
 
 			//make a log-projection-hashmap
 			HashMap<List<XEventClass>, IMTraceG<Move>> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
+			
+			//make a shortest path graph
+			ShortestPathGraph graph = new ShortestPathGraph(panel.getNodes(), panel.getEdges());
 
 			//compute the animation
 			Tokens tokens = new Tokens();
 			{
 				long indexTrace = 0;
 				for (XTrace trace : xLog) {
-					
+
 					if (indexTrace == maxTraces) {
 						break;
 					}
-					
-					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps, indexTrace, panel);
+
+					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps, indexTrace, graph, panel);
 					if (timedTrace != null) {
-						Animation.positionTrace(timedTrace, new UnfoldedNode(tree.getRoot()), tokens, panel);
+						Animation.positionTrace(timedTrace, new UnfoldedNode(tree.getRoot()), tokens, graph, panel);
 					}
 
 					indexTrace++;
@@ -363,8 +367,7 @@ public class InductiveVisualMinerController {
 		//		}
 
 		//Arya
-		//		AlignmentResult alignmentArya = AlignmentArya.alignTree(tree, classifier, logInfo, null, xLog,
-		//				filteredActivities);
+		//		AlignmentResult alignment = AlignmentArya.alignTree(tree, classifier, logInfo, null, xLog, filteredActivities);
 
 		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = computeDfgAlignment(alignment.log, tree);
 
