@@ -6,12 +6,13 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.DotEdge;
-import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
@@ -68,40 +69,46 @@ public class InductiveVisualMinerSelectionColourer {
 	private static void styleManual(UnfoldedNode unode, InductiveVisualMinerPanel panel, long cardinality,
 			long minCardinality, long maxCardinality, AlignedLogVisualisationParameters visualisationParameters)
 			throws SVGException {
-		DotElement dotNode = panel.getUnfoldedNode2dotNodes().get(unode).iterator().next();
 
-		Group group = panel.getGraph().getSVGElementOf(dotNode);
-		SVGElement polygon = group.getChild(1);
-		Text titleName = (Text) group.getChild(group.getChildren(null).size() - 2);
-		Text titleCount = (Text) group.getChild(group.getChildren(null).size() - 1);
+		for (LocalDotNode dotNode : panel.getUnfoldedNode2dotNodes().get(unode)) {
+			
+			if (dotNode.type == NodeType.activity) {
+			
+				Group group = panel.getGraph().getSVGElementOf(dotNode);
+				SVGElement polygon = group.getChild(1);
+				Text titleName = (Text) group.getChild(group.getChildren(null).size() - 2);
+				Text titleCount = (Text) group.getChild(group.getChildren(null).size() - 1);
 
-		//recolour the polygon
-		String fillColour;
-		String fontColour = "black";
-		if (cardinality > 0) {
-			fillColour = visualisationParameters.getColourNodes().colour(cardinality, minCardinality, maxCardinality);
-			if (ColourMaps.getLuma(fillColour) < 128) {
-				fontColour = "white";
+				//recolour the polygon
+				String fillColour;
+				String fontColour = "black";
+				if (cardinality > 0) {
+					fillColour = visualisationParameters.getColourNodes().colour(cardinality, minCardinality,
+							maxCardinality);
+					if (ColourMaps.getLuma(fillColour) < 128) {
+						fontColour = "white";
+					}
+				} else {
+					fillColour = visualisationParameters.getColourNodes().colour(1, 0, 2);
+				}
+				panel.getGraph().setCSSAttributeOf(polygon, "fill", fillColour);
+
+				//set label colour
+				panel.getGraph().setCSSAttributeOf(titleCount, "fill", fontColour);
+				panel.getGraph().setCSSAttributeOf(titleName, "fill", fontColour);
+
+				if (cardinality > 0) {
+					panel.getGraph().setCSSAttributeOf(group, "opacity", "1.0");
+				} else {
+					panel.getGraph().setCSSAttributeOf(group, "opacity", "0.2");
+				}
+
+				//set title
+				titleCount.getContent().clear();
+				titleCount.getContent().add(cardinality + "");
+				titleCount.rebuild();
 			}
-		} else {
-			fillColour = visualisationParameters.getColourNodes().colour(1, 0, 2);
 		}
-		panel.getGraph().setCSSAttributeOf(polygon, "fill", fillColour);
-
-		//set label colour
-		panel.getGraph().setCSSAttributeOf(titleCount, "fill", fontColour);
-		panel.getGraph().setCSSAttributeOf(titleName, "fill", fontColour);
-
-		if (cardinality > 0) {
-			panel.getGraph().setCSSAttributeOf(group, "opacity", "1.0");
-		} else {
-			panel.getGraph().setCSSAttributeOf(group, "opacity", "0.2");
-		}
-
-		//set title
-		titleCount.getContent().clear();
-		titleCount.getContent().add(cardinality + "");
-		titleCount.rebuild();
 	}
 
 	private static void styleNonManualNode(UnfoldedNode unode, InductiveVisualMinerPanel panel, long cardinality) {
@@ -150,10 +157,11 @@ public class InductiveVisualMinerSelectionColourer {
 			long minCardinality, long maxCardinality) throws SVGException {
 		for (UnfoldedNode unode : panel.getUnfoldedNode2dotEdgesMove().keySet()) {
 			for (DotEdge dotEdge : panel.getUnfoldedNode2dotEdgesMove().get(unode)) {
-				LocalDotEdge lDotEdge = (LocalDotEdge) dotEdge; 
+				LocalDotEdge lDotEdge = (LocalDotEdge) dotEdge;
 				long cardinality;
 				if (lDotEdge.getType().equals(EdgeType.logMove)) {
-					cardinality = AlignedLogMetrics.getLogMoves(lDotEdge.getLookupNode1(), lDotEdge.getLookupNode2(), logInfo).size();
+					cardinality = AlignedLogMetrics.getLogMoves(lDotEdge.getLookupNode1(), lDotEdge.getLookupNode2(),
+							logInfo).size();
 				} else {
 					cardinality = AlignedLogMetrics.getModelMovesLocal(lDotEdge.getUnode(), logInfo);
 				}
@@ -179,7 +187,7 @@ public class InductiveVisualMinerSelectionColourer {
 		panel.setCSSAttributeOf(arrowHead, "stroke", edgeColour);
 		panel.setCSSAttributeOf(arrowHead, "fill", edgeColour);
 		panel.setCSSAttributeOf(line, "stroke-width", strokeWidth + "");
-		
+
 		//transparency
 		if (cardinality > 0) {
 			panel.setCSSAttributeOf(group, "opacity", "1.0");

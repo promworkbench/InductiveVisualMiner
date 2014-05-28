@@ -45,18 +45,18 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 			long cardinality = log.getCardinalityOf(trace);
 			for (int i = 0; i < trace.size(); i++) {
 				Move move = trace.get(i);
-				if (move.type == Type.model) {
-					modelMoves.add(move.unode, log.getCardinalityOf(trace));
-				} else if (move.type == Type.log) {
+				if (move.getType() == Type.model) {
+					modelMoves.add(move.getUnode(), log.getCardinalityOf(trace));
+				} else if (move.getType() == Type.log) {
 					//position the log move
 					positionLogMove(lastUnode, i, trace, cardinality);
 
-					unlabeledLogMoves.add(move.eventClass.toString(), cardinality);
+					unlabeledLogMoves.add(move.getEventClass().toString(), cardinality);
 				}
 
-				if (move.unode != null && move.unode.getNode() instanceof Manual) {
-					dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastUnode, move.unode), log.getCardinalityOf(trace));
-					lastUnode = move.unode;
+				if (move.getUnode() != null && move.getUnode().getNode() instanceof Manual) {
+					dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastUnode, move.getUnode()), log.getCardinalityOf(trace));
+					lastUnode = move.getUnode();
 				}
 			}
 			if (lastUnode != null) {
@@ -82,15 +82,15 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 			long cardinality) {
 		UnfoldedNode nextKnownPosition = null;
 		for (int i = position + 1; i < trace.size(); i++) {
-			if (trace.get(i).unode != null) {
-				nextKnownPosition = trace.get(i).unode;
+			if (trace.get(i).isMoveSync()) {
+				nextKnownPosition = trace.get(i).getUnode();
 				break;
 			}
 		}
 
 		//exception cases: repeated forbidden execution of activity
 		//add log move on that node
-		XEventClass e = trace.get(position).eventClass;
+		XEventClass e = trace.get(position).getEventClass();
 		if (lastKnownPosition != null && e.toString().equals(((AbstractTask) lastKnownPosition.getNode()).getName())) {
 			addLogMove(lastKnownPosition, lastKnownPosition, e, cardinality);
 			return;

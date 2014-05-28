@@ -85,11 +85,6 @@ public class AlignmentETM {
 				if (naryMove.getMovedEvent() >= 0) {
 					//an ETM-log-move happened
 					activity = registry.getEventClassByID(naryTrace.get(naryMove.getMovedEvent()));
-
-					//filter log moves that activity filtering has filtered out
-					if (skipActivities.contains(activity)) {
-						continue;
-					}
 				}
 
 				if (unode != null || activity != null) {

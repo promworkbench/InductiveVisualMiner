@@ -7,7 +7,7 @@ public class TimedMove extends Move {
 	private final Double timestamp;
 	
 	public TimedMove(Move move, Double timestamp) {
-		super(move.type, move.unode, move.eventClass);
+		super(move.getType(), move.getUnode(), move.getEventClass());
 		this.timestamp = timestamp;
 	}
 	

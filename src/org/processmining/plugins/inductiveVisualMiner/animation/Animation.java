@@ -11,9 +11,9 @@ import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.NodeType;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.processtree.Node;
@@ -41,8 +41,8 @@ public class Animation {
 			LocalDotNode node = getDotNodeFromActivity(move, panel);
 			if (node != null) {
 				nodePath.add(node);
-			} else if (move.unode != null && move.unode.getNode() instanceof Automatic) {
-				nodePath.add(panel.getUnfoldedNode2dotEdgesModel().get(move.unode).get(0).getSource());
+			} else if (move.isMoveSync() && move.getUnode().getNode() instanceof Automatic) {
+				nodePath.add(panel.getUnfoldedNode2dotEdgesModel().get(move.getUnode()).get(0).getSource());
 			}
 		}
 		if (addSink) {
@@ -109,7 +109,8 @@ public class Animation {
 			List<LocalDotEdge> edgesTillDestination;
 			if (firstMove.getTimestamp() == null) {
 				//if the first node has no timestamp, we might need to make a detour to reach the requested destination
-				LocalDotNode detour = panel.getUnfoldedNode2dotEdgesModel().get(firstMove.unode).get(0).getTarget();
+				LocalDotNode detour = panel.getUnfoldedNode2dotEdgesModel().get(firstMove.getUnode()).get(0)
+						.getTarget();
 				edgesTillDestination = shortestPath.getShortestPath(token.getLastPosition(), detour);
 				edgesTillDestination.addAll(shortestPath.getShortestPath(detour, firstTimedMove.getLeft()));
 			} else {
@@ -385,8 +386,8 @@ public class Animation {
 		}
 
 		for (TimedMove move : trace) {
-			if (move.unode != null) {
-				Set<UnfoldedNode> sigma = mapActivity2sigma.get(move.unode);
+			if (move.isMoveSync()) {
+				Set<UnfoldedNode> sigma = mapActivity2sigma.get(move.getUnode());
 				if (sigma != null) {
 					mapSigma2subtrace.get(sigma).add(move);
 				}
@@ -405,11 +406,11 @@ public class Animation {
 
 		Set<UnfoldedNode> lastSigma = partition.iterator().next();
 		for (TimedMove move : trace) {
-			if (move.unode != null) {
-				if (!lastSigma.contains(move.unode)) {
+			if (move.isMoveSync()) {
+				if (!lastSigma.contains(move.getUnode())) {
 					mapSigma2sublog.get(lastSigma).add(partialTrace);
 					partialTrace = new TimedTrace();
-					lastSigma = mapActivity2sigma.get(move.unode);
+					lastSigma = mapActivity2sigma.get(move.getUnode());
 				}
 				partialTrace.add(move);
 			}
@@ -440,10 +441,10 @@ public class Animation {
 	}
 
 	private static LocalDotNode getDotNodeFromActivity(TimedMove move, InductiveVisualMinerPanel panel) {
-		if (!panel.getUnfoldedNode2dotNodes().containsKey(move.unode)) {
+		if (!panel.getUnfoldedNode2dotNodes().containsKey(move.getUnode())) {
 			return null;
 		}
-		for (LocalDotNode node : panel.getUnfoldedNode2dotNodes().get(move.unode)) {
+		for (LocalDotNode node : panel.getUnfoldedNode2dotNodes().get(move.getUnode())) {
 			if (node.type == NodeType.activity) {
 				return node;
 			}

@@ -266,19 +266,21 @@ public class InductiveVisualMinerController {
 	}
 
 	//prepare animation
-	private class Animate extends ChainLink<Quadruple<XLog, AlignedLog, ProcessTree, XLogInfo>, Tokens> {
+	private class Animate extends ChainLink<Quintuple<XLog, AlignedLog, ProcessTree, XLogInfo, ColourMode>, Tokens> {
 
-		protected Quadruple<XLog, AlignedLog, ProcessTree, XLogInfo> generateInput() {
-			return Quadruple.of(state.getXLog(), state.getAlignedFilteredLog(), state.getTree(), state.getXLogInfo());
+		protected Quintuple<XLog, AlignedLog, ProcessTree, XLogInfo, ColourMode> generateInput() {
+			return Quintuple.of(state.getXLog(), state.getAlignedLog(), state.getTree(), state.getXLogInfo(),
+					state.getColourMode());
 		}
 
-		protected Tokens executeLink(Quadruple<XLog, AlignedLog, ProcessTree, XLogInfo> input) {
+		protected Tokens executeLink(Quintuple<XLog, AlignedLog, ProcessTree, XLogInfo, ColourMode> input) {
 			setStatus("Creating animation..");
 
 			XLog xLog = input.getA();
 			AlignedLog aLog = input.getB();
 			ProcessTree tree = input.getC();
 			XLogInfo xLogInfo = input.getD();
+			ColourMode colourMode = input.getE();
 
 			long maxTraces = 1000;
 
@@ -287,9 +289,12 @@ public class InductiveVisualMinerController {
 
 			//make a log-projection-hashmap
 			HashMap<List<XEventClass>, IMTraceG<Move>> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
-			
+
 			//make a shortest path graph
 			ShortestPathGraph graph = new ShortestPathGraph(panel.getNodes(), panel.getEdges());
+
+			boolean showDeviations = colourMode != ColourMode.paths;
+			showDeviations = false;
 
 			//compute the animation
 			Tokens tokens = new Tokens();
@@ -301,7 +306,8 @@ public class InductiveVisualMinerController {
 						break;
 					}
 
-					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps, indexTrace, graph, panel);
+					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps,
+							indexTrace, showDeviations, graph, panel);
 					if (timedTrace != null) {
 						Animation.positionTrace(timedTrace, new UnfoldedNode(tree.getRoot()), tokens, graph, panel);
 					}
@@ -456,7 +462,7 @@ public class InductiveVisualMinerController {
 		AlignedLog fl = new AlignedLog();
 		for (IMTraceG<Move> trace : alignedLog) {
 			for (Move move : trace) {
-				if (selected.contains(move.unode)) {
+				if (selected.contains(move.getUnode())) {
 					fl.add(trace, alignedLog.getCardinalityOf(trace));
 					break;
 				}

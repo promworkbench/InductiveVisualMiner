@@ -27,6 +27,7 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
@@ -69,10 +70,6 @@ public class AlignedLogVisualisation {
 	public Dot fancy(PluginContext context, XLog xLog) {
 		ProcessTree tree = IMiProcessTree.mineProcessTree(xLog);
 		return fancy(context, tree, xLog);
-	}
-
-	public enum NodeType {
-		source, sink, activity, xor, parallel, logMoveActivity
 	}
 
 	public enum EdgeType {

@@ -5,14 +5,14 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 import org.processmining.plugins.graphviz.dot.DotNode;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.NodeType;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class LocalDotNode extends DotNode {
 
-	/**
-	 * 
-	 */
+	public enum NodeType {
+		source, sink, activity, xor, parallel, logMoveActivity
+	}
+	
 	private final AlignedLogVisualisation alignedLogVisualisation;
 	public NodeType type;
 	public final UnfoldedNode node;

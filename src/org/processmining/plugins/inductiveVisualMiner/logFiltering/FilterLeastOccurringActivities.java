@@ -17,7 +17,8 @@ import org.processmining.plugins.InductiveMiner.mining.cuts.Cut.Operator;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitter.LogSplitResult;
 
 public class FilterLeastOccurringActivities {
-	public static Triple<IMLog, IMLogInfo, Set<XEventClass>> filter(IMLog log, IMLogInfo logInfo, double threshold, MiningParameters miningParameters) {
+	public static Triple<IMLog, IMLogInfo, Set<XEventClass>> filter(IMLog log, IMLogInfo logInfo, double threshold,
+			MiningParameters miningParameters) {
 		List<XEventClass> list = logInfo.getActivities().sortByCardinality();
 		int lastIndex = (int) Math.floor((1 - threshold) * list.size());
 
@@ -31,6 +32,7 @@ public class FilterLeastOccurringActivities {
 		MinerState minerState = new MinerState(miningParameters);
 		LogSplitResult result = Miner.splitLog(log, logInfo, cut, minerState);
 		IMLogInfo filteredLogInfo = new IMLogInfo(result.sublogs.get(0));
+		
 		return new Triple<IMLog, IMLogInfo, Set<XEventClass>>(result.sublogs.get(0), filteredLogInfo, remove);
 	}
 }

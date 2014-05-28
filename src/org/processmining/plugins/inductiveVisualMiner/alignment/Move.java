@@ -10,16 +10,16 @@ public class Move {
 		model, log, synchronous
 	}
 
-	public final Type type;
-	public final UnfoldedNode unode;
-	public final XEventClass eventClass;
+	private final Type type;
+	private final UnfoldedNode unode;
+	private final XEventClass eventClass;
 
 	public Move(Type type, UnfoldedNode unode) {
 		this.type = type;
 		this.unode = unode;
 		this.eventClass = null;
 	}
-	
+
 	public Move(Type type, UnfoldedNode unode, XEventClass eventClass) {
 		this.type = type;
 		this.unode = unode;
@@ -39,19 +39,19 @@ public class Move {
 	}
 
 	public String toString() {
-		if (unode != null) {
-			return type + " " + unode.toString();
+		if (getUnode() != null) {
+			return getType() + " " + getUnode().toString();
 		} else {
-			return type + " " + eventClass.toString();
+			return getType() + " " + getEventClass().toString();
 		}
 	}
 
 	@Override
 	public int hashCode() {
-		if (unode != null) {
-			return type.hashCode() ^ unode.hashCode();
+		if (getUnode() != null) {
+			return getType().hashCode() ^ getUnode().hashCode();
 		} else {
-			return type.hashCode() ^ eventClass.hashCode();
+			return getType().hashCode() ^ getEventClass().hashCode();
 		}
 	}
 
@@ -61,13 +61,29 @@ public class Move {
 			return false;
 		}
 		Move arg = (Move) obj;
-		if (!type.equals(arg.type)) {
+		if (!getType().equals(arg.getType())) {
 			return false;
 		}
-		if (unode != null) {
-			return unode.equals(arg.unode);
+		if (getUnode() != null) {
+			return getUnode().equals(arg.getUnode());
 		} else {
-			return eventClass.equals(arg.eventClass);
+			return getEventClass().equals(arg.getEventClass());
 		}
+	}
+
+	public boolean isMoveSync() {
+		return type == Type.model || type == Type.synchronous;
+	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public UnfoldedNode getUnode() {
+		return unode;
+	}
+
+	public XEventClass getEventClass() {
+		return eventClass;
 	}
 }

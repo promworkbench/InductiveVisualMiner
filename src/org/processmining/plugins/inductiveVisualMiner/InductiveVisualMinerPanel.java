@@ -50,20 +50,19 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	//gui elements
 	private final DotPanel graphPanel;
-	private final JComboBox colourSelection;
+	private final JComboBox<?> colourSelection;
 	private final JLabel statusLabel;
 	private final JTextArea selectionLabel;
 	private final JCheckBox showDirectlyFollowsGraphs;
 	private final NiceDoubleSlider activitiesSlider;
 	private final NiceDoubleSlider noiseSlider;
-	private JComboBox classifiersCombobox;
+	private JComboBox<?> classifiersCombobox;
 	private JButton exitButton;
 
 	private final AlignedLogVisualisation visualiser;
 
 	private InputFunction<Set<UnfoldedNode>> onSelectionChanged = null;
 
-	@SuppressWarnings("unchecked")
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
 			Collection<XEventClassifier> classifiers, boolean enableExitButton) throws IOException {
 		visualiser = new AlignedLogVisualisation();
@@ -310,7 +309,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return graphPanel;
 	}
 
-	public JComboBox getColourModeSelection() {
+	public JComboBox<?> getColourModeSelection() {
 		return colourSelection;
 	}
 
@@ -318,11 +317,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return statusLabel;
 	}
 
-	public JComboBox getClassifiers() {
+	public JComboBox<?> getClassifiers() {
 		return classifiersCombobox;
 	}
 
-	public JComboBox getColourSelection() {
+	public JComboBox<?> getColourSelection() {
 		return colourSelection;
 	}
 
