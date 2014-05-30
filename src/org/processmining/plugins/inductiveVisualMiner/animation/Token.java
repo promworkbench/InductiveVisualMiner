@@ -9,23 +9,27 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Lo
 
 public class Token {
 	private final LocalDotNode startPosition;
-	private final double startTime;
+	private Double startTime;
 	private final boolean fade;
 	private List<Pair<LocalDotEdge, Double>> points;
+	private List<Pair<Integer, Token>> subTokens;
 
-	public Token(LocalDotNode startPosition, double startTime, boolean fade) {
+	public Token(LocalDotNode startPosition, Double startTime, boolean fade) {
 		//		System.out.println("create new token @" + startTime);
 		this.startPosition = startPosition;
 		this.startTime = startTime;
 		this.fade = fade;
 		points = new ArrayList<Pair<LocalDotEdge, Double>>();
+		subTokens = new ArrayList<>();
 	}
 
-	public double getLastTime() {
-		if (points.isEmpty()) {
-			return startTime;
+	public Double getLastTime() {
+		for (int i = points.size() - 1; i >= 0; i--) {
+			if (points.get(i).getRight() != null) {
+				return points.get(i).getRight();
+			}
 		}
-		return points.get(points.size() - 1).getRight();
+		return startTime;
 	}
 
 	public LocalDotNode getLastPosition() {
@@ -35,14 +39,21 @@ public class Token {
 		return points.get(points.size() - 1).getLeft().getTarget();
 	}
 
-	public void addPoint(LocalDotEdge edge, double time) {
+	public void addPoint(LocalDotEdge edge, Double time) {
 		//perform sanity check
-		if (getLastTime() > time) {
+		if (time != null && getLastTime() > time) {
 			throw new RuntimeException("token cannot move back in time");
 		}
 
 		points.add(Pair.of(edge, time));
-		//		System.out.println("  add point to token " + points.get(points.size()-1));
+		System.out.println("  add point to token " + points.get(points.size() - 1) + fade);
+		
+		System.out.println("   to " + edge.getTarget().toString().replaceAll("\\n", " "));
+	}
+
+	public void addSubToken(Token token) {
+		subTokens.add(Pair.of(points.size() - 1, token));
+		System.out.println("  add subtoken");
 	}
 
 	public List<Pair<LocalDotEdge, Double>> getPoints() {

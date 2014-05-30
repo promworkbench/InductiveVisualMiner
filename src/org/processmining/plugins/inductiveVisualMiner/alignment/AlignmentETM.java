@@ -24,6 +24,7 @@ import org.processmining.plugins.etm.model.narytree.NAryTree;
 import org.processmining.plugins.etm.model.narytree.conversion.ProcessTreeToNAryTree;
 import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
+import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
@@ -88,7 +89,17 @@ public class AlignmentETM {
 				}
 
 				if (unode != null || activity != null) {
-					Move move = new Move(activity, unode);
+					Move move;
+					if ((unode != null && activity != null) || (unode != null && unode.getNode() instanceof Automatic)) {
+						//synchronous move
+						move = new Move(Type.synchronous, unode, activity);
+					} else if (unode != null) {
+						//model move
+						move = new Move(Type.model, unode, activity);
+					} else {
+						//log move
+						move = new Move(Type.log, unode, activity);
+					}
 					//System.out.println(naryMove + ", " + move);
 					trace.add(move);
 				} else {

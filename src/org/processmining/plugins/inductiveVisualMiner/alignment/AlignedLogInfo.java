@@ -46,10 +46,11 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 			for (int i = 0; i < trace.size(); i++) {
 				Move move = trace.get(i);
 				if (move.getType() == Type.model) {
+					//add model move to list of model moves
 					modelMoves.add(move.getUnode(), log.getCardinalityOf(trace));
 				} else if (move.getType() == Type.log) {
 					//position the log move
-					positionLogMove(lastUnode, i, trace, cardinality);
+					positionLogMove(move, lastUnode, i, trace, cardinality);
 
 					unlabeledLogMoves.add(move.getEventClass().toString(), cardinality);
 				}
@@ -78,11 +79,11 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 		return parent.unfoldChild(itGrandChild.next());
 	}
 
-	private void positionLogMove(UnfoldedNode lastKnownPosition, int position, IMTraceG<Move> trace,
+	private void positionLogMove(Move move, UnfoldedNode lastKnownPosition, int position, IMTraceG<Move> trace,
 			long cardinality) {
 		UnfoldedNode nextKnownPosition = null;
 		for (int i = position + 1; i < trace.size(); i++) {
-			if (trace.get(i).isMoveSync()) {
+			if (trace.get(i).isModelSync()) {
 				nextKnownPosition = trace.get(i).getUnode();
 				break;
 			}
@@ -92,11 +93,11 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 		//add log move on that node
 		XEventClass e = trace.get(position).getEventClass();
 		if (lastKnownPosition != null && e.toString().equals(((AbstractTask) lastKnownPosition.getNode()).getName())) {
-			addLogMove(lastKnownPosition, lastKnownPosition, e, cardinality);
+			addLogMove(move, lastKnownPosition, lastKnownPosition, e, cardinality);
 			return;
 		}
 		if (nextKnownPosition != null && e.toString().equals(((AbstractTask) nextKnownPosition.getNode()).getName())) {
-			addLogMove(nextKnownPosition, nextKnownPosition, e, cardinality);
+			addLogMove(move, nextKnownPosition, nextKnownPosition, e, cardinality);
 			return;
 		}
 
@@ -107,11 +108,11 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 			return;
 		} else if (lastKnownPosition == null) {
 			UnfoldedNode root = new UnfoldedNode(nextKnownPosition.getPath().get(0));
-			addLogMove(null, root, e, cardinality);
+			addLogMove(move, null, root, e, cardinality);
 			return;
 		} else if (nextKnownPosition == null) {
 			UnfoldedNode root = new UnfoldedNode(lastKnownPosition.getPath().get(0));
-			addLogMove(root, null, e, cardinality);
+			addLogMove(move, root, null, e, cardinality);
 			return;
 		}
 
@@ -119,13 +120,13 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 		UnfoldedNode logMoveNode = getLowestCommonParent(nextKnownPosition, lastKnownPosition);
 		if (logMoveNode.getNode() instanceof Seq) {
 			//for a sequence, find the child of lowestCommonParent in which lastUnode is
-			addLogMove(logMoveNode, findChildWith(logMoveNode, lastKnownPosition), e, cardinality);
+			addLogMove(move, logMoveNode, findChildWith(logMoveNode, lastKnownPosition), e, cardinality);
 		} else if (logMoveNode.getNode() instanceof DefLoop || logMoveNode.getNode() instanceof XorLoop) {
 			//for loop, find the child of lowestcommonparent in which lastUnode is
-			addLogMove(logMoveNode, findChildWith(logMoveNode, lastKnownPosition), e, cardinality);
+			addLogMove(move, logMoveNode, findChildWith(logMoveNode, lastKnownPosition), e, cardinality);
 		} else {
 			//for all other nodes, put on the node itself
-			addLogMove(logMoveNode, logMoveNode, e, cardinality);
+			addLogMove(move, logMoveNode, logMoveNode, e, cardinality);
 		}
 
 	}
@@ -141,7 +142,9 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 		return result;
 	}
 
-	private void addLogMove(UnfoldedNode unode, UnfoldedNode beforeChild, XEventClass e, long cardinality) {
+	private void addLogMove(Move move, UnfoldedNode unode, UnfoldedNode beforeChild, XEventClass e, long cardinality) {
+		move.setLogMove(unode, beforeChild);
+		
 		Pair<UnfoldedNode, UnfoldedNode> key = new Pair<UnfoldedNode, UnfoldedNode>(unode, beforeChild);
 		if (!logMoves.containsKey(key)) {
 			logMoves.put(key, new MultiSet<XEventClass>());

@@ -8,6 +8,7 @@ public class TimedMove extends Move {
 	
 	public TimedMove(Move move, Double timestamp) {
 		super(move.getType(), move.getUnode(), move.getEventClass());
+		setLogMove(move.getLogMoveUnode(), move.getLogMoveBeforeChild());
 		this.timestamp = timestamp;
 	}
 	

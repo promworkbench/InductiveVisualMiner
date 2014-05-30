@@ -39,7 +39,7 @@ public class AlignedLogMetrics {
 
 	public static long getNumberOfTracesRepresented(UnfoldedNode unode, AlignedLogInfo logInfo) {
 		if (unode.getNode() instanceof Automatic || unode.getNode() instanceof Manual) {
-			return logInfo.getActivities().getCardinalityOf(new Move(Type.synchronous, unode));
+			return logInfo.getActivities().getCardinalityOf(new Move(Type.synchronous, unode, null));
 		} else if (unode.getBlock() != null) {
 			if (unode.getBlock() instanceof Xor || unode.getBlock() instanceof Def) {
 				//for the xor itself, there are no transitions fired

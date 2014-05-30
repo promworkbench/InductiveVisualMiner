@@ -84,7 +84,7 @@ public class AlignedLogSplitter {
 		}
 
 		for (Move move : trace) {
-			if (move.isMoveSync()) {
+			if (move.isModelSync()) {
 				Set<UnfoldedNode> sigma = mapActivity2sigma.get(move.getUnode());
 				if (sigma != null) {
 					mapSigma2subtrace.get(sigma).add(move);
@@ -105,7 +105,7 @@ public class AlignedLogSplitter {
 
 		Set<UnfoldedNode> lastSigma = partition.iterator().next();
 		for (Move move : trace) {
-			if (move.isMoveSync()) {
+			if (move.isModelSync()) {
 				if (!lastSigma.contains(move.getUnode())) {
 					mapSigma2sublog.get(lastSigma).add(partialTrace, cardinality);
 					partialTrace = new IMTraceG<Move>();

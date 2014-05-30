@@ -44,12 +44,12 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogSplitt
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationSVG;
 import org.processmining.plugins.inductiveVisualMiner.animation.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.animation.Tokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.Trace2Tokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
@@ -192,6 +192,9 @@ public class InductiveVisualMinerController {
 
 		protected void processResult(Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>> result) {
 			state.setAlignment(result.getLeft(), result.getRight());
+			
+			System.out.println(result.getLeft().log);
+			System.out.println(result.getLeft().logInfo.getModelMoves());
 		}
 
 		public void cancel() {
@@ -294,7 +297,6 @@ public class InductiveVisualMinerController {
 			ShortestPathGraph graph = new ShortestPathGraph(panel.getNodes(), panel.getEdges());
 
 			boolean showDeviations = colourMode != ColourMode.paths;
-			showDeviations = false;
 
 			//compute the animation
 			Tokens tokens = new Tokens();
@@ -309,7 +311,8 @@ public class InductiveVisualMinerController {
 					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps,
 							indexTrace, showDeviations, graph, panel);
 					if (timedTrace != null) {
-						Animation.positionTrace(timedTrace, new UnfoldedNode(tree.getRoot()), tokens, graph, panel);
+//						Animation.positionTrace(timedTrace, new UnfoldedNode(tree.getRoot()), tokens, showDeviations, graph, panel);
+						tokens.add(Trace2Tokens.trace2tokens(timedTrace, showDeviations, graph, panel));
 					}
 
 					indexTrace++;
@@ -462,7 +465,7 @@ public class InductiveVisualMinerController {
 		AlignedLog fl = new AlignedLog();
 		for (IMTraceG<Move> trace : alignedLog) {
 			for (Move move : trace) {
-				if (selected.contains(move.getUnode())) {
+				if (move.isModelSync() && selected.contains(move.getUnode())) {
 					fl.add(trace, alignedLog.getCardinalityOf(trace));
 					break;
 				}

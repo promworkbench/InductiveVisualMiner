@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.alignment;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
-import org.processmining.processtree.impl.AbstractTask.Automatic;
 
 public class Move {
 
@@ -13,12 +12,9 @@ public class Move {
 	private final Type type;
 	private final UnfoldedNode unode;
 	private final XEventClass eventClass;
-
-	public Move(Type type, UnfoldedNode unode) {
-		this.type = type;
-		this.unode = unode;
-		this.eventClass = null;
-	}
+	
+	private UnfoldedNode logMoveUnode;
+	private UnfoldedNode logMoveBeforeChild;
 
 	public Move(Type type, UnfoldedNode unode, XEventClass eventClass) {
 		this.type = type;
@@ -26,23 +22,11 @@ public class Move {
 		this.eventClass = eventClass;
 	}
 
-	public Move(XEventClass eventClass, UnfoldedNode unode) {
-		this.unode = unode;
-		this.eventClass = eventClass;
-		if ((unode != null && eventClass != null) || (unode != null && unode.getNode() instanceof Automatic)) {
-			this.type = Type.synchronous;
-		} else if (unode != null) {
-			this.type = Type.model;
-		} else {
-			this.type = Type.log;
-		}
-	}
-
 	public String toString() {
-		if (getUnode() != null) {
+		if (isModelSync()) {
 			return getType() + " " + getUnode().toString();
 		} else {
-			return getType() + " " + getEventClass().toString();
+			return getType() + " " + getEventClass().toString() + " " + getLogMoveUnode() + " " + getLogMoveBeforeChild();
 		}
 	}
 
@@ -71,7 +55,7 @@ public class Move {
 		}
 	}
 
-	public boolean isMoveSync() {
+	public boolean isModelSync() {
 		return type == Type.model || type == Type.synchronous;
 	}
 
@@ -85,5 +69,25 @@ public class Move {
 
 	public XEventClass getEventClass() {
 		return eventClass;
+	}
+
+	public UnfoldedNode getLogMoveBeforeChild() {
+		return logMoveBeforeChild;
+	}
+
+	public void setLogMove(UnfoldedNode logMoveUnode, UnfoldedNode logMoveBeforeChild) {
+		this.logMoveUnode = logMoveUnode;
+		this.logMoveBeforeChild = logMoveBeforeChild;
+	}
+
+	public UnfoldedNode getLogMoveUnode() {
+		return logMoveUnode;
+	}
+	
+	public UnfoldedNode getPositionUnode() {
+		if (unode != null) {
+			return unode;
+		}
+		return logMoveUnode;
 	}
 }

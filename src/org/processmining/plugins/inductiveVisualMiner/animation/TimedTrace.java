@@ -5,8 +5,8 @@ public class TimedTrace extends IMTraceG<TimedMove> {
 
 	private static final long serialVersionUID = 9214941352493005077L;
 	
-	private double startTime = 0;
-	private double endTime = 0;
+	private Double startTime = null;
+	private Double endTime = null;
 	
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;
@@ -16,15 +16,23 @@ public class TimedTrace extends IMTraceG<TimedMove> {
 		this.startTime = startTime;
 	}
 	
-	public double getEndTime() {
+	public Double getEndTime() {
 		return endTime;
 	}
 
-	public double getStartTime() {
+	public Double getStartTime() {
 		return startTime;
 	}
 	
 	public String toString() {
 		return "[@" + getStartTime() + " " + super.toString() + " " + " @" + getEndTime() + "]";
+	}
+	
+	public TimedTrace clone() {
+		TimedTrace copy = new TimedTrace();
+		copy.addAll(this);
+		copy.setStartTime(startTime);
+		copy.setEndTime(endTime);
+		return copy;
 	}
 }

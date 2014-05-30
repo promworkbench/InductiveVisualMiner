@@ -21,7 +21,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.Sho
 
 public class TimestampsAdder {
 
-	public static double animationDuration = 180;
+	public static double animationDuration = 20;
 	public static double beginEndEdgeDuration = 1;
 	private static Random random = new Random(123);
 
@@ -94,26 +94,16 @@ public class TimestampsAdder {
 
 		//every second, a trace starts; later traces are distributed randomly
 		double startTime = indexTrace;
-		if (indexTrace >= animationDuration) {
+		if (indexTrace >= animationDuration - 10) {
 			startTime = random.nextInt((int) (animationDuration - 10));
 		}
-
 		timedTrace.setStartTime(startTime);
-		double traceDuration = random.nextInt((int) (animationDuration - startTime));
+		
+		double traceDuration = 10 + random.nextInt((int) (animationDuration - (startTime + 10)));
 		timedTrace.setEndTime(timedTrace.getStartTime() + traceDuration);
 
-		int moveIndex = 0;
-		double t = 0;
 		for (Move move : alignedTrace) {
-			if (showDeviations || move.isMoveSync()) {
-				if (move.isMoveSync()) {
-					t = startTime + ((moveIndex + 1.0) / (alignedTrace.size() + 1.0)) * traceDuration;
-					timedTrace.add(new TimedMove(move, t));
-				} else {
-					timedTrace.add(new TimedMove(move, null));
-				}
-			}
-			moveIndex++;
+			timedTrace.add(new TimedMove(move, null));
 		}
 
 		return timedTrace;
@@ -128,10 +118,10 @@ public class TimestampsAdder {
 		double t = 0;
 		for (Move move : alignedTrace) {
 			if (move.getEventClass() != null) {
-				
+
 				//filter out log moves if wanted
-				if (showDeviations || move.isMoveSync()) {
-					
+				if (showDeviations || move.isModelSync()) {
+
 					XEvent event = trace.get(xEventIndex);
 					xEventIndex++;
 
