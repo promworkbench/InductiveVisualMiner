@@ -21,8 +21,6 @@
 	<classpathentry kind="lib" path="stdlib/jung-graph-impl-2.0.jar"/>
 	<classpathentry kind="lib" path="stdlib/jung-io-2.0.jar"/>
 	<classpathentry kind="lib" path="stdlib/jung-visualization-2.0.jar"/>
-	<classpathentry kind="lib" path="stdlib/OpenXES-XStream.jar"/>
-	<classpathentry kind="lib" path="stdlib/OpenXES.jar"/>
 	<classpathentry kind="lib" path="stdlib/simmetrics.jar"/>
 	<classpathentry kind="lib" path="stdlib/slickerbox1.0rc1.jar"/>
 	<classpathentry kind="lib" path="stdlib/Spex.jar"/>
@@ -74,7 +72,10 @@
 	<classpathentry kind="lib" path="stdlib/guava-16.0.1.jar"/>
 	<classpathentry kind="lib" path="packagelib/lib-EvolutionaryTreeMiner/trove-3.0.3.jar"/>
 	<classpathentry kind="lib" path="packagelib/Widgets.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/InductiveMiner"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/GraphViz"/>
+	<classpathentry kind="lib" path="packagelib/GraphViz.jar"/>
+	<classpathentry kind="lib" path="packagelib/InductiveMiner.jar"/>
+	<classpathentry kind="lib" path="packagelib/Log.jar"/>
+	<classpathentry kind="lib" path="packagelib/Log-lib/OpenXES-XStream.jar"/>
+	<classpathentry kind="lib" path="packagelib/Log-lib/OpenXES.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
