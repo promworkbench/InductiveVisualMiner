@@ -276,11 +276,11 @@ public class AlignedLogVisualisation {
 	private void convertParallel(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(this, NodeType.parallel, "+", unode);
+		LocalDotNode split = new LocalDotNode(this, NodeType.parallelSplit, "+", unode);
 		addArc(source, split, unode, directionForward);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(this, NodeType.parallel, "+", unode);
+		LocalDotNode join = new LocalDotNode(this, NodeType.parallelJoin, "+", unode);
 		addArc(join, sink, unode, directionForward);
 
 		for (Node child : unode.getBlock().getChildren()) {

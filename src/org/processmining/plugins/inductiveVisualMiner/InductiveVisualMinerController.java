@@ -192,9 +192,6 @@ public class InductiveVisualMinerController {
 
 		protected void processResult(Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>> result) {
 			state.setAlignment(result.getLeft(), result.getRight());
-			
-			System.out.println(result.getLeft().log);
-			System.out.println(result.getLeft().logInfo.getModelMoves());
 		}
 
 		public void cancel() {
@@ -312,7 +309,7 @@ public class InductiveVisualMinerController {
 							indexTrace, showDeviations, graph, panel);
 					if (timedTrace != null) {
 //						Animation.positionTrace(timedTrace, new UnfoldedNode(tree.getRoot()), tokens, showDeviations, graph, panel);
-						tokens.add(Trace2Tokens.trace2tokens(timedTrace, showDeviations, graph, panel));
+						tokens.addAll(Trace2Tokens.trace2tokens(timedTrace, showDeviations, graph, panel).getAllTokensRecursively());
 					}
 
 					indexTrace++;

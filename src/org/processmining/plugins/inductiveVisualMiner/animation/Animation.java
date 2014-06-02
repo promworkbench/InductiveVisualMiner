@@ -215,7 +215,7 @@ public class Animation {
 	
 	public static LocalDotNode getParallelSplit(UnfoldedNode unode, InductiveVisualMinerPanel panel) {
 		for (LocalDotNode node: panel.getUnfoldedNode2dotNodes().get(unode)) {
-			if (node.type == NodeType.parallel) {
+			if (node.type == NodeType.parallelSplit) {
 				return node;
 			}
 		}
@@ -223,14 +223,9 @@ public class Animation {
 	}
 	
 	public static LocalDotNode getParallelJoin(UnfoldedNode unode, InductiveVisualMinerPanel panel) {
-		boolean first = false;
 		for (LocalDotNode node: panel.getUnfoldedNode2dotNodes().get(unode)) {
-			if (node.type == NodeType.parallel) {
-				if (!first) {
-					first = true;
-				} else {
-					return node;
-				}
+			if (node.type == NodeType.parallelJoin) {
+				return node;
 			}
 		}
 		return null;

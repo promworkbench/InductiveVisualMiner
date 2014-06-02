@@ -10,7 +10,7 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 public class LocalDotNode extends DotNode {
 
 	public enum NodeType {
-		source, sink, activity, xor, parallel, logMoveActivity
+		source, sink, activity, xor, parallelSplit, parallelJoin, logMoveActivity
 	}
 	
 	private final AlignedLogVisualisation alignedLogVisualisation;
@@ -36,7 +36,8 @@ public class LocalDotNode extends DotNode {
 			case logMoveActivity :
 				setOptions("shape=\"box\", style=\"rounded,filled\", fontsize=9, fillcolor=\"red\"");
 				break;
-			case parallel :
+			case parallelSplit :
+			case parallelJoin:
 				setOptions("shape=\"diamond\", fixedsize=true, height=0.25, width=0.27");
 				break;
 			case sink :
