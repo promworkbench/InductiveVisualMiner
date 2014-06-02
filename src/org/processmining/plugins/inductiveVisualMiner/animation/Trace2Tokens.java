@@ -35,7 +35,9 @@ public class Trace2Tokens {
 		Token token = trace2tokens(copyTrace, Pair.of(panel.getRootSource(), trace.getStartTime()),
 				Pair.of(panel.getRootSink(), trace.getEndTime()), new ArrayList<UnfoldedNode>(), showDeviations,
 				shortestPath, panel);
-		
+
+		System.out.println(token);
+
 		//interpolate the missing timestamps from the token
 		InterpolateToken.interpolateToken(token);
 
@@ -52,6 +54,8 @@ public class Trace2Tokens {
 		//walk through the trace
 		for (int i = 0; i < trace.size(); i++) {
 			TimedMove move = trace.get(i);
+
+			debug(" " + move);
 
 			//see if we are leaving a parallel subtrace
 			for (int j = localInParallelUnodes.size() - 1; j >= 0; j--) {
@@ -169,7 +173,7 @@ public class Trace2Tokens {
 				token.addPoint(moveEdge, null);
 			}
 		}
-		
+
 		//exit remaining parallel unodes
 		for (UnfoldedNode parallel : localInParallelUnodes) {
 			if (!inParallelUnodes.contains(parallel)) {
@@ -186,8 +190,7 @@ public class Trace2Tokens {
 			token.addPoint(path.get(path.size() - 1), endPosition.getRight());
 		} else {
 			//the trace has already ended, fill in the end time
-			Pair<LocalDotEdge, Double> p = token.getPoints().get(token.getPoints().size() - 1);
-			token.getPoints().set(token.getPoints().size() - 1, Pair.of(p.getLeft(), endPosition.getRight()));
+			token.setTimestampOfPoint(token.getPoints().size() - 1, endPosition.getRight());
 		}
 
 		return token;
@@ -204,7 +207,7 @@ public class Trace2Tokens {
 		for (LocalDotEdge edge : path) {
 			token.addPoint(edge, null);
 		}
-		
+
 		debug(" leaving parallel " + parallel);
 	}
 
@@ -303,8 +306,8 @@ public class Trace2Tokens {
 
 		return result;
 	}
-	
+
 	private static void debug(Object s) {
-//		System.out.println(s.toString().replaceAll("\\n", " "));
+		//		System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }

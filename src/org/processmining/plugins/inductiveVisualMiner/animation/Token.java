@@ -58,7 +58,7 @@ public class Token {
 		}
 	}
 
-	public void setTimestampOfPoint(int index, double timestamp) {
+	public void setTimestampOfPoint(int index, Double timestamp) {
 		//set this token
 		points.set(index, Pair.of(points.get(index).getLeft(), timestamp));
 
@@ -100,12 +100,12 @@ public class Token {
 	public void addPoint(LocalDotEdge edge, Double time) {
 		points.add(Pair.of(edge, time));
 		subTokens.add(new HashSet<Token>());
-		
+
 		performSanityCheck();
 
-		//		System.out.println("  add point to token " + points.get(points.size() - 1) + fade);
-		//
-		//		System.out.println("   to " + edge.getTarget().toString().replaceAll("\\n", " "));
+		//				System.out.println("  add point to token " + points.get(points.size() - 1) + fade);
+		//		
+		//				System.out.println("   to " + edge.getTarget().toString().replaceAll("\\n", " "));
 	}
 
 	public void addSubToken(Token token) {
