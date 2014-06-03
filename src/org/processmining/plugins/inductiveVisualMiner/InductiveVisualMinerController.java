@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -46,6 +49,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationSVG;
 import org.processmining.plugins.inductiveVisualMiner.animation.ExportAnimation;
+import org.processmining.plugins.inductiveVisualMiner.animation.SVGTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.animation.Tokens;
@@ -308,7 +312,6 @@ public class InductiveVisualMinerController {
 					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps,
 							indexTrace, showDeviations, graph, panel);
 					if (timedTrace != null) {
-//						Animation.positionTrace(timedTrace, new UnfoldedNode(tree.getRoot()), tokens, showDeviations, graph, panel);
 						tokens.addAll(Trace2Tokens.trace2tokens(timedTrace, showDeviations, graph, panel).getAllTokensRecursively());
 					}
 
@@ -324,7 +327,11 @@ public class InductiveVisualMinerController {
 			//System.out.println(AnimationSVG.animateTokens(result, panel));
 			try {
 				OutputStream streamOut = new FileOutputStream("D:\\animationTest.svg");
-				ExportAnimation.export(AnimationSVG.animateTokens(result, panel), streamOut, panel);
+				SVGTokens animatedTokens = AnimationSVG.animateTokens(result, panel);
+				ExportAnimation.export(animatedTokens, streamOut, panel);
+				
+				ImageOutputStream streamOutAvi = new FileImageOutputStream(new File("D:\\animationTest.avi"));
+				ExportAnimation.exportMovie(animatedTokens, streamOutAvi, panel);
 			} catch (IOException e) {
 
 			}

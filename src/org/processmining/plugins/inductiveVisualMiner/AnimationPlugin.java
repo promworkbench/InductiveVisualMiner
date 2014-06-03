@@ -16,9 +16,7 @@ import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel;
 
 import com.kitfox.svg.SVGDiagram;
-import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.SVGUniverse;
-import com.kitfox.svg.animation.AnimationElement;
 
 @Plugin(name = "Inductive visual Miner animation test", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Log" }, userAccessible = false)
 @Visualizer
@@ -40,22 +38,8 @@ public class AnimationPlugin {
 		AnimatableSVGPanel panel = new AnimatableSVGPanel(universe);
 		panel.setImage(diagram, true);
 		
-		panel.setAnimationMaxTime(getMaxEndTime(diagram.getRoot()));
+		panel.setAnimationMaxTime(AnimatableSVGPanel.getExtremeTimes(diagram.getRoot()).get(1));
 
 		return panel;
-	}
-
-	public static double getMaxEndTime(SVGElement e) {
-		double result = Double.MIN_VALUE;
-		if (e instanceof AnimationElement) {
-			result = Math.max(result, ((AnimationElement) e).evalStartTime() + ((AnimationElement) e).evalDurTime());
-		}
-
-		//recurse
-		for (int i = 0; i < e.getNumChildren(); i++) {
-			result = Math.max(result, getMaxEndTime(e.getChild(i)));
-		}
-		
-		return result;
 	}
 }
