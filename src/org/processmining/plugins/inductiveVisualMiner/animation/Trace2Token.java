@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
@@ -21,10 +21,10 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 import org.processmining.processtree.impl.AbstractBlock.And;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 
-public class Trace2Tokens {
+public class Trace2Token {
 
-	public static Token trace2tokens(TimedTrace trace, boolean showDeviations, ShortestPathGraph shortestPath,
-			InductiveVisualMinerPanel panel) {
+	public static Token trace2token(TimedTrace trace, boolean showDeviations, ShortestPathGraph shortestPath,
+			AlignedLogVisualisationInfo info) {
 
 		debug("");
 		debug(trace);
@@ -32,21 +32,21 @@ public class Trace2Tokens {
 		//copy the trace
 		List<TimedMove> copyTrace = new ArrayList<TimedMove>(trace);
 
-		Token token = trace2tokens(copyTrace, Pair.of(panel.getRootSource(), trace.getStartTime()),
-				Pair.of(panel.getRootSink(), trace.getEndTime()), new ArrayList<UnfoldedNode>(), showDeviations,
-				shortestPath, panel);
-
-		System.out.println(token);
+		Token token = trace2token(copyTrace, Pair.of(info.getSource(), trace.getStartTime()),
+				Pair.of(info.getSink(), trace.getEndTime()), new ArrayList<UnfoldedNode>(), showDeviations,
+				shortestPath, info);
 
 		//interpolate the missing timestamps from the token
 		InterpolateToken.interpolateToken(token);
+		
+		debug(token);
 
 		return token;
 	}
 
-	public static Token trace2tokens(List<TimedMove> trace, Pair<LocalDotNode, Double> startPosition,
+	public static Token trace2token(List<TimedMove> trace, Pair<LocalDotNode, Double> startPosition,
 			Pair<LocalDotNode, Double> endPosition, List<UnfoldedNode> inParallelUnodes, boolean showDeviations,
-			ShortestPathGraph shortestPath, InductiveVisualMinerPanel panel) {
+			ShortestPathGraph shortestPath, AlignedLogVisualisationInfo info) {
 
 		Token token = new Token(startPosition.getLeft(), startPosition.getRight(), inParallelUnodes.isEmpty());
 		List<UnfoldedNode> localInParallelUnodes = new ArrayList<>(inParallelUnodes);
@@ -65,7 +65,7 @@ public class Trace2Tokens {
 
 					localInParallelUnodes.remove(j);
 
-					exitParallel(parallel, token, shortestPath, panel);
+					exitParallel(parallel, token, shortestPath, info);
 				} else {
 					break;
 				}
@@ -92,7 +92,7 @@ public class Trace2Tokens {
 				debug(" subsub traces " + subsubTraces);
 
 				//move the token up to the parallel split
-				LocalDotNode parallelSplit = Animation.getParallelSplit(parallel, panel);
+				LocalDotNode parallelSplit = Animation.getParallelSplit(parallel, info);
 				{
 					List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), parallelSplit);
 					for (LocalDotEdge edge : path) {
@@ -118,13 +118,13 @@ public class Trace2Tokens {
 				localInParallelUnodes.add(parallel);
 
 				//recurse on other subsubTraces
-				LocalDotNode parallelJoin = Animation.getParallelJoin(parallel, panel);
+				LocalDotNode parallelJoin = Animation.getParallelJoin(parallel, info);
 				for (int j = 1; j < subsubTraces.size(); j++) {
 					List<TimedMove> subsubTrace = subsubTraces.get(j);
 					List<UnfoldedNode> childInParallelUnodes = new ArrayList<>(localInParallelUnodes);
-					Token childToken = trace2tokens(subsubTrace, Pair.of(parallelSplit, (Double) null),
+					Token childToken = trace2token(subsubTrace, Pair.of(parallelSplit, (Double) null),
 							Pair.of(parallelJoin, (Double) null), childInParallelUnodes, showDeviations, shortestPath,
-							panel);
+							info);
 
 					token.addSubToken(childToken);
 				}
@@ -137,7 +137,7 @@ public class Trace2Tokens {
 
 				//move from the last known position to the start of the tau edge,
 				//then take the move tau itself
-				LocalDotEdge tauEdge = Animation.getTauEdge(move, panel);
+				LocalDotEdge tauEdge = Animation.getTauEdge(move, info);
 
 				List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), tauEdge.getSource());
 				for (LocalDotEdge edge : path) {
@@ -148,22 +148,24 @@ public class Trace2Tokens {
 
 			} else if (move.getType() == Type.synchronous || (move.getType() == Type.model && !showDeviations)) {
 				//synchronous move or model move without deviations showing
-				LocalDotNode nextDestination = Animation.getDotNodeFromActivity(move, panel);
+				LocalDotNode nextDestination = Animation.getDotNodeFromActivity(move, info);
 
 				//move from the last known position to the new position
 				//the last edge gets a timestamp
 				List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), nextDestination);
-				for (int j = 0; j < path.size() - 1; j++) {
-					token.addPoint(path.get(j), null);
+				if (!path.isEmpty()) {
+					for (int j = 0; j < path.size() - 1; j++) {
+						token.addPoint(path.get(j), null);
+					}
+					token.addPoint(path.get(path.size() - 1), move.getTimestamp());
 				}
-				token.addPoint(path.get(path.size() - 1), move.getTimestamp());
 
 			} else if (move.getType() == Type.model) {
 				//model move, showing deviations
 
 				//move from the last known position to the start of the move edge,
 				//then take the move edge itself
-				LocalDotEdge moveEdge = Animation.getModelMoveEdge(move, panel);
+				LocalDotEdge moveEdge = Animation.getModelMoveEdge(move, info);
 
 				List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), moveEdge.getSource());
 				for (LocalDotEdge edge : path) {
@@ -171,13 +173,26 @@ public class Trace2Tokens {
 				}
 
 				token.addPoint(moveEdge, null);
+			} else if (move.getType() == Type.log) {
+				//log move (should be filtered out if not showing deviations)
+				LocalDotEdge moveEdge = Animation.getLogMoveEdge(move.getLogMoveUnode(), move.getLogMoveBeforeChild(), info);
+				
+				//move from the last known position to the start of the move edge,
+				//then take the move edge itself
+				List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), moveEdge.getSource());
+				for (LocalDotEdge edge : path) {
+					token.addPoint(edge, null);
+				}
+				
+				//add the move edge
+				token.addPoint(moveEdge, move.getTimestamp());
 			}
 		}
 
 		//exit remaining parallel unodes
 		for (UnfoldedNode parallel : localInParallelUnodes) {
 			if (!inParallelUnodes.contains(parallel)) {
-				exitParallel(parallel, token, shortestPath, panel);
+				exitParallel(parallel, token, shortestPath, info);
 			}
 		}
 
@@ -200,9 +215,9 @@ public class Trace2Tokens {
 	 * leave a parallel unode
 	 */
 	private static void exitParallel(UnfoldedNode parallel, Token token, ShortestPathGraph shortestPath,
-			InductiveVisualMinerPanel panel) {
+			AlignedLogVisualisationInfo info) {
 		//move the token to the parallel join
-		LocalDotNode parallelJoin = Animation.getParallelJoin(parallel, panel);
+		LocalDotNode parallelJoin = Animation.getParallelJoin(parallel, info);
 		List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), parallelJoin);
 		for (LocalDotEdge edge : path) {
 			token.addPoint(edge, null);
@@ -308,6 +323,7 @@ public class Trace2Tokens {
 	}
 
 	private static void debug(Object s) {
-		//		System.out.println(s.toString().replaceAll("\\n", " "));
+		System.out.println(s);
+//				System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }

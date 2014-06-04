@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
@@ -15,23 +15,23 @@ import org.processmining.processtree.impl.AbstractTask.Automatic;
 public class Animation {
 
 	public static List<LocalDotEdge> getEdgesOnMovePath(List<TimedMove> movePath, ShortestPathGraph shortestPath,
-			InductiveVisualMinerPanel panel, boolean addSource, boolean addSink) {
+			AlignedLogVisualisationInfo info, boolean addSource, boolean addSink) {
 
 		//make a node-path
 		List<LocalDotNode> nodePath = new ArrayList<>();
 		if (addSource) {
-			nodePath.add(panel.getRootSource());
+			nodePath.add(info.getSource());
 		}
 		for (TimedMove move : movePath) {
-			LocalDotNode node = getDotNodeFromActivity(move, panel);
+			LocalDotNode node = getDotNodeFromActivity(move, info);
 			if (node != null) {
 				nodePath.add(node);
 			} else if (move.isModelSync() && move.getUnode().getNode() instanceof Automatic) {
-				nodePath.add(panel.getUnfoldedNode2dotEdgesModel().get(move.getUnode()).get(0).getSource());
+				nodePath.add(info.getModelEdges(move.getUnode()).get(0).getSource());
 			}
 		}
 		if (addSink) {
-			nodePath.add(panel.getRootSink());
+			nodePath.add(info.getSink());
 		}
 
 		//construct edge-path
@@ -55,38 +55,48 @@ public class Animation {
 		return result;
 	}
 
-	public static LocalDotEdge getModelMoveEdge(TimedMove move, InductiveVisualMinerPanel panel) {
-		return panel.getUnfoldedNode2dotEdgesMove().get(move.getUnode()).get(0);
-	}
-	
-	public static LocalDotEdge getTauEdge(TimedMove move, InductiveVisualMinerPanel panel) {
-		return panel.getUnfoldedNode2dotEdgesModel().get(move.getUnode()).get(0);
-	}
-	
-	public static LocalDotNode getParallelSplit(UnfoldedNode unode, InductiveVisualMinerPanel panel) {
-		for (LocalDotNode node: panel.getUnfoldedNode2dotNodes().get(unode)) {
-			if (node.type == NodeType.parallelSplit) {
-				return node;
-			}
+	public static LocalDotEdge getModelMoveEdge(TimedMove move, AlignedLogVisualisationInfo info) {
+		List<LocalDotEdge> edges = info.getModelMoveEdges(move.getUnode());
+		if (!edges.isEmpty()) {
+			return edges.get(0);
 		}
 		return null;
 	}
-	
-	public static LocalDotNode getParallelJoin(UnfoldedNode unode, InductiveVisualMinerPanel panel) {
-		for (LocalDotNode node: panel.getUnfoldedNode2dotNodes().get(unode)) {
-			if (node.type == NodeType.parallelJoin) {
+
+	public static LocalDotEdge getLogMoveEdge(UnfoldedNode logMoveUnode, UnfoldedNode logMoveBeforeChild,
+			AlignedLogVisualisationInfo info) {
+		List<LocalDotEdge> edges = info.getLogMoveEdges(logMoveUnode, logMoveBeforeChild);
+		if (!edges.isEmpty()) {
+			return edges.get(0);
+		}
+		return null;
+	}
+
+	public static LocalDotEdge getTauEdge(TimedMove move, AlignedLogVisualisationInfo info) {
+		return info.getModelEdges(move.getUnode()).get(0);
+	}
+
+	public static LocalDotNode getParallelSplit(UnfoldedNode unode, AlignedLogVisualisationInfo info) {
+		for (LocalDotNode node : info.getNodes(unode)) {
+			if (node.getType() == NodeType.parallelSplit) {
 				return node;
 			}
 		}
 		return null;
 	}
 
-	public static LocalDotNode getDotNodeFromActivity(TimedMove move, InductiveVisualMinerPanel panel) {
-		if (!panel.getUnfoldedNode2dotNodes().containsKey(move.getUnode())) {
-			return null;
+	public static LocalDotNode getParallelJoin(UnfoldedNode unode, AlignedLogVisualisationInfo info) {
+		for (LocalDotNode node : info.getNodes(unode)) {
+			if (node.getType() == NodeType.parallelJoin) {
+				return node;
+			}
 		}
-		for (LocalDotNode node : panel.getUnfoldedNode2dotNodes().get(move.getUnode())) {
-			if (node.type == NodeType.activity) {
+		return null;
+	}
+
+	public static LocalDotNode getDotNodeFromActivity(TimedMove move, AlignedLogVisualisationInfo info) {
+		for (LocalDotNode node : info.getNodes(move.getUnode())) {
+			if (node.getType() == NodeType.activity) {
 				return node;
 			}
 		}
@@ -94,6 +104,6 @@ public class Animation {
 	}
 
 	private static void debug(Object s) {
-//		System.out.println(s.toString().replaceAll("\\n", " "));
+		//		System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }

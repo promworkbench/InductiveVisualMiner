@@ -1,9 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-
+import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -13,21 +10,14 @@ public class LocalDotNode extends DotNode {
 		source, sink, activity, xor, parallelSplit, parallelJoin, logMoveActivity
 	}
 	
-	private final AlignedLogVisualisation alignedLogVisualisation;
-	public NodeType type;
-	public final UnfoldedNode node;
+	private NodeType type;
+	private final UnfoldedNode node;
 
-	public LocalDotNode(AlignedLogVisualisation alignedLogVisualisation, NodeType type, String label, final UnfoldedNode unode) {
+	public LocalDotNode(Dot dot, AlignedLogVisualisationInfo info, NodeType type, String label, final UnfoldedNode unode) {
 		super(label, "");
-		this.alignedLogVisualisation = alignedLogVisualisation;
-		this.alignedLogVisualisation.dot.addNode(this);
-		if (this.alignedLogVisualisation.unfoldedNode2dotNodes.get(unode) == null) {
-			this.alignedLogVisualisation.unfoldedNode2dotNodes.put(unode, new ArrayList<LocalDotNode>());
-		}
-		this.alignedLogVisualisation.unfoldedNode2dotNodes.get(unode).add(this);
-		this.alignedLogVisualisation.dotNodes.add(this);
+		
 		this.node = unode;
-		this.type = type;
+		this.setType(type);
 
 		switch (type) {
 			case activity :
@@ -50,27 +40,20 @@ public class LocalDotNode extends DotNode {
 				setOptions("width=0.05, shape=\"circle\"");
 				break;
 		}
+		
+		dot.addNode(this);
+		info.addNode(unode, this);
+	}
 
-		if (this.alignedLogVisualisation.parameters.isAddOnClick()) {
-			addMouseListener(new MouseListener() {
+	public UnfoldedNode getUnode() {
+		return node;
+	}
 
-				public void mouseReleased(MouseEvent arg0) {
-				}
+	public NodeType getType() {
+		return type;
+	}
 
-				public void mousePressed(MouseEvent arg0) {
-
-				}
-
-				public void mouseExited(MouseEvent arg0) {
-				}
-
-				public void mouseEntered(MouseEvent arg0) {
-				}
-
-				public void mouseClicked(MouseEvent arg0) {
-
-				}
-			});
-		}
+	public void setType(NodeType type) {
+		this.type = type;
 	}
 }

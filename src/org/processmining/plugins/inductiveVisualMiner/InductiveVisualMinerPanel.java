@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -20,6 +18,7 @@ import javax.swing.JTextArea;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.processmining.framework.plugin.PluginContext;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThrough;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughDirectlyFollowsGraph;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
@@ -30,8 +29,8 @@ import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
@@ -42,6 +41,7 @@ import com.fluxicon.slickerbox.components.NiceDoubleSlider;
 import com.fluxicon.slickerbox.components.NiceSlider.Orientation;
 import com.fluxicon.slickerbox.factory.SlickerFactory;
 import com.kitfox.svg.Group;
+import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGElement;
 
 public class InductiveVisualMinerPanel extends JPanel {
@@ -192,7 +192,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 				Set<UnfoldedNode> result = new HashSet<UnfoldedNode>();
 				for (DotElement dotElement : graphPanel.getSelectedElements()) {
-					result.add(((LocalDotNode) dotElement).node);
+					result.add(((LocalDotNode) dotElement).getUnode());
 				}
 
 				if (onSelectionChanged != null) {
@@ -214,11 +214,13 @@ public class InductiveVisualMinerPanel extends JPanel {
 		add(graphPanel, cGraphPanel);
 	}
 
-	public synchronized Dot updateModel(InductiveVisualMinerState state) throws IOException {
+	public synchronized Pair<Dot, AlignedLogVisualisationInfo> updateModel(InductiveVisualMinerState state)
+			throws IOException {
 		AlignedLogVisualisationParameters parameters = getViewParameters(state);
-		Dot dot = visualiser.fancy(state.getTree(), state.getAlignedFilteredLogInfo(), state.getDfgFilteredLogInfos(), parameters);
-		graphPanel.changeDot(dot, true);
-		return dot;
+		Pair<Dot, AlignedLogVisualisationInfo> p = visualiser.fancy(state.getTree(), state.getAlignedFilteredLogInfo(),
+				state.getDfgFilteredLogInfos(), parameters);
+		graphPanel.changeDot(p.getLeft(), true);
+		return p;
 	}
 
 	//==visualisation parameters==
@@ -271,32 +273,32 @@ public class InductiveVisualMinerPanel extends JPanel {
 		public String strokeDashArray;
 	}
 
-	public void makeNodeSelectable(final LocalDotNode dotNode, boolean select) {
+	public void makeNodeSelectable(final SVGDiagram svg, final LocalDotNode dotNode, boolean select) {
 		final Selected oldSelected = new Selected();
 		dotNode.setSelectable(true);
 		dotNode.addSelectionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DotPanel panel = (DotPanel) e.getSource();
-				Group svgGroup = panel.getSVGElementOf(dotNode);
+				Group svgGroup = DotPanel.getSVGElementOf(svg, dotNode);
 				SVGElement shape = svgGroup.getChild(1);
 
-				oldSelected.stroke = panel.setCSSAttributeOf(shape, "stroke", "red");
-				oldSelected.strokeWidth = panel.setCSSAttributeOf(shape, "stroke-width", "3");
-				oldSelected.strokeDashArray = panel.setCSSAttributeOf(shape, "stroke-dasharray", "5,5");
+				oldSelected.stroke = DotPanel.setCSSAttributeOf(shape, "stroke", "red");
+				oldSelected.strokeWidth = DotPanel.setCSSAttributeOf(shape, "stroke-width", "3");
+				oldSelected.strokeDashArray = DotPanel.setCSSAttributeOf(shape, "stroke-dasharray", "5,5");
 
+				DotPanel panel = (DotPanel) e.getSource();
 				panel.repaint();
 			}
 		});
 		dotNode.addDeselectionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DotPanel panel = (DotPanel) e.getSource();
-				Group svgGroup = panel.getSVGElementOf(dotNode);
+				Group svgGroup = DotPanel.getSVGElementOf(svg, dotNode);
 				SVGElement shape = svgGroup.getChild(1);
 
-				panel.setCSSAttributeOf(shape, "stroke", oldSelected.stroke);
-				panel.setCSSAttributeOf(shape, "stroke-width", oldSelected.strokeWidth);
-				panel.setCSSAttributeOf(shape, "stroke-dasharray", oldSelected.strokeDashArray);
+				DotPanel.setCSSAttributeOf(shape, "stroke", oldSelected.stroke);
+				DotPanel.setCSSAttributeOf(shape, "stroke-width", oldSelected.strokeWidth);
+				DotPanel.setCSSAttributeOf(shape, "stroke-dasharray", oldSelected.strokeDashArray);
 
+				DotPanel panel = (DotPanel) e.getSource();
 				panel.repaint();
 			}
 		});
@@ -340,52 +342,12 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public NiceDoubleSlider getActivitiesSlider() {
 		return activitiesSlider;
 	}
-	
+
 	public JButton getExitButton() {
 		return exitButton;
 	}
 
-	public Map<UnfoldedNode, List<LocalDotNode>> getUnfoldedNode2DfgdotNodes() {
-		return visualiser.getUnfoldedNode2DfgdotNodes();
-	}
-
-	public Map<UnfoldedNode, List<LocalDotNode>> getUnfoldedNode2dotNodes() {
-		return visualiser.getUnfoldedNode2dotNodes();
-	}
-
-	public Map<UnfoldedNode, LocalDotNode> getActivity2dotNode() {
-		return visualiser.getActivity2dotNode();
-	}
-
 	public void setOnSelectionChanged(InputFunction<Set<UnfoldedNode>> onSelectionChanged) {
 		this.onSelectionChanged = onSelectionChanged;
-	}
-
-	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2DfgdotEdges() {
-		return visualiser.getUnfoldedNode2DfgdotEdges();
-	}
-
-	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2dotEdgesModel() {
-		return visualiser.getUnfoldedNode2dotEdgesModel();
-	}
-
-	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2dotEdgesMove() {
-		return visualiser.getUnfoldedNode2dotEdgesMove();
-	}
-	
-	public LocalDotNode getRootSource() {
-		return visualiser.getRootSource();
-	}
-	
-	public LocalDotNode getRootSink() {
-		return visualiser.getRootSink();
-	}
-	
-	public Set<LocalDotNode> getNodes() {
-		return visualiser.getNodes();
-	}
-	
-	public Set<LocalDotEdge> getEdges() {
-		return visualiser.getEdges();
 	}
 }

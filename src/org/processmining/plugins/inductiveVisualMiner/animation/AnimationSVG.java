@@ -10,32 +10,33 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
+import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 
 import com.kitfox.svg.Group;
+import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.SVGException;
 
 public class AnimationSVG {
 
-	public static SVGTokens animateTokens(Tokens tokens, InductiveVisualMinerPanel panel) {
+	public static SVGTokens animateTokens(List<Token> tokens, SVGDiagram svg) {
 		SVGTokens svgTokens = new SVGTokens();
 		for (Token token : tokens) {
-			animateToken(token, svgTokens, panel);
+			animateToken(token, svgTokens, svg);
 		}
 		return svgTokens;
 	}
 
-	public static void animateToken(Token token, SVGTokens svgTokens, InductiveVisualMinerPanel panel) {
+	public static void animateToken(Token token, SVGTokens svgTokens, SVGDiagram svg) {
 		StringBuilder result = new StringBuilder();
 
 		//fade in
 		fade(token.isFade(), true, token.getStartTime(), null, result);
 
 		for (int i = 0; i < token.getPoints().size(); i++) {
-			animatePoint(token, i, result, panel);
+			animatePoint(token, i, result, svg);
 		}
 
 		//fade out
@@ -115,7 +116,7 @@ public class AnimationSVG {
 		}
 	}
 
-	public static void animatePoint(Token token, int index, StringBuilder result, InductiveVisualMinerPanel panel) {
+	public static void animatePoint(Token token, int index, StringBuilder result, SVGDiagram svg) {
 		Pair<LocalDotEdge, Double> point = token.getPoints().get(index);
 		LocalDotEdge edge = point.getLeft();
 		double endTime = point.getRight();
@@ -130,19 +131,19 @@ public class AnimationSVG {
 		double duration = endTime - startTime;
 
 		//get the svg-line with the edge
-		SVGElement SVGline = panel.getGraph().getSVGElementOf(edge).getChild(1);
+		SVGElement SVGline = DotPanel.getSVGElementOf(svg, edge).getChild(1);
 
 		//get the start node
 		LocalDotNode startNode = edge.getSource();
 
 		//compute the path
-		String path = "M" + getCenter(startNode, panel);
+		String path = "M" + getCenter(startNode, svg);
 		if (edge.isDirectionForward()) {
-			path += "L" + panel.getGraph().getAttributeOf(SVGline, "d").substring(1);
+			path += "L" + DotPanel.getAttributeOf(SVGline, "d").substring(1);
 		} else {
-			path += reversePath(panel.getGraph().getAttributeOf(SVGline, "d"));
+			path += reversePath(DotPanel.getAttributeOf(SVGline, "d"));
 		}
-		path += "L" + getCenter(edge.getTarget(), panel);
+		path += "L" + getCenter(edge.getTarget(), svg);
 
 		//put it all together
 		result.append("<animateMotion ");
@@ -159,8 +160,8 @@ public class AnimationSVG {
 		result.append("/>");
 	}
 
-	private static String getCenter(LocalDotNode node, InductiveVisualMinerPanel panel) {
-		Group nodeGroup = panel.getGraph().getSVGElementOf(node);
+	private static String getCenter(LocalDotNode node, SVGDiagram image) {
+		Group nodeGroup = DotPanel.getSVGElementOf(image, node);
 		Rectangle2D bb = null;
 		try {
 			bb = nodeGroup.getBoundingBox();

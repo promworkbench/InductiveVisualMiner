@@ -6,13 +6,11 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.DotEdge;
-import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation.EdgeType;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
@@ -21,13 +19,14 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
 import com.kitfox.svg.Group;
+import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.SVGException;
 import com.kitfox.svg.Text;
 
 public class InductiveVisualMinerSelectionColourer {
-	public static void colour(InductiveVisualMinerPanel panel, ProcessTree tree, AlignedLogInfo alignedFilteredLogInfo,
-			Map<UnfoldedNode, AlignedLogInfo> alignedFilteredDfgLogInfos,
+	public static void colour(SVGDiagram svg, AlignedLogVisualisationInfo info, ProcessTree tree,
+			AlignedLogInfo alignedFilteredLogInfo, Map<UnfoldedNode, AlignedLogInfo> alignedFilteredDfgLogInfos,
 			AlignedLogVisualisationParameters visualisationParameters) {
 
 		UnfoldedNode uroot = new UnfoldedNode(tree.getRoot());
@@ -42,157 +41,145 @@ public class InductiveVisualMinerSelectionColourer {
 			//style nodes
 			for (UnfoldedNode unode : AlignedLogMetrics.unfoldAllNodes(uroot)) {
 				long cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, alignedFilteredLogInfo);
-				styleUnfoldedNode(unode, panel, cardinality, minCardinality, maxCardinality, visualisationParameters);
+				styleUnfoldedNode(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
 			}
 
 			//style edges
-			styleEdges(panel, alignedFilteredLogInfo, visualisationParameters, alignedFilteredDfgLogInfos,
-					minCardinality, maxCardinality);
+			styleEdges(svg, info, alignedFilteredLogInfo, visualisationParameters, alignedFilteredDfgLogInfos, minCardinality,
+					maxCardinality);
 
 		} catch (SVGException e) {
 			e.printStackTrace();
 		}
-
-		panel.repaint();
 	}
 
-	private static void styleUnfoldedNode(UnfoldedNode unode, InductiveVisualMinerPanel panel, long cardinality,
-			long minCardinality, long maxCardinality, AlignedLogVisualisationParameters visualisationParameters)
-			throws SVGException {
+	private static void styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
+			long cardinality, long minCardinality, long maxCardinality,
+			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
 		if (unode.getNode() instanceof Manual) {
-			styleManual(unode, panel, cardinality, minCardinality, maxCardinality, visualisationParameters);
+			styleManual(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
 		} else {
-			styleNonManualNode(unode, panel, cardinality);
+			styleNonManualNode(unode, svg, info, cardinality);
 		}
 	}
 
-	private static void styleManual(UnfoldedNode unode, InductiveVisualMinerPanel panel, long cardinality,
-			long minCardinality, long maxCardinality, AlignedLogVisualisationParameters visualisationParameters)
-			throws SVGException {
+	private static void styleManual(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
+			long cardinality, long minCardinality, long maxCardinality,
+			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
 
-		for (LocalDotNode dotNode : panel.getUnfoldedNode2dotNodes().get(unode)) {
-			
-			if (dotNode.type == NodeType.activity) {
-			
-				Group group = panel.getGraph().getSVGElementOf(dotNode);
-				SVGElement polygon = group.getChild(1);
-				Text titleName = (Text) group.getChild(group.getChildren(null).size() - 2);
-				Text titleCount = (Text) group.getChild(group.getChildren(null).size() - 1);
+		LocalDotNode dotNode = info.getActivityNode(unode);
 
-				//recolour the polygon
-				String fillColour;
-				String fontColour = "black";
-				if (cardinality > 0) {
-					fillColour = visualisationParameters.getColourNodes().colour(cardinality, minCardinality,
-							maxCardinality);
-					if (ColourMaps.getLuma(fillColour) < 128) {
-						fontColour = "white";
-					}
-				} else {
-					fillColour = visualisationParameters.getColourNodes().colour(1, 0, 2);
-				}
-				panel.getGraph().setCSSAttributeOf(polygon, "fill", fillColour);
+		Group group = DotPanel.getSVGElementOf(svg, dotNode);
+		SVGElement polygon = group.getChild(1);
+		Text titleName = (Text) group.getChild(group.getChildren(null).size() - 2);
+		Text titleCount = (Text) group.getChild(group.getChildren(null).size() - 1);
 
-				//set label colour
-				panel.getGraph().setCSSAttributeOf(titleCount, "fill", fontColour);
-				panel.getGraph().setCSSAttributeOf(titleName, "fill", fontColour);
-
-				if (cardinality > 0) {
-					panel.getGraph().setCSSAttributeOf(group, "opacity", "1.0");
-				} else {
-					panel.getGraph().setCSSAttributeOf(group, "opacity", "0.2");
-				}
-
-				//set title
-				titleCount.getContent().clear();
-				titleCount.getContent().add(cardinality + "");
-				titleCount.rebuild();
+		//recolour the polygon
+		String fillColour;
+		String fontColour = "black";
+		if (cardinality > 0) {
+			fillColour = visualisationParameters.getColourNodes().colour(cardinality, minCardinality, maxCardinality);
+			if (ColourMaps.getLuma(fillColour) < 128) {
+				fontColour = "white";
 			}
+		} else {
+			fillColour = visualisationParameters.getColourNodes().colour(1, 0, 2);
 		}
+		DotPanel.setCSSAttributeOf(polygon, "fill", fillColour);
+
+		//set label colour
+		DotPanel.setCSSAttributeOf(titleCount, "fill", fontColour);
+		DotPanel.setCSSAttributeOf(titleName, "fill", fontColour);
+
+		if (cardinality > 0) {
+			DotPanel.setCSSAttributeOf(group, "opacity", "1.0");
+		} else {
+			DotPanel.setCSSAttributeOf(group, "opacity", "0.2");
+		}
+
+		//set title
+		titleCount.getContent().clear();
+		titleCount.getContent().add(cardinality + "");
+		titleCount.rebuild();
 	}
 
-	private static void styleNonManualNode(UnfoldedNode unode, InductiveVisualMinerPanel panel, long cardinality) {
+	private static void styleNonManualNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
+			long cardinality) {
 		//colour non-activity nodes
-		if (panel.getUnfoldedNode2dotNodes().containsKey(unode)) {
-			for (DotNode dotNode : panel.getUnfoldedNode2dotNodes().get(unode)) {
-				if (cardinality > 0) {
-					panel.getGraph().setCSSAttributeOf(dotNode, "opacity", "1.0");
-				} else {
-					panel.getGraph().setCSSAttributeOf(dotNode, "opacity", "0.2");
-				}
+		for (LocalDotNode dotNode : info.getNodes(unode)) {
+			if (cardinality > 0) {
+				DotPanel.setCSSAttributeOf(svg, dotNode, "opacity", "1.0");
+			} else {
+				DotPanel.setCSSAttributeOf(svg, dotNode, "opacity", "0.2");
 			}
 		}
 	}
 
-	private static void styleEdges(InductiveVisualMinerPanel panel, AlignedLogInfo logInfo,
+	private static void styleEdges(SVGDiagram svg, AlignedLogVisualisationInfo info, AlignedLogInfo logInfo,
 			AlignedLogVisualisationParameters parameters, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
 			long minCardinality, long maxCardinality) throws SVGException {
-		styleModelEdges(panel, logInfo, parameters, dfgLogInfos, minCardinality, maxCardinality);
-		styleMoveEdges(panel, logInfo, parameters, dfgLogInfos, minCardinality, maxCardinality);
+		styleModelEdges(svg, info, logInfo, parameters, dfgLogInfos, minCardinality, maxCardinality);
+		styleMoveEdges(svg, info, logInfo, parameters, dfgLogInfos, minCardinality, maxCardinality);
 	}
 
-	private static void styleModelEdges(InductiveVisualMinerPanel panel, AlignedLogInfo logInfo,
+	private static void styleModelEdges(SVGDiagram svg, AlignedLogVisualisationInfo info, AlignedLogInfo logInfo,
 			AlignedLogVisualisationParameters parameters, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
 			long minCardinality, long maxCardinality) throws SVGException {
-		for (UnfoldedNode unode : panel.getUnfoldedNode2dotEdgesModel().keySet()) {
-			for (DotEdge dotEdge : panel.getUnfoldedNode2dotEdgesModel().get(unode)) {
-				long cardinality;
-				if (!panel.getUnfoldedNode2DfgdotEdges().containsKey(unode)) {
-					//normal model edge
-					cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, logInfo);
-				} else {
-					//directly-follows edge
-					cardinality = AlignedLogMetrics.getNumberOfTimesDfgEdgeTaken((LocalDotEdge) dotEdge,
-							dfgLogInfos.get(unode));
-				}
-				styleEdge(dotEdge, panel.getGraph(), cardinality, minCardinality, maxCardinality,
-						parameters.getColourModelEdges(), parameters.isShowFrequenciesOnModelEdges(),
-						parameters.getModelEdgesWidth());
-			}
+		for (LocalDotEdge dotEdge : info.getAllModelEdges()) {
+			long cardinality;
+			//				if (!panel.getUnfoldedNode2DfgdotEdges().containsKey(unode)) {
+			//normal model edge
+			cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(dotEdge.getUnode(), logInfo);
+			//				} else {
+			//				//	directly-follows edge
+			//					cardinality = AlignedLogMetrics.getNumberOfTimesDfgEdgeTaken((LocalDotEdge) dotEdge,
+			//							dfgLogInfos.get(unode));
+			//				}
+			styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality, parameters.getColourModelEdges(),
+					parameters.isShowFrequenciesOnModelEdges(), parameters.getModelEdgesWidth());
 		}
 	}
 
-	private static void styleMoveEdges(InductiveVisualMinerPanel panel, AlignedLogInfo logInfo,
+	private static void styleMoveEdges(SVGDiagram svg, AlignedLogVisualisationInfo info, AlignedLogInfo logInfo,
 			AlignedLogVisualisationParameters parameters, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
 			long minCardinality, long maxCardinality) throws SVGException {
-		for (UnfoldedNode unode : panel.getUnfoldedNode2dotEdgesMove().keySet()) {
-			for (DotEdge dotEdge : panel.getUnfoldedNode2dotEdgesMove().get(unode)) {
-				LocalDotEdge lDotEdge = (LocalDotEdge) dotEdge;
-				long cardinality;
-				if (lDotEdge.getType().equals(EdgeType.logMove)) {
-					cardinality = AlignedLogMetrics.getLogMoves(lDotEdge.getLookupNode1(), lDotEdge.getLookupNode2(),
-							logInfo).size();
-				} else {
-					cardinality = AlignedLogMetrics.getModelMovesLocal(lDotEdge.getUnode(), logInfo);
-				}
-				styleEdge(dotEdge, panel.getGraph(), cardinality, minCardinality, maxCardinality,
-						parameters.getColourMoves(), parameters.isShowFrequenciesOnMoveEdges(),
-						parameters.getMoveEdgesWidth());
-			}
+		//style model move edges
+		for (LocalDotEdge dotEdge : info.getAllModelMoveEdges()) {
+			long cardinality = AlignedLogMetrics.getModelMovesLocal(dotEdge.getUnode(), logInfo);
+			styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality, parameters.getColourMoves(),
+					parameters.isShowFrequenciesOnMoveEdges(), parameters.getMoveEdgesWidth());
+		}
+
+		//style log moves
+		for (LocalDotEdge dotEdge : info.getAllLogMoveEdges()) {
+			long cardinality = AlignedLogMetrics.getLogMoves(dotEdge.getLookupNode1(), dotEdge.getLookupNode2(),
+					logInfo).size();
+			styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality, parameters.getColourMoves(),
+					parameters.isShowFrequenciesOnMoveEdges(), parameters.getMoveEdgesWidth());
 		}
 	}
 
-	private static void styleEdge(DotEdge edge, DotPanel panel, long cardinality, long minCardinality,
+	private static void styleEdge(DotEdge edge, SVGDiagram svg, long cardinality, long minCardinality,
 			long maxCardinality, ColourMap colourMap, boolean showFrequency, SizeMap widthMap) throws SVGException {
 
 		//prepare parts of the rendered dot element
-		Group group = panel.getSVGElementOf(edge);
+		Group group = DotPanel.getSVGElementOf(svg, edge);
 		SVGElement line = group.getChild(1);
 		SVGElement arrowHead = group.getChild(2);
 
 		//stroke
 		String edgeColour = colourMap.colour(cardinality, minCardinality, maxCardinality);
 		double strokeWidth = widthMap.size(cardinality, minCardinality, maxCardinality);
-		panel.setCSSAttributeOf(line, "stroke", edgeColour);
-		panel.setCSSAttributeOf(arrowHead, "stroke", edgeColour);
-		panel.setCSSAttributeOf(arrowHead, "fill", edgeColour);
-		panel.setCSSAttributeOf(line, "stroke-width", strokeWidth + "");
+		DotPanel.setCSSAttributeOf(line, "stroke", edgeColour);
+		DotPanel.setCSSAttributeOf(arrowHead, "stroke", edgeColour);
+		DotPanel.setCSSAttributeOf(arrowHead, "fill", edgeColour);
+		DotPanel.setCSSAttributeOf(line, "stroke-width", strokeWidth + "");
 
 		//transparency
 		if (cardinality > 0) {
-			panel.setCSSAttributeOf(group, "opacity", "1.0");
+			DotPanel.setCSSAttributeOf(group, "opacity", "1.0");
 		} else {
-			panel.setCSSAttributeOf(group, "opacity", "0.1");
+			DotPanel.setCSSAttributeOf(group, "opacity", "0.1");
 		}
 
 		//edge label

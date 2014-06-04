@@ -2,10 +2,10 @@ package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -37,7 +35,9 @@ import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
+import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
@@ -52,8 +52,8 @@ import org.processmining.plugins.inductiveVisualMiner.animation.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.SVGTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
-import org.processmining.plugins.inductiveVisualMiner.animation.Tokens;
-import org.processmining.plugins.inductiveVisualMiner.animation.Trace2Tokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.Token;
+import org.processmining.plugins.inductiveVisualMiner.animation.Trace2Token;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
@@ -205,7 +205,7 @@ public class InductiveVisualMinerController {
 	}
 
 	//perform layout
-	private class Layout extends ChainLink<Object, SVGDiagram> {
+	private class Layout extends ChainLink<Object, Object> {
 
 		protected Object generateInput() {
 			return null;
@@ -216,10 +216,11 @@ public class InductiveVisualMinerController {
 			return null;
 		}
 
-		protected void processResult(SVGDiagram result) {
+		protected void processResult(Object result) {
 			try {
-				panel.updateModel(state);
-				makeNodesSelectable();
+				Pair<Dot, AlignedLogVisualisationInfo> p = panel.updateModel(state);
+				state.setLayout(p.getLeft(), p.getRight(), panel.getGraph().getSVG());
+				makeNodesSelectable(state.getVisualisationInfo(), null, panel, state.getSelectedNodes());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -233,7 +234,7 @@ public class InductiveVisualMinerController {
 	//colour node selection
 	private class SelectionColouring
 			extends
-			ChainLink<Septuple<AlignedLog, Set<UnfoldedNode>, Set<UnfoldedNode>, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters>, Quintuple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters>> {
+			ChainLink<Septuple<AlignedLog, Set<UnfoldedNode>, Set<UnfoldedNode>, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters>, Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>> {
 
 		protected Septuple<AlignedLog, Set<UnfoldedNode>, Set<UnfoldedNode>, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> generateInput() {
 			return Septuple.of(state.getAlignedLog(), state.getSelectedNodes(),
@@ -242,25 +243,23 @@ public class InductiveVisualMinerController {
 					InductiveVisualMinerPanel.getViewParameters(state));
 		}
 
-		protected Quintuple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> executeLink(
+		protected Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> executeLink(
 				Septuple<AlignedLog, Set<UnfoldedNode>, Set<UnfoldedNode>, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> input) {
 			setStatus("Colouring selection..");
 			if (input.getB().size() > 0) {
-				Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> c = filterOnSelection(
-						input.getA(), input.getB(), input.getC());
-				return Quintuple.of(c.getA(), c.getB(), c.getC(), input.getF(), input.getG());
+				return filterOnSelection(input.getA(), input.getB(), input.getC());
 			} else {
-				return Quintuple.of(input.getA(), input.getD(), input.getE(), input.getF(), input.getG());
+				return Triple.of(input.getA(), input.getD(), input.getE());
 			}
 
 		}
 
-		protected void processResult(
-				Quintuple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> result) {
+		protected void processResult(Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> result) {
 			state.setAlignedFilteredLog(result.getA(), result.getB(), result.getC());
-			InductiveVisualMinerSelectionColourer.colour(panel, result.getD(), result.getB(), result.getC(),
-					result.getE());
+			InductiveVisualMinerSelectionColourer.colour(state.getSVG(), state.getVisualisationInfo(), state.getTree(),
+					result.getB(), result.getC(), InductiveVisualMinerPanel.getViewParameters(state));
 			updateSelectionDescription(panel, state.getSelectedNodes());
+			panel.repaint();
 		}
 
 		public void cancel() {
@@ -270,21 +269,26 @@ public class InductiveVisualMinerController {
 	}
 
 	//prepare animation
-	private class Animate extends ChainLink<Quintuple<XLog, AlignedLog, ProcessTree, XLogInfo, ColourMode>, Tokens> {
+	private class Animate
+			extends
+			ChainLink<Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram>, List<Token>> {
 
-		protected Quintuple<XLog, AlignedLog, ProcessTree, XLogInfo, ColourMode> generateInput() {
-			return Quintuple.of(state.getXLog(), state.getAlignedLog(), state.getTree(), state.getXLogInfo(),
-					state.getColourMode());
+		protected Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> generateInput() {
+			return Septuple.of(state.getXLog(), state.getAlignedLog(), state.getXLogInfo(), state.getColourMode(),
+					state.getVisualisationInfo(), panel.getGraph().getDot(), panel.getGraph().getSVG());
 		}
 
-		protected Tokens executeLink(Quintuple<XLog, AlignedLog, ProcessTree, XLogInfo, ColourMode> input) {
+		protected List<Token> executeLink(
+				Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> input) {
 			setStatus("Creating animation..");
 
 			XLog xLog = input.getA();
 			AlignedLog aLog = input.getB();
-			ProcessTree tree = input.getC();
-			XLogInfo xLogInfo = input.getD();
-			ColourMode colourMode = input.getE();
+			XLogInfo xLogInfo = input.getC();
+			ColourMode colourMode = input.getD();
+			AlignedLogVisualisationInfo info = input.getE();
+			Dot dot = input.getF();
+			SVGDiagram svg = input.getG();
 
 			long maxTraces = 1000;
 
@@ -295,12 +299,12 @@ public class InductiveVisualMinerController {
 			HashMap<List<XEventClass>, IMTraceG<Move>> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
 
 			//make a shortest path graph
-			ShortestPathGraph graph = new ShortestPathGraph(panel.getNodes(), panel.getEdges());
+			ShortestPathGraph graph = new ShortestPathGraph(info.getNodes(), info.getEdges());
 
 			boolean showDeviations = colourMode != ColourMode.paths;
 
 			//compute the animation
-			Tokens tokens = new Tokens();
+			List<Token> tokens = new ArrayList<>();
 			{
 				long indexTrace = 0;
 				for (XTrace trace : xLog) {
@@ -310,31 +314,33 @@ public class InductiveVisualMinerController {
 					}
 
 					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps,
-							indexTrace, showDeviations, graph, panel);
+							indexTrace, showDeviations, graph, info);
 					if (timedTrace != null) {
-						tokens.addAll(Trace2Tokens.trace2tokens(timedTrace, showDeviations, graph, panel).getAllTokensRecursively());
+						tokens.addAll(Trace2Token.trace2token(timedTrace, showDeviations, graph, info)
+								.getAllTokensRecursively());
 					}
 
 					indexTrace++;
 				}
 			}
 
-			return tokens;
-		}
-
-		protected void processResult(Tokens result) {
-			//			System.out.println(result);
-			//System.out.println(AnimationSVG.animateTokens(result, panel));
 			try {
 				OutputStream streamOut = new FileOutputStream("D:\\animationTest.svg");
-				SVGTokens animatedTokens = AnimationSVG.animateTokens(result, panel);
-				ExportAnimation.export(animatedTokens, streamOut, panel);
-				
-				ImageOutputStream streamOutAvi = new FileImageOutputStream(new File("D:\\animationTest.avi"));
-				ExportAnimation.exportMovie(animatedTokens, streamOutAvi, panel);
+				SVGTokens animatedTokens = AnimationSVG.animateTokens(tokens, svg);
+				ExportAnimation.export(animatedTokens, streamOut, dot, svg);
+
+//				ImageOutputStream streamOutAvi = new FileImageOutputStream(new File("D:\\animationTest.avi"));
+//				ExportAnimation.exportMovie(animatedTokens, streamOutAvi, dot, svg);
 			} catch (IOException e) {
 
 			}
+
+			return tokens;
+		}
+
+		protected void processResult(List<Token> result) {
+			//			System.out.println(result);
+			//System.out.println(AnimationSVG.animateTokens(result, panel));			
 			setStatus(" ");
 		}
 
@@ -452,10 +458,10 @@ public class InductiveVisualMinerController {
 		});
 	}
 
-	private void makeNodesSelectable() {
-		for (UnfoldedNode unode : panel.getActivity2dotNode().keySet()) {
-			LocalDotNode dotNode = panel.getActivity2dotNode().get(unode);
-			panel.makeNodeSelectable(dotNode, state.getSelectedNodes().contains(unode));
+	private static void makeNodesSelectable(AlignedLogVisualisationInfo info, SVGDiagram svg,
+			InductiveVisualMinerPanel panel, Set<UnfoldedNode> selectedNodes) {
+		for (LocalDotNode dotNode : info.getAllActivityNodes()) {
+			panel.makeNodeSelectable(svg, dotNode, selectedNodes.contains(dotNode.getUnode()));
 		}
 	}
 

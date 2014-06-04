@@ -31,7 +31,7 @@ public class InterpolateToken {
 						splitForwardTimestamp.getRight());
 				token.setTimestampOfPoint(i, splitTimestamp);
 
-				if (token.getTarget(i).type == NodeType.parallelSplit) {
+				if (token.getTarget(i).getType() == NodeType.parallelSplit) {
 					//if this node is a parallel split, we need to set the corresponding join now
 					int indexOfJoin = getParallelDestination(token, i);
 
@@ -94,7 +94,7 @@ public class InterpolateToken {
 		}
 
 		//if this node is not a parallel split, we move to the next point
-		if (thisPoint.getLeft().getTarget().type != NodeType.parallelSplit) {
+		if (thisPoint.getLeft().getTarget().getType() != NodeType.parallelSplit) {
 			return getTimestampForward(token, offset + 1, to, previousTimestamp, edgesFromPreviousTimestamp + 1);
 		} else {
 			//this is a parallel split node
@@ -163,7 +163,7 @@ public class InterpolateToken {
 		}
 
 		//if this node is not a parallel join, we move to the next point
-		if (token.getTarget(offset).type != NodeType.parallelJoin) {
+		if (token.getTarget(offset).getType() != NodeType.parallelJoin) {
 			return getTimestampBackward(token, offset - 1, edgesTillNow + 1);
 		} else {
 			//this is a parallel join

@@ -14,6 +14,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,26 +25,27 @@ import java.io.PipedOutputStream;
 import java.net.URI;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.monte.media.Format;
 import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.avi.AVIWriter;
 import org.monte.media.math.Rational;
+import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.AnimatedSVGExporter;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Function;
 
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGUniverse;
 
 public class ExportAnimation {
-	public static void export(SVGTokens tokens, OutputStream streamOut, InductiveVisualMinerPanel panel)
+	public static void export(SVGTokens tokens, OutputStream streamOut, Dot dot, SVGDiagram svg)
 			throws IOException {
-		InputStream stream = Dot2Image.dot2imageInputStream(panel.getGraph().getDot(), Type.svg);
+		InputStream stream = Dot2Image.dot2imageInputStream(dot, Type.svg);
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(streamOut, "utf-8"));
 
 		String line = null;
@@ -68,12 +70,12 @@ public class ExportAnimation {
 	}
 
 	public static void exportMovie(final SVGTokens tokens, ImageOutputStream streamOutMovie,
-			final InductiveVisualMinerPanel panel) throws IOException {
+			final Dot dot, final SVGDiagram svg) throws IOException {
 
 		//create svg and copy the stream
 		PipedInputStream stream = copy(new Function<PipedOutputStream, Integer>() {
 			public Integer call(PipedOutputStream out) throws Exception {
-				export(tokens, out, panel);
+				export(tokens, out, dot, svg);
 				return null;
 			}
 		});
@@ -138,6 +140,10 @@ public class ExportAnimation {
                 
                 // write it to the writer
                 out.write(0, img, 1);
+                
+                //write it to file
+                File file = new File("d:\\animationTest\\" + frame + ".png");
+                ImageIO.write(img, "png", file);
             }
 
         } finally {

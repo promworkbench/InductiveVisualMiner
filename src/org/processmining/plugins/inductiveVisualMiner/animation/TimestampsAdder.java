@@ -14,9 +14,10 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
+import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 
 public class TimestampsAdder {
@@ -55,7 +56,7 @@ public class TimestampsAdder {
 
 	public static TimedTrace timeTrace(HashMap<List<XEventClass>, IMTraceG<Move>> map, XTrace trace, XLogInfo xLogInfo,
 			Pair<Double, Double> extremeTimestamps, long indexTrace, boolean showDeviations,
-			ShortestPathGraph shortestGraph, InductiveVisualMinerPanel panel) {
+			ShortestPathGraph shortestGraph, AlignedLogVisualisationInfo info) {
 
 		//create an aligned trace to search for
 		List<XEventClass> lTrace = getTraceLogProjection(trace, xLogInfo);
@@ -67,13 +68,13 @@ public class TimestampsAdder {
 			TimedTrace timedTrace;
 			if (extremeTimestamps != null) {
 				timedTrace = timeTraceFromTimestamps(alignedTrace, trace, xLogInfo, extremeTimestamps, showDeviations,
-						panel);
+						info);
 
 				//set start end and time of trace
-				timedTrace.setStartTime(guessStartTime(timedTrace, shortestGraph, panel));
-				timedTrace.setEndTime(guessEndTime(timedTrace, shortestGraph, panel));
+				timedTrace.setStartTime(guessStartTime(timedTrace, shortestGraph, info));
+				timedTrace.setEndTime(guessEndTime(timedTrace, shortestGraph, info));
 			} else {
-				timedTrace = timeTraceDummyTimestamps(alignedTrace, trace, xLogInfo, indexTrace, showDeviations, panel);
+				timedTrace = timeTraceDummyTimestamps(alignedTrace, trace, xLogInfo, indexTrace, showDeviations);
 			}
 
 			if (timedTrace == null) {
@@ -87,7 +88,7 @@ public class TimestampsAdder {
 	}
 
 	private static TimedTrace timeTraceDummyTimestamps(IMTraceG<Move> alignedTrace, XTrace trace, XLogInfo xLogInfo,
-			long indexTrace, boolean showDeviations, InductiveVisualMinerPanel panel) {
+			long indexTrace, boolean showDeviations) {
 
 		//attach timestamps
 		TimedTrace timedTrace = new TimedTrace();
@@ -103,14 +104,16 @@ public class TimestampsAdder {
 		timedTrace.setEndTime(timedTrace.getStartTime() + traceDuration);
 
 		for (Move move : alignedTrace) {
-			timedTrace.add(new TimedMove(move, null));
+			if (showDeviations || move.getType() != Type.log) {
+				timedTrace.add(new TimedMove(move, null));
+			}
 		}
 
 		return timedTrace;
 	}
 
 	private static TimedTrace timeTraceFromTimestamps(IMTraceG<Move> alignedTrace, XTrace trace, XLogInfo xLogInfo,
-			Pair<Double, Double> extremeTimestamps, boolean showDeviations, InductiveVisualMinerPanel panel) {
+			Pair<Double, Double> extremeTimestamps, boolean showDeviations, AlignedLogVisualisationInfo info) {
 
 		//attach timestamps
 		TimedTrace timedTrace = new TimedTrace();
@@ -175,7 +178,7 @@ public class TimestampsAdder {
 	}
 
 	public static double guessStartTime(List<TimedMove> trace, ShortestPathGraph shortestGraph,
-			InductiveVisualMinerPanel panel) {
+			AlignedLogVisualisationInfo info) {
 		//find the first timed move
 		TimedMove firstTimedMove = null;
 		int firstTimedMoveIndex;
@@ -191,12 +194,12 @@ public class TimestampsAdder {
 
 		//the trace ends with 2 seconds per edge
 		return firstTimedMove.getTimestamp()
-				- Animation.getEdgesOnMovePath(partialTrace, shortestGraph, panel, true, false).size()
+				- Animation.getEdgesOnMovePath(partialTrace, shortestGraph, info, true, false).size()
 				* beginEndEdgeDuration;
 	}
 
 	public static double guessEndTime(List<TimedMove> trace, ShortestPathGraph shortestGraph,
-			InductiveVisualMinerPanel panel) {
+			AlignedLogVisualisationInfo info) {
 		//find the last timed move
 		TimedMove lastTimedMove = null;
 		int lastTimedMoveIndex;
@@ -212,7 +215,7 @@ public class TimestampsAdder {
 
 		//the trace ends with 2 seconds per edge
 		return lastTimedMove.getTimestamp()
-				+ Animation.getEdgesOnMovePath(partialTrace, shortestGraph, panel, false, true).size()
+				+ Animation.getEdgesOnMovePath(partialTrace, shortestGraph, info, false, true).size()
 				* beginEndEdgeDuration;
 	}
 

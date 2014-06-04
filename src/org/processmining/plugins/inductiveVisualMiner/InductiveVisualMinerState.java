@@ -10,12 +10,15 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
-import org.processmining.plugins.InductiveMiner.mining.MiningParametersIvM;
+import org.processmining.plugins.graphviz.dot.Dot;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+
+import com.kitfox.svg.SVGDiagram;
 
 public class InductiveVisualMinerState {
 
@@ -23,7 +26,6 @@ public class InductiveVisualMinerState {
 		this.xLog = xLog;
 		miningParameters = new MiningParametersIvM();
 		miningParameters.setDebug(false);
-		miningParameters.setReduce(true);
 	}
 
 	//==log==
@@ -96,6 +98,29 @@ public class InductiveVisualMinerState {
 
 	public synchronized void setMiningParameters(MiningParameters miningParameters) {
 		this.miningParameters = miningParameters;
+	}
+	
+	//==layout==
+	private Dot dot;
+	private SVGDiagram svg;
+	private AlignedLogVisualisationInfo visualisationInfo;
+	
+	public void setLayout(Dot dot, AlignedLogVisualisationInfo visualisationInfo, SVGDiagram svg) {
+		this.dot = dot;
+		this.svg = svg;
+		this.visualisationInfo = visualisationInfo;
+	}
+	
+	public AlignedLogVisualisationInfo getVisualisationInfo() {
+		return visualisationInfo;
+	}
+	
+	public Dot getDot() {
+		return dot;
+	}
+	
+	public SVGDiagram getSVG() {
+		return svg;
 	}
 
 	//==alignment==

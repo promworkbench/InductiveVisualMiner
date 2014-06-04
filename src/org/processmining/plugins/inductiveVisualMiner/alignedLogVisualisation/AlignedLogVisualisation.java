@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.model.XLog;
@@ -27,6 +26,7 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
@@ -56,13 +56,13 @@ public class AlignedLogVisualisation {
 				new HashSet<XEventClass>(), ProMCancelTerminationCondition.buildDummyCanceller());
 		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = InductiveVisualMinerController.computeDfgAlignment(result.log,
 				tree);
-		return fancy(tree, result.logInfo, dfgLogInfos, new AlignedLogVisualisationParameters());
+		return fancy(tree, result.logInfo, dfgLogInfos, new AlignedLogVisualisationParameters()).getLeft();
 	}
 
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Show deviations", requiredParameterLabels = { 0 })
 	public Dot fancy(PluginContext context, ProcessTree tree) {
-		return fancy(tree, null, null, new AlignedLogVisualisationParameters());
+		return fancy(tree, null, null, new AlignedLogVisualisationParameters()).getLeft();
 	}
 
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
@@ -72,31 +72,21 @@ public class AlignedLogVisualisation {
 		return fancy(context, tree, xLog);
 	}
 
-	public enum EdgeType {
-		model, logMove, modelMove
-	};
-
 	Dot dot;
 	private AlignedLogInfo logInfo;
 	private Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos;
 	private long maxCardinality;
 	private long minCardinality;
 	AlignedLogVisualisationParameters parameters;
-	private LocalDotNode rootSource;
-	private LocalDotNode rootSink;
 
-	Set<LocalDotEdge> dotEdges;
-	Set<LocalDotNode> dotNodes;
-	Map<UnfoldedNode, List<LocalDotNode>> unfoldedNode2dotNodes;
-	Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2dotEdgesModel;
-	Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2dotEdgesMove;
-	private Map<UnfoldedNode, LocalDotNode> activity2dotNode;
 	private Map<LocalDotNode, UnfoldedNode> dotNode2DfgUnfoldedNode;
 	private Map<UnfoldedNode, List<LocalDotNode>> unfoldedNode2DfgdotNodes;
 	private Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2DfgdotEdges;
 
-	public Dot fancy(ProcessTree tree, AlignedLogInfo logInfo, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
-			AlignedLogVisualisationParameters parameters) {
+	private AlignedLogVisualisationInfo info;
+
+	public Pair<Dot, AlignedLogVisualisationInfo> fancy(ProcessTree tree, AlignedLogInfo logInfo,
+			Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos, AlignedLogVisualisationParameters parameters) {
 		this.parameters = parameters;
 		if (logInfo == null) {
 			//use empty logInfo
@@ -118,35 +108,29 @@ public class AlignedLogVisualisation {
 		minCardinality = p.getLeft();
 		maxCardinality = p.getRight();
 
-		dotNodes = new HashSet<>();
-		dotEdges = new HashSet<>();
-		unfoldedNode2dotNodes = new HashMap<UnfoldedNode, List<LocalDotNode>>();
-		unfoldedNode2dotEdgesModel = new HashMap<UnfoldedNode, List<LocalDotEdge>>();
-		unfoldedNode2dotEdgesMove = new HashMap<UnfoldedNode, List<LocalDotEdge>>();
-		activity2dotNode = new HashMap<UnfoldedNode, LocalDotNode>();
 		dotNode2DfgUnfoldedNode = new HashMap<LocalDotNode, UnfoldedNode>();
 		unfoldedNode2DfgdotNodes = new HashMap<ProcessTree2Petrinet.UnfoldedNode, List<LocalDotNode>>();
 		unfoldedNode2DfgdotEdges = new HashMap<ProcessTree2Petrinet.UnfoldedNode, List<LocalDotEdge>>();
+		
 		dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
 		UnfoldedNode root = new UnfoldedNode(tree.getRoot());
 
-		//source
-		rootSource = new LocalDotNode(this, NodeType.source, "", root);
-
-		//sink
-		rootSink = new LocalDotNode(this, NodeType.sink, "", root);
-
+		//source & sink
+		info = new AlignedLogVisualisationInfo();
+		LocalDotNode source = new LocalDotNode(dot, info, NodeType.source, "", root);
+		LocalDotNode sink = new LocalDotNode(dot, info, NodeType.sink, "", root);
+		info.setRoot(source, sink);
 		//convert root node
-		convertNode(root, rootSource, rootSink, true);
+		convertNode(root, source, sink, true);
 
 		//add log-move-arcs to source and sink
 		if (parameters.isShowLogMoves()) {
-			visualiseLogMove(rootSource, rootSource, root, null, root, true);
-			visualiseLogMove(rootSink, rootSink, root, root, null, false);
+			visualiseLogMove(source, source, root, null, root, true);
+			visualiseLogMove(sink, sink, root, root, null, false);
 		}
 
-		return dot;
+		return Pair.of(dot, info);
 	}
 
 	private void convertNode(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
@@ -212,11 +196,11 @@ public class AlignedLogVisualisation {
 			label += "\n" + cardinality;
 		}
 
-		final LocalDotNode dotNode = new LocalDotNode(this, NodeType.activity, label, unode);
+		final LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.activity, label, unode);
 		dotNode.setOptions(dotNode.getOptions() + ", fillcolor=\"" + fillColour + "\", fontcolor=\"" + fontColour
 				+ "\"");
 
-		activity2dotNode.put(unode, dotNode);
+		info.addNode(unode, dotNode);
 		return dotNode;
 	}
 
@@ -234,7 +218,7 @@ public class AlignedLogVisualisation {
 
 			split = join;
 			if (it.hasNext()) {
-				join = new LocalDotNode(this, NodeType.xor, "", unode);
+				join = new LocalDotNode(dot, info, NodeType.xor, "", unode);
 			} else {
 				join = sink;
 			}
@@ -251,11 +235,11 @@ public class AlignedLogVisualisation {
 	private void convertLoop(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(this, NodeType.xor, "", unode);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", unode);
 		addArc(source, split, unode, directionForward);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(this, NodeType.xor, "", unode);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", unode);
 
 		Node bodyChild = unode.getBlock().getChildren().get(0);
 		convertNode(unode.unfoldChild(bodyChild), split, join, directionForward);
@@ -276,11 +260,11 @@ public class AlignedLogVisualisation {
 	private void convertParallel(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(this, NodeType.parallelSplit, "+", unode);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.parallelSplit, "+", unode);
 		addArc(source, split, unode, directionForward);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(this, NodeType.parallelJoin, "+", unode);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, "+", unode);
 		addArc(join, sink, unode, directionForward);
 
 		for (Node child : unode.getBlock().getChildren()) {
@@ -296,11 +280,11 @@ public class AlignedLogVisualisation {
 	private void convertXor(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(this, NodeType.xor, "", unode);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", unode);
 		addArc(source, split, unode, directionForward);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(this, NodeType.xor, "", unode);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", unode);
 		addArc(join, sink, unode, directionForward);
 
 		for (Node child : unode.getBlock().getChildren()) {
@@ -351,15 +335,15 @@ public class AlignedLogVisualisation {
 			LocalDotEdge dotEdge;
 			if (fromDotNode != null && toDotNode != null) {
 				//normal edge
-				long cardinality = dfgLogInfo.getDfg(fromDotNode.node, toDotNode.node);
+				long cardinality = dfgLogInfo.getDfg(fromDotNode.getUnode(), toDotNode.getUnode());
 				dotEdge = addModelArc(fromDotNode, toDotNode, unode, directionForward, cardinality);
 			} else if (fromDotNode == null) {
 				//start activity
-				long cardinality = dfgLogInfo.getDfg(null, toDotNode.node);
+				long cardinality = dfgLogInfo.getDfg(null, toDotNode.getUnode());
 				dotEdge = addModelArc(source, toDotNode, unode, directionForward, cardinality);
 			} else {
 				//end activity
-				long cardinality = dfgLogInfo.getDfg(fromDotNode.node, null);
+				long cardinality = dfgLogInfo.getDfg(fromDotNode.getUnode(), null);
 				dotEdge = addModelArc(fromDotNode, sink, unode, directionForward, cardinality);
 			}
 
@@ -370,14 +354,6 @@ public class AlignedLogVisualisation {
 	private LocalDotEdge addArc(LocalDotNode from, LocalDotNode to, final UnfoldedNode unode, boolean directionForward) {
 		return addModelArc(from, to, unode, directionForward,
 				AlignedLogMetrics.getNumberOfTracesRepresented(unode, logInfo));
-	}
-
-	public static double getPenWidth(long cardinality, long minCardinality, long maxCardinality, boolean widen) {
-		if (widen) {
-			return getOccurrenceFactor(cardinality, minCardinality, maxCardinality) * 100 + 1;
-		} else {
-			return 1;
-		}
 	}
 
 	private LocalDotEdge addModelArc(LocalDotNode from, LocalDotNode to, final UnfoldedNode unode,
@@ -395,9 +371,11 @@ public class AlignedLogVisualisation {
 
 		final LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(this, from, to, "", options, unode, directionForward);
+			edge = new LocalDotEdge(dot, info, from, to, "", options, unode, EdgeType.model, null, null,
+					directionForward);
 		} else {
-			edge = new LocalDotEdge(this, to, from, "", options + ", dir=\"back\"", unode, directionForward);
+			edge = new LocalDotEdge(dot, info, to, from, "", options + ", dir=\"back\"", unode, EdgeType.model, null,
+					null, directionForward);
 		}
 
 		if (parameters.isShowFrequenciesOnModelEdges()) {
@@ -414,7 +392,7 @@ public class AlignedLogVisualisation {
 			if (parameters.isRepairLogMoves()) {
 				for (XEventClass e : logMoves) {
 					long cardinality = logMoves.getCardinalityOf(e);
-					LocalDotNode dotNode = new LocalDotNode(this, NodeType.logMoveActivity, e.toString(), unode);
+					LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.logMoveActivity, e.toString(), unode);
 					addMoveArc(from, dotNode, unode, EdgeType.logMove, lookupNode1, lookupNode2, cardinality,
 							directionForward);
 					addMoveArc(dotNode, to, unode, EdgeType.logMove, lookupNode1, lookupNode2, cardinality,
@@ -441,10 +419,11 @@ public class AlignedLogVisualisation {
 
 		LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(this, from, to, "", options, unode, type, lookupNode1, lookupNode2, directionForward);
+			edge = new LocalDotEdge(dot, info, from, to, "", options, unode, type, lookupNode1, lookupNode2,
+					directionForward);
 		} else {
-			edge = new LocalDotEdge(this, to, from, "", options + ", dir=\"back\", " + options, unode, type, lookupNode1,
-					lookupNode2, directionForward);
+			edge = new LocalDotEdge(dot, info, to, from, "", options + ", dir=\"back\", " + options, unode, type,
+					lookupNode1, lookupNode2, directionForward);
 		}
 
 		if (parameters.isShowFrequenciesOnMoveEdges()) {
@@ -455,57 +434,6 @@ public class AlignedLogVisualisation {
 	}
 
 	private double getOccurrenceFactor(long cardinality) {
-		return getOccurrenceFactor(cardinality, minCardinality, maxCardinality);
-	}
-
-	private static double getOccurrenceFactor(long cardinality, long minCardinality, long maxCardinality) {
-		if (minCardinality == maxCardinality) {
-			return 1;
-		}
-		if (cardinality != -1 && minCardinality != -1 && maxCardinality != -1) {
-			return (cardinality - minCardinality) / ((maxCardinality - minCardinality) * 1.0);
-		}
-
-		return 0;
-	}
-
-	public Map<UnfoldedNode, List<LocalDotNode>> getUnfoldedNode2dotNodes() {
-		return unfoldedNode2dotNodes;
-	}
-
-	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2dotEdgesModel() {
-		return unfoldedNode2dotEdgesModel;
-	}
-
-	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2dotEdgesMove() {
-		return unfoldedNode2dotEdgesMove;
-	}
-
-	public Map<UnfoldedNode, LocalDotNode> getActivity2dotNode() {
-		return activity2dotNode;
-	}
-
-	public Map<UnfoldedNode, List<LocalDotNode>> getUnfoldedNode2DfgdotNodes() {
-		return unfoldedNode2DfgdotNodes;
-	}
-
-	public Map<UnfoldedNode, List<LocalDotEdge>> getUnfoldedNode2DfgdotEdges() {
-		return unfoldedNode2DfgdotEdges;
-	}
-
-	public Set<LocalDotEdge> getEdges() {
-		return dotEdges;
-	}
-	
-	public Set<LocalDotNode> getNodes() {
-		return dotNodes;
-	}
-
-	public LocalDotNode getRootSource() {
-		return rootSource;
-	}
-
-	public LocalDotNode getRootSink() {
-		return rootSink;
+		return AlignedLogVisualisationHelper.getOccurrenceFactor(cardinality, minCardinality, maxCardinality);
 	}
 }
