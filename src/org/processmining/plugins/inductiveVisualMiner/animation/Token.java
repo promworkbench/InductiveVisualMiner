@@ -84,7 +84,12 @@ public class Token {
 
 	private void performSanityCheck() {
 		//perform sanity check
-		double last = Double.NEGATIVE_INFINITY;
+		double last;
+		if (getStartTime() != null) {
+			last = getStartTime();
+		} else {
+			last = Double.NEGATIVE_INFINITY;
+		}
 		for (Pair<LocalDotEdge, Double> p : points) {
 			if (p.getRight() != null) {
 				if (p.getRight() < last) {
@@ -127,6 +132,8 @@ public class Token {
 
 	public void setStartTime(double startTime) {
 		this.startTime = startTime;
+
+		performSanityCheck();
 	}
 
 	public Double getStartTime() {

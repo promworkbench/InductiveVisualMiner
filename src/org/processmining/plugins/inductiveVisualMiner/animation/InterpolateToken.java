@@ -45,7 +45,8 @@ public class InterpolateToken {
 					debug(" forward timestamp " + joinForwardTimestamp);
 
 					double joinTimestamp = getLocalArrivalTime(joinBackwardsTimestamp.getLeft(),
-							joinForwardTimestamp.getLeft(), joinBackwardsTimestamp.getRight(), joinForwardTimestamp.getRight());
+							joinForwardTimestamp.getLeft(), joinBackwardsTimestamp.getRight(),
+							joinForwardTimestamp.getRight());
 					debug(" join timestamp " + joinTimestamp);
 					token.setTimestampOfPoint(indexOfJoin, joinTimestamp);
 
@@ -59,6 +60,7 @@ public class InterpolateToken {
 					}
 
 				}
+				debug(token);
 			}
 			lastSeenTimestamp = token.getTimestamp(i);
 		}
@@ -71,8 +73,8 @@ public class InterpolateToken {
 	private static Pair<Integer, Double> getTimestampForward(Token token, int offset, int to, double previousTimestamp,
 			int edgesFromPreviousTimestamp) {
 
-		//		debug(" get timestamp: offset " + offset + ", to " + to + ", edges from previous timestamp "
-		//				+ edgesFromPreviousTimestamp);
+		debug(" get timestamp: offset " + offset + ", to " + to + ", edges from previous timestamp "
+				+ edgesFromPreviousTimestamp);
 
 		//if we have reached the end of the token, return the token's end time
 		if (offset == token.getPoints().size()) {
@@ -99,30 +101,35 @@ public class InterpolateToken {
 
 			//see if somewhere in this parallel subtrace, a timestamp is present
 			//if multiple, pick the one that needs to arrive first
+			int parallelPieceTill = getParallelDestination(token, offset);
 
 			//recurse on the parallel sub trace that is within this token
-			int parallelPieceTill = getParallelDestination(token, offset);
-			Pair<Integer, Double> subTracePair = getTimestampForward(token, offset + 1, parallelPieceTill,
-					previousTimestamp, edgesFromPreviousTimestamp + 1);
-
 			//triple(edges, timestamp, arrivalTime)
-			Triple<Integer, Double, Double> earliestTimestamp = Triple.of(
-					subTracePair.getLeft(),
-					subTracePair.getRight(),
-					getLocalArrivalTime(edgesFromPreviousTimestamp, subTracePair.getLeft(), previousTimestamp,
-							subTracePair.getRight()));
-			int leastEdges = subTracePair.getLeft();
+			int leastEdges;
+			Triple<Integer, Double, Double> earliestTimestamp;
+			{
+				Pair<Integer, Double> subTracePair = getTimestampForward(token, offset + 1, parallelPieceTill,
+						previousTimestamp, edgesFromPreviousTimestamp + 1);
+				earliestTimestamp = Triple.of(
+						subTracePair.getLeft(),
+						subTracePair.getRight(),
+						getLocalArrivalTime(edgesFromPreviousTimestamp, subTracePair.getLeft(), previousTimestamp,
+								subTracePair.getRight()));
+				leastEdges = subTracePair.getLeft();
+			}
 
 			//recurse on all parallel sub tokens
 			Set<Token> subTokens = token.getSubTokensAtPoint(offset);
 			for (Token subToken : subTokens) {
-				Pair<Integer, Double> subPair = getTimestampForward(subToken, 0, subToken.getPoints().size(),
-						previousTimestamp, edgesFromPreviousTimestamp + 1);
+
+				Pair<Integer, Double> subPair = getTimestampForward(subToken, 0, Integer.MAX_VALUE, previousTimestamp,
+						edgesFromPreviousTimestamp + 1);
 
 				leastEdges = Math.min(leastEdges, subPair.getLeft());
-				Double localArrival = getLocalArrivalTime(edgesFromPreviousTimestamp, subTracePair.getLeft(),
-						previousTimestamp, subTracePair.getRight());
-				if (earliestTimestamp.getC() == null || earliestTimestamp.getC() > localArrival) {
+				Double localArrival = getLocalArrivalTime(edgesFromPreviousTimestamp, subPair.getLeft(),
+						previousTimestamp, subPair.getRight());
+				if (localArrival != null
+						&& (earliestTimestamp.getC() == null || earliestTimestamp.getC() > localArrival)) {
 					earliestTimestamp = Triple.of(subPair.getLeft(), subPair.getRight(), localArrival);
 				}
 			}
@@ -154,7 +161,7 @@ public class InterpolateToken {
 		if (offset == token.getPoints().size() - 1) {
 			return getTimestampBackward(token, offset - 1, edgesTillNow + 1);
 		}
-		
+
 		//if this node is not a parallel join, we move to the next point
 		if (token.getTarget(offset).type != NodeType.parallelJoin) {
 			return getTimestampBackward(token, offset - 1, edgesTillNow + 1);
@@ -183,8 +190,8 @@ public class InterpolateToken {
 
 	private static Double getLocalArrivalTime(int edgesFromDeparture, int totalEdges, double departureTime,
 			Double arrivalTime) {
-//				debug("  get local arrival, edgesFromDeparture " + edgesFromDeparture + ", totalEdges "
-//						+ totalEdges + ", departure @" + departureTime + ", arrival @" + arrivalTime);
+		//				debug("  get local arrival, edgesFromDeparture " + edgesFromDeparture + ", totalEdges "
+		//						+ totalEdges + ", departure @" + departureTime + ", arrival @" + arrivalTime);
 		if (arrivalTime == null) {
 			return null;
 		}
@@ -221,8 +228,9 @@ public class InterpolateToken {
 		}
 		return null;
 	}
-	
+
 	private static void debug(Object s) {
-//		System.out.println(s.toString().replaceAll("\\n", " "));
+		//		System.out.println(s);
+		//		System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }
