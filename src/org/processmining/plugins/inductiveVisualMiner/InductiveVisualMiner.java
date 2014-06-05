@@ -43,7 +43,7 @@ public class InductiveVisualMiner {
 		List<XEventClassifier> classifiers = getClassifiers(xLog);
 
 		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog);
-		InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, classifiers, false);
+		InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, classifiers);
 		new InductiveVisualMinerController(context, panel, state);
 
 		return panel;
@@ -62,13 +62,14 @@ public class InductiveVisualMiner {
 		List<XEventClassifier> classifiers = getClassifiers(launcher.xLog);
 
 		final InductiveVisualMinerState state = new InductiveVisualMinerState(launcher.xLog);
-		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, classifiers, true);
+		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, classifiers);
 		new InductiveVisualMinerController(context, panel, state);
 
 		//set up action listener to store model afterwards
 		panel.getExitButton().addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
+				
 				//store the resulting Process tree or Petri net
 				String name = XConceptExtension.instance().extractName(launcher.xLog);
 				ProcessTree tree = state.getTree();

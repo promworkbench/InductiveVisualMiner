@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -51,11 +52,13 @@ public class InductiveVisualMinerPanel extends JPanel {
 	//gui elements
 	private final DotPanel graphPanel;
 	private final JComboBox<?> colourSelection;
+	private final JLabel colourLabel;
 	private final JLabel statusLabel;
 	private final JTextArea selectionLabel;
 	private final JCheckBox showDirectlyFollowsGraphs;
 	private final NiceDoubleSlider activitiesSlider;
 	private final NiceDoubleSlider noiseSlider;
+	private final JLabel classifierLabel;
 	private JComboBox<?> classifiersCombobox;
 	private JButton exitButton;
 
@@ -64,7 +67,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private InputFunction<Set<UnfoldedNode>> onSelectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			Collection<XEventClassifier> classifiers, boolean enableExitButton) throws IOException {
+			Collection<XEventClassifier> classifiers) throws IOException {
 		visualiser = new AlignedLogVisualisation();
 		initVisualisationParameters();
 
@@ -72,24 +75,28 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		setLayout(new GridBagLayout());
 
-		activitiesSlider = SlickerFactory.instance().createNiceDoubleSlider("activities", 0, 1.0, 1.0,
-				Orientation.VERTICAL);
-		GridBagConstraints cActivitiesSlider = new GridBagConstraints();
-		cActivitiesSlider.gridx = 1;
-		cActivitiesSlider.gridy = gridy;
-		cActivitiesSlider.fill = GridBagConstraints.VERTICAL;
-		cActivitiesSlider.anchor = GridBagConstraints.EAST;
-		add(getActivitiesSlider(), cActivitiesSlider);
+		{
+			activitiesSlider = SlickerFactory.instance().createNiceDoubleSlider("activities", 0, 1.0, 1.0,
+					Orientation.VERTICAL);
+			GridBagConstraints cActivitiesSlider = new GridBagConstraints();
+			cActivitiesSlider.gridx = 1;
+			cActivitiesSlider.gridy = gridy;
+			cActivitiesSlider.fill = GridBagConstraints.VERTICAL;
+			cActivitiesSlider.anchor = GridBagConstraints.EAST;
+			add(getActivitiesSlider(), cActivitiesSlider);
+		}
 
-		noiseSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0,
-				1 - state.getMiningParameters().getNoiseThreshold(), Orientation.VERTICAL);
-		GridBagConstraints cNoiseSlider = new GridBagConstraints();
-		cNoiseSlider.gridx = 2;
-		cNoiseSlider.gridy = gridy;
-		cNoiseSlider.weighty = 1;
-		cNoiseSlider.fill = GridBagConstraints.VERTICAL;
-		cNoiseSlider.anchor = GridBagConstraints.WEST;
-		add(getNoiseSlider(), cNoiseSlider);
+		{
+			noiseSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0,
+					1 - state.getMiningParameters().getNoiseThreshold(), Orientation.VERTICAL);
+			GridBagConstraints cNoiseSlider = new GridBagConstraints();
+			cNoiseSlider.gridx = 2;
+			cNoiseSlider.gridy = gridy;
+			cNoiseSlider.weighty = 1;
+			cNoiseSlider.fill = GridBagConstraints.VERTICAL;
+			cNoiseSlider.anchor = GridBagConstraints.WEST;
+			add(getNoiseSlider(), cNoiseSlider);
+		}
 
 		gridy++;
 
@@ -101,16 +108,16 @@ public class InductiveVisualMinerPanel extends JPanel {
 			showDirectlyFollowsGraphs = SlickerFactory.instance().createCheckBox(
 					"Fall back to directly-follows graphs", dfg);
 			showDirectlyFollowsGraphs.setEnabled(false);
-			GridBagConstraints cShowDirectlyFollowsGraphs = new GridBagConstraints();
-			cShowDirectlyFollowsGraphs.gridx = 1;
-			cShowDirectlyFollowsGraphs.gridy = gridy++;
-			cShowDirectlyFollowsGraphs.gridwidth = 2;
-			cShowDirectlyFollowsGraphs.anchor = GridBagConstraints.NORTHWEST;
-			add(showDirectlyFollowsGraphs, cShowDirectlyFollowsGraphs);
+			//			GridBagConstraints cShowDirectlyFollowsGraphs = new GridBagConstraints();
+			//			cShowDirectlyFollowsGraphs.gridx = 1;
+			//			cShowDirectlyFollowsGraphs.gridy = gridy++;
+			//			cShowDirectlyFollowsGraphs.gridwidth = 2;
+			//			cShowDirectlyFollowsGraphs.anchor = GridBagConstraints.NORTHWEST;
+			//			add(showDirectlyFollowsGraphs, cShowDirectlyFollowsGraphs);
 		}
 
 		{
-			JLabel classifierLabel = SlickerFactory.instance().createLabel("Classifier");
+			classifierLabel = SlickerFactory.instance().createLabel("Classifier");
 			GridBagConstraints cClassifierLabel = new GridBagConstraints();
 			cClassifierLabel.gridx = 1;
 			cClassifierLabel.gridy = gridy;
@@ -129,7 +136,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 
 		{
-			JLabel colourLabel = SlickerFactory.instance().createLabel("Colour");
+			colourLabel = SlickerFactory.instance().createLabel("Show");
 			GridBagConstraints cColourLabel = new GridBagConstraints();
 			cColourLabel.gridx = 1;
 			cColourLabel.gridy = gridy;
@@ -145,15 +152,74 @@ public class InductiveVisualMinerPanel extends JPanel {
 			ccolourSelection.fill = GridBagConstraints.HORIZONTAL;
 			add(colourSelection, ccolourSelection);
 		}
+		
+		{
+			JLabel saveLabel = SlickerFactory.instance().createLabel("Save");
+			GridBagConstraints cExitButton = new GridBagConstraints();
+			cExitButton.gridx = 1;
+			cExitButton.gridy = gridy;
+			cExitButton.gridwidth = 1;
+			cExitButton.fill = GridBagConstraints.HORIZONTAL;
+			add(saveLabel, cExitButton);
+		}
 
-		if (enableExitButton) {
-			exitButton = SlickerFactory.instance().createButton("Mine this model (exit)");
+		{
+			exitButton = SlickerFactory.instance().createButton("model");
 			GridBagConstraints cExitButton = new GridBagConstraints();
 			cExitButton.gridx = 2;
 			cExitButton.gridy = gridy++;
 			cExitButton.gridwidth = 1;
 			cExitButton.fill = GridBagConstraints.HORIZONTAL;
 			add(exitButton, cExitButton);
+			
+			final JPanel panel = this;
+			exitButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					//Custom button text
+					Object[] options = {"Petri net",
+					                    "Process tree"};
+					int n = JOptionPane.showOptionDialog(panel,
+					    "As what would you like to save the model?\nIt will become available in ProM.",
+					    "Save",
+					    JOptionPane.YES_NO_CANCEL_OPTION,
+					    JOptionPane.QUESTION_MESSAGE,
+					    null,
+					    options,
+					    options[0]);
+					
+					System.out.println(n);
+				}
+			});
+		}
+		
+		{
+			JButton saveImage = SlickerFactory.instance().createButton("image/animation");
+			GridBagConstraints cExitButton = new GridBagConstraints();
+			cExitButton.gridx = 2;
+			cExitButton.gridy = gridy++;
+			cExitButton.gridwidth = 1;
+			cExitButton.fill = GridBagConstraints.HORIZONTAL;
+			add(saveImage, cExitButton);
+			
+			final JPanel panel = this;
+			saveImage.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					//Custom button text
+					Object[] options = {"Model",
+					                    "Image",
+					                    "Animation"};
+					int n = JOptionPane.showOptionDialog(panel,
+					    "What would you like to save?",
+					    "Save",
+					    JOptionPane.YES_NO_CANCEL_OPTION,
+					    JOptionPane.QUESTION_MESSAGE,
+					    null,
+					    options,
+					    null);
+					
+					System.out.println(n);
+				}
+			});
 		}
 
 		{
@@ -181,37 +247,39 @@ public class InductiveVisualMinerPanel extends JPanel {
 			add(statusLabel, cStatus);
 		}
 
-		Dot dot = new Dot();
-		dot.addNode("Inductive Visual Miner", "");
-		dot.addNode("Mining model...", "");
-		graphPanel = new DotPanel(dot) {
-			private static final long serialVersionUID = -3112819390640390685L;
+		{
+			Dot dot = new Dot();
+			dot.addNode("Inductive Visual Miner", "");
+			dot.addNode("Mining model...", "");
+			graphPanel = new DotPanel(dot) {
+				private static final long serialVersionUID = -3112819390640390685L;
 
-			public void selectionChanged() {
-				//selection of nodes changed; keep track of them
+				public void selectionChanged() {
+					//selection of nodes changed; keep track of them
 
-				Set<UnfoldedNode> result = new HashSet<UnfoldedNode>();
-				for (DotElement dotElement : graphPanel.getSelectedElements()) {
-					result.add(((LocalDotNode) dotElement).getUnode());
-				}
+					Set<UnfoldedNode> result = new HashSet<UnfoldedNode>();
+					for (DotElement dotElement : graphPanel.getSelectedElements()) {
+						result.add(((LocalDotNode) dotElement).getUnode());
+					}
 
-				if (onSelectionChanged != null) {
-					try {
-						onSelectionChanged.call(result);
-					} catch (Exception e) {
+					if (onSelectionChanged != null) {
+						try {
+							onSelectionChanged.call(result);
+						} catch (Exception e) {
+						}
 					}
 				}
-			}
-		};
-		GridBagConstraints cGraphPanel = new GridBagConstraints();
-		cGraphPanel.gridx = 0;
-		cGraphPanel.gridy = 0;
-		cGraphPanel.gridheight = gridy;
-		cGraphPanel.gridwidth = 1;
-		cGraphPanel.weightx = 1;
-		cGraphPanel.weighty = 1;
-		cGraphPanel.fill = GridBagConstraints.BOTH;
-		add(graphPanel, cGraphPanel);
+			};
+			GridBagConstraints cGraphPanel = new GridBagConstraints();
+			cGraphPanel.gridx = 0;
+			cGraphPanel.gridy = 0;
+			cGraphPanel.gridheight = gridy;
+			cGraphPanel.gridwidth = 1;
+			cGraphPanel.weightx = 1;
+			cGraphPanel.weighty = 1;
+			cGraphPanel.fill = GridBagConstraints.BOTH;
+			add(graphPanel, cGraphPanel);
+		}
 	}
 
 	public synchronized Pair<Dot, AlignedLogVisualisationInfo> updateModel(InductiveVisualMinerState state)
