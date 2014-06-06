@@ -25,6 +25,22 @@ import com.kitfox.svg.SVGException;
 import com.kitfox.svg.Text;
 
 public class InductiveVisualMinerSelectionColourer {
+	
+	public static void colourSelectedNode(SVGDiagram svg, LocalDotNode dotNode, boolean selected) {
+		Group svgGroup = DotPanel.getSVGElementOf(svg, dotNode);
+		SVGElement shape = svgGroup.getChild(1);
+
+		if (selected) {
+			dotNode.unselectedAppearance.stroke = DotPanel.setCSSAttributeOf(shape, "stroke", "red");
+			dotNode.unselectedAppearance.strokeWidth = DotPanel.setCSSAttributeOf(shape, "stroke-width", "3");
+			dotNode.unselectedAppearance.strokeDashArray = DotPanel.setCSSAttributeOf(shape, "stroke-dasharray", "5,5");
+		} else {
+			DotPanel.setCSSAttributeOf(shape, "stroke", dotNode.unselectedAppearance.stroke);
+			DotPanel.setCSSAttributeOf(shape, "stroke-width", dotNode.unselectedAppearance.strokeWidth);
+			DotPanel.setCSSAttributeOf(shape, "stroke-dasharray", dotNode.unselectedAppearance.strokeDashArray);
+		}
+	}
+	
 	public static void colour(SVGDiagram svg, AlignedLogVisualisationInfo info, ProcessTree tree,
 			AlignedLogInfo alignedFilteredLogInfo, Map<UnfoldedNode, AlignedLogInfo> alignedFilteredDfgLogInfos,
 			AlignedLogVisualisationParameters visualisationParameters) {
@@ -37,7 +53,6 @@ public class InductiveVisualMinerSelectionColourer {
 		long maxCardinality = extremes.getRight();
 
 		try {
-
 			//style nodes
 			for (UnfoldedNode unode : AlignedLogMetrics.unfoldAllNodes(uroot)) {
 				long cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, alignedFilteredLogInfo);

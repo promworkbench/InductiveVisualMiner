@@ -30,7 +30,9 @@ public abstract class ChainLink<I, O> {
 	 * 
 	 * @param result
 	 * 
-	 *            Processes the result of the computation.
+	 *            Processes the result of the computation. Guarantee: if
+	 *            executed, then all inputs are still relevant and have not been
+	 *            replaced.
 	 */
 	protected abstract void processResult(O result);
 
@@ -46,7 +48,7 @@ public abstract class ChainLink<I, O> {
 			}
 		});
 	}
-	
+
 	public abstract void cancel();
 
 	public void setExecutor(Executor executor, Chain chain) {

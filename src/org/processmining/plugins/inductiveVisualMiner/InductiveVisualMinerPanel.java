@@ -13,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -41,9 +40,6 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 import com.fluxicon.slickerbox.components.NiceDoubleSlider;
 import com.fluxicon.slickerbox.components.NiceSlider.Orientation;
 import com.fluxicon.slickerbox.factory.SlickerFactory;
-import com.kitfox.svg.Group;
-import com.kitfox.svg.SVGDiagram;
-import com.kitfox.svg.SVGElement;
 
 public class InductiveVisualMinerPanel extends JPanel {
 
@@ -60,7 +56,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final NiceDoubleSlider noiseSlider;
 	private final JLabel classifierLabel;
 	private JComboBox<?> classifiersCombobox;
-	private JButton exitButton;
+	private final JButton saveModelButton;
+	private final JButton saveImageButton;
 
 	private final AlignedLogVisualisation visualiser;
 
@@ -91,14 +88,12 @@ public class InductiveVisualMinerPanel extends JPanel {
 					1 - state.getMiningParameters().getNoiseThreshold(), Orientation.VERTICAL);
 			GridBagConstraints cNoiseSlider = new GridBagConstraints();
 			cNoiseSlider.gridx = 2;
-			cNoiseSlider.gridy = gridy;
+			cNoiseSlider.gridy = gridy++;
 			cNoiseSlider.weighty = 1;
 			cNoiseSlider.fill = GridBagConstraints.VERTICAL;
 			cNoiseSlider.anchor = GridBagConstraints.WEST;
 			add(getNoiseSlider(), cNoiseSlider);
 		}
-
-		gridy++;
 
 		{
 			boolean dfg = false;
@@ -152,7 +147,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			ccolourSelection.fill = GridBagConstraints.HORIZONTAL;
 			add(colourSelection, ccolourSelection);
 		}
-		
+
 		{
 			JLabel saveLabel = SlickerFactory.instance().createLabel("Save");
 			GridBagConstraints cExitButton = new GridBagConstraints();
@@ -164,62 +159,23 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 
 		{
-			exitButton = SlickerFactory.instance().createButton("model");
+			saveModelButton = SlickerFactory.instance().createButton("model");
 			GridBagConstraints cExitButton = new GridBagConstraints();
 			cExitButton.gridx = 2;
 			cExitButton.gridy = gridy++;
 			cExitButton.gridwidth = 1;
 			cExitButton.fill = GridBagConstraints.HORIZONTAL;
-			add(exitButton, cExitButton);
-			
-			final JPanel panel = this;
-			exitButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					//Custom button text
-					Object[] options = {"Petri net",
-					                    "Process tree"};
-					int n = JOptionPane.showOptionDialog(panel,
-					    "As what would you like to save the model?\nIt will become available in ProM.",
-					    "Save",
-					    JOptionPane.YES_NO_CANCEL_OPTION,
-					    JOptionPane.QUESTION_MESSAGE,
-					    null,
-					    options,
-					    options[0]);
-					
-					System.out.println(n);
-				}
-			});
+			add(saveModelButton, cExitButton);
 		}
-		
+
 		{
-			JButton saveImage = SlickerFactory.instance().createButton("image/animation");
+			saveImageButton = SlickerFactory.instance().createButton("image/animation");
 			GridBagConstraints cExitButton = new GridBagConstraints();
 			cExitButton.gridx = 2;
 			cExitButton.gridy = gridy++;
 			cExitButton.gridwidth = 1;
 			cExitButton.fill = GridBagConstraints.HORIZONTAL;
-			add(saveImage, cExitButton);
-			
-			final JPanel panel = this;
-			saveImage.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					//Custom button text
-					Object[] options = {"Model",
-					                    "Image",
-					                    "Animation"};
-					int n = JOptionPane.showOptionDialog(panel,
-					    "What would you like to save?",
-					    "Save",
-					    JOptionPane.YES_NO_CANCEL_OPTION,
-					    JOptionPane.QUESTION_MESSAGE,
-					    null,
-					    options,
-					    null);
-					
-					System.out.println(n);
-				}
-			});
+			add(saveImageButton, cExitButton);
 		}
 
 		{
@@ -335,38 +291,23 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 	}
 
-	private class Selected {
-		public String stroke;
-		public String strokeWidth;
-		public String strokeDashArray;
-	}
-
-	public void makeNodeSelectable(final SVGDiagram svg, final LocalDotNode dotNode, boolean select) {
-		final Selected oldSelected = new Selected();
+	public void makeNodeSelectable(final LocalDotNode dotNode, boolean select) {
 		dotNode.setSelectable(true);
 		dotNode.addSelectionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Group svgGroup = DotPanel.getSVGElementOf(svg, dotNode);
-				SVGElement shape = svgGroup.getChild(1);
-
-				oldSelected.stroke = DotPanel.setCSSAttributeOf(shape, "stroke", "red");
-				oldSelected.strokeWidth = DotPanel.setCSSAttributeOf(shape, "stroke-width", "3");
-				oldSelected.strokeDashArray = DotPanel.setCSSAttributeOf(shape, "stroke-dasharray", "5,5");
-
 				DotPanel panel = (DotPanel) e.getSource();
+
+				InductiveVisualMinerSelectionColourer.colourSelectedNode(panel.getSVG(), dotNode, true);
+
 				panel.repaint();
 			}
 		});
 		dotNode.addDeselectionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Group svgGroup = DotPanel.getSVGElementOf(svg, dotNode);
-				SVGElement shape = svgGroup.getChild(1);
-
-				DotPanel.setCSSAttributeOf(shape, "stroke", oldSelected.stroke);
-				DotPanel.setCSSAttributeOf(shape, "stroke-width", oldSelected.strokeWidth);
-				DotPanel.setCSSAttributeOf(shape, "stroke-dasharray", oldSelected.strokeDashArray);
-
 				DotPanel panel = (DotPanel) e.getSource();
+
+				InductiveVisualMinerSelectionColourer.colourSelectedNode(panel.getSVG(), dotNode, false);
+
 				panel.repaint();
 			}
 		});
@@ -411,8 +352,12 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return activitiesSlider;
 	}
 
-	public JButton getExitButton() {
-		return exitButton;
+	public JButton getSaveModelButton() {
+		return saveModelButton;
+	}
+
+	public JButton getSaveImageButton() {
+		return saveImageButton;
 	}
 
 	public void setOnSelectionChanged(InputFunction<Set<UnfoldedNode>> onSelectionChanged) {

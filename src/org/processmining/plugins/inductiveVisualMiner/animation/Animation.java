@@ -95,7 +95,11 @@ public class Animation {
 	}
 
 	public static LocalDotNode getDotNodeFromActivity(TimedMove move, AlignedLogVisualisationInfo info) {
-		for (LocalDotNode node : info.getNodes(move.getUnode())) {
+		return getDotNodeFromActivity(move.getUnode(), info);
+	}
+	
+	public static LocalDotNode getDotNodeFromActivity(UnfoldedNode unode, AlignedLogVisualisationInfo info) {
+		for (LocalDotNode node : info.getNodes(unode)) {
 			if (node.getType() == NodeType.activity) {
 				return node;
 			}

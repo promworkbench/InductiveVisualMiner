@@ -323,7 +323,7 @@ public class Trace2Token {
 	}
 
 	private static void debug(Object s) {
-		System.out.println(s);
+//		System.out.println(s);
 //				System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }

@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.animation;
+package org.processmining.plugins.inductiveVisualMiner.export;
 
 import static org.monte.media.FormatKeys.EncodingKey;
 import static org.monte.media.FormatKeys.FrameRateKey;
@@ -37,6 +37,7 @@ import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.AnimatedSVGExporter;
+import org.processmining.plugins.inductiveVisualMiner.animation.SVGTokens;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Function;
 
 import com.kitfox.svg.SVGDiagram;
@@ -68,6 +69,12 @@ public class ExportAnimation {
 		}
 		writer.close();
 	}
+	
+	//				OutputStream streamOut = new FileOutputStream("D:\\animationTest.svg");
+
+	//				ImageOutputStream streamOutAvi = new FileImageOutputStream(new File("D:\\animationTest.avi"));
+	//				ExportAnimation.exportMovie(animatedTokens, streamOutAvi, dot, svg);
+
 
 	public static void exportMovie(final SVGTokens tokens, ImageOutputStream streamOutMovie,
 			final Dot dot, final SVGDiagram svg) throws IOException {

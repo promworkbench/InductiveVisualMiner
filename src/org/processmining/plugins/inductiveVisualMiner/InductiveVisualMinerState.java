@@ -18,8 +18,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-import com.kitfox.svg.SVGDiagram;
-
 public class InductiveVisualMinerState {
 
 	public InductiveVisualMinerState(XLog xLog) {
@@ -102,12 +100,10 @@ public class InductiveVisualMinerState {
 	
 	//==layout==
 	private Dot dot;
-	private SVGDiagram svg;
 	private AlignedLogVisualisationInfo visualisationInfo;
 	
-	public void setLayout(Dot dot, AlignedLogVisualisationInfo visualisationInfo, SVGDiagram svg) {
+	public void setLayout(Dot dot, AlignedLogVisualisationInfo visualisationInfo) {
 		this.dot = dot;
-		this.svg = svg;
 		this.visualisationInfo = visualisationInfo;
 	}
 	
@@ -117,10 +113,6 @@ public class InductiveVisualMinerState {
 	
 	public Dot getDot() {
 		return dot;
-	}
-	
-	public SVGDiagram getSVG() {
-		return svg;
 	}
 
 	//==alignment==

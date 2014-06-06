@@ -6,12 +6,19 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class LocalDotNode extends DotNode {
 
+	public class Appearance {
+		public String stroke;
+		public String strokeWidth;
+		public String strokeDashArray;
+	}
+	
 	public enum NodeType {
 		source, sink, activity, xor, parallelSplit, parallelJoin, logMoveActivity
 	}
 	
 	private NodeType type;
 	private final UnfoldedNode node;
+	public final Appearance unselectedAppearance = new Appearance();
 
 	public LocalDotNode(Dot dot, AlignedLogVisualisationInfo info, NodeType type, String label, final UnfoldedNode unode) {
 		super(label, "");

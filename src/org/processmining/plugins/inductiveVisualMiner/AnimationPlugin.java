@@ -35,7 +35,7 @@ public class AnimationPlugin {
 
 		SVGDiagram diagram = universe.getDiagram(uri);
 
-		AnimatableSVGPanel panel = new AnimatableSVGPanel(universe);
+		AnimatableSVGPanel panel = new AnimatableSVGPanel(diagram);
 		panel.setImage(diagram, true);
 		
 		panel.setAnimationMaxTime(AnimatableSVGPanel.getExtremeTimes(diagram.getRoot()).get(1));
