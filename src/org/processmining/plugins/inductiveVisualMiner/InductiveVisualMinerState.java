@@ -15,6 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Al
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
+import org.processmining.plugins.inductiveVisualMiner.animation.SVGTokens;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -210,7 +211,7 @@ public class InductiveVisualMinerState {
 	}
 	
 	//==node selection==
-	Set<UnfoldedNode> selectedNodes = new HashSet<UnfoldedNode>();
+	private Set<UnfoldedNode> selectedNodes = new HashSet<UnfoldedNode>();
 	
 	public Set<UnfoldedNode> getSelectedNodes() {
 		return selectedNodes;
@@ -218,5 +219,16 @@ public class InductiveVisualMinerState {
 	
 	public synchronized void setSelectedNodes(Set<UnfoldedNode> selectedNodes) {
 		this.selectedNodes = selectedNodes;
+	}
+	
+	//==animation==
+	private SVGTokens SVGtokens;
+	
+	public SVGTokens getSVGtokens() {
+		return SVGtokens;
+	}
+	
+	public void setSVGtokens(SVGTokens tokens) {
+		this.SVGtokens = tokens;
 	}
 }

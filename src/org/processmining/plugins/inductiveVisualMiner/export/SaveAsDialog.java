@@ -54,13 +54,15 @@ public class SaveAsDialog extends JFileChooser {
 		}
 	}
 
-	public SaveAsDialog() {
+	public SaveAsDialog(boolean animationExportPossible) {
 		setAcceptAllFileFilterUsed(false);
 		addChoosableFileFilter(new IvMFileFilter(FileType.pngImage, "png", "png"));
 		addChoosableFileFilter(new IvMFileFilter(FileType.pdfImage, "pdf", "pdf"));
-		addChoosableFileFilter(new IvMFileFilter(FileType.svgImage, "svg", "svg (image)"));
-		addChoosableFileFilter(new IvMFileFilter(FileType.svgMovie, "svg", "svg (animation)"));
-		addChoosableFileFilter(new IvMFileFilter(FileType.aviMovie, "avi", "avi (animation)"));
+		addChoosableFileFilter(new IvMFileFilter(FileType.svgImage, "svg", "svg"));
+		if (animationExportPossible) {
+			addChoosableFileFilter(new IvMFileFilter(FileType.svgMovie, "svg", "svg (animation)"));
+			addChoosableFileFilter(new IvMFileFilter(FileType.aviMovie, "avi", "avi (animation)"));
+		}
 	}
 
 	@Override
