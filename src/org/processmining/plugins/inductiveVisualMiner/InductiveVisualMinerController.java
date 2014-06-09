@@ -111,6 +111,7 @@ public class InductiveVisualMinerController {
 			panel.getSaveModelButton().setEnabled(false);
 			panel.getSaveImageButton().setEnabled(false);
 			state.setSVGtokens(null);
+			panel.getSaveImageButton().setText("image");
 			return new Pair<XLog, XEventClassifier>(state.getXLog(), state.getMiningParameters().getClassifier());
 		}
 
@@ -143,6 +144,7 @@ public class InductiveVisualMinerController {
 			panel.getSaveModelButton().setEnabled(false);
 			panel.getSaveImageButton().setEnabled(false);
 			state.setSVGtokens(null);
+			panel.getSaveImageButton().setText("image");
 			return new Quadruple<IMLog, IMLogInfo, Double, MiningParameters>(state.getLog(), state.getLogInfo(),
 					state.getActivitiesThreshold(), state.getMiningParameters());
 		}
@@ -172,6 +174,7 @@ public class InductiveVisualMinerController {
 		protected Pair<IMLog, MiningParameters> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			state.setSVGtokens(null);
+			panel.getSaveImageButton().setText("image");
 			return new Pair<IMLog, MiningParameters>(state.getActivityFilteredIMLog(), state.getMiningParameters());
 		}
 
@@ -212,6 +215,7 @@ public class InductiveVisualMinerController {
 		protected Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			state.setSVGtokens(null);
+			panel.getSaveImageButton().setText("image");
 			return new Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo>(state.getTree(),
 					state.getMiningParameters().getClassifier(), state.getXLog(), state.getFilteredActivities(),
 					state.getLogInfo());
@@ -240,6 +244,7 @@ public class InductiveVisualMinerController {
 		protected Object generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			state.setSVGtokens(null);
+			panel.getSaveImageButton().setText("image");
 			return null;
 		}
 
@@ -271,6 +276,7 @@ public class InductiveVisualMinerController {
 		protected Septuple<AlignedLog, Set<UnfoldedNode>, Set<UnfoldedNode>, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			state.setSVGtokens(null);
+			panel.getSaveImageButton().setText("image");
 			return Septuple.of(state.getAlignedLog(), state.getSelectedNodes(),
 					AlignedLogMetrics.getAllDfgNodes(new UnfoldedNode(state.getTree().getRoot())),
 					state.getAlignedLogInfo(), state.getDfgLogInfos(), state.getTree(),
@@ -306,6 +312,7 @@ public class InductiveVisualMinerController {
 		protected Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			state.setSVGtokens(null);
+			panel.getSaveImageButton().setText("image");
 			return Septuple.of(state.getXLog(), state.getAlignedFilteredLog(), state.getXLogInfo(), state.getColourMode(),
 					state.getVisualisationInfo(), panel.getGraph().getDot(), panel.getGraph().getSVG());
 		}
@@ -376,6 +383,7 @@ public class InductiveVisualMinerController {
 		protected void processResult(Pair<SVGTokens, SVGDiagram> result) {
 			panel.getGraph().setImage(result.getB(), false);
 			panel.getGraph().setEnableAnimation(true);
+			panel.getSaveImageButton().setText("animation");
 			state.setSVGtokens(result.getA());
 			
 			//re-colour the selected nodes (i.e. the dashed red border)

@@ -169,7 +169,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 
 		{
-			saveImageButton = SlickerFactory.instance().createButton("image/animation");
+			saveImageButton = SlickerFactory.instance().createButton("image");
 			GridBagConstraints cExitButton = new GridBagConstraints();
 			cExitButton.gridx = 2;
 			cExitButton.gridy = gridy++;
