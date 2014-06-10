@@ -72,7 +72,7 @@ public class TimestampsAdder {
 
 				//set start end and time of trace
 				timedTrace.setStartTime(guessStartTime(timedTrace, shortestGraph, info));
-				timedTrace.setEndTime(guessEndTime(timedTrace, shortestGraph, info));
+				timedTrace.setEndTime(guessEndTime(timedTrace, timedTrace.getStartTime(), shortestGraph, info));
 			} else {
 				timedTrace = timeTraceDummyTimestamps(alignedTrace, trace, xLogInfo, indexTrace, showDeviations);
 			}
@@ -96,11 +96,11 @@ public class TimestampsAdder {
 		//every second, a trace starts; later traces are distributed randomly
 		double startTime = indexTrace;
 		if (indexTrace >= animationDuration - 10) {
-			startTime = random.nextInt((int) (animationDuration - 10));
+			startTime = randomStartTime();
 		}
 		timedTrace.setStartTime(startTime);
 		
-		double traceDuration = 10 + random.nextInt((int) (animationDuration - (startTime + 10)));
+		double traceDuration = randomDuration(startTime);
 		timedTrace.setEndTime(timedTrace.getStartTime() + traceDuration);
 
 		for (Move move : alignedTrace) {
@@ -110,6 +110,17 @@ public class TimestampsAdder {
 		}
 
 		return timedTrace;
+	}
+
+	private static double randomDuration(double startTime) {
+		double traceDuration = 10 + random.nextInt((int) (animationDuration - (startTime + 10)));
+		return traceDuration;
+	}
+
+	private static double randomStartTime() {
+		double startTime;
+		startTime = random.nextInt((int) (animationDuration - 10));
+		return startTime;
 	}
 
 	private static TimedTrace timeTraceFromTimestamps(IMTraceG<Move> alignedTrace, XTrace trace, XLogInfo xLogInfo,
@@ -189,8 +200,17 @@ public class TimestampsAdder {
 			}
 		}
 
-		//find the edges the trace is going through after the last timed move
-		List<TimedMove> partialTrace = trace.subList(0, firstTimedMoveIndex + 1);
+		if (firstTimedMove == null) {
+			return randomStartTime();
+		}
+		
+		//find the edges the trace is going through before the first timed move
+		List<TimedMove> partialTrace;
+		try {
+		partialTrace = trace.subList(0, firstTimedMoveIndex + 1);
+		} catch (Exception e) {
+			throw e;
+		}
 
 		//the trace ends with 2 seconds per edge
 		return firstTimedMove.getTimestamp()
@@ -198,7 +218,7 @@ public class TimestampsAdder {
 				* beginEndEdgeDuration;
 	}
 
-	public static double guessEndTime(List<TimedMove> trace, ShortestPathGraph shortestGraph,
+	public static double guessEndTime(List<TimedMove> trace, double startTime, ShortestPathGraph shortestGraph,
 			AlignedLogVisualisationInfo info) {
 		//find the last timed move
 		TimedMove lastTimedMove = null;
@@ -210,6 +230,10 @@ public class TimestampsAdder {
 			}
 		}
 
+		if (lastTimedMove == null) {
+			return randomDuration(startTime);
+		}
+		
 		//find the edges the trace is going through after the last timed move
 		List<TimedMove> partialTrace = trace.subList(lastTimedMoveIndex, trace.size());
 
