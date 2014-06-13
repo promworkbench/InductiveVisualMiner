@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Pair;
@@ -201,7 +202,12 @@ public class InterpolateToken {
 	}
 
 	private static int getParallelDestination(Token token, int offset) {
-		Token subToken = token.getSubTokensAtPoint(offset).iterator().next();
+		Token subToken;
+		try {
+		 subToken = token.getSubTokensAtPoint(offset).iterator().next();
+		} catch (NoSuchElementException e) {
+			throw e;
+		}
 		LocalDotNode parallelJoin = subToken.getLastPosition();
 
 		//search for the parallel join in the token, starting from offset

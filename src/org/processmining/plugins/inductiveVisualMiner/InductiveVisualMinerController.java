@@ -313,8 +313,9 @@ public class InductiveVisualMinerController {
 			panel.getGraph().setEnableAnimation(false);
 			state.setSVGtokens(null);
 			panel.getSaveImageButton().setText("image");
-			return Septuple.of(state.getXLog(), state.getAlignedFilteredLog(), state.getXLogInfo(), state.getColourMode(),
-					state.getVisualisationInfo(), panel.getGraph().getDot(), panel.getGraph().getSVG());
+			return Septuple.of(state.getXLog(), state.getAlignedFilteredLog(), state.getXLogInfo(), state
+					.getColourMode(), state.getVisualisationInfo(), panel.getGraph().getDot(), panel.getGraph()
+					.getSVG());
 		}
 
 		protected Pair<SVGTokens, SVGDiagram> executeLink(
@@ -355,8 +356,12 @@ public class InductiveVisualMinerController {
 					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps,
 							indexTrace, showDeviations, graph, info);
 					if (timedTrace != null) {
-						tokens.addAll(Trace2Token.trace2token(timedTrace, showDeviations, graph, info)
-								.getAllTokensRecursively());
+						try {
+							tokens.addAll(Trace2Token.trace2token(timedTrace, showDeviations, graph, info)
+									.getAllTokensRecursively());
+						} catch (Exception e) {
+							//for the demo, just ignore this case
+						}
 					}
 
 					indexTrace++;
@@ -385,7 +390,7 @@ public class InductiveVisualMinerController {
 			panel.getGraph().setEnableAnimation(true);
 			panel.getSaveImageButton().setText("animation");
 			state.setSVGtokens(result.getA());
-			
+
 			//re-colour the selected nodes (i.e. the dashed red border)
 			for (UnfoldedNode unode : state.getSelectedNodes()) {
 				LocalDotNode dotNode = Animation.getDotNodeFromActivity(unode, state.getVisualisationInfo());
@@ -398,8 +403,10 @@ public class InductiveVisualMinerController {
 		}
 
 	}
-	
-	private class ApplyNodeSelectionColouring extends ChainLink<Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>, Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>> {
+
+	private class ApplyNodeSelectionColouring
+			extends
+			ChainLink<Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>, Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>> {
 
 		protected Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> generateInput() {
 			return Pair.of(state.getAlignedFilteredLogInfo(), state.getDfgFilteredLogInfos());
@@ -411,17 +418,17 @@ public class InductiveVisualMinerController {
 		}
 
 		protected void processResult(Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> result) {
-			InductiveVisualMinerSelectionColourer.colour(panel.getGraph().getSVG(), state.getVisualisationInfo(), state.getTree(),
-					result.getA(), result.getB(), InductiveVisualMinerPanel.getViewParameters(state));
+			InductiveVisualMinerSelectionColourer.colour(panel.getGraph().getSVG(), state.getVisualisationInfo(),
+					state.getTree(), result.getA(), result.getB(), InductiveVisualMinerPanel.getViewParameters(state));
 			updateSelectionDescription(panel, state.getSelectedNodes());
 			setStatus(" ");
 			panel.repaint();
 		}
 
 		public void cancel() {
-			
+
 		}
-		
+
 	}
 
 	private final Chain chain;
@@ -594,7 +601,8 @@ public class InductiveVisualMinerController {
 							public void run() {
 								try {
 									ImageOutputStream stream = new FileImageOutputStream(p.getA());
-									boolean success = ExportAnimation.exportAvi(state.getSVGtokens(), stream, state.getDot(), panel);
+									boolean success = ExportAnimation.exportAvi(state.getSVGtokens(), stream,
+											state.getDot(), panel);
 									if (!success) {
 										p.getA().delete();
 									}

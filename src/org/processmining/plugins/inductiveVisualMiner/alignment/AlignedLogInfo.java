@@ -15,7 +15,6 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 import org.processmining.processtree.impl.AbstractBlock.DefLoop;
 import org.processmining.processtree.impl.AbstractBlock.Seq;
 import org.processmining.processtree.impl.AbstractBlock.XorLoop;
-import org.processmining.processtree.impl.AbstractTask;
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
 
@@ -89,17 +88,19 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 			}
 		}
 
+		XEventClass e = trace.get(position).getEventClass();
+		
 		//exception cases: repeated forbidden execution of activity
 		//add log move on that node
-		XEventClass e = trace.get(position).getEventClass();
-		if (lastKnownPosition != null && e.toString().equals(((AbstractTask) lastKnownPosition.getNode()).getName())) {
-			addLogMove(move, lastKnownPosition, lastKnownPosition, e, cardinality);
-			return;
-		}
-		if (nextKnownPosition != null && e.toString().equals(((AbstractTask) nextKnownPosition.getNode()).getName())) {
-			addLogMove(move, nextKnownPosition, nextKnownPosition, e, cardinality);
-			return;
-		}
+		//update: disabled for unlogical animation paths
+//		if (lastKnownPosition != null && e.toString().equals(((AbstractTask) lastKnownPosition.getNode()).getName())) {
+//			addLogMove(move, lastKnownPosition, lastKnownPosition, e, cardinality);
+//			return;
+//		}
+//		if (nextKnownPosition != null && e.toString().equals(((AbstractTask) nextKnownPosition.getNode()).getName())) {
+//			addLogMove(move, nextKnownPosition, nextKnownPosition, e, cardinality);
+//			return;
+//		}
 
 		//case: log move at begin or end of trace
 		//add log move to root

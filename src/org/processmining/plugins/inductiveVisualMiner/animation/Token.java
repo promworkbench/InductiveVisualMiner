@@ -115,7 +115,7 @@ public class Token {
 
 	public void addSubToken(Token token) {
 		subTokens.get(subTokens.size() - 1).add(token);
-		//		System.out.println("  add subtoken");
+//		System.out.println("  add subtoken at " + (subTokens.size() - 1));
 	}
 
 	public List<Pair<LocalDotEdge, Double>> getPoints() {
@@ -124,6 +124,10 @@ public class Token {
 
 	public Set<Token> getSubTokensAtPoint(int index) {
 		return subTokens.get(index);
+	}
+
+	public Set<Token> getLastSubTokens() {
+		return subTokens.get(subTokens.size() - 1);
 	}
 
 	public LocalDotNode getStartPosition() {

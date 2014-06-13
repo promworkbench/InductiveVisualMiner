@@ -128,6 +128,12 @@ public class Trace2Token {
 
 					token.addSubToken(childToken);
 				}
+				
+				if (token.getLastSubTokens().size() == 0) {
+					debug(token);
+					debug("no subtokens");
+					throw new RuntimeException("no subtokens created");
+				}
 
 				//continue, and in the next iteration re-process the same move
 				i--;
@@ -316,6 +322,9 @@ public class Trace2Token {
 		//split the trace
 		for (TimedMove move : trace) {
 			Set<UnfoldedNode> sigma = mapUnode2sigma.get(move.getPositionUnode());
+			if (sigma == null) {
+				debug("");
+			}
 			mapSigma2subtrace.get(sigma).add(move);
 		}
 
