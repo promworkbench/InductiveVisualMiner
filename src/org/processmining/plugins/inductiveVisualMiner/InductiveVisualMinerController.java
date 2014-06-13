@@ -345,35 +345,26 @@ public class InductiveVisualMinerController {
 
 			//compute the animation
 			final List<Token> tokens = new ArrayList<>();
-			{
-				long indexTrace = 0;
-				for (XTrace trace : xLog) {
 
-					if (indexTrace == maxTraces) {
-						break;
+			for (XTrace trace : xLog) {
+				TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps,
+						showDeviations, graph, info);
+				if (timedTrace != null) {
+					try {
+						tokens.add(Trace2Token.trace2token(timedTrace, showDeviations, graph, info));
+					} catch (Exception e) {
+						//for the demo, just ignore this case
 					}
-
-					TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps,
-							indexTrace, showDeviations, graph, info);
-					if (timedTrace != null) {
-						try {
-							tokens.addAll(Trace2Token.trace2token(timedTrace, showDeviations, graph, info)
-									.getAllTokensRecursively());
-						} catch (Exception e) {
-							//for the demo, just ignore this case
-						}
-					}
-
-					indexTrace++;
 				}
 			}
 
 			//make an svg and read it in directly
 			try {
-				final SVGTokens animatedTokens = AnimationSVG.animateTokens(tokens, svg);
+				final SVGTokens animatedTokens = AnimationSVG.animateTokens(tokens, null, svg);
+				final SVGTokens animatedTokensLimited = AnimationSVG.animateTokens(tokens, maxTraces, svg);
 				PipedInputStream svgStream = ExportAnimation.copy(new Function<PipedOutputStream, Object>() {
 					public Object call(PipedOutputStream input) throws Exception {
-						ExportAnimation.exportSVG(animatedTokens, input, dot);
+						ExportAnimation.exportSVG(animatedTokensLimited, input, dot);
 						return null;
 					}
 				});

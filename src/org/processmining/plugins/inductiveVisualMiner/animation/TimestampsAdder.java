@@ -55,8 +55,8 @@ public class TimestampsAdder {
 	}
 
 	public static TimedTrace timeTrace(HashMap<List<XEventClass>, IMTraceG<Move>> map, XTrace trace, XLogInfo xLogInfo,
-			Pair<Double, Double> extremeTimestamps, long indexTrace, boolean showDeviations,
-			ShortestPathGraph shortestGraph, AlignedLogVisualisationInfo info) {
+			Pair<Double, Double> extremeTimestamps, boolean showDeviations, ShortestPathGraph shortestGraph,
+			AlignedLogVisualisationInfo info) {
 
 		//create an aligned trace to search for
 		List<XEventClass> lTrace = getTraceLogProjection(trace, xLogInfo);
@@ -74,7 +74,7 @@ public class TimestampsAdder {
 				timedTrace.setStartTime(guessStartTime(timedTrace, shortestGraph, info));
 				timedTrace.setEndTime(guessEndTime(timedTrace, timedTrace.getStartTime(), shortestGraph, info));
 			} else {
-				timedTrace = timeTraceDummyTimestamps(alignedTrace, trace, xLogInfo, indexTrace, showDeviations);
+				timedTrace = timeTraceDummyTimestamps(alignedTrace, trace, xLogInfo, showDeviations);
 			}
 
 			if (timedTrace == null) {
@@ -88,19 +88,13 @@ public class TimestampsAdder {
 	}
 
 	private static TimedTrace timeTraceDummyTimestamps(IMTraceG<Move> alignedTrace, XTrace trace, XLogInfo xLogInfo,
-			long indexTrace, boolean showDeviations) {
+			boolean showDeviations) {
 
 		//attach timestamps
 		TimedTrace timedTrace = new TimedTrace();
 
-		//every second, a trace starts; later traces are distributed randomly
-		double startTime = indexTrace;
-		if (indexTrace >= animationDuration - 10) {
-			startTime = randomStartTime();
-		}
-		timedTrace.setStartTime(startTime);
-		
-		double traceDuration = randomDuration(startTime);
+		timedTrace.setStartTime(randomStartTime());
+		double traceDuration = randomDuration(timedTrace.getStartTime());
 		timedTrace.setEndTime(timedTrace.getStartTime() + traceDuration);
 
 		for (Move move : alignedTrace) {
@@ -203,11 +197,11 @@ public class TimestampsAdder {
 		if (firstTimedMove == null) {
 			return randomStartTime();
 		}
-		
+
 		//find the edges the trace is going through before the first timed move
 		List<TimedMove> partialTrace;
 		try {
-		partialTrace = trace.subList(0, firstTimedMoveIndex + 1);
+			partialTrace = trace.subList(0, firstTimedMoveIndex + 1);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -233,7 +227,7 @@ public class TimestampsAdder {
 		if (lastTimedMove == null) {
 			return randomDuration(startTime);
 		}
-		
+
 		//find the edges the trace is going through after the last timed move
 		List<TimedMove> partialTrace = trace.subList(lastTimedMoveIndex, trace.size());
 
