@@ -17,7 +17,6 @@ import org.processmining.plugins.InductiveMiner.MaybeString;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.metrics.PropertyDirectlyFollowsGraph;
 import org.processmining.plugins.InductiveMiner.plugins.IMiProcessTree;
@@ -28,12 +27,10 @@ import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
-import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet;
@@ -90,7 +87,7 @@ public class AlignedLogVisualisation {
 		this.parameters = parameters;
 		if (logInfo == null) {
 			//use empty logInfo
-			logInfo = new AlignedLogInfo(new MultiSet<IMTraceG<Move>>());
+			logInfo = new AlignedLogInfo();
 			//set parameters to not show frequencies
 			parameters.setShowFrequenciesOnModelEdges(false);
 			parameters.setShowFrequenciesOnMoveEdges(false);
@@ -227,7 +224,7 @@ public class AlignedLogVisualisation {
 
 			//draw log-move-arc if necessary
 			if (parameters.isShowLogMoves()) {
-				visualiseLogMove(join, join, unode, unode, unode.unfoldChild(child), directionForward);
+				visualiseLogMove(split, split, unode, unode, unode.unfoldChild(child), directionForward);
 			}
 		}
 	}
@@ -316,7 +313,7 @@ public class AlignedLogVisualisation {
 		//get the logInfo of the directly-follows graph
 		AlignedLogInfo dfgLogInfo = dfgLogInfos.get(unode);
 		if (dfgLogInfo == null) {
-			dfgLogInfo = new AlignedLogInfo(new AlignedLog());
+			dfgLogInfo = new AlignedLogInfo();
 		}
 
 		//add edges

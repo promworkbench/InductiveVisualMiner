@@ -90,4 +90,8 @@ public class Move {
 		}
 		return logMoveUnode;
 	}
+
+	public boolean isLogMove() {
+		return type == Type.log;
+	}
 }

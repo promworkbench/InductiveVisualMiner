@@ -58,7 +58,7 @@ public class AlignedLogMetrics {
 				}
 				return result;
 			} else if (unode.getBlock() instanceof XorLoop || unode.getBlock() instanceof DefLoop) {
-				//a loop is execute precisely as much times as its exit node.
+				//a loop is executed precisely as often as its exit node.
 				//in alignment land, the exit node cannot be skipped
 				return getNumberOfTracesRepresented(unode.unfoldChild(unode.getBlock().getChildren().get(2)), logInfo);
 			}

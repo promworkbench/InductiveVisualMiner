@@ -1,7 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.deckfour.xes.classification.XEventClass;
@@ -10,18 +12,19 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfoG;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
+import org.processmining.processtree.Block.And;
+import org.processmining.processtree.Block.Def;
+import org.processmining.processtree.Block.Seq;
+import org.processmining.processtree.Block.Xor;
+import org.processmining.processtree.Block.XorLoop;
 import org.processmining.processtree.Node;
+import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
-import org.processmining.processtree.impl.AbstractBlock.DefLoop;
-import org.processmining.processtree.impl.AbstractBlock.Seq;
-import org.processmining.processtree.impl.AbstractBlock.XorLoop;
-import org.processmining.processtree.impl.AbstractTask.Manual;
-
 
 public class AlignedLogInfo extends IMLogInfoG<Move> {
 
-	private MultiSet<UnfoldedNode> modelMoves;
-	private MultiSet<String> unlabeledLogMoves;
+	private final MultiSet<UnfoldedNode> modelMoves;
+	private final MultiSet<String> unlabeledLogMoves;
 
 	//for each position in the tree, the xeventclasses that were moved
 	//position:
@@ -29,39 +32,185 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 	// (node1, node2) on node1, before node2 (only in case of node1 sequence or loop)
 	// (root, null) at end of trace
 	// (null, root) at start of trace
-	private Map<Pair<UnfoldedNode, UnfoldedNode>, MultiSet<XEventClass>> logMoves;
-	private MultiSet<Pair<UnfoldedNode, UnfoldedNode>> dfg;
+	private final Map<Pair<UnfoldedNode, UnfoldedNode>, MultiSet<XEventClass>> logMoves;
+	private final MultiSet<Pair<UnfoldedNode, UnfoldedNode>> dfg;
 
-	public AlignedLogInfo(MultiSet<? extends IMTraceG<Move>> log) {
-		super(log);
-
+	public AlignedLogInfo() {
+		super(new AlignedLog());
 		modelMoves = new MultiSet<UnfoldedNode>();
 		logMoves = new HashMap<Pair<UnfoldedNode, UnfoldedNode>, MultiSet<XEventClass>>();
 		unlabeledLogMoves = new MultiSet<String>();
 		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
+	}
+	
+	public AlignedLogInfo(MultiSet<? extends IMTraceG<Move>> log) {
+		super(log);
+		modelMoves = new MultiSet<UnfoldedNode>();
+		logMoves = new HashMap<Pair<UnfoldedNode, UnfoldedNode>, MultiSet<XEventClass>>();
+		unlabeledLogMoves = new MultiSet<String>();
+		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
+		UnfoldedNode root = null;
 		for (IMTraceG<Move> trace : log) {
 			UnfoldedNode lastUnode = null;
 			long cardinality = log.getCardinalityOf(trace);
+			boolean traceContainsLogMove = false;
 			for (int i = 0; i < trace.size(); i++) {
 				Move move = trace.get(i);
 				if (move.getType() == Type.model) {
 					//add model move to list of model moves
-					modelMoves.add(move.getUnode(), log.getCardinalityOf(trace));
+					modelMoves.add(move.getUnode(), cardinality);
 				} else if (move.getType() == Type.log) {
 					//position the log move
-					positionLogMove(move, lastUnode, i, trace, cardinality);
-
+//					positionLogMove(move, lastUnode, i, trace, cardinality);
+					traceContainsLogMove = true;
 					unlabeledLogMoves.add(move.getEventClass().toString(), cardinality);
+				}
+				
+				if (root == null && move.isModelSync()) {
+					root = new UnfoldedNode(move.getUnode().getPath().get(0));
 				}
 
 				if (move.getUnode() != null && move.getUnode().getNode() instanceof Manual) {
-					dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastUnode, move.getUnode()), log.getCardinalityOf(trace));
+					dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastUnode, move.getUnode()), cardinality);
 					lastUnode = move.getUnode();
 				}
 			}
 			if (lastUnode != null) {
-				dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastUnode, null), log.getCardinalityOf(trace));
+				dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastUnode, null), cardinality);
 			}
+			
+			//position the log moves
+			if (traceContainsLogMove) {
+				positionLogMovesRoot(root, root, trace, cardinality);
+			}
+		}
+	}
+
+	public void positionLogMovesRoot(UnfoldedNode root, UnfoldedNode continueOn, IMTraceG<Move> trace, long cardinality) {
+		System.out.println("");
+		
+		//remove the leading and trailing log moves and position them on the root
+		int start = 0;
+		while (!trace.get(start).isModelSync()) {
+			start++;
+		}
+		int end = trace.size() - 1;
+		while (!trace.get(end).isModelSync()) {
+			end--;
+		}
+		List<Move> subtrace = trace.subList(start, end + 1);
+
+		//position the leading log moves
+		for (Move logMove : trace.subList(0, start)) {
+			addLogMove(logMove, null, root, logMove.getEventClass(), cardinality);
+		}
+
+		//position the trailing log moves
+		for (Move logMove : trace.subList(end + 1, trace.size())) {
+			addLogMove(logMove, root, null, logMove.getEventClass(), cardinality);
+		}
+
+		//recurse on the subtrace
+		positionLogMoves(continueOn, subtrace, cardinality);
+	}
+
+	/*
+	 * Invariant: the first and the last move of the trace are not log moves.
+	 */
+	private void positionLogMoves(UnfoldedNode unode, List<Move> trace, long cardinality) {
+		System.out.println(" position " + trace + " on " + unode);
+		if (unode.getBlock() == null) {
+			//unode is an activity or tau
+			//by the invariant, the trace contains no log moves
+		} else if (unode.getBlock() instanceof Xor || unode.getBlock() instanceof Def) {
+			//an xor cannot have log moves, just recurse on the child that produced this trace
+
+			//by the invariant, the trace does not start with a log move
+			//find the child that this grandchild belongs to
+			UnfoldedNode child = findChildWith(unode, trace.get(0).getUnode());
+
+			positionLogMoves(child, trace, cardinality);
+
+		} else if (unode.getBlock() instanceof Seq || unode.getBlock() instanceof XorLoop) {
+			splitSequenceLoop(unode, trace, cardinality);
+		} else if (unode.getBlock() instanceof And) {
+			
+			//set up subtraces for children
+			Map<UnfoldedNode, IMTraceG<Move>> subTraces = new HashMap<>();
+			for (Node child : unode.getBlock().getChildren()) {
+				subTraces.put(unode.unfoldChild(child), new IMTraceG<Move>());
+			}
+			
+			//by the invariant, the first move is not a log move
+			UnfoldedNode lastSeenChild = null;
+			
+			//walk through the trace to split it
+			for (Move move : trace) {
+				if (move.isLogMove()) {
+					//put this log move on the last seen child
+					//we cannot know a better place to put it
+					subTraces.get(lastSeenChild).add(move);
+				} else {
+					//put this move in the subtrace of the child it belongs to
+					UnfoldedNode child = findChildWith(unode, move.getUnode());
+					subTraces.get(child).add(move);
+					lastSeenChild = child;
+				}
+			}
+			
+			//invariant might be invalid on sub traces; position leading and trailing log moves
+			for (Node child : unode.getBlock().getChildren()) {
+				UnfoldedNode uChild = unode.unfoldChild(child);
+				IMTraceG<Move> subTrace = subTraces.get(uChild);
+				positionLogMovesRoot(unode, uChild, subTrace, cardinality);
+			}
+		}
+	}
+
+	private void splitSequenceLoop(UnfoldedNode unode, List<Move> trace, long cardinality) {
+		//by the invariant, the first move is not a log move
+		UnfoldedNode lastSeenChild = findChildWith(unode, trace.get(0).getUnode());
+		List<Move> logMoves = new ArrayList<Move>();
+		List<Move> subTrace = new ArrayList<Move>();
+		
+		//walk through the trace to split it
+		for (Move move : trace) {
+			if (move.isLogMove()) {
+				logMoves.add(move);
+			} else {
+				UnfoldedNode child = findChildWith(unode, move.getUnode());
+				if (child.equals(lastSeenChild)) {
+					//we are not leaving the previous child with this move
+					//the log moves we have seen now are internal to the subtrace; add them
+					subTrace.addAll(logMoves);
+					subTrace.add(move);
+					logMoves.clear();
+				} else {
+					//we are leaving the last child with this move
+
+					//recurse on subtrace
+					positionLogMoves(lastSeenChild, subTrace, cardinality);
+
+					//the log moves we have seen now are external to both subtraces; position them on this unode
+					for (Move logMove : logMoves) {
+						addLogMove(logMove, unode, child, logMove.getEventClass(), cardinality);
+					}
+					
+					subTrace.clear();
+					logMoves.clear();
+					subTrace.add(move);
+					lastSeenChild = child;
+
+				}
+			}
+		}
+		
+		//recurse on subtrace
+		positionLogMoves(lastSeenChild, subTrace, cardinality);
+
+		//the log moves we have seen now are external to both subtraces; position them on this unode
+		for (Move logMove : logMoves) {
+			addLogMove(logMove, unode, null, logMove.getEventClass(), cardinality);
 		}
 	}
 
@@ -78,60 +227,6 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 		return parent.unfoldChild(itGrandChild.next());
 	}
 
-	private void positionLogMove(Move move, UnfoldedNode lastKnownPosition, int position, IMTraceG<Move> trace,
-			long cardinality) {
-		UnfoldedNode nextKnownPosition = null;
-		for (int i = position + 1; i < trace.size(); i++) {
-			if (trace.get(i).isModelSync()) {
-				nextKnownPosition = trace.get(i).getUnode();
-				break;
-			}
-		}
-
-		XEventClass e = trace.get(position).getEventClass();
-		
-		//exception cases: repeated forbidden execution of activity
-		//add log move on that node
-		//update: disabled for unlogical animation paths
-//		if (lastKnownPosition != null && e.toString().equals(((AbstractTask) lastKnownPosition.getNode()).getName())) {
-//			addLogMove(move, lastKnownPosition, lastKnownPosition, e, cardinality);
-//			return;
-//		}
-//		if (nextKnownPosition != null && e.toString().equals(((AbstractTask) nextKnownPosition.getNode()).getName())) {
-//			addLogMove(move, nextKnownPosition, nextKnownPosition, e, cardinality);
-//			return;
-//		}
-
-		//case: log move at begin or end of trace
-		//add log move to root
-		if (lastKnownPosition == null && nextKnownPosition == null) {
-			//we have an empty model, do nothing;
-			return;
-		} else if (lastKnownPosition == null) {
-			UnfoldedNode root = new UnfoldedNode(nextKnownPosition.getPath().get(0));
-			addLogMove(move, null, root, e, cardinality);
-			return;
-		} else if (nextKnownPosition == null) {
-			UnfoldedNode root = new UnfoldedNode(lastKnownPosition.getPath().get(0));
-			addLogMove(move, root, null, e, cardinality);
-			return;
-		}
-
-		//we have a lowest common parent that we will put the log move on
-		UnfoldedNode logMoveNode = getLowestCommonParent(nextKnownPosition, lastKnownPosition);
-		if (logMoveNode.getNode() instanceof Seq) {
-			//for a sequence, find the child of lowestCommonParent in which lastUnode is
-			addLogMove(move, logMoveNode, findChildWith(logMoveNode, lastKnownPosition), e, cardinality);
-		} else if (logMoveNode.getNode() instanceof DefLoop || logMoveNode.getNode() instanceof XorLoop) {
-			//for loop, find the child of lowestcommonparent in which lastUnode is
-			addLogMove(move, logMoveNode, findChildWith(logMoveNode, lastKnownPosition), e, cardinality);
-		} else {
-			//for all other nodes, put on the node itself
-			addLogMove(move, logMoveNode, logMoveNode, e, cardinality);
-		}
-
-	}
-
 	public static UnfoldedNode getLowestCommonParent(UnfoldedNode unode1, UnfoldedNode unode2) {
 		UnfoldedNode result = new UnfoldedNode(unode1.getPath().get(0));
 		int i = 1;
@@ -145,7 +240,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 
 	private void addLogMove(Move move, UnfoldedNode unode, UnfoldedNode beforeChild, XEventClass e, long cardinality) {
 		move.setLogMove(unode, beforeChild);
-		
+
 		Pair<UnfoldedNode, UnfoldedNode> key = new Pair<UnfoldedNode, UnfoldedNode>(unode, beforeChild);
 		if (!logMoves.containsKey(key)) {
 			logMoves.put(key, new MultiSet<XEventClass>());

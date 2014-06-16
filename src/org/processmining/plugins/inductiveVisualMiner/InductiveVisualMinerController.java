@@ -354,6 +354,8 @@ public class InductiveVisualMinerController {
 						tokens.add(Trace2Token.trace2token(timedTrace, showDeviations, graph, info));
 					} catch (Exception e) {
 						//for the demo, just ignore this case
+						debug(timedTrace);
+						throw e;
 					}
 				}
 			}
@@ -681,5 +683,9 @@ public class InductiveVisualMinerController {
 			}
 			panel.getSelectionLabel().setText(s);
 		}
+	}
+	
+	private static void debug(Object s) {
+		System.out.println(s);
 	}
 }

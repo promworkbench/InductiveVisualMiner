@@ -1,10 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -12,10 +9,10 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.LogSplitter;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractBlock.And;
@@ -38,7 +35,7 @@ public class Trace2Token {
 
 		//interpolate the missing timestamps from the token
 		InterpolateToken.interpolateToken(token);
-		
+
 		debug(token);
 
 		return token;
@@ -128,7 +125,7 @@ public class Trace2Token {
 
 					token.addSubToken(childToken);
 				}
-				
+
 				if (token.getLastSubTokens().size() == 0) {
 					debug(token);
 					debug("no subtokens");
@@ -181,15 +178,16 @@ public class Trace2Token {
 				token.addPoint(moveEdge, null);
 			} else if (move.getType() == Type.log) {
 				//log move (should be filtered out if not showing deviations)
-				LocalDotEdge moveEdge = Animation.getLogMoveEdge(move.getLogMoveUnode(), move.getLogMoveBeforeChild(), info);
-				
+				LocalDotEdge moveEdge = Animation.getLogMoveEdge(move.getLogMoveUnode(), move.getLogMoveBeforeChild(),
+						info);
+
 				//move from the last known position to the start of the move edge,
 				//then take the move edge itself
 				List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), moveEdge.getSource());
 				for (LocalDotEdge edge : path) {
 					token.addPoint(edge, null);
 				}
-				
+
 				//add the move edge
 				token.addPoint(moveEdge, move.getTimestamp());
 			}
@@ -299,40 +297,21 @@ public class Trace2Token {
 	 */
 	public static List<List<TimedMove>> splitTrace(UnfoldedNode unode, List<TimedMove> trace) {
 
-		//make a partition
-		List<Set<UnfoldedNode>> partition = new LinkedList<Set<UnfoldedNode>>();
-		for (Node child : unode.getBlock().getChildren()) {
-			UnfoldedNode uchild = unode.unfoldChild(child);
-			partition.add(new HashSet<UnfoldedNode>(AlignedLogMetrics.unfoldAllNodes(uchild)));
-		}
-
-		//map activities to sigmas
-		List<List<TimedMove>> result = new ArrayList<List<TimedMove>>();
-		HashMap<Set<UnfoldedNode>, List<TimedMove>> mapSigma2subtrace = new HashMap<Set<UnfoldedNode>, List<TimedMove>>();
-		HashMap<UnfoldedNode, Set<UnfoldedNode>> mapUnode2sigma = new HashMap<UnfoldedNode, Set<UnfoldedNode>>();
-		for (Set<UnfoldedNode> sigma : partition) {
-			List<TimedMove> subtrace = new ArrayList<TimedMove>();
-			result.add(subtrace);
-			mapSigma2subtrace.put(sigma, subtrace);
-			for (UnfoldedNode unode2 : sigma) {
-				mapUnode2sigma.put(unode2, sigma);
-			}
-		}
+		LogSplitter.SigmaMaps<TimedMove> maps = LogSplitter.makeSigmaMaps(unode);
 
 		//split the trace
 		for (TimedMove move : trace) {
-			Set<UnfoldedNode> sigma = mapUnode2sigma.get(move.getPositionUnode());
-			if (sigma == null) {
-				debug("");
+			Set<UnfoldedNode> sigma = maps.mapUnode2sigma.get(move.getPositionUnode());
+			if (sigma != null) {
+				maps.mapSigma2subtrace.get(sigma).add(move);
 			}
-			mapSigma2subtrace.get(sigma).add(move);
 		}
 
-		return result;
+		return maps.sublogs;
 	}
 
 	private static void debug(Object s) {
-//		System.out.println(s);
-//				System.out.println(s.toString().replaceAll("\\n", " "));
+				System.out.println(s);
+		//				System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }
