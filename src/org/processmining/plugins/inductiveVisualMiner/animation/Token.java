@@ -26,6 +26,11 @@ public class Token {
 		subTokens = new ArrayList<>();
 	}
 
+	/**
+	 * Returns the last known time stamp in this token; Can return null.
+	 * 
+	 * @return
+	 */
 	public Double getLastTime() {
 		for (int i = points.size() - 1; i >= 0; i--) {
 			if (points.get(i).getRight() != null) {
@@ -35,6 +40,11 @@ public class Token {
 		return startTime;
 	}
 
+	/**
+	 * Returns the last known dot node in this token.
+	 * 
+	 * @return
+	 */
 	public LocalDotNode getLastPosition() {
 		if (points.isEmpty()) {
 			return startPosition;
@@ -42,6 +52,13 @@ public class Token {
 		return points.get(points.size() - 1).getLeft().getTarget();
 	}
 
+	/**
+	 * Gets the target dot node after the edge of the given index. -1 gives the
+	 * start position
+	 * 
+	 * @param index
+	 * @return
+	 */
 	public LocalDotNode getTarget(int index) {
 		if (index == -1) {
 			return getStartPosition();
@@ -50,6 +67,13 @@ public class Token {
 		}
 	}
 
+	/**
+	 * Gets the time stamp after the edge of the given index. -1 gives the start
+	 * time
+	 * 
+	 * @param index
+	 * @return
+	 */
 	public Double getTimestamp(int index) {
 		if (index == -1) {
 			return getStartTime();
@@ -67,10 +91,15 @@ public class Token {
 			subToken.setStartTime(timestamp);
 		}
 
-		performSanityCheck();
+		performSanityCheck(null);
 
 	}
 
+	/**
+	 * Returns a set containing this token and all its subtokens.
+	 * 
+	 * @return
+	 */
 	public Set<Token> getAllTokensRecursively() {
 		Set<Token> result = new HashSet<>();
 		result.add(this);
@@ -82,15 +111,26 @@ public class Token {
 		return result;
 	}
 
-	private void performSanityCheck() {
+	private double performSanityCheck(Double last2) {
 		//perform sanity check
 		double last;
-		if (getStartTime() != null) {
+		if (last2 != null) {
+			last = last2;
+		} else if (getStartTime() != null) {
 			last = getStartTime();
 		} else {
 			last = Double.NEGATIVE_INFINITY;
 		}
-		for (Pair<LocalDotEdge, Double> p : points) {
+		
+		if (last2 != null && last < last2) {
+			System.out.println("===========");
+			System.out.println(this);
+			throw new RuntimeException("token cannot move back in time");
+		}
+		
+		for (int i = 0; i < points.size(); i++) {
+			Pair<LocalDotEdge, Double> p = points.get(i);
+
 			if (p.getRight() != null) {
 				if (p.getRight() < last) {
 					System.out.println("===========");
@@ -99,14 +139,21 @@ public class Token {
 				}
 				last = p.getRight();
 			}
+
+			//check sub tokens
+			for (Token subToken : getSubTokensAtPoint(i)) {
+				subToken.performSanityCheck(last);
+			}
 		}
+		
+		return last;
 	}
 
 	public void addPoint(LocalDotEdge edge, Double time) {
 		points.add(Pair.of(edge, time));
 		subTokens.add(new HashSet<Token>());
 
-		performSanityCheck();
+		performSanityCheck(null);
 
 		//				System.out.println("  add point to token " + points.get(points.size() - 1) + fade);
 		//		
@@ -115,21 +162,45 @@ public class Token {
 
 	public void addSubToken(Token token) {
 		subTokens.get(subTokens.size() - 1).add(token);
-//		System.out.println("  add subtoken at " + (subTokens.size() - 1));
+		//		System.out.println("  add subtoken at " + (subTokens.size() - 1));
 	}
 
+	/**
+	 * Returns a list of all edges and timestamps in this token. Note: does not
+	 * return the start time.
+	 * 
+	 * @return
+	 */
 	public List<Pair<LocalDotEdge, Double>> getPoints() {
 		return Collections.unmodifiableList(points);
 	}
 
+	/**
+	 * Returns a set of tokens that start after the given index. Subtokens
+	 * cannot start at the start of the token, so -1 is not a valid input.
+	 * 
+	 * @param index
+	 * @return
+	 */
 	public Set<Token> getSubTokensAtPoint(int index) {
 		return subTokens.get(index);
 	}
 
+	/**
+	 * Returns the set of subtokens that start at the last known position in
+	 * this token.
+	 * 
+	 * @return
+	 */
 	public Set<Token> getLastSubTokens() {
 		return subTokens.get(subTokens.size() - 1);
 	}
 
+	/**
+	 * Returns the start dot node of this token.
+	 * 
+	 * @return
+	 */
 	public LocalDotNode getStartPosition() {
 		return startPosition;
 	}
@@ -137,13 +208,24 @@ public class Token {
 	public void setStartTime(double startTime) {
 		this.startTime = startTime;
 
-		performSanityCheck();
+		performSanityCheck(null);
 	}
 
+	/**
+	 * Returns the start time of this token.
+	 * 
+	 * @return
+	 */
 	public Double getStartTime() {
 		return startTime;
 	}
 
+	/**
+	 * Returns whether this token is supposed to be faded in and out at start
+	 * and end.
+	 * 
+	 * @return
+	 */
 	public boolean isFade() {
 		return fade;
 	}
@@ -174,5 +256,16 @@ public class Token {
 			}
 		}
 		return result.toString();
+	}
+
+	/**
+	 * Returns whether there are subtokens after the given index. A token cannot
+	 * have subtokens at its start position, so -1 is not a valid input.
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean hasSubTokensAt(int index) {
+		return !subTokens.get(index).isEmpty();
 	}
 }

@@ -108,7 +108,7 @@ public class AlignedLogVisualisation {
 		dotNode2DfgUnfoldedNode = new HashMap<LocalDotNode, UnfoldedNode>();
 		unfoldedNode2DfgdotNodes = new HashMap<ProcessTree2Petrinet.UnfoldedNode, List<LocalDotNode>>();
 		unfoldedNode2DfgdotEdges = new HashMap<ProcessTree2Petrinet.UnfoldedNode, List<LocalDotEdge>>();
-		
+
 		dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
 		UnfoldedNode root = new UnfoldedNode(tree.getRoot());
@@ -122,7 +122,8 @@ public class AlignedLogVisualisation {
 		convertNode(root, source, sink, true);
 
 		//add log-move-arcs to source and sink
-		if (parameters.isShowLogMoves()) {
+		//a parallel root will project its own log moves 
+		if (parameters.isShowLogMoves() && !(root.getBlock() instanceof And)) {
 			visualiseLogMove(source, source, root, null, root, true);
 			visualiseLogMove(sink, sink, root, root, null, false);
 		}
@@ -268,9 +269,13 @@ public class AlignedLogVisualisation {
 			convertNode(unode.unfoldChild(child), split, join, directionForward);
 		}
 
-		//put log-moves on join, if necessary
+		//put log-moves, if necessary
 		if (parameters.isShowLogMoves()) {
-			visualiseLogMove(join, join, unode, unode, unode, directionForward);
+			//on split
+			visualiseLogMove(split, split, unode, null, unode, directionForward);
+
+			//on join
+			visualiseLogMove(join, join, unode, unode, null, directionForward);
 		}
 	}
 

@@ -42,7 +42,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 		unlabeledLogMoves = new MultiSet<String>();
 		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
 	}
-	
+
 	public AlignedLogInfo(MultiSet<? extends IMTraceG<Move>> log) {
 		super(log);
 		modelMoves = new MultiSet<UnfoldedNode>();
@@ -61,11 +61,11 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 					modelMoves.add(move.getUnode(), cardinality);
 				} else if (move.getType() == Type.log) {
 					//position the log move
-//					positionLogMove(move, lastUnode, i, trace, cardinality);
+					//					positionLogMove(move, lastUnode, i, trace, cardinality);
 					traceContainsLogMove = true;
 					unlabeledLogMoves.add(move.getEventClass().toString(), cardinality);
 				}
-				
+
 				if (root == null && move.isModelSync()) {
 					root = new UnfoldedNode(move.getUnode().getPath().get(0));
 				}
@@ -78,17 +78,19 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 			if (lastUnode != null) {
 				dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastUnode, null), cardinality);
 			}
-			
+
 			//position the log moves
 			if (traceContainsLogMove) {
 				positionLogMovesRoot(root, root, trace, cardinality);
 			}
 		}
+
+		debug(logMoves);
 	}
 
 	public void positionLogMovesRoot(UnfoldedNode root, UnfoldedNode continueOn, IMTraceG<Move> trace, long cardinality) {
-		System.out.println("");
-		
+		debug("");
+
 		//remove the leading and trailing log moves and position them on the root
 		int start = 0;
 		while (!trace.get(start).isModelSync()) {
@@ -118,7 +120,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 	 * Invariant: the first and the last move of the trace are not log moves.
 	 */
 	private void positionLogMoves(UnfoldedNode unode, List<Move> trace, long cardinality) {
-		System.out.println(" position " + trace + " on " + unode);
+		debug(" position " + trace + " on " + unode);
 		if (unode.getBlock() == null) {
 			//unode is an activity or tau
 			//by the invariant, the trace contains no log moves
@@ -134,16 +136,16 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 		} else if (unode.getBlock() instanceof Seq || unode.getBlock() instanceof XorLoop) {
 			splitSequenceLoop(unode, trace, cardinality);
 		} else if (unode.getBlock() instanceof And) {
-			
+
 			//set up subtraces for children
 			Map<UnfoldedNode, IMTraceG<Move>> subTraces = new HashMap<>();
 			for (Node child : unode.getBlock().getChildren()) {
 				subTraces.put(unode.unfoldChild(child), new IMTraceG<Move>());
 			}
-			
+
 			//by the invariant, the first move is not a log move
 			UnfoldedNode lastSeenChild = null;
-			
+
 			//walk through the trace to split it
 			for (Move move : trace) {
 				if (move.isLogMove()) {
@@ -157,7 +159,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 					lastSeenChild = child;
 				}
 			}
-			
+
 			//invariant might be invalid on sub traces; position leading and trailing log moves
 			for (Node child : unode.getBlock().getChildren()) {
 				UnfoldedNode uChild = unode.unfoldChild(child);
@@ -172,7 +174,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 		UnfoldedNode lastSeenChild = findChildWith(unode, trace.get(0).getUnode());
 		List<Move> logMoves = new ArrayList<Move>();
 		List<Move> subTrace = new ArrayList<Move>();
-		
+
 		//walk through the trace to split it
 		for (Move move : trace) {
 			if (move.isLogMove()) {
@@ -195,7 +197,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 					for (Move logMove : logMoves) {
 						addLogMove(logMove, unode, child, logMove.getEventClass(), cardinality);
 					}
-					
+
 					subTrace.clear();
 					logMoves.clear();
 					subTrace.add(move);
@@ -204,7 +206,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 				}
 			}
 		}
-		
+
 		//recurse on subtrace
 		positionLogMoves(lastSeenChild, subTrace, cardinality);
 
@@ -262,6 +264,11 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 
 	public long getDfg(UnfoldedNode unode1, UnfoldedNode unode2) {
 		return dfg.getCardinalityOf(new Pair<UnfoldedNode, UnfoldedNode>(unode1, unode2));
+	}
+
+	private static void debug(Object s) {
+		//		System.out.println(s);
+		//				debug(s.toString().replaceAll("\\n", " "));
 	}
 
 }

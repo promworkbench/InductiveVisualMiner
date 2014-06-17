@@ -304,6 +304,10 @@ public class Trace2Token {
 			Set<UnfoldedNode> sigma = maps.mapUnode2sigma.get(move.getPositionUnode());
 			if (sigma != null) {
 				maps.mapSigma2subtrace.get(sigma).add(move);
+			} else {
+				//this is a log move that was mapped on unode itself and not on one of its children
+				//put it in the default sigma
+				maps.sublogs.get(0).add(move);
 			}
 		}
 
@@ -311,7 +315,7 @@ public class Trace2Token {
 	}
 
 	private static void debug(Object s) {
-				System.out.println(s);
+//				System.out.println(s);
 		//				System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }

@@ -32,7 +32,7 @@ public class InterpolateToken {
 						splitForwardTimestamp.getRight());
 				token.setTimestampOfPoint(i, splitTimestamp);
 
-				if (token.getTarget(i).getType() == NodeType.parallelSplit) {
+				if (token.getTarget(i).getType() == NodeType.parallelSplit && token.hasSubTokensAt(i)) {
 					//if this node is a parallel split, we need to set the corresponding join now
 					int indexOfJoin = getParallelDestination(token, i);
 
@@ -94,13 +94,13 @@ public class InterpolateToken {
 			return Pair.of(edgesFromPreviousTimestamp, thisPoint.getRight());
 		}
 
-		//if this node is not a parallel split, we move to the next point
-		if (thisPoint.getLeft().getTarget().getType() != NodeType.parallelSplit) {
-			return getTimestampForward(token, offset + 1, to, previousTimestamp, edgesFromPreviousTimestamp + 1);
-		} else {
-			//this is a parallel split node
+		//if this is a parallel split node, we have to find out at what time each branch needs to get a token
+		LocalDotNode thisPointDestination = thisPoint.getLeft().getTarget();
+		if (thisPointDestination.getType() == NodeType.parallelSplit && token.hasSubTokensAt(offset)) {
+			//this is a parallel split node and has sub tokens
+			//we could pass a parallel split on our way to a log move, so not every parallel split in the path is used as such
 
-			//see if somewhere in this parallel subtrace, a timestamp is present
+			//see if somewhere in this parallel sub trace, a timestamp is present
 			//if multiple, pick the one that needs to arrive first
 			int parallelPieceTill = getParallelDestination(token, offset);
 
@@ -142,6 +142,9 @@ public class InterpolateToken {
 
 			//if not, move to after the parallel join
 			return getTimestampForward(token, parallelPieceTill, to, previousTimestamp, leastEdges);
+		} else {
+			//if this node is not a parallel split, we move to the next point
+			return getTimestampForward(token, offset + 1, to, previousTimestamp, edgesFromPreviousTimestamp + 1);
 		}
 	}
 
@@ -204,16 +207,20 @@ public class InterpolateToken {
 	private static int getParallelDestination(Token token, int offset) {
 		Token subToken;
 		try {
-		 subToken = token.getSubTokensAtPoint(offset).iterator().next();
+			subToken = token.getSubTokensAtPoint(offset).iterator().next();
 		} catch (NoSuchElementException e) {
+			debug(token);
 			throw e;
 		}
 		LocalDotNode parallelJoin = subToken.getLastPosition();
 
 		//search for the parallel join in the token, starting from offset
+		//that is, the last parallel join of the first list of matching parallel joins
 		for (int i = offset + 1; i < token.getPoints().size(); i++) {
 			if (token.getTarget(i).equals(parallelJoin)) {
-				return i;
+				if (offset == token.getPoints().size() - 1 || !token.getTarget(i + 1).equals(parallelJoin)) {
+					return i;
+				}
 			}
 		}
 

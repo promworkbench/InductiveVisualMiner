@@ -128,7 +128,12 @@ public class AnimationSVG {
 	public static void animatePoint(Token token, int index, StringBuilder result, SVGDiagram svg) {
 		Pair<LocalDotEdge, Double> point = token.getPoints().get(index);
 		LocalDotEdge edge = point.getLeft();
-		double endTime = point.getRight();
+		double endTime;
+		try {
+		 endTime = point.getRight();
+		} catch (Exception e) {
+			throw e;
+		}
 
 		//get the start time and compute the duration
 		double startTime;
