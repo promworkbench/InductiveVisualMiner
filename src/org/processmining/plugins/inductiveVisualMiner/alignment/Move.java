@@ -12,9 +12,10 @@ public class Move {
 	private final Type type;
 	private final UnfoldedNode unode;
 	private final XEventClass eventClass;
-	
+
 	private UnfoldedNode logMoveUnode;
 	private UnfoldedNode logMoveBeforeChild;
+	private UnfoldedNode logMoveParallelBranchMappedTo;
 
 	public Move(Type type, UnfoldedNode unode, XEventClass eventClass) {
 		this.type = type;
@@ -26,7 +27,9 @@ public class Move {
 		if (isModelSync()) {
 			return getType() + " " + getUnode().toString();
 		} else {
-			return getType() + " " + getEventClass().toString() + " " + getLogMoveUnode() + " " + getLogMoveBeforeChild();
+//			return getType() + " " + getEventClass().toString() + " " + getLogMoveUnode() + " "
+//					+ getLogMoveBeforeChild();
+			return getType() + " " + getEventClass().toString();
 		}
 	}
 
@@ -83,15 +86,31 @@ public class Move {
 	public UnfoldedNode getLogMoveUnode() {
 		return logMoveUnode;
 	}
-	
+
 	public UnfoldedNode getPositionUnode() {
 		if (unode != null) {
 			return unode;
 		}
-		return logMoveUnode;
+		if (logMoveUnode != null) {
+			return logMoveUnode;
+		}
+		return logMoveBeforeChild;
 	}
 
 	public boolean isLogMove() {
 		return type == Type.log;
+	}
+
+	/**
+	 * Returns the last known unode in the trace before this log move.
+	 * This is used in log splitting, to make sure that the log move ends up in the correct sub trace. 
+	 * @return
+	 */
+	public UnfoldedNode getLogMoveParallelBranchMappedTo() {
+		return logMoveParallelBranchMappedTo;
+	}
+
+	public void setLogMoveParallelBranchMappedTo(UnfoldedNode logMoveParallelBranch) {
+		this.logMoveParallelBranchMappedTo = logMoveParallelBranch;
 	}
 }

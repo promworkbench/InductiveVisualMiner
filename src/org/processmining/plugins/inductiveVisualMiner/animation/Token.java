@@ -9,6 +9,7 @@ import java.util.Set;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
 
 public class Token {
 	private final LocalDotNode startPosition;
@@ -161,6 +162,12 @@ public class Token {
 	}
 
 	public void addSubToken(Token token) {
+		
+		//check whether this sub token is added to a parallel split
+		if (getLastPosition().getType() != NodeType.parallelSplit) {
+			throw new RuntimeException("A sub token can only be added to a parallel split node.");
+		}
+		
 		subTokens.get(subTokens.size() - 1).add(token);
 		//		System.out.println("  add subtoken at " + (subTokens.size() - 1));
 	}

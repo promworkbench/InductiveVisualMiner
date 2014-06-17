@@ -166,10 +166,7 @@ public class InterpolateToken {
 			return getTimestampBackward(token, offset - 1, edgesTillNow + 1);
 		}
 
-		//if this node is not a parallel join, we move to the next point
-		if (token.getTarget(offset).getType() != NodeType.parallelJoin) {
-			return getTimestampBackward(token, offset - 1, edgesTillNow + 1);
-		} else {
+		if (token.getTarget(offset).getType() == NodeType.parallelJoin && token.hasSubTokensAt(offset)) {
 			//this is a parallel join
 
 			//recurse on the parallel sub trace that is within this token
@@ -189,6 +186,9 @@ public class InterpolateToken {
 				}
 			}
 			return bestPair;
+		} else {
+			//if this node is not a parallel join, we move to the next point
+			return getTimestampBackward(token, offset - 1, edgesTillNow + 1);
 		}
 	}
 

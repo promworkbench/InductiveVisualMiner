@@ -51,6 +51,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
 		UnfoldedNode root = null;
 		for (IMTraceG<Move> trace : log) {
+			UnfoldedNode lastDfgUnode = null;
 			UnfoldedNode lastUnode = null;
 			long cardinality = log.getCardinalityOf(trace);
 			boolean traceContainsLogMove = false;
@@ -59,24 +60,27 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 				if (move.getType() == Type.model) {
 					//add model move to list of model moves
 					modelMoves.add(move.getUnode(), cardinality);
-				} else if (move.getType() == Type.log) {
-					//position the log move
-					//					positionLogMove(move, lastUnode, i, trace, cardinality);
+				} else if (move.isLogMove()) {
 					traceContainsLogMove = true;
+					move.setLogMoveParallelBranchMappedTo(lastUnode);
 					unlabeledLogMoves.add(move.getEventClass().toString(), cardinality);
 				}
 
 				if (root == null && move.isModelSync()) {
 					root = new UnfoldedNode(move.getUnode().getPath().get(0));
 				}
-
-				if (move.getUnode() != null && move.getUnode().getNode() instanceof Manual) {
-					dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastUnode, move.getUnode()), cardinality);
+				
+				if (move.isModelSync()) {
 					lastUnode = move.getUnode();
 				}
+
+				if (move.getUnode() != null && move.getUnode().getNode() instanceof Manual) {
+					dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastDfgUnode, move.getUnode()), cardinality);
+					lastDfgUnode = move.getUnode();
+				}
 			}
-			if (lastUnode != null) {
-				dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastUnode, null), cardinality);
+			if (lastDfgUnode != null) {
+				dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastDfgUnode, null), cardinality);
 			}
 
 			//position the log moves

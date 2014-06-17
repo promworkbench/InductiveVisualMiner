@@ -23,28 +23,29 @@ public class Trace2Token {
 	public static Token trace2token(TimedTrace trace, boolean showDeviations, ShortestPathGraph shortestPath,
 			AlignedLogVisualisationInfo info) {
 
-		debug("");
-		debug(trace);
+		debug("", 0);
 
 		//copy the trace
 		List<TimedMove> copyTrace = new ArrayList<TimedMove>(trace);
 
 		Token token = trace2token(copyTrace, Pair.of(info.getSource(), trace.getStartTime()),
 				Pair.of(info.getSink(), trace.getEndTime()), new ArrayList<UnfoldedNode>(), showDeviations,
-				shortestPath, info);
+				shortestPath, info, 0);
 
 		//interpolate the missing timestamps from the token
 		InterpolateToken.interpolateToken(token);
 
-		debug(token);
+		debug(token, 0);
 
 		return token;
 	}
 
 	public static Token trace2token(List<TimedMove> trace, Pair<LocalDotNode, Double> startPosition,
 			Pair<LocalDotNode, Double> endPosition, List<UnfoldedNode> inParallelUnodes, boolean showDeviations,
-			ShortestPathGraph shortestPath, AlignedLogVisualisationInfo info) {
+			ShortestPathGraph shortestPath, AlignedLogVisualisationInfo info, int indent) {
 
+		debug("translate trace " + trace, indent);
+		
 		Token token = new Token(startPosition.getLeft(), startPosition.getRight(), inParallelUnodes.isEmpty());
 		List<UnfoldedNode> localInParallelUnodes = new ArrayList<>(inParallelUnodes);
 
@@ -52,7 +53,11 @@ public class Trace2Token {
 		for (int i = 0; i < trace.size(); i++) {
 			TimedMove move = trace.get(i);
 
-			debug(" " + move);
+			if (move.isLogMove()) {
+				debug(" consider move " + move + " (" + move.getLogMoveUnode() + " before " + move.getLogMoveBeforeChild() + ")", indent);
+			} else {
+				debug(" consider move " + move, indent);
+			}
 
 			//see if we are leaving a parallel subtrace
 			for (int j = localInParallelUnodes.size() - 1; j >= 0; j--) {
@@ -62,7 +67,7 @@ public class Trace2Token {
 
 					localInParallelUnodes.remove(j);
 
-					exitParallel(parallel, token, shortestPath, info);
+					exitParallel(parallel, token, shortestPath, info, indent);
 				} else {
 					break;
 				}
@@ -77,16 +82,16 @@ public class Trace2Token {
 				//find out where we are exiting it again
 				int exitsAt = findParallelExit(trace, parallel, i);
 
-				debug(" entering parallel " + parallel + " with move " + move);
-				debug(" will exit at " + exitsAt);
+				debug("  entering parallel " + parallel + " with move " + move, indent);
+				debug("  will exit at " + exitsAt, indent);
 
 				//extract parallel subtrace we're entering
 				List<TimedMove> parallelSubtrace = trace.subList(i, exitsAt + 1);
-				debug(" parallel subtrace " + parallelSubtrace);
+				debug("  parallel subtrace " + parallelSubtrace, indent);
 
 				//spit the subtrace into sublogs
 				List<List<TimedMove>> subsubTraces = splitTrace(parallel, parallelSubtrace);
-				debug(" subsub traces " + subsubTraces);
+				debug("  subsub traces " + subsubTraces, indent);
 
 				//move the token up to the parallel split
 				LocalDotNode parallelSplit = Animation.getParallelSplit(parallel, info);
@@ -109,7 +114,7 @@ public class Trace2Token {
 					}
 				}
 
-				debug(" trace after parallel reduction " + trace);
+				debug(" trace after parallel reduction " + trace, indent);
 
 				//denote that we have entered this parallel unode (prevents infinite loops)
 				localInParallelUnodes.add(parallel);
@@ -121,14 +126,15 @@ public class Trace2Token {
 					List<UnfoldedNode> childInParallelUnodes = new ArrayList<>(localInParallelUnodes);
 					Token childToken = trace2token(subsubTrace, Pair.of(parallelSplit, (Double) null),
 							Pair.of(parallelJoin, (Double) null), childInParallelUnodes, showDeviations, shortestPath,
-							info);
+							info, indent + 1);
 
 					token.addSubToken(childToken);
 				}
 
+				//sanity check
 				if (token.getLastSubTokens().size() == 0) {
-					debug(token);
-					debug("no subtokens");
+					debug(token, 0);
+					debug("no subtokens", 0);
 					throw new RuntimeException("no subtokens created");
 				}
 
@@ -196,7 +202,7 @@ public class Trace2Token {
 		//exit remaining parallel unodes
 		for (UnfoldedNode parallel : localInParallelUnodes) {
 			if (!inParallelUnodes.contains(parallel)) {
-				exitParallel(parallel, token, shortestPath, info);
+				exitParallel(parallel, token, shortestPath, info, indent);
 			}
 		}
 
@@ -219,7 +225,7 @@ public class Trace2Token {
 	 * leave a parallel unode
 	 */
 	private static void exitParallel(UnfoldedNode parallel, Token token, ShortestPathGraph shortestPath,
-			AlignedLogVisualisationInfo info) {
+			AlignedLogVisualisationInfo info, int indent) {
 		//move the token to the parallel join
 		LocalDotNode parallelJoin = Animation.getParallelJoin(parallel, info);
 		List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), parallelJoin);
@@ -227,7 +233,7 @@ public class Trace2Token {
 			token.addPoint(edge, null);
 		}
 
-		debug(" leaving parallel " + parallel);
+		debug("  leaving parallel " + parallel, indent);
 	}
 
 	/*
@@ -306,16 +312,24 @@ public class Trace2Token {
 				maps.mapSigma2subtrace.get(sigma).add(move);
 			} else {
 				//this is a log move that was mapped on unode itself and not on one of its children
-				//put it in the default sigma
-				maps.sublogs.get(0).add(move);
+				//put it in the mapped sigma
+				sigma = maps.mapUnode2sigma.get(move.getLogMoveParallelBranchMappedTo());
+				if (sigma != null) {
+					maps.mapSigma2subtrace.get(sigma).add(move);
+				} else {
+					//put it on the first branch
+					maps.sublogs.get(0).add(move);
+				}
 			}
 		}
 
 		return maps.sublogs;
 	}
 
-	private static void debug(Object s) {
-//				System.out.println(s);
+	private static void debug(Object s, int indent) {
+		//		String sIndent = new String(new char[indent]).replace("\0", "   ");
+		//		System.out.print(sIndent);
+		//				System.out.println(s);
 		//				System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }
