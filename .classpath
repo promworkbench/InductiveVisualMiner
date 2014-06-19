@@ -9,7 +9,6 @@
 	<classpathentry kind="lib" path="stdlib/collections-generic-4.01.jar"/>
 	<classpathentry kind="lib" path="stdlib/colt.jar"/>
 	<classpathentry kind="lib" path="stdlib/commons-compress-1.0.jar"/>
-	<classpathentry kind="lib" path="stdlib/commons-math-1.2.jar"/>
 	<classpathentry kind="lib" path="stdlib/FilterableSortableTablePanel.jar"/>
 	<classpathentry kind="lib" path="stdlib/flanagan.jar"/>
 	<classpathentry kind="lib" path="stdlib/jargs.jar"/>
@@ -70,12 +69,12 @@
 	<classpathentry kind="lib" path="packagelib/lib-InductiveMiner/jgrapht-jdk1.6.jar"/>
 	<classpathentry kind="lib" path="packagelib/EvolutionaryTreeMiner.jar"/>
 	<classpathentry kind="lib" path="stdlib/guava-16.0.1.jar"/>
-	<classpathentry kind="lib" path="packagelib/lib-EvolutionaryTreeMiner/trove-3.0.3.jar"/>
 	<classpathentry kind="lib" path="packagelib/Widgets.jar"/>
 	<classpathentry kind="lib" path="packagelib/GraphViz.jar"/>
 	<classpathentry kind="lib" path="packagelib/InductiveMiner.jar"/>
 	<classpathentry kind="lib" path="packagelib/Log.jar"/>
 	<classpathentry kind="lib" path="packagelib/Log-lib/OpenXES-XStream.jar"/>
 	<classpathentry kind="lib" path="packagelib/Log-lib/OpenXES.jar"/>
+	<classpathentry kind="lib" path="packagelib/BasicUtils-lib/trove-3.0.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -7,7 +7,7 @@
 		<property name="lib" location="lib" />
 		<property name="dist" location="dist" />
 		<property name="release" location="latestrelease" />
-		<property name="version" value="6.1.${env.BUILD_NUMBER}" />
+		<property name="version" value="6.4.${env.BUILD_NUMBER}" />
 		<property name="project" value="InductiveVisualMiner" />
 
 		<!-- Set the os to win32, win64, lin32, lin64, mac, or all -->
@@ -133,15 +133,18 @@
 							hasPlugins="true"
 							logo="http://www.promtools.org/prom6/packages/prom_subtitle_hat_300.png"
 						>
+							<dependency name="BasicUtils"/>
 							<dependency name="Log"/>
-							<dependency name="InductiveMiner"/>
 							<dependency name="DataAwareReplayer"/>
+							<dependency name="DataPetriNets"/>
 							<dependency name="EvolutionaryTreeMiner"/>
 							<dependency name="GraphViz"/>
+							<dependency name="InductiveMiner"/>
 							<dependency name="PetriNets"/>
 							<dependency name="PNetReplayer"/>
 							<dependency name="ProcessTree"/>
 							<dependency name="Properties"/>
+							<dependency name="Widgets"/>
 						</package>
 					</packages>
 				</echoxml>
