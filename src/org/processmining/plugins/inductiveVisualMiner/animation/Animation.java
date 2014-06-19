@@ -65,11 +65,7 @@ public class Animation {
 
 	public static LocalDotEdge getLogMoveEdge(UnfoldedNode logMoveUnode, UnfoldedNode logMoveBeforeChild,
 			AlignedLogVisualisationInfo info) {
-		List<LocalDotEdge> edges = info.getLogMoveEdges(logMoveUnode, logMoveBeforeChild);
-		if (!edges.isEmpty()) {
-			return edges.get(0);
-		}
-		return null;
+		return info.getLogMoveEdge(logMoveUnode, logMoveBeforeChild);
 	}
 
 	public static LocalDotEdge getTauEdge(TimedMove move, AlignedLogVisualisationInfo info) {

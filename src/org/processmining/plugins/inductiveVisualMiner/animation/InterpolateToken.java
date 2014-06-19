@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Pair;
@@ -34,7 +33,7 @@ public class InterpolateToken {
 
 				if (token.getTarget(i).getType() == NodeType.parallelSplit && token.hasSubTokensAt(i)) {
 					//if this node is a parallel split, we need to set the corresponding join now
-					int indexOfJoin = getParallelDestination(token, i);
+					int indexOfJoin = token.getParallelDestination(i);
 
 					//get the latest timestamp from the parallel branches
 					Pair<Integer, Double> joinBackwardsTimestamp = getTimestampBackward(token, indexOfJoin, 0);
@@ -95,14 +94,13 @@ public class InterpolateToken {
 		}
 
 		//if this is a parallel split node, we have to find out at what time each branch needs to get a token
-		LocalDotNode thisPointDestination = thisPoint.getLeft().getTarget();
-		if (thisPointDestination.getType() == NodeType.parallelSplit && token.hasSubTokensAt(offset)) {
+		if (token.hasSubTokensAt(offset)) {
 			//this is a parallel split node and has sub tokens
 			//we could pass a parallel split on our way to a log move, so not every parallel split in the path is used as such
 
 			//see if somewhere in this parallel sub trace, a timestamp is present
 			//if multiple, pick the one that needs to arrive first
-			int parallelPieceTill = getParallelDestination(token, offset);
+			int parallelPieceTill = token.getParallelDestination(offset);
 
 			//recurse on the parallel sub trace that is within this token
 			//triple(edges, timestamp, arrivalTime)
@@ -166,7 +164,7 @@ public class InterpolateToken {
 			return getTimestampBackward(token, offset - 1, edgesTillNow + 1);
 		}
 
-		if (token.getTarget(offset).getType() == NodeType.parallelJoin && token.hasSubTokensAt(offset)) {
+		if (token.isParallelJoin(offset)) {
 			//this is a parallel join
 
 			//recurse on the parallel sub trace that is within this token
@@ -202,29 +200,6 @@ public class InterpolateToken {
 		double duration = arrivalTime - departureTime;
 		double p = edgesFromDeparture / (1.0 * totalEdges);
 		return departureTime + duration * p;
-	}
-
-	private static int getParallelDestination(Token token, int offset) {
-		Token subToken;
-		try {
-			subToken = token.getSubTokensAtPoint(offset).iterator().next();
-		} catch (NoSuchElementException e) {
-			debug(token);
-			throw e;
-		}
-		LocalDotNode parallelJoin = subToken.getLastPosition();
-
-		//search for the parallel join in the token, starting from offset
-		//that is, the last parallel join of the first list of matching parallel joins
-		for (int i = offset + 1; i < token.getPoints().size(); i++) {
-			if (token.getTarget(i).equals(parallelJoin)) {
-				if (offset == token.getPoints().size() - 1 || !token.getTarget(i + 1).equals(parallelJoin)) {
-					return i;
-				}
-			}
-		}
-
-		return -1;
 	}
 
 	private static Set<Token> getSubTokensOfParallelJoin(Token token, int offset) {

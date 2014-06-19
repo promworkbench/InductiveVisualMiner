@@ -122,13 +122,13 @@ public class Token {
 		} else {
 			last = Double.NEGATIVE_INFINITY;
 		}
-		
+
 		if (last2 != null && last < last2) {
 			System.out.println("===========");
 			System.out.println(this);
 			throw new RuntimeException("token cannot move back in time");
 		}
-		
+
 		for (int i = 0; i < points.size(); i++) {
 			Pair<LocalDotEdge, Double> p = points.get(i);
 
@@ -146,7 +146,7 @@ public class Token {
 				subToken.performSanityCheck(last);
 			}
 		}
-		
+
 		return last;
 	}
 
@@ -162,12 +162,12 @@ public class Token {
 	}
 
 	public void addSubToken(Token token) {
-		
+
 		//check whether this sub token is added to a parallel split
 		if (getLastPosition().getType() != NodeType.parallelSplit) {
 			throw new RuntimeException("A sub token can only be added to a parallel split node.");
 		}
-		
+
 		subTokens.get(subTokens.size() - 1).add(token);
 		//		System.out.println("  add subtoken at " + (subTokens.size() - 1));
 	}
@@ -275,4 +275,47 @@ public class Token {
 	public boolean hasSubTokensAt(int index) {
 		return !subTokens.get(index).isEmpty();
 	}
+
+	/**
+	 * Given an index, returns the index of the parallel join where index is the
+	 * parallel split of.
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public int getParallelDestination(int index) {
+		Token subToken = getSubTokensAtPoint(index).iterator().next();
+		LocalDotNode parallelJoin = subToken.getLastPosition();
+
+		//search for the parallel join in the token, starting from offset
+		//that is, the last parallel join of the first list of matching parallel joins
+		for (int i = index + 1; i < points.size(); i++) {
+			if (getTarget(i).equals(parallelJoin)) {
+				if (index == points.size() - 1 || !getTarget(i + 1).equals(parallelJoin)) {
+					return i;
+				}
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Returns whether the position after index is a parallel join, i.e. has
+	 * ending sub tokens.
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public boolean isParallelJoin(int index) {
+		//check whether this node is a parallel join
+		if (getTarget(index).getType() != NodeType.parallelJoin) {
+			return false;
+		}
+
+		//check whether the next node is a parallel join
+		//in that case, this join is caused by a log move
+		return index == points.size() - 1 || getTarget(index + 1).getType() != NodeType.parallelJoin;
+	}
+
 }

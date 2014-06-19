@@ -23,7 +23,7 @@ public class AlignedLogVisualisationInfo {
 	private final Set<LocalDotEdge> edges;
 	private final Map<UnfoldedNode, List<LocalDotEdge>> modelEdges;
 	private final Map<UnfoldedNode, List<LocalDotEdge>> modelMoveEdges;
-	private final Map<Pair<UnfoldedNode, UnfoldedNode>, List<LocalDotEdge>> logMoveEdges;
+	private final Map<Pair<UnfoldedNode, UnfoldedNode>, LocalDotEdge> logMoveEdges;
 	private final Set<LocalDotEdge> allModelEdges;
 	private final Set<LocalDotEdge> allLogMoveEdges;
 	private final Set<LocalDotEdge> allModelMoveEdges;
@@ -65,11 +65,9 @@ public class AlignedLogVisualisationInfo {
 	public void addEdge(UnfoldedNode unode1, UnfoldedNode unode2, LocalDotEdge edge) {
 		switch (edge.getType()) {
 			case logMove :
-				if (!logMoveEdges.containsKey(Pair.of(unode1, unode2))) {
-					logMoveEdges.put(Pair.of(unode1, unode2), new ArrayList<LocalDotEdge>());
-				}
-				logMoveEdges.get(Pair.of(unode1, unode2)).add(edge);
 				allLogMoveEdges.add(edge);
+				assert(!logMoveEdges.containsKey(Pair.of(unode1, unode2)));
+				logMoveEdges.put(Pair.of(unode1, unode2), edge);
 				break;
 			case model :
 				if (!modelEdges.containsKey(unode1)) {
@@ -89,6 +87,11 @@ public class AlignedLogVisualisationInfo {
 				break;
 		}
 		edges.add(edge);
+	}
+	
+	public void registerExtraEdge(UnfoldedNode unode1, UnfoldedNode unode2, LocalDotEdge edge) {
+		assert(!logMoveEdges.containsKey(Pair.of(unode1, unode2)));
+		logMoveEdges.put(Pair.of(unode1, unode2), edge);
 	}
 	
 	public Set<LocalDotNode> getNodes() {
@@ -136,11 +139,8 @@ public class AlignedLogVisualisationInfo {
 		return Collections.unmodifiableList(modelMoveEdges.get(unode));
 	}
 	
-	public List<LocalDotEdge> getLogMoveEdges(UnfoldedNode unode1, UnfoldedNode unode2) {
-		if (!logMoveEdges.containsKey(Pair.of(unode1, unode2))) {
-			return new ArrayList<>();
-		}
-		return Collections.unmodifiableList(logMoveEdges.get(Pair.of(unode1, unode2)));
+	public LocalDotEdge getLogMoveEdge(UnfoldedNode unode1, UnfoldedNode unode2) {
+		return logMoveEdges.get(Pair.of(unode1, unode2));
 	}
 	
 	public Set<LocalDotEdge> getAllModelEdges() {

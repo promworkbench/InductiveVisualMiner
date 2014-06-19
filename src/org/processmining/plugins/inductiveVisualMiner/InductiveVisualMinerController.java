@@ -309,6 +309,8 @@ public class InductiveVisualMinerController {
 			extends
 			ChainLink<Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram>, Pair<SVGTokens, SVGDiagram>> {
 
+		private ResettableCanceller canceller = new ResettableCanceller();
+		
 		protected Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			state.setSVGtokens(null);
@@ -321,6 +323,8 @@ public class InductiveVisualMinerController {
 		protected Pair<SVGTokens, SVGDiagram> executeLink(
 				Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> input) {
 			setStatus("Creating animation..");
+			
+			canceller.reset();
 
 			XLog xLog = input.getA();
 			AlignedLog aLog = input.getB();
@@ -352,6 +356,9 @@ public class InductiveVisualMinerController {
 				if (timedTrace != null) {
 					try {
 						tokens.add(Trace2Token.trace2token(timedTrace, showDeviations, graph, info));
+						if (canceller.isCancelled()) {
+							return null;
+						}
 					} catch (Exception e) {
 						//for the demo, just ignore this case
 						debug(timedTrace);
@@ -392,7 +399,7 @@ public class InductiveVisualMinerController {
 		}
 
 		public void cancel() {
-
+			canceller.cancel();
 		}
 
 	}

@@ -252,6 +252,10 @@ public class AlignedLogVisualisation {
 		if (parameters.isShowLogMoves()) {
 			visualiseLogMove(join, join, unode, unode, unode.unfoldChild(bodyChild), directionForward);
 			visualiseLogMove(split, split, unode, unode, unode.unfoldChild(redoChild), directionForward);
+			
+			//log moves can be projected before the exit-tau
+			//(assume it's tau)
+			info.registerExtraEdge(unode, unode.unfoldChild(exitChild), info.getLogMoveEdge(unode, unode.unfoldChild(redoChild)));
 		}
 	}
 
