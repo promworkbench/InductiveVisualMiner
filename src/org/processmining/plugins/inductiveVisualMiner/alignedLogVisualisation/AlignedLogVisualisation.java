@@ -266,7 +266,7 @@ public class AlignedLogVisualisation {
 		addArc(source, split, unode, directionForward);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, "-", unode);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, "+", unode);
 		addArc(join, sink, unode, directionForward);
 
 		for (Node child : unode.getBlock().getChildren()) {

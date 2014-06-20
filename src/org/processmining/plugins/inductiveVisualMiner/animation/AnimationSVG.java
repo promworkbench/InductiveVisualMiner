@@ -40,6 +40,10 @@ public class AnimationSVG {
 
 	public static void animateToken(Token token, SVGTokens svgTokens, SVGDiagram svg) {
 		StringBuilder result = new StringBuilder();
+		
+		if (!token.isAllTimestampsSet()) {
+			assert(token.isAllTimestampsSet());
+		}
 
 		//fade in
 		fade(token.isFade(), true, token.getStartTime(), null, result);

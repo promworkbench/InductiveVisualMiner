@@ -318,4 +318,28 @@ public class Token {
 		return index == points.size() - 1 || getTarget(index + 1).getType() != NodeType.parallelJoin;
 	}
 
+	/**
+	 * Returns whether all timestamps have been set
+	 * 
+	 * @return
+	 */
+	public boolean isAllTimestampsSet() {
+		if (getStartTime() == null) {
+			return false;
+		}
+		for (int i = 0; i < points.size() - 1; i++) {
+			if (points.get(i).getB() == null) {
+				return false;
+			}
+			
+			for (Token subToken : getSubTokensAtPoint(i)) {
+				if (!subToken.isAllTimestampsSet()) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+
 }

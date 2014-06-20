@@ -30,38 +30,39 @@ public class InterpolateToken {
 				double splitTimestamp = getLocalArrivalTime(1, splitForwardTimestamp.getLeft(), lastSeenTimestamp,
 						splitForwardTimestamp.getRight());
 				token.setTimestampOfPoint(i, splitTimestamp);
-
-				if (token.getTarget(i).getType() == NodeType.parallelSplit && token.hasSubTokensAt(i)) {
-					//if this node is a parallel split, we need to set the corresponding join now
-					int indexOfJoin = token.getParallelDestination(i);
-
-					//get the latest timestamp from the parallel branches
-					Pair<Integer, Double> joinBackwardsTimestamp = getTimestampBackward(token, indexOfJoin, 0);
-					debug(" backward timestamp " + joinBackwardsTimestamp);
-
-					//now compute the timestamp of the join
-					Pair<Integer, Double> joinForwardTimestamp = getTimestampForward(token, indexOfJoin,
-							Integer.MAX_VALUE, joinBackwardsTimestamp.getRight(), joinBackwardsTimestamp.getLeft());
-					debug(" forward timestamp " + joinForwardTimestamp);
-
-					double joinTimestamp = getLocalArrivalTime(joinBackwardsTimestamp.getLeft(),
-							joinForwardTimestamp.getLeft(), joinBackwardsTimestamp.getRight(),
-							joinForwardTimestamp.getRight());
-					debug(" join timestamp " + joinTimestamp);
-					token.setTimestampOfPoint(indexOfJoin, joinTimestamp);
-
-					//process the subtokens
-					for (Token subToken : token.getSubTokensAtPoint(i)) {
-						//set the end time of the subtoken
-						subToken.setTimestampOfPoint(subToken.getPoints().size() - 1, joinTimestamp);
-
-						//interpolate the subtoken
-						interpolateToken(subToken);
-					}
-
-				}
-				debug(token);
 			}
+			
+			if (token.getTarget(i).getType() == NodeType.parallelSplit && token.hasSubTokensAt(i)) {
+				//if this node is a parallel split, we need to set the corresponding join now
+				int indexOfJoin = token.getParallelDestination(i);
+
+				//get the latest timestamp from the parallel branches
+				Pair<Integer, Double> joinBackwardsTimestamp = getTimestampBackward(token, indexOfJoin, 0);
+				debug(" backward timestamp " + joinBackwardsTimestamp);
+
+				//now compute the timestamp of the join
+				Pair<Integer, Double> joinForwardTimestamp = getTimestampForward(token, indexOfJoin,
+						Integer.MAX_VALUE, joinBackwardsTimestamp.getRight(), joinBackwardsTimestamp.getLeft());
+				debug(" forward timestamp " + joinForwardTimestamp);
+
+				double joinTimestamp = getLocalArrivalTime(joinBackwardsTimestamp.getLeft(),
+						joinForwardTimestamp.getLeft(), joinBackwardsTimestamp.getRight(),
+						joinForwardTimestamp.getRight());
+				debug(" join timestamp " + joinTimestamp);
+				token.setTimestampOfPoint(indexOfJoin, joinTimestamp);
+
+				//process the subtokens
+				for (Token subToken : token.getSubTokensAtPoint(i)) {
+					//set the end time of the subtoken
+					subToken.setTimestampOfPoint(subToken.getPoints().size() - 1, joinTimestamp);
+
+					//interpolate the subtoken
+					interpolateToken(subToken);
+				}
+
+			}
+			debug(token);
+			
 			lastSeenTimestamp = token.getTimestamp(i);
 		}
 	}

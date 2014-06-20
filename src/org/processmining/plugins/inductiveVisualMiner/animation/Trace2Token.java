@@ -33,7 +33,11 @@ public class Trace2Token {
 				shortestPath, info, 0);
 
 		//interpolate the missing timestamps from the token
-		InterpolateToken.interpolateToken(token);
+		try {
+			InterpolateToken.interpolateToken(token);
+		} catch (Exception e) {
+			throw e;
+		}
 
 		debug(token, 0);
 
@@ -241,21 +245,25 @@ public class Trace2Token {
 	 */
 	private static UnfoldedNode entersParallel(TimedMove move, List<UnfoldedNode> inParallelUnodes) {
 
-		if (move == null || move.isLogMove()) {
+		if (move == null) {
 			//there's nothing being entered here
 			return null;
 		}
+			
+		//get the unode
+		UnfoldedNode unode = move.getPositionUnode();
 
-		UnfoldedNode unode = new UnfoldedNode(move.getUnode().getPath().get(0));
+		//get the root of the tree
+		UnfoldedNode root = new UnfoldedNode(unode.getPath().get(0));
 
-		if (move.getUnode().getPath().get(0) instanceof And && !inParallelUnodes.contains(unode)) {
-			return unode;
+		if (root.getNode() instanceof And && !inParallelUnodes.contains(root)) {
+			return root;
 		}
 
-		for (int i = 1; i < move.getUnode().getPath().size(); i++) {
-			unode = unode.unfoldChild(move.getUnode().getPath().get(i));
-			if (unode.getNode() instanceof And && !inParallelUnodes.contains(unode)) {
-				return unode;
+		for (int i = 1; i < unode.getPath().size(); i++) {
+			root = root.unfoldChild(unode.getPath().get(i));
+			if (root.getNode() instanceof And && !inParallelUnodes.contains(root)) {
+				return root;
 			}
 		}
 		return null;
@@ -326,9 +334,9 @@ public class Trace2Token {
 	}
 
 	private static void debug(Object s, int indent) {
-//		String sIndent = new String(new char[indent]).replace("\0", "   ");
-//		System.out.print(sIndent);
-//		System.out.println(s);
+		//		String sIndent = new String(new char[indent]).replace("\0", "   ");
+		//		System.out.print(sIndent);
+		//		System.out.println(s);
 		//				System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }
