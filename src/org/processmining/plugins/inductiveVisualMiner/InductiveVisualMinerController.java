@@ -53,6 +53,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogSplitter;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
@@ -161,6 +162,8 @@ public class InductiveVisualMinerController {
 
 		protected void processResult(Triple<IMLog, IMLogInfo, Set<XEventClass>> result) {
 			state.setActivityFilteredIMLog(result.getA(), result.getB(), result.getC());
+
+			panel.getTraceView().set(state.getLog());
 		}
 
 		public void cancel() {
@@ -175,6 +178,7 @@ public class InductiveVisualMinerController {
 			panel.getGraph().setEnableAnimation(false);
 			state.setSVGtokens(null);
 			panel.getSaveImageButton().setText("image");
+			panel.getTraceView().set(state.getLog());
 			return new Pair<IMLog, MiningParameters>(state.getActivityFilteredIMLog(), state.getMiningParameters());
 		}
 
@@ -193,11 +197,7 @@ public class InductiveVisualMinerController {
 
 			//deviation from chain: already show the model, without alignment
 			//this is to not have the user wait for the alignment without visual feedback
-			try {
-				panel.updateModel(state);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			panel.updateModel(state);
 		}
 
 		public void cancel() {
@@ -254,13 +254,9 @@ public class InductiveVisualMinerController {
 		}
 
 		protected void processResult(Object result) {
-			try {
-				Pair<Dot, AlignedLogVisualisationInfo> p = panel.updateModel(state);
-				state.setLayout(p.getLeft(), p.getRight());
-				makeNodesSelectable(state.getVisualisationInfo(), panel, state.getSelectedNodes());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			Pair<Dot, AlignedLogVisualisationInfo> p = panel.updateModel(state);
+			state.setLayout(p.getLeft(), p.getRight());
+			makeNodesSelectable(state.getVisualisationInfo(), panel, state.getSelectedNodes());
 		}
 
 		public void cancel() {
@@ -296,6 +292,8 @@ public class InductiveVisualMinerController {
 
 		protected void processResult(Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> result) {
 			state.setAlignedFilteredLog(result.getA(), result.getB(), result.getC());
+
+			panel.getTraceView().set(state.getAlignedFilteredLog());
 		}
 
 		public void cancel() {
@@ -310,11 +308,12 @@ public class InductiveVisualMinerController {
 			ChainLink<Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram>, Pair<SVGTokens, SVGDiagram>> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
-		
+
 		protected Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			state.setSVGtokens(null);
 			panel.getSaveImageButton().setText("image");
+			panel.getTraceView().set(state.getAlignedFilteredLog());
 			return Septuple.of(state.getXLog(), state.getAlignedFilteredLog(), state.getXLogInfo(), state
 					.getColourMode(), state.getVisualisationInfo(), panel.getGraph().getDot(), panel.getGraph()
 					.getSVG());
@@ -323,7 +322,7 @@ public class InductiveVisualMinerController {
 		protected Pair<SVGTokens, SVGDiagram> executeLink(
 				Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> input) {
 			setStatus("Creating animation..");
-			
+
 			canceller.reset();
 
 			XLog xLog = input.getA();
@@ -421,6 +420,7 @@ public class InductiveVisualMinerController {
 			InductiveVisualMinerSelectionColourer.colour(panel.getGraph().getSVG(), state.getVisualisationInfo(),
 					state.getTree(), result.getA(), result.getB(), InductiveVisualMinerPanel.getViewParameters(state));
 			updateSelectionDescription(panel, state.getSelectedNodes());
+
 			setStatus(" ");
 			panel.repaint();
 		}
@@ -628,6 +628,13 @@ public class InductiveVisualMinerController {
 				}
 			}
 		});
+
+		//set trace view button
+		panel.getTraceViewButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				panel.getTraceView().setVisible(!panel.getTraceView().isVisible());
+			}
+		});
 	}
 
 	private static void makeNodesSelectable(AlignedLogVisualisationInfo info, InductiveVisualMinerPanel panel,
@@ -645,7 +652,7 @@ public class InductiveVisualMinerController {
 			AlignedLog alignedLog, Set<UnfoldedNode> selected, Set<UnfoldedNode> dfgNodes) {
 
 		AlignedLog fl = new AlignedLog();
-		for (IMTraceG<Move> trace : alignedLog) {
+		for (AlignedTrace trace : alignedLog) {
 			for (Move move : trace) {
 				if (move.isModelSync() && selected.contains(move.getUnode())) {
 					fl.add(trace, alignedLog.getCardinalityOf(trace));
@@ -691,7 +698,7 @@ public class InductiveVisualMinerController {
 			panel.getSelectionLabel().setText(s);
 		}
 	}
-	
+
 	private static void debug(Object s) {
 		System.out.println(s);
 	}

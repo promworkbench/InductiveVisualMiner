@@ -1,9 +1,13 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
+import java.awt.Color;
+
 import org.deckfour.xes.classification.XEventClass;
+import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
+import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class Move {
+public class Move implements Event {
 
 	public enum Type {
 		model, log, synchronous
@@ -100,6 +104,14 @@ public class Move {
 	public boolean isLogMove() {
 		return type == Type.log;
 	}
+	
+	private boolean isModelMove() {
+		return type == Type.model;
+	}
+	
+	public boolean isSyncMove() {
+		return type == Type.synchronous;
+	}
 
 	/**
 	 * Returns the last known unode in the trace before this log move.
@@ -112,5 +124,61 @@ public class Move {
 
 	public void setLogMoveParallelBranchMappedTo(UnfoldedNode logMoveParallelBranch) {
 		this.logMoveParallelBranchMappedTo = logMoveParallelBranch;
+	}
+
+	//methods from the list view widget
+	public String getLabel() {
+		if (isModelMove()) {
+			return unode.toString();
+		}
+		
+		if (isSyncMove() && unode.getNode() instanceof Automatic) {
+			//tau
+			return null;
+		}
+		
+		return eventClass.toString();
+	}
+	
+	public String getTopLabel() {
+		return "";
+	}
+
+	public String getBottomLabel() {
+		if (isSyncMove()) {
+			return "";
+		} else if (isModelMove()){
+			return "only in model";
+		} else {
+			return "only in log";
+		}
+	}
+
+	public String getBottomLabel2() {
+		return "";
+	}
+
+	public Color getWedgeColor() {
+		if (isSyncMove()) {
+			return new Color(0.5f, 0.5f, 0.5f);
+		} else {
+			return new Color(255, 0, 0);
+		}
+	}
+
+	public Color getLabelColor() {
+		return null;
+	}
+
+	public Color getTopLabelColor() {
+		return null;
+	}
+
+	public Color getBottomLabelColor() {
+		return null;
+	}
+
+	public Color getBottomLabel2Color() {
+		return null;
 	}
 }

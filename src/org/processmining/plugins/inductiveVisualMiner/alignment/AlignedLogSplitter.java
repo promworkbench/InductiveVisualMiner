@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractBlock.XorLoop;
@@ -61,7 +60,7 @@ public class AlignedLogSplitter {
 			}
 		}
 
-		for (IMTraceG<Move> trace : log) {
+		for (AlignedTrace trace : log) {
 			if (!loop) {
 				splitParallel(result, trace, partition, log.getCardinalityOf(trace), mapSigma2sublog, mapActivity2sigma);
 			} else {
@@ -72,14 +71,14 @@ public class AlignedLogSplitter {
 		return result;
 	}
 
-	public static void splitParallel(List<AlignedLog> result, IMTraceG<Move> trace, List<Set<UnfoldedNode>> partition,
+	public static void splitParallel(List<AlignedLog> result, AlignedTrace trace, List<Set<UnfoldedNode>> partition,
 			long cardinality, HashMap<Set<UnfoldedNode>, AlignedLog> mapSigma2sublog,
 			HashMap<UnfoldedNode, Set<UnfoldedNode>> mapActivity2sigma) {
 
 		//add a new trace to every sublog
-		HashMap<Set<UnfoldedNode>, IMTraceG<Move>> mapSigma2subtrace = new HashMap<Set<UnfoldedNode>, IMTraceG<Move>>();
+		HashMap<Set<UnfoldedNode>, AlignedTrace> mapSigma2subtrace = new HashMap<>();
 		for (Set<UnfoldedNode> sigma : partition) {
-			IMTraceG<Move> subtrace = new IMTraceG<Move>();
+			AlignedTrace subtrace = new AlignedTrace();
 			mapSigma2subtrace.put(sigma, subtrace);
 		}
 
@@ -97,18 +96,18 @@ public class AlignedLogSplitter {
 		}
 	}
 
-	public static void splitLoop(List<AlignedLog> result, IMTraceG<Move> trace,
+	public static void splitLoop(List<AlignedLog> result, AlignedTrace trace,
 			Collection<Set<UnfoldedNode>> partition, long cardinality,
 			HashMap<Set<UnfoldedNode>, AlignedLog> mapSigma2sublog,
 			HashMap<UnfoldedNode, Set<UnfoldedNode>> mapActivity2sigma) {
-		IMTraceG<Move> partialTrace = new IMTraceG<Move>();
+		AlignedTrace partialTrace = new AlignedTrace();
 
 		Set<UnfoldedNode> lastSigma = partition.iterator().next();
 		for (Move move : trace) {
 			if (move.isModelSync()) {
 				if (!lastSigma.contains(move.getUnode())) {
 					mapSigma2sublog.get(lastSigma).add(partialTrace, cardinality);
-					partialTrace = new IMTraceG<Move>();
+					partialTrace = new AlignedTrace();
 					lastSigma = mapActivity2sigma.get(move.getUnode());
 				}
 				partialTrace.add(move);

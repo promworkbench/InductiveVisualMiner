@@ -15,7 +15,6 @@ import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersIM;
 import org.processmining.plugins.etm.CentralRegistry;
 import org.processmining.plugins.etm.fitness.BehaviorCounter;
@@ -65,7 +64,7 @@ public class AlignmentETM {
 		AlignedLog alignedLog = new AlignedLog();
 		for (Trace naryTrace : behC.getAlignments().keySet()) {
 
-			IMTraceG<Move> trace = new IMTraceG<Move>();
+			AlignedTrace trace = new AlignedTrace();
 
 			TreeRecord tr = behC.getAlignment(naryTrace);
 			List<TreeRecord> naryMoves = TreeRecord.getHistory(tr);

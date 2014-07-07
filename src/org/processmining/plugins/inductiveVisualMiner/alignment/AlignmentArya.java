@@ -15,7 +15,6 @@ import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.astar.petrinet.PetrinetReplayerWithILP;
 import org.processmining.plugins.connectionfactories.logpetrinet.TransEvClassMapping;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
@@ -112,7 +111,7 @@ public class AlignmentArya {
 		//construct aligned log
 		AlignedLog alignedLog = new AlignedLog();
 		for (SyncReplayResult r : replayed) {
-			IMTraceG<Move> trace = new IMTraceG<Move>();
+			AlignedTrace trace = new AlignedTrace();
 			Iterator<Object> itEvent = r.getNodeInstance().iterator();
 			Iterator<StepTypes> itMoveType = r.getStepTypes().iterator();
 			long cardinality = r.getTraceIndex().size();

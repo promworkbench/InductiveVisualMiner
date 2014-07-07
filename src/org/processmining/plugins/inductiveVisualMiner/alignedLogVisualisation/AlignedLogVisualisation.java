@@ -19,7 +19,7 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.metrics.PropertyDirectlyFollowsGraph;
-import org.processmining.plugins.InductiveMiner.plugins.IMiProcessTree;
+import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -65,7 +65,7 @@ public class AlignedLogVisualisation {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Show deviations", requiredParameterLabels = { 0 })
 	public Dot fancy(PluginContext context, XLog xLog) {
-		ProcessTree tree = IMiProcessTree.mineProcessTree(xLog);
+		ProcessTree tree = IMProcessTree.mineProcessTree(xLog);
 		return fancy(context, tree, xLog);
 	}
 

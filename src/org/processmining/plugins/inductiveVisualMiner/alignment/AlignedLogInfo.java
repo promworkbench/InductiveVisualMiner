@@ -43,7 +43,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
 	}
 
-	public AlignedLogInfo(MultiSet<? extends IMTraceG<Move>> log) {
+	public AlignedLogInfo(MultiSet<AlignedTrace> log) {
 		super(log);
 		modelMoves = new MultiSet<UnfoldedNode>();
 		logMoves = new HashMap<Pair<UnfoldedNode, UnfoldedNode>, MultiSet<XEventClass>>();

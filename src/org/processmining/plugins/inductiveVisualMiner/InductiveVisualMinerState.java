@@ -24,7 +24,6 @@ public class InductiveVisualMinerState {
 	public InductiveVisualMinerState(XLog xLog) {
 		this.xLog = xLog;
 		miningParameters = new MiningParametersIvM();
-		miningParameters.setDebug(false);
 	}
 
 	//==log==

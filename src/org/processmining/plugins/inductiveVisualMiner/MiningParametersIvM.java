@@ -50,5 +50,7 @@ public class MiningParametersIvM extends MiningParameters {
 		//set parameters
 		setNoiseThreshold((float) 0.2);
 		setReduce(true);
+		
+		setDebug(false);
 	}
 }

@@ -58,6 +58,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private JComboBox<?> classifiersCombobox;
 	private final JButton saveModelButton;
 	private final JButton saveImageButton;
+	private final JButton traceViewButton;
+	private final TraceView traceView;
 
 	private final AlignedLogVisualisation visualiser;
 
@@ -148,6 +150,18 @@ public class InductiveVisualMinerPanel extends JPanel {
 			add(colourSelection, ccolourSelection);
 		}
 
+		//trace view
+		{
+			traceView = new TraceView();
+			traceViewButton = SlickerFactory.instance().createButton("traces");
+			GridBagConstraints cTraceViewButton = new GridBagConstraints();
+			cTraceViewButton.gridx = 2;
+			cTraceViewButton.gridy = gridy++;
+			cTraceViewButton.gridwidth = 1;
+			cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
+			add(getTraceViewButton(), cTraceViewButton);
+		}
+
 		{
 			JLabel saveLabel = SlickerFactory.instance().createLabel("Save");
 			GridBagConstraints cExitButton = new GridBagConstraints();
@@ -203,6 +217,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			add(statusLabel, cStatus);
 		}
 
+		//graph panel
 		{
 			Dot dot = new Dot();
 			dot.addNode("Inductive visual Miner", "");
@@ -238,8 +253,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 	}
 
-	public synchronized Pair<Dot, AlignedLogVisualisationInfo> updateModel(InductiveVisualMinerState state)
-			throws IOException {
+	public synchronized Pair<Dot, AlignedLogVisualisationInfo> updateModel(InductiveVisualMinerState state) {
 		AlignedLogVisualisationParameters parameters = getViewParameters(state);
 		Pair<Dot, AlignedLogVisualisationInfo> p = visualiser.fancy(state.getTree(), state.getAlignedFilteredLogInfo(),
 				state.getDfgFilteredLogInfos(), parameters);
@@ -289,6 +303,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 			default :
 				return paths;
 		}
+	}
+
+	public void removeNotify() {
+		super.removeNotify();
+		traceView.setVisible(false);
 	}
 
 	public void makeNodeSelectable(final LocalDotNode dotNode, boolean select) {
@@ -362,5 +381,13 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public void setOnSelectionChanged(InputFunction<Set<UnfoldedNode>> onSelectionChanged) {
 		this.onSelectionChanged = onSelectionChanged;
+	}
+
+	public TraceView getTraceView() {
+		return traceView;
+	}
+
+	public JButton getTraceViewButton() {
+		return traceViewButton;
 	}
 }

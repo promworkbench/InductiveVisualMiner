@@ -16,6 +16,7 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
@@ -170,7 +171,7 @@ public class TimestampsAdder {
 	 */
 	public static HashMap<List<XEventClass>, IMTraceG<Move>> getIMTrace2AlignedTrace(AlignedLog aLog) {
 		HashMap<List<XEventClass>, IMTraceG<Move>> result = new HashMap<>();
-		for (IMTraceG<Move> aTrace : aLog) {
+		for (AlignedTrace aTrace : aLog) {
 			List<XEventClass> trace = new ArrayList<>();
 			for (Move m : aTrace) {
 				if (m.getEventClass() != null) {
