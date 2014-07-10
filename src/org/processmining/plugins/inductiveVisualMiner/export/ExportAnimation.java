@@ -4,7 +4,6 @@ import static org.monte.media.FormatKeys.EncodingKey;
 import static org.monte.media.FormatKeys.FrameRateKey;
 import static org.monte.media.FormatKeys.MediaTypeKey;
 import static org.monte.media.VideoFormatKeys.DepthKey;
-import static org.monte.media.VideoFormatKeys.ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE;
 import static org.monte.media.VideoFormatKeys.HeightKey;
 import static org.monte.media.VideoFormatKeys.WidthKey;
 
@@ -26,13 +25,15 @@ import java.io.PipedOutputStream;
 import java.net.URI;
 import java.util.List;
 
+import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-import javax.swing.ProgressMonitor;
+import javax.swing.JPanel;
 
 import nl.tue.astar.AStarThread.Canceller;
 
 import org.monte.media.Format;
 import org.monte.media.FormatKeys.MediaType;
+import org.monte.media.VideoFormatKeys;
 import org.monte.media.avi.AVIWriter;
 import org.monte.media.math.Rational;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -40,7 +41,6 @@ import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.AnimatedSVGExporter;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
@@ -79,20 +79,31 @@ public class ExportAnimation {
 		writer.close();
 	}
 
-	public static void saveSVGtoFile(final TimedLog timedLog, final AlignedLogVisualisationInfo info, final ColourMode colourMode,
-			final SVGDiagram svg, final Canceller canceller, final Dot dot, final File file) throws IOException {
+	public static void saveSVGtoFile(final TimedLog timedLog, final AlignedLogVisualisationInfo info,
+			final ColourMode colourMode, final SVGDiagram svg, final Canceller canceller, final Dot dot, final File file)
+			throws IOException {
 		final SVGTokens animatedTokens = ComputeAnimation.computeSVGTokens(timedLog, info, colourMode, svg, canceller);
 		OutputStream streamOut = new FileOutputStream(file);
 		ExportAnimation.exportSVG(animatedTokens, streamOut, dot);
 	}
 
-	public static boolean exportAvi(final SVGTokens tokens, ImageOutputStream streamOutMovie, final Dot dot,
-			InductiveVisualMinerPanel panel) throws IOException {
+	public static boolean saveAVItoFile(final TimedLog timedLog, final AlignedLogVisualisationInfo info,
+			final ColourMode colourMode, final SVGDiagram svg, final Dot dot, final File file, final JPanel panel)
+			throws IOException {
 
-		//set up progress monitor
-		ProgressMonitor progressMonitor = new ProgressMonitor(panel, "", "Rendering animation..", 0, 100);
-		progressMonitor.setProgress(0);
-		progressMonitor.setMillisToDecideToPopup(0);
+		final GuaranteedProgressMonitor progressMonitor = new GuaranteedProgressMonitor(panel, "", "Preparing animation", 0, 100);
+
+		final ImageOutputStream streamOutMovie = new FileImageOutputStream(file);
+
+		//set up progress monitor and new canceller
+		final Canceller canceller = new Canceller() {
+			public boolean isCancelled() {
+				return progressMonitor.isCanceled();
+			}
+		};
+
+		//create svg tokens
+		final SVGTokens tokens = ComputeAnimation.computeSVGTokens(timedLog, info, colourMode, svg, canceller);
 
 		//create svg and copy the stream
 		PipedInputStream stream = copy(new Function<PipedOutputStream, Object>() {
@@ -116,6 +127,8 @@ public class ExportAnimation {
 		double minDuration = ex.get(0) - timeMargin;
 		double maxDuration = ex.get(1) + timeMargin;
 		int height = (int) (width * (diagram.getHeight() / (diagram.getWidth() * 1.0)));
+		
+		progressMonitor.setNote("Rendering animation..");
 
 		//compute the number of frames
 		long frames = Math.round((maxDuration - minDuration) * (framerate * 1.0));
@@ -124,7 +137,7 @@ public class ExportAnimation {
 		AnimatedSVGExporter svgExporter = new AnimatedSVGExporter(universe, diagram, width, height);
 
 		//create format
-		Format format = new Format(EncodingKey, ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, DepthKey, 24);
+		Format format = new Format(EncodingKey, VideoFormatKeys.ENCODING_AVI_MJPG, DepthKey, 24);
 		format = format.prepend(MediaTypeKey, MediaType.VIDEO, //
 				FrameRateKey, new Rational(framerate, 1),//
 				WidthKey, width, //
@@ -158,7 +171,7 @@ public class ExportAnimation {
 				// Create an animation frame
 				svgExporter.paintFrame(g, time);
 
-				//				System.out.println("frame " + frame + " done @" + time);
+				System.out.println("frame " + frame + " done @" + time);
 
 				// write it to the writer
 				out.write(0, img, 1);
@@ -169,8 +182,8 @@ public class ExportAnimation {
 
 				//write progress
 				progressMonitor.setProgress((int) Math.round(frame / (frames / 100.0)));
-				if (progressMonitor.isCanceled()) {
-					break;
+				if (canceller.isCancelled()) {
+					return false;
 				}
 			}
 
@@ -185,7 +198,7 @@ public class ExportAnimation {
 		}
 
 		progressMonitor.close();
-		return !progressMonitor.isCanceled();
+		return !canceller.isCancelled();
 	}
 
 	public static PipedInputStream copy(final Function<PipedOutputStream, Object> f) throws IOException {

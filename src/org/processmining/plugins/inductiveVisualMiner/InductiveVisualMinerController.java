@@ -276,11 +276,11 @@ public class InductiveVisualMinerController {
 
 		}
 	}
-	
+
 	private class TimeLog extends ChainLink<Triple<AlignedLog, XLog, XLogInfo>, TimedLog> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
-		
+
 		protected Triple<AlignedLog, XLog, XLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
@@ -295,7 +295,7 @@ public class InductiveVisualMinerController {
 
 		protected void processResult(TimedLog result) {
 			state.setTimedLog(result);
-			
+
 			//update the trace view
 			panel.getTraceView().set(result);
 		}
@@ -303,12 +303,11 @@ public class InductiveVisualMinerController {
 		public void cancel() {
 			canceller.cancel();
 		}
-		
+
 	}
 
 	//prepare animation
-	private class Animate
-			extends
+	private class Animate extends
 			ChainLink<Quintuple<TimedLog, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram>, SVGDiagram> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
@@ -316,9 +315,8 @@ public class InductiveVisualMinerController {
 		protected Quintuple<TimedLog, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			return Quintuple.of(state.getTimedLog(), state
-					.getColourMode(), state.getVisualisationInfo(), panel.getGraph().getDot(), panel.getGraph()
-					.getSVG());
+			return Quintuple.of(state.getTimedLog(), state.getColourMode(), state.getVisualisationInfo(), panel
+					.getGraph().getDot(), panel.getGraph().getSVG());
 		}
 
 		protected SVGDiagram executeLink(
@@ -511,24 +509,31 @@ public class InductiveVisualMinerController {
 						}).start();
 						break;
 					case aviMovie :
-						//save avi asynchronously
-//						new Thread(new Runnable() {
-//							public void run() {
-//								try {
-//									ImageOutputStream stream = new FileImageOutputStream(p.getA());
-//									boolean success = ExportAnimation.exportAvi(state.getSVGtokens(), stream,
-//											state.getDot(), panel);
-//									if (!success) {
-//										p.getA().delete();
-//									}
-//								} catch (IOException e) {
-//									e.printStackTrace();
-//								}
-//							}
-//						}).start();
+					//save avi asynchronously
+					{
+						final SVGDiagram svg = panel.getGraph().getSVG();
+						final ColourMode colourMode = state.getColourMode();
+						final Dot dot = state.getDot();
+						final TimedLog timedLog = state.getTimedLog();
+						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
+						new Thread(new Runnable() {
+							public void run() {
+								try {
+									if (!ExportAnimation.saveAVItoFile(timedLog, info, colourMode, svg, dot, p.getA(),
+											panel)) {
+										System.out.println("deleted");
+										p.getA().delete();
+									}
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}).start();
+					}
 						break;
 					case svgMovie :
-						//save svg asynchronously
+					//save svg asynchronously
+					{
 						final SVGDiagram svg = panel.getGraph().getSVG();
 						final ColourMode colourMode = state.getColourMode();
 						final Dot dot = state.getDot();
@@ -542,12 +547,14 @@ public class InductiveVisualMinerController {
 											return false;
 										}
 									};
-									ExportAnimation.saveSVGtoFile(timedLog, info, colourMode, svg, canceller, dot, p.getA());
+									ExportAnimation.saveSVGtoFile(timedLog, info, colourMode, svg, canceller, dot,
+											p.getA());
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
 							}
 						}).start();
+					}
 						break;
 				}
 			}
