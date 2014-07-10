@@ -14,6 +14,8 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,6 +29,8 @@ import java.util.List;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.ProgressMonitor;
 
+import nl.tue.astar.AStarThread.Canceller;
+
 import org.monte.media.Format;
 import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.avi.AVIWriter;
@@ -37,14 +41,19 @@ import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.AnimatedSVGExporter;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
+import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.SVGTokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Function;
 
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGUniverse;
 
 public class ExportAnimation {
-	public static void exportSVG(SVGTokens tokens, OutputStream streamOut, Dot dot) throws IOException {
+	public static void exportSVG(final SVGTokens tokens, final OutputStream streamOut, final Dot dot)
+			throws IOException {
 		InputStream stream = Dot2Image.dot2imageInputStream(dot, Type.svg);
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(streamOut, "utf-8"));
 
@@ -70,10 +79,12 @@ public class ExportAnimation {
 		writer.close();
 	}
 
-	//				OutputStream streamOut = new FileOutputStream("D:\\animationTest.svg");
-
-	//				ImageOutputStream streamOutAvi = new FileImageOutputStream(new File("D:\\animationTest.avi"));
-	//				ExportAnimation.exportMovie(animatedTokens, streamOutAvi, dot, svg);
+	public static void saveSVGtoFile(final TimedLog timedLog, final AlignedLogVisualisationInfo info, final ColourMode colourMode,
+			final SVGDiagram svg, final Canceller canceller, final Dot dot, final File file) throws IOException {
+		final SVGTokens animatedTokens = ComputeAnimation.computeSVGTokens(timedLog, info, colourMode, svg, canceller);
+		OutputStream streamOut = new FileOutputStream(file);
+		ExportAnimation.exportSVG(animatedTokens, streamOut, dot);
+	}
 
 	public static boolean exportAvi(final SVGTokens tokens, ImageOutputStream streamOutMovie, final Dot dot,
 			InductiveVisualMinerPanel panel) throws IOException {

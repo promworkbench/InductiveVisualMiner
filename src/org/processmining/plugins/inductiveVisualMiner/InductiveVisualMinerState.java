@@ -15,7 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Al
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
-import org.processmining.plugins.inductiveVisualMiner.animation.SVGTokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -35,7 +35,7 @@ public class InductiveVisualMinerState {
 	public XLog getXLog() {
 		return xLog;
 	}
-	
+
 	public XLogInfo getXLogInfo() {
 		return xLogInfo;
 	}
@@ -97,20 +97,20 @@ public class InductiveVisualMinerState {
 	public synchronized void setMiningParameters(MiningParameters miningParameters) {
 		this.miningParameters = miningParameters;
 	}
-	
+
 	//==layout==
 	private Dot dot;
 	private AlignedLogVisualisationInfo visualisationInfo;
-	
+
 	public void setLayout(Dot dot, AlignedLogVisualisationInfo visualisationInfo) {
 		this.dot = dot;
 		this.visualisationInfo = visualisationInfo;
 	}
-	
+
 	public AlignedLogVisualisationInfo getVisualisationInfo() {
 		return visualisationInfo;
 	}
-	
+
 	public Dot getDot() {
 		return dot;
 	}
@@ -150,7 +150,7 @@ public class InductiveVisualMinerState {
 	public Map<UnfoldedNode, AlignedLogInfo> getDfgLogInfos() {
 		return dfgLogInfos;
 	}
-	
+
 	/*
 	 * Reset alignment to null
 	 */
@@ -208,26 +208,26 @@ public class InductiveVisualMinerState {
 	public synchronized void setColourMode(ColourMode modus) {
 		colourMode = modus;
 	}
-	
+
 	//==node selection==
 	private Set<UnfoldedNode> selectedNodes = new HashSet<UnfoldedNode>();
-	
+
 	public Set<UnfoldedNode> getSelectedNodes() {
 		return selectedNodes;
 	}
-	
+
 	public synchronized void setSelectedNodes(Set<UnfoldedNode> selectedNodes) {
 		this.selectedNodes = selectedNodes;
 	}
-	
-	//==animation==
-	private SVGTokens SVGtokens;
-	
-	public SVGTokens getSVGtokens() {
-		return SVGtokens;
+
+	//==timed log==
+	private TimedLog timedLog;
+
+	public void setTimedLog(TimedLog timedLog) {
+		this.timedLog = timedLog;
 	}
-	
-	public void setSVGtokens(SVGTokens tokens) {
-		this.SVGtokens = tokens;
+
+	public TimedLog getTimedLog() {
+		return timedLog;
 	}
 }

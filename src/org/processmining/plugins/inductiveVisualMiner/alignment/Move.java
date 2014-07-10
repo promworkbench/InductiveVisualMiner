@@ -31,8 +31,8 @@ public class Move implements Event {
 		if (isModelSync()) {
 			return getType() + " " + getUnode().toString();
 		} else {
-//			return getType() + " " + getEventClass().toString() + " " + getLogMoveUnode() + " "
-//					+ getLogMoveBeforeChild();
+			//			return getType() + " " + getEventClass().toString() + " " + getLogMoveUnode() + " "
+			//					+ getLogMoveBeforeChild();
 			return getType() + " " + getEventClass().toString();
 		}
 	}
@@ -104,18 +104,20 @@ public class Move implements Event {
 	public boolean isLogMove() {
 		return type == Type.log;
 	}
-	
-	private boolean isModelMove() {
+
+	public boolean isModelMove() {
 		return type == Type.model;
 	}
-	
+
 	public boolean isSyncMove() {
 		return type == Type.synchronous;
 	}
 
 	/**
-	 * Returns the last known unode in the trace before this log move.
-	 * This is used in log splitting, to make sure that the log move ends up in the correct sub trace. 
+	 * Returns the last known unode in the trace before this log move. This is
+	 * used in log splitting, to make sure that the log move ends up in the
+	 * correct sub trace.
+	 * 
 	 * @return
 	 */
 	public UnfoldedNode getLogMoveParallelBranchMappedTo() {
@@ -131,15 +133,15 @@ public class Move implements Event {
 		if (isModelMove()) {
 			return unode.toString();
 		}
-		
+
 		if (isSyncMove() && unode.getNode() instanceof Automatic) {
 			//tau
 			return null;
 		}
-		
+
 		return eventClass.toString();
 	}
-	
+
 	public String getTopLabel() {
 		return "";
 	}
@@ -147,7 +149,7 @@ public class Move implements Event {
 	public String getBottomLabel() {
 		if (isSyncMove()) {
 			return "";
-		} else if (isModelMove()){
+		} else if (isModelMove()) {
 			return "only in model";
 		} else {
 			return "only in log";

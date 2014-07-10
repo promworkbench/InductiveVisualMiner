@@ -24,13 +24,13 @@ import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
+import org.processmining.plugins.inductiveVisualMiner.alignment.ComputeAlignment;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet;
@@ -51,7 +51,7 @@ public class AlignedLogVisualisation {
 	public Dot fancy(PluginContext context, ProcessTree tree, XLog xLog) {
 		AlignmentResult result = AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog,
 				new HashSet<XEventClass>(), ProMCancelTerminationCondition.buildDummyCanceller());
-		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = InductiveVisualMinerController.computeDfgAlignment(result.log,
+		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = ComputeAlignment.computeDfgAlignment(result.log,
 				tree);
 		return fancy(tree, result.logInfo, dfgLogInfos, new AlignedLogVisualisationParameters()).getLeft();
 	}

@@ -3,21 +3,12 @@ package org.processmining.plugins.inductiveVisualMiner;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -30,7 +21,6 @@ import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.model.XTrace;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
@@ -39,7 +29,6 @@ import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -52,34 +41,26 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Lo
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogSplitter;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
+import org.processmining.plugins.inductiveVisualMiner.alignment.ComputeAlignment;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
-import org.processmining.plugins.inductiveVisualMiner.animation.AnimationSVG;
-import org.processmining.plugins.inductiveVisualMiner.animation.SVGTokens;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
-import org.processmining.plugins.inductiveVisualMiner.animation.Token;
-import org.processmining.plugins.inductiveVisualMiner.animation.Trace2Token;
-import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
+import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
+import org.processmining.plugins.inductiveVisualMiner.animation.ComputeTimedLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog.FileType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.Function;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
 import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 import com.kitfox.svg.SVGDiagram;
-import com.kitfox.svg.SVGUniverse;
 
 public class InductiveVisualMinerController {
 
@@ -111,7 +92,6 @@ public class InductiveVisualMinerController {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveModelButton().setEnabled(false);
 			panel.getSaveImageButton().setEnabled(false);
-			state.setSVGtokens(null);
 			panel.getSaveImageButton().setText("image");
 			return new Pair<XLog, XEventClassifier>(state.getXLog(), state.getMiningParameters().getClassifier());
 		}
@@ -144,7 +124,6 @@ public class InductiveVisualMinerController {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveModelButton().setEnabled(false);
 			panel.getSaveImageButton().setEnabled(false);
-			state.setSVGtokens(null);
 			panel.getSaveImageButton().setText("image");
 			return new Quadruple<IMLog, IMLogInfo, Double, MiningParameters>(state.getLog(), state.getLogInfo(),
 					state.getActivitiesThreshold(), state.getMiningParameters());
@@ -176,7 +155,6 @@ public class InductiveVisualMinerController {
 
 		protected Pair<IMLog, MiningParameters> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
-			state.setSVGtokens(null);
 			panel.getSaveImageButton().setText("image");
 			panel.getTraceView().set(state.getLog());
 			return new Pair<IMLog, MiningParameters>(state.getActivityFilteredIMLog(), state.getMiningParameters());
@@ -214,7 +192,6 @@ public class InductiveVisualMinerController {
 
 		protected Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
-			state.setSVGtokens(null);
 			panel.getSaveImageButton().setText("image");
 			return new Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo>(state.getTree(),
 					state.getMiningParameters().getClassifier(), state.getXLog(), state.getFilteredActivities(),
@@ -225,7 +202,8 @@ public class InductiveVisualMinerController {
 				Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo> input) {
 			setStatus("Computing alignment..");
 			canceller.reset();
-			return computeAlignment(input.getA(), input.getB(), input.getC(), input.getD(), input.getE(), canceller);
+			return ComputeAlignment.computeAlignment(input.getA(), input.getB(), input.getC(), input.getD(),
+					input.getE(), canceller);
 		}
 
 		protected void processResult(Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>> result) {
@@ -243,7 +221,6 @@ public class InductiveVisualMinerController {
 
 		protected Object generateInput() {
 			panel.getGraph().setEnableAnimation(false);
-			state.setSVGtokens(null);
 			panel.getSaveImageButton().setText("image");
 			return null;
 		}
@@ -271,7 +248,6 @@ public class InductiveVisualMinerController {
 
 		protected Septuple<AlignedLog, Set<UnfoldedNode>, Set<UnfoldedNode>, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
-			state.setSVGtokens(null);
 			panel.getSaveImageButton().setText("image");
 			return Septuple.of(state.getAlignedLog(), state.getSelectedNodes(),
 					AlignedLogMetrics.getAllDfgNodes(new UnfoldedNode(state.getTree().getRoot())),
@@ -299,96 +275,65 @@ public class InductiveVisualMinerController {
 		public void cancel() {
 
 		}
+	}
+	
+	private class TimeLog extends ChainLink<Triple<AlignedLog, XLog, XLogInfo>, TimedLog> {
 
+		private ResettableCanceller canceller = new ResettableCanceller();
+		
+		protected Triple<AlignedLog, XLog, XLogInfo> generateInput() {
+			panel.getGraph().setEnableAnimation(false);
+			panel.getSaveImageButton().setText("image");
+			return Triple.of(state.getAlignedLog(), state.getXLog(), state.getXLogInfo());
+		}
+
+		protected TimedLog executeLink(Triple<AlignedLog, XLog, XLogInfo> input) {
+			setStatus("Creating timed log..");
+			canceller.reset();
+			return ComputeTimedLog.computeTimedLog(input.getA(), input.getB(), input.getC(), canceller);
+		}
+
+		protected void processResult(TimedLog result) {
+			state.setTimedLog(result);
+			
+			//update the trace view
+			panel.getTraceView().set(result);
+		}
+
+		public void cancel() {
+			canceller.cancel();
+		}
+		
 	}
 
 	//prepare animation
 	private class Animate
 			extends
-			ChainLink<Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram>, Pair<SVGTokens, SVGDiagram>> {
+			ChainLink<Quintuple<TimedLog, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram>, SVGDiagram> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
-		protected Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> generateInput() {
+		protected Quintuple<TimedLog, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
-			state.setSVGtokens(null);
 			panel.getSaveImageButton().setText("image");
-			panel.getTraceView().set(state.getAlignedFilteredLog());
-			return Septuple.of(state.getXLog(), state.getAlignedFilteredLog(), state.getXLogInfo(), state
+			return Quintuple.of(state.getTimedLog(), state
 					.getColourMode(), state.getVisualisationInfo(), panel.getGraph().getDot(), panel.getGraph()
 					.getSVG());
 		}
 
-		protected Pair<SVGTokens, SVGDiagram> executeLink(
-				Septuple<XLog, AlignedLog, XLogInfo, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> input) {
+		protected SVGDiagram executeLink(
+				Quintuple<TimedLog, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> input) {
 			setStatus("Creating animation..");
-
 			canceller.reset();
 
-			XLog xLog = input.getA();
-			AlignedLog aLog = input.getB();
-			XLogInfo xLogInfo = input.getC();
-			ColourMode colourMode = input.getD();
-			AlignedLogVisualisationInfo info = input.getE();
-			final Dot dot = input.getF();
-			final SVGDiagram svg = input.getG();
-
-			long maxTraces = 50;
-
-			//gather timestamp information
-			Pair<Double, Double> extremeTimstamps = TimestampsAdder.getExtremeTimestamps(xLog, maxTraces);
-
-			//make a log-projection-hashmap
-			HashMap<List<XEventClass>, IMTraceG<Move>> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
-
-			//make a shortest path graph
-			ShortestPathGraph graph = new ShortestPathGraph(info.getNodes(), info.getEdges());
-
-			boolean showDeviations = colourMode != ColourMode.paths;
-
-			//compute the animation
-			final List<Token> tokens = new ArrayList<>();
-
-			for (XTrace trace : xLog) {
-				TimedTrace timedTrace = TimestampsAdder.timeTrace(map, trace, xLogInfo, extremeTimstamps,
-						showDeviations, graph, info);
-				if (timedTrace != null) {
-					try {
-						tokens.add(Trace2Token.trace2token(timedTrace, showDeviations, graph, info));
-						if (canceller.isCancelled()) {
-							return null;
-						}
-					} catch (Exception e) {
-						//for the demo, just ignore this case
-						debug(timedTrace);
-						throw e;
-					}
-				}
-			}
-
-			//make an svg and read it in directly
-			try {
-				final SVGTokens animatedTokens = AnimationSVG.animateTokens(tokens, null, svg);
-				final SVGTokens animatedTokensLimited = AnimationSVG.animateTokens(tokens, maxTraces, svg);
-				PipedInputStream svgStream = ExportAnimation.copy(new Function<PipedOutputStream, Object>() {
-					public Object call(PipedOutputStream input) throws Exception {
-						ExportAnimation.exportSVG(animatedTokensLimited, input, dot);
-						return null;
-					}
-				});
-
-				SVGUniverse universe = new SVGUniverse();
-				return Pair.of(animatedTokens, universe.getDiagram(universe.loadSVG(svgStream, "anim")));
-			} catch (IOException e) {
-				return null;
-			}
+			return ComputeAnimation.computeAnimation(input.getA(), input.getB(), input.getC(), 50, input.getD(),
+					input.getE(), canceller);
 		}
 
-		protected void processResult(Pair<SVGTokens, SVGDiagram> result) {
-			panel.getGraph().setImage(result.getB(), false);
+		protected void processResult(SVGDiagram result) {
+			panel.getGraph().setImage(result, false);
 			panel.getGraph().setEnableAnimation(true);
 			panel.getSaveImageButton().setText("animation");
-			state.setSVGtokens(result.getA());
 
 			//re-colour the selected nodes (i.e. the dashed red border)
 			for (UnfoldedNode unode : state.getSelectedNodes()) {
@@ -451,41 +396,11 @@ public class InductiveVisualMinerController {
 		chain.add(new Layout());
 		chain.add(new FilterNodeSelection());
 		chain.add(new ApplyNodeSelectionColouring());
+		chain.add(new TimeLog());
 		chain.add(new Animate());
 		chain.add(new ApplyNodeSelectionColouring());
 
 		chain.execute(MakeLog.class);
-	}
-
-	private static Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>> computeAlignment(ProcessTree tree,
-			XEventClassifier classifier, XLog xLog, Set<XEventClass> filteredActivities, IMLogInfo logInfo,
-			Canceller canceller) {
-
-		//ETM
-		AlignmentResult alignment = AlignmentETM.alignTree(tree, classifier, xLog, filteredActivities, canceller);
-
-		//		if (alignment.log.size() == 0) {
-		//			//Felix
-		//			XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(xLog, classifier);
-		//			alignment = AlignmentFelix.alignTree(tree, classifier, logInfo, xLog, xLogInfo, filteredActivities);
-		//		}
-
-		//Arya
-		//		AlignmentResult alignment = AlignmentArya.alignTree(tree, classifier, logInfo, null, xLog, filteredActivities);
-
-		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = computeDfgAlignment(alignment.log, tree);
-
-		return Pair.of(alignment, dfgLogInfos);
-	}
-
-	public static Map<UnfoldedNode, AlignedLogInfo> computeDfgAlignment(AlignedLog log, ProcessTree tree) {
-		Map<UnfoldedNode, AlignedLogInfo> result = new HashMap<ProcessTree2Petrinet.UnfoldedNode, AlignedLogInfo>();
-
-		for (UnfoldedNode unode : AlignedLogMetrics.getAllDfgNodes(new UnfoldedNode(tree.getRoot()))) {
-			result.put(unode, new AlignedLogInfo(AlignedLogSplitter.getLog(unode, log)));
-		}
-
-		return result;
 	}
 
 	private void initGui() {
@@ -568,7 +483,7 @@ public class InductiveVisualMinerController {
 		//set image export button
 		panel.getSaveImageButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SaveAsDialog dialog = new SaveAsDialog(state.getSVGtokens() != null);
+				SaveAsDialog dialog = new SaveAsDialog(panel.getGraph().isEnableAnimation());
 				final Pair<File, FileType> p = dialog.askUser(panel);
 				switch (p.getRight()) {
 					case pdfImage :
@@ -597,28 +512,37 @@ public class InductiveVisualMinerController {
 						break;
 					case aviMovie :
 						//save avi asynchronously
-						new Thread(new Runnable() {
-							public void run() {
-								try {
-									ImageOutputStream stream = new FileImageOutputStream(p.getA());
-									boolean success = ExportAnimation.exportAvi(state.getSVGtokens(), stream,
-											state.getDot(), panel);
-									if (!success) {
-										p.getA().delete();
-									}
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-							}
-						}).start();
+//						new Thread(new Runnable() {
+//							public void run() {
+//								try {
+//									ImageOutputStream stream = new FileImageOutputStream(p.getA());
+//									boolean success = ExportAnimation.exportAvi(state.getSVGtokens(), stream,
+//											state.getDot(), panel);
+//									if (!success) {
+//										p.getA().delete();
+//									}
+//								} catch (IOException e) {
+//									e.printStackTrace();
+//								}
+//							}
+//						}).start();
 						break;
 					case svgMovie :
 						//save svg asynchronously
+						final SVGDiagram svg = panel.getGraph().getSVG();
+						final ColourMode colourMode = state.getColourMode();
+						final Dot dot = state.getDot();
+						final TimedLog timedLog = state.getTimedLog();
+						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
 						new Thread(new Runnable() {
 							public void run() {
 								try {
-									OutputStream streamOut = new FileOutputStream(p.getA());
-									ExportAnimation.exportSVG(state.getSVGtokens(), streamOut, state.getDot());
+									Canceller canceller = new Canceller() {
+										public boolean isCancelled() {
+											return false;
+										}
+									};
+									ExportAnimation.saveSVGtoFile(timedLog, info, colourMode, svg, canceller, dot, p.getA());
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -663,18 +587,8 @@ public class InductiveVisualMinerController {
 		}
 
 		AlignedLogInfo fli = new AlignedLogInfo(fl);
-		Map<UnfoldedNode, AlignedLogInfo> fldfg = computeDfgAlignment(fl, dfgNodes);
+		Map<UnfoldedNode, AlignedLogInfo> fldfg = ComputeAlignment.computeDfgAlignment(fl, dfgNodes);
 		return new Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>(fl, fli, fldfg);
-	}
-
-	private static Map<UnfoldedNode, AlignedLogInfo> computeDfgAlignment(AlignedLog log, Set<UnfoldedNode> dfgNodes) {
-		Map<UnfoldedNode, AlignedLogInfo> result = new HashMap<ProcessTree2Petrinet.UnfoldedNode, AlignedLogInfo>();
-
-		for (UnfoldedNode unode : dfgNodes) {
-			result.put(unode, new AlignedLogInfo(AlignedLogSplitter.getLog(unode, log)));
-		}
-
-		return result;
 	}
 
 	private static void updateSelectionDescription(InductiveVisualMinerPanel panel, Set<UnfoldedNode> selected) {
@@ -699,7 +613,7 @@ public class InductiveVisualMinerController {
 		}
 	}
 
-	private static void debug(Object s) {
+	public static void debug(Object s) {
 		System.out.println(s);
 	}
 }

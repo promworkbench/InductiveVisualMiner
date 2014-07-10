@@ -10,7 +10,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Al
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.LogSplitter;
 import org.processmining.processtree.Node;
@@ -21,7 +21,7 @@ import org.processmining.processtree.impl.AbstractTask.Automatic;
 public class Trace2Token {
 
 	public static Token trace2token(TimedTrace trace, boolean showDeviations, ShortestPathGraph shortestPath,
-			AlignedLogVisualisationInfo info) {
+			AlignedLogVisualisationInfo info, Scaler scaler) {
 
 		debug("", 0);
 
@@ -30,7 +30,7 @@ public class Trace2Token {
 
 		Token token = trace2token(copyTrace, Pair.of(info.getSource(), trace.getStartTime()),
 				Pair.of(info.getSink(), trace.getEndTime()), new ArrayList<UnfoldedNode>(), showDeviations,
-				shortestPath, info, 0);
+				shortestPath, info, 0, scaler);
 
 		//interpolate the missing timestamps from the token
 		try {
@@ -46,7 +46,7 @@ public class Trace2Token {
 
 	public static Token trace2token(List<TimedMove> trace, Pair<LocalDotNode, Double> startPosition,
 			Pair<LocalDotNode, Double> endPosition, List<UnfoldedNode> inParallelUnodes, boolean showDeviations,
-			ShortestPathGraph shortestPath, AlignedLogVisualisationInfo info, int indent) {
+			ShortestPathGraph shortestPath, AlignedLogVisualisationInfo info, int indent, Scaler scaler) {
 
 		debug("translate trace " + trace, indent);
 
@@ -129,7 +129,7 @@ public class Trace2Token {
 					List<UnfoldedNode> childInParallelUnodes = new ArrayList<>(localInParallelUnodes);
 					Token childToken = trace2token(subsubTrace, Pair.of(parallelSplit, (Double) null),
 							Pair.of(parallelJoin, (Double) null), childInParallelUnodes, showDeviations, shortestPath,
-							info, indent + 1);
+							info, indent + 1, scaler);
 
 					token.addSubToken(childToken);
 				}
@@ -158,7 +158,7 @@ public class Trace2Token {
 
 				token.addPoint(tauEdge, null);
 
-			} else if (move.getType() == Type.synchronous || (move.getType() == Type.model && !showDeviations)) {
+			} else if (move.isSyncMove() || (move.isModelMove() && !showDeviations)) {
 				//synchronous move or model move without deviations showing
 				LocalDotNode nextDestination = Animation.getDotNodeFromActivity(move, info);
 
@@ -169,10 +169,10 @@ public class Trace2Token {
 					for (int j = 0; j < path.size() - 1; j++) {
 						token.addPoint(path.get(j), null);
 					}
-					token.addPoint(path.get(path.size() - 1), move.getTimestamp());
+					token.addPoint(path.get(path.size() - 1), move.getScaledTimestamp(scaler));
 				}
 
-			} else if (move.getType() == Type.model) {
+			} else if (move.isModelMove()) {
 				//model move, showing deviations
 
 				//move from the last known position to the start of the move edge,
@@ -185,7 +185,8 @@ public class Trace2Token {
 				}
 
 				token.addPoint(moveEdge, null);
-			} else if (move.getType() == Type.log) {
+			} else if (move.isLogMove() && showDeviations) {
+				
 				//log move (should be filtered out if not showing deviations)
 				LocalDotEdge moveEdge = Animation.getLogMoveEdge(move.getLogMoveUnode(), move.getLogMoveBeforeChild(),
 						info);
@@ -198,7 +199,7 @@ public class Trace2Token {
 				}
 
 				//add the move edge
-				token.addPoint(moveEdge, move.getTimestamp());
+				token.addPoint(moveEdge, move.getScaledTimestamp(scaler));
 			}
 		}
 
@@ -249,7 +250,7 @@ public class Trace2Token {
 			//there's nothing being entered here
 			return null;
 		}
-			
+
 		//get the unode
 		UnfoldedNode unode = move.getPositionUnode();
 
@@ -334,9 +335,8 @@ public class Trace2Token {
 	}
 
 	private static void debug(Object s, int indent) {
-		//		String sIndent = new String(new char[indent]).replace("\0", "   ");
-		//		System.out.print(sIndent);
-		//		System.out.println(s);
-		//				System.out.println(s.toString().replaceAll("\\n", " "));
+//		String sIndent = new String(new char[indent]).replace("\0", "   ");
+//		System.out.print(sIndent);
+//		System.out.println(s);
 	}
 }

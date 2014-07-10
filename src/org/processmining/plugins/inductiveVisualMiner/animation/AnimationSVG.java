@@ -21,16 +21,9 @@ import com.kitfox.svg.SVGException;
 
 public class AnimationSVG {
 
-	public static SVGTokens animateTokens(List<Token> tokens, Long maxTraces, SVGDiagram svg) {
+	public static SVGTokens animateTokens(List<Token> tokens, SVGDiagram svg) {
 		SVGTokens svgTokens = new SVGTokens();
 		for (Token token : tokens) {
-			if (maxTraces != null)  {
-				maxTraces--;
-				if (maxTraces == -1) {
-					break;
-				}
-			}
-			
 			for (Token subToken : token.getAllTokensRecursively()) {
 				animateToken(subToken, svgTokens, svg);
 			}
