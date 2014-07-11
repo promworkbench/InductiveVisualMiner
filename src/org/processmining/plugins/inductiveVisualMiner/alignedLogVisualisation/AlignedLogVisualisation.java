@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.metrics.PropertyDirectlyFollowsGraph;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
+import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
@@ -51,8 +53,7 @@ public class AlignedLogVisualisation {
 	public Dot fancy(PluginContext context, ProcessTree tree, XLog xLog) {
 		AlignmentResult result = AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog,
 				new HashSet<XEventClass>(), ProMCancelTerminationCondition.buildDummyCanceller());
-		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = ComputeAlignment.computeDfgAlignment(result.log,
-				tree);
+		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = ComputeAlignment.computeDfgAlignment(result.log, tree);
 		return fancy(tree, result.logInfo, dfgLogInfos, new AlignedLogVisualisationParameters()).getLeft();
 	}
 
@@ -175,15 +176,15 @@ public class AlignedLogVisualisation {
 
 	private LocalDotNode convertActivity(UnfoldedNode unode, long cardinality) {
 		//style the activity by the occurrences of it
-		String fillColour = "#FFFFFF";
+		Color fillColour = Color.white;
 		if (cardinality != 0 && parameters.getColourNodes() != null) {
 			fillColour = parameters.getColourNodes().colour((long) (getOccurrenceFactor(cardinality) * 100), 100);
 		}
 
 		//determine label colour
-		String fontColour = "black";
+		Color fontColour = Color.black;
 		if (ColourMaps.getLuma(fillColour) < 128) {
-			fontColour = "white";
+			fontColour = Color.white;
 		}
 
 		String label = unode.getNode().getName();
@@ -195,8 +196,8 @@ public class AlignedLogVisualisation {
 		}
 
 		final LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.activity, label, unode);
-		dotNode.setOptions(dotNode.getOptions() + ", fillcolor=\"" + fillColour + "\", fontcolor=\"" + fontColour
-				+ "\"");
+		dotNode.setOptions(dotNode.getOptions() + ", fillcolor=\"" + ColourMap.toHexString(fillColour)
+				+ "\", fontcolor=\"" + ColourMap.toHexString(fontColour) + "\"");
 
 		info.addNode(unode, dotNode);
 		return dotNode;
@@ -252,10 +253,11 @@ public class AlignedLogVisualisation {
 		if (parameters.isShowLogMoves()) {
 			visualiseLogMove(join, join, unode, unode, unode.unfoldChild(bodyChild), directionForward);
 			visualiseLogMove(split, split, unode, unode, unode.unfoldChild(redoChild), directionForward);
-			
+
 			//log moves can be projected before the exit-tau
 			//(assume it's tau)
-			info.registerExtraEdge(unode, unode.unfoldChild(exitChild), info.getLogMoveEdge(unode, unode.unfoldChild(redoChild)));
+			info.registerExtraEdge(unode, unode.unfoldChild(exitChild),
+					info.getLogMoveEdge(unode, unode.unfoldChild(redoChild)));
 		}
 	}
 
@@ -368,8 +370,8 @@ public class AlignedLogVisualisation {
 		String options = "";
 
 		if (parameters.getColourModelEdges() != null) {
-			String lineColour = null;
-			lineColour = parameters.getColourModelEdges().colour(cardinality, minCardinality, maxCardinality);
+			String lineColour = parameters.getColourModelEdges().colourString(cardinality, minCardinality,
+					maxCardinality);
 			options += "color=\"" + lineColour + "\", ";
 		}
 
@@ -417,7 +419,7 @@ public class AlignedLogVisualisation {
 		String options = "style=\"dashed\", arrowsize=.5";
 
 		if (parameters.getColourMoves() != null) {
-			String lineColour = parameters.getColourMoves().colour(cardinality, minCardinality, maxCardinality);
+			String lineColour = parameters.getColourMoves().colourString(cardinality, minCardinality, maxCardinality);
 			options += ", color=\"" + lineColour + "\", fontcolor=\"" + lineColour + "\"";
 		}
 

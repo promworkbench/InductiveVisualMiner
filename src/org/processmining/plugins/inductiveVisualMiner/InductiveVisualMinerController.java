@@ -35,6 +35,7 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
+import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
@@ -346,6 +347,7 @@ public class InductiveVisualMinerController {
 
 	}
 
+	//colour the nodes
 	private class ApplyNodeSelectionColouring
 			extends
 			ChainLink<Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>, Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>> {
@@ -360,9 +362,12 @@ public class InductiveVisualMinerController {
 		}
 
 		protected void processResult(Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> result) {
-			InductiveVisualMinerSelectionColourer.colour(panel.getGraph().getSVG(), state.getVisualisationInfo(),
+			TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colour(panel.getGraph().getSVG(), state.getVisualisationInfo(),
 					state.getTree(), result.getA(), result.getB(), InductiveVisualMinerPanel.getViewParameters(state));
 			updateSelectionDescription(panel, state.getSelectedNodes());
+			
+			//make a colour map for the trace view
+			panel.getTraceView().setColourMap(colourMap);
 
 			setStatus(" ");
 			panel.repaint();

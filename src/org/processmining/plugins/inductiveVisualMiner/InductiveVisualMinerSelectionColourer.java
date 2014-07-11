@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import java.awt.Color;
 import java.util.Map;
 
 import org.processmining.plugins.InductiveMiner.Pair;
@@ -7,6 +8,7 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
+import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
@@ -41,11 +43,12 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 	
-	public static void colour(SVGDiagram svg, AlignedLogVisualisationInfo info, ProcessTree tree,
+	public static TraceViewColourMap colour(SVGDiagram svg, AlignedLogVisualisationInfo info, ProcessTree tree,
 			AlignedLogInfo alignedFilteredLogInfo, Map<UnfoldedNode, AlignedLogInfo> alignedFilteredDfgLogInfos,
 			AlignedLogVisualisationParameters visualisationParameters) {
 
 		UnfoldedNode uroot = new UnfoldedNode(tree.getRoot());
+		TraceViewColourMap colourMap = new TraceViewColourMap();
 
 		//compute extreme cardinalities
 		Pair<Long, Long> extremes = AlignedLogMetrics.getExtremes(uroot, alignedFilteredLogInfo, true);
@@ -56,7 +59,11 @@ public class InductiveVisualMinerSelectionColourer {
 			//style nodes
 			for (UnfoldedNode unode : AlignedLogMetrics.unfoldAllNodes(uroot)) {
 				long cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, alignedFilteredLogInfo);
-				styleUnfoldedNode(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
+				Color colour = styleUnfoldedNode(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
+				
+				if (unode.getNode() instanceof Manual) {
+					colourMap.set(unode, colour);
+				}
 			}
 
 			//style edges
@@ -66,19 +73,22 @@ public class InductiveVisualMinerSelectionColourer {
 		} catch (SVGException e) {
 			e.printStackTrace();
 		}
+		
+		return colourMap;
 	}
 
-	private static void styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
+	private static Color styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
 			long cardinality, long minCardinality, long maxCardinality,
 			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
 		if (unode.getNode() instanceof Manual) {
-			styleManual(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
+			return styleManual(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
 		} else {
 			styleNonManualNode(unode, svg, info, cardinality);
+			return null;
 		}
 	}
 
-	private static void styleManual(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
+	private static Color styleManual(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
 			long cardinality, long minCardinality, long maxCardinality,
 			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
 
@@ -90,12 +100,12 @@ public class InductiveVisualMinerSelectionColourer {
 		Text titleCount = (Text) group.getChild(group.getChildren(null).size() - 1);
 
 		//recolour the polygon
-		String fillColour;
-		String fontColour = "black";
+		Color fillColour;
+		Color fontColour = Color.black;
 		if (cardinality > 0) {
 			fillColour = visualisationParameters.getColourNodes().colour(cardinality, minCardinality, maxCardinality);
 			if (ColourMaps.getLuma(fillColour) < 128) {
-				fontColour = "white";
+				fontColour = Color.white;
 			}
 		} else {
 			fillColour = visualisationParameters.getColourNodes().colour(1, 0, 2);
@@ -116,6 +126,8 @@ public class InductiveVisualMinerSelectionColourer {
 		titleCount.getContent().clear();
 		titleCount.getContent().add(cardinality + "");
 		titleCount.rebuild();
+		
+		return fillColour;
 	}
 
 	private static void styleNonManualNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
@@ -183,7 +195,7 @@ public class InductiveVisualMinerSelectionColourer {
 		SVGElement arrowHead = group.getChild(2);
 
 		//stroke
-		String edgeColour = colourMap.colour(cardinality, minCardinality, maxCardinality);
+		Color edgeColour = colourMap.colour(cardinality, minCardinality, maxCardinality);
 		double strokeWidth = widthMap.size(cardinality, minCardinality, maxCardinality);
 		DotPanel.setCSSAttributeOf(line, "stroke", edgeColour);
 		DotPanel.setCSSAttributeOf(arrowHead, "stroke", edgeColour);

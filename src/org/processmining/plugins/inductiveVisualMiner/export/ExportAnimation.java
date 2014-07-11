@@ -121,7 +121,7 @@ public class ExportAnimation {
 		//set constants for this animation
 		double timeMargin = 0.5;
 		int framerate = 30;
-		int width = 2000;
+		int width = 1000;
 
 		List<Double> ex = AnimatableSVGPanel.getExtremeTimes(diagram.getRoot());
 		double minDuration = ex.get(0) - timeMargin;
@@ -171,7 +171,7 @@ public class ExportAnimation {
 				// Create an animation frame
 				svgExporter.paintFrame(g, time);
 
-				System.out.println("frame " + frame + " done @" + time);
+//				System.out.println("frame " + frame + " done @" + time);
 
 				// write it to the writer
 				out.write(0, img, 1);

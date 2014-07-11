@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.animation;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
 public class TimedMove extends Move {
@@ -56,7 +57,7 @@ public class TimedMove extends Move {
 	}
 	
 	//Event functions from list-view widget
-	public String getTopLabel() {
+	public String getTopLabel(TraceViewColourMap input) {
 		if (logTimestamp != null) {
 			return (new SimpleDateFormat ("dd-MM-yyyy HH:mm:ss:SSS")).format(new Date(logTimestamp));
 		} else {

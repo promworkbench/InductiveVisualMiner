@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -152,7 +153,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		//trace view
 		{
-			traceView = new TraceView();
+			traceView = new TraceView(this);
 			traceViewButton = SlickerFactory.instance().createButton("traces");
 			GridBagConstraints cTraceViewButton = new GridBagConstraints();
 			cTraceViewButton.gridx = 2;
@@ -281,13 +282,13 @@ public class InductiveVisualMinerPanel extends JPanel {
 		paths.setShowLogMoves(false);
 		paths.setShowModelMoves(false);
 
-		moves.setColourModelEdges(new ColourMapFixed("#BBBBFF"));
+		moves.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
 		moves.setColourNodes(new ColourMapLightBlue());
 
 		both.setShowFrequenciesOnModelEdges(true);
 		both.setShowFrequenciesOnMoveEdges(true);
-		both.setColourModelEdges(new ColourMapFixed("#9999FF"));
-		both.setColourMoves(new ColourMapFixed("#FF0000"));
+		both.setColourModelEdges(new ColourMapFixed(new Color(153, 153, 255)));
+		both.setColourMoves(new ColourMapFixed(new Color(255, 0, 0)));
 		both.setRepairLogMoves(false);
 	}
 

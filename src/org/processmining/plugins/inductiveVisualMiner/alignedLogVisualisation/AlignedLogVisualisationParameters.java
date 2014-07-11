@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
+import java.awt.Color;
+
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
@@ -14,14 +16,14 @@ public class AlignedLogVisualisationParameters {
 	private ColourMap colourNodes = new ColourMapBlue();
 	
 	//model edges
-	private ColourMap colourModelEdges = new ColourMapOpacity(new ColourMapFixed("#000000"));
+	private ColourMap colourModelEdges = new ColourMapOpacity(new ColourMapFixed(Color.black));
 	private SizeMap modelEdgesWidth = new SizeMapLinear(1, 3);
 	private boolean showFrequenciesOnModelEdges = false;
 	
 	//moves
 	private boolean showLogMoves = true;
 	private boolean showModelMoves = true;
-	private ColourMap colourMoves = new ColourMapFixed("#FF0000");
+	private ColourMap colourMoves = new ColourMapFixed(Color.red);
 	private SizeMap moveEdgesWidth = new SizeMapLinear(3, 4);
 	private boolean showFrequenciesOnMoveEdges = true;
 	private boolean repairLogMoves = false;
