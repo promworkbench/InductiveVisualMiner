@@ -27,7 +27,7 @@ import com.kitfox.svg.SVGException;
 import com.kitfox.svg.Text;
 
 public class InductiveVisualMinerSelectionColourer {
-	
+
 	public static void colourSelectedNode(SVGDiagram svg, LocalDotNode dotNode, boolean selected) {
 		Group svgGroup = DotPanel.getSVGElementOf(svg, dotNode);
 		SVGElement shape = svgGroup.getChild(1);
@@ -42,7 +42,7 @@ public class InductiveVisualMinerSelectionColourer {
 			DotPanel.setCSSAttributeOf(shape, "stroke-dasharray", dotNode.unselectedAppearance.strokeDashArray);
 		}
 	}
-	
+
 	public static TraceViewColourMap colour(SVGDiagram svg, AlignedLogVisualisationInfo info, ProcessTree tree,
 			AlignedLogInfo alignedFilteredLogInfo, Map<UnfoldedNode, AlignedLogInfo> alignedFilteredDfgLogInfos,
 			AlignedLogVisualisationParameters visualisationParameters) {
@@ -59,25 +59,26 @@ public class InductiveVisualMinerSelectionColourer {
 			//style nodes
 			for (UnfoldedNode unode : AlignedLogMetrics.unfoldAllNodes(uroot)) {
 				long cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, alignedFilteredLogInfo);
-				Color colour = styleUnfoldedNode(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
-				
+				Pair<Color, Color> colour = styleUnfoldedNode(unode, svg, info, cardinality, minCardinality,
+						maxCardinality, visualisationParameters);
+
 				if (unode.getNode() instanceof Manual) {
-					colourMap.set(unode, colour);
+					colourMap.set(unode, colour.getA(), colour.getB());
 				}
 			}
 
 			//style edges
-			styleEdges(svg, info, alignedFilteredLogInfo, visualisationParameters, alignedFilteredDfgLogInfos, minCardinality,
-					maxCardinality);
+			styleEdges(svg, info, alignedFilteredLogInfo, visualisationParameters, alignedFilteredDfgLogInfos,
+					minCardinality, maxCardinality);
 
 		} catch (SVGException e) {
 			e.printStackTrace();
 		}
-		
+
 		return colourMap;
 	}
 
-	private static Color styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
+	private static Pair<Color, Color> styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
 			long cardinality, long minCardinality, long maxCardinality,
 			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
 		if (unode.getNode() instanceof Manual) {
@@ -88,7 +89,7 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
-	private static Color styleManual(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
+	private static Pair<Color, Color> styleManual(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
 			long cardinality, long minCardinality, long maxCardinality,
 			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
 
@@ -103,12 +104,12 @@ public class InductiveVisualMinerSelectionColourer {
 		Color fillColour;
 		Color fontColour = Color.black;
 		if (cardinality > 0) {
-			fillColour = visualisationParameters.getColourNodes().colour(cardinality, minCardinality, maxCardinality);
+			fillColour = visualisationParameters.getColourNodes().colour2(cardinality, minCardinality, maxCardinality);
 			if (ColourMaps.getLuma(fillColour) < 128) {
 				fontColour = Color.white;
 			}
 		} else {
-			fillColour = visualisationParameters.getColourNodes().colour(1, 0, 2);
+			fillColour = visualisationParameters.getColourNodes().colour2(1, 0, 2);
 		}
 		DotPanel.setCSSAttributeOf(polygon, "fill", fillColour);
 
@@ -126,8 +127,8 @@ public class InductiveVisualMinerSelectionColourer {
 		titleCount.getContent().clear();
 		titleCount.getContent().add(cardinality + "");
 		titleCount.rebuild();
-		
-		return fillColour;
+
+		return Pair.of(fillColour, fontColour);
 	}
 
 	private static void styleNonManualNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
@@ -195,7 +196,7 @@ public class InductiveVisualMinerSelectionColourer {
 		SVGElement arrowHead = group.getChild(2);
 
 		//stroke
-		Color edgeColour = colourMap.colour(cardinality, minCardinality, maxCardinality);
+		Color edgeColour = colourMap.colour2(cardinality, minCardinality, maxCardinality);
 		double strokeWidth = widthMap.size(cardinality, minCardinality, maxCardinality);
 		DotPanel.setCSSAttributeOf(line, "stroke", edgeColour);
 		DotPanel.setCSSAttributeOf(arrowHead, "stroke", edgeColour);

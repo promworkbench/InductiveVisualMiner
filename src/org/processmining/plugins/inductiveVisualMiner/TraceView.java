@@ -34,24 +34,29 @@ import com.google.common.collect.FluentIterable;
 public class TraceView extends JFrame {
 
 	public static class TraceViewColourMap implements ColorBuilder {
-		private Map<UnfoldedNode, Color> map = new HashMap<>();
+		private Map<UnfoldedNode, Color> mapFill = new HashMap<>();
+		private Map<UnfoldedNode, Color> mapFont = new HashMap<>();
 
-		public void set(UnfoldedNode unode, Color colour) {
-			map.put(unode, colour);
+		public void set(UnfoldedNode unode, Color colourFill, Color colourFont) {
+			mapFill.put(unode, colourFill);
+			mapFont.put(unode, colourFont);
 		}
 
 		public void clear() {
-			map.clear();
+			mapFill.clear();
 		}
 
 		public Color buildWedgeColor(Trace<? extends Event> trace, Event event) {
 			if (event instanceof Move) {
-				return map.get(((Move) event).getUnode());
+				return mapFill.get(((Move) event).getUnode());
 			}
 			return null;
 		}
 
 		public Color buildLabelColor(Trace<? extends Event> trace, Event event) {
+			if (event instanceof Move) {
+				return mapFont.get(((Move) event).getUnode());
+			}
 			return null;
 		}
 

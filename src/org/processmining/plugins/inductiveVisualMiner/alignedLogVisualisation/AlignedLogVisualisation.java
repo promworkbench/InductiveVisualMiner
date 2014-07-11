@@ -178,7 +178,7 @@ public class AlignedLogVisualisation {
 		//style the activity by the occurrences of it
 		Color fillColour = Color.white;
 		if (cardinality != 0 && parameters.getColourNodes() != null) {
-			fillColour = parameters.getColourNodes().colour((long) (getOccurrenceFactor(cardinality) * 100), 100);
+			fillColour = parameters.getColourNodes().colour2((long) (getOccurrenceFactor(cardinality) * 100), 100);
 		}
 
 		//determine label colour

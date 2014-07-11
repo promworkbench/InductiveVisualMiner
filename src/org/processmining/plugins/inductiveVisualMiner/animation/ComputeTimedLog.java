@@ -26,7 +26,9 @@ public class ComputeTimedLog {
 		TimedLog timedLog = new TimedLog();
 		for (XTrace xTrace : xLog) {
 			TimedTrace tTrace = timeTrace(map, xTrace, xLogInfo);
-			timedLog.add(tTrace);
+			if (tTrace != null) {
+				timedLog.add(tTrace);
+			}
 			if (canceller.isCancelled()) {
 				return null;
 			}
@@ -39,6 +41,9 @@ public class ComputeTimedLog {
 		//find the corresponding aligned trace
 		List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfo);
 		IMTraceG<Move> alignedTrace = map.get(lTrace);
+		if (alignedTrace == null) {
+			return null;
+		}
 
 		//construct a timed trace
 		TimedTrace timedTrace = new TimedTrace();

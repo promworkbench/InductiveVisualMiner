@@ -285,7 +285,7 @@ public class InductiveVisualMinerController {
 		protected Triple<AlignedLog, XLog, XLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			return Triple.of(state.getAlignedLog(), state.getXLog(), state.getXLogInfo());
+			return Triple.of(state.getAlignedFilteredLog(), state.getXLog(), state.getXLogInfo());
 		}
 
 		protected TimedLog executeLink(Triple<AlignedLog, XLog, XLogInfo> input) {
