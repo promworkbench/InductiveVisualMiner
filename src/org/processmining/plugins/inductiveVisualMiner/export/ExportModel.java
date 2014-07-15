@@ -1,6 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.export;
 
 import org.processmining.contexts.uitopia.UIPluginContext;
+import org.processmining.models.connections.petrinets.behavioral.FinalMarkingConnection;
+import org.processmining.models.connections.petrinets.behavioral.InitialMarkingConnection;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.processtree.ProcessTree;
@@ -33,6 +35,8 @@ public class ExportModel {
 					Marking.class, context);
 			context.getProvidedObjectManager().createProvidedObject("Final marking of " + name, pnwm.finalMarking,
 					Marking.class, context);
+			context.addConnection(new InitialMarkingConnection(pnwm.petrinet, pnwm.initialMarking));
+			context.addConnection(new FinalMarkingConnection(pnwm.petrinet, pnwm.finalMarking));
 		} catch (NotYetImplementedException e) {
 			e.printStackTrace();
 		} catch (InvalidProcessTreeException e) {
