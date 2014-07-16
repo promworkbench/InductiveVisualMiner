@@ -104,12 +104,12 @@ public class InductiveVisualMinerSelectionColourer {
 		Color fillColour;
 		Color fontColour = Color.black;
 		if (cardinality > 0) {
-			fillColour = visualisationParameters.getColourNodes().colour2(cardinality, minCardinality, maxCardinality);
+			fillColour = visualisationParameters.getColourNodes().colour(cardinality, minCardinality, maxCardinality);
 			if (ColourMaps.getLuma(fillColour) < 128) {
 				fontColour = Color.white;
 			}
 		} else {
-			fillColour = visualisationParameters.getColourNodes().colour2(1, 0, 2);
+			fillColour = visualisationParameters.getColourNodes().colour(1, 0, 2);
 		}
 		DotPanel.setCSSAttributeOf(polygon, "fill", fillColour);
 
@@ -196,7 +196,7 @@ public class InductiveVisualMinerSelectionColourer {
 		SVGElement arrowHead = group.getChild(2);
 
 		//stroke
-		Color edgeColour = colourMap.colour2(cardinality, minCardinality, maxCardinality);
+		Color edgeColour = colourMap.colour(cardinality, minCardinality, maxCardinality);
 		double strokeWidth = widthMap.size(cardinality, minCardinality, maxCardinality);
 		DotPanel.setCSSAttributeOf(line, "stroke", edgeColour);
 		DotPanel.setCSSAttributeOf(arrowHead, "stroke", edgeColour);
