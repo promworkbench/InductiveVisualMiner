@@ -368,6 +368,7 @@ public class InductiveVisualMinerController {
 			
 			//make a colour map for the trace view
 			panel.getTraceView().setColourMap(colourMap);
+			colourMap.setSelectedNodes(state.getSelectedNodes());
 
 			setStatus(" ");
 			panel.repaint();

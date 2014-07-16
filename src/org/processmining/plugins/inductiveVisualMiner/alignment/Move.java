@@ -167,6 +167,10 @@ public class Move implements Event {
 			return new Color(255, 0, 0);
 		}
 	}
+	
+	public Color getBorderColor() {
+		return null;
+	}
 
 	public Color getLabelColor() {
 		return null;
@@ -181,10 +185,6 @@ public class Move implements Event {
 	}
 
 	public Color getBottomLabel2Color() {
-		return null;
-	}
-
-	public Color getBorderColor() {
 		return null;
 	}
 

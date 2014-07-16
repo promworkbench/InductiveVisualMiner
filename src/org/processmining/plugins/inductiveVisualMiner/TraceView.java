@@ -1,18 +1,22 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Stroke;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JFrame;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList;
-import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.ColorBuilder;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.TraceBuilder;
+import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.WedgeBuilder;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
@@ -33,9 +37,10 @@ import com.google.common.collect.FluentIterable;
 
 public class TraceView extends JFrame {
 
-	public static class TraceViewColourMap implements ColorBuilder {
+	public static class TraceViewColourMap implements WedgeBuilder {
 		private Map<UnfoldedNode, Color> mapFill = new HashMap<>();
 		private Map<UnfoldedNode, Color> mapFont = new HashMap<>();
+		private Set<UnfoldedNode> selectedNodes = new HashSet<>();
 
 		public void set(UnfoldedNode unode, Color colourFill, Color colourFont) {
 			mapFill.put(unode, colourFill);
@@ -44,13 +49,47 @@ public class TraceView extends JFrame {
 
 		public void clear() {
 			mapFill.clear();
+			selectedNodes = new HashSet<>();
+		}
+		
+		public void setSelectedNodes(Set<UnfoldedNode> selectedNodes) {
+			this.selectedNodes = selectedNodes;
 		}
 
 		public Color buildWedgeColor(Trace<? extends Event> trace, Event event) {
-			if (event instanceof Move) {
+			if (event instanceof Move && !((Move) event).isModelMove()) {
 				return mapFill.get(((Move) event).getUnode());
 			}
 			return null;
+		}
+		
+		public Integer assignWedgeGap(Trace<? extends Event> trace, Event event) {
+			return 2;
+		}
+
+		static final float dash1[] = {10.0f};
+		static final Stroke selectedStroke = new BasicStroke(2.0f,
+                BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_MITER,
+                10.0f, dash1, 0.0f);
+		public Stroke buildBorderStroke(Trace<? extends Event> trace, Event event) {
+			if (event instanceof Move && selectedNodes.contains(((Move) event).getUnode())) {
+				return selectedStroke;
+			}
+			return null;
+		}
+
+		public Color buildBorderColor(Trace<? extends Event> trace, Event event) {
+			if (event instanceof Move && selectedNodes.contains(((Move) event).getUnode())) {
+				//selected
+				if (((Move) event).isSyncMove()) {
+					return Color.WHITE;
+				} else {
+					return Color.white;
+				}
+			} else {
+				return null;
+			}
 		}
 
 		public Color buildLabelColor(Trace<? extends Event> trace, Event event) {
@@ -209,6 +248,6 @@ public class TraceView extends JFrame {
 	}
 
 	public void setColourMap(TraceViewColourMap colourMap) {
-		traceView.setColorBuilder(colourMap);
+		traceView.setWedgeBuilder(colourMap);
 	}
 }
