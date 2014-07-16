@@ -183,4 +183,9 @@ public class Move implements Event {
 	public Color getBottomLabel2Color() {
 		return null;
 	}
+
+	public Color getBorderColor() {
+		return null;
+	}
+
 }
