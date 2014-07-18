@@ -38,8 +38,8 @@ import com.google.common.collect.FluentIterable;
 public class TraceView extends JFrame {
 
 	public static class TraceViewColourMap implements WedgeBuilder {
-		private Map<UnfoldedNode, Color> mapFill = new HashMap<>();
-		private Map<UnfoldedNode, Color> mapFont = new HashMap<>();
+		private final Map<UnfoldedNode, Color> mapFill = new HashMap<>();
+		private final Map<UnfoldedNode, Color> mapFont = new HashMap<>();
 		private Set<UnfoldedNode> selectedNodes = new HashSet<>();
 
 		public void set(UnfoldedNode unode, Color colourFill, Color colourFont) {
@@ -47,11 +47,6 @@ public class TraceView extends JFrame {
 			mapFont.put(unode, colourFont);
 		}
 
-		public void clear() {
-			mapFill.clear();
-			selectedNodes = new HashSet<>();
-		}
-		
 		public void setSelectedNodes(Set<UnfoldedNode> selectedNodes) {
 			this.selectedNodes = selectedNodes;
 		}
@@ -62,16 +57,15 @@ public class TraceView extends JFrame {
 			}
 			return null;
 		}
-		
+
 		public Integer assignWedgeGap(Trace<? extends Event> trace, Event event) {
 			return 2;
 		}
 
-		static final float dash1[] = {10.0f};
-		static final Stroke selectedStroke = new BasicStroke(2.0f,
-                BasicStroke.CAP_BUTT,
-                BasicStroke.JOIN_MITER,
-                10.0f, dash1, 0.0f);
+		static final float dash1[] = { 10.0f };
+		static final Stroke selectedStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
+				dash1, 0.0f);
+
 		public Stroke buildBorderStroke(Trace<? extends Event> trace, Event event) {
 			if (event instanceof Move && selectedNodes.contains(((Move) event).getUnode())) {
 				return selectedStroke;
@@ -112,85 +106,105 @@ public class TraceView extends JFrame {
 		}
 	}
 
+	private static class IMLogTraceBuilder implements TraceBuilder<Object> {
+
+		private final IMLog IMLog;
+
+		public IMLogTraceBuilder(IMLog IMLog) {
+			this.IMLog = IMLog;
+		}
+
+		public Trace<? extends Event> build(final Object trace) {
+			return new ProMTraceView.Trace<Event>() {
+
+				public Iterator<Event> iterator() {
+					return FluentIterable.from((IMTrace) trace).transform(new Function<XEventClass, Event>() {
+						public Event apply(final XEventClass input) {
+							return new ProMTraceView.AbstractEvent() {
+								public String getLabel() {
+									return input.toString();
+								}
+							};
+						}
+					}).iterator();
+				}
+
+				public String getName() {
+					return IMLog.getCardinalityOf(trace) + "x";
+				}
+
+				public String getInfo() {
+					return null;
+				}
+			};
+		}
+	}
+
+	private static class AlignedLogTraceBuilder implements TraceBuilder<Object> {
+
+		private final AlignedLog alignedLog;
+
+		public AlignedLogTraceBuilder(AlignedLog alignedLog) {
+			this.alignedLog = alignedLog;
+		}
+
+		public Trace<? extends Event> build(final Object trace) {
+			return new ProMTraceView.Trace<Move>() {
+
+				public Iterator<Move> iterator() {
+					return FluentIterable.from((AlignedTrace) trace).filter(new Predicate<Move>() {
+						public boolean apply(final Move input) {
+							return !(input.isSyncMove() && input.getUnode().getNode() instanceof Automatic);
+						}
+					}).iterator();
+				}
+
+				public String getName() {
+					return alignedLog.getCardinalityOf(trace) + "x";
+				}
+
+				public String getInfo() {
+					return null;
+				}
+			};
+		}
+	}
+
+	private static class TimedLogTraceBuilder implements TraceBuilder<Object> {
+
+		public Trace<? extends Event> build(final Object trace) {
+			return new ProMTraceView.Trace<TimedMove>() {
+
+				public Iterator<TimedMove> iterator() {
+					return FluentIterable.from((TimedTrace) trace).filter(new Predicate<TimedMove>() {
+						public boolean apply(final TimedMove input) {
+							return !(input.isSyncMove() && input.getUnode().getNode() instanceof Automatic);
+						}
+					}).iterator();
+				}
+
+				public String getName() {
+					return null;
+				}
+
+				public String getInfo() {
+					return null;
+				}
+			};
+		}
+	}
+
 	private static final long serialVersionUID = 8386546677949149002L;
-	private final TraceBuilder<Object> traceBuilder;
 	private final ProMTraceList<Object> traceView;
 
 	private Object showing = null;
 
 	public TraceView(Component parent) {
-		super("Inductive visual Miner trace view");
+		super("Inductive visual Miner - trace view");
 
-		traceBuilder = new TraceBuilder<Object>() {
-			public Trace<? extends Event> build(final Object element) {
-				if (element instanceof TimedTrace) {
-					//timed trace
-					return new ProMTraceView.Trace<TimedMove>() {
-
-						public Iterator<TimedMove> iterator() {
-							return FluentIterable.from((TimedTrace) element).filter(new Predicate<TimedMove>() {
-								public boolean apply(final TimedMove input) {
-									return !(input.isSyncMove() && input.getUnode().getNode() instanceof Automatic);
-								}
-							}).iterator();
-						}
-
-						public String getName() {
-							return null;
-						}
-
-						public String getInfo() {
-							return null;
-						}
-
-					};
-				} else if (element instanceof AlignedTrace) {
-					//aligned trace
-					return new ProMTraceView.Trace<Move>() {
-
-						public Iterator<Move> iterator() {
-							return FluentIterable.from((AlignedTrace) element).filter(new Predicate<Move>() {
-								public boolean apply(final Move input) {
-									return !(input.isSyncMove() && input.getUnode().getNode() instanceof Automatic);
-								}
-							}).iterator();
-						}
-
-						public String getName() {
-							return null;
-						}
-
-						public String getInfo() {
-							return null;
-						}
-
-					};
-
-				} else {
-					//normal trace
-					return new ProMTraceView.Trace<Event>() {
-
-						public Iterator<Event> iterator() {
-							return FluentIterable.from((IMTrace) element).transform(new Function<XEventClass, Event>() {
-								public Event apply(final XEventClass input) {
-									return new ProMTraceView.AbstractEvent() {
-										public String getLabel() {
-											return input.toString();
-										}
-									};
-								}
-							}).iterator();
-						}
-
-						public String getName() {
-							return null;
-						}
-
-						public String getInfo() {
-							return null;
-						}
-					};
-				}
+		TraceBuilder<Object> traceBuilder = new TraceBuilder<Object>() {
+			public Trace<? extends Event> build(Object element) {
+				return null;
 			}
 		};
 
@@ -213,8 +227,9 @@ public class TraceView extends JFrame {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void set(IMLog log) {
 		if (!log.equals(showing)) {
-			//			traceView.clear();
-			//			traceView.addAll((Collection) log.toSet());
+			traceView.clear();
+			traceView.setTraceBuilder(new IMLogTraceBuilder(log));
+			traceView.addAll((Collection) log.toSet());
 		}
 		showing = log;
 	}
@@ -227,8 +242,9 @@ public class TraceView extends JFrame {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void set(AlignedLog alog) {
 		if (!alog.equals(showing)) {
-			//			traceView.clear();
-			//			traceView.addAll((Collection) alog.toSet());
+			traceView.clear();
+			traceView.setTraceBuilder(new AlignedLogTraceBuilder(alog));
+			traceView.addAll((Collection) alog.toSet());
 		}
 		showing = alog;
 	}
@@ -242,6 +258,7 @@ public class TraceView extends JFrame {
 	public void set(TimedLog tlog) {
 		if (!tlog.equals(showing)) {
 			traceView.clear();
+			traceView.setTraceBuilder(new TimedLogTraceBuilder());
 			traceView.addAll((Collection) tlog);
 		}
 		showing = tlog;
