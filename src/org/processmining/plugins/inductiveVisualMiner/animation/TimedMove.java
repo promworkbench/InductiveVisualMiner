@@ -58,7 +58,18 @@ public class TimedMove extends Move {
 	//Event functions from list-view widget
 	public String getTopLabel() {
 		if (logTimestamp != null) {
-			return (new SimpleDateFormat ("dd-MM-yyyy HH:mm:ss:SSS")).format(new Date(logTimestamp));
+			Date date = new Date(logTimestamp);
+			if (date.getTime() % 1000 != 0) {
+				return (new SimpleDateFormat ("dd-MM-yyyy HH:mm:ss:SSS")).format(date);
+			} else if (date.getSeconds() != 0) {
+				return (new SimpleDateFormat ("dd-MM-yyyy HH:mm:ss")).format(date);
+			} else if (date.getMinutes() != 0) {
+				return (new SimpleDateFormat ("dd-MM-yyyy HH:mm")).format(date);
+			} else if (date.getHours() != 0) {
+				return (new SimpleDateFormat ("dd-MM-yyyy HHh")).format(date);
+			} else {
+				return (new SimpleDateFormat ("dd-MM-yyyy")).format(date);
+			}
 		} else {
 			return null;
 		}
