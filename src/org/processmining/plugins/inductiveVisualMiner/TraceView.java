@@ -88,7 +88,11 @@ public class TraceView extends JFrame {
 
 		public Color buildLabelColor(Trace<? extends Event> trace, Event event) {
 			if (event instanceof Move) {
-				return mapFont.get(((Move) event).getUnode());
+				if (((Move) event).isSyncMove()) {
+					return mapFont.get(((Move) event).getUnode());
+				} else {
+					return Color.black;
+				}
 			}
 			return null;
 		}

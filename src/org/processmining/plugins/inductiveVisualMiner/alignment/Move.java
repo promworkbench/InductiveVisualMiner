@@ -148,7 +148,7 @@ public class Move implements Event {
 
 	public String getBottomLabel() {
 		if (isSyncMove()) {
-			return "";
+			return null;
 		} else if (isModelMove()) {
 			return "only in model";
 		} else {
@@ -177,11 +177,11 @@ public class Move implements Event {
 	}
 
 	public Color getTopLabelColor() {
-		return null;
+		return Color.white;
 	}
 
 	public Color getBottomLabelColor() {
-		return null;
+		return Color.red;
 	}
 
 	public Color getBottomLabel2Color() {
