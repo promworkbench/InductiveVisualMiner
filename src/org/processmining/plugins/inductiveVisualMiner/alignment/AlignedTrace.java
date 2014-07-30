@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
+import java.awt.Color;
+
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 
@@ -12,6 +14,14 @@ public class AlignedTrace extends IMTraceG<Move> implements Trace<Move> {
 	}
 
 	public String getInfo() {
+		return null;
+	}
+
+	public Color getNameColor() {
+		return null;
+	}
+
+	public Color getInfoColor() {
 		return null;
 	}
 

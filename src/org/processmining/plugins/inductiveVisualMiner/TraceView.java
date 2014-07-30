@@ -142,7 +142,7 @@ public class TraceView extends JFrame {
 				}
 				
 				public Color getNameColor() {
-					return null;
+					return Color.white;
 				}
 
 				public String getInfo() {
@@ -180,7 +180,7 @@ public class TraceView extends JFrame {
 				}
 				
 				public Color getNameColor() {
-					return null;
+					return Color.white;
 				}
 
 				public String getInfo() {
