@@ -76,11 +76,7 @@ public class TraceView extends JFrame {
 		public Color buildBorderColor(Trace<? extends Event> trace, Event event) {
 			if (event instanceof Move && selectedNodes.contains(((Move) event).getUnode())) {
 				//selected
-				if (((Move) event).isSyncMove()) {
-					return Color.WHITE;
-				} else {
-					return Color.white;
-				}
+				return Color.white;
 			} else {
 				return null;
 			}
@@ -106,6 +102,14 @@ public class TraceView extends JFrame {
 		}
 
 		public Color buildBottom2LabelColor(Trace<? extends Event> trace, Event event) {
+			return null;
+		}
+
+		public Color buildNameColor(Trace<? extends Event> trace) {
+			return null;
+		}
+
+		public Color buildInfoColor(Trace<? extends Event> trace) {
 			return null;
 		}
 	}
@@ -136,8 +140,16 @@ public class TraceView extends JFrame {
 				public String getName() {
 					return IMLog.getCardinalityOf(trace) + "x";
 				}
+				
+				public Color getNameColor() {
+					return null;
+				}
 
 				public String getInfo() {
+					return null;
+				}
+				
+				public Color getInfoColor() {
 					return null;
 				}
 			};
@@ -166,8 +178,16 @@ public class TraceView extends JFrame {
 				public String getName() {
 					return alignedLog.getCardinalityOf(trace) + "x";
 				}
+				
+				public Color getNameColor() {
+					return null;
+				}
 
 				public String getInfo() {
+					return null;
+				}
+				
+				public Color getInfoColor() {
 					return null;
 				}
 			};
@@ -190,10 +210,20 @@ public class TraceView extends JFrame {
 				public String getName() {
 					return null;
 				}
+				
+				public Color getNameColor() {
+					return null;
+				}
 
 				public String getInfo() {
 					return null;
 				}
+				
+				public Color getInfoColor() {
+					return null;
+				}
+				
+				
 			};
 		}
 	}
@@ -214,7 +244,13 @@ public class TraceView extends JFrame {
 
 		traceView = new ProMTraceList<>(traceBuilder);
 		add(traceView);
+		
 		traceView.setForeground(Color.white);
+		traceView.getList().setForeground(Color.white);
+		traceView.getScrollPane().setForeground(Color.white);
+		setForeground(Color.white);
+		traceView.getScrollPane().getViewport().setForeground(Color.white);
+		
 		traceView.setBackground(new Color(30, 30, 30));
 		traceView.setOpaque(true);
 
@@ -260,12 +296,12 @@ public class TraceView extends JFrame {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void set(TimedLog tlog) {
-		if (!tlog.equals(showing)) {
-			traceView.clear();
-			traceView.setTraceBuilder(new TimedLogTraceBuilder());
-			traceView.addAll((Collection) tlog);
-		}
-		showing = tlog;
+//		if (!tlog.equals(showing)) {
+//			traceView.clear();
+//			traceView.setTraceBuilder(new TimedLogTraceBuilder());
+//			traceView.addAll((Collection) tlog);
+//		}
+//		showing = tlog;
 	}
 
 	public void setColourMap(TraceViewColourMap colourMap) {
