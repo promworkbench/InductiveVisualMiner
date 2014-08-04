@@ -296,12 +296,12 @@ public class TraceView extends JFrame {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void set(TimedLog tlog) {
-//		if (!tlog.equals(showing)) {
-//			traceView.clear();
-//			traceView.setTraceBuilder(new TimedLogTraceBuilder());
-//			traceView.addAll((Collection) tlog);
-//		}
-//		showing = tlog;
+		if (!tlog.equals(showing)) {
+			traceView.clear();
+			traceView.setTraceBuilder(new TimedLogTraceBuilder());
+			traceView.addAll((Collection) tlog);
+		}
+		showing = tlog;
 	}
 
 	public void setColourMap(TraceViewColourMap colourMap) {

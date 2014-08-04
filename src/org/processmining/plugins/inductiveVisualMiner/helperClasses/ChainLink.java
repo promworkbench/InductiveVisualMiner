@@ -3,6 +3,8 @@ package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 
+import javax.swing.SwingUtilities;
+
 public abstract class ChainLink<I, O> {
 
 	private Chain chain;
@@ -40,11 +42,15 @@ public abstract class ChainLink<I, O> {
 		final I input = generateInput();
 		executor.execute(new Runnable() {
 			public void run() {
-				O result = executeLink(input);
-				if (chain.getCurrentExecution().equals(execution)) {
-					processResult(result);
-					chain.executeNext(execution, indexInChain);
-				}
+				final O result = executeLink(input);
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						if (chain.getCurrentExecution().equals(execution)) {
+							processResult(result);
+							chain.executeNext(execution, indexInChain);
+						}
+					}
+				});
 			}
 		});
 	}

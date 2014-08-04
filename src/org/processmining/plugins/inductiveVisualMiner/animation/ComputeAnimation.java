@@ -9,6 +9,7 @@ import java.util.Random;
 
 import nl.tue.astar.AStarThread.Canceller;
 
+import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
@@ -16,7 +17,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Al
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAnimation;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.Function;
 
 import com.google.common.collect.FluentIterable;
 import com.kitfox.svg.SVGDiagram;

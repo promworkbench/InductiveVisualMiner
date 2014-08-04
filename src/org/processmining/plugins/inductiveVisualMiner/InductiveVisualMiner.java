@@ -57,10 +57,6 @@ public class InductiveVisualMiner {
 		return panel;
 	}
 
-	public enum ReturnType {
-		processTree, PetriNet
-	}
-
 	public class InteractiveMinerLauncher {
 		public XLog xLog;
 

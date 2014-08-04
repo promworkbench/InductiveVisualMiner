@@ -36,6 +36,7 @@ import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.VideoFormatKeys;
 import org.monte.media.avi.AVIWriter;
 import org.monte.media.math.Rational;
+import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
@@ -46,7 +47,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Al
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.SVGTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.Function;
 
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGUniverse;
