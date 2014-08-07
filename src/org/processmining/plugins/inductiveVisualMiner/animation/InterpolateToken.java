@@ -198,8 +198,18 @@ public class InterpolateToken {
 		if (arrivalTime == null) {
 			return null;
 		}
+		
+		//total duration of this part
 		double duration = arrivalTime - departureTime;
+		
+		//ratio of part that is already travelled
+		if (totalEdges == 0) {
+			//if there are no edges to be travelled, we are already at the destination
+			return departureTime;
+		}
 		double p = edgesFromDeparture / (1.0 * totalEdges);
+		
+		//compute the time with this ratio
 		return departureTime + duration * p;
 	}
 
@@ -219,7 +229,7 @@ public class InterpolateToken {
 	}
 
 	private static void debug(Object s) {
-		//		System.out.println(s);
-		//		System.out.println(s.toString().replaceAll("\\n", " "));
+//		System.out.println(s);
+//		System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }

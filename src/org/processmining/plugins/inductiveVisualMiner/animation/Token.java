@@ -131,8 +131,13 @@ public class Token {
 
 		for (int i = 0; i < points.size(); i++) {
 			Pair<LocalDotEdge, Double> p = points.get(i);
-
+			
 			if (p.getRight() != null) {
+				if (p.getRight().isNaN()) {
+					System.out.println("===========");
+					System.out.println(this);
+					throw new RuntimeException("token has a NaN time");
+				}
 				if (p.getRight() < last) {
 					System.out.println("===========");
 					System.out.println(this);

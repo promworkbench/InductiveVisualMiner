@@ -330,6 +330,10 @@ public class InductiveVisualMinerController {
 		}
 
 		protected void processResult(SVGDiagram result) {
+			if (result == null) {
+				return;
+			}
+			
 			panel.getGraph().setImage(result, false);
 			panel.getGraph().setEnableAnimation(true);
 			panel.getSaveImageButton().setText("animation");

@@ -66,7 +66,7 @@ public class AnimationSVG {
 		}
 		
 		if (fade) {
-			result.append("<animate ");
+			result.append("\t<animate ");
 			result.append("attributeName='opacity' ");
 			result.append("attributeType='XML' ");
 
@@ -98,26 +98,26 @@ public class AnimationSVG {
 			result.append(fadeDuration2);
 			result.append("s' ");
 
-			result.append("fill='freeze'/>");
+			result.append("fill='freeze'/>\n");
 		} else {
 			if (trueInFalseOut) {
 				//fade in
-				result.append("<set attributeName='visibility' attributeType='XML' to='visible' begin='");
+				result.append("\t<set attributeName='visibility' attributeType='XML' to='visible' begin='");
 				if (beginTime != null) {
 					result.append(beginTime);
 				} else {
 					result.append(endTime);
 				}
-				result.append("s' fill='freeze'/>");
+				result.append("s' fill='freeze'/>\n");
 			} else {
 				//fade out
-				result.append("<set attributeName='visibility' attributeType='XML' to='hidden' begin='");
+				result.append("\t<set attributeName='visibility' attributeType='XML' to='hidden' begin='");
 				if (beginTime != null) {
 					result.append(beginTime);
 				} else {
 					result.append(endTime);
 				}
-				result.append("s' fill='freeze'/>");
+				result.append("s' fill='freeze'/>\n");
 			}
 		}
 	}
@@ -157,7 +157,7 @@ public class AnimationSVG {
 		path += "L" + getCenter(edge.getTarget(), svg);
 
 		//put it all together
-		result.append("<animateMotion ");
+		result.append("\t<animateMotion ");
 		result.append("path='");
 		result.append(path);
 		result.append("' begin='");
@@ -168,7 +168,7 @@ public class AnimationSVG {
 		if (index == token.getPoints().size() - 1) {
 			result.append("fill='freeze'");
 		}
-		result.append("/>");
+		result.append("/>\n");
 	}
 
 	private static String getCenter(LocalDotNode node, SVGDiagram image) {
