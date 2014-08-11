@@ -22,6 +22,9 @@ public class TimedMove extends Move {
 			if (value == null) {
 				return null;
 			}
+			if (max == min) {
+				return animationDuration * value;
+			}
 			return animationDuration * (value - min) / (max - 1.0 * min);
 		}
 	}

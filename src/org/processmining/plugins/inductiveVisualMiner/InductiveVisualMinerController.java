@@ -493,6 +493,9 @@ public class InductiveVisualMinerController {
 			public void actionPerformed(ActionEvent e) {
 				SaveAsDialog dialog = new SaveAsDialog(panel.getGraph().isEnableAnimation());
 				final Pair<File, FileType> p = dialog.askUser(panel);
+				if (p == null) {
+					return;
+				}
 				switch (p.getRight()) {
 					case pdfImage :
 						//save the file asynchronously
