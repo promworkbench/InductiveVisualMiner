@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import org.deckfour.xes.model.XLog;
@@ -8,8 +9,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 
 public interface ColouringFilter {
 	
-	public boolean countInColouring(XLog xLog, XTrace xTrace, AlignedTrace aTrace);
+	public JFrame createGui(JComponent parent, XLog log, Runnable update);
 	
-	public JFrame createGui(Runnable update);
+	public boolean countInColouring(XTrace xTrace, AlignedTrace aTrace);
 
 }
