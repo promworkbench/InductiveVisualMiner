@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
-
 public class AlignmentResult {
 	public final AlignedLog log;
 	public final AlignedLogInfo logInfo;

@@ -10,17 +10,13 @@ import java.util.Map;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.model.XLog;
-import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
-import org.processmining.framework.plugin.annotations.Plugin;
-import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.InductiveMiner.MaybeString;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.metrics.PropertyDirectlyFollowsGraph;
-import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
@@ -44,30 +40,13 @@ import org.processmining.processtree.impl.AbstractBlock.XorLoop;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
-@Plugin(name = "Show deviations", returnLabels = { "dot" }, returnTypes = { Dot.class }, parameterLabels = {
-		"process tree", "event log" }, userAccessible = true)
 public class AlignedLogVisualisation {
 
-	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
-	@PluginVariant(variantLabel = "Show deviations", requiredParameterLabels = { 0, 1 })
 	public Dot fancy(PluginContext context, ProcessTree tree, XLog xLog) {
 		AlignmentResult result = AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog,
 				new HashSet<XEventClass>(), ProMCancelTerminationCondition.buildDummyCanceller());
 		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = ComputeAlignment.computeDfgAlignment(result.log, tree);
 		return fancy(tree, result.logInfo, dfgLogInfos, new AlignedLogVisualisationParameters()).getLeft();
-	}
-
-	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
-	@PluginVariant(variantLabel = "Show deviations", requiredParameterLabels = { 0 })
-	public Dot fancy(PluginContext context, ProcessTree tree) {
-		return fancy(tree, null, null, new AlignedLogVisualisationParameters()).getLeft();
-	}
-
-	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
-	@PluginVariant(variantLabel = "Show deviations", requiredParameterLabels = { 0 })
-	public Dot fancy(PluginContext context, XLog xLog) {
-		ProcessTree tree = IMProcessTree.mineProcessTree(xLog);
-		return fancy(context, tree, xLog);
 	}
 
 	Dot dot;
