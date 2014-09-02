@@ -395,7 +395,7 @@ public class AlignedLogVisualisation {
 	private LocalDotEdge addMoveArc(LocalDotNode from, LocalDotNode to, UnfoldedNode unode, EdgeType type,
 			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, long cardinality, boolean directionForward) {
 
-		String options = "style=\"dashed\", constraint=\"false\", arrowsize=.5";
+		String options = "style=\"dashed\", arrowsize=.5";
 
 		if (parameters.getColourMoves() != null) {
 			String lineColour = parameters.getColourMoves().colourString(cardinality, minCardinality, maxCardinality);
