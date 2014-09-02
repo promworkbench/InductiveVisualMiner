@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner;
+package org.processmining.plugins.inductiveVisualMiner.ColouringFilter;
 
 import javax.swing.JFrame;
 
