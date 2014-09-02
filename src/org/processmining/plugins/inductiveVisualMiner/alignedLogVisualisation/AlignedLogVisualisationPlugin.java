@@ -28,7 +28,7 @@ public class AlignedLogVisualisationPlugin {
 		AlignedLogVisualisationParameters parameters = new AlignedLogVisualisationParameters();
 		parameters.setShowFrequenciesOnModelEdges(true);
 		
-		Dot dot = visualisation.fancy(tree, logInfo, null, parameters).getLeft();
+		Dot dot = visualisation.fancy(tree, logInfo, parameters).getLeft();
 		return new DotPanel(dot);
 	}
 	
@@ -38,7 +38,7 @@ public class AlignedLogVisualisationPlugin {
 	@PluginVariant(variantLabel = "Visualise process tree", requiredParameterLabels = { 0 })
 	public JComponent fancy(PluginContext context, ProcessTree tree) {
 		AlignedLogVisualisation visualisation = new AlignedLogVisualisation();
-		return new DotPanel(visualisation.fancy(tree, null, null, new AlignedLogVisualisationParameters()).getLeft());
+		return new DotPanel(visualisation.fancy(tree, null, new AlignedLogVisualisationParameters()).getLeft());
 	}
 	
 	private static ProcessTree getTree(AlignedLog aLog) {

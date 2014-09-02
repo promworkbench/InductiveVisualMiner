@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -11,12 +10,9 @@ import java.util.Map;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
-import org.processmining.plugins.InductiveMiner.MaybeString;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
-import org.processmining.plugins.InductiveMiner.mining.metrics.PropertyDirectlyFollowsGraph;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
@@ -28,7 +24,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
-import org.processmining.plugins.inductiveVisualMiner.alignment.ComputeAlignment;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet;
@@ -45,13 +40,11 @@ public class AlignedLogVisualisation {
 	public Dot fancy(PluginContext context, ProcessTree tree, XLog xLog) {
 		AlignmentResult result = AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog,
 				new HashSet<XEventClass>(), ProMCancelTerminationCondition.buildDummyCanceller());
-		Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = ComputeAlignment.computeDfgAlignment(result.log, tree);
-		return fancy(tree, result.logInfo, dfgLogInfos, new AlignedLogVisualisationParameters()).getLeft();
+		return fancy(tree, result.logInfo, new AlignedLogVisualisationParameters()).getLeft();
 	}
 
 	Dot dot;
 	private AlignedLogInfo logInfo;
-	private Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos;
 	private long maxCardinality;
 	private long minCardinality;
 	AlignedLogVisualisationParameters parameters;
@@ -63,7 +56,7 @@ public class AlignedLogVisualisation {
 	private AlignedLogVisualisationInfo info;
 
 	public Pair<Dot, AlignedLogVisualisationInfo> fancy(ProcessTree tree, AlignedLogInfo logInfo,
-			Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos, AlignedLogVisualisationParameters parameters) {
+			AlignedLogVisualisationParameters parameters) {
 		this.parameters = parameters;
 		if (logInfo == null) {
 			//use empty logInfo
@@ -74,11 +67,6 @@ public class AlignedLogVisualisation {
 			parameters.setShowFrequenciesOnNodes(false);
 		}
 		this.logInfo = logInfo;
-
-		if (dfgLogInfos == null) {
-			dfgLogInfos = new HashMap<UnfoldedNode, AlignedLogInfo>();
-		}
-		this.dfgLogInfos = dfgLogInfos;
 
 		//find maximum and mimimum occurrences
 		Pair<Long, Long> p = AlignedLogMetrics.getExtremes(new UnfoldedNode(tree.getRoot()), logInfo, true);
@@ -112,9 +100,7 @@ public class AlignedLogVisualisation {
 	}
 
 	private void convertNode(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
-		if (PropertyDirectlyFollowsGraph.isSet(unode.getNode())) {
-			convertDirectlyFollowsGraph(unode, source, sink, directionForward);
-		} else if (unode.getNode() instanceof Seq) {
+		if (unode.getNode() instanceof Seq) {
 			convertSequence(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof XorLoop) {
 			convertLoop(unode, source, sink, directionForward);
@@ -280,62 +266,6 @@ public class AlignedLogVisualisation {
 
 		//log-moves
 		//are never put on xor
-	}
-
-	private void convertDirectlyFollowsGraph(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink,
-			boolean directionForward) {
-		//make map of activities and add nodes
-		Map<String, LocalDotNode> mapName2dotNode = new HashMap<String, LocalDotNode>();
-		unfoldedNode2DfgdotNodes.put(unode, new ArrayList<LocalDotNode>());
-		for (UnfoldedNode unode2 : AlignedLogMetrics.unfoldAllNodes(unode)) {
-			if (unode2.getNode() instanceof Manual) {
-				LocalDotNode dotNode = convertActivity(unode2,
-						AlignedLogMetrics.getNumberOfTracesRepresented(unode2, logInfo));
-				mapName2dotNode.put(unode2.getNode().getName(), dotNode);
-				unfoldedNode2DfgdotNodes.get(unode).add(dotNode);
-				dotNode2DfgUnfoldedNode.put(dotNode, unode);
-			}
-		}
-
-		//get the directly-follows graph
-		List<Triple<MaybeString, MaybeString, Long>> edges = PropertyDirectlyFollowsGraph.get(unode.getNode());
-
-		//get the logInfo of the directly-follows graph
-		AlignedLogInfo dfgLogInfo = dfgLogInfos.get(unode);
-		if (dfgLogInfo == null) {
-			dfgLogInfo = new AlignedLogInfo();
-		}
-
-		//add edges
-		unfoldedNode2DfgdotEdges.put(unode, new ArrayList<LocalDotEdge>());
-		for (Triple<MaybeString, MaybeString, Long> edge : edges) {
-
-			//get endpoints-names
-			String fromName = edge.getA().get();
-			String toName = edge.getB().get();
-
-			//get dotNodes of the endpoints
-			LocalDotNode fromDotNode = mapName2dotNode.get(fromName);
-			LocalDotNode toDotNode = mapName2dotNode.get(toName);
-
-			//create the edge
-			LocalDotEdge dotEdge;
-			if (fromDotNode != null && toDotNode != null) {
-				//normal edge
-				long cardinality = dfgLogInfo.getDfg(fromDotNode.getUnode(), toDotNode.getUnode());
-				dotEdge = addModelArc(fromDotNode, toDotNode, unode, directionForward, cardinality);
-			} else if (fromDotNode == null) {
-				//start activity
-				long cardinality = dfgLogInfo.getDfg(null, toDotNode.getUnode());
-				dotEdge = addModelArc(source, toDotNode, unode, directionForward, cardinality);
-			} else {
-				//end activity
-				long cardinality = dfgLogInfo.getDfg(fromDotNode.getUnode(), null);
-				dotEdge = addModelArc(fromDotNode, sink, unode, directionForward, cardinality);
-			}
-
-			unfoldedNode2DfgdotEdges.get(unode).add(dotEdge);
-		}
 	}
 
 	private LocalDotEdge addArc(LocalDotNode from, LocalDotNode to, final UnfoldedNode unode, boolean directionForward) {

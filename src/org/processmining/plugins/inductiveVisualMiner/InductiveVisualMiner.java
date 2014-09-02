@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,7 +26,7 @@ public class InductiveVisualMiner {
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0 })
-	public JComponent visualise(final UIPluginContext context, XLog xLog) throws IOException {
+	public JComponent visualise(final UIPluginContext context, XLog xLog) {
 
 		List<XEventClassifier> classifiers = getClassifiers(xLog);
 
@@ -42,8 +41,7 @@ public class InductiveVisualMiner {
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0 })
-	public JComponent visualise(final UIPluginContext context, final InteractiveMinerLauncher launcher)
-			throws IOException {
+	public JComponent visualise(final UIPluginContext context, final InteractiveMinerLauncher launcher) {
 
 		//remove launcher
 		context.getGlobalContext().getResourceManager().getResourceForInstance(launcher).destroy();
@@ -51,6 +49,7 @@ public class InductiveVisualMiner {
 		List<XEventClassifier> classifiers = getClassifiers(launcher.xLog);
 
 		final InductiveVisualMinerState state = new InductiveVisualMinerState(launcher.xLog);
+		
 		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, classifiers);
 		new InductiveVisualMinerController(context, panel, state);
 

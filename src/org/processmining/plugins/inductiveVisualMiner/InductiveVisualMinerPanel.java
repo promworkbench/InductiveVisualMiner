@@ -5,7 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -67,7 +66,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private InputFunction<Set<UnfoldedNode>> onSelectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			Collection<XEventClassifier> classifiers) throws IOException {
+			Collection<XEventClassifier> classifiers) {
 		visualiser = new AlignedLogVisualisation();
 		initVisualisationParameters();
 
@@ -257,7 +256,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public synchronized Pair<Dot, AlignedLogVisualisationInfo> updateModel(InductiveVisualMinerState state) {
 		AlignedLogVisualisationParameters parameters = getViewParameters(state);
 		Pair<Dot, AlignedLogVisualisationInfo> p = visualiser.fancy(state.getTree(), state.getAlignedFilteredLogInfo(),
-				state.getDfgFilteredLogInfos(), parameters);
+				parameters);
 		graphPanel.changeDot(p.getLeft(), true);
 		return p;
 	}

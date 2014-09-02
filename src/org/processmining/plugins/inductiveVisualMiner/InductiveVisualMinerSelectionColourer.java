@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.Color;
-import java.util.Map;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
@@ -44,8 +43,7 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	public static TraceViewColourMap colour(SVGDiagram svg, AlignedLogVisualisationInfo info, ProcessTree tree,
-			AlignedLogInfo alignedFilteredLogInfo, Map<UnfoldedNode, AlignedLogInfo> alignedFilteredDfgLogInfos,
-			AlignedLogVisualisationParameters visualisationParameters) {
+			AlignedLogInfo alignedFilteredLogInfo, AlignedLogVisualisationParameters visualisationParameters) {
 
 		UnfoldedNode uroot = new UnfoldedNode(tree.getRoot());
 		TraceViewColourMap colourMap = new TraceViewColourMap();
@@ -68,8 +66,7 @@ public class InductiveVisualMinerSelectionColourer {
 			}
 
 			//style edges
-			styleEdges(svg, info, alignedFilteredLogInfo, visualisationParameters, alignedFilteredDfgLogInfos,
-					minCardinality, maxCardinality);
+			styleEdges(svg, info, alignedFilteredLogInfo, visualisationParameters, minCardinality, maxCardinality);
 
 		} catch (SVGException e) {
 			e.printStackTrace();
@@ -78,8 +75,8 @@ public class InductiveVisualMinerSelectionColourer {
 		return colourMap;
 	}
 
-	private static Pair<Color, Color> styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
-			long cardinality, long minCardinality, long maxCardinality,
+	private static Pair<Color, Color> styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg,
+			AlignedLogVisualisationInfo info, long cardinality, long minCardinality, long maxCardinality,
 			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
 		if (unode.getNode() instanceof Manual) {
 			return styleManual(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
@@ -144,15 +141,13 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	private static void styleEdges(SVGDiagram svg, AlignedLogVisualisationInfo info, AlignedLogInfo logInfo,
-			AlignedLogVisualisationParameters parameters, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
-			long minCardinality, long maxCardinality) throws SVGException {
-		styleModelEdges(svg, info, logInfo, parameters, dfgLogInfos, minCardinality, maxCardinality);
-		styleMoveEdges(svg, info, logInfo, parameters, dfgLogInfos, minCardinality, maxCardinality);
+			AlignedLogVisualisationParameters parameters, long minCardinality, long maxCardinality) throws SVGException {
+		styleModelEdges(svg, info, logInfo, parameters, minCardinality, maxCardinality);
+		styleMoveEdges(svg, info, logInfo, parameters, minCardinality, maxCardinality);
 	}
 
 	private static void styleModelEdges(SVGDiagram svg, AlignedLogVisualisationInfo info, AlignedLogInfo logInfo,
-			AlignedLogVisualisationParameters parameters, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
-			long minCardinality, long maxCardinality) throws SVGException {
+			AlignedLogVisualisationParameters parameters, long minCardinality, long maxCardinality) throws SVGException {
 		for (LocalDotEdge dotEdge : info.getAllModelEdges()) {
 			long cardinality;
 			//				if (!panel.getUnfoldedNode2DfgdotEdges().containsKey(unode)) {
@@ -169,8 +164,7 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	private static void styleMoveEdges(SVGDiagram svg, AlignedLogVisualisationInfo info, AlignedLogInfo logInfo,
-			AlignedLogVisualisationParameters parameters, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos,
-			long minCardinality, long maxCardinality) throws SVGException {
+			AlignedLogVisualisationParameters parameters, long minCardinality, long maxCardinality) throws SVGException {
 		//style model move edges
 		for (LocalDotEdge dotEdge : info.getAllModelMoveEdges()) {
 			long cardinality = AlignedLogMetrics.getModelMovesLocal(dotEdge.getUnode(), logInfo);

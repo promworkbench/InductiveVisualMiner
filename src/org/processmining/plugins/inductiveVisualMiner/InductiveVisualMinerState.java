@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClass;
@@ -16,6 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
+import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -118,10 +118,9 @@ public class InductiveVisualMinerState {
 	//==alignment==
 	private AlignedLog alignedLog = null;
 	private AlignedLogInfo alignedLogInfo = null;
-	private Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos = null;
 	private AlignedLog alignedFilteredLog = null;
 	private AlignedLogInfo alignedFilteredLogInfo = null;
-	private Map<UnfoldedNode, AlignedLogInfo> dfgFilteredLogInfos = null;
+	private XLog alignedFilteredXLog = null;
 
 	public boolean isAlignmentReady() {
 		return alignedLog != null;
@@ -142,13 +141,9 @@ public class InductiveVisualMinerState {
 	public AlignedLogInfo getAlignedFilteredLogInfo() {
 		return alignedFilteredLogInfo;
 	}
-
-	public Map<UnfoldedNode, AlignedLogInfo> getDfgFilteredLogInfos() {
-		return dfgFilteredLogInfos;
-	}
-
-	public Map<UnfoldedNode, AlignedLogInfo> getDfgLogInfos() {
-		return dfgLogInfos;
+	
+	public XLog getAlignedFilteredXLog() {
+		return alignedFilteredXLog;
 	}
 
 	/*
@@ -159,30 +154,26 @@ public class InductiveVisualMinerState {
 		this.alignedFilteredLog = null;
 		this.alignedLogInfo = null;
 		this.alignedFilteredLogInfo = null;
-		this.dfgLogInfos = null;
-		this.dfgFilteredLogInfos = null;
 	}
 
 	/*
 	 * Finish alignment computation
 	 */
-	public synchronized void setAlignment(AlignmentResult alignment, Map<UnfoldedNode, AlignedLogInfo> dfgLogInfos) {
+	public synchronized void setAlignment(AlignmentResult alignment) {
 		this.alignedLog = alignment.log;
 		this.alignedFilteredLog = alignment.log;
 		this.alignedLogInfo = alignment.logInfo;
 		this.alignedFilteredLogInfo = alignment.logInfo;
-		this.dfgLogInfos = dfgLogInfos;
-		this.dfgFilteredLogInfos = dfgLogInfos;
 	}
 
 	/*
 	 * Apply a new filter
 	 */
 	public synchronized void setAlignedFilteredLog(AlignedLog alignedFilteredLog,
-			AlignedLogInfo alignedFilteredLogInfo, Map<UnfoldedNode, AlignedLogInfo> dfgFilteredLogInfos) {
+			AlignedLogInfo alignedFilteredLogInfo, XLog alignedFilteredXLog) {
 		this.alignedFilteredLog = alignedFilteredLog;
 		this.alignedFilteredLogInfo = alignedFilteredLogInfo;
-		this.dfgFilteredLogInfos = dfgFilteredLogInfos;
+		this.alignedFilteredXLog = alignedFilteredXLog;
 	}
 
 	//==gui-parameters==
@@ -209,8 +200,9 @@ public class InductiveVisualMinerState {
 		colourMode = modus;
 	}
 
-	//==node selection==
+	//==colour filtering ( & node selection)==
 	private Set<UnfoldedNode> selectedNodes = new HashSet<UnfoldedNode>();
+	private ColouringFilter[] colouringFilters;
 
 	public Set<UnfoldedNode> getSelectedNodes() {
 		return selectedNodes;
@@ -218,6 +210,14 @@ public class InductiveVisualMinerState {
 
 	public synchronized void setSelectedNodes(Set<UnfoldedNode> selectedNodes) {
 		this.selectedNodes = selectedNodes;
+	}
+
+	public ColouringFilter[] getColouringFilters() {
+		return colouringFilters;
+	}
+
+	public void setColouringFilters(ColouringFilter[] colouringFilters) {
+		this.colouringFilters = colouringFilters;
 	}
 
 	//==timed log==

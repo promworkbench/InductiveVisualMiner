@@ -11,7 +11,6 @@ import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
@@ -136,8 +135,8 @@ public class TimestampsAdder {
 	/*
 	 * Make a log-projection hashmap
 	 */
-	public static HashMap<List<XEventClass>, IMTraceG<Move>> getIMTrace2AlignedTrace(AlignedLog aLog) {
-		HashMap<List<XEventClass>, IMTraceG<Move>> result = new HashMap<>();
+	public static HashMap<List<XEventClass>, AlignedTrace> getIMTrace2AlignedTrace(AlignedLog aLog) {
+		HashMap<List<XEventClass>, AlignedTrace> result = new HashMap<>();
 		for (AlignedTrace aTrace : aLog) {
 			List<XEventClass> trace = new ArrayList<>();
 			for (Move m : aTrace) {

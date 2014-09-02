@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
@@ -25,7 +24,7 @@ import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Quintuple;
-import org.processmining.plugins.InductiveMiner.Septuple;
+import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
@@ -37,11 +36,9 @@ import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.ComputeAlignment;
@@ -50,6 +47,9 @@ import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeTimedLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
+import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
+import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginManager;
+import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ComputeColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog;
@@ -185,9 +185,8 @@ public class InductiveVisualMinerController {
 	}
 
 	//compute alignment
-	private class Align
-			extends
-			ChainLink<Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo>, Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>>> {
+	private class Align extends
+			ChainLink<Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo>, AlignmentResult> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
@@ -199,7 +198,7 @@ public class InductiveVisualMinerController {
 					state.getLogInfo());
 		}
 
-		protected Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>> executeLink(
+		protected AlignmentResult executeLink(
 				Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo> input) {
 			setStatus("Computing alignment..");
 			canceller.reset();
@@ -207,8 +206,8 @@ public class InductiveVisualMinerController {
 					input.getE(), canceller);
 		}
 
-		protected void processResult(Pair<AlignmentResult, Map<UnfoldedNode, AlignedLogInfo>> result) {
-			state.setAlignment(result.getLeft(), result.getRight());
+		protected void processResult(AlignmentResult result) {
+			state.setAlignment(result);
 		}
 
 		public void cancel() {
@@ -245,36 +244,43 @@ public class InductiveVisualMinerController {
 	//filter log for node selection
 	private class FilterNodeSelection
 			extends
-			ChainLink<Septuple<AlignedLog, Set<UnfoldedNode>, Set<UnfoldedNode>, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters>, Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>> {
+			ChainLink<Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, ColouringFilter[]>, Triple<AlignedLog, AlignedLogInfo, XLog>> {
 
-		protected Septuple<AlignedLog, Set<UnfoldedNode>, Set<UnfoldedNode>, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> generateInput() {
+		private ResettableCanceller canceller = new ResettableCanceller();
+
+		protected Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, ColouringFilter[]> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			return Septuple.of(state.getAlignedLog(), state.getSelectedNodes(),
-					AlignedLogMetrics.getAllDfgNodes(new UnfoldedNode(state.getTree().getRoot())),
-					state.getAlignedLogInfo(), state.getDfgLogInfos(), state.getTree(),
-					InductiveVisualMinerPanel.getViewParameters(state));
+			return Sextuple.of(state.getAlignedLog(), state.getSelectedNodes(), state.getAlignedLogInfo(),
+					state.getXLog(), state.getXLogInfo(), state.getColouringFilters());
 		}
 
-		protected Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> executeLink(
-				Septuple<AlignedLog, Set<UnfoldedNode>, Set<UnfoldedNode>, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>, ProcessTree, AlignedLogVisualisationParameters> input) {
+		protected Triple<AlignedLog, AlignedLogInfo, XLog> executeLink(
+				Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, ColouringFilter[]> input) {
 			setStatus("Colouring selection..");
+
+			canceller.reset();
+
+			//apply colour filters
+			Triple<AlignedLog, AlignedLogInfo, XLog> colouringFilteredAlignment = ComputeColouringFilter.applyColouringFilter(input.getA(),
+					input.getC(), input.getD(), input.getE(), input.getF(), canceller);
+
 			if (input.getB().size() > 0) {
-				return filterOnSelection(input.getA(), input.getB(), input.getC());
+				return filterOnSelection(colouringFilteredAlignment.getA(), input.getB(), input.getD());
 			} else {
-				return Triple.of(input.getA(), input.getD(), input.getE());
+				return colouringFilteredAlignment;
 			}
 
 		}
 
-		protected void processResult(Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> result) {
+		protected void processResult(Triple<AlignedLog, AlignedLogInfo, XLog> result) {
 			state.setAlignedFilteredLog(result.getA(), result.getB(), result.getC());
 
 			panel.getTraceView().set(state.getAlignedFilteredLog());
 		}
 
 		public void cancel() {
-
+			canceller.cancel();
 		}
 	}
 
@@ -285,7 +291,7 @@ public class InductiveVisualMinerController {
 		protected Triple<AlignedLog, XLog, XLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			return Triple.of(state.getAlignedFilteredLog(), state.getXLog(), state.getXLogInfo());
+			return Triple.of(state.getAlignedFilteredLog(), state.getAlignedFilteredXLog(), state.getXLogInfo());
 		}
 
 		protected TimedLog executeLink(Triple<AlignedLog, XLog, XLogInfo> input) {
@@ -333,7 +339,7 @@ public class InductiveVisualMinerController {
 			if (result == null) {
 				return;
 			}
-			
+
 			panel.getGraph().setImage(result, false);
 			panel.getGraph().setEnableAnimation(true);
 			panel.getSaveImageButton().setText("animation");
@@ -352,24 +358,22 @@ public class InductiveVisualMinerController {
 	}
 
 	//colour the nodes
-	private class ApplyNodeSelectionColouring
-			extends
-			ChainLink<Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>, Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>> {
+	private class ApplyNodeSelectionColouring extends ChainLink<AlignedLogInfo, AlignedLogInfo> {
 
-		protected Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> generateInput() {
-			return Pair.of(state.getAlignedFilteredLogInfo(), state.getDfgFilteredLogInfos());
+		protected AlignedLogInfo generateInput() {
+			return state.getAlignedFilteredLogInfo();
 		}
 
-		protected Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> executeLink(
-				Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> input) {
+		protected AlignedLogInfo executeLink(AlignedLogInfo input) {
 			return input;
 		}
 
-		protected void processResult(Pair<AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> result) {
-			TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colour(panel.getGraph().getSVG(), state.getVisualisationInfo(),
-					state.getTree(), result.getA(), result.getB(), InductiveVisualMinerPanel.getViewParameters(state));
+		protected void processResult(AlignedLogInfo result) {
+			TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colour(panel.getGraph().getSVG(),
+					state.getVisualisationInfo(), state.getTree(), result,
+					InductiveVisualMinerPanel.getViewParameters(state));
 			updateSelectionDescription(panel, state.getSelectedNodes());
-			
+
 			//make a colour map for the trace view
 			panel.getTraceView().setColourMap(colourMap);
 			colourMap.setSelectedNodes(state.getSelectedNodes());
@@ -408,6 +412,16 @@ public class InductiveVisualMinerController {
 		chain.add(new Animate());
 		chain.add(new ApplyNodeSelectionColouring());
 
+		//set up plug-ins
+		ColouringFilter[] colouringFilters = ColouringFilterPluginManager.getAllMetricInfos(context, panel,
+				state.getXLog(), new Runnable() {
+					public void run() {
+						chain.execute(FilterNodeSelection.class);
+					}
+				});
+		state.setColouringFilters(colouringFilters);
+
+		//start the chain
 		chain.execute(MakeLog.class);
 	}
 
@@ -592,8 +606,7 @@ public class InductiveVisualMinerController {
 		panel.getStatusLabel().setText(s);
 	}
 
-	private static Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>> filterOnSelection(
-			AlignedLog alignedLog, Set<UnfoldedNode> selected, Set<UnfoldedNode> dfgNodes) {
+	private static Triple<AlignedLog, AlignedLogInfo, XLog> filterOnSelection(AlignedLog alignedLog, Set<UnfoldedNode> selected, XLog xLog) {
 
 		AlignedLog fl = new AlignedLog();
 		for (AlignedTrace trace : alignedLog) {
@@ -607,8 +620,7 @@ public class InductiveVisualMinerController {
 		}
 
 		AlignedLogInfo fli = new AlignedLogInfo(fl);
-		Map<UnfoldedNode, AlignedLogInfo> fldfg = ComputeAlignment.computeDfgAlignment(fl, dfgNodes);
-		return new Triple<AlignedLog, AlignedLogInfo, Map<UnfoldedNode, AlignedLogInfo>>(fl, fli, fldfg);
+		return Triple.of(fl, fli, xLog);
 	}
 
 	private static void updateSelectionDescription(InductiveVisualMinerPanel panel, Set<UnfoldedNode> selected) {

@@ -13,6 +13,7 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
 public class ComputeTimedLog {
@@ -21,7 +22,7 @@ public class ComputeTimedLog {
 			final Canceller canceller) {
 
 		//make a log-projection-hashmap
-		HashMap<List<XEventClass>, IMTraceG<Move>> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
+		HashMap<List<XEventClass>, AlignedTrace> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
 
 		TimedLog timedLog = new TimedLog();
 		for (XTrace xTrace : xLog) {
@@ -36,7 +37,7 @@ public class ComputeTimedLog {
 		return timedLog;
 	}
 
-	private static TimedTrace timeTrace(HashMap<List<XEventClass>, IMTraceG<Move>> map, XTrace trace, XLogInfo xLogInfo) {
+	private static TimedTrace timeTrace(HashMap<List<XEventClass>, AlignedTrace> map, XTrace trace, XLogInfo xLogInfo) {
 
 		//find the corresponding aligned trace
 		List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfo);
