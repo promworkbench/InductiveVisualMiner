@@ -266,7 +266,7 @@ public class InductiveVisualMinerController {
 					input.getC(), input.getD(), input.getE(), input.getF(), canceller);
 
 			if (input.getB().size() > 0) {
-				return filterOnSelection(colouringFilteredAlignment.getA(), input.getB(), input.getD());
+				return filterOnSelection(colouringFilteredAlignment.getA(), input.getB(), colouringFilteredAlignment.getC());
 			} else {
 				return colouringFilteredAlignment;
 			}

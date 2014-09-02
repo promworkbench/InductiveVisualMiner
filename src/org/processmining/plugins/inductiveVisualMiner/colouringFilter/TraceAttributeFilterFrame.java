@@ -62,7 +62,7 @@ public class TraceAttributeFilterFrame extends JFrame {
 					for (XAttribute a : traceAttributes.get(selectedKey)) {
 						attributeSelector.addItem(a);
 					}
-					selectedAttribute = null;
+					attributeSelector.setSelectedIndex(0);
 				}
 				update.run();
 			}
@@ -81,6 +81,7 @@ public class TraceAttributeFilterFrame extends JFrame {
 			}
 		});
 		panel.add(attributeSelector);
+		attributeSelector.setSelectedIndex(0);
 
 		// filter applier
 //		JButton filter = new JButton("Filter");
