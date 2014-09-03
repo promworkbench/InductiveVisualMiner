@@ -34,7 +34,6 @@ public class TraceAttributeFilterFrame extends JFrame {
 	public TraceAttributeFilterFrame(XLog log, Runnable update) {
 		super("Trace Attribute Filter");
 
-
 		this.update = update;
 		JPanel panel = getFilterPanel(log);
 
