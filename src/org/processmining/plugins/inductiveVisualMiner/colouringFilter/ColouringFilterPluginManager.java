@@ -27,6 +27,7 @@ public class ColouringFilterPluginManager {
 
 					if (xyz instanceof ColouringFilter) {
 						knownInfos.add((ColouringFilter) xyz);
+						((ColouringFilter) xyz).setOnUpdate(onUpdate);
 					}
 				} catch (Exception e) {
 					//Catch and ignore all exceptions to be resistant to external faults. 
