@@ -3,9 +3,9 @@ package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -108,12 +108,12 @@ public class TraceAttributeFilterFrame extends JFrame {
 	private Map<String, Set<XAttribute>> getTraceAttributeMap(XLog log) {
 		Map<String, Set<XAttribute>> traceAttributes = new HashMap<String, Set<XAttribute>>();
 
-		for (XTrace t : log) {
-			for (String traceAttributeKey : t.getAttributes().keySet()) {
-				if (!traceAttributes.containsKey(traceAttributeKey)) {
-					traceAttributes.put(traceAttributeKey, new HashSet<XAttribute>());
+		for (XTrace trace : log) {
+			for (XAttribute traceAttribute : trace.getAttributes().values()) {
+				if (!traceAttributes.containsKey(traceAttribute.getKey())) {
+					traceAttributes.put(traceAttribute.getKey(), new TreeSet<XAttribute>());
 				}
-				traceAttributes.get(traceAttributeKey).add(t.getAttributes().get(traceAttributeKey));
+				traceAttributes.get(traceAttribute.getKey()).add(traceAttribute);
 			}
 		}
 		return traceAttributes;
