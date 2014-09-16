@@ -19,13 +19,13 @@ import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 public class ComputeColouringFilter {
 
 	public static Triple<AlignedLog, AlignedLogInfo, XLog> applyColouringFilter(final AlignedLog aLog,
-			final AlignedLogInfo aLogInfo, final XLog xLog, final XLogInfo xLogInfo, ColouringFilter[] filters,
+			final AlignedLogInfo aLogInfo, final XLog xLog, final XLogInfo xLogInfo, List<ColouringFilter> filters,
 			final Canceller canceller) {
 
 		//first, walk through the filters to see there is actually one enabled
 		boolean enabled = false;
 		for (ColouringFilter filter : filters) {
-			enabled = enabled || filter.isEnabled();
+			enabled = enabled || filter.isEnabledFilter();
 		}
 		if (!enabled) {
 			//no filter is enabled, just return the unchanged aligned log

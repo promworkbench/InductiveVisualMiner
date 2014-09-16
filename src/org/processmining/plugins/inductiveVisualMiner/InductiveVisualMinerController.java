@@ -6,9 +6,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -48,7 +51,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeTimedLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginManager;
+import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ComputeColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
@@ -244,11 +247,11 @@ public class InductiveVisualMinerController {
 	//filter log for node selection
 	private class FilterNodeSelection
 			extends
-			ChainLink<Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, ColouringFilter[]>, Triple<AlignedLog, AlignedLogInfo, XLog>> {
+			ChainLink<Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, List<ColouringFilter>>, Triple<AlignedLog, AlignedLogInfo, XLog>> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
-		protected Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, ColouringFilter[]> generateInput() {
+		protected Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, List<ColouringFilter>> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
 			return Sextuple.of(state.getAlignedLog(), state.getSelectedNodes(), state.getAlignedLogInfo(),
@@ -256,7 +259,7 @@ public class InductiveVisualMinerController {
 		}
 
 		protected Triple<AlignedLog, AlignedLogInfo, XLog> executeLink(
-				Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, ColouringFilter[]> input) {
+				Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, List<ColouringFilter>> input) {
 			setStatus("Colouring selection..");
 
 			canceller.reset();
@@ -413,13 +416,15 @@ public class InductiveVisualMinerController {
 		chain.add(new ApplyNodeSelectionColouring());
 
 		//set up plug-ins
-		ColouringFilter[] colouringFilters = ColouringFilterPluginManager.getAllMetricInfos(context, panel,
+		List<ColouringFilter> colouringFilters = ColouringFilterPluginFinder.getAllMetricInfos(context, panel,
 				state.getXLog(), new Runnable() {
 					public void run() {
 						chain.execute(FilterNodeSelection.class);
 					}
 				});
 		state.setColouringFilters(colouringFilters);
+		panel.getColouringFiltersView().initialise(colouringFilters);
+		initialiseColourFilters(state.getXLog(), context.getExecutor());
 
 		//start the chain
 		chain.execute(MakeLog.class);
@@ -590,7 +595,14 @@ public class InductiveVisualMinerController {
 		//set trace view button
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				panel.getTraceView().setVisible(!panel.getTraceView().isVisible());
+				panel.getTraceView().swapVisibility();
+			}
+		});
+		
+		//set colouring filters button
+		panel.getColouringFiltersViewButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				panel.getColouringFiltersView().swapVisibility();
 			}
 		});
 	}
@@ -642,6 +654,22 @@ public class InductiveVisualMinerController {
 				}
 			}
 			panel.getSelectionLabel().setText(s);
+		}
+	}
+	
+	/**
+	 * Call all colouring filters to initialise their guis.
+	 * @param xLog
+	 * @param executor
+	 */
+	private void initialiseColourFilters(final XLog xLog, Executor executor) {
+		for (final ColouringFilter colouringFilter : state.getColouringFilters()) {
+			executor.execute(new Runnable() {
+				public void run() {
+					JPanel filterPanel = colouringFilter.createGui(xLog);
+					panel.getColouringFiltersView().setPanel(colouringFilter, filterPanel);
+				}
+			});
 		}
 	}
 

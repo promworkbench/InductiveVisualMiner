@@ -32,6 +32,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Al
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
@@ -60,6 +61,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JButton saveImageButton;
 	private final JButton traceViewButton;
 	private final TraceView traceView;
+	private final JButton colouringFiltersViewButton;
+	private final ColouringFiltersView colouringFiltersView;
 
 	private final AlignedLogVisualisation visualiser;
 
@@ -159,7 +162,19 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cTraceViewButton.gridy = gridy++;
 			cTraceViewButton.gridwidth = 1;
 			cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
-			add(getTraceViewButton(), cTraceViewButton);
+			add(traceViewButton, cTraceViewButton);
+		}
+		
+		//colouring filters view
+		{
+			colouringFiltersView = new ColouringFiltersView(this);
+			colouringFiltersViewButton = SlickerFactory.instance().createButton("colour filters");
+			GridBagConstraints cColouringFiltersViewButton = new GridBagConstraints();
+			cColouringFiltersViewButton.gridx = 2;
+			cColouringFiltersViewButton.gridy = gridy++;
+			cColouringFiltersViewButton.gridwidth = 1;
+			cColouringFiltersViewButton.fill = GridBagConstraints.HORIZONTAL;
+			add(colouringFiltersViewButton, cColouringFiltersViewButton);
 		}
 
 		{
@@ -308,6 +323,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public void removeNotify() {
 		super.removeNotify();
 		traceView.setVisible(false);
+		colouringFiltersView.setVisible(false);
 	}
 
 	public void makeNodeSelectable(final LocalDotNode dotNode, boolean select) {
@@ -389,5 +405,13 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public JButton getTraceViewButton() {
 		return traceViewButton;
+	}
+	
+	public ColouringFiltersView getColouringFiltersView() {
+		return colouringFiltersView;
+	}
+	
+	public JButton getColouringFiltersViewButton() {
+		return colouringFiltersViewButton;
 	}
 }

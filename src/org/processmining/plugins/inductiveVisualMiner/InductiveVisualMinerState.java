@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClass;
@@ -202,7 +203,7 @@ public class InductiveVisualMinerState {
 
 	//==colour filtering ( & node selection)==
 	private Set<UnfoldedNode> selectedNodes = new HashSet<UnfoldedNode>();
-	private ColouringFilter[] colouringFilters;
+	private List<ColouringFilter> colouringFilters;
 
 	public Set<UnfoldedNode> getSelectedNodes() {
 		return selectedNodes;
@@ -212,11 +213,11 @@ public class InductiveVisualMinerState {
 		this.selectedNodes = selectedNodes;
 	}
 
-	public ColouringFilter[] getColouringFilters() {
+	public List<ColouringFilter> getColouringFilters() {
 		return colouringFilters;
 	}
 
-	public void setColouringFilters(ColouringFilter[] colouringFilters) {
+	public void setColouringFilters(List<ColouringFilter> colouringFilters) {
 		this.colouringFilters = colouringFilters;
 	}
 

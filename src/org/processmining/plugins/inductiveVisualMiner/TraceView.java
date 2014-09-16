@@ -11,8 +11,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JFrame;
-
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.TraceBuilder;
@@ -28,6 +26,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -35,7 +34,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
-public class TraceView extends JFrame {
+public class TraceView extends SideWindow {
 
 	public static class TraceViewColourMap implements WedgeBuilder {
 		private final Map<UnfoldedNode, Color> mapFill = new HashMap<>();
@@ -234,7 +233,7 @@ public class TraceView extends JFrame {
 	private Object showing = null;
 
 	public TraceView(Component parent) {
-		super("Inductive visual Miner - trace view");
+		super(parent, "Inductive visual Miner - trace view");
 
 		TraceBuilder<Object> traceBuilder = new TraceBuilder<Object>() {
 			public Trace<? extends Event> build(Object element) {
@@ -253,10 +252,6 @@ public class TraceView extends JFrame {
 		
 		traceView.setBackground(new Color(30, 30, 30));
 		traceView.setOpaque(true);
-
-		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		setSize(400, 600);
-		setLocationRelativeTo(parent);
 	}
 
 	/**

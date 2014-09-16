@@ -1,25 +1,38 @@
 package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 
-@IvMColouringFilterPlugin
+@ColouringFilterAnnotation
 public abstract class ColouringFilter {
 
-	protected final JFrame jFrame;
-	protected final XLog xLog;
-	
-	private Runnable onUpdate = null;
+	/**
+	 * Constructor. User is waiting when this function is called.
+	 */
+	public ColouringFilter() {
 
-	public ColouringFilter(JComponent parent, XLog xLog) {
-		this.xLog = xLog;
-		jFrame = createGui(parent);
-		jFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 	}
+
+	/**
+	 * Returns the name of this filter.
+	 * 
+	 * @return
+	 */
+	public abstract String getName();
+
+	/**
+	 * Initialises the JPanel containing the filter settings. Called
+	 * asynchronously, but it is guaranteed to be the first abstract function
+	 * that will be called (after constructor). No other function will be called
+	 * until this one is finished.
+	 * 
+	 * @param log
+	 * @return
+	 */
+	public abstract JPanel createGui(XLog log);
 
 	/**
 	 * Returns whether this filter is actually filtering something. If this
@@ -28,16 +41,7 @@ public abstract class ColouringFilter {
 	 * 
 	 * @return
 	 */
-	public abstract boolean isEnabled();
-
-	/**
-	 * Initialises the JFrame containing the filter settings.
-	 * 
-	 * @param parent
-	 * @param update
-	 * @return
-	 */
-	public abstract JFrame createGui(JComponent parent);
+	protected abstract boolean isEnabled();
 
 	/**
 	 * Main function of the filter. Returns whether the given xTrace/aligned
@@ -50,24 +54,6 @@ public abstract class ColouringFilter {
 	public abstract boolean countInColouring(XTrace xTrace, AlignedTrace aTrace);
 
 	/**
-	 * Hides the filter settings.
-	 */
-	public void hide() {
-		if (jFrame != null) {
-			jFrame.setVisible(false);
-		}
-	}
-
-	/**
-	 * Shows the filter settings.
-	 */
-	public void show() {
-		if (jFrame != null) {
-			jFrame.setVisible(true);
-		}
-	}
-
-	/**
 	 * This function is called when the user updates a filter and the filtering
 	 * has to be recomputed.
 	 */
@@ -77,11 +63,16 @@ public abstract class ColouringFilter {
 		}
 	}
 
-	public Runnable getOnUpdate() {
-		return onUpdate;
+	//private methods
+	private JPanel panel = null;
+	private Runnable onUpdate = null;
+
+	public void initialiseFilter(XLog log, Runnable onUpdate) {
+		panel = createGui(log);
+		this.onUpdate = onUpdate;
 	}
 
-	public void setOnUpdate(Runnable onUpdate) {
-		this.onUpdate = onUpdate;
+	public boolean isEnabledFilter() {
+		return (panel != null) && isEnabled();
 	}
 }
