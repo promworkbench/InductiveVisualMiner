@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import nl.tue.astar.AStarThread.Canceller;
@@ -23,11 +24,13 @@ public class ComputeColouringFilter {
 			final Canceller canceller) {
 
 		//first, walk through the filters to see there is actually one enabled
-		boolean enabled = false;
+		List<ColouringFilter> enabledColouringFilters = new LinkedList<>();
 		for (ColouringFilter filter : filters) {
-			enabled = enabled || filter.isEnabledFilter();
+			if (filter.isEnabledFilter()) {
+				enabledColouringFilters.add(filter);
+			}
 		}
-		if (!enabled) {
+		if (enabledColouringFilters.isEmpty()) {
 			//no filter is enabled, just return the unchanged aligned log
 			return Triple.of(aLog, aLogInfo, xLog);
 		}
@@ -50,7 +53,7 @@ public class ComputeColouringFilter {
 
 			//feed this trace to each filter
 			boolean keepTrace = true;
-			for (ColouringFilter filter : filters) {
+			for (ColouringFilter filter : enabledColouringFilters) {
 				keepTrace = keepTrace && filter.countInColouring(xTrace, alignedTrace);
 
 				if (!keepTrace) {

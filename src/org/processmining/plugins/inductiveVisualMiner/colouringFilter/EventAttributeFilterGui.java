@@ -10,13 +10,13 @@ import org.deckfour.xes.model.XAttribute;
 
 import com.fluxicon.slickerbox.factory.SlickerFactory;
 
-public class TraceAttributeFilterGui extends ColouringFilterGui {
+public class EventAttributeFilterGui extends ColouringFilterGui {
 	private final JComboBox<String> keySelector;
 	private final JComboBox<XAttribute> attributeSelector;
 	private final JCheckBox enabled;
 
-	public TraceAttributeFilterGui(Map<String, Set<XAttribute>> attributes) {
-		super("Trace attribute filter");
+	public EventAttributeFilterGui(Map<String, Set<XAttribute>> attributes) {
+		super("Event attribute filter");
 		keySelector = SlickerFactory.instance().createComboBox(
 				attributes.keySet().toArray(new String[attributes.keySet().size()]));
 		keySelector.setSelectedIndex(0);
