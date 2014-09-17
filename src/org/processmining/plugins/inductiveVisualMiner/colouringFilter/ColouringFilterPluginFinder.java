@@ -12,8 +12,7 @@ import org.processmining.framework.plugin.PluginContext;
 
 public class ColouringFilterPluginFinder {
 
-	public static List<ColouringFilter> getAllMetricInfos(PluginContext context, JComponent parent, XLog xLog,
-			Runnable onUpdate) {
+	public static List<ColouringFilter> findFilteringPlugins(PluginContext context, JComponent parent, XLog xLog) {
 		List<ColouringFilter> colouringFilters = new LinkedList<ColouringFilter>();
 
 		Set<Class<?>> coverageEstimatorClasses = context.getPluginManager().getKnownClassesAnnotatedWith(
@@ -26,7 +25,6 @@ public class ColouringFilterPluginFinder {
 
 					if (xyz instanceof ColouringFilter) {
 						colouringFilters.add((ColouringFilter) xyz);
-						((ColouringFilter) xyz).initialiseFilter(xLog, onUpdate);
 					}
 				} catch (Exception e) {
 					//Catch and ignore all exceptions to be resistant to external faults. 

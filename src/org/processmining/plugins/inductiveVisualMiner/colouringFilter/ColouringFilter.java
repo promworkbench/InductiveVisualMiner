@@ -75,4 +75,8 @@ public abstract class ColouringFilter {
 	public boolean isEnabledFilter() {
 		return (panel != null) && isEnabled();
 	}
+
+	public JPanel getPanel() {
+		return panel;
+	}
 }

@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -416,12 +415,8 @@ public class InductiveVisualMinerController {
 		chain.add(new ApplyNodeSelectionColouring());
 
 		//set up plug-ins
-		List<ColouringFilter> colouringFilters = ColouringFilterPluginFinder.getAllMetricInfos(context, panel,
-				state.getXLog(), new Runnable() {
-					public void run() {
-						chain.execute(FilterNodeSelection.class);
-					}
-				});
+		List<ColouringFilter> colouringFilters = ColouringFilterPluginFinder.findFilteringPlugins(context, panel,
+				state.getXLog());
 		state.setColouringFilters(colouringFilters);
 		panel.getColouringFiltersView().initialise(colouringFilters);
 		initialiseColourFilters(state.getXLog(), context.getExecutor());
@@ -666,8 +661,12 @@ public class InductiveVisualMinerController {
 		for (final ColouringFilter colouringFilter : state.getColouringFilters()) {
 			executor.execute(new Runnable() {
 				public void run() {
-					JPanel filterPanel = colouringFilter.createGui(xLog);
-					panel.getColouringFiltersView().setPanel(colouringFilter, filterPanel);
+					colouringFilter.initialiseFilter(xLog, new Runnable() {
+						public void run() {
+							chain.execute(FilterNodeSelection.class);
+						}
+					});
+					panel.getColouringFiltersView().setPanel(colouringFilter);
 				}
 			});
 		}
