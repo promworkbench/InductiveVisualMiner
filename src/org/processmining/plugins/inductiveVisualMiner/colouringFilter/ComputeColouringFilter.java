@@ -38,7 +38,7 @@ public class ComputeColouringFilter {
 		//make a log-projection-hashmap
 		HashMap<List<XEventClass>, AlignedTrace> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
 
-		AlignedLog result = new AlignedLog();
+		AlignedLog resultALog = new AlignedLog();
 		XLog resultXLog = XFactoryRegistry.instance().currentDefault().createLog();
 		for (XTrace xTrace : xLog) {
 			List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(xTrace, xLogInfo);
@@ -51,7 +51,7 @@ public class ComputeColouringFilter {
 				return null;
 			}
 
-			//feed this trace to each filter
+			//feed this trace to each enabled filter
 			boolean keepTrace = true;
 			for (ColouringFilter filter : enabledColouringFilters) {
 				keepTrace = keepTrace && filter.countInColouring(xTrace, alignedTrace);
@@ -61,12 +61,12 @@ public class ComputeColouringFilter {
 				}
 			}
 			if (keepTrace) {
-				result.add(alignedTrace);
+				resultALog.add(alignedTrace);
 				resultXLog.add(xTrace);
 			}
 		}
 
-		AlignedLogInfo resultInfo = new AlignedLogInfo(result);
-		return Triple.of(result, resultInfo, resultXLog);
+		AlignedLogInfo resultInfo = new AlignedLogInfo(resultALog);
+		return Triple.of(resultALog, resultInfo, resultXLog);
 	}
 }

@@ -658,15 +658,16 @@ public class InductiveVisualMinerController {
 	 * @param executor
 	 */
 	private void initialiseColourFilters(final XLog xLog, Executor executor) {
+		final Runnable onUpdate = new Runnable() {
+			public void run() {
+				chain.execute(FilterNodeSelection.class);
+			}
+		};
 		for (final ColouringFilter colouringFilter : state.getColouringFilters()) {
 			executor.execute(new Runnable() {
 				public void run() {
-					colouringFilter.initialiseFilter(xLog, new Runnable() {
-						public void run() {
-							chain.execute(FilterNodeSelection.class);
-						}
-					});
-					panel.getColouringFiltersView().setPanel(colouringFilter);
+					colouringFilter.initialiseFilter(xLog, onUpdate);
+					panel.getColouringFiltersView().setPanel(colouringFilter, onUpdate);
 				}
 			});
 		}

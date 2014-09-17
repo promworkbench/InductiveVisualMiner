@@ -66,14 +66,20 @@ public abstract class ColouringFilter {
 	//private methods
 	private JPanel panel = null;
 	private Runnable onUpdate = null;
+	private boolean enabledFilter = false;
 
 	public void initialiseFilter(XLog log, Runnable onUpdate) {
 		panel = createGui(log);
 		this.onUpdate = onUpdate;
 	}
-
+	
+	public boolean swapEnabledFilter() {
+		enabledFilter = !enabledFilter;
+		return enabledFilter;
+	}
+	
 	public boolean isEnabledFilter() {
-		return (panel != null) && isEnabled();
+		return enabledFilter && (panel != null) && isEnabled();
 	}
 
 	public JPanel getPanel() {

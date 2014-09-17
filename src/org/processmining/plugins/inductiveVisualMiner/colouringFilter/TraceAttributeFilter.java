@@ -16,7 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 
 public class TraceAttributeFilter extends ColouringFilter {
 
-	TraceAttributeFilterGui panel = null;
+	AttributeFilterGui panel = null;
 	boolean block = true;
 
 	public String getName() {
@@ -25,11 +25,10 @@ public class TraceAttributeFilter extends ColouringFilter {
 
 	public ColouringFilterGui createGui(XLog log) {
 		final Map<String, Set<XAttribute>> traceAttributes = getTraceAttributeMap(log);
-		panel = new TraceAttributeFilterGui(traceAttributes);
+		panel = new AttributeFilterGui(traceAttributes, getName());
 
 		// Key selector
 		panel.getKeySelector().addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
 				block = true;
 				String selectedKey = panel.getSelectedKey();
@@ -46,20 +45,15 @@ public class TraceAttributeFilter extends ColouringFilter {
 
 		// Attribute value selector
 		panel.getAttributeSelector().addItemListener(new ItemListener() {
-			
 			public void itemStateChanged(ItemEvent e) {
 				if (!block && e.getStateChange() == ItemEvent.SELECTED) {
 					update();
 				}
+				updateExplanation();
 			}
 		});
 
-		panel.getEnabled().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				update();
-			}
-		});
-
+		updateExplanation();
 		return panel;
 	}
 
@@ -72,7 +66,13 @@ public class TraceAttributeFilter extends ColouringFilter {
 	}
 
 	public boolean isEnabled() {
-		return panel.getEnabled().isSelected();
+		return true;
+	}
+
+	public void updateExplanation() {
+		panel.getExplanation().setText(
+				"<html>Include only traces having attribute `" + panel.getSelectedKey() + "' being `"
+						+ panel.getSelectedAttribute() + "'</html>");
 	}
 
 	private static Map<String, Set<XAttribute>> getTraceAttributeMap(XLog log) {

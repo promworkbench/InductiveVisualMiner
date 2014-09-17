@@ -2,6 +2,8 @@ package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +17,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 
 public class EventAttributeFilter extends ColouringFilter {
 
-	EventAttributeFilterGui panel = null;
+	private AttributeFilterGui panel = null;
+	private boolean block = false;
 
 	public String getName() {
 		return "Event attribute filter";
@@ -23,12 +26,12 @@ public class EventAttributeFilter extends ColouringFilter {
 
 	public ColouringFilterGui createGui(XLog log) {
 		final Map<String, Set<XAttribute>> eventAttributes = getEventAttributeMap(log);
-		panel = new EventAttributeFilterGui(eventAttributes);
+		panel = new AttributeFilterGui(eventAttributes, getName());
 
 		// Key selector
 		panel.getKeySelector().addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
+				block = true;
 				String selectedKey = panel.getSelectedKey();
 
 				panel.getAttributeSelector().removeAllItems();
@@ -36,24 +39,22 @@ public class EventAttributeFilter extends ColouringFilter {
 					panel.getAttributeSelector().addItem(a);
 				}
 				panel.getAttributeSelector().setSelectedIndex(0);
-
+				block = false;
 				update();
 			}
 		});
 
 		// Attribute value selector
-		panel.getAttributeSelector().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				update();
+		panel.getAttributeSelector().addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if (!block && e.getStateChange() == ItemEvent.SELECTED) {
+					update();
+				}
+				updateExplanation();
 			}
 		});
 
-		panel.getEnabled().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				update();
-			}
-		});
-
+		updateExplanation();
 		return panel;
 	}
 
@@ -72,7 +73,13 @@ public class EventAttributeFilter extends ColouringFilter {
 	}
 
 	public boolean isEnabled() {
-		return panel.getEnabled().isSelected();
+		return true;
+	}
+	
+	public void updateExplanation() {
+		panel.getExplanation().setText(
+				"<html>Include only traces that have at least one event having attribute `" + panel.getSelectedKey() + "' being `"
+						+ panel.getSelectedAttribute() + "'</html>");
 	}
 
 	private static Map<String, Set<XAttribute>> getEventAttributeMap(XLog log) {
