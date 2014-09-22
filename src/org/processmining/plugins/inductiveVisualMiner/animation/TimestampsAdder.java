@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Random;
 
 import org.deckfour.xes.classification.XEventClass;
+import org.deckfour.xes.extension.std.XTimeExtension;
 import org.deckfour.xes.info.XLogInfo;
-import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
@@ -213,9 +213,9 @@ public class TimestampsAdder {
 //	}
 
 	public static Long getTimestamp(XEvent event) {
-		if (event.hasAttributes() && event.getAttributes().containsKey("time:timestamp")) {
-			Date timestamp = ((XAttributeTimestamp) event.getAttributes().get("time:timestamp")).getValue();
-			return (long) timestamp.getTime();
+		Date date = XTimeExtension.instance().extractTimestamp(event);
+		if (date != null) {
+			return date.getTime();
 		}
 		return null;
 	}
