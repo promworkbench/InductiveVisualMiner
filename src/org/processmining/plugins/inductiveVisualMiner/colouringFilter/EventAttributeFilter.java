@@ -4,9 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.deckfour.xes.model.XAttribute;
@@ -83,7 +83,7 @@ public class EventAttributeFilter extends ColouringFilter {
 	}
 
 	private static Map<String, Set<XAttribute>> getEventAttributeMap(XLog log) {
-		Map<String, Set<XAttribute>> eventAttributes = new HashMap<String, Set<XAttribute>>();
+		Map<String, Set<XAttribute>> eventAttributes = new TreeMap<String, Set<XAttribute>>();
 
 		for (XTrace trace : log) {
 			for (XEvent event : trace) {
