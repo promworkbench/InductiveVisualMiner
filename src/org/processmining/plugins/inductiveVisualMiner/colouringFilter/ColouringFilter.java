@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
 
-import javax.swing.JPanel;
-
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
@@ -32,7 +30,7 @@ public abstract class ColouringFilter {
 	 * @param log
 	 * @return
 	 */
-	public abstract JPanel createGui(XLog log);
+	public abstract ColouringFilterGui createGui(XLog log);
 
 	/**
 	 * Returns whether this filter is actually filtering something. If this
@@ -64,7 +62,7 @@ public abstract class ColouringFilter {
 	}
 
 	//private methods
-	private JPanel panel = null;
+	private ColouringFilterGui panel = null;
 	private Runnable onUpdate = null;
 	private boolean enabledFilter = false;
 
@@ -72,17 +70,17 @@ public abstract class ColouringFilter {
 		panel = createGui(log);
 		this.onUpdate = onUpdate;
 	}
-	
+
 	public boolean swapEnabledFilter() {
 		enabledFilter = !enabledFilter;
 		return enabledFilter;
 	}
-	
+
 	public boolean isEnabledFilter() {
 		return enabledFilter && (panel != null) && isEnabled();
 	}
 
-	public JPanel getPanel() {
+	public ColouringFilterGui getPanel() {
 		return panel;
 	}
 }

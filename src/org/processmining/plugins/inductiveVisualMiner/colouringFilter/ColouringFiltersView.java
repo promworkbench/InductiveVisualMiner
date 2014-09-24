@@ -25,16 +25,18 @@ public class ColouringFiltersView extends SideWindow {
 
 	private static final long serialVersionUID = -5500440632866414477L;
 	private final JPanel panel;
-	private final Map<ColouringFilter, JComponent> filter2panel;
+	private final Map<ColouringFilter, JComponent> filter2label;
 	private final Map<ColouringFilter, Integer> filter2position;
+	private int highFilters;
 
 	public ColouringFiltersView(Component parent) {
 		super(parent, "Inductive visual Miner - colouring filters");
 		panel = new JPanel(new GridBagLayout());
 		panel.setBackground(Color.gray);
 		add(panel);
-		filter2panel = new HashMap<>();
+		filter2label = new HashMap<>();
 		filter2position = new HashMap<>();
+		highFilters = 0;
 	}
 
 	public void initialise(List<ColouringFilter> colouringFilters) {
@@ -54,7 +56,7 @@ public class ColouringFiltersView extends SideWindow {
 			cLabel.anchor = GridBagConstraints.EAST;
 			panel.add(label, cLabel);
 
-			filter2panel.put(colouringFilter, label);
+			filter2label.put(colouringFilter, label);
 			filter2position.put(colouringFilter, new Integer(gridy));
 
 			gridy++;
@@ -63,16 +65,20 @@ public class ColouringFiltersView extends SideWindow {
 
 	public void setPanel(final ColouringFilter colouringFilter, final Runnable onUpdate) {
 		//remove initialising message
-		panel.remove(filter2panel.get(colouringFilter));
+		panel.remove(filter2label.get(colouringFilter));
 		
 		//add panel
 		{
 			GridBagConstraints cPanel = new GridBagConstraints();
 			cPanel.gridx = 1;
 			cPanel.gridy = filter2position.get(colouringFilter);
-			cPanel.fill = GridBagConstraints.HORIZONTAL;
+			cPanel.fill = GridBagConstraints.BOTH;
 			cPanel.anchor = GridBagConstraints.NORTH;
 			cPanel.weightx = 1;
+			if (colouringFilter.getPanel().isUsesVerticalSpace()) {
+				highFilters++;
+				cPanel.weighty = 1 / (highFilters * 1.0);
+			}
 			panel.add(colouringFilter.getPanel(), cPanel);
 		}
 		
