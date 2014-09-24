@@ -154,18 +154,24 @@ public class InductiveVisualMinerController {
 	}
 
 	//mine a model
-	private class Mine extends ChainLink<Pair<IMLog, MiningParameters>, ProcessTree> {
+	private class Mine extends ChainLink<Triple<ProcessTree, IMLog, MiningParameters>, ProcessTree> {
 
-		protected Pair<IMLog, MiningParameters> generateInput() {
+		protected Triple<ProcessTree, IMLog, MiningParameters> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
 			panel.getTraceView().set(state.getLog());
-			return new Pair<IMLog, MiningParameters>(state.getActivityFilteredIMLog(), state.getMiningParameters());
+			return Triple.of(state.getPreMinedTree(), state.getActivityFilteredIMLog(), state.getMiningParameters());
 		}
 
-		protected ProcessTree executeLink(Pair<IMLog, MiningParameters> input) {
+		protected ProcessTree executeLink(Triple<ProcessTree, IMLog, MiningParameters> input) {
 			setStatus("Mining..");
-			return IMProcessTree.mineProcessTree(input.getLeft(), input.getRight());
+			if (input.getA() == null) {
+				//mine a new tree
+				return IMProcessTree.mineProcessTree(input.getB(), input.getC());
+			} else {
+				//use the existing tree
+				return input.getA();
+			}
 		}
 
 		protected void processResult(ProcessTree result) {
@@ -264,11 +270,13 @@ public class InductiveVisualMinerController {
 			canceller.reset();
 
 			//apply colour filters
-			Triple<AlignedLog, AlignedLogInfo, XLog> colouringFilteredAlignment = ComputeColouringFilter.applyColouringFilter(input.getA(),
-					input.getC(), input.getD(), input.getE(), input.getF(), canceller);
+			Triple<AlignedLog, AlignedLogInfo, XLog> colouringFilteredAlignment = ComputeColouringFilter
+					.applyColouringFilter(input.getA(), input.getC(), input.getD(), input.getE(), input.getF(),
+							canceller);
 
 			if (input.getB().size() > 0) {
-				return filterOnSelection(colouringFilteredAlignment.getA(), input.getB(), colouringFilteredAlignment.getC());
+				return filterOnSelection(colouringFilteredAlignment.getA(), input.getB(),
+						colouringFilteredAlignment.getC());
 			} else {
 				return colouringFilteredAlignment;
 			}
@@ -593,7 +601,7 @@ public class InductiveVisualMinerController {
 				panel.getTraceView().swapVisibility();
 			}
 		});
-		
+
 		//set colouring filters button
 		panel.getColouringFiltersViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -613,7 +621,8 @@ public class InductiveVisualMinerController {
 		panel.getStatusLabel().setText(s);
 	}
 
-	private static Triple<AlignedLog, AlignedLogInfo, XLog> filterOnSelection(AlignedLog alignedLog, Set<UnfoldedNode> selected, XLog xLog) {
+	private static Triple<AlignedLog, AlignedLogInfo, XLog> filterOnSelection(AlignedLog alignedLog,
+			Set<UnfoldedNode> selected, XLog xLog) {
 
 		AlignedLog fl = new AlignedLog();
 		for (AlignedTrace trace : alignedLog) {
@@ -651,9 +660,10 @@ public class InductiveVisualMinerController {
 			panel.getSelectionLabel().setText(s);
 		}
 	}
-	
+
 	/**
 	 * Call all colouring filters to initialise their guis.
+	 * 
 	 * @param xLog
 	 * @param executor
 	 */

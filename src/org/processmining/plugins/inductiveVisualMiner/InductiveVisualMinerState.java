@@ -22,9 +22,13 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class InductiveVisualMinerState {
 
-	public InductiveVisualMinerState(XLog xLog) {
+	public InductiveVisualMinerState(XLog xLog, ProcessTree preMinedTree) {
 		this.xLog = xLog;
 		miningParameters = new MiningParametersIvM();
+		if (preMinedTree != null) {
+			this.tree = preMinedTree;
+			this.preMinedTree = preMinedTree;
+		}
 	}
 
 	//==log==
@@ -82,9 +86,14 @@ public class InductiveVisualMinerState {
 	//==mining==
 	private MiningParameters miningParameters;
 	private ProcessTree tree = null;
+	private ProcessTree preMinedTree = null;
 
 	public ProcessTree getTree() {
 		return tree;
+	}
+	
+	public ProcessTree getPreMinedTree() {
+		return preMinedTree;
 	}
 
 	public MiningParameters getMiningParameters() {

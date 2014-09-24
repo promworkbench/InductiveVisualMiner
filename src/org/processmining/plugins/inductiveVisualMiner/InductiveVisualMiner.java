@@ -19,6 +19,7 @@ import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.processtree.ProcessTree;
 
 public class InductiveVisualMiner {
 
@@ -30,8 +31,8 @@ public class InductiveVisualMiner {
 
 		List<XEventClassifier> classifiers = getClassifiers(xLog);
 
-		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog);
-		InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, classifiers);
+		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog, null);
+		InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, classifiers, true);
 		new InductiveVisualMinerController(context, panel, state);
 
 		return panel;
@@ -48,9 +49,9 @@ public class InductiveVisualMiner {
 		
 		List<XEventClassifier> classifiers = getClassifiers(launcher.xLog);
 
-		final InductiveVisualMinerState state = new InductiveVisualMinerState(launcher.xLog);
+		final InductiveVisualMinerState state = new InductiveVisualMinerState(launcher.xLog, launcher.preMinedTree);
 		
-		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, classifiers);
+		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, classifiers, launcher.preMinedTree == null);
 		new InductiveVisualMinerController(context, panel, state);
 
 		return panel;
@@ -58,17 +59,31 @@ public class InductiveVisualMiner {
 
 	public class InteractiveMinerLauncher {
 		public XLog xLog;
+		public ProcessTree preMinedTree;
 
 		public InteractiveMinerLauncher(XLog xLog) {
 			this.xLog = xLog;
+			this.preMinedTree = null;
+		}
+		
+		public InteractiveMinerLauncher(XLog xLog, ProcessTree preMinedTree) {
+			this.xLog = xLog;
+			this.preMinedTree = preMinedTree;
 		}
 	}
 
-	@Plugin(name = "Mine with Inductive visual Miner", returnLabels = { "Interactive Miner launcher" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = { "Log" }, userAccessible = true)
+	@Plugin(name = "Mine with Inductive visual Miner", returnLabels = { "Interactive Miner launcher" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true)
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0 })
 	public InteractiveMinerLauncher mineGuiProcessTree(UIPluginContext context, XLog xLog) {
 		return new InteractiveMinerLauncher(xLog);
+	}
+	
+	@Plugin(name = "Visualise deviations on process tree", returnLabels = { "Interactive Miner launcher" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = { "Event log", "Process tree" }, userAccessible = true)
+	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
+	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
+	public InteractiveMinerLauncher mineGuiProcessTree(UIPluginContext context, XLog xLog, ProcessTree preMinedTree) {
+		return new InteractiveMinerLauncher(xLog, preMinedTree);
 	}
 
 	//make xloginfo to obtain a list of classifiers

@@ -69,7 +69,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private InputFunction<Set<UnfoldedNode>> onSelectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			Collection<XEventClassifier> classifiers) {
+			Collection<XEventClassifier> classifiers, boolean enableMining) {
 		visualiser = new AlignedLogVisualisation();
 		initVisualisationParameters();
 
@@ -265,6 +265,14 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cGraphPanel.weighty = 1;
 			cGraphPanel.fill = GridBagConstraints.BOTH;
 			add(graphPanel, cGraphPanel);
+		}
+		
+		//handle pre-mined tree case
+		if (!enableMining) {
+			activitiesSlider.setVisible(false);
+			noiseSlider.setVisible(false);
+			classifierLabel.setVisible(false);
+			classifiersCombobox.setVisible(false);
 		}
 	}
 
