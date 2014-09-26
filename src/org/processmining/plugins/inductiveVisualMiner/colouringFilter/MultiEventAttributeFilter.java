@@ -59,10 +59,12 @@ public class MultiEventAttributeFilter extends ColouringFilter {
 
 	public boolean countInColouring(XTrace xTrace, AlignedTrace aTrace) {
 		String key = panel.getSelectedKey();
-		if (!xTrace.getAttributes().containsKey(key)) {
-			return false;
+		for (XEvent event : xTrace) {
+			if (event.getAttributes().containsKey(key) && panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
+				return true;
+			}
 		}
-		return panel.getSelectedAttributes().contains(xTrace.getAttributes().get(key));
+		return false;
 	}
 
 	public boolean isEnabled() {
@@ -71,7 +73,8 @@ public class MultiEventAttributeFilter extends ColouringFilter {
 
 	public void updateExplanation() {
 		if (panel.getSelectedAttributes().isEmpty()) {
-			panel.getExplanation().setText("<html>Include only traces that have at least one event having an attribute as selected.</html>");
+			panel.getExplanation().setText(
+					"<html>Include only traces that have at least one event having an attribute as selected.</html>");
 		} else {
 			StringBuilder s = new StringBuilder();
 			s.append("<html>Include only traces that have at least one event having attribute `");
