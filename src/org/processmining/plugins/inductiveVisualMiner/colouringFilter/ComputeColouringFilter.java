@@ -19,6 +19,16 @@ import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 
 public class ComputeColouringFilter {
 
+	/**
+	 * Apply colouring filters.
+	 * @param aLog
+	 * @param aLogInfo
+	 * @param xLog
+	 * @param xLogInfo
+	 * @param filters
+	 * @param canceller
+	 * @return
+	 */
 	public static Triple<AlignedLog, AlignedLogInfo, XLog> applyColouringFilter(final AlignedLog aLog,
 			final AlignedLogInfo aLogInfo, final XLog xLog, final XLogInfo xLogInfo, List<ColouringFilter> filters,
 			final Canceller canceller) {

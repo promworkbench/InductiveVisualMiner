@@ -22,6 +22,7 @@ import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove;
@@ -40,14 +41,16 @@ public class TraceView extends SideWindow {
 		private final Map<UnfoldedNode, Color> mapFill = new HashMap<>();
 		private final Map<UnfoldedNode, Color> mapFont = new HashMap<>();
 		private Set<UnfoldedNode> selectedNodes = new HashSet<>();
+		private Set<LogMovePosition> selectedLogMoves = new HashSet<>();
 
 		public void set(UnfoldedNode unode, Color colourFill, Color colourFont) {
 			mapFill.put(unode, colourFill);
 			mapFont.put(unode, colourFont);
 		}
 
-		public void setSelectedNodes(Set<UnfoldedNode> selectedNodes) {
+		public void setSelectedNodes(Set<UnfoldedNode> selectedNodes, Set<LogMovePosition> selectedLogMoves) {
 			this.selectedNodes = selectedNodes;
+			this.selectedLogMoves = selectedLogMoves;
 		}
 
 		public Color buildWedgeColor(Trace<? extends Event> trace, Event event) {
@@ -67,6 +70,11 @@ public class TraceView extends SideWindow {
 
 		public Stroke buildBorderStroke(Trace<? extends Event> trace, Event event) {
 			if (event instanceof Move && selectedNodes.contains(((Move) event).getUnode())) {
+				//selected node
+				return selectedStroke;
+			} else if (event instanceof Move && ((Move) event).isLogMove()
+					&& selectedLogMoves.contains(LogMovePosition.of((Move) event))) {
+				//selected log move
 				return selectedStroke;
 			}
 			return null;
@@ -74,11 +82,15 @@ public class TraceView extends SideWindow {
 
 		public Color buildBorderColor(Trace<? extends Event> trace, Event event) {
 			if (event instanceof Move && selectedNodes.contains(((Move) event).getUnode())) {
-				//selected
+				//selected node
 				return Color.white;
-			} else {
-				return null;
+			} else if (event instanceof Move && ((Move) event).isLogMove()
+					&& selectedLogMoves.contains(LogMovePosition.of((Move) event))) {
+				//selected log move
+				return Color.white;
 			}
+			return null;
+
 		}
 
 		public Color buildLabelColor(Trace<? extends Event> trace, Event event) {
@@ -139,7 +151,7 @@ public class TraceView extends SideWindow {
 				public String getName() {
 					return IMLog.getCardinalityOf(trace) + "x";
 				}
-				
+
 				public Color getNameColor() {
 					return Color.white;
 				}
@@ -147,7 +159,7 @@ public class TraceView extends SideWindow {
 				public String getInfo() {
 					return null;
 				}
-				
+
 				public Color getInfoColor() {
 					return null;
 				}
@@ -177,7 +189,7 @@ public class TraceView extends SideWindow {
 				public String getName() {
 					return alignedLog.getCardinalityOf(trace) + "x";
 				}
-				
+
 				public Color getNameColor() {
 					return Color.white;
 				}
@@ -185,7 +197,7 @@ public class TraceView extends SideWindow {
 				public String getInfo() {
 					return null;
 				}
-				
+
 				public Color getInfoColor() {
 					return null;
 				}
@@ -209,7 +221,7 @@ public class TraceView extends SideWindow {
 				public String getName() {
 					return null;
 				}
-				
+
 				public Color getNameColor() {
 					return null;
 				}
@@ -217,12 +229,11 @@ public class TraceView extends SideWindow {
 				public String getInfo() {
 					return null;
 				}
-				
+
 				public Color getInfoColor() {
 					return null;
 				}
-				
-				
+
 			};
 		}
 	}
@@ -243,13 +254,13 @@ public class TraceView extends SideWindow {
 
 		traceView = new ProMTraceList<>(traceBuilder);
 		add(traceView);
-		
+
 		traceView.setForeground(Color.white);
 		traceView.getList().setForeground(Color.white);
 		traceView.getScrollPane().setForeground(Color.white);
 		setForeground(Color.white);
 		traceView.getScrollPane().getViewport().setForeground(Color.white);
-		
+
 		traceView.setBackground(new Color(30, 30, 30));
 		traceView.setOpaque(true);
 	}

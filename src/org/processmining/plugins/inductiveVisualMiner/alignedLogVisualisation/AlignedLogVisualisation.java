@@ -24,6 +24,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet;
@@ -92,8 +93,8 @@ public class AlignedLogVisualisation {
 		//add log-move-arcs to source and sink
 		//a parallel root will project its own log moves 
 		if (parameters.isShowLogMoves() && !(root.getBlock() instanceof And)) {
-			visualiseLogMove(source, source, root, null, root, true);
-			visualiseLogMove(sink, sink, root, root, null, false);
+			visualiseLogMove(source, source, root, LogMovePosition.atSource(root), true);
+			visualiseLogMove(sink, sink, root, LogMovePosition.atSink(root), false);
 		}
 
 		return Pair.of(dot, info);
@@ -127,14 +128,6 @@ public class AlignedLogVisualisation {
 			long modelMoves = AlignedLogMetrics.getModelMovesLocal(unode, logInfo);
 			if (modelMoves != 0) {
 				addMoveArc(source, sink, unode, EdgeType.modelMove, null, null, modelMoves, directionForward);
-			}
-		}
-
-		//draw self-log moves
-		if (parameters.isShowLogMoves()) {
-			MultiSet<XEventClass> selfLogMoves = AlignedLogMetrics.getLogMoves(unode, unode, logInfo);
-			if (selfLogMoves.size() != 0) {
-				visualiseLogMove(dotNode, dotNode, unode, unode, unode, directionForward);
 			}
 		}
 	}
@@ -191,7 +184,7 @@ public class AlignedLogVisualisation {
 
 			//draw log-move-arc if necessary
 			if (parameters.isShowLogMoves()) {
-				visualiseLogMove(split, split, unode, unode, unode.unfoldChild(child), directionForward);
+				visualiseLogMove(split, split, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(child)), directionForward);
 			}
 		}
 	}
@@ -216,8 +209,8 @@ public class AlignedLogVisualisation {
 
 		//put log-moves on children
 		if (parameters.isShowLogMoves()) {
-			visualiseLogMove(join, join, unode, unode, unode.unfoldChild(bodyChild), directionForward);
-			visualiseLogMove(split, split, unode, unode, unode.unfoldChild(redoChild), directionForward);
+			visualiseLogMove(join, join, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(bodyChild)), directionForward);
+			visualiseLogMove(split, split, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(redoChild)), directionForward);
 
 			//log moves can be projected before the exit-tau
 			//(assume it's tau)
@@ -243,10 +236,10 @@ public class AlignedLogVisualisation {
 		//put log-moves, if necessary
 		if (parameters.isShowLogMoves()) {
 			//on split
-			visualiseLogMove(split, split, unode, null, unode, directionForward);
+			visualiseLogMove(split, split, unode, LogMovePosition.atSource(unode), directionForward);
 
 			//on join
-			visualiseLogMove(join, join, unode, unode, null, directionForward);
+			visualiseLogMove(join, join, unode, LogMovePosition.atSink(unode), directionForward);
 		}
 	}
 
@@ -302,22 +295,22 @@ public class AlignedLogVisualisation {
 		return edge;
 	}
 
-	private void visualiseLogMove(LocalDotNode from, LocalDotNode to, UnfoldedNode unode, UnfoldedNode lookupNode1,
-			UnfoldedNode lookupNode2, boolean directionForward) {
-		MultiSet<XEventClass> logMoves = AlignedLogMetrics.getLogMoves(lookupNode1, lookupNode2, logInfo);
+	private void visualiseLogMove(LocalDotNode from, LocalDotNode to, UnfoldedNode unode,
+			LogMovePosition logMovePosition, boolean directionForward) {
+		MultiSet<XEventClass> logMoves = AlignedLogMetrics.getLogMoves(logMovePosition, logInfo);
 		if (logMoves.size() > 0) {
 			if (parameters.isRepairLogMoves()) {
 				for (XEventClass e : logMoves) {
 					long cardinality = logMoves.getCardinalityOf(e);
 					LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.logMoveActivity, e.toString(), unode);
-					addMoveArc(from, dotNode, unode, EdgeType.logMove, lookupNode1, lookupNode2, cardinality,
-							directionForward);
-					addMoveArc(dotNode, to, unode, EdgeType.logMove, lookupNode1, lookupNode2, cardinality,
-							directionForward);
+					addMoveArc(from, dotNode, unode, EdgeType.logMove, logMovePosition.getOn(),
+							logMovePosition.getBeforeChild(), cardinality, directionForward);
+					addMoveArc(dotNode, to, unode, EdgeType.logMove, logMovePosition.getOn(),
+							logMovePosition.getBeforeChild(), cardinality, directionForward);
 				}
 			} else {
-				addMoveArc(from, to, unode, EdgeType.logMove, lookupNode1, lookupNode2, logMoves.size(),
-						directionForward);
+				addMoveArc(from, to, unode, EdgeType.logMove, logMovePosition.getOn(),
+						logMovePosition.getBeforeChild(), logMoves.size(), directionForward);
 			}
 		}
 	}

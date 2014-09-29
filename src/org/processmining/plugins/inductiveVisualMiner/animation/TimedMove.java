@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.animation;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
 public class TimedMove extends Move {
@@ -33,7 +34,7 @@ public class TimedMove extends Move {
 
 	public TimedMove(Move move, Long logTimestamp) {
 		super(move.getType(), move.getUnode(), move.getEventClass());
-		setLogMove(move.getLogMoveUnode(), move.getLogMoveBeforeChild());
+		setLogMove(LogMovePosition.beforeChild(move.getLogMoveUnode(), move.getLogMoveBeforeChild()));
 		setLogMoveParallelBranchMappedTo(move.getLogMoveParallelBranchMappedTo());
 		this.logTimestamp = logTimestamp;
 	}

@@ -26,7 +26,7 @@ import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Quintuple;
-import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
@@ -38,12 +38,14 @@ import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.ComputeAlignment;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
@@ -177,6 +179,7 @@ public class InductiveVisualMinerController {
 		protected void processResult(ProcessTree result) {
 			state.setTree(result);
 			state.setSelectedNodes(new HashSet<UnfoldedNode>());
+			state.setSelectedLogMoves(new HashSet<LogMovePosition>());
 			state.resetAlignment();
 
 			panel.getSaveModelButton().setEnabled(true);
@@ -230,6 +233,10 @@ public class InductiveVisualMinerController {
 		protected Object generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
+			//if the view does not show log moves anymore, do not select any nodes
+			if (state.getColourMode() == ColourMode.paths) {
+				state.setSelectedLogMoves(new HashSet<LogMovePosition>());
+			}
 			return null;
 		}
 
@@ -241,7 +248,7 @@ public class InductiveVisualMinerController {
 		protected void processResult(Object result) {
 			Pair<Dot, AlignedLogVisualisationInfo> p = panel.updateModel(state);
 			state.setLayout(p.getLeft(), p.getRight());
-			makeNodesSelectable(state.getVisualisationInfo(), panel, state.getSelectedNodes());
+			makeNodesSelectable(state.getVisualisationInfo(), panel, state.getSelectedNodes(), state.getSelectedLogMoves());
 		}
 
 		public void cancel() {
@@ -252,30 +259,31 @@ public class InductiveVisualMinerController {
 	//filter log for node selection
 	private class FilterNodeSelection
 			extends
-			ChainLink<Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, List<ColouringFilter>>, Triple<AlignedLog, AlignedLogInfo, XLog>> {
+			ChainLink<Septuple<AlignedLog, Set<UnfoldedNode>, Set<LogMovePosition>, AlignedLogInfo, XLog, XLogInfo, List<ColouringFilter>>, Triple<AlignedLog, AlignedLogInfo, XLog>> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
-		protected Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, List<ColouringFilter>> generateInput() {
+		protected Septuple<AlignedLog, Set<UnfoldedNode>, Set<LogMovePosition>, AlignedLogInfo, XLog, XLogInfo, List<ColouringFilter>> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			return Sextuple.of(state.getAlignedLog(), state.getSelectedNodes(), state.getAlignedLogInfo(),
-					state.getXLog(), state.getXLogInfo(), state.getColouringFilters());
+			return Septuple.of(state.getAlignedLog(), state.getSelectedNodes(), state.getSelectedLogMoves(),
+					state.getAlignedLogInfo(), state.getXLog(), state.getXLogInfo(), state.getColouringFilters());
 		}
 
 		protected Triple<AlignedLog, AlignedLogInfo, XLog> executeLink(
-				Sextuple<AlignedLog, Set<UnfoldedNode>, AlignedLogInfo, XLog, XLogInfo, List<ColouringFilter>> input) {
+				Septuple<AlignedLog, Set<UnfoldedNode>, Set<LogMovePosition>, AlignedLogInfo, XLog, XLogInfo, List<ColouringFilter>> input) {
 			setStatus("Colouring selection..");
 
 			canceller.reset();
 
 			//apply colour filters
 			Triple<AlignedLog, AlignedLogInfo, XLog> colouringFilteredAlignment = ComputeColouringFilter
-					.applyColouringFilter(input.getA(), input.getC(), input.getD(), input.getE(), input.getF(),
+					.applyColouringFilter(input.getA(), input.getD(), input.getE(), input.getF(), input.getG(),
 							canceller);
 
-			if (input.getB().size() > 0) {
-				return filterOnSelection(colouringFilteredAlignment.getA(), input.getB(),
+			//apply node/edge selection filters
+			if (!input.getB().isEmpty() || !input.getC().isEmpty()) {
+				return filterOnSelection(colouringFilteredAlignment.getA(), input.getB(), input.getC(),
 						colouringFilteredAlignment.getC());
 			} else {
 				return colouringFilteredAlignment;
@@ -359,6 +367,11 @@ public class InductiveVisualMinerController {
 				LocalDotNode dotNode = Animation.getDotNodeFromActivity(unode, state.getVisualisationInfo());
 				InductiveVisualMinerSelectionColourer.colourSelectedNode(panel.getGraph().getSVG(), dotNode, true);
 			}
+			//re-colour the selected log moves
+			for (LogMovePosition logMove : state.getSelectedLogMoves()) {
+				LocalDotEdge dotEdge = Animation.getDotEdgeFromLogMove(logMove, state.getVisualisationInfo());
+				InductiveVisualMinerSelectionColourer.colourSelectedEdge(panel.getGraph().getSVG(), dotEdge, true);
+			}
 		}
 
 		public void cancel() {
@@ -382,11 +395,11 @@ public class InductiveVisualMinerController {
 			TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colour(panel.getGraph().getSVG(),
 					state.getVisualisationInfo(), state.getTree(), result,
 					InductiveVisualMinerPanel.getViewParameters(state));
-			updateSelectionDescription(panel, state.getSelectedNodes());
+			updateSelectionDescription(panel, state.getSelectedNodes(), state.getSelectedLogMoves());
 
 			//make a colour map for the trace view
 			panel.getTraceView().setColourMap(colourMap);
-			colourMap.setSelectedNodes(state.getSelectedNodes());
+			colourMap.setSelectedNodes(state.getSelectedNodes(), state.getSelectedLogMoves());
 
 			setStatus(" ");
 			panel.repaint();
@@ -480,9 +493,10 @@ public class InductiveVisualMinerController {
 		});
 
 		//node selection changed
-		panel.setOnSelectionChanged(new InputFunction<Set<UnfoldedNode>>() {
-			public void call(Set<UnfoldedNode> input) throws Exception {
-				state.setSelectedNodes(input);
+		panel.setOnSelectionChanged(new InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>>() {
+			public void call(Pair<Set<UnfoldedNode>, Set<LogMovePosition>> input) throws Exception {
+				state.setSelectedNodes(input.getA());
+				state.setSelectedLogMoves(input.getB());
 				chain.execute(FilterNodeSelection.class);
 			}
 		});
@@ -611,9 +625,12 @@ public class InductiveVisualMinerController {
 	}
 
 	private static void makeNodesSelectable(AlignedLogVisualisationInfo info, InductiveVisualMinerPanel panel,
-			Set<UnfoldedNode> selectedNodes) {
+			Set<UnfoldedNode> selectedNodes, Set<LogMovePosition> selectedLogMoves) {
 		for (LocalDotNode dotNode : info.getAllActivityNodes()) {
 			panel.makeNodeSelectable(dotNode, selectedNodes.contains(dotNode.getUnode()));
+		}
+		for (LocalDotEdge logMoveEdge : info.getAllLogMoveEdges()) {
+			panel.makeEdgeSelectable(logMoveEdge, selectedLogMoves.contains(LogMovePosition.of(logMoveEdge)));
 		}
 	}
 
@@ -622,12 +639,18 @@ public class InductiveVisualMinerController {
 	}
 
 	private static Triple<AlignedLog, AlignedLogInfo, XLog> filterOnSelection(AlignedLog alignedLog,
-			Set<UnfoldedNode> selected, XLog xLog) {
+			Set<UnfoldedNode> selectedNodes, Set<LogMovePosition> selectedLogMoves, XLog xLog) {
 
 		AlignedLog fl = new AlignedLog();
+		boolean useNodes = !selectedNodes.isEmpty();
+		boolean useLogMoves = !selectedLogMoves.isEmpty();
 		for (AlignedTrace trace : alignedLog) {
 			for (Move move : trace) {
-				if (move.isModelSync() && selected.contains(move.getUnode())) {
+				if (useNodes && move.isModelSync() && selectedNodes.contains(move.getUnode())) {
+					fl.add(trace, alignedLog.getCardinalityOf(trace));
+					break;
+				}
+				if (useLogMoves && move.isLogMove() && selectedLogMoves.contains(LogMovePosition.of(move))) {
 					fl.add(trace, alignedLog.getCardinalityOf(trace));
 					break;
 				}
@@ -639,25 +662,39 @@ public class InductiveVisualMinerController {
 		return Triple.of(fl, fli, xLog);
 	}
 
-	private static void updateSelectionDescription(InductiveVisualMinerPanel panel, Set<UnfoldedNode> selected) {
+	private static void updateSelectionDescription(InductiveVisualMinerPanel panel, Set<UnfoldedNode> selectedNodes,
+			Set<LogMovePosition> selectedLogMoves) {
 		//show the user which traces are shown
-		if (selected.size() == 0) {
-			panel.getSelectionLabel().setText("Showing all traces\n");
+		if (selectedNodes.isEmpty()) {
+			if (selectedLogMoves.isEmpty()) {
+				//none
+				panel.getSelectionLabel().setText("Showing all traces\n");
+			} else {
+				//log moves only
+				panel.getSelectionLabel().setText(
+						"Showing traces that have an only-in-log event at a position as selected.");
+			}
 		} else {
-			String s = "Showing traces that (should) pass through ";
-			Iterator<UnfoldedNode> it = selected.iterator();
-			{
-				s += it.next().getNode();
-			}
-			while (it.hasNext()) {
-				String p = it.next().getNode().toString();
-				if (it.hasNext()) {
-					s += ", " + p;
-				} else {
-					s += " or " + p;
+			if (selectedLogMoves.isEmpty()) {
+				//nodes only
+				String s = "Showing traces that (should) pass through ";
+				Iterator<UnfoldedNode> it = selectedNodes.iterator();
+				{
+					s += it.next().getNode();
 				}
+				while (it.hasNext()) {
+					String p = it.next().getNode().toString();
+					if (it.hasNext()) {
+						s += ", " + p;
+					} else {
+						s += " or " + p;
+					}
+				}
+				panel.getSelectionLabel().setText(s);
+			} else {
+				//both
+				panel.getSelectionLabel().setText("complicated");
 			}
-			panel.getSelectionLabel().setText(s);
 		}
 	}
 

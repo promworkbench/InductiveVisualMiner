@@ -8,6 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Al
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
@@ -98,6 +99,15 @@ public class Animation {
 		for (LocalDotNode node : info.getNodes(unode)) {
 			if (node.getType() == NodeType.activity) {
 				return node;
+			}
+		}
+		return null;
+	}
+	
+	public static LocalDotEdge getDotEdgeFromLogMove(LogMovePosition logMovePosition, AlignedLogVisualisationInfo info) {
+		for (LocalDotEdge edge: info.getAllLogMoveEdges()) {
+			if (logMovePosition.equals(LogMovePosition.of(edge))) {
+				return edge;
 			}
 		}
 		return null;

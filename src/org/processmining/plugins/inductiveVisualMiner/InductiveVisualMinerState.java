@@ -15,6 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Al
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.processtree.ProcessTree;
@@ -211,7 +212,8 @@ public class InductiveVisualMinerState {
 	}
 
 	//==colour filtering ( & node selection)==
-	private Set<UnfoldedNode> selectedNodes = new HashSet<UnfoldedNode>();
+	private Set<UnfoldedNode> selectedNodes = new HashSet<>();
+	private Set<LogMovePosition> selectedLogMoves = new HashSet<>();
 	private List<ColouringFilter> colouringFilters;
 
 	public Set<UnfoldedNode> getSelectedNodes() {
@@ -220,6 +222,14 @@ public class InductiveVisualMinerState {
 
 	public synchronized void setSelectedNodes(Set<UnfoldedNode> selectedNodes) {
 		this.selectedNodes = selectedNodes;
+	}
+	
+	public Set<LogMovePosition> getSelectedLogMoves() {
+		return selectedLogMoves;
+	}
+	
+	public synchronized void setSelectedLogMoves(Set<LogMovePosition> selectedLogMoves) {
+		this.selectedLogMoves = selectedLogMoves;
 	}
 
 	public List<ColouringFilter> getColouringFilters() {

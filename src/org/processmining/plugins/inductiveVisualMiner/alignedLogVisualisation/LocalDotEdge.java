@@ -10,11 +10,19 @@ public class LocalDotEdge extends DotEdge {
 		model, logMove, modelMove
 	};
 	
+	public class Appearance {
+		public String textFill;
+		public String textStroke;
+		public String textStrokeWidth;
+		public String lineStrokeDashArray;
+	}
+	
 	private final EdgeType type;
 	private final UnfoldedNode unode;
 	private final UnfoldedNode lookupNode1;
 	private final UnfoldedNode lookupNode2;
 	private final boolean directionForward;
+	public final Appearance unselectedAppearance = new Appearance();
 
 	public LocalDotEdge(Dot dot, AlignedLogVisualisationInfo info, LocalDotNode source, LocalDotNode target,
 			String label, String options, UnfoldedNode unode, EdgeType type, UnfoldedNode lookupNode1,

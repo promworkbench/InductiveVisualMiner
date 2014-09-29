@@ -14,6 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Lo
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
@@ -39,6 +40,24 @@ public class InductiveVisualMinerSelectionColourer {
 			DotPanel.setCSSAttributeOf(shape, "stroke", dotNode.unselectedAppearance.stroke);
 			DotPanel.setCSSAttributeOf(shape, "stroke-width", dotNode.unselectedAppearance.strokeWidth);
 			DotPanel.setCSSAttributeOf(shape, "stroke-dasharray", dotNode.unselectedAppearance.strokeDashArray);
+		}
+	}
+	
+	public static void colourSelectedEdge(SVGDiagram svg, LocalDotEdge dotEdge, boolean selected) {
+		Group svgGroup = DotPanel.getSVGElementOf(svg, dotEdge);
+		SVGElement line = svgGroup.getChild(1);
+		SVGElement text = svgGroup.getChild(3);
+		
+		if (selected) {
+			dotEdge.unselectedAppearance.textFill = DotPanel.setCSSAttributeOf(text, "fill", "none");
+			dotEdge.unselectedAppearance.textStroke = DotPanel.setCSSAttributeOf(text, "stroke", "red");
+			dotEdge.unselectedAppearance.textStrokeWidth = DotPanel.setCSSAttributeOf(text, "stroke-width", "0.55");
+			dotEdge.unselectedAppearance.lineStrokeDashArray = DotPanel.setCSSAttributeOf(line, "stroke-dasharray", "2,5");
+		} else {
+			DotPanel.setCSSAttributeOf(text, "fill", dotEdge.unselectedAppearance.textFill);
+			DotPanel.setCSSAttributeOf(text, "stroke", dotEdge.unselectedAppearance.textStroke);
+			DotPanel.setCSSAttributeOf(text, "stroke-width", dotEdge.unselectedAppearance.textStrokeWidth);
+			DotPanel.setCSSAttributeOf(line, "stroke-dasharray", dotEdge.unselectedAppearance.lineStrokeDashArray);
 		}
 	}
 
@@ -150,14 +169,7 @@ public class InductiveVisualMinerSelectionColourer {
 			AlignedLogVisualisationParameters parameters, long minCardinality, long maxCardinality) throws SVGException {
 		for (LocalDotEdge dotEdge : info.getAllModelEdges()) {
 			long cardinality;
-			//				if (!panel.getUnfoldedNode2DfgdotEdges().containsKey(unode)) {
-			//normal model edge
 			cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(dotEdge.getUnode(), logInfo);
-			//				} else {
-			//				//	directly-follows edge
-			//					cardinality = AlignedLogMetrics.getNumberOfTimesDfgEdgeTaken((LocalDotEdge) dotEdge,
-			//							dfgLogInfos.get(unode));
-			//				}
 			styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality, parameters.getColourModelEdges(),
 					parameters.isShowFrequenciesOnModelEdges(), parameters.getModelEdgesWidth());
 		}
@@ -174,8 +186,8 @@ public class InductiveVisualMinerSelectionColourer {
 
 		//style log moves
 		for (LocalDotEdge dotEdge : info.getAllLogMoveEdges()) {
-			long cardinality = AlignedLogMetrics.getLogMoves(dotEdge.getLookupNode1(), dotEdge.getLookupNode2(),
-					logInfo).size();
+			LogMovePosition logMovePosition = LogMovePosition.of(dotEdge);
+			long cardinality = AlignedLogMetrics.getLogMoves(logMovePosition, logInfo).size();
 			styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality, parameters.getColourMoves(),
 					parameters.isShowFrequenciesOnMoveEdges(), parameters.getMoveEdgesWidth());
 		}

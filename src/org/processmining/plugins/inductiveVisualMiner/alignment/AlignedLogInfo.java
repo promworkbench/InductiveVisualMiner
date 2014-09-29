@@ -32,13 +32,13 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 	// (node1, node2) on node1, before node2 (only in case of node1 sequence or loop)
 	// (root, null) at end of trace
 	// (null, root) at start of trace
-	private final Map<Pair<UnfoldedNode, UnfoldedNode>, MultiSet<XEventClass>> logMoves;
+	private final Map<LogMovePosition, MultiSet<XEventClass>> logMoves;
 	private final MultiSet<Pair<UnfoldedNode, UnfoldedNode>> dfg;
 
 	public AlignedLogInfo() {
 		super(new AlignedLog());
 		modelMoves = new MultiSet<UnfoldedNode>();
-		logMoves = new HashMap<Pair<UnfoldedNode, UnfoldedNode>, MultiSet<XEventClass>>();
+		logMoves = new HashMap<LogMovePosition, MultiSet<XEventClass>>();
 		unlabeledLogMoves = new MultiSet<String>();
 		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
 	}
@@ -46,7 +46,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 	public AlignedLogInfo(MultiSet<AlignedTrace> log) {
 		super(log);
 		modelMoves = new MultiSet<UnfoldedNode>();
-		logMoves = new HashMap<Pair<UnfoldedNode, UnfoldedNode>, MultiSet<XEventClass>>();
+		logMoves = new HashMap<LogMovePosition, MultiSet<XEventClass>>();
 		unlabeledLogMoves = new MultiSet<String>();
 		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
 		UnfoldedNode root = null;
@@ -245,20 +245,19 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 	}
 
 	private void addLogMove(Move move, UnfoldedNode unode, UnfoldedNode beforeChild, XEventClass e, long cardinality) {
-		move.setLogMove(unode, beforeChild);
-
-		Pair<UnfoldedNode, UnfoldedNode> key = new Pair<UnfoldedNode, UnfoldedNode>(unode, beforeChild);
-		if (!logMoves.containsKey(key)) {
-			logMoves.put(key, new MultiSet<XEventClass>());
+		LogMovePosition logMovePosition = LogMovePosition.beforeChild(unode, beforeChild);
+		move.setLogMove(logMovePosition);
+		if (!logMoves.containsKey(logMovePosition)) {
+			logMoves.put(logMovePosition, new MultiSet<XEventClass>());
 		}
-		logMoves.get(key).add(e, cardinality);
+		logMoves.get(logMovePosition).add(e, cardinality);
 	}
 
 	public MultiSet<UnfoldedNode> getModelMoves() {
 		return modelMoves;
 	}
 
-	public Map<Pair<UnfoldedNode, UnfoldedNode>, MultiSet<XEventClass>> getLogMoves() {
+	public Map<LogMovePosition, MultiSet<XEventClass>> getLogMoves() {
 		return logMoves;
 	}
 

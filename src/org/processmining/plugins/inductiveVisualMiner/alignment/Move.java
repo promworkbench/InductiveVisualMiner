@@ -82,9 +82,9 @@ public class Move implements Event {
 		return logMoveBeforeChild;
 	}
 
-	public void setLogMove(UnfoldedNode logMoveUnode, UnfoldedNode logMoveBeforeChild) {
-		this.logMoveUnode = logMoveUnode;
-		this.logMoveBeforeChild = logMoveBeforeChild;
+	public void setLogMove(LogMovePosition logMovePosition) {
+		this.logMoveUnode = logMovePosition.getOn();
+		this.logMoveBeforeChild = logMovePosition.getBeforeChild();
 	}
 
 	public UnfoldedNode getLogMoveUnode() {

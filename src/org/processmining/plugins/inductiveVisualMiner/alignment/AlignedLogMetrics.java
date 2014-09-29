@@ -90,11 +90,10 @@ public class AlignedLogMetrics {
 		return logInfo.getModelMoves().getCardinalityOf(unode);
 	}
 
-	public static MultiSet<XEventClass> getLogMoves(UnfoldedNode unode1, UnfoldedNode unode2,
+	public static MultiSet<XEventClass> getLogMoves(LogMovePosition logMovePosition,
 			AlignedLogInfo logInfo) {
-		Pair<UnfoldedNode, UnfoldedNode> key = Pair.of(unode1, unode2);
-		if (logInfo.getLogMoves().containsKey(key)) {
-			return logInfo.getLogMoves().get(key);
+		if (logInfo.getLogMoves().containsKey(logMovePosition)) {
+			return logInfo.getLogMoves().get(logMovePosition);
 		}
 		return new MultiSet<XEventClass>();
 	}

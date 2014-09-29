@@ -31,7 +31,9 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
@@ -66,7 +68,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	private final AlignedLogVisualisation visualiser;
 
-	private InputFunction<Set<UnfoldedNode>> onSelectionChanged = null;
+	private InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
 			Collection<XEventClassifier> classifiers, boolean enableMining) {
@@ -164,7 +166,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
 			add(traceViewButton, cTraceViewButton);
 		}
-		
+
 		//colouring filters view
 		{
 			colouringFiltersView = new ColouringFiltersView(this);
@@ -243,14 +245,19 @@ public class InductiveVisualMinerPanel extends JPanel {
 				public void selectionChanged() {
 					//selection of nodes changed; keep track of them
 
-					Set<UnfoldedNode> result = new HashSet<UnfoldedNode>();
+					Set<UnfoldedNode> resultNodes = new HashSet<>();
+					Set<LogMovePosition> resultLogMoveEdges = new HashSet<>();
 					for (DotElement dotElement : graphPanel.getSelectedElements()) {
-						result.add(((LocalDotNode) dotElement).getUnode());
+						if (dotElement instanceof LocalDotNode) {
+							resultNodes.add(((LocalDotNode) dotElement).getUnode());
+						} else if (dotElement instanceof LocalDotEdge) {
+							resultLogMoveEdges.add(LogMovePosition.of(((LocalDotEdge) dotElement)));
+						}
 					}
 
 					if (onSelectionChanged != null) {
 						try {
-							onSelectionChanged.call(result);
+							onSelectionChanged.call(Pair.of(resultNodes, resultLogMoveEdges));
 						} catch (Exception e) {
 						}
 					}
@@ -266,7 +273,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cGraphPanel.fill = GridBagConstraints.BOTH;
 			add(graphPanel, cGraphPanel);
 		}
-		
+
 		//handle pre-mined tree case
 		if (!enableMining) {
 			activitiesSlider.setVisible(false);
@@ -359,6 +366,24 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 	}
 
+	public void makeEdgeSelectable(final LocalDotEdge dotEdge, boolean select) {
+		dotEdge.setSelectable(true);
+		dotEdge.addSelectionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DotPanel panel = (DotPanel) e.getSource();
+				InductiveVisualMinerSelectionColourer.colourSelectedEdge(panel.getSVG(), dotEdge, true);
+				panel.repaint();
+			}
+		});
+		dotEdge.addDeselectionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DotPanel panel = (DotPanel) e.getSource();
+				InductiveVisualMinerSelectionColourer.colourSelectedEdge(panel.getSVG(), dotEdge, false);
+				panel.repaint();
+			}
+		});
+	}
+
 	public DotPanel getGraph() {
 		return graphPanel;
 	}
@@ -403,7 +428,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return saveImageButton;
 	}
 
-	public void setOnSelectionChanged(InputFunction<Set<UnfoldedNode>> onSelectionChanged) {
+	public void setOnSelectionChanged(InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged) {
 		this.onSelectionChanged = onSelectionChanged;
 	}
 
@@ -414,11 +439,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public JButton getTraceViewButton() {
 		return traceViewButton;
 	}
-	
+
 	public ColouringFiltersView getColouringFiltersView() {
 		return colouringFiltersView;
 	}
-	
+
 	public JButton getColouringFiltersViewButton() {
 		return colouringFiltersViewButton;
 	}
