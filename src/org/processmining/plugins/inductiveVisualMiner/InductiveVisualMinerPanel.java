@@ -170,7 +170,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		//colouring filters view
 		{
 			colouringFiltersView = new ColouringFiltersView(this);
-			colouringFiltersViewButton = SlickerFactory.instance().createButton("colour filters");
+			colouringFiltersViewButton = SlickerFactory.instance().createButton("highlighting filters");
 			GridBagConstraints cColouringFiltersViewButton = new GridBagConstraints();
 			cColouringFiltersViewButton.gridx = 2;
 			cColouringFiltersViewButton.gridy = gridy++;
