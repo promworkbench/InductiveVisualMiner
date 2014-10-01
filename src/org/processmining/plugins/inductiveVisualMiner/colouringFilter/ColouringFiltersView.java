@@ -199,7 +199,7 @@ public class ColouringFiltersView extends SideWindow {
 
 		//add animation message
 		if (maxAnimatedTraces < numberOfTraces) {
-			s += "; animating the first " + maxAnimatedTraces + " of these " + numberOfTraces + ".";
+			s += "; animating the first " + maxAnimatedTraces + ".";
 		} else {
 			s += ".";
 		}
