@@ -1,32 +1,33 @@
-package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
+package org.processmining.plugins.inductiveVisualMiner.colouringFilter.filters;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.deckfour.xes.model.XAttribute;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
+import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
+import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterGui;
 
-public class MultiTraceAttributeFilter extends ColouringFilter {
+public class ColouringFilterTraceWithEventTwice extends ColouringFilter {
 
 	MultiAttributeFilterGui panel = null;
 	boolean block = true;
-
+	
 	public String getName() {
-		return "Trace attribute filter";
+		return "Event happening twice filter";
 	}
 
 	public ColouringFilterGui createGui(XLog log) {
-		final Map<String, Set<XAttribute>> traceAttributes = getTraceAttributeMap(log);
+		final Map<String, Set<XAttribute>> traceAttributes = MultiEventAttributeFilter.getEventAttributeMap(log);
 		panel = new MultiAttributeFilterGui(traceAttributes, getName());
 
 		// Key selector
@@ -56,24 +57,31 @@ public class MultiTraceAttributeFilter extends ColouringFilter {
 		return panel;
 	}
 
-	public boolean countInColouring(XTrace xTrace, AlignedTrace aTrace) {
-		String key = panel.getSelectedKey();
-		if (!xTrace.getAttributes().containsKey(key)) {
-			return false;
-		}
-		return panel.getSelectedAttributes().contains(xTrace.getAttributes().get(key));
-	}
-
-	public boolean isEnabled() {
+	protected boolean isEnabled() {
 		return !panel.getSelectedAttributes().isEmpty();
 	}
 
+	public boolean countInColouring(XTrace xTrace, AlignedTrace aTrace) {
+		String key = panel.getSelectedKey();
+		int count = 0;
+		for (XEvent event : xTrace) {
+			if (event.getAttributes().containsKey(key) && panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
+				count++;
+				if (count >= 2) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	public void updateExplanation() {
 		if (panel.getSelectedAttributes().isEmpty()) {
-			panel.getExplanation().setText("<html>Include only traces having an attribute as selected.</html>");
+			panel.getExplanation().setText(
+					"<html>Include only traces that have at least two events having an attribute as selected.</html>");
 		} else {
 			StringBuilder s = new StringBuilder();
-			s.append("<html>Include only traces having attribute `");
+			s.append("<html>Include only traces that have at least two events having attribute `");
 			s.append(panel.getSelectedKey());
 			s.append("' being ");
 			List<XAttribute> attributes = panel.getSelectedAttributes();
@@ -94,19 +102,5 @@ public class MultiTraceAttributeFilter extends ColouringFilter {
 			panel.getExplanation().setText(s.toString());
 		}
 	}
-
-	private static Map<String, Set<XAttribute>> getTraceAttributeMap(XLog log) {
-		Map<String, Set<XAttribute>> traceAttributes = new TreeMap<String, Set<XAttribute>>();
-
-		for (XTrace trace : log) {
-			for (XAttribute traceAttribute : trace.getAttributes().values()) {
-				if (!traceAttributes.containsKey(traceAttribute.getKey())) {
-					traceAttributes.put(traceAttribute.getKey(), new TreeSet<XAttribute>());
-				}
-				traceAttributes.get(traceAttribute.getKey()).add(traceAttribute);
-			}
-		}
-		return traceAttributes;
-	}
-
+	
 }

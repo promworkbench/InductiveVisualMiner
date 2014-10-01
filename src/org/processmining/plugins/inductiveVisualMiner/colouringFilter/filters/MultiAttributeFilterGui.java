@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
+package org.processmining.plugins.inductiveVisualMiner.colouringFilter.filters;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -19,6 +19,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 
 import org.deckfour.xes.model.XAttribute;
+import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterGui;
 
 import com.fluxicon.slickerbox.factory.SlickerFactory;
 
