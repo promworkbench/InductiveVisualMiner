@@ -51,23 +51,22 @@ public class AlignmentETM {
 
 		//perform alignment
 		CentralRegistry registry = new CentralRegistry(log, classifier, new Random());
-				
-		XEventClasses e = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
-		System.out.println("checking xeventclasses " + e.size());
-		for (XTrace trace : log) {
-			for (XEvent event : trace) {
-				XEventClass eventClass = e.getClassOf(event);
-				if (!registry.getLogCosts().containsKey(eventClass)) {
-					System.out.println("eventclass " + eventClass + " not in registry");
+
+		//debug output for 
+		{
+			XEventClasses e = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
+			System.out.println("checking xeventclasses " + e.size());
+			for (XTrace trace : log) {
+				for (XEvent event : trace) {
+					XEventClass eventClass = e.getClassOf(event);
+					if (!registry.getLogCosts().containsKey(eventClass)) {
+						System.out.println("eventclass " + eventClass + " not in registry");
+					}
 				}
 			}
+			System.out.println("done " + registry.getLogCosts().keySet().size());
 		}
-		System.out.println("done " + registry.getLogCosts().keySet().size());
-		//todo
-//		registry.getLogCosts(); //change
-//		CentralRegistry.MLcost;
-//		registry.updateLogDerived();
-		
+
 		ProcessTreeToNAryTree pt2nt = new ProcessTreeToNAryTree(registry.getEventClasses());
 		NAryTree nTree = pt2nt.convert(tree);
 
@@ -89,7 +88,7 @@ public class AlignmentETM {
 
 			TreeRecord tr = behC.getAlignment(naryTrace);
 			List<TreeRecord> naryMoves = TreeRecord.getHistory(tr);
-			long cardinality = registry.getaStarAlgorithm().getTraceFreq(naryTrace);			
+			long cardinality = registry.getaStarAlgorithm().getTraceFreq(naryTrace);
 
 			for (TreeRecord naryMove : naryMoves) {
 
