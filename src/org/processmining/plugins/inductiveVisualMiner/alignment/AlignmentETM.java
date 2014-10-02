@@ -9,8 +9,12 @@ import nl.tue.astar.AStarThread.Canceller;
 import nl.tue.astar.Trace;
 
 import org.deckfour.xes.classification.XEventClass;
+import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.info.XLogInfoFactory;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
@@ -47,6 +51,23 @@ public class AlignmentETM {
 
 		//perform alignment
 		CentralRegistry registry = new CentralRegistry(log, classifier, new Random());
+				
+		XEventClasses e = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
+		System.out.println("checking xeventclasses " + e.size());
+		for (XTrace trace : log) {
+			for (XEvent event : trace) {
+				XEventClass eventClass = e.getClassOf(event);
+				if (!registry.getLogCosts().containsKey(eventClass)) {
+					System.out.println("eventclass " + eventClass + " not in registry");
+				}
+			}
+		}
+		System.out.println("done " + registry.getLogCosts().keySet().size());
+		//todo
+//		registry.getLogCosts(); //change
+//		CentralRegistry.MLcost;
+//		registry.updateLogDerived();
+		
 		ProcessTreeToNAryTree pt2nt = new ProcessTreeToNAryTree(registry.getEventClasses());
 		NAryTree nTree = pt2nt.convert(tree);
 
