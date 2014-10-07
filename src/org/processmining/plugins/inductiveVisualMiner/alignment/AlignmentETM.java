@@ -68,10 +68,13 @@ public class AlignmentETM {
 		}
 
 		ProcessTreeToNAryTree pt2nt = new ProcessTreeToNAryTree(registry.getEventClasses());
+		
+
 		NAryTree nTree = pt2nt.convert(tree);
+		registry.updateLogDerived();
 
 		FitnessReplay fr = new FitnessReplay(registry, canceller);
-		//		fr.setNrThreads(20);
+		fr.setNrThreads(20);
 		fr.setDetailedAlignmentInfoEnabled(true);
 		double fitness = fr.getFitness(nTree, null);
 		BehaviorCounter behC = registry.getFitness(nTree).behaviorCounter;
