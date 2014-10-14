@@ -47,7 +47,7 @@ public class ComputeTimedLog {
 		}
 
 		//construct a timed trace
-		TimedTrace timedTrace = new TimedTrace();
+		TimedTrace timedTrace = new TimedTrace(trace.getAttributes().get("concept:name").toString());
 		Iterator<XEvent> itEvent = trace.iterator();
 		double lastSeenTimestamp = 0;
 		for (Move move : alignedTrace) {

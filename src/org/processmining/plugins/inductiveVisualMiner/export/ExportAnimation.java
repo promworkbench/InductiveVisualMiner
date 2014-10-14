@@ -121,7 +121,7 @@ public class ExportAnimation {
 		//set constants for this animation
 		double timeMargin = 0.5;
 		int framerate = 30;
-		int width = 1000;
+		int width = 1500;
 
 		List<Double> ex = AnimatableSVGPanel.getExtremeTimes(diagram.getRoot());
 		double minDuration = ex.get(0) - timeMargin;

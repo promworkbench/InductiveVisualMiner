@@ -147,9 +147,13 @@ public class InterpolateToken {
 		}
 	}
 
-	/*
-	 * returns the number of edges from the last timestamp and that timestamp;
+	/**
+	 * Returns the number of edges from the last timestamp and that timestamp;
 	 * notice: offset means "after the #offset edge in the token"
+	 * @param token
+	 * @param offset
+	 * @param edgesTillNow
+	 * @return
 	 */
 	private static Pair<Integer, Double> getTimestampBackward(Token token, int offset, int edgesTillNow) {
 

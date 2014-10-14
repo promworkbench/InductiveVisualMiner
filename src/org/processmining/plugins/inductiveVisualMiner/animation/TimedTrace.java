@@ -7,6 +7,11 @@ public class TimedTrace extends IMTraceG<TimedMove> {
 	
 	private Double startTime = null;
 	private Double endTime = null;
+	private String id;
+	
+	public TimedTrace(String id) {
+		this.id = id;
+	}
 	
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;
@@ -28,8 +33,12 @@ public class TimedTrace extends IMTraceG<TimedMove> {
 		return "[@" + getStartTime() + " " + super.toString() + " " + " @" + getEndTime() + "]";
 	}
 	
+	public String getId() {
+		return id;
+	}
+	
 	public TimedTrace clone() {
-		TimedTrace copy = new TimedTrace();
+		TimedTrace copy = new TimedTrace(id);
 		copy.addAll(this);
 		copy.setStartTime(startTime);
 		copy.setEndTime(endTime);

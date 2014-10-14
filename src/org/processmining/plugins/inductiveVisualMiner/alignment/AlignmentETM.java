@@ -11,10 +11,11 @@ import nl.tue.astar.Trace;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.model.XTrace;
+import org.deckfour.xes.model.impl.XEventImpl;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
@@ -28,6 +29,8 @@ import org.processmining.plugins.etm.model.narytree.conversion.ProcessTreeToNAry
 import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
+import org.processmining.processtree.Block;
+import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
@@ -44,39 +47,35 @@ public class AlignmentETM {
 				ProMCancelTerminationCondition.buildDummyCanceller()).log;
 	}
 
+	public static String debug(XEventClasses ev) {
+		String result = "";
+		for (int i = 0; i < ev.size(); i++) {
+			result += ev.getByIndex(i) + ", ";
+		}
+		System.out.println(ev.getByIdentity("a"));
+		System.out.println(ev.getByIdentity("_"));
+		return result;
+	}
+	
 	public static AlignmentResult alignTree(ProcessTree tree, XEventClassifier classifier, XLog log,
 			Set<XEventClass> skipActivities, Canceller canceller) {
 
-		long start = System.nanoTime();
+		XEventClasses ev = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
 
-		//perform alignment
 		CentralRegistry registry = new CentralRegistry(log, classifier, new Random());
-
-		//debug output for 
-		{
-			XEventClasses e = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
-			System.out.println("checking xeventclasses " + e.size());
-			for (XTrace trace : log) {
-				for (XEvent event : trace) {
-					XEventClass eventClass = e.getClassOf(event);
-					if (!registry.getLogCosts().containsKey(eventClass)) {
-						System.out.println("eventclass " + eventClass + " not in registry");
-					}
-				}
-			}
-			System.out.println("done " + registry.getLogCosts().keySet().size());
-		}
+		
+		//add the event classes of the tree manually
+		addAllLeaves(registry.getEventClasses(), tree.getRoot());
 
 		ProcessTreeToNAryTree pt2nt = new ProcessTreeToNAryTree(registry.getEventClasses());
-		
-
 		NAryTree nTree = pt2nt.convert(tree);
+
 		registry.updateLogDerived();
 
 		FitnessReplay fr = new FitnessReplay(registry, canceller);
-		fr.setNrThreads(20);
+		fr.setNrThreads(24);
 		fr.setDetailedAlignmentInfoEnabled(true);
-		double fitness = fr.getFitness(nTree, null);
+		fr.getFitness(nTree, null);
 		BehaviorCounter behC = registry.getFitness(nTree).behaviorCounter;
 
 		//create mapping int->unfoldedNode
@@ -122,21 +121,28 @@ public class AlignmentETM {
 						//log move
 						move = new Move(Type.log, unode, activity);
 					}
-					//System.out.println(naryMove + ", " + move);
 					trace.add(move);
-				} else {
-					//System.out.println("internal " + naryMove);
 				}
 			}
 			alignedLog.add(trace, cardinality);
-			//System.out.println("");
 		}
 
 		AlignedLogInfo alignedLogInfo = new AlignedLogInfo(alignedLog);
 
-		//		System.out.println("ETM alignment done,   took " + String.format("%15d", System.nanoTime() - start) + ", fitness " + fitness);
-		//		System.out.println(TreeUtils.toString(nTree, registry.getEventClasses()));
 
 		return new AlignmentResult(alignedLog, alignedLogInfo);
+	}
+	
+	public static void addAllLeaves(XEventClasses classes, Node node) {
+		if (node instanceof Manual) {
+			XEvent event = new XEventImpl();
+			XConceptExtension.instance().assignName(event, node.getName());
+			classes.register(event);
+		} else if (node instanceof Block) {
+			for (Node child : ((Block) node).getChildren()) {
+				addAllLeaves(classes, child);
+			}
+		}
+		classes.harmonizeIndices();
 	}
 }
