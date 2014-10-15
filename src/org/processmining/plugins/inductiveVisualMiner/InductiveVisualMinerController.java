@@ -324,7 +324,7 @@ public class InductiveVisualMinerController {
 			state.setTimedLog(result);
 
 			//update the trace view
-//			panel.getTraceView().set(result);
+			panel.getTraceView().set(result);
 		}
 
 		public void cancel() {
