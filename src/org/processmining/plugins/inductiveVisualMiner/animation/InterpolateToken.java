@@ -184,7 +184,7 @@ public class InterpolateToken {
 						edgesTillNow);
 				if (bestPair.getRight() == subPair.getRight() && subPair.getLeft() > bestPair.getLeft()) {
 					bestPair = subPair;
-				} else if (subPair.getRight() != null && subPair.getRight() > bestPair.getRight()) {
+				} else if (subPair.getRight() != null && (bestPair.getRight() == null || subPair.getRight() > bestPair.getRight())) {
 					bestPair = subPair;
 				}
 			}
