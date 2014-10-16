@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner;
 
 import javax.swing.JComponent;
 
+import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
@@ -37,7 +38,8 @@ public class InductiveVisualMiner {
 
 		final InductiveVisualMinerState state = new InductiveVisualMinerState(launcher.xLog, launcher.preMinedTree);
 		
-		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, IM.getClassifiers(launcher.xLog), launcher.preMinedTree == null);
+//		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, Classifiers.getClassifiers(launcher.xLog), launcher.preMinedTree == null);
+		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, new XEventClassifier[]{}, launcher.preMinedTree == null);
 		new InductiveVisualMinerController(context, panel, state);
 
 		return panel;
@@ -58,14 +60,14 @@ public class InductiveVisualMiner {
 		}
 	}
 
-	@Plugin(name = "Mine with Inductive visual Miner", returnLabels = { "Interactive Miner launcher" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true)
+	@Plugin(name = "Mine with Inductive visual Miner", returnLabels = { "Inductive visual Miner" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true)
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0 })
 	public InteractiveMinerLauncher mineGuiProcessTree(UIPluginContext context, XLog xLog) {
 		return new InteractiveMinerLauncher(xLog);
 	}
 	
-	@Plugin(name = "Visualise deviations on process tree", returnLabels = { "Interactive Miner launcher" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = { "Event log", "Process tree" }, userAccessible = true)
+	@Plugin(name = "Visualise deviations on process tree", returnLabels = { "Deviations visualisation" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = { "Event log", "Process tree" }, userAccessible = true)
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
 	public InteractiveMinerLauncher mineGuiProcessTree(UIPluginContext context, XLog xLog, ProcessTree preMinedTree) {
