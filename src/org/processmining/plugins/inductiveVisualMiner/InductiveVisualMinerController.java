@@ -452,14 +452,6 @@ public class InductiveVisualMinerController {
 
 	private void initGui() {
 
-		//set the default classifier
-		for (int i = 0; i < panel.getClassifiers().getItemCount(); i++) {
-			if (((XEventClassifier) panel.getClassifiers().getItemAt(i)).name().equals("Event Name")) {
-				panel.getClassifiers().setSelectedIndex(i);
-				break;
-			}
-		}
-
 		//noise filter
 		panel.getNoiseSlider().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
