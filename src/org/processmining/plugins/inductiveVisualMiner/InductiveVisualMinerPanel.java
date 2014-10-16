@@ -15,8 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.deckfour.xes.classification.XEventClassifier;
 import org.processmining.framework.plugin.PluginContext;
+import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThrough;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughDirectlyFollowsGraph;
@@ -70,7 +70,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			XEventClassifier[] classifiers, boolean enableMining) {
+			ClassifierWrapper[] classifiers, boolean enableMining) {
 		visualiser = new AlignedLogVisualisation();
 		initVisualisationParameters();
 

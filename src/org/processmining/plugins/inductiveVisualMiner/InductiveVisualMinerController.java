@@ -22,6 +22,7 @@ import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
 import org.processmining.contexts.uitopia.UIPluginContext;
+import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Quintuple;
@@ -472,7 +473,7 @@ public class InductiveVisualMinerController {
 		//classifier
 		panel.getClassifiers().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				state.getMiningParameters().setClassifier((XEventClassifier) panel.getClassifiers().getSelectedItem());
+				state.getMiningParameters().setClassifier(((ClassifierWrapper) panel.getClassifiers().getSelectedItem()).classifier);
 				chain.execute(MakeLog.class);
 			}
 		});

@@ -2,14 +2,13 @@ package org.processmining.plugins.inductiveVisualMiner;
 
 import javax.swing.JComponent;
 
-import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.plugins.InductiveMiner.plugins.IM;
+import org.processmining.plugins.InductiveMiner.Classifiers;
 import org.processmining.processtree.ProcessTree;
 
 public class InductiveVisualMiner {
@@ -21,7 +20,8 @@ public class InductiveVisualMiner {
 	public JComponent visualise(final UIPluginContext context, XLog xLog) {
 
 		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog, null);
-		InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, IM.getClassifiers(xLog), true);
+		InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state,
+				Classifiers.getClassifiers(xLog), true);
 		new InductiveVisualMinerController(context, panel, state);
 
 		return panel;
@@ -37,9 +37,9 @@ public class InductiveVisualMiner {
 		context.getGlobalContext().getResourceManager().getResourceForInstance(launcher).destroy();
 
 		final InductiveVisualMinerState state = new InductiveVisualMinerState(launcher.xLog, launcher.preMinedTree);
-		
-//		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, Classifiers.getClassifiers(launcher.xLog), launcher.preMinedTree == null);
-		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state, new XEventClassifier[]{}, launcher.preMinedTree == null);
+
+		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state,
+				Classifiers.getClassifiers(launcher.xLog), launcher.preMinedTree == null);
 		new InductiveVisualMinerController(context, panel, state);
 
 		return panel;
@@ -53,7 +53,7 @@ public class InductiveVisualMiner {
 			this.xLog = xLog;
 			this.preMinedTree = null;
 		}
-		
+
 		public InteractiveMinerLauncher(XLog xLog, ProcessTree preMinedTree) {
 			this.xLog = xLog;
 			this.preMinedTree = preMinedTree;
@@ -66,8 +66,9 @@ public class InductiveVisualMiner {
 	public InteractiveMinerLauncher mineGuiProcessTree(UIPluginContext context, XLog xLog) {
 		return new InteractiveMinerLauncher(xLog);
 	}
-	
-	@Plugin(name = "Visualise deviations on process tree", returnLabels = { "Deviations visualisation" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = { "Event log", "Process tree" }, userAccessible = true)
+
+	@Plugin(name = "Visualise deviations on process tree", returnLabels = { "Deviations visualisation" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = {
+			"Event log", "Process tree" }, userAccessible = true)
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
 	public InteractiveMinerLauncher mineGuiProcessTree(UIPluginContext context, XLog xLog, ProcessTree preMinedTree) {
