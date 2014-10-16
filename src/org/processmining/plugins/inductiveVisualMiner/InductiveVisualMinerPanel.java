@@ -5,7 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -71,7 +70,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			Collection<XEventClassifier> classifiers, boolean enableMining) {
+			XEventClassifier[] classifiers, boolean enableMining) {
 		visualiser = new AlignedLogVisualisation();
 		initVisualisationParameters();
 
@@ -127,7 +126,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cClassifierLabel.anchor = GridBagConstraints.WEST;
 			add(classifierLabel, cClassifierLabel);
 
-			classifiersCombobox = SlickerFactory.instance().createComboBox(classifiers.toArray());
+			classifiersCombobox = SlickerFactory.instance().createComboBox(classifiers);
 			GridBagConstraints cClassifiers = new GridBagConstraints();
 			cClassifiers.gridx = 2;
 			cClassifiers.gridy = gridy++;
