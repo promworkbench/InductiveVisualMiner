@@ -73,7 +73,7 @@ public class AlignmentETM {
 		registry.updateLogDerived();
 
 		FitnessReplay fr = new FitnessReplay(registry, canceller);
-		fr.setNrThreads(24);
+		fr.setNrThreads(Math.max(1, Runtime.getRuntime().availableProcessors() - 1));
 		fr.setDetailedAlignmentInfoEnabled(true);
 		fr.getFitness(nTree, null);
 		BehaviorCounter behC = registry.getFitness(nTree).behaviorCounter;
