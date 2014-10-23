@@ -69,6 +69,12 @@ public class ExportAnimation {
 				}
 				writer.write(lastLine);
 				writer.write("\n");
+				
+				//trying animation
+//				if (lastLine.endsWith("xlink\">") && line.startsWith("<g id=")) {
+//					writer.write("<animate attributeName=\"viewBox\" begin=\"0.5s\" dur=\"3s\" values=\"0 0 500 195; 1100 0 500 195\" fill=\"freeze\" />");
+//					writer.write("\n");
+//				}
 			}
 			lastLine = line;
 		}
@@ -91,7 +97,8 @@ public class ExportAnimation {
 			final ColourMode colourMode, final SVGDiagram svg, final Dot dot, final File file, final JPanel panel)
 			throws IOException {
 
-		final GuaranteedProgressMonitor progressMonitor = new GuaranteedProgressMonitor(panel, "", "Preparing animation", 0, 100);
+		final GuaranteedProgressMonitor progressMonitor = new GuaranteedProgressMonitor(panel, "",
+				"Preparing animation", 0, 100);
 
 		final ImageOutputStream streamOutMovie = new FileImageOutputStream(file);
 
@@ -127,7 +134,7 @@ public class ExportAnimation {
 		double minDuration = ex.get(0) - timeMargin;
 		double maxDuration = ex.get(1) + timeMargin;
 		int height = (int) (width * (diagram.getHeight() / (diagram.getWidth() * 1.0)));
-		
+
 		progressMonitor.setNote("Rendering animation..");
 
 		//compute the number of frames
@@ -171,7 +178,7 @@ public class ExportAnimation {
 				// Create an animation frame
 				svgExporter.paintFrame(g, time);
 
-//				System.out.println("frame " + frame + " done @" + time);
+				//				System.out.println("frame " + frame + " done @" + time);
 
 				// write it to the writer
 				out.write(0, img, 1);

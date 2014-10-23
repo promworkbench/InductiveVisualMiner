@@ -67,7 +67,12 @@ public abstract class ColouringFilter {
 	private boolean enabledFilter = false;
 
 	public void initialiseFilter(XLog log, Runnable onUpdate) {
-		panel = createGui(log);
+		try {
+			//this might be foreign code, so be careful
+			panel = createGui(log);
+		} catch (Exception e) {
+			panel = null;
+		}
 		this.onUpdate = onUpdate;
 	}
 

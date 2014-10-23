@@ -69,6 +69,14 @@ public class ColouringFiltersView extends SideWindow {
 	}
 
 	public void setPanel(final ColouringFilter colouringFilter, final Runnable onUpdate) {
+
+		//if the colouringfilter did not initialise, print error message
+		if (colouringFilter.getPanel() == null) {
+			((JLabel) filter2label.get(colouringFilter)).setText(colouringFilter.getName()
+					+ " did not initialise properly. It could be that the log contains inconsistent attribute types.");
+			return;
+		}
+
 		//remove initialising message
 		panel.remove(filter2label.get(colouringFilter));
 
