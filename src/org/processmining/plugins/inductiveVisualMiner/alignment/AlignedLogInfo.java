@@ -36,7 +36,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 	private final MultiSet<Pair<UnfoldedNode, UnfoldedNode>> dfg;
 
 	public AlignedLogInfo() {
-		super(new AlignedLog());
+		super(Move.class, new AlignedLog());
 		modelMoves = new MultiSet<UnfoldedNode>();
 		logMoves = new HashMap<LogMovePosition, MultiSet<XEventClass>>();
 		unlabeledLogMoves = new MultiSet<String>();
@@ -44,7 +44,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 	}
 
 	public AlignedLogInfo(MultiSet<AlignedTrace> log) {
-		super(log);
+		super(Move.class, log);
 		modelMoves = new MultiSet<UnfoldedNode>();
 		logMoves = new HashMap<LogMovePosition, MultiSet<XEventClass>>();
 		unlabeledLogMoves = new MultiSet<String>();
