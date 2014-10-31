@@ -171,7 +171,9 @@ public class InductiveVisualMinerController {
 			setStatus("Mining..");
 			if (input.getA() == null) {
 				//mine a new tree
-				return IMProcessTree.mineProcessTree(input.getB(), input.getC());
+				ProcessTree tree = IMProcessTree.mineProcessTree(input.getB(), input.getC());
+				System.out.println("Mining done.");
+				return tree;
 			} else {
 				//use the existing tree
 				return input.getA();
@@ -186,6 +188,7 @@ public class InductiveVisualMinerController {
 
 			panel.getSaveModelButton().setEnabled(true);
 			panel.getSaveImageButton().setEnabled(true);
+			setStatus("Layouting model..");
 
 			//deviation from chain: already show the model, without alignment
 			//this is to not have the user wait for the alignment without visual feedback

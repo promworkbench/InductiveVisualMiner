@@ -68,7 +68,7 @@ public class InductiveVisualMinerSelectionColourer {
 		TraceViewColourMap colourMap = new TraceViewColourMap();
 
 		//compute extreme cardinalities
-		Pair<Long, Long> extremes = AlignedLogMetrics.getExtremes(uroot, alignedFilteredLogInfo, true);
+		Pair<Long, Long> extremes = AlignedLogMetrics.getExtremes(uroot, alignedFilteredLogInfo);
 		long minCardinality = extremes.getLeft();
 		long maxCardinality = extremes.getRight();
 

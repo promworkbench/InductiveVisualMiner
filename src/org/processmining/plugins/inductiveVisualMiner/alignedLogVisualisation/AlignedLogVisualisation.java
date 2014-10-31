@@ -1,11 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
 import java.awt.Color;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.model.XLog;
@@ -27,7 +24,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractBlock.And;
 import org.processmining.processtree.impl.AbstractBlock.Seq;
@@ -50,10 +46,6 @@ public class AlignedLogVisualisation {
 	private long minCardinality;
 	AlignedLogVisualisationParameters parameters;
 
-	private Map<LocalDotNode, UnfoldedNode> dotNode2DfgUnfoldedNode;
-	private Map<UnfoldedNode, List<LocalDotNode>> unfoldedNode2DfgdotNodes;
-	private Map<UnfoldedNode, List<LocalDotEdge>> unfoldedNode2DfgdotEdges;
-
 	private AlignedLogVisualisationInfo info;
 
 	public Pair<Dot, AlignedLogVisualisationInfo> fancy(ProcessTree tree, AlignedLogInfo logInfo,
@@ -70,13 +62,9 @@ public class AlignedLogVisualisation {
 		this.logInfo = logInfo;
 
 		//find maximum and mimimum occurrences
-		Pair<Long, Long> p = AlignedLogMetrics.getExtremes(new UnfoldedNode(tree.getRoot()), logInfo, true);
+		Pair<Long, Long> p = AlignedLogMetrics.getExtremes(new UnfoldedNode(tree.getRoot()), logInfo);
 		minCardinality = p.getLeft();
 		maxCardinality = p.getRight();
-
-		dotNode2DfgUnfoldedNode = new HashMap<LocalDotNode, UnfoldedNode>();
-		unfoldedNode2DfgdotNodes = new HashMap<ProcessTree2Petrinet.UnfoldedNode, List<LocalDotNode>>();
-		unfoldedNode2DfgdotEdges = new HashMap<ProcessTree2Petrinet.UnfoldedNode, List<LocalDotEdge>>();
 
 		dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
@@ -117,11 +105,11 @@ public class AlignedLogVisualisation {
 	}
 
 	private void convertActivity(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
-		long cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, logInfo);
+		long cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, false, logInfo);
 		LocalDotNode dotNode = convertActivity(unode, cardinality);
 
-		addArc(source, dotNode, unode, directionForward);
-		addArc(dotNode, sink, unode, directionForward);
+		addArc(source, dotNode, unode, directionForward, false);
+		addArc(dotNode, sink, unode, directionForward, false);
 
 		//draw model moves
 		if (parameters.isShowModelMoves()) {
@@ -162,7 +150,7 @@ public class AlignedLogVisualisation {
 	}
 
 	private void convertTau(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
-		addArc(source, sink, unode, directionForward);
+		addArc(source, sink, unode, directionForward, false);
 	}
 
 	private void convertSequence(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
@@ -184,7 +172,8 @@ public class AlignedLogVisualisation {
 
 			//draw log-move-arc if necessary
 			if (parameters.isShowLogMoves()) {
-				visualiseLogMove(split, split, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(child)), directionForward);
+				visualiseLogMove(split, split, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(child)),
+						directionForward);
 			}
 		}
 	}
@@ -193,7 +182,7 @@ public class AlignedLogVisualisation {
 
 		//operator split
 		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", unode);
-		addArc(source, split, unode, directionForward);
+		addArc(source, split, unode, directionForward, true);
 
 		//operator join
 		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", unode);
@@ -209,8 +198,10 @@ public class AlignedLogVisualisation {
 
 		//put log-moves on children
 		if (parameters.isShowLogMoves()) {
-			visualiseLogMove(join, join, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(bodyChild)), directionForward);
-			visualiseLogMove(split, split, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(redoChild)), directionForward);
+			visualiseLogMove(join, join, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(bodyChild)),
+					directionForward);
+			visualiseLogMove(split, split, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(redoChild)),
+					directionForward);
 
 			//log moves can be projected before the exit-tau
 			//(assume it's tau)
@@ -223,11 +214,11 @@ public class AlignedLogVisualisation {
 
 		//operator split
 		LocalDotNode split = new LocalDotNode(dot, info, NodeType.parallelSplit, "+", unode);
-		addArc(source, split, unode, directionForward);
+		addArc(source, split, unode, directionForward, true);
 
 		//operator join
 		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, "+", unode);
-		addArc(join, sink, unode, directionForward);
+		addArc(join, sink, unode, directionForward, true);
 
 		for (Node child : unode.getBlock().getChildren()) {
 			convertNode(unode.unfoldChild(child), split, join, directionForward);
@@ -247,11 +238,11 @@ public class AlignedLogVisualisation {
 
 		//operator split
 		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", unode);
-		addArc(source, split, unode, directionForward);
+		addArc(source, split, unode, directionForward, true);
 
 		//operator join
 		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", unode);
-		addArc(join, sink, unode, directionForward);
+		addArc(join, sink, unode, directionForward, true);
 
 		for (Node child : unode.getBlock().getChildren()) {
 			convertNode(unode.unfoldChild(child), split, join, directionForward);
@@ -261,9 +252,10 @@ public class AlignedLogVisualisation {
 		//are never put on xor
 	}
 
-	private LocalDotEdge addArc(LocalDotNode from, LocalDotNode to, final UnfoldedNode unode, boolean directionForward) {
+	private LocalDotEdge addArc(LocalDotNode from, LocalDotNode to, final UnfoldedNode unode, boolean directionForward,
+			boolean includeModelMoves) {
 		return addModelArc(from, to, unode, directionForward,
-				AlignedLogMetrics.getNumberOfTracesRepresented(unode, logInfo));
+				AlignedLogMetrics.getNumberOfTracesRepresented(unode, includeModelMoves, logInfo));
 	}
 
 	private LocalDotEdge addModelArc(LocalDotNode from, LocalDotNode to, final UnfoldedNode unode,
