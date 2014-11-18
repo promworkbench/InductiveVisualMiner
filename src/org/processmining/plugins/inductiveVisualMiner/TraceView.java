@@ -219,11 +219,15 @@ public class TraceView extends SideWindow {
 				}
 
 				public String getName() {
-					return null;
+					String s = ((TimedTrace) trace).getId();
+					if (s.length() > 9) {
+						return s.substring(0, 7) + "..";
+					}
+					return s;
 				}
 
 				public Color getNameColor() {
-					return null;
+					return Color.white;
 				}
 
 				public String getInfo() {
