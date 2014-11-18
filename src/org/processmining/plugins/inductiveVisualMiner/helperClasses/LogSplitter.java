@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -38,7 +37,7 @@ public class LogSplitter {
 		//make a partition
 		for (Node child : unode.getBlock().getChildren()) {
 			UnfoldedNode uchild = unode.unfoldChild(child);
-			r.partition.add(new HashSet<UnfoldedNode>(AlignedLogMetrics.unfoldAllNodes(uchild)));
+			r.partition.add(new HashSet<UnfoldedNode>(TreeUtils.unfoldAllNodes(uchild)));
 		}
 
 		//map activities to sigmas

@@ -1,8 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
@@ -20,17 +17,6 @@ import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
 public class AlignedLogMetrics {
-
-	public static List<UnfoldedNode> unfoldAllNodes(UnfoldedNode unode) {
-		List<UnfoldedNode> result = new ArrayList<UnfoldedNode>();
-		result.add(unode);
-		if (unode.getNode() instanceof Block) {
-			for (Node child : unode.getBlock().getChildren()) {
-				result.addAll(unfoldAllNodes(unode.unfoldChild(child)));
-			}
-		}
-		return result;
-	}
 
 	public static long getNumberOfTracesRepresented(UnfoldedNode unode, AlignedLogInfo logInfo) {
 		return getNumberOfTracesRepresented(unode, false, logInfo);

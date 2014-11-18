@@ -202,24 +202,23 @@ public class InductiveVisualMinerController {
 
 	//compute alignment
 	private class Align extends
-			ChainLink<Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo>, AlignmentResult> {
+			ChainLink<Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo>, AlignmentResult> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
-		protected Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo> generateInput() {
+		protected Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			return new Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo>(state.getTree(),
-					state.getMiningParameters().getClassifier(), state.getXLog(), state.getFilteredActivities(),
+			return new Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo>(state.getTree(),
+					state.getMiningParameters().getClassifier(), state.getXLog(), 
 					state.getLogInfo());
 		}
 
 		protected AlignmentResult executeLink(
-				Quintuple<ProcessTree, XEventClassifier, XLog, Set<XEventClass>, IMLogInfo> input) {
+				Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo> input) {
 			setStatus("Computing alignment..");
 			canceller.reset();
-			return ComputeAlignment.computeAlignment(input.getA(), input.getB(), input.getC(), input.getD(),
-					input.getE(), canceller);
+			return ComputeAlignment.computeAlignment(input.getA(), input.getB(), input.getC(), input.getD(), canceller);
 		}
 
 		protected void processResult(AlignmentResult result) {

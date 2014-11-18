@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
 import java.awt.Color;
-import java.util.HashSet;
 import java.util.Iterator;
 
 import org.deckfour.xes.classification.XEventClass;
@@ -36,7 +35,7 @@ public class AlignedLogVisualisation {
 
 	public Dot fancy(PluginContext context, ProcessTree tree, XLog xLog) {
 		AlignmentResult result = AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog,
-				new HashSet<XEventClass>(), ProMCancelTerminationCondition.buildDummyCanceller());
+				ProMCancelTerminationCondition.buildDummyCanceller());
 		return fancy(tree, result.logInfo, new AlignedLogVisualisationParameters()).getLeft();
 	}
 

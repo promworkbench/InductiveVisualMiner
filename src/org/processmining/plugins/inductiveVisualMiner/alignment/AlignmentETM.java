@@ -1,9 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import nl.tue.astar.AStarThread.Canceller;
 import nl.tue.astar.Trace;
@@ -29,6 +27,7 @@ import org.processmining.plugins.etm.model.narytree.conversion.ProcessTreeToNAry
 import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
@@ -43,27 +42,15 @@ public class AlignmentETM {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Batch compare miners, default", requiredParameterLabels = { 0, 1 })
 	public AlignedLog alignTree(PluginContext context, ProcessTree tree, XLog log) {
-		return alignTree(tree, MiningParametersIM.getDefaultClassifier(), log, new HashSet<XEventClass>(),
-				ProMCancelTerminationCondition.buildDummyCanceller()).log;
+		return alignTree(tree, MiningParametersIM.getDefaultClassifier(), log, ProMCancelTerminationCondition.buildDummyCanceller()).log;
 	}
 
-	public static String debug(XEventClasses ev) {
-		String result = "";
-		for (int i = 0; i < ev.size(); i++) {
-			result += ev.getByIndex(i) + ", ";
-		}
-		System.out.println(ev.getByIdentity("a"));
-		System.out.println(ev.getByIdentity("_"));
-		return result;
-	}
-	
-	public static AlignmentResult alignTree(ProcessTree tree, XEventClassifier classifier, XLog log,
-			Set<XEventClass> skipActivities, Canceller canceller) {
+	public static AlignmentResult alignTree(ProcessTree tree, XEventClassifier classifier, XLog log, Canceller canceller) {
 
 		XEventClasses ev = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
 
 		CentralRegistry registry = new CentralRegistry(log, classifier, new Random());
-		
+
 		//add the event classes of the tree manually
 		addAllLeaves(registry.getEventClasses(), tree.getRoot());
 
@@ -79,7 +66,7 @@ public class AlignmentETM {
 		BehaviorCounter behC = registry.getFitness(nTree).behaviorCounter;
 
 		//create mapping int->unfoldedNode
-		List<UnfoldedNode> l = AlignedLogMetrics.unfoldAllNodes(new UnfoldedNode(tree.getRoot()));
+		List<UnfoldedNode> l = TreeUtils.unfoldAllNodes(new UnfoldedNode(tree.getRoot()));
 		UnfoldedNode[] nodes = l.toArray(new UnfoldedNode[l.size()]);
 
 		//read moves and create aligned log
@@ -129,10 +116,9 @@ public class AlignmentETM {
 
 		AlignedLogInfo alignedLogInfo = new AlignedLogInfo(alignedLog);
 
-
 		return new AlignmentResult(alignedLog, alignedLogInfo);
 	}
-	
+
 	public static void addAllLeaves(XEventClasses classes, Node node) {
 		if (node instanceof Manual) {
 			XEvent event = new XEventImpl();

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractBlock.XorLoop;
@@ -31,7 +32,7 @@ public class AlignedLogSplitter {
 		List<Set<UnfoldedNode>> partition = new LinkedList<Set<UnfoldedNode>>();
 		for (Node child : unode.getBlock().getChildren()) {
 			UnfoldedNode uchild = unode.unfoldChild(child);
-			partition.add(new HashSet<UnfoldedNode>(AlignedLogMetrics.unfoldAllNodes(uchild)));
+			partition.add(new HashSet<UnfoldedNode>(TreeUtils.unfoldAllNodes(uchild)));
 		}
 
 		//split the log
