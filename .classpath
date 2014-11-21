@@ -76,6 +76,5 @@
 	<classpathentry kind="lib" path="packagelib/Log-lib/OpenXES.jar"/>
 	<classpathentry kind="lib" path="packagelib/BasicUtils-lib/trove-3.0.3.jar"/>
 	<classpathentry kind="lib" path="packagelib/BasicUtils-lib/jgrapht-jdk1.6.jar"/>
-	<classpathentry kind="lib" path="packagelib/lib-EvolutionaryTreeMiner/j2ssh/lib/xercesImpl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
