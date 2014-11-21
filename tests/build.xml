@@ -97,7 +97,7 @@
 		<javac classpathref="classpath.test"
 			srcdir="${dir.test-src}"
          	destdir="${dir.test-bin}"
-         	debug="on" />
+         	debug="on" source="7" target="7"/>
 	</target>
          		
 	<!-- run tests -->
