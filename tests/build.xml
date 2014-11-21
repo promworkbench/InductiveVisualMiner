@@ -127,13 +127,13 @@
 	      <test name="org.processmining.tests.newpackage.NewPackageTest" todir="${test.basedir}" />
 	    </junit>
 		
-		<!-- Cobertura: generate HTML coverage report
+		<!-- Cobertura: generate HTML coverage report -->
 		<cobertura-report destdir="${dir.coveragereport.html}" format="html">
 		    <fileset refid="src.coveragereport" />
 		</cobertura-report>
 		<cobertura-report destdir="${dir.coveragereport.xml}" format="xml">
 		    <fileset refid="src.coveragereport" />
-		</cobertura-report> -->		
+		</cobertura-report> 		
 	</target>
 
 	<!-- clean build files and intermediate results -->
