@@ -108,7 +108,7 @@
 	    	<!-- parameters to run ProM -->
 	    	<jvmarg value="-ea"/>
 	    	<jvmarg value="-Xmx1G"/>
-	    	<jvmarg value="-Djava.library.path=.//lib;.//stdlib;.//packagelib;//packagelib//lib-EvolutionaryTreeMiner//j2ssh//lib"/>
+	    	<jvmarg value="-Djava.library.path=.//lib;.//stdlib"/>
 	    	<!-- fixed location for cobertura to log method calls and generate report from -->
 	    	<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${cobertura.datafile}"/>
 	    	
