@@ -28,6 +28,7 @@ import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.InductiveMiner.Triple;
+import org.processmining.plugins.InductiveMiner.dfgOnly.log2dfg.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
@@ -93,22 +94,23 @@ public class InductiveVisualMinerController {
 	}
 
 	//make an IMlog out of an XLog
-	private class MakeLog extends ChainLink<Pair<XLog, XEventClassifier>, Triple<XLogInfo, IMLog, IMLogInfo>> {
+	private class MakeLog extends
+			ChainLink<Triple<XLog, XEventClassifier, IMLog2IMLogInfo>, Triple<XLogInfo, IMLog, IMLogInfo>> {
 
-		protected Pair<XLog, XEventClassifier> generateInput() {
+		protected Triple<XLog, XEventClassifier, IMLog2IMLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveModelButton().setEnabled(false);
 			panel.getSaveImageButton().setEnabled(false);
 			panel.getSaveImageButton().setText("image");
-			return new Pair<XLog, XEventClassifier>(state.getXLog(), state.getMiningParameters().getClassifier());
+			return Triple.of(state.getXLog(), state.getMiningParameters().getClassifier(), state.getMiningParameters().getLog2LogInfo());
 		}
 
-		protected Triple<XLogInfo, IMLog, IMLogInfo> executeLink(Pair<XLog, XEventClassifier> input) {
+		protected Triple<XLogInfo, IMLog, IMLogInfo> executeLink(Triple<XLog, XEventClassifier, IMLog2IMLogInfo> input) {
 			setStatus("Making log..");
 
-			IMLog imLog = new IMLog(input.getLeft(), input.getRight());
-			IMLogInfo imLogInfo = new IMLogInfo(imLog);
-			XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(input.getLeft(), input.getRight());
+			IMLog imLog = new IMLog(input.getA(), input.getB());
+			IMLogInfo imLogInfo = input.getC().createLogInfo(imLog);
+			XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(input.getA(), input.getB());
 
 			return Triple.of(xLogInfo, imLog, imLogInfo);
 		}
@@ -201,21 +203,18 @@ public class InductiveVisualMinerController {
 	}
 
 	//compute alignment
-	private class Align extends
-			ChainLink<Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo>, AlignmentResult> {
+	private class Align extends ChainLink<Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo>, AlignmentResult> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
 		protected Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			return new Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo>(state.getTree(),
-					state.getMiningParameters().getClassifier(), state.getXLog(), 
-					state.getLogInfo());
+			return new Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo>(state.getTree(), state
+					.getMiningParameters().getClassifier(), state.getXLog(), state.getLogInfo());
 		}
 
-		protected AlignmentResult executeLink(
-				Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo> input) {
+		protected AlignmentResult executeLink(Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo> input) {
 			setStatus("Computing alignment..");
 			canceller.reset();
 			return ComputeAlignment.computeAlignment(input.getA(), input.getB(), input.getC(), input.getD(), canceller);
@@ -354,8 +353,8 @@ public class InductiveVisualMinerController {
 			setStatus("Creating animation..");
 			canceller.reset();
 
-			return ComputeAnimation.computeAnimation(input.getA(), input.getB(), input.getC(), maxAnimatedTraces, input.getD(),
-					input.getE(), canceller);
+			return ComputeAnimation.computeAnimation(input.getA(), input.getB(), input.getC(), maxAnimatedTraces,
+					input.getD(), input.getE(), canceller);
 		}
 
 		protected void processResult(SVGDiagram result) {
@@ -400,8 +399,9 @@ public class InductiveVisualMinerController {
 			TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colour(panel.getGraph().getSVG(),
 					state.getVisualisationInfo(), state.getTree(), result,
 					InductiveVisualMinerPanel.getViewParameters(state));
-			ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(), state.getSelectedLogMoves(),
-					state.getColouringFilters(), state.getAlignedFilteredLog().size(), maxAnimatedTraces);
+			ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
+					state.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
+					maxAnimatedTraces);
 
 			//make a colour map for the trace view
 			panel.getTraceView().setColourMap(colourMap);
@@ -467,7 +467,8 @@ public class InductiveVisualMinerController {
 		//classifier
 		panel.getClassifiers().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				state.getMiningParameters().setClassifier(((ClassifierWrapper) panel.getClassifiers().getSelectedItem()).classifier);
+				state.getMiningParameters().setClassifier(
+						((ClassifierWrapper) panel.getClassifiers().getSelectedItem()).classifier);
 				chain.execute(MakeLog.class);
 			}
 		});

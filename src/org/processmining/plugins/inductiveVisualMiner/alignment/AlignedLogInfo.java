@@ -9,7 +9,6 @@ import java.util.Map;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.mining.IMLogInfoG;
 import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.processtree.Block.And;
@@ -21,7 +20,7 @@ import org.processmining.processtree.Node;
 import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class AlignedLogInfo extends IMLogInfoG<Move> {
+public class AlignedLogInfo {
 
 	private final MultiSet<UnfoldedNode> modelMoves;
 	private final MultiSet<String> unlabeledLogMoves;
@@ -34,21 +33,22 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 	// (null, root) at start of trace
 	private final Map<LogMovePosition, MultiSet<XEventClass>> logMoves;
 	private final MultiSet<Pair<UnfoldedNode, UnfoldedNode>> dfg;
+	private final MultiSet<Move> activities;
 
 	public AlignedLogInfo() {
-		super(Move.class, new AlignedLog());
 		modelMoves = new MultiSet<UnfoldedNode>();
 		logMoves = new HashMap<LogMovePosition, MultiSet<XEventClass>>();
 		unlabeledLogMoves = new MultiSet<String>();
 		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
+		activities = new MultiSet<>();
 	}
 
 	public AlignedLogInfo(MultiSet<AlignedTrace> log) {
-		super(Move.class, log);
 		modelMoves = new MultiSet<UnfoldedNode>();
 		logMoves = new HashMap<LogMovePosition, MultiSet<XEventClass>>();
 		unlabeledLogMoves = new MultiSet<String>();
 		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
+		activities = new MultiSet<>();		
 		UnfoldedNode root = null;
 		for (IMTraceG<Move> trace : log) {
 			UnfoldedNode lastDfgUnode = null;
@@ -57,6 +57,7 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 			boolean traceContainsLogMove = false;
 			for (int i = 0; i < trace.size(); i++) {
 				Move move = trace.get(i);
+				activities.add(move, cardinality);
 				if (move.getType() == Type.model) {
 					//add model move to list of model moves
 					modelMoves.add(move.getUnode(), cardinality);
@@ -267,6 +268,10 @@ public class AlignedLogInfo extends IMLogInfoG<Move> {
 
 	public long getDfg(UnfoldedNode unode1, UnfoldedNode unode2) {
 		return dfg.getCardinalityOf(new Pair<UnfoldedNode, UnfoldedNode>(unode1, unode2));
+	}
+	
+	public MultiSet<Move> getActivities() {
+		return activities;
 	}
 
 	private static void debug(Object s) {

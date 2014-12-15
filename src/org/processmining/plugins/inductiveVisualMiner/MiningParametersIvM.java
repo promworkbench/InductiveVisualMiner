@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.processmining.plugins.InductiveMiner.dfgOnly.log2dfg.IMLog2IMLogInfoDefault;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.baseCases.BaseCaseFinder;
 import org.processmining.plugins.InductiveMiner.mining.baseCases.BaseCaseFinderIM;
@@ -21,11 +22,13 @@ import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterIv
 public class MiningParametersIvM extends MiningParameters {
 
 	/*
-	 * No other parameter, except mentioned in this file, has influence on mined model
+	 * No other parameter, except mentioned in this file, has influence on the mined model
 	 */
 	
 	public MiningParametersIvM() {
 		//determine algorithm
+		
+		setLogConverter(new IMLog2IMLogInfoDefault());
 		
 		setBaseCaseFinders(new ArrayList<BaseCaseFinder>(Arrays.asList(
 				new BaseCaseFinderIMiEmptyLog(),

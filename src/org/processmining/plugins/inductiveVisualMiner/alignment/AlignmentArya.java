@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.alignment;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import nl.tue.astar.AStarException;
 
@@ -14,7 +13,6 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.semantics.petrinet.Marking;
-import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.astar.petrinet.PetrinetReplayerWithILP;
 import org.processmining.plugins.connectionfactories.logpetrinet.TransEvClassMapping;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
@@ -32,8 +30,8 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.PetrinetWit
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class AlignmentArya {
-	public static AlignmentResult alignTree(ProcessTree tree, XEventClassifier classifier, IMLogInfo logInfo,
-			PluginContext context, XLog log, Set<XEventClass> skipActivities) {
+	public static AlignmentResult alignTree(ProcessTree tree, XEventClassifier classifier, Collection<XEventClass> activities,
+			PluginContext context, XLog log) {
 
 		long start = System.nanoTime();
 
@@ -60,12 +58,11 @@ public class AlignmentArya {
 			if (t.isInvisible()) {
 				mapping.put(t, dummy);
 			} else {
-				mapping.put(t, mapTransitionToEventClass(t, logInfo, mapTransition2Path));
+				mapping.put(t, mapTransitionToEventClass(t, activities, mapTransition2Path));
 			}
 		}
 
 		PNLogReplayer replayer = new PNLogReplayer();
-		Collection<XEventClass> activities = logInfo.getActivities().toSet();
 		CostBasedCompleteParam replayParameters = new CostBasedCompleteParam(activities, dummy,
 				petrinet.getTransitions(), 1, 1);
 		replayParameters.setInitialMarking(initialMarking);
@@ -84,7 +81,7 @@ public class AlignmentArya {
 		}
 
 		//construct log and loginfo
-		AlignedLog alignedLog = constructLogFromAlignment(replayed, mapTransition2Path, skipActivities);
+		AlignedLog alignedLog = constructLogFromAlignment(replayed, mapTransition2Path);
 		AlignedLogInfo alignedLogInfo = new AlignedLogInfo(alignedLog);
 
 		System.out.println("Arya alignment done,  took " + String.format("%15d", System.nanoTime() - start) + ", fitness "
@@ -93,10 +90,10 @@ public class AlignmentArya {
 		return new AlignmentResult(alignedLog, alignedLogInfo);
 	}
 
-	private static XEventClass mapTransitionToEventClass(Transition t, IMLogInfo logInfo,
+	private static XEventClass mapTransitionToEventClass(Transition t, Iterable<XEventClass> activities,
 			Map<Transition, UnfoldedNode> mapTransition2Path) {
 		//find the event class with the same label as the transition
-		for (XEventClass activity : logInfo.getActivities()) {
+		for (XEventClass activity : activities) {
 			UnfoldedNode unode = mapTransition2Path.get(t);
 			if (unode.getNode().getName().equals(activity.toString())) {
 				return activity;
@@ -106,7 +103,7 @@ public class AlignmentArya {
 	}
 
 	public static AlignedLog constructLogFromAlignment(PNRepResult replayed,
-			Map<Transition, UnfoldedNode> mapTransition2Path, Set<XEventClass> skipActivities) {
+			Map<Transition, UnfoldedNode> mapTransition2Path) {
 
 		//construct aligned log
 		AlignedLog alignedLog = new AlignedLog();
@@ -118,20 +115,18 @@ public class AlignmentArya {
 			while (itEvent.hasNext()) {
 				Object event = itEvent.next();
 				StepTypes moveType = itMoveType.next();
-				if (!skipActivities.contains(event)) {
-					if ((moveType == StepTypes.MINVI || moveType == StepTypes.LMGOOD) && event instanceof Transition) {
-						//synchronous move
-						trace.add(new Move(Type.synchronous, mapTransition2Path.get(event), null));
-					} else if (moveType == StepTypes.L && event instanceof XEventClass) {
-						//log move
-						trace.add(new Move(Type.log, null, (XEventClass) event));
-					} else if (moveType == StepTypes.MREAL && event instanceof Transition) {
-						//model move
-						trace.add(new Move(Type.model, mapTransition2Path.get(event), null));
-					} else {
-						System.out.println("unknown move " + moveType + " " + event);
-						trace.add(new Move(null, null, null));
-					}
+				if ((moveType == StepTypes.MINVI || moveType == StepTypes.LMGOOD) && event instanceof Transition) {
+					//synchronous move
+					trace.add(new Move(Type.synchronous, mapTransition2Path.get(event), null));
+				} else if (moveType == StepTypes.L && event instanceof XEventClass) {
+					//log move
+					trace.add(new Move(Type.log, null, (XEventClass) event));
+				} else if (moveType == StepTypes.MREAL && event instanceof Transition) {
+					//model move
+					trace.add(new Move(Type.model, mapTransition2Path.get(event), null));
+				} else {
+					System.out.println("unknown move " + moveType + " " + event);
+					trace.add(new Move(null, null, null));
 				}
 			}
 			alignedLog.add(trace, cardinality);

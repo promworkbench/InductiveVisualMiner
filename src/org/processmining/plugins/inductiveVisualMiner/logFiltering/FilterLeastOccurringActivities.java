@@ -31,7 +31,7 @@ public class FilterLeastOccurringActivities {
 		Cut cut = new Cut(Operator.parallel, partition);
 		MinerState minerState = new MinerState(miningParameters);
 		LogSplitResult result = Miner.splitLog(log, logInfo, cut, minerState);
-		IMLogInfo filteredLogInfo = new IMLogInfo(result.sublogs.get(0));
+		IMLogInfo filteredLogInfo = miningParameters.getLog2LogInfo().createLogInfo(result.sublogs.get(0));
 		
 		return new Triple<IMLog, IMLogInfo, Set<XEventClass>>(result.sublogs.get(0), filteredLogInfo, remove);
 	}
