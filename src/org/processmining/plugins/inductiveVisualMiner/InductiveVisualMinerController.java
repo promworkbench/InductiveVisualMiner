@@ -523,7 +523,7 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		//set image export button
+		//set image/animation export button
 		panel.getSaveImageButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SaveAsDialog dialog = new SaveAsDialog(panel.getGraph().isEnableAnimation());
