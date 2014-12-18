@@ -39,7 +39,6 @@ import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
-import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.AnimatedSVGExporter;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
@@ -129,9 +128,11 @@ public class ExportAnimation {
 		int framerate = 30;
 		int width = 1500;
 
-		double[] ex = AnimatableSVGPanel.getExtremeTimes(diagram.getRoot());
-		double minDuration = ex[0] - timeMargin;
-		double maxDuration = ex[1] + timeMargin;
+//		double[] ex = AnimatableSVGPanel.getExtremeTimes(diagram.getRoot());
+//		double minDuration = ex[0] - timeMargin;
+//		double maxDuration = ex[1] + timeMargin;
+		double minDuration = 0;
+		double maxDuration = 20;
 		int height = (int) (width * (diagram.getHeight() / (diagram.getWidth() * 1.0)));
 
 		progressMonitor.setNote("Rendering animation..");
