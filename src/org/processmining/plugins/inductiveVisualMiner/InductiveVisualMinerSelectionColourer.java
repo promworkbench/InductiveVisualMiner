@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.Color;
+import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
@@ -15,6 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Lo
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
 import org.processmining.processtree.ProcessTree;
@@ -28,6 +30,19 @@ import com.kitfox.svg.SVGException;
 import com.kitfox.svg.Text;
 
 public class InductiveVisualMinerSelectionColourer {
+
+	public static void colourSelection(SVGDiagram diagram, Set<UnfoldedNode> selectedNodes,
+			Set<LogMovePosition> selectedLogMoves, AlignedLogVisualisationInfo visualisationInfo) {
+		for (UnfoldedNode unode : selectedNodes) {
+			LocalDotNode dotNode = Animation.getDotNodeFromActivity(unode, visualisationInfo);
+			colourSelectedNode(diagram, dotNode, true);
+		}
+		//re-colour the selected log moves
+		for (LogMovePosition logMove : selectedLogMoves) {
+			LocalDotEdge dotEdge = Animation.getDotEdgeFromLogMove(logMove, visualisationInfo);
+			colourSelectedEdge(diagram, dotEdge, true);
+		}
+	}
 
 	public static void colourSelectedNode(SVGDiagram svg, LocalDotNode dotNode, boolean selected) {
 		Group svgGroup = DotPanel.getSVGElementOf(svg, dotNode);
@@ -43,17 +58,18 @@ public class InductiveVisualMinerSelectionColourer {
 			DotPanel.setCSSAttributeOf(shape, "stroke-dasharray", dotNode.unselectedAppearance.strokeDashArray);
 		}
 	}
-	
+
 	public static void colourSelectedEdge(SVGDiagram svg, LocalDotEdge dotEdge, boolean selected) {
 		Group svgGroup = DotPanel.getSVGElementOf(svg, dotEdge);
 		SVGElement line = svgGroup.getChild(1);
 		SVGElement text = svgGroup.getChild(3);
-		
+
 		if (selected) {
 			dotEdge.unselectedAppearance.textFill = DotPanel.setCSSAttributeOf(text, "fill", "none");
 			dotEdge.unselectedAppearance.textStroke = DotPanel.setCSSAttributeOf(text, "stroke", "red");
 			dotEdge.unselectedAppearance.textStrokeWidth = DotPanel.setCSSAttributeOf(text, "stroke-width", "0.55");
-			dotEdge.unselectedAppearance.lineStrokeDashArray = DotPanel.setCSSAttributeOf(line, "stroke-dasharray", "2,5");
+			dotEdge.unselectedAppearance.lineStrokeDashArray = DotPanel.setCSSAttributeOf(line, "stroke-dasharray",
+					"2,5");
 		} else {
 			DotPanel.setCSSAttributeOf(text, "fill", dotEdge.unselectedAppearance.textFill);
 			DotPanel.setCSSAttributeOf(text, "stroke", dotEdge.unselectedAppearance.textStroke);
@@ -62,7 +78,7 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
-	public static TraceViewColourMap colour(SVGDiagram svg, AlignedLogVisualisationInfo info, ProcessTree tree,
+	public static TraceViewColourMap colourHighlighting(SVGDiagram svg, AlignedLogVisualisationInfo info, ProcessTree tree,
 			AlignedLogInfo alignedFilteredLogInfo, AlignedLogVisualisationParameters visualisationParameters) {
 
 		UnfoldedNode uroot = new UnfoldedNode(tree.getRoot());

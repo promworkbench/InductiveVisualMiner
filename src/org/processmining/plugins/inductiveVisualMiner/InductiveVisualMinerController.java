@@ -36,9 +36,12 @@ import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
+import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
@@ -48,7 +51,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.ComputeAlignment;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeTimedLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
@@ -102,7 +104,8 @@ public class InductiveVisualMinerController {
 			panel.getSaveModelButton().setEnabled(false);
 			panel.getSaveImageButton().setEnabled(false);
 			panel.getSaveImageButton().setText("image");
-			return Triple.of(state.getXLog(), state.getMiningParameters().getClassifier(), state.getMiningParameters().getLog2LogInfo());
+			return Triple.of(state.getXLog(), state.getMiningParameters().getClassifier(), state.getMiningParameters()
+					.getLog2LogInfo());
 		}
 
 		protected Triple<XLogInfo, IMLog, IMLogInfo> executeLink(Triple<XLog, XEventClassifier, IMLog2IMLogInfo> input) {
@@ -174,7 +177,6 @@ public class InductiveVisualMinerController {
 			if (input.getA() == null) {
 				//mine a new tree
 				ProcessTree tree = IMProcessTree.mineProcessTree(input.getB(), input.getC());
-				System.out.println("Mining done.");
 				return tree;
 			} else {
 				//use the existing tree
@@ -194,7 +196,7 @@ public class InductiveVisualMinerController {
 
 			//deviation from chain: already show the model, without alignment
 			//this is to not have the user wait for the alignment without visual feedback
-			panel.updateModel(state);
+			//panel.updateModel(state);
 		}
 
 		public void cancel() {
@@ -231,26 +233,41 @@ public class InductiveVisualMinerController {
 	}
 
 	//perform layout
-	private class Layout extends ChainLink<Object, Object> {
+	private class Layout
+			extends
+			ChainLink<Triple<ProcessTree, AlignedLogInfo, AlignedLogVisualisationParameters>, Triple<Dot, SVGDiagram, AlignedLogVisualisationInfo>> {
 
-		protected Object generateInput() {
+		protected Triple<ProcessTree, AlignedLogInfo, AlignedLogVisualisationParameters> generateInput() {
+			setStatus("Layouting graph..");
+
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			//if the view does not show log moves anymore, do not select any nodes
+
+			//if the view does not show deviations, do not select any log moves
 			if (state.getColourMode() == ColourMode.paths) {
 				state.setSelectedLogMoves(new HashSet<LogMovePosition>());
 			}
-			return null;
+
+			AlignedLogVisualisationParameters parameters = InductiveVisualMinerPanel.getViewParameters(state);
+			return Triple.of(state.getTree(), state.getAlignedFilteredLogInfo(), parameters);
 		}
 
-		protected SVGDiagram executeLink(Object input) {
-			setStatus("Layouting graph..");
-			return null;
+		protected Triple<Dot, SVGDiagram, AlignedLogVisualisationInfo> executeLink(
+				Triple<ProcessTree, AlignedLogInfo, AlignedLogVisualisationParameters> input) {
+			//compute dot
+			AlignedLogVisualisation visualiser = new AlignedLogVisualisation();
+			Pair<Dot, AlignedLogVisualisationInfo> p = visualiser.fancy(input.getA(), input.getB(), input.getC());
+
+			//compute svg from dot
+			SVGDiagram diagram = DotPanel.dot2svg(p.getA());
+
+			return Triple.of(p.getA(), diagram, p.getB());
 		}
 
-		protected void processResult(Object result) {
-			Pair<Dot, AlignedLogVisualisationInfo> p = panel.updateModel(state);
-			state.setLayout(p.getLeft(), p.getRight());
+		protected void processResult(Triple<Dot, SVGDiagram, AlignedLogVisualisationInfo> result) {
+			panel.getGraph().changeDot(result.getA(), result.getB(), true);
+			
+			state.setLayout(result.getC());
 			makeNodesSelectable(state.getVisualisationInfo(), panel, state.getSelectedNodes(),
 					state.getSelectedLogMoves());
 		}
@@ -306,6 +323,40 @@ public class InductiveVisualMinerController {
 		}
 	}
 
+	//colour the nodes
+		private class ApplyHighlighting extends ChainLink<AlignedLogInfo, AlignedLogInfo> {
+
+			protected AlignedLogInfo generateInput() {
+				return state.getAlignedFilteredLogInfo();
+			}
+
+			protected AlignedLogInfo executeLink(AlignedLogInfo input) {
+				return input;
+			}
+
+			protected void processResult(AlignedLogInfo result) {
+				
+				TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(panel.getGraph().getSVG(),
+						state.getVisualisationInfo(), state.getTree(), result,
+						InductiveVisualMinerPanel.getViewParameters(state));
+				ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
+						state.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
+						maxAnimatedTraces);
+
+				//tell trace view the colour map and the selection
+				panel.getTraceView().setColourMap(colourMap);
+				colourMap.setSelectedNodes(state.getSelectedNodes(), state.getSelectedLogMoves());
+
+				setStatus(" ");
+				panel.repaint();
+			}
+
+			public void cancel() {
+
+			}
+
+		}
+	
 	private class TimeLog extends ChainLink<Triple<AlignedLog, XLog, XLogInfo>, TimedLog> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
@@ -358,63 +409,34 @@ public class InductiveVisualMinerController {
 		}
 
 		protected void processResult(SVGDiagram result) {
-			if (result == null) {
-				return;
-			}
-
-			panel.getGraph().setImage(result, false);
-			panel.getGraph().setEnableAnimation(true);
-			panel.getSaveImageButton().setText("animation");
 
 			//re-colour the selected nodes (i.e. the dashed red border)
-			for (UnfoldedNode unode : state.getSelectedNodes()) {
-				LocalDotNode dotNode = Animation.getDotNodeFromActivity(unode, state.getVisualisationInfo());
-				InductiveVisualMinerSelectionColourer.colourSelectedNode(panel.getGraph().getSVG(), dotNode, true);
-			}
-			//re-colour the selected log moves
-			for (LogMovePosition logMove : state.getSelectedLogMoves()) {
-				LocalDotEdge dotEdge = Animation.getDotEdgeFromLogMove(logMove, state.getVisualisationInfo());
-				InductiveVisualMinerSelectionColourer.colourSelectedEdge(panel.getGraph().getSVG(), dotEdge, true);
-			}
+			InductiveVisualMinerSelectionColourer.colourSelection(result, state.getSelectedNodes(),
+					state.getSelectedLogMoves(), state.getVisualisationInfo());
+			
+			//re-highlight the model
+			TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(result,
+					state.getVisualisationInfo(), state.getTree(), state.getAlignedFilteredLogInfo(),
+					InductiveVisualMinerPanel.getViewParameters(state));
+
+			//tell trace view the colour map and the selection
+			panel.getTraceView().setColourMap(colourMap);
+			colourMap.setSelectedNodes(state.getSelectedNodes(), state.getSelectedLogMoves());
+			
+			//update selection description
+			ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
+					state.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
+					maxAnimatedTraces);
+			
+			panel.getSaveImageButton().setText("animation");
+			setStatus(" ");
+			panel.getGraph().setImage(result, false);
+			panel.getGraph().setEnableAnimation(true);
 		}
 
 		public void cancel() {
 			canceller.cancel();
 		}
-
-	}
-
-	//colour the nodes
-	private class ApplyNodeSelectionColouring extends ChainLink<AlignedLogInfo, AlignedLogInfo> {
-
-		protected AlignedLogInfo generateInput() {
-			return state.getAlignedFilteredLogInfo();
-		}
-
-		protected AlignedLogInfo executeLink(AlignedLogInfo input) {
-			return input;
-		}
-
-		protected void processResult(AlignedLogInfo result) {
-			TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colour(panel.getGraph().getSVG(),
-					state.getVisualisationInfo(), state.getTree(), result,
-					InductiveVisualMinerPanel.getViewParameters(state));
-			ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
-					state.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
-					maxAnimatedTraces);
-
-			//make a colour map for the trace view
-			panel.getTraceView().setColourMap(colourMap);
-			colourMap.setSelectedNodes(state.getSelectedNodes(), state.getSelectedLogMoves());
-
-			setStatus(" ");
-			panel.repaint();
-		}
-
-		public void cancel() {
-
-		}
-
 	}
 
 	private final Chain chain;
@@ -433,13 +455,13 @@ public class InductiveVisualMinerController {
 		chain.add(new MakeLog());
 		chain.add(new FilterLog());
 		chain.add(new Mine());
+		chain.add(new Layout());
 		chain.add(new Align());
 		chain.add(new Layout());
 		chain.add(new FilterNodeSelection());
-		chain.add(new ApplyNodeSelectionColouring());
+		chain.add(new ApplyHighlighting());
 		chain.add(new TimeLog());
 		chain.add(new Animate());
-		chain.add(new ApplyNodeSelectionColouring());
 
 		//set up plug-ins
 		List<ColouringFilter> colouringFilters = ColouringFilterPluginFinder.findFilteringPlugins(context, panel,
@@ -536,7 +558,7 @@ public class InductiveVisualMinerController {
 						//save the file asynchronously
 						new Thread(new Runnable() {
 							public void run() {
-								Dot2Image.dot2image(state.getDot(), p.getLeft(), Type.pdf);
+								Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.pdf);
 							}
 						}).start();
 						break;
@@ -544,7 +566,7 @@ public class InductiveVisualMinerController {
 						//save the file asynchronously
 						new Thread(new Runnable() {
 							public void run() {
-								Dot2Image.dot2image(state.getDot(), p.getLeft(), Type.png);
+								Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.png);
 							}
 						}).start();
 						break;
@@ -552,7 +574,7 @@ public class InductiveVisualMinerController {
 						//save the file asynchronously
 						new Thread(new Runnable() {
 							public void run() {
-								Dot2Image.dot2image(state.getDot(), p.getLeft(), Type.svg);
+								Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.svg);
 							}
 						}).start();
 						break;
@@ -561,7 +583,7 @@ public class InductiveVisualMinerController {
 					{
 						final SVGDiagram svg = panel.getGraph().getSVG();
 						final ColourMode colourMode = state.getColourMode();
-						final Dot dot = state.getDot();
+						final Dot dot = panel.getGraph().getDot();
 						final TimedLog timedLog = state.getTimedLog();
 						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
 						new Thread(new Runnable() {
@@ -584,7 +606,7 @@ public class InductiveVisualMinerController {
 					{
 						final SVGDiagram svg = panel.getGraph().getSVG();
 						final ColourMode colourMode = state.getColourMode();
-						final Dot dot = state.getDot();
+						final Dot dot = panel.getGraph().getDot();
 						final TimedLog timedLog = state.getTimedLog();
 						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
 						new Thread(new Runnable() {

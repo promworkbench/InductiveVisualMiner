@@ -10,7 +10,6 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
-import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
@@ -110,20 +109,14 @@ public class InductiveVisualMinerState {
 	}
 
 	//==layout==
-	private Dot dot;
 	private AlignedLogVisualisationInfo visualisationInfo;
 
-	public void setLayout(Dot dot, AlignedLogVisualisationInfo visualisationInfo) {
-		this.dot = dot;
+	public void setLayout(AlignedLogVisualisationInfo visualisationInfo) {
 		this.visualisationInfo = visualisationInfo;
 	}
 
 	public AlignedLogVisualisationInfo getVisualisationInfo() {
 		return visualisationInfo;
-	}
-
-	public Dot getDot() {
-		return dot;
 	}
 
 	//==alignment==

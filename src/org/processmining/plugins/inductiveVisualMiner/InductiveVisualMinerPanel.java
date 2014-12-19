@@ -28,7 +28,6 @@ import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
@@ -280,14 +279,6 @@ public class InductiveVisualMinerPanel extends JPanel {
 			classifierLabel.setVisible(false);
 			classifiersCombobox.setVisible(false);
 		}
-	}
-
-	public synchronized Pair<Dot, AlignedLogVisualisationInfo> updateModel(InductiveVisualMinerState state) {
-		AlignedLogVisualisationParameters parameters = getViewParameters(state);
-		Pair<Dot, AlignedLogVisualisationInfo> p = visualiser.fancy(state.getTree(), state.getAlignedFilteredLogInfo(),
-				parameters);
-		graphPanel.changeDot(p.getLeft(), true);
-		return p;
 	}
 
 	//==visualisation parameters==
