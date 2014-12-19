@@ -28,6 +28,7 @@ import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.InductiveMiner.Triple;
+import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
@@ -91,10 +92,6 @@ public class InductiveVisualMinerController {
 		}
 
 	}
-	
-	private class IMLog2IMLogInfo {
-		
-	}
 
 	//make an IMlog out of an XLog
 	private class MakeLog extends
@@ -105,16 +102,14 @@ public class InductiveVisualMinerController {
 			panel.getSaveModelButton().setEnabled(false);
 			panel.getSaveImageButton().setEnabled(false);
 			panel.getSaveImageButton().setText("image");
-//			return Triple.of(state.getXLog(), state.getMiningParameters().getClassifier(), state.getMiningParameters().getLog2LogInfo());
-			return Triple.of(state.getXLog(), state.getMiningParameters().getClassifier(), new IMLog2IMLogInfo());
+			return Triple.of(state.getXLog(), state.getMiningParameters().getClassifier(), state.getMiningParameters().getLog2LogInfo());
 		}
 
 		protected Triple<XLogInfo, IMLog, IMLogInfo> executeLink(Triple<XLog, XEventClassifier, IMLog2IMLogInfo> input) {
 			setStatus("Making log..");
 
 			IMLog imLog = new IMLog(input.getA(), input.getB());
-//			IMLogInfo imLogInfo = input.getC().createLogInfo(imLog);
-			IMLogInfo imLogInfo = null;
+			IMLogInfo imLogInfo = input.getC().createLogInfo(imLog);
 			XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(input.getA(), input.getB());
 
 			return Triple.of(xLogInfo, imLog, imLogInfo);
