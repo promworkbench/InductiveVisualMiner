@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,8 +17,6 @@ import javax.swing.JTextArea;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThrough;
-import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughDirectlyFollowsGraph;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapLightBlue;
@@ -36,6 +33,7 @@ import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringF
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 import com.fluxicon.slickerbox.components.NiceDoubleSlider;
@@ -52,11 +50,12 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JLabel colourLabel;
 	private final JLabel statusLabel;
 	private final JTextArea selectionLabel;
-	private final JCheckBox showDirectlyFollowsGraphs;
 	private final NiceDoubleSlider activitiesSlider;
-	private final NiceDoubleSlider noiseSlider;
+	private final NiceDoubleSlider pathsSlider;
 	private final JLabel classifierLabel;
 	private JComboBox<?> classifiersCombobox;
+	private final JLabel minerLabel;
+	private JComboBox<?> minerCombobox;
 	private final JButton saveModelButton;
 	private final JButton saveImageButton;
 	private final JButton traceViewButton;
@@ -68,8 +67,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	private InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged = null;
 
-	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			ClassifierWrapper[] classifiers, boolean enableMining) {
+	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state, ClassifierWrapper[] classifiers,
+			VisualMinerWrapper[] miners, boolean enableMining) {	
 		visualiser = new AlignedLogVisualisation();
 		initVisualisationParameters();
 
@@ -89,31 +88,15 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 
 		{
-			noiseSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0,
-					1 - state.getMiningParameters().getNoiseThreshold(), Orientation.VERTICAL);
+			pathsSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0,
+					state.getPaths(), Orientation.VERTICAL);
 			GridBagConstraints cNoiseSlider = new GridBagConstraints();
 			cNoiseSlider.gridx = 2;
 			cNoiseSlider.gridy = gridy++;
 			cNoiseSlider.weighty = 1;
 			cNoiseSlider.fill = GridBagConstraints.VERTICAL;
 			cNoiseSlider.anchor = GridBagConstraints.WEST;
-			add(getNoiseSlider(), cNoiseSlider);
-		}
-
-		{
-			boolean dfg = false;
-			for (FallThrough f : state.getMiningParameters().getFallThroughs()) {
-				dfg = dfg || f instanceof FallThroughDirectlyFollowsGraph;
-			}
-			showDirectlyFollowsGraphs = SlickerFactory.instance().createCheckBox(
-					"Fall back to directly-follows graphs", dfg);
-			showDirectlyFollowsGraphs.setEnabled(false);
-			//			GridBagConstraints cShowDirectlyFollowsGraphs = new GridBagConstraints();
-			//			cShowDirectlyFollowsGraphs.gridx = 1;
-			//			cShowDirectlyFollowsGraphs.gridy = gridy++;
-			//			cShowDirectlyFollowsGraphs.gridwidth = 2;
-			//			cShowDirectlyFollowsGraphs.anchor = GridBagConstraints.NORTHWEST;
-			//			add(showDirectlyFollowsGraphs, cShowDirectlyFollowsGraphs);
+			add(getPathsSlider(), cNoiseSlider);
 		}
 
 		{
@@ -132,7 +115,26 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cClassifiers.gridwidth = 1;
 			cClassifiers.fill = GridBagConstraints.HORIZONTAL;
 			add(classifiersCombobox, cClassifiers);
-			classifiersCombobox.setSelectedItem(state.getMiningParameters().getClassifier());
+			classifiersCombobox.setSelectedItem(state.getClassifier());
+		}
+
+		{
+			minerLabel = SlickerFactory.instance().createLabel("Miner");
+			GridBagConstraints cMinerLabel = new GridBagConstraints();
+			cMinerLabel.gridx = 1;
+			cMinerLabel.gridy = gridy;
+			cMinerLabel.gridwidth = 1;
+			cMinerLabel.anchor = GridBagConstraints.WEST;
+			add(minerLabel, cMinerLabel);
+
+			minerCombobox = SlickerFactory.instance().createComboBox(miners);
+			GridBagConstraints cMiners = new GridBagConstraints();
+			cMiners.gridx = 2;
+			cMiners.gridy = gridy++;
+			cMiners.gridwidth = 1;
+			cMiners.fill = GridBagConstraints.HORIZONTAL;
+			add(minerCombobox, cMiners);
+			minerCombobox.setSelectedItem(state.getMiner());
 		}
 
 		{
@@ -275,7 +277,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		//handle pre-mined tree case
 		if (!enableMining) {
 			activitiesSlider.setVisible(false);
-			noiseSlider.setVisible(false);
+			pathsSlider.setVisible(false);
 			classifierLabel.setVisible(false);
 			classifiersCombobox.setVisible(false);
 		}
@@ -378,6 +380,10 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return graphPanel;
 	}
 
+	public JComboBox<?> getMinerSelection() {
+		return minerCombobox;
+	}
+
 	public JComboBox<?> getColourModeSelection() {
 		return colourSelection;
 	}
@@ -398,12 +404,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return selectionLabel;
 	}
 
-	public JCheckBox getShowDirectlyFollowsGraphs() {
-		return showDirectlyFollowsGraphs;
-	}
-
-	public NiceDoubleSlider getNoiseSlider() {
-		return noiseSlider;
+	public NiceDoubleSlider getPathsSlider() {
+		return pathsSlider;
 	}
 
 	public NiceDoubleSlider getActivitiesSlider() {

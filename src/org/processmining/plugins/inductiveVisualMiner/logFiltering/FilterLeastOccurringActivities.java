@@ -7,18 +7,19 @@ import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.Triple;
+import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.Miner;
 import org.processmining.plugins.InductiveMiner.mining.MinerState;
-import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.cuts.Cut;
 import org.processmining.plugins.InductiveMiner.mining.cuts.Cut.Operator;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitter.LogSplitResult;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.MiningParametersIvM;
 
 public class FilterLeastOccurringActivities {
 	public static Triple<IMLog, IMLogInfo, Set<XEventClass>> filter(IMLog log, IMLogInfo logInfo, double threshold,
-			MiningParameters miningParameters) {
+			IMLog2IMLogInfo log2logInfo) {
 		List<XEventClass> list = logInfo.getActivities().sortByCardinality();
 		int lastIndex = (int) Math.floor((1 - threshold) * list.size());
 
@@ -29,9 +30,10 @@ public class FilterLeastOccurringActivities {
 		partition.add(keep);
 		partition.add(remove);
 		Cut cut = new Cut(Operator.parallel, partition);
-		MinerState minerState = new MinerState(miningParameters);
+		MinerState minerState = new MinerState(new MiningParametersIvM());
 		LogSplitResult result = Miner.splitLog(log, logInfo, cut, minerState);
-		IMLogInfo filteredLogInfo = miningParameters.getLog2LogInfo().createLogInfo(result.sublogs.get(0));
+		
+		IMLogInfo filteredLogInfo = log2logInfo.createLogInfo(result.sublogs.get(0));
 		
 		return new Triple<IMLog, IMLogInfo, Set<XEventClass>>(result.sublogs.get(0), filteredLogInfo, remove);
 	}

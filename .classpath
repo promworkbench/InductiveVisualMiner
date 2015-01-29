@@ -68,7 +68,6 @@
 	<classpathentry kind="lib" path="packagelib/EvolutionaryTreeMiner.jar"/>
 	<classpathentry kind="lib" path="stdlib/guava-16.0.1.jar"/>
 	<classpathentry kind="lib" path="packagelib/Widgets.jar"/>
-	<classpathentry kind="lib" path="packagelib/GraphViz.jar"/>
 	<classpathentry kind="lib" path="packagelib/InductiveMiner.jar"/>
 	<classpathentry kind="lib" path="packagelib/Log.jar"/>
 	<classpathentry kind="lib" path="packagelib/Log-lib/OpenXES-XStream.jar"/>
@@ -77,5 +76,6 @@
 	<classpathentry kind="lib" path="packagelib/BasicUtils-lib/jgrapht-jdk1.6.jar"/>
 	<classpathentry kind="lib" path="packagelib/ApacheUtils-lib/uncommons-maths-1.2.3.jar"/>
 	<classpathentry kind="lib" path="packagelib/EfficientStorage.jar"/>
+	<classpathentry kind="lib" path="packagelib/GraphViz.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -5,8 +5,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClass;
+import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.classification.XEventNameClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
+import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
+import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
@@ -17,11 +21,14 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.IMi;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.MiningParametersIvM;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class InductiveVisualMinerState {
-
+	
 	public InductiveVisualMinerState(XLog xLog, ProcessTree preMinedTree) {
 		this.xLog = xLog;
 		miningParameters = new MiningParametersIvM();
@@ -32,11 +39,29 @@ public class InductiveVisualMinerState {
 	}
 
 	//==log==
+	private XEventClassifier classifier = new XEventNameClassifier();
+	private IMLog2IMLogInfo log2logInfo = new IMLog2IMLogInfoDefault();
 	private final XLog xLog;
 	private XLogInfo xLogInfo;
 	private IMLog imLog;
 	private IMLogInfo imLogInfo;
 
+	public XEventClassifier getClassifier() {
+		return classifier;
+	}
+	
+	public synchronized void setClassifier (XEventClassifier classifier) {
+		this.classifier = classifier;
+	}
+
+	public IMLog2IMLogInfo getLog2logInfo() {
+		return log2logInfo;
+	}
+
+	public void setLog2logInfo(IMLog2IMLogInfo log2logInfo) {
+		this.log2logInfo = log2logInfo;
+	}
+	
 	public XLog getXLog() {
 		return xLog;
 	}
@@ -85,27 +110,45 @@ public class InductiveVisualMinerState {
 
 	//==mining==
 	private MiningParameters miningParameters;
+	private VisualMinerWrapper miner = new IMi();
+	private double paths = 0.8;
 	private ProcessTree tree = null;
 	private ProcessTree preMinedTree = null;
 
+	public MiningParameters getMiningParameters2() {
+		return miningParameters;
+	}
+	
+	public synchronized void setMiningParameters(MiningParameters miningParameters) {
+		this.miningParameters = miningParameters;
+	}
+	
+	public VisualMinerWrapper getMiner() {
+		return miner;
+	}
+	
+	public void setMiner(VisualMinerWrapper miner) {
+		this.miner = miner;
+	}
+	
+	public double getPaths() {
+		return paths;
+	}
+
+	public synchronized void setPaths(double paths) {
+		this.paths = paths;
+	}
+	
 	public ProcessTree getTree() {
 		return tree;
 	}
 	
-	public ProcessTree getPreMinedTree() {
-		return preMinedTree;
-	}
-
-	public MiningParameters getMiningParameters() {
-		return miningParameters;
-	}
-
 	public synchronized void setTree(ProcessTree tree) {
 		this.tree = tree;
 	}
-
-	public synchronized void setMiningParameters(MiningParameters miningParameters) {
-		this.miningParameters = miningParameters;
+	
+	public ProcessTree getPreMinedTree() {
+		return preMinedTree;
 	}
 
 	//==layout==

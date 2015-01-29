@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner;
+package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners;
 
 import java.util.ArrayList;
 import java.util.Arrays;
