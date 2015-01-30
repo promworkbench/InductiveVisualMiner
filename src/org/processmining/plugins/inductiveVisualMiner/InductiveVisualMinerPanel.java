@@ -119,7 +119,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 
 		{
-			minerLabel = SlickerFactory.instance().createLabel("Miner");
+			minerLabel = SlickerFactory.instance().createLabel("Mine");
 			GridBagConstraints cMinerLabel = new GridBagConstraints();
 			cMinerLabel.gridx = 1;
 			cMinerLabel.gridy = gridy;

@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.TraceBuilder;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.WedgeBuilder;
@@ -19,7 +18,6 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
-import org.processmining.plugins.InductiveMiner.mining.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
@@ -31,7 +29,6 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
@@ -137,15 +134,16 @@ public class TraceView extends SideWindow {
 			return new ProMTraceView.Trace<Event>() {
 
 				public Iterator<Event> iterator() {
-					return FluentIterable.from((IMTrace) trace).transform(new Function<XEventClass, Event>() {
-						public Event apply(final XEventClass input) {
-							return new ProMTraceView.AbstractEvent() {
-								public String getLabel() {
-									return input.toString();
-								}
-							};
-						}
-					}).iterator();
+//					return FluentIterable.from((IMTrace) trace).transform(new Function<XEvent, Event>() {
+//						public Event apply(final XEvent input) {
+//							return new ProMTraceView.AbstractEvent() {
+//								public String getLabel() {
+//									return input.toString();
+//								}
+//							};
+//						}
+//					}).iterator();
+					return null;
 				}
 
 				public String getName() {
