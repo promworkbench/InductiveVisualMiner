@@ -12,7 +12,7 @@ import javax.swing.event.ListSelectionListener;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.model.XTrace;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterGui;
@@ -61,10 +61,10 @@ public class ColouringFilterTraceWithEventTwice extends ColouringFilter {
 		return !panel.getSelectedAttributes().isEmpty();
 	}
 
-	public boolean countInColouring(XTrace xTrace, AlignedTrace aTrace) {
+	public boolean countInColouring(IMTrace trace, AlignedTrace aTrace) {
 		String key = panel.getSelectedKey();
 		int count = 0;
-		for (XEvent event : xTrace) {
+		for (XEvent event : trace) {
 			if (event.getAttributes().containsKey(key) && panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
 				count++;
 				if (count >= 2) {

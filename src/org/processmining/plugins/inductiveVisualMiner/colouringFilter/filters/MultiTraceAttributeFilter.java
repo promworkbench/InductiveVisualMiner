@@ -14,6 +14,7 @@ import javax.swing.event.ListSelectionListener;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterGui;
@@ -58,12 +59,12 @@ public class MultiTraceAttributeFilter extends ColouringFilter {
 		return panel;
 	}
 
-	public boolean countInColouring(XTrace xTrace, AlignedTrace aTrace) {
+	public boolean countInColouring(IMTrace trace, AlignedTrace aTrace) {
 		String key = panel.getSelectedKey();
-		if (!xTrace.getAttributes().containsKey(key)) {
+		if (!trace.getAttributes().containsKey(key)) {
 			return false;
 		}
-		return panel.getSelectedAttributes().contains(xTrace.getAttributes().get(key));
+		return panel.getSelectedAttributes().contains(trace.getAttributes().get(key));
 	}
 
 	public boolean isEnabled() {

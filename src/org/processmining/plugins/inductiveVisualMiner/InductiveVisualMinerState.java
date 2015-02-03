@@ -12,8 +12,8 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
-import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
@@ -85,9 +85,18 @@ public class InductiveVisualMinerState {
 	}
 
 	//==activity-filtered log==
+	private double activitiesThreshold = 1.0;
 	private IMLog activityFilteredIMLog;
 	private IMLogInfo activityFilteredIMLogInfo;
 	private Set<XEventClass> filteredActivities;
+	
+	public double getActivitiesThreshold() {
+		return activitiesThreshold;
+	}
+	
+	public synchronized void setActivitiesThreshold(double activitiesThreshold) {
+		this.activitiesThreshold = activitiesThreshold;
+	}
 
 	public IMLog getActivityFilteredIMLog() {
 		return activityFilteredIMLog;
@@ -167,7 +176,7 @@ public class InductiveVisualMinerState {
 	private AlignedLogInfo alignedLogInfo = null;
 	private AlignedLog alignedFilteredLog = null;
 	private AlignedLogInfo alignedFilteredLogInfo = null;
-	private XLog alignedFilteredXLog = null;
+	private IMLog alignedFilteredXLog = null;
 
 	public boolean isAlignmentReady() {
 		return alignedLog != null;
@@ -189,7 +198,7 @@ public class InductiveVisualMinerState {
 		return alignedFilteredLogInfo;
 	}
 	
-	public XLog getAlignedFilteredXLog() {
+	public IMLog getAlignedFilteredXLog() {
 		return alignedFilteredXLog;
 	}
 
@@ -217,30 +226,21 @@ public class InductiveVisualMinerState {
 	 * Apply a new filter
 	 */
 	public synchronized void setAlignedFilteredLog(AlignedLog alignedFilteredLog,
-			AlignedLogInfo alignedFilteredLogInfo, XLog alignedFilteredXLog) {
+			AlignedLogInfo alignedFilteredLogInfo, IMLog alignedFilteredXLog) {
 		this.alignedFilteredLog = alignedFilteredLog;
 		this.alignedFilteredLogInfo = alignedFilteredLogInfo;
 		this.alignedFilteredXLog = alignedFilteredXLog;
 	}
 
 	//==gui-parameters==
+	private ColourMode colourMode = ColourMode.paths;
+	
 	public enum ColourMode {
 		paths, deviations, both
 	};
-
-	private double activitiesThreshold = 1.0;
-	private ColourMode colourMode = ColourMode.paths;
-
-	public double getActivitiesThreshold() {
-		return activitiesThreshold;
-	}
-
+	
 	public ColourMode getColourMode() {
 		return colourMode;
-	}
-
-	public synchronized void setActivitiesThreshold(double activitiesThreshold) {
-		this.activitiesThreshold = activitiesThreshold;
 	}
 
 	public synchronized void setColourMode(ColourMode modus) {

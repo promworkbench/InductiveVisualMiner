@@ -19,7 +19,7 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
-import org.processmining.plugins.InductiveMiner.mining.IMTrace;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
@@ -27,6 +27,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
@@ -143,13 +144,35 @@ public class TraceView extends SideWindow {
 								public String getLabel() {
 									return IMLog.classify(input).toString();
 								}
+								
+								public String getTopLabel() {
+									Long timestamp = TimestampsAdder.getTimestamp(input);
+									return TimestampsAdder.toString(timestamp);
+								}
+								
+								public String getBottomLabel() {
+									if (IMLog.isStart(input)) {
+										return "start";
+									} else {
+										return "complete";
+									}
+								}
 							};
 						}
 					}).iterator();
 				}
 
 				public String getName() {
-					return null;
+					String s;
+					if (((IMTrace) trace).getAttributes().containsKey("concept:name")) {
+						s = ((IMTrace) trace).getAttributes().get("concept:name").toString();
+					} else {
+						s = "";
+					}
+					if (s.length() > 9) {
+						return s.substring(0, 7) + "..";
+					}
+					return s;
 				}
 
 				public Color getNameColor() {

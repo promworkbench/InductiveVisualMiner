@@ -9,7 +9,7 @@ import java.util.Map;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTraceG;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Block.Def;

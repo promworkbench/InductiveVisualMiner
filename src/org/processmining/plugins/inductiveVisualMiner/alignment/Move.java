@@ -147,6 +147,10 @@ public class Move implements Event {
 	}
 
 	public String getBottomLabel() {
+		return "";
+	}
+
+	public String getBottomLabel2() {
 		if (isSyncMove()) {
 			return null;
 		} else if (isModelMove()) {
@@ -154,10 +158,6 @@ public class Move implements Event {
 		} else {
 			return "only in log";
 		}
-	}
-
-	public String getBottomLabel2() {
-		return "";
 	}
 
 	public Color getWedgeColor() {
@@ -181,11 +181,11 @@ public class Move implements Event {
 	}
 
 	public Color getBottomLabelColor() {
-		return Color.red;
+		return null;
 	}
 
 	public Color getBottomLabel2Color() {
-		return null;
+		return Color.red;
 	}
 
 }

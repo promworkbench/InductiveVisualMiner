@@ -9,24 +9,24 @@ import nl.tue.astar.AStarThread.Canceller;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XEvent;
-import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.model.XTrace;
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
+import org.processmining.plugins.InductiveMiner.mining.IMLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTraceG;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
 public class ComputeTimedLog {
 
-	public static TimedLog computeTimedLog(final AlignedLog aLog, final XLog xLog, final XLogInfo xLogInfo,
+	public static TimedLog computeTimedLog(final AlignedLog aLog, final IMLog log, final XLogInfo xLogInfo,
 			final Canceller canceller) {
 
 		//make a log-projection-hashmap
 		HashMap<List<XEventClass>, AlignedTrace> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
 
 		TimedLog timedLog = new TimedLog();
-		for (XTrace xTrace : xLog) {
-			TimedTrace tTrace = timeTrace(map, xTrace, xLogInfo);
+		for (IMTrace trace : log) {
+			TimedTrace tTrace = timeTrace(log, map, trace, xLogInfo);
 			if (tTrace != null) {
 				timedLog.add(tTrace);
 			}
@@ -37,7 +37,7 @@ public class ComputeTimedLog {
 		return timedLog;
 	}
 
-	private static TimedTrace timeTrace(HashMap<List<XEventClass>, AlignedTrace> map, XTrace trace, XLogInfo xLogInfo) {
+	private static TimedTrace timeTrace(IMLog log, HashMap<List<XEventClass>, AlignedTrace> map, IMTrace trace, XLogInfo xLogInfo) {
 
 		//find the corresponding aligned trace
 		List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfo);
@@ -59,18 +59,19 @@ public class ComputeTimedLog {
 		for (Move move : alignedTrace) {
 			if (move.getEventClass() != null) {
 
-				Long timestamp = TimestampsAdder.getTimestamp(itEvent.next());
+				XEvent event = itEvent.next();
+				Long timestamp = TimestampsAdder.getTimestamp(event);
 
 				//see if this event has a valid timestamp
 				if (timestamp != null && timestamp >= lastSeenTimestamp) {
 					lastSeenTimestamp = timestamp;
-					timedTrace.add(new TimedMove(move, timestamp));
+					timedTrace.add(new TimedMove(move, timestamp, log.isStart(event)));
 				} else {
-					timedTrace.add(new TimedMove(move, null));
+					timedTrace.add(new TimedMove(move, null, log.isComplete(event)));
 				}
 			} else {
 				//model move or tau
-				timedTrace.add(new TimedMove(move, null));
+				timedTrace.add(new TimedMove(move, null, false));
 			}
 		}
 

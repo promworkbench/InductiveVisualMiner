@@ -6,7 +6,7 @@ import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.processtree.ProcessTree;
 
 @VisualMinerWrapperAnnotation
-public abstract class VisualMinerWrapper {
+public abstract class VisualMinerWrapper implements Comparable<VisualMinerWrapper> {
 
 	/**
 	 * Constructor. User is waiting when this function is called.
@@ -31,4 +31,7 @@ public abstract class VisualMinerWrapper {
 	 */
 	public abstract ProcessTree mine(IMLog log, VisualMinerParameters parameters, Canceller canceller);
 
+	public int compareTo(VisualMinerWrapper o) {
+		return this.toString().compareTo(o.toString());
+	}
 }

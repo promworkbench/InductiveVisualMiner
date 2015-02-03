@@ -1,8 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
@@ -31,12 +28,14 @@ public class TimedMove extends Move {
 	}
 
 	private final Long logTimestamp;
+	private final boolean start;
 
-	public TimedMove(Move move, Long logTimestamp) {
+	public TimedMove(Move move, Long logTimestamp, boolean start) {
 		super(move.getType(), move.getUnode(), move.getEventClass());
 		setLogMove(LogMovePosition.beforeChild(move.getLogMoveUnode(), move.getLogMoveBeforeChild()));
 		setLogMoveParallelBranchMappedTo(move.getLogMoveParallelBranchMappedTo());
 		this.logTimestamp = logTimestamp;
+		this.start = start;
 	}
 
 	@Override
@@ -54,28 +53,28 @@ public class TimedMove extends Move {
 	public Long getLogTimestamp() {
 		return logTimestamp;
 	}
+	
+	public boolean isStart() {
+		return start;
+	}
+	
+	public boolean isComplete() {
+		return !isStart();
+	}
 
 	public String toString() {
-		return super.toString() + " @" + logTimestamp;
+		return super.toString() + " " + (isStart() ? "start" : "complete") + " @" + logTimestamp;
 	}
 	
 	//Event functions from list-view widget
 	public String getTopLabel() {
-		if (logTimestamp != null) {
-			Date date = new Date(logTimestamp);
-			if (date.getTime() % 1000 != 0) {
-				return (new SimpleDateFormat ("dd-MM-yyyy HH:mm:ss:SSS")).format(date);
-			} else if (date.getSeconds() != 0) {
-				return (new SimpleDateFormat ("dd-MM-yyyy HH:mm:ss")).format(date);
-			} else if (date.getMinutes() != 0) {
-				return (new SimpleDateFormat ("dd-MM-yyyy HH:mm")).format(date);
-			} else if (date.getHours() != 0) {
-				return (new SimpleDateFormat ("dd-MM-yyyy HHh")).format(date);
-			} else {
-				return (new SimpleDateFormat ("dd-MM-yyyy")).format(date);
-			}
-		} else {
-			return null;
+		return TimestampsAdder.toString(logTimestamp);
+	}
+	
+	public String getBottomLabel() {
+		if (isLogMove()) {
+			return "";
 		}
+		return isStart() ? "start" : "complete";
 	}
 }

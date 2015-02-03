@@ -22,7 +22,7 @@ public class InductiveVisualMiner {
 
 		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog, null);
 		InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state,
-				Classifiers.getClassifiers(xLog), VisualMinerWrapperPluginFinder.find(context), true);
+				Classifiers.getClassifiers(xLog), VisualMinerWrapperPluginFinder.find(context, state.getMiner()), true);
 		new InductiveVisualMinerController(context, panel, state);
 
 		return panel;
@@ -40,7 +40,8 @@ public class InductiveVisualMiner {
 		final InductiveVisualMinerState state = new InductiveVisualMinerState(launcher.xLog, launcher.preMinedTree);
 
 		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state,
-				Classifiers.getClassifiers(launcher.xLog), VisualMinerWrapperPluginFinder.find(context), launcher.preMinedTree == null);
+				Classifiers.getClassifiers(launcher.xLog), VisualMinerWrapperPluginFinder.find(context,
+						state.getMiner()), launcher.preMinedTree == null);
 		new InductiveVisualMinerController(context, panel, state);
 
 		return panel;

@@ -17,7 +17,11 @@ import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThrough;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughFlower;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughLeaveOutActivitiesThenApplyOthers;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughTauLoop;
-import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterIvM;
+import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterCombination;
+import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterLoop;
+import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterParallel;
+import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterSequenceFiltering;
+import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterXor;
 
 public class MiningParametersIvM extends MiningParameters {
 
@@ -42,7 +46,12 @@ public class MiningParametersIvM extends MiningParameters {
 				new CutFinderIMi()
 				)));
 		
-		setLogSplitter(new LogSplitterIvM());
+		setLogSplitter(new LogSplitterCombination(
+						new LogSplitterXor(), 
+						new LogSplitterSequenceFiltering(), 
+						new LogSplitterParallel(),
+						new LogSplitterLoop()
+		));
 		
 		setFallThroughs(new ArrayList<FallThrough>(Arrays.asList(
 				new FallThroughLeaveOutActivitiesThenApplyOthers(),
