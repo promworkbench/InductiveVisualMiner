@@ -4,7 +4,7 @@ import nl.tue.astar.AStarThread.Canceller;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLogInfo;
+import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.processtree.ProcessTree;
 
 public class ComputeAlignment {

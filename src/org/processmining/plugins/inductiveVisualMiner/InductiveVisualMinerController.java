@@ -30,7 +30,7 @@ import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMLog;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLogInfo;
+import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
