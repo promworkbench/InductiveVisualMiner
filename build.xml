@@ -55,10 +55,10 @@
 						<include name="**" />
 						<exclude name="test**" />
 					</fileset>
-					<!--fileset dir="${doc}">
+					<fileset dir="${doc}">
 						<include name="**" />
 						<exclude name="test**" />
-					</fileset-->
+					</fileset>
 					<manifest>
 						<attribute name="Built-By" value="${user.name}" />
 						<attribute name="Specification-Title" value="${project}-@{module}" />
