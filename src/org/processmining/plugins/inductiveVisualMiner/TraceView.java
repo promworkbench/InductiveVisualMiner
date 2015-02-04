@@ -18,8 +18,8 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.Wedge
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
-import org.processmining.plugins.InductiveMiner.mining.IMLog;
-import org.processmining.plugins.InductiveMiner.mining.IMTrace;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;

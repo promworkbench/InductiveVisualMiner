@@ -2,7 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper;
 
 import nl.tue.astar.AStarThread.Canceller;
 
-import org.processmining.plugins.InductiveMiner.mining.IMLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.processtree.ProcessTree;
 
 @VisualMinerWrapperAnnotation
