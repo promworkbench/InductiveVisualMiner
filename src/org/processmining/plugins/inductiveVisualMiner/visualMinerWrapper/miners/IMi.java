@@ -2,8 +2,8 @@ package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners
 
 import nl.tue.astar.AStarThread.Canceller;
 
-import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
@@ -15,7 +15,7 @@ public class IMi extends VisualMinerWrapper {
 		return "Log";
 	}
 
-	public ProcessTree mine(IMLog log, VisualMinerParameters parameters, Canceller canceller) {
+	public ProcessTree mine(IMLog2 log, VisualMinerParameters parameters, Canceller canceller) {
 		
 		//copy the relevant parameters
 		MiningParameters miningParameters = new MiningParametersIvM();

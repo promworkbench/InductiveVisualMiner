@@ -29,8 +29,8 @@ import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
-import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
@@ -97,7 +97,7 @@ public class InductiveVisualMinerController {
 
 	//make an IMlog out of an XLog
 	private class MakeLog extends
-			ChainLink<Triple<XLog, XEventClassifier, IMLog2IMLogInfo>, Triple<XLogInfo, IMLog, IMLogInfo>> {
+			ChainLink<Triple<XLog, XEventClassifier, IMLog2IMLogInfo>, Triple<XLogInfo, IMLog2, IMLogInfo>> {
 
 		protected Triple<XLog, XEventClassifier, IMLog2IMLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
@@ -107,17 +107,17 @@ public class InductiveVisualMinerController {
 			return Triple.of(state.getXLog(), state.getClassifier(), state.getLog2logInfo());
 		}
 
-		protected Triple<XLogInfo, IMLog, IMLogInfo> executeLink(Triple<XLog, XEventClassifier, IMLog2IMLogInfo> input) {
+		protected Triple<XLogInfo, IMLog2, IMLogInfo> executeLink(Triple<XLog, XEventClassifier, IMLog2IMLogInfo> input) {
 			setStatus("Making log..");
 
-			IMLog imLog = new IMLog(input.getA(), input.getB());
+			IMLog2 imLog = new IMLog2(input.getA(), input.getB());
 			IMLogInfo imLogInfo = input.getC().createLogInfo(imLog);
 			XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(input.getA(), input.getB());
 
 			return Triple.of(xLogInfo, imLog, imLogInfo);
 		}
 
-		protected void processResult(Triple<XLogInfo, IMLog, IMLogInfo> result) {
+		protected void processResult(Triple<XLogInfo, IMLog2, IMLogInfo> result) {
 			state.setLog(result.getA(), result.getB(), result.getC());
 		}
 
@@ -128,28 +128,28 @@ public class InductiveVisualMinerController {
 
 	//filter the log using activities threshold
 	private class FilterLogOnActivities extends
-			ChainLink<Quadruple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo>, Triple<IMLog, IMLogInfo, Set<XEventClass>>> {
+			ChainLink<Quadruple<IMLog2, IMLogInfo, Double, IMLog2IMLogInfo>, Triple<IMLog2, IMLogInfo, Set<XEventClass>>> {
 
-		protected Quadruple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo> generateInput() {
+		protected Quadruple<IMLog2, IMLogInfo, Double, IMLog2IMLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveModelButton().setEnabled(false);
 			panel.getSaveImageButton().setEnabled(false);
 			panel.getSaveImageButton().setText("image");
-			return new Quadruple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo>(state.getLog(), state.getLogInfo(),
+			return new Quadruple<IMLog2, IMLogInfo, Double, IMLog2IMLogInfo>(state.getLog(), state.getLogInfo(),
 					state.getActivitiesThreshold(), state.getLog2logInfo());
 		}
 
-		protected Triple<IMLog, IMLogInfo, Set<XEventClass>> executeLink(
-				Quadruple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo> input) {
+		protected Triple<IMLog2, IMLogInfo, Set<XEventClass>> executeLink(
+				Quadruple<IMLog2, IMLogInfo, Double, IMLog2IMLogInfo> input) {
 			if (input.getC() < 1.0) {
 				return FilterLeastOccurringActivities.filter(input.getA(), input.getB(), input.getC(), input.getD());
 			} else {
-				return new Triple<IMLog, IMLogInfo, Set<XEventClass>>(input.getA(), input.getB(),
+				return new Triple<IMLog2, IMLogInfo, Set<XEventClass>>(input.getA(), input.getB(),
 						new HashSet<XEventClass>());
 			}
 		}
 
-		protected void processResult(Triple<IMLog, IMLogInfo, Set<XEventClass>> result) {
+		protected void processResult(Triple<IMLog2, IMLogInfo, Set<XEventClass>> result) {
 			state.setActivityFilteredIMLog(result.getA(), result.getB(), result.getC());
 
 			panel.getTraceView().set(state.getLog());
@@ -162,11 +162,11 @@ public class InductiveVisualMinerController {
 
 	//mine a model
 	private class Mine extends
-			ChainLink<Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters>, ProcessTree> {
+			ChainLink<Quadruple<ProcessTree, IMLog2, VisualMinerWrapper, VisualMinerParameters>, ProcessTree> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
-		protected Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters> generateInput() {
+		protected Quadruple<ProcessTree, IMLog2, VisualMinerWrapper, VisualMinerParameters> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
 			panel.getTraceView().set(state.getLog());
@@ -175,7 +175,7 @@ public class InductiveVisualMinerController {
 					minerParameters);
 		}
 
-		protected ProcessTree executeLink(Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters> input) {
+		protected ProcessTree executeLink(Quadruple<ProcessTree, IMLog2, VisualMinerWrapper, VisualMinerParameters> input) {
 			setStatus("Mining..");
 			canceller.reset();
 			if (input.getA() == null) {
@@ -283,26 +283,26 @@ public class InductiveVisualMinerController {
 	//filter log for node selection
 	private class FilterNodeSelection
 			extends
-			ChainLink<Septuple<AlignedLog, Set<UnfoldedNode>, Set<LogMovePosition>, AlignedLogInfo, IMLog, XLogInfo, List<ColouringFilter>>, Triple<AlignedLog, AlignedLogInfo, IMLog>> {
+			ChainLink<Septuple<AlignedLog, Set<UnfoldedNode>, Set<LogMovePosition>, AlignedLogInfo, IMLog2, XLogInfo, List<ColouringFilter>>, Triple<AlignedLog, AlignedLogInfo, IMLog2>> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
-		protected Septuple<AlignedLog, Set<UnfoldedNode>, Set<LogMovePosition>, AlignedLogInfo, IMLog, XLogInfo, List<ColouringFilter>> generateInput() {
+		protected Septuple<AlignedLog, Set<UnfoldedNode>, Set<LogMovePosition>, AlignedLogInfo, IMLog2, XLogInfo, List<ColouringFilter>> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
 			return Septuple.of(state.getAlignedLog(), state.getSelectedNodes(), state.getSelectedLogMoves(),
-					state.getAlignedLogInfo(), new IMLog(state.getXLog(), state.getClassifier()), state.getXLogInfo(),
+					state.getAlignedLogInfo(), new IMLog2(state.getXLog(), state.getClassifier()), state.getXLogInfo(),
 					state.getColouringFilters());
 		}
 
-		protected Triple<AlignedLog, AlignedLogInfo, IMLog> executeLink(
-				Septuple<AlignedLog, Set<UnfoldedNode>, Set<LogMovePosition>, AlignedLogInfo, IMLog, XLogInfo, List<ColouringFilter>> input) {
+		protected Triple<AlignedLog, AlignedLogInfo, IMLog2> executeLink(
+				Septuple<AlignedLog, Set<UnfoldedNode>, Set<LogMovePosition>, AlignedLogInfo, IMLog2, XLogInfo, List<ColouringFilter>> input) {
 			setStatus("Highlighting selection..");
 
 			canceller.reset();
 
 			//apply colouring filters
-			Triple<AlignedLog, AlignedLogInfo, IMLog> colouringFilteredAlignment = ComputeColouringFilter
+			Triple<AlignedLog, AlignedLogInfo, IMLog2> colouringFilteredAlignment = ComputeColouringFilter
 					.applyColouringFilter(input.getA(), input.getD(), input.getE(), input.getF(), input.getG(),
 							canceller);
 
@@ -316,7 +316,7 @@ public class InductiveVisualMinerController {
 
 		}
 
-		protected void processResult(Triple<AlignedLog, AlignedLogInfo, IMLog> result) {
+		protected void processResult(Triple<AlignedLog, AlignedLogInfo, IMLog2> result) {
 			state.setAlignedFilteredLog(result.getA(), result.getB(), result.getC());
 
 			panel.getTraceView().set(state.getAlignedFilteredLog());
@@ -361,17 +361,17 @@ public class InductiveVisualMinerController {
 
 	}
 
-	private class TimeLog extends ChainLink<Triple<AlignedLog, IMLog, XLogInfo>, TimedLog> {
+	private class TimeLog extends ChainLink<Triple<AlignedLog, IMLog2, XLogInfo>, TimedLog> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
-		protected Triple<AlignedLog, IMLog, XLogInfo> generateInput() {
+		protected Triple<AlignedLog, IMLog2, XLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
 			return Triple.of(state.getAlignedFilteredLog(), state.getAlignedFilteredXLog(), state.getXLogInfo());
 		}
 
-		protected TimedLog executeLink(Triple<AlignedLog, IMLog, XLogInfo> input) {
+		protected TimedLog executeLink(Triple<AlignedLog, IMLog2, XLogInfo> input) {
 			setStatus("Creating timed log..");
 			canceller.reset();
 			return ComputeTimedLog.computeTimedLog(input.getA(), input.getB(), input.getC(), canceller);
@@ -670,8 +670,8 @@ public class InductiveVisualMinerController {
 		panel.getStatusLabel().setText(s);
 	}
 
-	private static Triple<AlignedLog, AlignedLogInfo, IMLog> filterOnSelection(AlignedLog alignedLog,
-			Set<UnfoldedNode> selectedNodes, Set<LogMovePosition> selectedLogMoves, IMLog xLog) {
+	private static Triple<AlignedLog, AlignedLogInfo, IMLog2> filterOnSelection(AlignedLog alignedLog,
+			Set<UnfoldedNode> selectedNodes, Set<LogMovePosition> selectedLogMoves, IMLog2 xLog) {
 
 		AlignedLog fl = new AlignedLog();
 		boolean useNodes = !selectedNodes.isEmpty();
