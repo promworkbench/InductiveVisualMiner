@@ -6,7 +6,7 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.dfgOnly.DfgMiningParameters;
 import org.processmining.plugins.InductiveMiner.dfgOnly.plugins.IMdProcessTree;
 import org.processmining.plugins.InductiveMiner.dfgOnly.plugins.Log2DfgLifeCycle;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.InductiveMiner.mining.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
