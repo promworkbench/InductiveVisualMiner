@@ -1,7 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
 
 import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.InductiveMiner.mining.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 
 @ColouringFilterAnnotation
