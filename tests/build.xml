@@ -126,7 +126,7 @@
 	    	
 	      <!-- class path for code coverage by cobertura -->
 	      <classpath location="${dir.test-instrument}" />
-	      <classpath refid="classpath.cobertura"/>
+	      
 
 	      <!-- class path of the code to test and the Junit framework -->
 	      <classpath refid="classpath.test"/>
@@ -152,7 +152,7 @@
 	<target name="clean" description="Remove all intermediate results">
 		<delete dir="${dir.test-bin}" includeemptydirs="true" failonerror="false" />
 		<delete dir="${dir.test-instrument}" includeemptydirs="true" failonerror="false" />
-		<delete file="${cobertura.datafile}" failonerror="false" />
+		
 	</target>
 	
 	<target name="svn-clean" depends="clean"
