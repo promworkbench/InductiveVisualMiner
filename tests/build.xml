@@ -95,12 +95,12 @@
 	<property name="cobertura.datafile" location="${test.basedir}/cobertura.ser" />
 
 	<!-- instrument all classes specified in classes.coveragereport -->
-	<target name="prepare-cobertura">
+	<!--target name="prepare-cobertura">
 		<cobertura-instrument todir="${dir.test-instrument}" classpathref="classpath.cobertura">
 			<ignore regex="org.apache.log4j.*" />
 		    <fileset refid="classes.coveragereport" />
 		</cobertura-instrument>
-	</target>
+	</target-->
 	
 
 	<!-- build JUnit tests -->
@@ -113,7 +113,8 @@
 	</target>
          		
 	<!-- run tests -->
-	<target name="check" depends="build-test,prepare-cobertura">
+	<!--target name="check" depends="build-test,prepare-cobertura"-->
+	<target name="check" depends="build-test">
 	
 		<!-- integration tests of invoking plugins in ProM -->
 	    <junit fork="true" dir="${home}" includeantruntime="yes" >
@@ -140,19 +141,19 @@
 	    </junit>
 		
 		<!-- Cobertura: generate HTML coverage report -->
-		<cobertura-report destdir="${dir.coveragereport.html}" format="html">
+		<!--cobertura-report destdir="${dir.coveragereport.html}" format="html">
 		    <fileset refid="src.coveragereport" />
 		</cobertura-report>
 		<cobertura-report destdir="${dir.coveragereport.xml}" format="xml">
 		    <fileset refid="src.coveragereport" />
-		</cobertura-report> 		
+		</cobertura-report--> 		
 	</target>
 
 	<!-- clean build files and intermediate results -->
 	<target name="clean" description="Remove all intermediate results">
 		<delete dir="${dir.test-bin}" includeemptydirs="true" failonerror="false" />
 		<delete dir="${dir.test-instrument}" includeemptydirs="true" failonerror="false" />
-		
+		<!--delete file="${cobertura.datafile}" failonerror="false" /-->
 	</target>
 	
 	<target name="svn-clean" depends="clean"
