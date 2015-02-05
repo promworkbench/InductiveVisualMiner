@@ -123,7 +123,7 @@
 	    	<jvmarg value="-Xmx1G"/>
 	    	<jvmarg value="-Djava.library.path=.//lib;.//stdlib"/>
 	    	<!-- fixed location for cobertura to log method calls and generate report from -->
-	    	<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${cobertura.datafile}"/>
+	    	<!--jvmarg value="-Dnet.sourceforge.cobertura.datafile=${cobertura.datafile}"/-->
 	    	
 	      <!-- class path for code coverage by cobertura -->
 	      <classpath location="${dir.test-instrument}" />
