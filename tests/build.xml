@@ -98,6 +98,7 @@
 	<target name="prepare-cobertura">
 		<cobertura-instrument todir="${dir.test-instrument}" classpathref="classpath.cobertura">
 			<ignore regex="org.apache.log4j.*" />
+			<ignore regex="*"/>
 		    <fileset refid="classes.coveragereport" />
 		</cobertura-instrument>
 	</target>
