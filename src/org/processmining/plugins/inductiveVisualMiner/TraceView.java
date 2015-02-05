@@ -18,8 +18,8 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.Wedge
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
-import org.processmining.plugins.InductiveMiner.mining.IMTrace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace2;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
@@ -138,7 +138,7 @@ public class TraceView extends SideWindow {
 			return new ProMTraceView.Trace<Event>() {
 
 				public Iterator<Event> iterator() {
-					return FluentIterable.from((IMTrace) trace).transform(new Function<XEvent, Event>() {
+					return FluentIterable.from((IMTrace2) trace).transform(new Function<XEvent, Event>() {
 						public Event apply(final XEvent input) {
 							return new ProMTraceView.AbstractEvent() {
 								public String getLabel() {
@@ -164,8 +164,8 @@ public class TraceView extends SideWindow {
 
 				public String getName() {
 					String s;
-					if (((IMTrace) trace).getAttributes().containsKey("concept:name")) {
-						s = ((IMTrace) trace).getAttributes().get("concept:name").toString();
+					if (((IMTrace2) trace).getAttributes().containsKey("concept:name")) {
+						s = ((IMTrace2) trace).getAttributes().get("concept:name").toString();
 					} else {
 						s = "";
 					}
@@ -302,7 +302,7 @@ public class TraceView extends SideWindow {
 		if (!log.equals(showing)) {
 			traceView.clear();
 			traceView.setTraceBuilder(new IMLog2TraceBuilder(log));
-			for (IMTrace t : log) {
+			for (IMTrace2 t : log) {
 				traceView.add(t);
 			}
 		}

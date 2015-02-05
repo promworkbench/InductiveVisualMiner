@@ -10,8 +10,8 @@ import nl.tue.astar.AStarThread.Canceller;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.mining.IMTrace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace2;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
@@ -51,8 +51,8 @@ public class ComputeColouringFilter {
 
 		AlignedLog resultALog = new AlignedLog();
 		IMLog2 resultLog = new IMLog2(log);
-		for (Iterator<? extends IMTrace> it = resultLog.iterator(); it.hasNext();) {
-			IMTrace trace = it.next();
+		for (Iterator<IMTrace2> it = resultLog.iterator(); it.hasNext();) {
+			IMTrace2 trace = it.next();
 			List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfo);
 			AlignedTrace alignedTrace = map.get(lTrace);
 			if (alignedTrace == null) {

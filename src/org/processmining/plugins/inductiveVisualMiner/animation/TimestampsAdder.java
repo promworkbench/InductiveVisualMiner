@@ -11,7 +11,7 @@ import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.extension.std.XTimeExtension;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XEvent;
-import org.processmining.plugins.InductiveMiner.mining.IMTrace;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace2;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
@@ -22,7 +22,7 @@ public class TimestampsAdder {
 	public static double beginEndEdgeDuration = 1;
 	private static Random random = new Random(123);
 
-	public static List<XEventClass> getTraceLogProjection(IMTrace trace, XLogInfo xLogInfo) {
+	public static List<XEventClass> getTraceLogProjection(IMTrace2 trace, XLogInfo xLogInfo) {
 		List<XEventClass> lTrace = new ArrayList<>();
 		for (XEvent event : trace) {
 			lTrace.add(xLogInfo.getEventClasses().getClassOf(event));
