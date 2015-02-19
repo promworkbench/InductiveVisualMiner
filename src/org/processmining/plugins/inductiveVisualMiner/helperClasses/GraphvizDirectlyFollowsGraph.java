@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
@@ -26,6 +27,11 @@ public class GraphvizDirectlyFollowsGraph {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Display directly-follows graph", requiredParameterLabels = { 0 })
 	public JComponent visualize(PluginContext context, Dfg dfg) {
+		
+		if (dfg.getDirectlyFollowsGraph().getVertices().length > 50) {
+			return new JPanel();
+		}
+		
 		return new DotPanel(dfg2Dot(dfg, true));
 	}
 
@@ -72,10 +78,10 @@ public class GraphvizDirectlyFollowsGraph {
 		}
 
 		//add the directly-follows edges
-		for (int edge : dfg.getDirectlyFollowsGraph().getEdges()) {
-			XEventClass from = dfg.getDirectlyFollowsGraph().getEdgeSource(edge);
-			XEventClass to = dfg.getDirectlyFollowsGraph().getEdgeTarget(edge);
-			int weight = (int) dfg.getDirectlyFollowsGraph().getEdgeWeight(edge);
+		for (long edge : dfg.getDirectlyFollowsGraph().getEdges()) {
+			XEventClass from = dfg.getDirectlyFollowsGraph().getEdgeSource((int) edge);
+			XEventClass to = dfg.getDirectlyFollowsGraph().getEdgeTarget((int) edge);
+			int weight = (int) dfg.getDirectlyFollowsGraph().getEdgeWeight((int) edge);
 
 			DotNode source = activityToNode.get(from);
 			DotNode target = activityToNode.get(to);
@@ -87,10 +93,10 @@ public class GraphvizDirectlyFollowsGraph {
 
 		if (includeParalelEdges) {
 			//add the parallel directly-follows edges
-			for (int edge : dfg.getParallelGraph().getEdges()) {
-				XEventClass from = dfg.getParallelGraph().getEdgeSource(edge);
-				XEventClass to = dfg.getParallelGraph().getEdgeTarget(edge);
-				int weight = (int) dfg.getParallelGraph().getEdgeWeight(edge);
+			for (long edge : dfg.getParallelGraph().getEdges()) {
+				XEventClass from = dfg.getParallelGraph().getEdgeSource((int) edge);
+				XEventClass to = dfg.getParallelGraph().getEdgeTarget((int) edge);
+				int weight = (int) dfg.getParallelGraph().getEdgeWeight((int) edge);
 
 				DotNode source = activityToNode.get(from);
 				DotNode target = activityToNode.get(to);
@@ -123,13 +129,13 @@ public class GraphvizDirectlyFollowsGraph {
 		}
 
 		long maxWeight = Long.MIN_VALUE;
-		for (int edge : dfg.getDirectlyFollowsGraph().getEdges()) {
-			maxWeight = Math.max(maxWeight, dfg.getDirectlyFollowsGraph().getEdgeWeight(edge));
+		for (long edge : dfg.getDirectlyFollowsGraph().getEdges()) {
+			maxWeight = Math.max(maxWeight, dfg.getDirectlyFollowsGraph().getEdgeWeight((int) edge));
 		}
 
 		long maxParallel = Long.MIN_VALUE;
-		for (int edge : dfg.getParallelGraph().getEdges()) {
-			maxParallel = Math.max(maxParallel, dfg.getParallelGraph().getEdgeWeight(edge));
+		for (long edge : dfg.getParallelGraph().getEdges()) {
+			maxParallel = Math.max(maxParallel, dfg.getParallelGraph().getEdgeWeight((int) edge));
 		}
 
 		return Sextuple.of(startMin, startMax, endMin, endMax, (int) maxWeight, (int) maxParallel);

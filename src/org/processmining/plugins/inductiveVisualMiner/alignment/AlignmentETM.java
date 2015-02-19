@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import nl.tue.astar.AStarThread.Canceller;
@@ -18,6 +19,7 @@ import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersIM;
 import org.processmining.plugins.etm.CentralRegistry;
 import org.processmining.plugins.etm.fitness.BehaviorCounter;
@@ -42,32 +44,42 @@ public class AlignmentETM {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Batch compare miners, default", requiredParameterLabels = { 0, 1 })
 	public AlignedLog alignTree(PluginContext context, ProcessTree tree, XLog log) {
-		return alignTree(tree, MiningParametersIM.getDefaultClassifier(), log, ProMCancelTerminationCondition.buildDummyCanceller()).log;
+		return alignTree(tree, MiningParametersIM.getDefaultClassifier(), log,
+				ProMCancelTerminationCondition.buildDummyCanceller()).log;
 	}
 
 	public static AlignmentResult alignTree(ProcessTree tree, XEventClassifier classifier, XLog log, Canceller canceller) {
 
-		XEventClasses ev = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
+		XEventClassifier doubleClassifier = new XEventPerformanceClassifier(classifier);
 
-		CentralRegistry registry = new CentralRegistry(log, classifier, new Random());
+		XEventClasses eventClasses = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
+		XEventClasses performanceEventClasses = XLogInfoFactory.createLogInfo(log, doubleClassifier).getEventClasses();
+		CentralRegistry registry = new CentralRegistry(log, doubleClassifier, new Random());
+
+		//transform tree for performance measurement
+		Pair<ProcessTree, Map<UnfoldedNode, UnfoldedNode>> p = ConvertTreeForPerformance.convert(tree);
+		ProcessTree performanceTree = p.getA();
+		Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping = p.getB(); //mapping performance node -> original node
 
 		//add the event classes of the tree manually
-		addAllLeaves(registry.getEventClasses(), tree.getRoot());
+		addAllLeaves(registry.getEventClasses(), performanceTree.getRoot());
 
 		ProcessTreeToNAryTree pt2nt = new ProcessTreeToNAryTree(registry.getEventClasses());
-		NAryTree nTree = pt2nt.convert(tree);
+		NAryTree nTree = pt2nt.convert(performanceTree);
 
+		//tell ETM that event classes were added
 		registry.updateLogDerived();
 
+		//perform the alignment
 		FitnessReplay fr = new FitnessReplay(registry, canceller);
 		fr.setNrThreads(Math.max(1, Runtime.getRuntime().availableProcessors() - 1));
 		fr.setDetailedAlignmentInfoEnabled(true);
 		fr.getFitness(nTree, null);
 		BehaviorCounter behC = registry.getFitness(nTree).behaviorCounter;
 
-		//create mapping int->unfoldedNode
-		List<UnfoldedNode> l = TreeUtils.unfoldAllNodes(new UnfoldedNode(tree.getRoot()));
-		UnfoldedNode[] nodes = l.toArray(new UnfoldedNode[l.size()]);
+		//create mapping int->(performance)unfoldedNode
+		List<UnfoldedNode> l = TreeUtils.unfoldAllNodes(new UnfoldedNode(performanceTree.getRoot()));
+		UnfoldedNode[] nodeId2performanceNode = l.toArray(new UnfoldedNode[l.size()]);
 
 		//read moves and create aligned log
 		AlignedLog alignedLog = new AlignedLog();
@@ -81,32 +93,56 @@ public class AlignmentETM {
 
 			for (TreeRecord naryMove : naryMoves) {
 
+				//get log part of move
+				XEventClass performanceActivity = null;
+				XEventClass activity = null;
+				boolean start = false;
+				if (naryMove.getMovedEvent() >= 0) {
+					//an ETM-log-move happened
+					performanceActivity = registry.getEventClassByID(naryTrace.get(naryMove.getMovedEvent()));
+					activity = getActivity(performanceActivity, eventClasses);
+					start = isStart(performanceActivity);
+				}
+				
+				//get model part of move
+				UnfoldedNode performanceUnode = null;
 				UnfoldedNode unode = null;
 				if (naryMove.getModelMove() >= 0) {
 					//an ETM-model-move happened
-					unode = nodes[naryMove.getModelMove()];
-					if (!(unode.getNode() instanceof Manual) && !(unode.getNode() instanceof Automatic)) {
+					performanceUnode = nodeId2performanceNode[naryMove.getModelMove()];
+					unode = performanceNodeMapping.get(performanceUnode);
+					start = isStart(performanceUnode);
+
+					if (performanceUnode.getNode() instanceof Automatic && unode.getNode() instanceof Manual) {
+						//this is a tau that represents that the start of an activity is skipped;
+						//make it a synchronous move on the start
+						start = true;
+						performanceActivity = eventClasses.getByIdentity(unode.getNode().getName());
+						activity = performanceActivity;
+					}
+
+					//we are only interested in moves on leaves, not in moves on nodes
+					if (!(performanceUnode.getNode() instanceof Manual)
+							&& !(performanceUnode.getNode() instanceof Automatic)) {
+						performanceUnode = null;
 						unode = null;
 					}
 				}
 
-				XEventClass activity = null;
-				if (naryMove.getMovedEvent() >= 0) {
-					//an ETM-log-move happened
-					activity = registry.getEventClassByID(naryTrace.get(naryMove.getMovedEvent()));
-				}
-
-				if (unode != null || activity != null) {
+				if (performanceUnode != null || performanceActivity != null) {
 					Move move;
-					if ((unode != null && activity != null) || (unode != null && unode.getNode() instanceof Automatic)) {
+					if ((performanceUnode != null && performanceActivity != null)
+							|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)
+							|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic && unode
+									.getNode() instanceof Manual)) {
 						//synchronous move
-						move = new Move(Type.synchronous, unode, activity);
-					} else if (unode != null) {
+						move = new Move(Type.synchronous, unode, activity, start);
+					} else if (performanceUnode != null) {
 						//model move
-						move = new Move(Type.model, unode, activity);
+						move = new Move(Type.model, unode, activity, start);
 					} else {
 						//log move
-						move = new Move(Type.log, unode, activity);
+						move = new Move(Type.log, unode, activity, start);
 					}
 					trace.add(move);
 				}
@@ -130,5 +166,23 @@ public class AlignmentETM {
 			}
 		}
 		classes.harmonizeIndices();
+	}
+
+	public static boolean isStart(UnfoldedNode performanceUnode) {
+		return performanceUnode.getNode().getName().endsWith("+start");
+	}
+
+	public static boolean isStart(XEventClass performanceActivity) {
+		return performanceActivity.getId().endsWith("+start");
+	}
+	
+	public static XEventClass getActivity(XEventClass performanceActivity, XEventClasses eventClasses) {
+		String s = performanceActivity.getId();
+		if (s.endsWith("+start")) {
+			s = s.substring(0, s.lastIndexOf("+start"));
+		} else if (s.endsWith("+complete")) {
+			s = s.substring(0, s.lastIndexOf("+complete"));
+		}
+		return eventClasses.getByIdentity(s);
 	}
 }

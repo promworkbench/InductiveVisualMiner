@@ -16,24 +16,26 @@ public class Move implements Event {
 	private final Type type;
 	private final UnfoldedNode unode;
 	private final XEventClass eventClass;
+	private final boolean start;
 
 	private UnfoldedNode logMoveUnode;
 	private UnfoldedNode logMoveBeforeChild;
 	private UnfoldedNode logMoveParallelBranchMappedTo;
 
-	public Move(Type type, UnfoldedNode unode, XEventClass eventClass) {
+	public Move(Type type, UnfoldedNode unode, XEventClass eventClass, boolean start) {
 		this.type = type;
 		this.unode = unode;
 		this.eventClass = eventClass;
+		this.start = start;
 	}
 
 	public String toString() {
 		if (isModelSync()) {
-			return getType() + " " + getUnode().toString();
+			return getType() + " " + getUnode().toString() + " " + (start ? "start" : "complete");
 		} else {
 			//			return getType() + " " + getEventClass().toString() + " " + getLogMoveUnode() + " "
 			//					+ getLogMoveBeforeChild();
-			return getType() + " " + getEventClass().toString();
+			return getType() + " " + getEventClass().toString() + " " + (start ? "start" : "complete");
 		}
 	}
 
@@ -53,6 +55,9 @@ public class Move implements Event {
 		}
 		Move arg = (Move) obj;
 		if (!getType().equals(arg.getType())) {
+			return false;
+		}
+		if (((Move) obj).isStart() != isStart()) {
 			return false;
 		}
 		if (getUnode() != null) {
@@ -113,6 +118,14 @@ public class Move implements Event {
 		return type == Type.synchronous;
 	}
 
+	public boolean isStart() {
+		return start;
+	}
+
+	public boolean isComplete() {
+		return !isStart();
+	}
+
 	/**
 	 * Returns the last known unode in the trace before this log move. This is
 	 * used in log splitting, to make sure that the log move ends up in the
@@ -145,9 +158,12 @@ public class Move implements Event {
 	public String getTopLabel() {
 		return "";
 	}
-
+	
 	public String getBottomLabel() {
-		return "";
+		if (isLogMove()) {
+			return "";
+		}
+		return isStart() ? "start" : "complete";
 	}
 
 	public String getBottomLabel2() {
@@ -167,7 +183,7 @@ public class Move implements Event {
 			return new Color(255, 0, 0);
 		}
 	}
-	
+
 	public Color getBorderColor() {
 		return null;
 	}
