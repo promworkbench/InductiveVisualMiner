@@ -79,9 +79,9 @@ public class GraphvizDirectlyFollowsGraph {
 
 		//add the directly-follows edges
 		for (long edge : dfg.getDirectlyFollowsGraph().getEdges()) {
-			XEventClass from = dfg.getDirectlyFollowsGraph().getEdgeSource((int) edge);
-			XEventClass to = dfg.getDirectlyFollowsGraph().getEdgeTarget((int) edge);
-			int weight = (int) dfg.getDirectlyFollowsGraph().getEdgeWeight((int) edge);
+			XEventClass from = dfg.getDirectlyFollowsGraph().getEdgeSource(edge);
+			XEventClass to = dfg.getDirectlyFollowsGraph().getEdgeTarget(edge);
+			int weight = (int) dfg.getDirectlyFollowsGraph().getEdgeWeight(edge);
 
 			DotNode source = activityToNode.get(from);
 			DotNode target = activityToNode.get(to);
