@@ -21,7 +21,7 @@ import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
-import org.processmining.contexts.uitopia.UIPluginContext;
+import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
@@ -444,9 +444,9 @@ public class InductiveVisualMinerController {
 	}
 
 	private final Chain chain;
-	private final UIPluginContext context;
+	private final PluginContext context;
 
-	public InductiveVisualMinerController(UIPluginContext context, InductiveVisualMinerPanel panel,
+	public InductiveVisualMinerController(PluginContext context, InductiveVisualMinerPanel panel,
 			InductiveVisualMinerState state) {
 		this.panel = panel;
 		this.state = state;
