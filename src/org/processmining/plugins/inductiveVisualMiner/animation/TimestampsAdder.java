@@ -1,9 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -33,8 +34,8 @@ public class TimestampsAdder {
 	/*
 	 * Make a log-projection hashmap
 	 */
-	public static HashMap<List<XEventClass>, AlignedTrace> getIMTrace2AlignedTrace(AlignedLog aLog) {
-		HashMap<List<XEventClass>, AlignedTrace> result = new HashMap<>();
+	public static THashMap<List<XEventClass>, AlignedTrace> getIMTrace2AlignedTrace(AlignedLog aLog) {
+		THashMap<List<XEventClass>, AlignedTrace> result = new THashMap<>();
 		for (AlignedTrace aTrace : aLog) {
 			List<XEventClass> trace = new ArrayList<>();
 			for (Move m : aTrace) {

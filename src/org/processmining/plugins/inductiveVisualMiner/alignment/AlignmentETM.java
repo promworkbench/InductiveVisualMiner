@@ -11,6 +11,7 @@ import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.std.XConceptExtension;
+import org.deckfour.xes.extension.std.XLifecycleExtension;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
@@ -30,6 +31,9 @@ import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
+import org.processmining.plugins.inductiveVisualMiner.performance.ConvertTreeForPerformance;
+import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
+import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
@@ -100,8 +104,8 @@ public class AlignmentETM {
 				if (naryMove.getMovedEvent() >= 0) {
 					//an ETM-log-move happened
 					performanceActivity = registry.getEventClassByID(naryTrace.get(naryMove.getMovedEvent()));
-					activity = getActivity(performanceActivity, eventClasses);
-					start = isStart(performanceActivity);
+					activity = Performance.getActivity(performanceActivity, eventClasses);
+					start = Performance.isStart(performanceActivity);
 				}
 				
 				//get model part of move
@@ -111,7 +115,7 @@ public class AlignmentETM {
 					//an ETM-model-move happened
 					performanceUnode = nodeId2performanceNode[naryMove.getModelMove()];
 					unode = performanceNodeMapping.get(performanceUnode);
-					start = isStart(performanceUnode);
+					start = Performance.isStart(performanceUnode);
 
 					if (performanceUnode.getNode() instanceof Automatic && unode.getNode() instanceof Manual) {
 						//this is a tau that represents that the start of an activity is skipped;
@@ -158,7 +162,14 @@ public class AlignmentETM {
 	public static void addAllLeaves(XEventClasses classes, Node node) {
 		if (node instanceof Manual) {
 			XEvent event = new XEventImpl();
-			XConceptExtension.instance().assignName(event, node.getName());
+			UnfoldedNode unode = new UnfoldedNode(node);
+			XConceptExtension.instance().assignName(event, Performance.getActivity(unode));
+			
+			if (Performance.isStart(unode)) {
+				XLifecycleExtension.instance().assignTransition(event, XLifecycleExtension.StandardModel.START.getEncoding());
+			} else {
+				XLifecycleExtension.instance().assignTransition(event, XLifecycleExtension.StandardModel.COMPLETE.getEncoding());
+			}
 			classes.register(event);
 		} else if (node instanceof Block) {
 			for (Node child : ((Block) node).getChildren()) {
@@ -168,21 +179,5 @@ public class AlignmentETM {
 		classes.harmonizeIndices();
 	}
 
-	public static boolean isStart(UnfoldedNode performanceUnode) {
-		return performanceUnode.getNode().getName().endsWith("+start");
-	}
-
-	public static boolean isStart(XEventClass performanceActivity) {
-		return performanceActivity.getId().endsWith("+start");
-	}
 	
-	public static XEventClass getActivity(XEventClass performanceActivity, XEventClasses eventClasses) {
-		String s = performanceActivity.getId();
-		if (s.endsWith("+start")) {
-			s = s.substring(0, s.lastIndexOf("+start"));
-		} else if (s.endsWith("+complete")) {
-			s = s.substring(0, s.lastIndexOf("+complete"));
-		}
-		return eventClasses.getByIdentity(s);
-	}
 }

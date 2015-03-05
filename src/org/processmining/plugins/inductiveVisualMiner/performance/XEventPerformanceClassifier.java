@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.alignment;
+package org.processmining.plugins.inductiveVisualMiner.performance;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.std.XLifecycleExtension;

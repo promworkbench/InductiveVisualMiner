@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
 
-import java.util.HashMap;
+import gnu.trove.map.hash.THashMap;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class ComputeColouringFilter {
 		}
 
 		//make a log-projection-hashmap
-		HashMap<List<XEventClass>, AlignedTrace> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
+		THashMap<List<XEventClass>, AlignedTrace> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
 
 		AlignedLog resultALog = new AlignedLog();
 		IMLog2 resultLog = new IMLog2(log);

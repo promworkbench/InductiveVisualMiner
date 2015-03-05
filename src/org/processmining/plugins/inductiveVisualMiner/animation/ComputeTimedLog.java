@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import java.util.HashMap;
+import gnu.trove.map.hash.THashMap;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class ComputeTimedLog {
 			final Canceller canceller) {
 
 		//make a log-projection-hashmap
-		HashMap<List<XEventClass>, AlignedTrace> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
+		THashMap<List<XEventClass>, AlignedTrace> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
 
 		TimedLog timedLog = new TimedLog();
 		for (IMTrace2 trace : log) {
@@ -37,7 +38,7 @@ public class ComputeTimedLog {
 		return timedLog;
 	}
 
-	private static TimedTrace timeTrace(IMLog2 log, HashMap<List<XEventClass>, AlignedTrace> map, IMTrace2 trace, XLogInfo xLogInfo) {
+	private static TimedTrace timeTrace(IMLog2 log, THashMap<List<XEventClass>, AlignedTrace> map, IMTrace2 trace, XLogInfo xLogInfo) {
 
 		//find the corresponding aligned trace
 		List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfo);

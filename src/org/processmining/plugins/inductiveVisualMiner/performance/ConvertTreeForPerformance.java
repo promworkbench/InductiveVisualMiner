@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.alignment;
+package org.processmining.plugins.inductiveVisualMiner.performance;
 
 import gnu.trove.map.hash.THashMap;
 
