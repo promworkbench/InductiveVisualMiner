@@ -204,7 +204,7 @@ public class TraceView extends SideWindow {
 				public Iterator<Move> iterator() {
 					return FluentIterable.from((AlignedTrace) trace).filter(new Predicate<Move>() {
 						public boolean apply(final Move input) {
-							return !(input.isSyncMove() && input.getUnode().getNode() instanceof Automatic);
+							return !((input.isSyncMove() && input.getUnode().getNode() instanceof Automatic) || input.isTauStart());
 						}
 					}).iterator();
 				}
@@ -236,7 +236,7 @@ public class TraceView extends SideWindow {
 				public Iterator<TimedMove> iterator() {
 					return FluentIterable.from((TimedTrace) trace).filter(new Predicate<TimedMove>() {
 						public boolean apply(final TimedMove input) {
-							return !(input.isSyncMove() && input.getUnode().getNode() instanceof Automatic);
+							return !((input.isSyncMove() && input.getUnode().getNode() instanceof Automatic) || input.isTauStart());
 						}
 					}).iterator();
 				}
@@ -297,7 +297,6 @@ public class TraceView extends SideWindow {
 	 * 
 	 * @param log
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void set(IMLog2 log) {
 		if (!log.equals(showing)) {
 			traceView.clear();

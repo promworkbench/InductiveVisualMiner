@@ -29,8 +29,8 @@ public class TimedMove extends Move {
 
 	private final Long logTimestamp;
 
-	public TimedMove(Move move, Long logTimestamp, boolean start) {
-		super(move.getType(), move.getUnode(), move.getEventClass(), start);
+	public TimedMove(Move move, Long logTimestamp) {
+		super(move.getType(), move.getUnode(), move.getActivityEventClass(), move.getPerformanceEventClass(), move.isStart(), move.isTauStart());
 		setLogMove(LogMovePosition.beforeChild(move.getLogMoveUnode(), move.getLogMoveBeforeChild()));
 		setLogMoveParallelBranchMappedTo(move.getLogMoveParallelBranchMappedTo());
 		this.logTimestamp = logTimestamp;
@@ -53,7 +53,7 @@ public class TimedMove extends Move {
 	}
 
 	public String toString() {
-		return super.toString() + " " + (isStart() ? "start" : "complete") + " @" + logTimestamp;
+		return super.toString() + " @" + logTimestamp;
 	}
 	
 	//Event functions from list-view widget

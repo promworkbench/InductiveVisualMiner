@@ -16,7 +16,7 @@ import javax.swing.event.ChangeListener;
 import nl.tue.astar.AStarThread.Canceller;
 
 import org.deckfour.xes.classification.XEventClass;
-import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
@@ -45,8 +45,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Lo
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
-import org.processmining.plugins.inductiveVisualMiner.alignment.ComputeAlignment;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
@@ -64,6 +64,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
+import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
@@ -96,29 +97,33 @@ public class InductiveVisualMinerController {
 	}
 
 	//make an IMlog out of an XLog
-	private class MakeLog extends
-			ChainLink<Triple<XLog, XEventClassifier, IMLog2IMLogInfo>, Triple<XLogInfo, IMLog2, IMLogInfo>> {
+	private class MakeLog
+			extends
+			ChainLink<Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo>, Quadruple<XLogInfo, XLogInfo, IMLog2, IMLogInfo>> {
 
-		protected Triple<XLog, XEventClassifier, IMLog2IMLogInfo> generateInput() {
+		protected Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveModelButton().setEnabled(false);
 			panel.getSaveImageButton().setEnabled(false);
 			panel.getSaveImageButton().setText("image");
-			return Triple.of(state.getXLog(), state.getClassifier(), state.getLog2logInfo());
+			return Triple.of(state.getXLog(), state.getPerformanceClassifier(), state.getLog2logInfo());
 		}
 
-		protected Triple<XLogInfo, IMLog2, IMLogInfo> executeLink(Triple<XLog, XEventClassifier, IMLog2IMLogInfo> input) {
+		protected Quadruple<XLogInfo, XLogInfo, IMLog2, IMLogInfo> executeLink(
+				Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> input) {
 			setStatus("Making log..");
 
-			IMLog2 imLog = new IMLog2(input.getA(), input.getB());
+			IMLog2 imLog = new IMLog2(input.getA(), input.getB().getActivityClassifier());
 			IMLogInfo imLogInfo = input.getC().createLogInfo(imLog);
-			XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(input.getA(), input.getB());
+			XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(input.getA(), input.getB().getActivityClassifier());
+			XLogInfo xLogInfoPerformance = XLogInfoFactory.createLogInfo(input.getA(), input.getB());
 
-			return Triple.of(xLogInfo, imLog, imLogInfo);
+			return Quadruple.of(xLogInfo, xLogInfoPerformance, imLog, imLogInfo);
 		}
 
-		protected void processResult(Triple<XLogInfo, IMLog2, IMLogInfo> result) {
-			state.setLog(result.getA(), result.getB(), result.getC());
+		protected void processResult(Quadruple<XLogInfo, XLogInfo, IMLog2, IMLogInfo> result) {
+			state.setLog(result.getA(), result.getB(), result.getC(), result.getD());
+			panel.getTraceView().set(result.getC());
 		}
 
 		public void cancel() {
@@ -127,7 +132,8 @@ public class InductiveVisualMinerController {
 	}
 
 	//filter the log using activities threshold
-	private class FilterLogOnActivities extends
+	private class FilterLogOnActivities
+			extends
 			ChainLink<Quadruple<IMLog2, IMLogInfo, Double, IMLog2IMLogInfo>, Triple<IMLog2, IMLogInfo, Set<XEventClass>>> {
 
 		protected Quadruple<IMLog2, IMLogInfo, Double, IMLog2IMLogInfo> generateInput() {
@@ -151,8 +157,6 @@ public class InductiveVisualMinerController {
 
 		protected void processResult(Triple<IMLog2, IMLogInfo, Set<XEventClass>> result) {
 			state.setActivityFilteredIMLog(result.getA(), result.getB(), result.getC());
-
-			panel.getTraceView().set(state.getLog());
 		}
 
 		public void cancel() {
@@ -175,7 +179,8 @@ public class InductiveVisualMinerController {
 					minerParameters);
 		}
 
-		protected ProcessTree executeLink(Quadruple<ProcessTree, IMLog2, VisualMinerWrapper, VisualMinerParameters> input) {
+		protected ProcessTree executeLink(
+				Quadruple<ProcessTree, IMLog2, VisualMinerWrapper, VisualMinerParameters> input) {
 			setStatus("Mining..");
 			canceller.reset();
 			if (input.getA() == null) {
@@ -208,25 +213,30 @@ public class InductiveVisualMinerController {
 	}
 
 	//compute alignment
-	private class Align extends ChainLink<Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo>, AlignmentResult> {
+	private class Align
+			extends
+			ChainLink<Quintuple<ProcessTree, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses>, AlignmentResult> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
-		protected Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo> generateInput() {
+		protected Quintuple<ProcessTree, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			return new Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo>(state.getTree(),
-					state.getClassifier(), state.getXLog(), state.getLogInfo());
+			return Quintuple.of(state.getTree(), state.getPerformanceClassifier(), state.getXLog(),
+					state.getXLogInfo().getEventClasses(), state.getXLogInfoPerformance().getEventClasses());
 		}
 
-		protected AlignmentResult executeLink(Quadruple<ProcessTree, XEventClassifier, XLog, IMLogInfo> input) {
+		protected AlignmentResult executeLink(
+				Quintuple<ProcessTree, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses> input) {
 			setStatus("Computing alignment..");
 			canceller.reset();
-			return ComputeAlignment.computeAlignment(input.getA(), input.getB(), input.getC(), input.getD(), canceller);
+			return AlignmentETM.alignTree(input.getA(), input.getB(), input.getC(), input.getD(), input.getE(),
+					canceller);
 		}
 
 		protected void processResult(AlignmentResult result) {
 			state.setAlignment(result);
+			panel.getTraceView().set(state.getAlignedLog());
 		}
 
 		public void cancel() {
@@ -291,7 +301,7 @@ public class InductiveVisualMinerController {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
 			return Septuple.of(state.getAlignedLog(), state.getSelectedNodes(), state.getSelectedLogMoves(),
-					state.getAlignedLogInfo(), new IMLog2(state.getXLog(), state.getClassifier()), state.getXLogInfo(),
+					state.getAlignedLogInfo(), new IMLog2(state.getXLog(), state.getActivityClassifier()), state.getXLogInfo(),
 					state.getColouringFilters());
 		}
 
@@ -318,7 +328,6 @@ public class InductiveVisualMinerController {
 
 		protected void processResult(Triple<AlignedLog, AlignedLogInfo, IMLog2> result) {
 			state.setAlignedFilteredLog(result.getA(), result.getB(), result.getC());
-
 			panel.getTraceView().set(state.getAlignedFilteredLog());
 		}
 
@@ -368,7 +377,8 @@ public class InductiveVisualMinerController {
 		protected Triple<AlignedLog, IMLog2, XLogInfo> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			return Triple.of(state.getAlignedFilteredLog(), state.getAlignedFilteredXLog(), state.getXLogInfo());
+			return Triple.of(state.getAlignedFilteredLog(), state.getAlignedFilteredXLog(),
+					state.getXLogInfoPerformance());
 		}
 
 		protected TimedLog executeLink(Triple<AlignedLog, IMLog2, XLogInfo> input) {

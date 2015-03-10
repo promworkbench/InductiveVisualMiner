@@ -15,18 +15,23 @@ public class Move implements Event {
 
 	private final Type type;
 	private final UnfoldedNode unode;
-	private final XEventClass eventClass;
+	private final XEventClass activityEventClass;
+	private final XEventClass performanceEventClass;
 	private final boolean start;
+	private final boolean tauStart;
 
 	private UnfoldedNode logMoveUnode;
 	private UnfoldedNode logMoveBeforeChild;
 	private UnfoldedNode logMoveParallelBranchMappedTo;
 
-	public Move(Type type, UnfoldedNode unode, XEventClass eventClass, boolean start) {
+	public Move(Type type, UnfoldedNode unode, XEventClass activityEventClass, XEventClass performanceEventClass,
+			boolean start, boolean tauStart) {
 		this.type = type;
 		this.unode = unode;
-		this.eventClass = eventClass;
+		this.activityEventClass = activityEventClass;
+		this.performanceEventClass = performanceEventClass;
 		this.start = start;
+		this.tauStart = tauStart;
 	}
 
 	public String toString() {
@@ -35,7 +40,7 @@ public class Move implements Event {
 		} else {
 			//			return getType() + " " + getEventClass().toString() + " " + getLogMoveUnode() + " "
 			//					+ getLogMoveBeforeChild();
-			return getType() + " " + getEventClass().toString() + " " + (start ? "start" : "complete");
+			return getType() + " " + getActivityEventClass().toString() + " " + (start ? "start" : "complete");
 		}
 	}
 
@@ -44,7 +49,7 @@ public class Move implements Event {
 		if (getUnode() != null) {
 			return getType().hashCode() ^ getUnode().hashCode();
 		} else {
-			return getType().hashCode() ^ getEventClass().hashCode();
+			return getType().hashCode() ^ getActivityEventClass().hashCode();
 		}
 	}
 
@@ -63,7 +68,7 @@ public class Move implements Event {
 		if (getUnode() != null) {
 			return getUnode().equals(arg.getUnode());
 		} else {
-			return getEventClass().equals(arg.getEventClass());
+			return getActivityEventClass().equals(arg.getActivityEventClass());
 		}
 	}
 
@@ -79,8 +84,12 @@ public class Move implements Event {
 		return unode;
 	}
 
-	public XEventClass getEventClass() {
-		return eventClass;
+	public XEventClass getActivityEventClass() {
+		return activityEventClass;
+	}
+
+	public XEventClass getPerformanceEventClass() {
+		return performanceEventClass;
 	}
 
 	public UnfoldedNode getLogMoveBeforeChild() {
@@ -125,6 +134,14 @@ public class Move implements Event {
 	public boolean isComplete() {
 		return !isStart();
 	}
+	
+	/**
+	 * 
+	 * @return whether this move is a missing start
+	 */
+	public boolean isTauStart() {
+		return tauStart;
+	}
 
 	/**
 	 * Returns the last known unode in the trace before this log move. This is
@@ -152,13 +169,13 @@ public class Move implements Event {
 			return null;
 		}
 
-		return eventClass.toString();
+		return activityEventClass.toString();
 	}
 
 	public String getTopLabel() {
 		return "";
 	}
-	
+
 	public String getBottomLabel() {
 		if (isLogMove()) {
 			return "";
@@ -203,5 +220,4 @@ public class Move implements Event {
 	public Color getBottomLabel2Color() {
 		return Color.red;
 	}
-
 }

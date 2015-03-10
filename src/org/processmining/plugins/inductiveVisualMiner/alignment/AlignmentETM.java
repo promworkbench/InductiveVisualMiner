@@ -12,6 +12,7 @@ import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.extension.std.XLifecycleExtension;
+import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
@@ -48,17 +49,21 @@ public class AlignmentETM {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Batch compare miners, default", requiredParameterLabels = { 0, 1 })
 	public AlignedLog alignTree(PluginContext context, ProcessTree tree, XLog log) {
-		return alignTree(tree, MiningParametersIM.getDefaultClassifier(), log,
+		XEventClassifier activityClassifier = MiningParametersIM.getDefaultClassifier();
+		XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(activityClassifier);
+
+		XLogInfo logInfo = XLogInfoFactory.createLogInfo(log, activityClassifier);
+		XLogInfo logInfoPerformance = XLogInfoFactory.createLogInfo(log, performanceClassifier);
+
+		return alignTree(tree, new XEventPerformanceClassifier(MiningParametersIM.getDefaultClassifier()), log,
+				logInfo.getEventClasses(), logInfoPerformance.getEventClasses(),
 				ProMCancelTerminationCondition.buildDummyCanceller()).log;
 	}
 
-	public static AlignmentResult alignTree(ProcessTree tree, XEventClassifier classifier, XLog log, Canceller canceller) {
+	public static AlignmentResult alignTree(ProcessTree tree, XEventPerformanceClassifier performanceClassifier,
+			XLog log, XEventClasses activityEventClasses, XEventClasses performanceEventClasses, Canceller canceller) {
 
-		XEventClassifier doubleClassifier = new XEventPerformanceClassifier(classifier);
-
-		XEventClasses eventClasses = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
-		XEventClasses performanceEventClasses = XLogInfoFactory.createLogInfo(log, doubleClassifier).getEventClasses();
-		CentralRegistry registry = new CentralRegistry(log, doubleClassifier, new Random());
+		CentralRegistry registry = new CentralRegistry(log, performanceClassifier, new Random());
 
 		//transform tree for performance measurement
 		Pair<ProcessTree, Map<UnfoldedNode, UnfoldedNode>> p = ConvertTreeForPerformance.convert(tree);
@@ -104,10 +109,10 @@ public class AlignmentETM {
 				if (naryMove.getMovedEvent() >= 0) {
 					//an ETM-log-move happened
 					performanceActivity = registry.getEventClassByID(naryTrace.get(naryMove.getMovedEvent()));
-					activity = Performance.getActivity(performanceActivity, eventClasses);
+					activity = Performance.getActivity(performanceActivity, activityEventClasses);
 					start = Performance.isStart(performanceActivity);
 				}
-				
+
 				//get model part of move
 				UnfoldedNode performanceUnode = null;
 				UnfoldedNode unode = null;
@@ -121,8 +126,9 @@ public class AlignmentETM {
 						//this is a tau that represents that the start of an activity is skipped;
 						//make it a synchronous move on the start
 						start = true;
-						performanceActivity = eventClasses.getByIdentity(unode.getNode().getName());
-						activity = performanceActivity;
+						activity = activityEventClasses.getByIdentity(unode.getNode().getName());
+						performanceActivity = performanceEventClasses.getByIdentity(unode.getNode().getName()
+								+ "+start");
 					}
 
 					//we are only interested in moves on leaves, not in moves on nodes
@@ -135,18 +141,20 @@ public class AlignmentETM {
 
 				if (performanceUnode != null || performanceActivity != null) {
 					Move move;
-					if ((performanceUnode != null && performanceActivity != null)
-							|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)
-							|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic && unode
-									.getNode() instanceof Manual)) {
+					if (performanceUnode != null && performanceUnode.getNode() instanceof Automatic
+							&& unode.getNode() instanceof Manual) {
+						//tau-start
+						move = new Move(Type.synchronous, unode, activity, performanceActivity, start, true);
+					} else if ((performanceUnode != null && performanceActivity != null)
+							|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)) {
 						//synchronous move
-						move = new Move(Type.synchronous, unode, activity, start);
+						move = new Move(Type.synchronous, unode, activity, performanceActivity, start, false);
 					} else if (performanceUnode != null) {
 						//model move
-						move = new Move(Type.model, unode, activity, start);
+						move = new Move(Type.model, unode, activity, performanceActivity, start, false);
 					} else {
 						//log move
-						move = new Move(Type.log, unode, activity, start);
+						move = new Move(Type.log, unode, activity, performanceActivity, start, false);
 					}
 					trace.add(move);
 				}
@@ -164,11 +172,13 @@ public class AlignmentETM {
 			XEvent event = new XEventImpl();
 			UnfoldedNode unode = new UnfoldedNode(node);
 			XConceptExtension.instance().assignName(event, Performance.getActivity(unode));
-			
+
 			if (Performance.isStart(unode)) {
-				XLifecycleExtension.instance().assignTransition(event, XLifecycleExtension.StandardModel.START.getEncoding());
+				XLifecycleExtension.instance().assignTransition(event,
+						XLifecycleExtension.StandardModel.START.getEncoding());
 			} else {
-				XLifecycleExtension.instance().assignTransition(event, XLifecycleExtension.StandardModel.COMPLETE.getEncoding());
+				XLifecycleExtension.instance().assignTransition(event,
+						XLifecycleExtension.StandardModel.COMPLETE.getEncoding());
 			}
 			classes.register(event);
 		} else if (node instanceof Block) {
@@ -179,5 +189,4 @@ public class AlignmentETM {
 		classes.harmonizeIndices();
 	}
 
-	
 }

@@ -23,10 +23,10 @@ public class TimestampsAdder {
 	public static double beginEndEdgeDuration = 1;
 	private static Random random = new Random(123);
 
-	public static List<XEventClass> getTraceLogProjection(IMTrace2 trace, XLogInfo xLogInfo) {
+	public static List<XEventClass> getTraceLogProjection(IMTrace2 trace, XLogInfo xLogInfoPerformance) {
 		List<XEventClass> lTrace = new ArrayList<>();
 		for (XEvent event : trace) {
-			lTrace.add(xLogInfo.getEventClasses().getClassOf(event));
+			lTrace.add(xLogInfoPerformance.getEventClasses().getClassOf(event));
 		}
 		return lTrace;
 	}
@@ -39,8 +39,8 @@ public class TimestampsAdder {
 		for (AlignedTrace aTrace : aLog) {
 			List<XEventClass> trace = new ArrayList<>();
 			for (Move m : aTrace) {
-				if (m.getEventClass() != null) {
-					trace.add(m.getEventClass());
+				if (m.getPerformanceEventClass() != null && !m.isTauStart()) {
+					trace.add(m.getPerformanceEventClass());
 				}
 			}
 			result.put(trace, aTrace);

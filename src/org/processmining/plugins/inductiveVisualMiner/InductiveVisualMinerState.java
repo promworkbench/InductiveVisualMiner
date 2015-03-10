@@ -21,6 +21,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
+import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.IMi;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.MiningParametersIvM;
@@ -39,19 +40,24 @@ public class InductiveVisualMinerState {
 	}
 
 	//==log==
-	private XEventClassifier classifier = new XEventNameClassifier();
+	private XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(new XEventNameClassifier());
 	private IMLog2IMLogInfo log2logInfo = new IMLog2IMLogInfoDefault();
 	private final XLog xLog;
 	private XLogInfo xLogInfo;
+	private XLogInfo xLogInfoPerformance;
 	private IMLog2 IMLog;
 	private IMLogInfo IMLogInfo;
 
-	public XEventClassifier getClassifier() {
-		return classifier;
+	public XEventPerformanceClassifier getPerformanceClassifier() {
+		return performanceClassifier;
+	}
+	
+	public XEventClassifier getActivityClassifier() {
+		return performanceClassifier.getActivityClassifier();
 	}
 	
 	public synchronized void setClassifier (XEventClassifier classifier) {
-		this.classifier = classifier;
+		this.performanceClassifier = new XEventPerformanceClassifier(classifier);
 	}
 
 	public IMLog2IMLogInfo getLog2logInfo() {
@@ -69,6 +75,10 @@ public class InductiveVisualMinerState {
 	public XLogInfo getXLogInfo() {
 		return xLogInfo;
 	}
+	
+	public XLogInfo getXLogInfoPerformance() {
+		return xLogInfoPerformance;
+	}
 
 	public IMLog2 getLog() {
 		return IMLog;
@@ -78,10 +88,11 @@ public class InductiveVisualMinerState {
 		return IMLogInfo;
 	}
 
-	public synchronized void setLog(XLogInfo xLogInfo, IMLog2 IMLog, IMLogInfo IMLogInfo) {
+	public synchronized void setLog(XLogInfo xLogInfo, XLogInfo xLogInfoPerformance, IMLog2 IMLog, IMLogInfo IMLogInfo) {
 		this.IMLog = IMLog;
 		this.IMLogInfo = IMLogInfo;
 		this.xLogInfo = xLogInfo;
+		this.xLogInfoPerformance = xLogInfoPerformance;
 	}
 
 	//==activity-filtered log==

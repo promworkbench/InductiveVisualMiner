@@ -19,7 +19,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
 public class ComputeTimedLog {
 
-	public static TimedLog computeTimedLog(final AlignedLog aLog, final IMLog2 log, final XLogInfo xLogInfo,
+	public static TimedLog computeTimedLog(final AlignedLog aLog, final IMLog2 log, final XLogInfo xLogInfoPerformance,
 			final Canceller canceller) {
 
 		//make a log-projection-hashmap
@@ -27,7 +27,7 @@ public class ComputeTimedLog {
 
 		TimedLog timedLog = new TimedLog();
 		for (IMTrace2 trace : log) {
-			TimedTrace tTrace = timeTrace(log, map, trace, xLogInfo);
+			TimedTrace tTrace = timeTrace(log, map, trace, xLogInfoPerformance);
 			if (tTrace != null) {
 				timedLog.add(tTrace);
 			}
@@ -38,10 +38,10 @@ public class ComputeTimedLog {
 		return timedLog;
 	}
 
-	private static TimedTrace timeTrace(IMLog2 log, THashMap<List<XEventClass>, AlignedTrace> map, IMTrace2 trace, XLogInfo xLogInfo) {
+	private static TimedTrace timeTrace(IMLog2 log, THashMap<List<XEventClass>, AlignedTrace> map, IMTrace2 trace, XLogInfo xLogInfoPerformance) {
 
 		//find the corresponding aligned trace
-		List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfo);
+		List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfoPerformance);
 		IMTraceG<Move> alignedTrace = map.get(lTrace);
 		if (alignedTrace == null) {
 			return null;
@@ -58,7 +58,11 @@ public class ComputeTimedLog {
 		Iterator<XEvent> itEvent = trace.iterator();
 		double lastSeenTimestamp = 0;
 		for (Move move : alignedTrace) {
-			if (move.getEventClass() != null) {
+			if (move.isTauStart()) {
+				//tau-start
+				timedTrace.add(new TimedMove(move, null));
+			} else if (move.getActivityEventClass() != null) {
+				//sync move or 
 
 				XEvent event = itEvent.next();
 				Long timestamp = TimestampsAdder.getTimestamp(event);
@@ -66,13 +70,11 @@ public class ComputeTimedLog {
 				//see if this event has a valid timestamp
 				if (timestamp != null && timestamp >= lastSeenTimestamp) {
 					lastSeenTimestamp = timestamp;
-					timedTrace.add(new TimedMove(move, timestamp, log.isStart(event)));
-				} else {
-					timedTrace.add(new TimedMove(move, null, log.isComplete(event)));
 				}
+				timedTrace.add(new TimedMove(move, timestamp));
 			} else {
 				//model move or tau
-				timedTrace.add(new TimedMove(move, null, false));
+				timedTrace.add(new TimedMove(move, null));
 			}
 		}
 

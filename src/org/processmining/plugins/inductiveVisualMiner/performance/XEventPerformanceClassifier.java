@@ -9,10 +9,14 @@ import org.deckfour.xes.model.XVisitor;
 
 public class XEventPerformanceClassifier implements XEventClassifier, Comparable<XEventClassifier> {
 	
-	public final XEventClassifier otherClassifier;
+	private final XEventClassifier activityClassifier;
 	
-	public XEventPerformanceClassifier(XEventClassifier otherClassifier) {
-		this.otherClassifier = otherClassifier;
+	public XEventPerformanceClassifier(XEventClassifier activityClassifier) {
+		this.activityClassifier = activityClassifier;
+	}
+	
+	public XEventClassifier getActivityClassifier() {
+		return activityClassifier;
 	}
 
 	public void accept(XVisitor visitor, XLog log) {
@@ -27,7 +31,7 @@ public class XEventPerformanceClassifier implements XEventClassifier, Comparable
 	}
 
 	public String getClassIdentity(XEvent event) {
-		return otherClassifier.getClassIdentity(event) + "+" + getLifecycle(event);
+		return activityClassifier.getClassIdentity(event) + "+" + getLifecycle(event);
 	}
 	
 	public String getLifecycle(XEvent event) {
@@ -67,5 +71,4 @@ public class XEventPerformanceClassifier implements XEventClassifier, Comparable
 	public boolean equals(Object obj) {
 		return obj instanceof XEventPerformanceClassifier;
 	}
-
 }

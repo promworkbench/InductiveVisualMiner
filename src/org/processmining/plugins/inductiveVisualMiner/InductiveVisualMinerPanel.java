@@ -115,7 +115,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cClassifiers.gridwidth = 1;
 			cClassifiers.fill = GridBagConstraints.HORIZONTAL;
 			add(classifiersCombobox, cClassifiers);
-			classifiersCombobox.setSelectedItem(state.getClassifier());
+			classifiersCombobox.setSelectedItem(state.getActivityClassifier());
 		}
 
 		{

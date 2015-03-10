@@ -64,7 +64,7 @@ public class AlignedLogInfo {
 				} else if (move.isLogMove()) {
 					traceContainsLogMove = true;
 					move.setLogMoveParallelBranchMappedTo(lastUnode);
-					unlabeledLogMoves.add(move.getEventClass().toString(), cardinality);
+					unlabeledLogMoves.add(move.getActivityEventClass().toString(), cardinality);
 				}
 
 				if (root == null && move.isModelSync()) {
@@ -109,12 +109,12 @@ public class AlignedLogInfo {
 
 		//position the leading log moves
 		for (Move logMove : trace.subList(0, start)) {
-			addLogMove(logMove, null, root, logMove.getEventClass(), cardinality);
+			addLogMove(logMove, null, root, logMove.getActivityEventClass(), cardinality);
 		}
 
 		//position the trailing log moves
 		for (Move logMove : trace.subList(end + 1, trace.size())) {
-			addLogMove(logMove, root, null, logMove.getEventClass(), cardinality);
+			addLogMove(logMove, root, null, logMove.getActivityEventClass(), cardinality);
 		}
 
 		//recurse on the subtrace
@@ -200,7 +200,7 @@ public class AlignedLogInfo {
 
 					//the log moves we have seen now are external to both subtraces; position them on this unode
 					for (Move logMove : logMoves) {
-						addLogMove(logMove, unode, child, logMove.getEventClass(), cardinality);
+						addLogMove(logMove, unode, child, logMove.getActivityEventClass(), cardinality);
 					}
 
 					subTrace.clear();
@@ -217,7 +217,7 @@ public class AlignedLogInfo {
 
 		//the log moves we have seen now are external to both subtraces; position them on this unode
 		for (Move logMove : logMoves) {
-			addLogMove(logMove, unode, null, logMove.getEventClass(), cardinality);
+			addLogMove(logMove, unode, null, logMove.getActivityEventClass(), cardinality);
 		}
 	}
 

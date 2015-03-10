@@ -4,11 +4,12 @@ import java.awt.Color;
 import java.util.Iterator;
 
 import org.deckfour.xes.classification.XEventClass;
+import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
+import org.processmining.plugins.InductiveMiner.mining.MiningParametersIM;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
@@ -21,6 +22,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetric
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
@@ -33,9 +35,10 @@ import org.processmining.processtree.impl.AbstractTask.Manual;
 
 public class AlignedLogVisualisation {
 
-	public Dot fancy(PluginContext context, ProcessTree tree, XLog xLog) {
-		AlignmentResult result = AlignmentETM.alignTree(tree, MiningParameters.getDefaultClassifier(), xLog,
-				ProMCancelTerminationCondition.buildDummyCanceller());
+	public Dot fancy(PluginContext context, ProcessTree tree, XLog xLog, XLogInfo xLogInfo, XLogInfo XLogInfoPerformance) {
+		AlignmentResult result = AlignmentETM.alignTree(tree,
+				new XEventPerformanceClassifier(MiningParametersIM.getDefaultClassifier()), xLog, xLogInfo.getEventClasses(),
+				XLogInfoPerformance.getEventClasses(), ProMCancelTerminationCondition.buildDummyCanceller());
 		return fancy(tree, result.logInfo, new AlignedLogVisualisationParameters()).getLeft();
 	}
 
