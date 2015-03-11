@@ -44,8 +44,8 @@ import org.processmining.plugins.graphviz.visualisation.AnimatedSVGExporter;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
-import org.processmining.plugins.inductiveVisualMiner.animation.SVGTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.svgToken.SVGTokens;
 
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGUniverse;

@@ -15,7 +15,11 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerContro
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.DotToken;
+import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.Trace2DotToken;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
+import org.processmining.plugins.inductiveVisualMiner.animation.svgToken.DotTokens2SVGtokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.svgToken.SVGTokens;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAnimation;
 
 import com.google.common.collect.FluentIterable;
@@ -74,19 +78,19 @@ public class ComputeAnimation {
 		}
 
 		//compute tokens
-		final List<Token> tokens = computeTokens(timedLog, info, colourMode, scaler, graph, canceller);
+		final List<DotToken> tokens = computeTokens(timedLog, info, colourMode, scaler, graph, canceller);
 		if (canceller.isCancelled()) {
 			return null;
 		}
 
-		return AnimationSVG.animateTokens(tokens, svg);
+		return DotTokens2SVGtokens.animateTokens(tokens, svg);
 	}
 
-	public static List<Token> computeTokens(Iterable<TimedTrace> timedLog,
+	public static List<DotToken> computeTokens(Iterable<TimedTrace> timedLog,
 			final AlignedLogVisualisationInfo info, final ColourMode colourMode, Scaler scaler,
 			ShortestPathGraph graph, final Canceller canceller) {
 		boolean showDeviations = colourMode != ColourMode.paths;
-		final List<Token> tokens = new ArrayList<>();
+		final List<DotToken> tokens = new ArrayList<>();
 		for (TimedTrace timedTrace : timedLog) {
 			try {
 				//guess start and end time of the trace
@@ -94,7 +98,7 @@ public class ComputeAnimation {
 				timedTrace.setEndTime(guessEndTime(timedTrace, timedTrace.getStartTime(), graph, info, scaler));
 
 				//compute the tokens of this trace
-				tokens.add(Trace2Token.trace2token(timedTrace, showDeviations, graph, info, scaler));
+				tokens.add(Trace2DotToken.trace2token(timedTrace, showDeviations, graph, info, scaler));
 			} catch (Exception e) {
 				//for the demo, just ignore this case
 				InductiveVisualMinerController.debug(timedTrace);

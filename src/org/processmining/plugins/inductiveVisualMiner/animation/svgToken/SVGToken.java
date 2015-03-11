@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.animation;
+package org.processmining.plugins.inductiveVisualMiner.animation.svgToken;
 
 public class SVGToken {
 	private double endTime;
@@ -7,12 +7,7 @@ public class SVGToken {
 	public SVGToken(boolean fade) {
 		result = new StringBuilder();
 		result.append("<ellipse fill='yellow' stroke='black' cx='0' cy='0' rx='4' ry='4' ");
-		//we use fading at all times due to a flaw in svgsalamander
-		//		if (fade) {
 		result.append("opacity='0'>");
-		//		} else {
-		//			result.append("visibility='hidden'>");
-		//		}
 	}
 
 	public void addTrace(String trace, double endTime) {

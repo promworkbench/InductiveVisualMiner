@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.animation;
+package org.processmining.plugins.inductiveVisualMiner.animation.svgToken;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -9,47 +9,47 @@ import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.DotToken;
+import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.DotTokenStep;
 
 import com.kitfox.svg.Group;
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.SVGException;
 
-public class AnimationSVG {
+public class DotTokens2SVGtokens {
 
-	public static SVGTokens animateTokens(List<Token> tokens, SVGDiagram svg) {
+	public static SVGTokens animateTokens(List<DotToken> tokens, SVGDiagram svg) {
 		SVGTokens svgTokens = new SVGTokens();
-		for (Token token : tokens) {
-			for (Token subToken : token.getAllTokensRecursively()) {
+		for (DotToken token : tokens) {
+			for (DotToken subToken : token.getAllTokensRecursively()) {
 				animateToken(subToken, svgTokens, svg);
 			}
 		}
 		return svgTokens;
 	}
 
-	public static void animateToken(Token token, SVGTokens svgTokens, SVGDiagram svg) {
+	public static void animateToken(DotToken token, SVGTokens svgTokens, SVGDiagram svg) {
 		StringBuilder result = new StringBuilder();
-		
+
 		if (!token.isAllTimestampsSet()) {
-			assert(token.isAllTimestampsSet());
+			assert (token.isAllTimestampsSet());
 		}
 
 		//fade in
 		fade(token.isFade(), true, token.getStartTime(), null, result);
 
-		for (int i = 0; i < token.getPoints().size(); i++) {
-			animatePoint(token, i, result, svg);
+		for (int i = 0; i < token.size(); i++) {
+			animateDotTokenStep(token, i, result, svg);
 		}
 
 		//fade out
-		fade(token.isFade(), false, null, token.getPoints().get(token.getPoints().size() - 1).getRight(), result);
+		fade(token.isFade(), false, null, token.getLastTime(), result);
 
-		svgTokens.addTrace(result.toString(), token.getPoints().get(token.getPoints().size() - 1).getRight(),
-				token.isFade());
+		svgTokens.addTrace(result.toString(), token.getLastTime(), token.isFade());
 	}
 
 	public static double fadeDuration = 0.5;
@@ -64,7 +64,7 @@ public class AnimationSVG {
 		} else {
 			fadeDuration2 = fadeDuration;
 		}
-		
+
 		if (fade) {
 			result.append("\t<animate ");
 			result.append("attributeName='opacity' ");
@@ -122,22 +122,41 @@ public class AnimationSVG {
 		}
 	}
 
-	public static void animatePoint(Token token, int index, StringBuilder result, SVGDiagram svg) {
-		Pair<LocalDotEdge, Double> point = token.getPoints().get(index);
-		LocalDotEdge edge = point.getLeft();
-		double endTime;
-		try {
-		 endTime = point.getRight();
-		} catch (Exception e) {
-			throw e;
+	/**
+	 * Animate a token over one dotTokenStep.
+	 * @param dotToken
+	 * @param stepIndex
+	 * @param result
+	 * @param svg
+	 */
+	public static void animateDotTokenStep(DotToken dotToken, int stepIndex, StringBuilder result, SVGDiagram svg) {
+		DotTokenStep step = dotToken.get(stepIndex);
+		if (step.isOverEdge()) {
+			animateDotTokenStepEdge(dotToken, stepIndex, result, svg);
+		} else {
+			animateDotTokenStepNode(dotToken, stepIndex, result, svg);
 		}
+	}
+
+	/**
+	 * Animate a token over one edge.
+	 * @param dotToken
+	 * @param stepIndex
+	 * @param result
+	 * @param svg
+	 */
+	public static void animateDotTokenStepEdge(DotToken dotToken, int stepIndex, StringBuilder result, SVGDiagram svg) {
+		DotTokenStep step = dotToken.get(stepIndex);
+
+		LocalDotEdge edge = step.getEdge();
+		double endTime = step.getArrivalTime();
 
 		//get the start time and compute the duration
 		double startTime;
-		if (index == 0) {
-			startTime = token.getStartTime();
+		if (stepIndex == 0) {
+			startTime = dotToken.getStartTime();
 		} else {
-			startTime = token.getPoints().get(index - 1).getRight();
+			startTime = dotToken.get(stepIndex - 1).getArrivalTime();
 		}
 		double duration = endTime - startTime;
 
@@ -146,9 +165,11 @@ public class AnimationSVG {
 
 		//get the start node
 		LocalDotNode startNode = edge.getSource();
-
+		
 		//compute the path
-		String path = "M" + getCenter(startNode, svg);
+//		String path = "M" + getCenter(startNode, svg);
+		
+		String path = "M" + getSourceLocation(edge, svg);
 		if (edge.isDirectionForward()) {
 			path += "L" + DotPanel.getAttributeOf(SVGline, "d").substring(1);
 		} else {
@@ -165,10 +186,25 @@ public class AnimationSVG {
 		result.append("s' dur='");
 		result.append(duration);
 		result.append("s' ");
-		if (index == token.getPoints().size() - 1) {
+		if (stepIndex == dotToken.size() - 1) {
 			result.append("fill='freeze'");
 		}
 		result.append("/>\n");
+	}
+	
+	public static void animateDotTokenStepNode(DotToken dotToken, int stepIndex, StringBuilder result, SVGDiagram svg) {
+		DotTokenStep step = dotToken.get(stepIndex);
+		
+		
+	}
+	
+	private static String getSourceLocation(LocalDotEdge edge, SVGDiagram image) {
+		SVGElement SVGline = DotPanel.getSVGElementOf(image, edge).getChild(1);
+		String path = DotPanel.getAttributeOf(SVGline, "d");
+		Matcher matcher = pattern.matcher(path);
+		matcher.find();
+		String point = matcher.group();
+		return point;
 	}
 
 	private static String getCenter(LocalDotNode node, SVGDiagram image) {
@@ -184,12 +220,14 @@ public class AnimationSVG {
 		return centerX + "," + centerY;
 	}
 
-	/*
-	 * Reverses a path, assuming it consists of one move/line followed by one or
+	private static final Pattern pattern = Pattern.compile("-?(\\d*\\.)?\\d+,-?(\\d*\\.)?\\d+");
+
+	/**
+	 * 
+	 * @param path
+	 * @return The reversed path, assuming the original path consists of one move/line followed by one or
 	 * more cubic bezier curves.
 	 */
-	private static Pattern pattern = Pattern.compile("-?(\\d*\\.)?\\d+,-?(\\d*\\.)?\\d+");
-
 	public static String reversePath(String path) {
 
 		//get the points from the path

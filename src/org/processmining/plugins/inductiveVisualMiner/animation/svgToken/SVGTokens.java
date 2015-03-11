@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.animation;
+package org.processmining.plugins.inductiveVisualMiner.animation.svgToken;
 
 import java.util.ArrayList;
 import java.util.List;

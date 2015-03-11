@@ -1,41 +1,42 @@
-package org.processmining.plugins.inductiveVisualMiner.animation;
+package org.processmining.plugins.inductiveVisualMiner.animation.dotToken;
+
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
 
-public class Token {
+public class DotToken implements Iterable<DotTokenStep> {
 	private final LocalDotNode startPosition;
 	private Double startTime;
 	private final boolean fade;
-	private List<Pair<LocalDotEdge, Double>> points;
-	private List<Set<Token>> subTokens;
+	private final List<DotTokenStep> steps;
+	private final List<Set<DotToken>> subTokens;
 
-	public Token(LocalDotNode startPosition, Double startTime, boolean fade) {
+	public DotToken(LocalDotNode startPosition, Double startTime, boolean fade) {
 		//		System.out.println("create new token @" + startTime);
 		this.startPosition = startPosition;
 		this.startTime = startTime;
 		this.fade = fade;
-		points = new ArrayList<Pair<LocalDotEdge, Double>>();
+		steps = new ArrayList<>();
 		subTokens = new ArrayList<>();
 	}
 
 	/**
-	 * Returns the last known time stamp in this token; Can return null.
 	 * 
-	 * @return
+	 * @return the last known time stamp in this token; Can return null.
 	 */
 	public Double getLastTime() {
-		for (int i = points.size() - 1; i >= 0; i--) {
-			if (points.get(i).getRight() != null) {
-				return points.get(i).getRight();
+		for (int i = steps.size() - 1; i >= 0; i--) {
+			if (steps.get(i).hasArrivalTime()) {
+				return steps.get(i).getArrivalTime();
 			}
 		}
 		return startTime;
@@ -47,10 +48,10 @@ public class Token {
 	 * @return
 	 */
 	public LocalDotNode getLastPosition() {
-		if (points.isEmpty()) {
+		if (steps.isEmpty()) {
 			return startPosition;
 		}
-		return points.get(points.size() - 1).getLeft().getTarget();
+		return steps.get(steps.size() - 1).getDestinationNode();
 	}
 
 	/**
@@ -64,31 +65,33 @@ public class Token {
 		if (index == -1) {
 			return getStartPosition();
 		} else {
-			return points.get(index).getLeft().getTarget();
+			return steps.get(index).getDestinationNode();
 		}
 	}
 
 	/**
-	 * Gets the time stamp after the edge of the given index. -1 gives the start
-	 * time
+	 * Gets 
 	 * 
 	 * @param index
-	 * @return
+	 * @return the arrival time stamp of the step at the given index. -1 gives the start
+	 * time.
 	 */
 	public Double getTimestamp(int index) {
 		if (index == -1) {
 			return getStartTime();
+		} else if (steps.get(index).hasArrivalTime()){
+			return steps.get(index).getArrivalTime();
 		} else {
-			return points.get(index).getRight();
+			return null;
 		}
 	}
 
 	public void setTimestampOfPoint(int index, Double timestamp) {
 		//set this token
-		points.set(index, Pair.of(points.get(index).getLeft(), timestamp));
+		steps.get(index).setArrivalTime(timestamp);
 
 		//set all subtokens
-		for (Token subToken : subTokens.get(index)) {
+		for (DotToken subToken : subTokens.get(index)) {
 			subToken.setStartTime(timestamp);
 		}
 
@@ -101,11 +104,11 @@ public class Token {
 	 * 
 	 * @return
 	 */
-	public Set<Token> getAllTokensRecursively() {
-		Set<Token> result = new HashSet<>();
+	public Set<DotToken> getAllTokensRecursively() {
+		Set<DotToken> result = new HashSet<>();
 		result.add(this);
-		for (int i = 0; i < points.size(); i++) {
-			for (Token subToken : getSubTokensAtPoint(i)) {
+		for (int i = 0; i < steps.size(); i++) {
+			for (DotToken subToken : getSubTokensAtPoint(i)) {
 				result.addAll(subToken.getAllTokensRecursively());
 			}
 		}
@@ -129,44 +132,40 @@ public class Token {
 			throw new RuntimeException("token cannot move back in time");
 		}
 
-		for (int i = 0; i < points.size(); i++) {
-			Pair<LocalDotEdge, Double> p = points.get(i);
+		for (int i = 0; i < steps.size(); i++) {
+			DotTokenStep p = steps.get(i);
 			
-			if (p.getRight() != null) {
-				if (p.getRight().isNaN()) {
-					System.out.println("===========");
-					System.out.println(this);
-					throw new RuntimeException("token has a NaN time");
-				}
-				if (p.getRight() < last) {
+			if (p.hasArrivalTime()) {
+				if (p.getArrivalTime() < last) {
 					System.out.println("===========");
 					System.out.println(this);
 					throw new RuntimeException("token cannot move back in time");
 				}
-				last = p.getRight();
+				last = p.getArrivalTime();
 			}
 
 			//check sub tokens
-			for (Token subToken : getSubTokensAtPoint(i)) {
+			for (DotToken subToken : getSubTokensAtPoint(i)) {
 				subToken.performSanityCheck(last);
 			}
 		}
 
 		return last;
 	}
-
-	public void addPoint(LocalDotEdge edge, Double time) {
-		points.add(Pair.of(edge, time));
-		subTokens.add(new HashSet<Token>());
-
+	
+	public void addStepInNode(LocalDotNode node, Double arrivalTime) {
+		steps.add(DotTokenStep.node(node, arrivalTime));
+		subTokens.add(new THashSet<DotToken>());
 		performSanityCheck(null);
-
-		//				System.out.println("  add point to token " + points.get(points.size() - 1) + fade);
-		//		
-		//				System.out.println("   to " + edge.getTarget().toString().replaceAll("\\n", " "));
 	}
 
-	public void addSubToken(Token token) {
+	public void addStepOverEdge(LocalDotEdge edge, Double arrivalTime) {
+		steps.add(DotTokenStep.edge(edge, arrivalTime));
+		subTokens.add(new THashSet<DotToken>());
+		performSanityCheck(null);
+	}
+
+	public void addSubToken(DotToken token) {
 
 		//check whether this sub token is added to a parallel split
 		if (getLastPosition().getType() != NodeType.parallelSplit) {
@@ -176,15 +175,9 @@ public class Token {
 		subTokens.get(subTokens.size() - 1).add(token);
 		//		System.out.println("  add subtoken at " + (subTokens.size() - 1));
 	}
-
-	/**
-	 * Returns a list of all edges and timestamps in this token. Note: does not
-	 * return the start time.
-	 * 
-	 * @return
-	 */
-	public List<Pair<LocalDotEdge, Double>> getPoints() {
-		return Collections.unmodifiableList(points);
+	
+	public DotTokenStep getLastStep() {
+		return steps.get(steps.size() - 1);
 	}
 
 	/**
@@ -194,7 +187,7 @@ public class Token {
 	 * @param index
 	 * @return
 	 */
-	public Set<Token> getSubTokensAtPoint(int index) {
+	public Set<DotToken> getSubTokensAtPoint(int index) {
 		return subTokens.get(index);
 	}
 
@@ -204,7 +197,7 @@ public class Token {
 	 * 
 	 * @return
 	 */
-	public Set<Token> getLastSubTokens() {
+	public Set<DotToken> getLastSubTokens() {
 		return subTokens.get(subTokens.size() - 1);
 	}
 
@@ -253,17 +246,15 @@ public class Token {
 		result.append(sIndent);
 		result.append("Token starts at " + startPosition.getId() + " @" + startTime);
 		result.append("\n");
-		for (int i = 0; i < points.size(); i++) {
-			Pair<LocalDotEdge, Double> p = points.get(i);
+		for (int i = 0; i < steps.size(); i++) {
+			DotTokenStep p = steps.get(i);
 			result.append(sIndent);
-			result.append(p.getLeft().getTarget().toString().replaceAll("\\n", " "));
-			result.append(" @");
-			result.append(p.getRight());
+			result.append(p.toString());
 			result.append("\n");
 
 			//subtokens
-			Set<Token> sub = subTokens.get(i);
-			for (Token token : sub) {
+			Set<DotToken> sub = subTokens.get(i);
+			for (DotToken token : sub) {
 				result.append(token.toString(indent + 1));
 			}
 		}
@@ -289,14 +280,14 @@ public class Token {
 	 * @return
 	 */
 	public int getParallelDestination(int index) {
-		Token subToken = getSubTokensAtPoint(index).iterator().next();
+		DotToken subToken = getSubTokensAtPoint(index).iterator().next();
 		LocalDotNode parallelJoin = subToken.getLastPosition();
 
 		//search for the parallel join in the token, starting from offset
 		//that is, the last parallel join of the first list of matching parallel joins
-		for (int i = index + 1; i < points.size(); i++) {
+		for (int i = index + 1; i < steps.size(); i++) {
 			if (getTarget(i).equals(parallelJoin)) {
-				if (index == points.size() - 1 || !getTarget(i + 1).equals(parallelJoin)) {
+				if (index == steps.size() - 1 || !getTarget(i + 1).equals(parallelJoin)) {
 					return i;
 				}
 			}
@@ -320,7 +311,7 @@ public class Token {
 
 		//check whether the next node is a parallel join
 		//in that case, this join is caused by a log move
-		return index == points.size() - 1 || getTarget(index + 1).getType() != NodeType.parallelJoin;
+		return index == steps.size() - 1 || getTarget(index + 1).getType() != NodeType.parallelJoin;
 	}
 
 	/**
@@ -332,12 +323,12 @@ public class Token {
 		if (getStartTime() == null) {
 			return false;
 		}
-		for (int i = 0; i < points.size() - 1; i++) {
-			if (points.get(i).getB() == null) {
+		for (int i = 0; i < steps.size() - 1; i++) {
+			if (!steps.get(i).hasArrivalTime()) {
 				return false;
 			}
 			
-			for (Token subToken : getSubTokensAtPoint(i)) {
+			for (DotToken subToken : getSubTokensAtPoint(i)) {
 				if (!subToken.isAllTimestampsSet()) {
 					return false;
 				}
@@ -346,5 +337,18 @@ public class Token {
 		
 		return true;
 	}
+	
+	//collection-like functions
 
+	public Iterator<DotTokenStep> iterator() {
+		return Collections.unmodifiableList(steps).iterator();
+	}
+	
+	public int size() {
+		return steps.size();
+	}
+
+	public DotTokenStep get(int i) {
+		return steps.get(i);
+	}
 }

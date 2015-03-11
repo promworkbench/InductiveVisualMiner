@@ -475,7 +475,7 @@ public class InductiveVisualMinerController {
 		chain.add(new FilterNodeSelection());
 		chain.add(new ApplyHighlighting());
 		chain.add(new TimeLog());
-//		chain.add(new Animate());
+		chain.add(new Animate());
 
 		//set up plug-ins
 		List<ColouringFilter> colouringFilters = ColouringFilterPluginFinder.findFilteringPlugins(context, panel,
