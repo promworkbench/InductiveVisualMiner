@@ -51,6 +51,10 @@ public class DotTokenStep {
 		return edge;
 	}
 	
+	public LocalDotNode getNode() {
+		return node;
+	}
+	
 	@Override
 	public String toString() {
 		if (isOverEdge()) {
@@ -59,5 +63,4 @@ public class DotTokenStep {
 			return "step over node, arrive @" + String.format("%.6f", arrivalTime) + " at " + node.toString().replaceAll("\\n", " ");
 		}
 	}
-	
 }

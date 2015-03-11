@@ -124,6 +124,7 @@ public class DotTokens2SVGtokens {
 
 	/**
 	 * Animate a token over one dotTokenStep.
+	 * 
 	 * @param dotToken
 	 * @param stepIndex
 	 * @param result
@@ -140,12 +141,13 @@ public class DotTokens2SVGtokens {
 
 	/**
 	 * Animate a token over one edge.
+	 * 
 	 * @param dotToken
 	 * @param stepIndex
 	 * @param result
-	 * @param svg
+	 * @param image
 	 */
-	public static void animateDotTokenStepEdge(DotToken dotToken, int stepIndex, StringBuilder result, SVGDiagram svg) {
+	public static void animateDotTokenStepEdge(DotToken dotToken, int stepIndex, StringBuilder result, SVGDiagram image) {
 		DotTokenStep step = dotToken.get(stepIndex);
 
 		LocalDotEdge edge = step.getEdge();
@@ -161,21 +163,35 @@ public class DotTokens2SVGtokens {
 		double duration = endTime - startTime;
 
 		//get the svg-line with the edge
-		SVGElement SVGline = DotPanel.getSVGElementOf(svg, edge).getChild(1);
+		SVGElement SVGline = DotPanel.getSVGElementOf(image, edge).getChild(1);
 
-		//get the start node
-		LocalDotNode startNode = edge.getSource();
-		
 		//compute the path
-//		String path = "M" + getCenter(startNode, svg);
+		String path;
 		
-		String path = "M" + getSourceLocation(edge, svg);
+		//start the token in its last position
+		if (stepIndex == 0 || dotToken.get(stepIndex - 1).isOverEdge()) {
+			//If there was no activity before, start at the center of the source node.
+			path = "M" + getCenter(edge.getSource(), image);
+		} else {
+			//If there was an activity before, then the token was gracefully put on the source already.
+			path = "M" + getSourceLocation(edge, image);
+		}
+		
+		//move over the edge
 		if (edge.isDirectionForward()) {
 			path += "L" + DotPanel.getAttributeOf(SVGline, "d").substring(1);
 		} else {
 			path += reversePath(DotPanel.getAttributeOf(SVGline, "d"));
 		}
-		path += "L" + getCenter(edge.getTarget(), svg);
+
+		//Leave the token in a nice place.
+		if (stepIndex == dotToken.size() - 1 || dotToken.get(stepIndex + 1).isOverEdge()) {
+			//If there's no activity afterwards, leave it on the center of the target node.
+			path += "L" + getCenter(edge.getTarget(), image);
+		} else {
+			//If there is an activity afterwards, move over the arrowhead.
+			path += "L" + getArrowHeadPoint(edge, image);
+		}
 
 		//put it all together
 		result.append("\t<animateMotion ");
@@ -191,20 +207,80 @@ public class DotTokens2SVGtokens {
 		}
 		result.append("/>\n");
 	}
-	
-	public static void animateDotTokenStepNode(DotToken dotToken, int stepIndex, StringBuilder result, SVGDiagram svg) {
+
+	public static void animateDotTokenStepNode(DotToken dotToken, int stepIndex, StringBuilder result, SVGDiagram image) {
 		DotTokenStep step = dotToken.get(stepIndex);
-		
-		
+
+		//get the start time and compute the duration
+		double endTime = step.getArrivalTime();
+		double startTime;
+		if (stepIndex == 0) {
+			startTime = dotToken.getStartTime();
+		} else {
+			startTime = dotToken.get(stepIndex - 1).getArrivalTime();
+		}
+		double duration = endTime - startTime;
+
+		//move to last point on the preceding edge
+		String path = "M" + getArrowHeadPoint(dotToken.get(stepIndex - 1).getEdge(), image);
+
+		//line to the center of the node
+		path += "L" + getCenter(step.getNode(), image);
+
+		//line to the first point on the edge after this 
+		path += "L" + getSourceLocation(dotToken.get(stepIndex + 1).getEdge(), image);
+
+		//put it all together
+		result.append("\t<animateMotion ");
+		result.append("path='");
+		result.append(path);
+		result.append("' begin='");
+		result.append(startTime);
+		result.append("s' dur='");
+		result.append(duration);
+		result.append("s' ");
+		if (stepIndex == dotToken.size() - 1) {
+			result.append("fill='freeze'");
+		}
+		result.append("/>\n");
 	}
-	
+
 	private static String getSourceLocation(LocalDotEdge edge, SVGDiagram image) {
 		SVGElement SVGline = DotPanel.getSVGElementOf(image, edge).getChild(1);
 		String path = DotPanel.getAttributeOf(SVGline, "d");
+
+		if (edge.isDirectionForward()) {
+			return getFirstLocation(path);
+		} else {
+			return getLastLocation(path);
+		}
+	}
+
+	private static String getTargetLocation(LocalDotEdge edge, SVGDiagram image) {
+		SVGElement SVGline = DotPanel.getSVGElementOf(image, edge).getChild(1);
+		String path = DotPanel.getAttributeOf(SVGline, "d");
+
+		if (!edge.isDirectionForward()) {
+			return getFirstLocation(path);
+		} else {
+			return getLastLocation(path);
+		}
+	}
+
+	private static String getFirstLocation(String path) {
 		Matcher matcher = pattern.matcher(path);
 		matcher.find();
 		String point = matcher.group();
 		return point;
+	}
+
+	private static String getLastLocation(String path) {
+		Matcher matcher = pattern.matcher(path);
+		String location = null;
+		while (matcher.find()) {
+			location = matcher.group();
+		}
+		return location;
 	}
 
 	private static String getCenter(LocalDotNode node, SVGDiagram image) {
@@ -225,8 +301,8 @@ public class DotTokens2SVGtokens {
 	/**
 	 * 
 	 * @param path
-	 * @return The reversed path, assuming the original path consists of one move/line followed by one or
-	 * more cubic bezier curves.
+	 * @return The reversed path, assuming the original path consists of one
+	 *         move/line followed by one or more cubic bezier curves.
 	 */
 	public static String reversePath(String path) {
 
@@ -262,5 +338,17 @@ public class DotTokens2SVGtokens {
 		}
 
 		return result.toString();
+	}
+
+	private static String getArrowHeadPoint(LocalDotEdge edge, SVGDiagram image) {
+		//the arrowhead polygon is the second child of the edge object
+		SVGElement svgArrowHead = DotPanel.getSVGElementOf(image, edge).getChild(2);
+		String path = DotPanel.getAttributeOf(svgArrowHead, "points");
+
+		//the point we're looking for is the second point
+		Matcher matcher = pattern.matcher(path);
+		matcher.find();
+		matcher.find();
+		return matcher.group();
 	}
 }
