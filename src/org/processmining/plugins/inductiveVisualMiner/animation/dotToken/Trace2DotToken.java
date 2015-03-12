@@ -12,8 +12,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Lo
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.LogSplitter;
 import org.processmining.processtree.Node;
@@ -104,7 +104,7 @@ public class Trace2DotToken {
 			} else if (move.isSyncMove() || (move.isModelMove() && !showDeviations)) {
 				//synchronous move or model move without deviations showing
 				LocalDotNode nextDestination = Animation.getDotNodeFromActivity(move, info);
-				
+
 				if (move.isStart()) {
 					//start: walk to the node
 	
