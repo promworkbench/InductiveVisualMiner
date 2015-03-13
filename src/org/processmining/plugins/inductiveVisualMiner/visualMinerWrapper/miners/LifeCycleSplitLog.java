@@ -2,26 +2,30 @@ package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners
 
 import nl.tue.astar.AStarThread.Canceller;
 
-import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
+import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
+import org.processmining.plugins.InductiveMiner.dfgOnly.DfgMiningParameters;
+import org.processmining.plugins.InductiveMiner.dfgOnly.plugins.IMdProcessTree;
+import org.processmining.plugins.InductiveMiner.dfgOnly.plugins.Log2DfgLifeCycle;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
-import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
 
-public class IMi extends VisualMinerWrapper {
-
+public class LifeCycleSplitLog extends VisualMinerWrapper {
+	
 	public String toString() {
-		return "Log";
+		return "lifecycle; split log";
 	}
 
 	public ProcessTree mine(IMLog2 log, VisualMinerParameters parameters, Canceller canceller) {
 		
 		//copy the relevant parameters
-		MiningParameters miningParameters = new MiningParametersIvM();
+		DfgMiningParameters miningParameters = new DfgMiningParametersIvMLifecycle();
 		miningParameters.setNoiseThreshold((float) (1 - parameters.getPaths()));
 		
-		return IMProcessTree.mineProcessTree(log, miningParameters);
+		Dfg dfg = Log2DfgLifeCycle.log2Dfg(log);
+		dfg.collapseParallelIntoDirectly();
+		return IMdProcessTree.mineProcessTree(dfg, miningParameters);
 	}
-	
+
 }
