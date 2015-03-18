@@ -11,8 +11,8 @@ import nl.tue.astar.AStarThread.Canceller;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace2;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
@@ -31,8 +31,8 @@ public class ComputeColouringFilter {
 	 * @param canceller
 	 * @return
 	 */
-	public static Triple<AlignedLog, AlignedLogInfo, IMLog2> applyColouringFilter(final AlignedLog aLog,
-			final AlignedLogInfo aLogInfo, final IMLog2 log, final XLogInfo xLogInfo, List<ColouringFilter> filters,
+	public static Triple<AlignedLog, AlignedLogInfo, IMLog> applyColouringFilter(final AlignedLog aLog,
+			final AlignedLogInfo aLogInfo, final IMLog log, final XLogInfo xLogInfo, List<ColouringFilter> filters,
 			final Canceller canceller) {
 
 		//first, walk through the filters to see there is actually one enabled
@@ -51,9 +51,9 @@ public class ComputeColouringFilter {
 		THashMap<List<XEventClass>, AlignedTrace> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
 
 		AlignedLog resultALog = new AlignedLog();
-		IMLog2 resultLog = new IMLog2(log);
-		for (Iterator<? extends IMTrace2> it = resultLog.iterator(); it.hasNext();) {
-			IMTrace2 trace = it.next();
+		IMLog resultLog = new IMLog(log);
+		for (Iterator<IMTrace> it = resultLog.iterator(); it.hasNext();) {
+			IMTrace trace = it.next();
 			List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfo);
 			AlignedTrace alignedTrace = map.get(lTrace);
 			if (alignedTrace == null) {

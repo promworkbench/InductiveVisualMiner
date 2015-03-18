@@ -1,7 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
 
 import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace2;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 
 @ColouringFilterAnnotation
@@ -49,7 +49,7 @@ public abstract class ColouringFilter {
 	 * @param aTrace
 	 * @return
 	 */
-	public abstract boolean countInColouring(IMTrace2 xTrace, AlignedTrace aTrace);
+	public abstract boolean countInColouring(IMTrace xTrace, AlignedTrace aTrace);
 
 	/**
 	 * This function is called when the user updates a filter and the filtering

@@ -10,22 +10,22 @@ import nl.tue.astar.AStarThread.Canceller;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XEvent;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace2;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
 public class ComputeTimedLog {
 
-	public static TimedLog computeTimedLog(final AlignedLog aLog, final IMLog2 log, final XLogInfo xLogInfoPerformance,
+	public static TimedLog computeTimedLog(final AlignedLog aLog, final IMLog log, final XLogInfo xLogInfoPerformance,
 			final Canceller canceller) {
 
 		//make a log-projection-hashmap
 		THashMap<List<XEventClass>, AlignedTrace> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
 
 		TimedLog timedLog = new TimedLog();
-		for (IMTrace2 trace : log) {
+		for (IMTrace trace : log) {
 			TimedTrace tTrace = timeTrace(log, map, trace, xLogInfoPerformance);
 			if (tTrace != null) {
 				timedLog.add(tTrace);
@@ -37,7 +37,7 @@ public class ComputeTimedLog {
 		return timedLog;
 	}
 
-	private static TimedTrace timeTrace(IMLog2 log, THashMap<List<XEventClass>, AlignedTrace> map, IMTrace2 trace, XLogInfo xLogInfoPerformance) {
+	private static TimedTrace timeTrace(IMLog log, THashMap<List<XEventClass>, AlignedTrace> map, IMTrace trace, XLogInfo xLogInfoPerformance) {
 
 		//find the corresponding aligned trace
 		List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfoPerformance);

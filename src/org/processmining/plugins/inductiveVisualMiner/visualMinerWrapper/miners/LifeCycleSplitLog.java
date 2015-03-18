@@ -6,7 +6,7 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.dfgOnly.DfgMiningParameters;
 import org.processmining.plugins.InductiveMiner.dfgOnly.plugins.IMdProcessTree;
 import org.processmining.plugins.InductiveMiner.dfgOnly.plugins.Log2DfgLifeCycle;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
@@ -17,7 +17,7 @@ public class LifeCycleSplitLog extends VisualMinerWrapper {
 		return "lifecycle; split log";
 	}
 
-	public ProcessTree mine(IMLog2 log, VisualMinerParameters parameters, Canceller canceller) {
+	public ProcessTree mine(IMLog log, VisualMinerParameters parameters, Canceller canceller) {
 		
 		//copy the relevant parameters
 		DfgMiningParameters miningParameters = new DfgMiningParametersIvMLifecycle();

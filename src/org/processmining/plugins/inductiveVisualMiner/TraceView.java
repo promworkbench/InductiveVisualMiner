@@ -18,7 +18,8 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.Wedge
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace2;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
@@ -128,10 +129,10 @@ public class TraceView extends SideWindow {
 
 	private static class IMLog2TraceBuilder implements TraceBuilder<Object> {
 
-		private final IMLog2 IMLog2;
+		private final IMLog log;
 
-		public IMLog2TraceBuilder(IMLog2 IMLog2) {
-			this.IMLog2 = IMLog2;
+		public IMLog2TraceBuilder(IMLog log) {
+			this.log = log;
 		}
 
 		public Trace<? extends Event> build(final Object trace) {
@@ -142,7 +143,7 @@ public class TraceView extends SideWindow {
 						public Event apply(final XEvent input) {
 							return new ProMTraceView.AbstractEvent() {
 								public String getLabel() {
-									return IMLog2.classify(input).toString();
+									return log.classify(input).toString();
 								}
 								
 								public String getTopLabel() {
@@ -151,7 +152,7 @@ public class TraceView extends SideWindow {
 								}
 								
 								public String getBottomLabel() {
-									if (IMLog2.isStart(input)) {
+									if (log.isStart(input)) {
 										return "start";
 									} else {
 										return "complete";
@@ -297,11 +298,11 @@ public class TraceView extends SideWindow {
 	 * 
 	 * @param log
 	 */
-	public void set(IMLog2 log) {
+	public void set(IMLog log) {
 		if (!log.equals(showing)) {
 			traceView.clear();
 			traceView.setTraceBuilder(new IMLog2TraceBuilder(log));
-			for (IMTrace2 t : log) {
+			for (IMTrace t : log) {
 				traceView.add(t);
 			}
 		}

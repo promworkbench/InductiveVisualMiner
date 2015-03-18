@@ -13,7 +13,7 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogI
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
@@ -46,7 +46,7 @@ public class InductiveVisualMinerState {
 	private final XLog xLog;
 	private XLogInfo xLogInfo;
 	private XLogInfo xLogInfoPerformance;
-	private IMLog2 IMLog;
+	private IMLog IMLog;
 	private IMLogInfo IMLogInfo;
 
 	public XEventPerformanceClassifier getPerformanceClassifier() {
@@ -81,7 +81,7 @@ public class InductiveVisualMinerState {
 		return xLogInfoPerformance;
 	}
 
-	public IMLog2 getLog() {
+	public IMLog getLog() {
 		return IMLog;
 	}
 
@@ -89,7 +89,7 @@ public class InductiveVisualMinerState {
 		return IMLogInfo;
 	}
 
-	public synchronized void setLog(XLogInfo xLogInfo, XLogInfo xLogInfoPerformance, IMLog2 IMLog, IMLogInfo IMLogInfo) {
+	public synchronized void setLog(XLogInfo xLogInfo, XLogInfo xLogInfoPerformance, IMLog IMLog, IMLogInfo IMLogInfo) {
 		this.IMLog = IMLog;
 		this.IMLogInfo = IMLogInfo;
 		this.xLogInfo = xLogInfo;
@@ -98,7 +98,7 @@ public class InductiveVisualMinerState {
 
 	//==activity-filtered log==
 	private double activitiesThreshold = 1.0;
-	private IMLog2 activityFilteredIMLog;
+	private IMLog activityFilteredIMLog;
 	private IMLogInfo activityFilteredIMLogInfo;
 	private Set<XEventClass> filteredActivities;
 	
@@ -110,7 +110,7 @@ public class InductiveVisualMinerState {
 		this.activitiesThreshold = activitiesThreshold;
 	}
 
-	public IMLog2 getActivityFilteredIMLog() {
+	public IMLog getActivityFilteredIMLog() {
 		return activityFilteredIMLog;
 	}
 
@@ -122,7 +122,7 @@ public class InductiveVisualMinerState {
 		return filteredActivities;
 	}
 
-	public synchronized void setActivityFilteredIMLog(IMLog2 activityFilteredIMLog, IMLogInfo activityFilteredIMLogInfo,
+	public synchronized void setActivityFilteredIMLog(IMLog activityFilteredIMLog, IMLogInfo activityFilteredIMLogInfo,
 			Set<XEventClass> filteredActivities) {
 		this.activityFilteredIMLog = activityFilteredIMLog;
 		this.activityFilteredIMLogInfo = activityFilteredIMLogInfo;
@@ -188,7 +188,7 @@ public class InductiveVisualMinerState {
 	private AlignedLogInfo alignedLogInfo = null;
 	private AlignedLog alignedFilteredLog = null;
 	private AlignedLogInfo alignedFilteredLogInfo = null;
-	private IMLog2 alignedFilteredXLog = null;
+	private IMLog alignedFilteredXLog = null;
 
 	public boolean isAlignmentReady() {
 		return alignedLog != null;
@@ -210,7 +210,7 @@ public class InductiveVisualMinerState {
 		return alignedFilteredLogInfo;
 	}
 	
-	public IMLog2 getAlignedFilteredXLog() {
+	public IMLog getAlignedFilteredXLog() {
 		return alignedFilteredXLog;
 	}
 
@@ -238,7 +238,7 @@ public class InductiveVisualMinerState {
 	 * Apply a new filter
 	 */
 	public synchronized void setAlignedFilteredLog(AlignedLog alignedFilteredLog,
-			AlignedLogInfo alignedFilteredLogInfo, IMLog2 alignedFilteredXLog) {
+			AlignedLogInfo alignedFilteredLogInfo, IMLog alignedFilteredXLog) {
 		this.alignedFilteredLog = alignedFilteredLog;
 		this.alignedFilteredLogInfo = alignedFilteredLogInfo;
 		this.alignedFilteredXLog = alignedFilteredXLog;
