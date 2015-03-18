@@ -52,7 +52,7 @@ public class ComputeColouringFilter {
 
 		AlignedLog resultALog = new AlignedLog();
 		IMLog2 resultLog = new IMLog2(log);
-		for (Iterator<IMTrace2> it = resultLog.iterator(); it.hasNext();) {
+		for (Iterator<? extends IMTrace2> it = resultLog.iterator(); it.hasNext();) {
 			IMTrace2 trace = it.next();
 			List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfo);
 			AlignedTrace alignedTrace = map.get(lTrace);
