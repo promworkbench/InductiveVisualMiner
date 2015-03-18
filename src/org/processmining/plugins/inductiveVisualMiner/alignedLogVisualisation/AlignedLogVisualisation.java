@@ -37,8 +37,9 @@ public class AlignedLogVisualisation {
 
 	public Dot fancy(PluginContext context, ProcessTree tree, XLog xLog, XLogInfo xLogInfo, XLogInfo XLogInfoPerformance) {
 		AlignmentResult result = AlignmentETM.alignTree(tree,
-				new XEventPerformanceClassifier(MiningParametersIM.getDefaultClassifier()), xLog, xLogInfo.getEventClasses(),
-				XLogInfoPerformance.getEventClasses(), ProMCancelTerminationCondition.buildDummyCanceller());
+				new XEventPerformanceClassifier(MiningParametersIM.getDefaultClassifier()), xLog,
+				xLogInfo.getEventClasses(), XLogInfoPerformance.getEventClasses(),
+				ProMCancelTerminationCondition.buildDummyCanceller());
 		return fancy(tree, result.logInfo, new AlignedLogVisualisationParameters()).getLeft();
 	}
 
@@ -120,6 +121,11 @@ public class AlignedLogVisualisation {
 				addMoveArc(source, sink, unode, EdgeType.modelMove, null, null, modelMoves, directionForward);
 			}
 		}
+
+		//draw log moves
+		if (parameters.isShowLogMoves()) {
+			visualiseLogMove(dotNode, dotNode, unode, LogMovePosition.onLeaf(unode), directionForward);
+		}
 	}
 
 	private LocalDotNode convertActivity(UnfoldedNode unode, long cardinality) {
@@ -200,9 +206,9 @@ public class AlignedLogVisualisation {
 
 		//put log-moves on children
 		if (parameters.isShowLogMoves()) {
-			visualiseLogMove(join, join, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(bodyChild)),
+			visualiseLogMove(split, split, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(bodyChild)),
 					directionForward);
-			visualiseLogMove(split, split, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(redoChild)),
+			visualiseLogMove(join, join, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(redoChild)),
 					directionForward);
 
 			//log moves can be projected before the exit-tau

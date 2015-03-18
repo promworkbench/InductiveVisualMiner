@@ -10,7 +10,6 @@ import nl.tue.astar.AStarThread.Canceller;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XEvent;
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace2;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
@@ -42,7 +41,7 @@ public class ComputeTimedLog {
 
 		//find the corresponding aligned trace
 		List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfoPerformance);
-		IMTraceG<Move> alignedTrace = map.get(lTrace);
+		AlignedTrace alignedTrace = map.get(lTrace);
 		if (alignedTrace == null) {
 			return null;
 		}

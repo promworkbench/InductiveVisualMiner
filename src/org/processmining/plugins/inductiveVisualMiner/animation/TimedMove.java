@@ -25,6 +25,24 @@ public class TimedMove extends Move {
 			}
 			return animationDuration * (value - min) / (max - 1.0 * min);
 		}
+		
+		public Long scaleBack(Double value2) {
+			if (value2 == null) {
+				return null;
+			}
+			if (max == min) {
+				return (long) (value2 / animationDuration);
+			}
+			return (long) ((value2 / (1.0 * animationDuration)) * (max - 1.0 * min) + min);
+		}
+		
+		public long getMin() {
+			return min;
+		}
+		
+		public long getMax() {
+			return max;
+		}
 	}
 
 	private final Long logTimestamp;

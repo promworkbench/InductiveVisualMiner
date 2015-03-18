@@ -28,8 +28,13 @@ public class Trace2DotToken {
 
 		debug("", 0);
 
-		//copy the trace
-		List<TimedMove> copyTrace = new ArrayList<TimedMove>(trace);
+		//copy the trace; remove ignored log moves
+		List<TimedMove> copyTrace = new ArrayList<TimedMove>();
+		for (TimedMove t : trace) {
+			if (!t.isIgnoredLogMove()) {
+				copyTrace.add(t);
+			}
+		}
 
 		DotToken token = trace2dotToken(copyTrace, Pair.of(info.getSource(), trace.getStartTime()),
 				Pair.of(info.getSink(), trace.getEndTime()), new ArrayList<UnfoldedNode>(), showDeviations,
@@ -87,7 +92,42 @@ public class Trace2DotToken {
 				//continue, and in the next iteration re-process the same move
 				i--;
 				continue;
-			} else if (move.getUnode() != null && move.getUnode().getNode() instanceof Automatic) {
+			}
+
+			/*
+			 * case: this is a start move according to the model. At this point,
+			 * we don't know whether this will be a synchronous move or a model.
+			 * Therefore, look ahead in the trace to find out.
+			 */
+			if (move.isStart() && move.isModelSync()) {
+				//search for the corresponding complete
+				int complete = findCompleteIndex(i, trace);
+
+				if (trace.get(complete).isSyncMove()) {
+					//the corresponding complete is a synchronous move; treat this start as a synchronous move
+
+					//move to the activity; arrive at the given timestamp
+					LocalDotNode nextDestination = Animation.getDotNodeFromActivity(move, info);
+					List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), nextDestination);
+					if (!path.isEmpty()) {
+						for (int j = 0; j < path.size() - 1; j++) {
+							dotToken.addStepOverEdge(path.get(j), null);
+						}
+						dotToken.addStepOverEdge(path.get(path.size() - 1), move.getScaledTimestamp(scaler));
+					}
+
+					continue;
+				} else {
+					//the corresponding complete is a model move; treat this start as the beginning of a model move
+					//hence, do nothing
+					continue;
+				}
+			}
+
+			/*
+			 * Case: tau. By definition synchronous.
+			 */
+			if (move.getUnode() != null && move.getUnode().getNode() instanceof Automatic) {
 				//tau, by definition synchronous
 
 				//move from the last known position to the start of the tau edge,
@@ -100,27 +140,28 @@ public class Trace2DotToken {
 				}
 
 				dotToken.addStepOverEdge(tauEdge, null);
-
-			} else if (move.isSyncMove() || (move.isModelMove() && !showDeviations)) {
+				continue;
+			} 
+			
+			if (move.isSyncMove() || (move.isModelMove() && !showDeviations)) {
 				//synchronous move or model move without deviations showing
 				LocalDotNode nextDestination = Animation.getDotNodeFromActivity(move, info);
 
-				if (move.isStart()) {
-					//start: walk to the node
-	
-					//move from the last known position to the new position
-					//the last edge gets a timestamp
-					List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), nextDestination);
-					if (!path.isEmpty()) {
-						for (int j = 0; j < path.size() - 1; j++) {
-							dotToken.addStepOverEdge(path.get(j), null);
-						}
-						dotToken.addStepOverEdge(path.get(path.size() - 1), move.getScaledTimestamp(scaler));
+				//first: walk to the node
+
+				//move from the last known position to the new position
+				//the last edge gets a timestamp
+				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), nextDestination);
+				if (!path.isEmpty()) {
+					for (int j = 0; j < path.size() - 1; j++) {
+						dotToken.addStepOverEdge(path.get(j), null);
 					}
-				} else {
-					//complete: walk over the node
-					dotToken.addStepInNode(nextDestination, move.getScaledTimestamp(scaler));
+					dotToken.addStepOverEdge(path.get(path.size() - 1), move.getScaledTimestamp(scaler));
 				}
+
+				//second: walk over the node
+				dotToken.addStepInNode(nextDestination, move.getScaledTimestamp(scaler));
+
 			} else if (move.isModelMove()) {
 				//model move, showing deviations
 
@@ -128,21 +169,23 @@ public class Trace2DotToken {
 				//then take the move edge itself
 				LocalDotEdge moveEdge = Animation.getModelMoveEdge(move, info);
 
-				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), moveEdge.getSource());
+				List<LocalDotEdge> path = shortestPath
+						.getShortestPath(dotToken.getLastPosition(), moveEdge.getSource());
 				for (LocalDotEdge edge : path) {
 					dotToken.addStepOverEdge(edge, null);
 				}
 
 				dotToken.addStepOverEdge(moveEdge, null);
 			} else if (move.isLogMove() && showDeviations) {
-				
+
 				//log move (should be filtered out if not showing deviations)
 				LocalDotEdge moveEdge = Animation.getLogMoveEdge(move.getLogMoveUnode(), move.getLogMoveBeforeChild(),
 						info);
 
 				//move from the last known position to the start of the move edge,
 				//then take the move edge itself
-				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), moveEdge.getSource());
+				List<LocalDotEdge> path = shortestPath
+						.getShortestPath(dotToken.getLastPosition(), moveEdge.getSource());
 				for (LocalDotEdge edge : path) {
 					dotToken.addStepOverEdge(edge, null);
 				}
@@ -224,8 +267,8 @@ public class Trace2DotToken {
 			List<TimedMove> subsubTrace = subsubTraces.get(j);
 			List<UnfoldedNode> childInParallelUnodes = new ArrayList<>(localInParallelUnodes);
 			DotToken childToken = trace2dotToken(subsubTrace, Pair.of(parallelSplit, (Double) null),
-					Pair.of(parallelJoin, (Double) null), childInParallelUnodes, showDeviations, shortestPath,
-					info, indent + 1, scaler);
+					Pair.of(parallelJoin, (Double) null), childInParallelUnodes, showDeviations, shortestPath, info,
+					indent + 1, scaler);
 
 			token.addSubToken(childToken);
 		}
@@ -356,9 +399,25 @@ public class Trace2DotToken {
 		return maps.sublogs;
 	}
 
+	/**
+	 * 
+	 * @param i
+	 * @param trace
+	 * @return the index of the first complete after @i in @trace.
+	 */
+	public static int findCompleteIndex(int i, List<TimedMove> trace) {
+		//walk over log moves until the complete is encountered
+		//by construction, only log moves will occur until the complete that belongs to this start
+		int j = i + 1;
+		while (!trace.get(j).isComplete() || trace.get(j).isLogMove()) {
+			j++;
+		}
+		return j;
+	}
+
 	private static void debug(Object s, int indent) {
-		String sIndent = new String(new char[indent]).replace("\0", "   ");
-		System.out.print(sIndent);
-		System.out.println(s);
+//		String sIndent = new String(new char[indent]).replace("\0", "   ");
+//		System.out.print(sIndent);
+//		System.out.println(s);
 	}
 }

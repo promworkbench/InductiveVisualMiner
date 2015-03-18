@@ -9,7 +9,7 @@ public class LogMovePosition {
 
 	/**
 	 * Create a log move position. (null, unode) = at source; (unode, null) = at
-	 * sink; (unode1, unode2) = at unode1, before child unode2.
+	 * sink; (unode1, unode2) = at unode1, before child unode2; (unode, unode) = on leaf unode.
 	 * 
 	 * @param on
 	 * @param beforeChild
@@ -29,6 +29,10 @@ public class LogMovePosition {
 	 */
 	public static LogMovePosition beforeChild(UnfoldedNode unode, UnfoldedNode child) {
 		return new LogMovePosition(unode, child);
+	}
+	
+	public static LogMovePosition onLeaf(UnfoldedNode unode) {
+		return new LogMovePosition(unode, unode);
 	}
 
 	/**

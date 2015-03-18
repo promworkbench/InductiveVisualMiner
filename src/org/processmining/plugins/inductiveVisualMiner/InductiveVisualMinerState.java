@@ -20,11 +20,12 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleSplitLog;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.MiningParametersIvM;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleSplitLog;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -296,5 +297,16 @@ public class InductiveVisualMinerState {
 
 	public TimedLog getTimedLog() {
 		return timedLog;
+	}
+	
+	//==playing animation
+	private Scaler animationTimeScaler;
+	
+	public void setAnimationTimeScaler(Scaler animationTimeScaler) {
+		this.animationTimeScaler = animationTimeScaler;
+	}
+	
+	public Scaler getAnimationTimeScaler() {
+		return animationTimeScaler;
 	}
 }

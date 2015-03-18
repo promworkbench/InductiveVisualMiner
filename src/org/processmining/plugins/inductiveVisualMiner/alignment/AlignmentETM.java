@@ -123,19 +123,17 @@ public class AlignmentETM {
 					start = Performance.isStart(performanceUnode);
 
 					if (performanceUnode.getNode() instanceof Automatic && unode.getNode() instanceof Manual) {
-						//this is a tau that represents that the start of an activity is skipped;
-						//make it a synchronous move on the start
+						//this is a tau that represents that the start of an activity is skipped
 						start = true;
 						activity = activityEventClasses.getByIdentity(unode.getNode().getName());
 						performanceActivity = performanceEventClasses.getByIdentity(unode.getNode().getName()
-								+ "+start");
+								+ "+" + XLifecycleExtension.StandardModel.START);
 					}
 
 					//we are only interested in moves on leaves, not in moves on nodes
 					if (!(performanceUnode.getNode() instanceof Manual)
 							&& !(performanceUnode.getNode() instanceof Automatic)) {
-						performanceUnode = null;
-						unode = null;
+						continue;
 					}
 				}
 
@@ -144,7 +142,7 @@ public class AlignmentETM {
 					if (performanceUnode != null && performanceUnode.getNode() instanceof Automatic
 							&& unode.getNode() instanceof Manual) {
 						//tau-start
-						move = new Move(Type.synchronous, unode, activity, performanceActivity, start, true);
+						move = new Move(Type.tauStart, unode, activity, performanceActivity, start, true);
 					} else if ((performanceUnode != null && performanceActivity != null)
 							|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)) {
 						//synchronous move
@@ -154,7 +152,12 @@ public class AlignmentETM {
 						move = new Move(Type.model, unode, activity, performanceActivity, start, false);
 					} else {
 						//log move
-						move = new Move(Type.log, unode, activity, performanceActivity, start, false);
+						if (start) {
+							//log moves of start events are ignored
+							move = new Move(Type.ignoredLogMove, null, activity, performanceActivity, start, false);
+						} else {
+							move = new Move(Type.log, unode, activity, performanceActivity, start, false);
+						}
 					}
 					trace.add(move);
 				}

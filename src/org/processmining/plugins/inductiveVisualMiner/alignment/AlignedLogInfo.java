@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,7 +11,6 @@ import java.util.Map;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.mining.IMTraceG;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Block.Def;
@@ -17,6 +18,7 @@ import org.processmining.processtree.Block.Seq;
 import org.processmining.processtree.Block.Xor;
 import org.processmining.processtree.Block.XorLoop;
 import org.processmining.processtree.Node;
+import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -45,12 +47,12 @@ public class AlignedLogInfo {
 
 	public AlignedLogInfo(MultiSet<AlignedTrace> log) {
 		modelMoves = new MultiSet<UnfoldedNode>();
-		logMoves = new HashMap<LogMovePosition, MultiSet<XEventClass>>();
+		logMoves = new THashMap<LogMovePosition, MultiSet<XEventClass>>();
 		unlabeledLogMoves = new MultiSet<String>();
 		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
-		activities = new MultiSet<>();		
+		activities = new MultiSet<>();
 		UnfoldedNode root = null;
-		for (IMTraceG<Move> trace : log) {
+		for (AlignedTrace trace : log) {
 			UnfoldedNode lastDfgUnode = null;
 			UnfoldedNode lastUnode = null;
 			long cardinality = log.getCardinalityOf(trace);
@@ -70,7 +72,7 @@ public class AlignedLogInfo {
 				if (root == null && move.isModelSync()) {
 					root = new UnfoldedNode(move.getUnode().getPath().get(0));
 				}
-				
+
 				if (move.isModelSync()) {
 					lastUnode = move.getUnode();
 				}
@@ -93,7 +95,7 @@ public class AlignedLogInfo {
 		debug(logMoves);
 	}
 
-	public void positionLogMovesRoot(UnfoldedNode root, UnfoldedNode continueOn, IMTraceG<Move> trace, long cardinality) {
+	public void positionLogMovesRoot(UnfoldedNode root, UnfoldedNode continueOn, AlignedTrace trace, long cardinality) {
 		debug("");
 
 		//remove the leading and trailing log moves and position them on the root
@@ -126,8 +128,16 @@ public class AlignedLogInfo {
 	 */
 	private void positionLogMoves(UnfoldedNode unode, List<Move> trace, long cardinality) {
 		debug(" position " + trace + " on " + unode);
-		if (unode.getBlock() == null) {
-			//unode is an activity or tau
+		if (unode.getNode() instanceof Manual) {
+			//unode is an activity
+			for (Move move : trace) {
+				if (move.isLogMove()) {
+					//put this log move on this leaf
+					addLogMove(move, unode, unode, move.getActivityEventClass(), cardinality);
+				}
+			}
+		} else if (unode.getNode() instanceof Automatic) {
+			//unode is a tau
 			//by the invariant, the trace contains no log moves
 		} else if (unode.getBlock() instanceof Xor || unode.getBlock() instanceof Def) {
 			//an xor cannot have log moves, just recurse on the child that produced this trace
@@ -143,9 +153,9 @@ public class AlignedLogInfo {
 		} else if (unode.getBlock() instanceof And) {
 
 			//set up subtraces for children
-			Map<UnfoldedNode, IMTraceG<Move>> subTraces = new HashMap<>();
+			Map<UnfoldedNode, AlignedTrace> subTraces = new THashMap<>();
 			for (Node child : unode.getBlock().getChildren()) {
-				subTraces.put(unode.unfoldChild(child), new IMTraceG<Move>());
+				subTraces.put(unode.unfoldChild(child), new AlignedTrace());
 			}
 
 			//by the invariant, the first move is not a log move
@@ -168,7 +178,7 @@ public class AlignedLogInfo {
 			//invariant might be invalid on sub traces; position leading and trailing log moves
 			for (Node child : unode.getBlock().getChildren()) {
 				UnfoldedNode uChild = unode.unfoldChild(child);
-				IMTraceG<Move> subTrace = subTraces.get(uChild);
+				AlignedTrace subTrace = subTraces.get(uChild);
 				positionLogMovesRoot(unode, uChild, subTrace, cardinality);
 			}
 		}
@@ -182,7 +192,9 @@ public class AlignedLogInfo {
 
 		//walk through the trace to split it
 		for (Move move : trace) {
-			if (move.isLogMove()) {
+			if (move.isIgnoredLogMove()) {
+				//skip
+			} else if (move.isLogMove()) {
 				logMoves.add(move);
 			} else {
 				UnfoldedNode child = findChildWith(unode, move.getUnode());
@@ -269,14 +281,13 @@ public class AlignedLogInfo {
 	public long getDfg(UnfoldedNode unode1, UnfoldedNode unode2) {
 		return dfg.getCardinalityOf(new Pair<UnfoldedNode, UnfoldedNode>(unode1, unode2));
 	}
-	
+
 	public MultiSet<Move> getActivities() {
 		return activities;
 	}
 
 	private static void debug(Object s) {
-		//		System.out.println(s);
-		//				debug(s.toString().replaceAll("\\n", " "));
+//		InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
 	}
 
 }

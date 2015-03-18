@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -24,7 +25,6 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
@@ -49,6 +49,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JComboBox<?> colourSelection;
 	private final JLabel colourLabel;
 	private final JLabel statusLabel;
+	private final JLabel animationTimeLabel;
 	private final JTextArea selectionLabel;
 	private final NiceDoubleSlider activitiesSlider;
 	private final NiceDoubleSlider pathsSlider;
@@ -63,13 +64,10 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JButton colouringFiltersViewButton;
 	private final ColouringFiltersView colouringFiltersView;
 
-	private final AlignedLogVisualisation visualiser;
-
 	private InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state, ClassifierWrapper[] classifiers,
-			VisualMinerWrapper[] miners, boolean enableMining) {	
-		visualiser = new AlignedLogVisualisation();
+			VisualMinerWrapper[] miners, boolean enableMining) {
 		initVisualisationParameters();
 
 		int gridy = 0;
@@ -222,6 +220,17 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cSelectionLabel.anchor = GridBagConstraints.NORTH;
 			cSelectionLabel.fill = GridBagConstraints.HORIZONTAL;
 			add(selectionLabel, cSelectionLabel);
+		}
+		
+		{
+			animationTimeLabel = SlickerFactory.instance().createLabel(" ");
+			animationTimeLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+			GridBagConstraints cAnimationTimeLabel = new GridBagConstraints();
+			cAnimationTimeLabel.gridx = 1;
+			cAnimationTimeLabel.gridy = gridy++;
+			cAnimationTimeLabel.gridwidth = 2;
+			cAnimationTimeLabel.anchor = GridBagConstraints.SOUTH;
+			add(animationTimeLabel, cAnimationTimeLabel);
 		}
 
 		{
@@ -438,5 +447,9 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public JButton getColouringFiltersViewButton() {
 		return colouringFiltersViewButton;
+	}
+	
+	public JLabel getAnimationTimeLabel() {
+		return animationTimeLabel;
 	}
 }

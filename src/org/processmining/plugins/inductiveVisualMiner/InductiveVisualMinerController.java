@@ -34,6 +34,7 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMLog2;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
+import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel.Callback;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
@@ -52,6 +53,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeTimedLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
@@ -201,10 +204,6 @@ public class InductiveVisualMinerController {
 			panel.getSaveModelButton().setEnabled(true);
 			panel.getSaveImageButton().setEnabled(true);
 			setStatus("Layouting model..");
-
-			//deviation from chain: already show the model, without alignment
-			//this is to not have the user wait for the alignment without visual feedback
-			//panel.updateModel(state);
 		}
 
 		public void cancel() {
@@ -222,8 +221,8 @@ public class InductiveVisualMinerController {
 		protected Quintuple<ProcessTree, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses> generateInput() {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
-			return Quintuple.of(state.getTree(), state.getPerformanceClassifier(), state.getXLog(),
-					state.getXLogInfo().getEventClasses(), state.getXLogInfoPerformance().getEventClasses());
+			return Quintuple.of(state.getTree(), state.getPerformanceClassifier(), state.getXLog(), state.getXLogInfo()
+					.getEventClasses(), state.getXLogInfoPerformance().getEventClasses());
 		}
 
 		protected AlignmentResult executeLink(
@@ -301,8 +300,8 @@ public class InductiveVisualMinerController {
 			panel.getGraph().setEnableAnimation(false);
 			panel.getSaveImageButton().setText("image");
 			return Septuple.of(state.getAlignedLog(), state.getSelectedNodes(), state.getSelectedLogMoves(),
-					state.getAlignedLogInfo(), new IMLog2(state.getXLog(), state.getActivityClassifier()), state.getXLogInfo(),
-					state.getColouringFilters());
+					state.getAlignedLogInfo(), new IMLog2(state.getXLog(), state.getActivityClassifier()),
+					state.getXLogInfo(), state.getColouringFilters());
 		}
 
 		protected Triple<AlignedLog, AlignedLogInfo, IMLog2> executeLink(
@@ -401,8 +400,9 @@ public class InductiveVisualMinerController {
 	}
 
 	//prepare animation
-	private class Animate extends
-			ChainLink<Quintuple<TimedLog, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram>, SVGDiagram> {
+	private class Animate
+			extends
+			ChainLink<Quintuple<TimedLog, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram>, Pair<SVGDiagram, Scaler>> {
 
 		private ResettableCanceller canceller = new ResettableCanceller();
 
@@ -413,7 +413,7 @@ public class InductiveVisualMinerController {
 					.getGraph().getDot(), panel.getGraph().getSVG());
 		}
 
-		protected SVGDiagram executeLink(
+		protected Pair<SVGDiagram, Scaler> executeLink(
 				Quintuple<TimedLog, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> input) {
 			setStatus("Creating animation..");
 			canceller.reset();
@@ -422,14 +422,15 @@ public class InductiveVisualMinerController {
 					input.getD(), input.getE(), canceller);
 		}
 
-		protected void processResult(SVGDiagram result) {
+		protected void processResult(Pair<SVGDiagram, Scaler> result) {
+			state.setAnimationTimeScaler(result.getB());
 
 			//re-colour the selected nodes (i.e. the dashed red border)
-			InductiveVisualMinerSelectionColourer.colourSelection(result, state.getSelectedNodes(),
+			InductiveVisualMinerSelectionColourer.colourSelection(result.getA(), state.getSelectedNodes(),
 					state.getSelectedLogMoves(), state.getVisualisationInfo());
 
 			//re-highlight the model
-			TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(result,
+			TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(result.getA(),
 					state.getVisualisationInfo(), state.getTree(), state.getAlignedFilteredLogInfo(),
 					InductiveVisualMinerPanel.getViewParameters(state));
 
@@ -444,7 +445,7 @@ public class InductiveVisualMinerController {
 
 			panel.getSaveImageButton().setText("animation");
 			setStatus(" ");
-			panel.getGraph().setImage(result, false);
+			panel.getGraph().setImage(result.getA(), false);
 			panel.getGraph().setEnableAnimation(true);
 		}
 
@@ -662,6 +663,21 @@ public class InductiveVisualMinerController {
 		panel.getColouringFiltersViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				panel.getColouringFiltersView().swapVisibility();
+			}
+		});
+
+		//set animation time updater
+		panel.getGraph().setTimeStepCallback(new Callback<Double, Object>() {
+			public Object call(Double arg) {
+				Scaler scaler = state.getAnimationTimeScaler();
+				if (scaler != null && scaler.getMin() != Long.MAX_VALUE && scaler.getMax() != Long.MIN_VALUE
+						&& panel.getGraph().isEnableAnimation()) {
+					panel.getAnimationTimeLabel().setText(
+							TimestampsAdder.toString(state.getAnimationTimeScaler().scaleBack(arg)));
+				} else {
+					panel.getAnimationTimeLabel().setText(" ");
+				}
+				return null;
 			}
 		});
 	}

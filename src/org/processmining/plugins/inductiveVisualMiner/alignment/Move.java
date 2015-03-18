@@ -10,7 +10,7 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 public class Move implements Event {
 
 	public enum Type {
-		model, log, synchronous
+		model, log, synchronous, ignoredLogMove, tauStart
 	}
 
 	private final Type type;
@@ -140,7 +140,11 @@ public class Move implements Event {
 	 * @return whether this move is a missing start
 	 */
 	public boolean isTauStart() {
-		return tauStart;
+		return type == Type.tauStart;
+	}
+	
+	public boolean isIgnoredLogMove() {
+		return type == Type.ignoredLogMove;
 	}
 
 	/**
@@ -177,24 +181,22 @@ public class Move implements Event {
 	}
 
 	public String getBottomLabel() {
-		if (isLogMove()) {
-			return "";
-		}
 		return isStart() ? "start" : "complete";
 	}
 
 	public String getBottomLabel2() {
-		if (isSyncMove()) {
-			return null;
-		} else if (isModelMove()) {
+		if (isModelMove()) {
 			return "only in model";
-		} else {
+		} else if (isLogMove()) {
 			return "only in log";
+		} else if (isIgnoredLogMove()) {
+			return "only in log; ignored";
 		}
+		return null;
 	}
 
 	public Color getWedgeColor() {
-		if (isSyncMove()) {
+		if (isSyncMove() || isIgnoredLogMove()) {
 			return new Color(0.5f, 0.5f, 0.5f);
 		} else {
 			return new Color(255, 0, 0);
@@ -218,6 +220,10 @@ public class Move implements Event {
 	}
 
 	public Color getBottomLabel2Color() {
-		return Color.red;
+		if (isLogMove() || isModelMove()) {
+			return Color.red;
+		} else {
+			return new Color(0.5f, 0.5f, 0.5f);
+		}
 	}
 }

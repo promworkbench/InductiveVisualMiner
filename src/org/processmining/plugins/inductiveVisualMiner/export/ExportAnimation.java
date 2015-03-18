@@ -36,6 +36,7 @@ import org.monte.media.VideoFormatKeys;
 import org.monte.media.avi.AVIWriter;
 import org.monte.media.math.Rational;
 import org.processmining.plugins.InductiveMiner.Function;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
@@ -45,6 +46,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.svgToken.SVGTokens;
 
 import com.kitfox.svg.SVGDiagram;
@@ -87,9 +89,9 @@ public class ExportAnimation {
 	public static void saveSVGtoFile(final TimedLog timedLog, final AlignedLogVisualisationInfo info,
 			final ColourMode colourMode, final SVGDiagram svg, final Canceller canceller, final Dot dot, final File file)
 			throws IOException {
-		final SVGTokens animatedTokens = ComputeAnimation.computeSVGTokens(timedLog, info, colourMode, svg, canceller);
+		final Pair<SVGTokens, Scaler> p = ComputeAnimation.computeSVGTokens(timedLog, info, colourMode, svg, canceller);
 		OutputStream streamOut = new FileOutputStream(file);
-		ExportAnimation.exportSVG(animatedTokens, streamOut, dot);
+		ExportAnimation.exportSVG(p.getA(), streamOut, dot);
 	}
 
 	public static boolean saveAVItoFile(final TimedLog timedLog, final AlignedLogVisualisationInfo info,
@@ -109,12 +111,12 @@ public class ExportAnimation {
 		};
 
 		//create svg tokens
-		final SVGTokens tokens = ComputeAnimation.computeSVGTokens(timedLog, info, colourMode, svg, canceller);
+		final Pair<SVGTokens, Scaler> p = ComputeAnimation.computeSVGTokens(timedLog, info, colourMode, svg, canceller);
 
 		//create svg and copy the stream
 		PipedInputStream stream = copy(new Function<PipedOutputStream, Object>() {
 			public Integer call(PipedOutputStream out) throws Exception {
-				exportSVG(tokens, out, dot);
+				exportSVG(p.getA(), out, dot);
 				return null;
 			}
 		});

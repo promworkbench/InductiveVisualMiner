@@ -10,6 +10,7 @@ import java.util.Random;
 import nl.tue.astar.AStarThread.Canceller;
 
 import org.processmining.plugins.InductiveMiner.Function;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
@@ -32,7 +33,7 @@ public class ComputeAnimation {
 	public static double beginEndEdgeDuration = 1;
 	private static Random random = new Random(123);
 
-	public static SVGDiagram computeAnimation(final TimedLog timedLog, final ColourMode colourMode,
+	public static Pair<SVGDiagram, Scaler> computeAnimation(final TimedLog timedLog, final ColourMode colourMode,
 			final AlignedLogVisualisationInfo info, final int maxTraces, final Dot dot, final SVGDiagram svg,
 			final Canceller canceller) {
 		
@@ -41,10 +42,11 @@ public class ComputeAnimation {
 		return computeAnimation(filteredTimedLog, colourMode, info, dot, svg, canceller);
 	}
 
-	public static SVGDiagram computeAnimation(final Iterable<TimedTrace> timedLog, final ColourMode colourMode,
+	public static Pair<SVGDiagram, Scaler> computeAnimation(final Iterable<TimedTrace> timedLog, final ColourMode colourMode,
 			final AlignedLogVisualisationInfo info, final Dot dot, final SVGDiagram svg, final Canceller canceller) {
 
-		final SVGTokens animatedTokens = computeSVGTokens(timedLog, info, colourMode, svg, canceller);
+		Pair<SVGTokens, Scaler> p = computeSVGTokens(timedLog, info, colourMode, svg, canceller);
+		final SVGTokens animatedTokens = p.getA();
 		if (canceller.isCancelled()) {
 			return null;
 		}
@@ -59,13 +61,13 @@ public class ComputeAnimation {
 			});
 
 			SVGUniverse universe = new SVGUniverse();
-			return universe.getDiagram(universe.loadSVG(svgStream, "anim"));
+			return Pair.of(universe.getDiagram(universe.loadSVG(svgStream, "anim")), p.getB());
 		} catch (IOException e) {
 			return null;
 		}
 	}
 
-	public static SVGTokens computeSVGTokens(final Iterable<TimedTrace> timedLog,
+	public static Pair<SVGTokens, Scaler> computeSVGTokens(final Iterable<TimedTrace> timedLog,
 			final AlignedLogVisualisationInfo info, final ColourMode colourMode, final SVGDiagram svg,
 			final Canceller canceller) {
 		//make a shortest path graph
@@ -83,7 +85,7 @@ public class ComputeAnimation {
 			return null;
 		}
 
-		return DotTokens2SVGtokens.animateTokens(tokens, svg);
+		return Pair.of(DotTokens2SVGtokens.animateTokens(tokens, svg), scaler);
 	}
 
 	public static List<DotToken> computeTokens(Iterable<TimedTrace> timedLog,
