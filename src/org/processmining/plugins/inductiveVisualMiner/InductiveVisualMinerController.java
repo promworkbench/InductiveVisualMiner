@@ -301,7 +301,7 @@ public class InductiveVisualMinerController {
 			panel.getSaveImageButton().setText("image");
 			return Septuple.of(state.getAlignedLog(), state.getSelectedNodes(), state.getSelectedLogMoves(),
 					state.getAlignedLogInfo(), new IMLog(state.getXLog(), state.getActivityClassifier()),
-					state.getXLogInfo(), state.getColouringFilters());
+					state.getXLogInfoPerformance(), state.getColouringFilters());
 		}
 
 		protected Triple<AlignedLog, AlignedLogInfo, IMLog> executeLink(
