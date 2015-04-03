@@ -27,6 +27,7 @@ import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractBlock.And;
+import org.processmining.processtree.impl.AbstractBlock.Or;
 import org.processmining.processtree.impl.AbstractBlock.Seq;
 import org.processmining.processtree.impl.AbstractBlock.Xor;
 import org.processmining.processtree.impl.AbstractBlock.XorLoop;
@@ -98,6 +99,8 @@ public class AlignedLogVisualisation {
 			convertLoop(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof And) {
 			convertParallel(unode, source, sink, directionForward);
+		} else if (unode.getNode() instanceof Or) {
+			convertOr(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof Xor) {
 			convertXor(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof Manual) {
@@ -226,6 +229,30 @@ public class AlignedLogVisualisation {
 
 		//operator join
 		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, "+", unode);
+		addArc(join, sink, unode, directionForward, true);
+
+		for (Node child : unode.getBlock().getChildren()) {
+			convertNode(unode.unfoldChild(child), split, join, directionForward);
+		}
+
+		//put log-moves, if necessary
+		if (parameters.isShowLogMoves()) {
+			//on split
+			visualiseLogMove(split, split, unode, LogMovePosition.atSource(unode), directionForward);
+
+			//on join
+			visualiseLogMove(join, join, unode, LogMovePosition.atSink(unode), directionForward);
+		}
+	}
+	
+	private void convertOr(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
+
+		//operator split
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.parallelSplit, "o", unode);
+		addArc(source, split, unode, directionForward, true);
+
+		//operator join
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, "o", unode);
 		addArc(join, sink, unode, directionForward, true);
 
 		for (Node child : unode.getBlock().getChildren()) {
