@@ -5,16 +5,17 @@ import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.processtree.Block;
+import org.processmining.processtree.Block.And;
+import org.processmining.processtree.Block.Def;
+import org.processmining.processtree.Block.DefLoop;
+import org.processmining.processtree.Block.Or;
+import org.processmining.processtree.Block.Seq;
+import org.processmining.processtree.Block.Xor;
+import org.processmining.processtree.Block.XorLoop;
 import org.processmining.processtree.Node;
+import org.processmining.processtree.Task.Automatic;
+import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
-import org.processmining.processtree.impl.AbstractBlock.And;
-import org.processmining.processtree.impl.AbstractBlock.Def;
-import org.processmining.processtree.impl.AbstractBlock.DefLoop;
-import org.processmining.processtree.impl.AbstractBlock.Seq;
-import org.processmining.processtree.impl.AbstractBlock.Xor;
-import org.processmining.processtree.impl.AbstractBlock.XorLoop;
-import org.processmining.processtree.impl.AbstractTask.Automatic;
-import org.processmining.processtree.impl.AbstractTask.Manual;
 
 public class AlignedLogMetrics {
 
@@ -50,6 +51,15 @@ public class AlignedLogMetrics {
 				//a loop is executed precisely as often as its exit node.
 				//in alignment land, the exit node cannot be skipped
 				return getNumberOfTracesRepresented(unode.unfoldChild(unode.getBlock().getChildren().get(2)), true, logInfo);
+			} else if (unode.getBlock() instanceof Or) {
+				//for the OR, there is no way to determine how often it fired just by its children
+				//for now, pick the maximum of the children
+				//TODO: find better way
+				long result = 0;
+				for (Node child : unode.getBlock().getChildren()) {
+					result = Math.max(result, getNumberOfTracesRepresented(unode.unfoldChild(child), true, logInfo));
+				}
+				return result;
 			}
 		}
 		assert (false);
