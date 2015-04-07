@@ -17,6 +17,7 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
+import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 
@@ -89,9 +90,8 @@ public class GraphvizDirectlyFollowsGraph {
 			DotNode source = activityToNode.get(from);
 			DotNode target = activityToNode.get(to);
 			String label = String.valueOf(weight);
-			String options = "color=\"" + ColourMap.toHexString(ColourMaps.colourMapBlue(weight, dfgMax)) + "\"";
 
-			dot.addEdge(source, target, label, options);
+			dot.addEdge(source, target, label).setOption("color", ColourMap.toHexString(ColourMaps.colourMapBlue(weight, dfgMax)));
 		}
 
 		if (includeParalelEdges) {
@@ -104,10 +104,11 @@ public class GraphvizDirectlyFollowsGraph {
 				DotNode source = activityToNode.get(from);
 				DotNode target = activityToNode.get(to);
 				String label = String.valueOf(weight);
-				String options = "style=\"dashed\", dir=\"none\", constraint=\"false\", color=\""
-						+ ColourMap.toHexString(ColourMaps.colourMapBlue(weight, dfgParallelMax)) + "\"";
-
-				dot.addEdge(source, target, label, options);
+				DotEdge dotEdge = dot.addEdge(source, target, label);
+				dotEdge.setOption("style", "dashed");
+				dotEdge.setOption("dir", "none");
+				dotEdge.setOption("constraint", "false");
+				dotEdge.setOption("color", ColourMap.toHexString(ColourMaps.colourMapBlue(weight, dfgParallelMax)));
 			}
 		}
 
