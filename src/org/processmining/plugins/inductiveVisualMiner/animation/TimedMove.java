@@ -48,7 +48,7 @@ public class TimedMove extends Move {
 	private final Long logTimestamp;
 
 	public TimedMove(Move move, Long logTimestamp) {
-		super(move.getType(), move.getUnode(), move.getActivityEventClass(), move.getPerformanceEventClass(), move.isStart(), move.isTauStart());
+		super(move.getType(), move.getUnode(), move.getActivityEventClass(), move.getPerformanceEventClass(), move.isStart());
 		setLogMove(LogMovePosition.beforeChild(move.getLogMoveUnode(), move.getLogMoveBeforeChild()));
 		setLogMoveParallelBranchMappedTo(move.getLogMoveParallelBranchMappedTo());
 		this.logTimestamp = logTimestamp;

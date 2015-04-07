@@ -32,6 +32,7 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogI
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
+import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel.Callback;
@@ -269,6 +270,9 @@ public class InductiveVisualMinerController {
 			//compute dot
 			AlignedLogVisualisation visualiser = new AlignedLogVisualisation();
 			Pair<Dot, AlignedLogVisualisationInfo> p = visualiser.fancy(input.getA(), input.getB(), input.getC());
+			
+			//set the graph direction
+			p.getA().setDirection(state.getGraphDirection());
 
 			//compute svg from dot
 			SVGDiagram diagram = DotPanel.dot2svg(p.getA());
@@ -543,7 +547,15 @@ public class InductiveVisualMinerController {
 				chain.execute(FilterNodeSelection.class);
 			}
 		});
-
+		
+		//graph direction changed
+		panel.setOnGraphDirectionChanged(new InputFunction<Dot.GraphDirection>() {
+			public void call(GraphDirection input) throws Exception {
+				state.setGraphDirection(input);
+				chain.execute(Layout.class);
+			}
+		});
+			
 		//set model export button
 		panel.getSaveModelButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {

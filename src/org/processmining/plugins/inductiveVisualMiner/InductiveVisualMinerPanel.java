@@ -22,6 +22,7 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapLightBlue;
 import org.processmining.plugins.graphviz.dot.Dot;
+import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
@@ -65,6 +66,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final ColouringFiltersView colouringFiltersView;
 
 	private InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged = null;
+	private InputFunction<GraphDirection> onGraphDirectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state, ClassifierWrapper[] classifiers,
 			VisualMinerWrapper[] miners, boolean enableMining) {
@@ -251,6 +253,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			graphPanel = new DotPanel(dot) {
 				private static final long serialVersionUID = -3112819390640390685L;
 
+				@Override
 				public void selectionChanged() {
 					//selection of nodes changed; keep track of them
 
@@ -268,8 +271,22 @@ public class InductiveVisualMinerPanel extends JPanel {
 						try {
 							onSelectionChanged.call(Pair.of(resultNodes, resultLogMoveEdges));
 						} catch (Exception e) {
+							e.printStackTrace();
 						}
 					}
+				}
+				
+				@Override
+				public boolean graphDirectionChanged(GraphDirection direction) {
+					if (onGraphDirectionChanged != null) {
+						try {
+							onGraphDirectionChanged.call(direction);
+							return false;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					return true;
 				}
 			};
 			GridBagConstraints cGraphPanel = new GridBagConstraints();
@@ -431,6 +448,10 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public void setOnSelectionChanged(InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged) {
 		this.onSelectionChanged = onSelectionChanged;
+	}
+	
+	public void setOnGraphDirectionChanged(InputFunction<GraphDirection> onGraphDirectionChanged) {
+		this.onGraphDirectionChanged = onGraphDirectionChanged;
 	}
 
 	public TraceView getTraceView() {

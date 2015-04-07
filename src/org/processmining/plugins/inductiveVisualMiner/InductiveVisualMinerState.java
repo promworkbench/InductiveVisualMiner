@@ -14,6 +14,7 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogI
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
@@ -174,6 +175,7 @@ public class InductiveVisualMinerState {
 
 	//==layout==
 	private AlignedLogVisualisationInfo visualisationInfo;
+	private GraphDirection graphDirection = GraphDirection.leftRight;
 
 	public void setLayout(AlignedLogVisualisationInfo visualisationInfo) {
 		this.visualisationInfo = visualisationInfo;
@@ -181,6 +183,14 @@ public class InductiveVisualMinerState {
 
 	public AlignedLogVisualisationInfo getVisualisationInfo() {
 		return visualisationInfo;
+	}
+
+	public GraphDirection getGraphDirection() {
+		return graphDirection;
+	}
+
+	public void setGraphDirection(GraphDirection graphDirection) {
+		this.graphDirection = graphDirection;
 	}
 
 	//==alignment==

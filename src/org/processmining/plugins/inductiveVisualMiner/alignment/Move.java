@@ -18,20 +18,18 @@ public class Move implements Event {
 	private final XEventClass activityEventClass;
 	private final XEventClass performanceEventClass;
 	private final boolean start;
-	private final boolean tauStart;
 
 	private UnfoldedNode logMoveUnode;
 	private UnfoldedNode logMoveBeforeChild;
 	private UnfoldedNode logMoveParallelBranchMappedTo;
 
 	public Move(Type type, UnfoldedNode unode, XEventClass activityEventClass, XEventClass performanceEventClass,
-			boolean start, boolean tauStart) {
+			boolean start) {
 		this.type = type;
 		this.unode = unode;
 		this.activityEventClass = activityEventClass;
 		this.performanceEventClass = performanceEventClass;
 		this.start = start;
-		this.tauStart = tauStart;
 	}
 
 	public String toString() {

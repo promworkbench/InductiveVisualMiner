@@ -142,21 +142,21 @@ public class AlignmentETM {
 					if (performanceUnode != null && performanceUnode.getNode() instanceof Automatic
 							&& unode.getNode() instanceof Manual) {
 						//tau-start
-						move = new Move(Type.tauStart, unode, activity, performanceActivity, start, true);
+						move = new Move(Type.tauStart, unode, activity, performanceActivity, start);
 					} else if ((performanceUnode != null && performanceActivity != null)
 							|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)) {
 						//synchronous move
-						move = new Move(Type.synchronous, unode, activity, performanceActivity, start, false);
+						move = new Move(Type.synchronous, unode, activity, performanceActivity, start);
 					} else if (performanceUnode != null) {
 						//model move
-						move = new Move(Type.model, unode, activity, performanceActivity, start, false);
+						move = new Move(Type.model, unode, activity, performanceActivity, start);
 					} else {
 						//log move
 						if (start) {
 							//log moves of start events are ignored
-							move = new Move(Type.ignoredLogMove, null, activity, performanceActivity, start, false);
+							move = new Move(Type.ignoredLogMove, null, activity, performanceActivity, start);
 						} else {
-							move = new Move(Type.log, unode, activity, performanceActivity, start, false);
+							move = new Move(Type.log, unode, activity, performanceActivity, start);
 						}
 					}
 					trace.add(move);
