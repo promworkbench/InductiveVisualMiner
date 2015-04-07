@@ -48,7 +48,7 @@ public class GraphvizDirectlyFollowsGraph {
 		//prepare the nodes
 		HashMap<XEventClass, DotNode> activityToNode = new HashMap<XEventClass, DotNode>();
 		for (XEventClass activity : dfg.getDirectlyFollowsGraph().getVertices()) {
-			DotNode node = dot.addNode(activity.toString(), "");
+			DotNode node = dot.addNode(activity.toString());
 			activityToNode.put(activity, node);
 
 			node.setOption("shape", "box");

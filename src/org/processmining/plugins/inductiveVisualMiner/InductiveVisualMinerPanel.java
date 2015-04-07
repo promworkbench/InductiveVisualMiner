@@ -248,8 +248,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 		//graph panel
 		{
 			Dot dot = new Dot();
-			dot.addNode("Inductive visual Miner", "");
-			dot.addNode("Mining model...", "");
+			dot.addNode("Inductive visual Miner");
+			dot.addNode("Mining model...");
 			graphPanel = new DotPanel(dot) {
 				private static final long serialVersionUID = -3112819390640390685L;
 
