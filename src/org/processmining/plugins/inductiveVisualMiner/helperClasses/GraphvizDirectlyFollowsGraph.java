@@ -27,11 +27,11 @@ public class GraphvizDirectlyFollowsGraph {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Display directly-follows graph", requiredParameterLabels = { 0 })
 	public JComponent visualize(PluginContext context, Dfg dfg) {
-		
+
 		if (dfg.getDirectlyFollowsGraph().getVertices().length > 50) {
 			return new JPanel();
 		}
-		
+
 		return new DotPanel(dfg2Dot(dfg, true));
 	}
 
@@ -51,30 +51,33 @@ public class GraphvizDirectlyFollowsGraph {
 			DotNode node = dot.addNode(activity.toString(), "");
 			activityToNode.put(activity, node);
 
-			String options = "shape=\"box\"";
+			node.setOption("shape", "box");
 
 			//determine node colour using start and end activities
 			if (dfg.getStartActivities().contains(activity) && dfg.getEndActivities().contains(activity)) {
-				options += ", style=\"filled\""
-						+ ", fillcolor=\""
-						+ ColourMap.toHexString(ColourMaps.colourMapGreen(
+				node.setOption("style", "filled");
+				node.setOption(
+						"fillcolor",
+						ColourMap.toHexString(ColourMaps.colourMapGreen(
 								dfg.getStartActivities().getCardinalityOf(activity), startMax))
-						+ ":"
-						+ ColourMap.toHexString(ColourMaps.colourMapRed(
-								dfg.getEndActivities().getCardinalityOf(activity), endMax)) + "\"";
+								+ ":"
+								+ ColourMap.toHexString(ColourMaps.colourMapRed(dfg.getEndActivities()
+										.getCardinalityOf(activity), endMax)));
 			} else if (dfg.getStartActivities().contains(activity)) {
-				options += ", style=\"filled\""
-						+ ", fillcolor=\""
-						+ ColourMap.toHexString(ColourMaps.colourMapGreen(
-								dfg.getStartActivities().getCardinalityOf(activity), startMax)) + ":white\"";
+				node.setOption("style", "filled");
+				node.setOption(
+						"fillcolor",
+						ColourMap.toHexString(ColourMaps.colourMapGreen(
+								dfg.getStartActivities().getCardinalityOf(activity), startMax))
+								+ ":white");
 			} else if (dfg.getEndActivities().contains(activity)) {
-				options += ", style=\"filled\""
-						+ ", fillcolor=\"white:"
-						+ ColourMap.toHexString(ColourMaps.colourMapRed(
-								dfg.getEndActivities().getCardinalityOf(activity), endMax)) + "\"";
+				node.setOption("style", "filled");
+				node.setOption(
+						"fillcolor",
+						"white:"
+								+ ColourMap.toHexString(ColourMaps.colourMapRed(dfg.getEndActivities()
+										.getCardinalityOf(activity), endMax)));
 			}
-
-			node.setOptions(options);
 		}
 
 		//add the directly-follows edges

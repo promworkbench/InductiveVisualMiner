@@ -153,8 +153,8 @@ public class AlignedLogVisualisation {
 		}
 
 		final LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.activity, label, unode);
-		dotNode.setOptions(dotNode.getOptions() + ", fillcolor=\"" + ColourMap.toHexString(fillColour)
-				+ "\", fontcolor=\"" + ColourMap.toHexString(fontColour) + "\"");
+		dotNode.setOption("fillcolor", ColourMap.toHexString(fillColour));
+		dotNode.setOption("fontcolor", ColourMap.toHexString(fontColour));
 
 		info.addNode(unode, dotNode);
 		return dotNode;
@@ -244,7 +244,7 @@ public class AlignedLogVisualisation {
 			visualiseLogMove(join, join, unode, LogMovePosition.atSink(unode), directionForward);
 		}
 	}
-	
+
 	private void convertOr(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
 
 		//operator split
@@ -296,24 +296,21 @@ public class AlignedLogVisualisation {
 	private LocalDotEdge addModelArc(LocalDotNode from, LocalDotNode to, final UnfoldedNode unode,
 			boolean directionForward, long cardinality) {
 
-		String options = "";
+		final LocalDotEdge edge;
+		if (directionForward) {
+			edge = new LocalDotEdge(dot, info, from, to, "", unode, EdgeType.model, null, null, directionForward);
+		} else {
+			edge = new LocalDotEdge(dot, info, to, from, "", unode, EdgeType.model, null, null, directionForward);
+			edge.setOption("dir", "back");
+		}
 
 		if (parameters.getColourModelEdges() != null) {
 			String lineColour = parameters.getColourModelEdges().colourString(cardinality, minCardinality,
 					maxCardinality);
-			options += "color=\"" + lineColour + "\", ";
+			edge.setOption("color", lineColour);
 		}
 
-		options += "penwidth=" + parameters.getModelEdgesWidth().size(cardinality, minCardinality, maxCardinality);
-
-		final LocalDotEdge edge;
-		if (directionForward) {
-			edge = new LocalDotEdge(dot, info, from, to, "", options, unode, EdgeType.model, null, null,
-					directionForward);
-		} else {
-			edge = new LocalDotEdge(dot, info, to, from, "", options + ", dir=\"back\"", unode, EdgeType.model, null,
-					null, directionForward);
-		}
+		edge.setOption("penwidth", "" + parameters.getModelEdgesWidth().size(cardinality, minCardinality, maxCardinality));
 
 		if (parameters.isShowFrequenciesOnModelEdges()) {
 			edge.setLabel(cardinality + "");
@@ -345,23 +342,26 @@ public class AlignedLogVisualisation {
 	private LocalDotEdge addMoveArc(LocalDotNode from, LocalDotNode to, UnfoldedNode unode, EdgeType type,
 			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, long cardinality, boolean directionForward) {
 
-		String options = "style=\"dashed\", arrowsize=.5";
+		LocalDotEdge edge;
+		if (directionForward) {
+			edge = new LocalDotEdge(dot, info, from, to, "", unode, type, lookupNode1, lookupNode2,
+					directionForward);
+		} else {
+			edge = new LocalDotEdge(dot, info, to, from, "", unode, type,
+					lookupNode1, lookupNode2, directionForward);
+			edge.setOption("dir", "back");
+		}
+		
+		edge.setOption("style", "dashed");
+		edge.setOption("arrowsize", ".5");
 
 		if (parameters.getColourMoves() != null) {
 			String lineColour = parameters.getColourMoves().colourString(cardinality, minCardinality, maxCardinality);
-			options += ", color=\"" + lineColour + "\", fontcolor=\"" + lineColour + "\"";
+			edge.setOption("color", lineColour);
+			edge.setOption("fontcolor", lineColour);
 		}
 
-		options += ", penwidth=" + parameters.getMoveEdgesWidth().size(cardinality, minCardinality, maxCardinality);
-
-		LocalDotEdge edge;
-		if (directionForward) {
-			edge = new LocalDotEdge(dot, info, from, to, "", options, unode, type, lookupNode1, lookupNode2,
-					directionForward);
-		} else {
-			edge = new LocalDotEdge(dot, info, to, from, "", options + ", dir=\"back\", " + options, unode, type,
-					lookupNode1, lookupNode2, directionForward);
-		}
+		edge.setOption("penwidth", "" + parameters.getMoveEdgesWidth().size(cardinality, minCardinality, maxCardinality));
 
 		if (parameters.isShowFrequenciesOnMoveEdges()) {
 			edge.setLabel(cardinality + "");

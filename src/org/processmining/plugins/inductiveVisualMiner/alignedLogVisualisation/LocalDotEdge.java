@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
 
+import java.util.HashMap;
+
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
@@ -25,9 +27,9 @@ public class LocalDotEdge extends DotEdge {
 	public final Appearance unselectedAppearance = new Appearance();
 
 	public LocalDotEdge(Dot dot, AlignedLogVisualisationInfo info, LocalDotNode source, LocalDotNode target,
-			String label, String options, UnfoldedNode unode, EdgeType type, UnfoldedNode lookupNode1,
+			String label, UnfoldedNode unode, EdgeType type, UnfoldedNode lookupNode1,
 			UnfoldedNode lookupNode2, boolean directionForward) {
-		super(source, target, label, options);
+		super(source, target, label, new HashMap<String, String>());
 		this.unode = unode;
 		this.lookupNode1 = lookupNode1;
 		this.lookupNode2 = lookupNode2;
