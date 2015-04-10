@@ -86,7 +86,7 @@ public class DotToken implements Iterable<DotTokenStep> {
 		}
 	}
 
-	public void setTimestampOfPoint(int index, Double timestamp) {
+	public void setTimestampOfPoint(int index, double timestamp) {
 		//set this token
 		steps.get(index).setArrivalTime(timestamp);
 

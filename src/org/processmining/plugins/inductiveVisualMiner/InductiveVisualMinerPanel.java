@@ -389,10 +389,12 @@ public class InductiveVisualMinerPanel extends JPanel {
 			
 			public void selected(DotElement element) {
 				InductiveVisualMinerSelectionColourer.colourSelectedEdge(graphPanel.getSVG(), dotEdge, true);
+				graphPanel.repaint();
 			}
 			
 			public void deselected(DotElement element) {
 				InductiveVisualMinerSelectionColourer.colourSelectedEdge(graphPanel.getSVG(), dotEdge, false);
+				graphPanel.repaint();
 			}
 		});
 		if (select) {
