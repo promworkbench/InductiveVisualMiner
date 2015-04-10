@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +23,7 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
+import org.processmining.plugins.graphviz.visualisation.listeners.ElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphDirectionChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
@@ -294,6 +293,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 							e.printStackTrace();
 						}
 					}
+					
+					graphPanel.repaint();
 				}
 			});
 			
@@ -368,23 +369,14 @@ public class InductiveVisualMinerPanel extends JPanel {
 	}
 
 	public void makeNodeSelectable(final LocalDotNode dotNode, boolean select) {
-		dotNode.setSelectable(true);
-		dotNode.addSelectionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				DotPanel panel = (DotPanel) e.getSource();
-
-				InductiveVisualMinerSelectionColourer.colourSelectedNode(panel.getSVG(), dotNode, true);
-
-				panel.repaint();
+		dotNode.addSelectionListener(new ElementSelectionListener<DotElement>() {
+			
+			public void selected(DotElement element) {
+				InductiveVisualMinerSelectionColourer.colourSelectedNode(graphPanel.getSVG(), dotNode, true);
 			}
-		});
-		dotNode.addDeselectionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				DotPanel panel = (DotPanel) e.getSource();
-
-				InductiveVisualMinerSelectionColourer.colourSelectedNode(panel.getSVG(), dotNode, false);
-
-				panel.repaint();
+			
+			public void deselected(DotElement element) {
+				InductiveVisualMinerSelectionColourer.colourSelectedNode(graphPanel.getSVG(), dotNode, false);
 			}
 		});
 		if (select) {
@@ -393,21 +385,19 @@ public class InductiveVisualMinerPanel extends JPanel {
 	}
 
 	public void makeEdgeSelectable(final LocalDotEdge dotEdge, boolean select) {
-		dotEdge.setSelectable(true);
-		dotEdge.addSelectionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				DotPanel panel = (DotPanel) e.getSource();
-				InductiveVisualMinerSelectionColourer.colourSelectedEdge(panel.getSVG(), dotEdge, true);
-				panel.repaint();
+		dotEdge.addSelectionListener(new ElementSelectionListener<DotElement>() {
+			
+			public void selected(DotElement element) {
+				InductiveVisualMinerSelectionColourer.colourSelectedEdge(graphPanel.getSVG(), dotEdge, true);
+			}
+			
+			public void deselected(DotElement element) {
+				InductiveVisualMinerSelectionColourer.colourSelectedEdge(graphPanel.getSVG(), dotEdge, false);
 			}
 		});
-		dotEdge.addDeselectionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				DotPanel panel = (DotPanel) e.getSource();
-				InductiveVisualMinerSelectionColourer.colourSelectedEdge(panel.getSVG(), dotEdge, false);
-				panel.repaint();
-			}
-		});
+		if (select) {
+			graphPanel.select(dotEdge);
+		}
 	}
 
 	public DotPanel getGraph() {
