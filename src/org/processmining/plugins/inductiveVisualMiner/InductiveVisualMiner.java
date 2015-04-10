@@ -37,7 +37,8 @@ public class InductiveVisualMiner {
 
 		//remove launcher
 		if (context instanceof UIPluginContext) {
-			((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(launcher).destroy();
+			((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(launcher)
+					.destroy();
 		}
 
 		final InductiveVisualMinerState state = new InductiveVisualMinerState(launcher.xLog, launcher.preMinedTree);
@@ -65,7 +66,7 @@ public class InductiveVisualMiner {
 		}
 	}
 
-	@Plugin(name = "Mine with Inductive visual Miner", returnLabels = { "Inductive visual Miner" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true)
+	@Plugin(name = "Mine with Inductive visual Miner", returnLabels = { "Inductive visual Miner" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true, help = "Discover a process tree or a Petri net interactively using Inductive Miner.")
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0 })
 	public InteractiveMinerLauncher mineGuiProcessTree(PluginContext context, XLog xLog) {
@@ -73,7 +74,7 @@ public class InductiveVisualMiner {
 	}
 
 	@Plugin(name = "Visualise deviations on process tree", returnLabels = { "Deviations visualisation" }, returnTypes = { InteractiveMinerLauncher.class }, parameterLabels = {
-			"Event log", "Process tree" }, userAccessible = true)
+			"Event log", "Process tree" }, userAccessible = true, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner, including its filtering options.")
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
 	public InteractiveMinerLauncher mineGuiProcessTree(PluginContext context, XLog xLog, ProcessTree preMinedTree) {
