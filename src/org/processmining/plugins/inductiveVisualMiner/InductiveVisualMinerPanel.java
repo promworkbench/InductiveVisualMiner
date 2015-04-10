@@ -25,6 +25,8 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
+import org.processmining.plugins.graphviz.visualisation.listeners.GraphDirectionChangedListener;
+import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
@@ -247,14 +249,32 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		//graph panel
 		{
+			//set up intialisation splash screen
 			Dot dot = new Dot();
 			dot.addNode("Inductive visual Miner");
 			dot.addNode("Mining model...");
-			graphPanel = new DotPanel(dot) {
-				private static final long serialVersionUID = -3112819390640390685L;
-
-				@Override
-				public void selectionChanged() {
+			
+			graphPanel = new DotPanel(dot);
+			
+			//set the graph direction changed listener
+			//if we are initialised, the dotPanel should not update the layout, as we have to recompute the animation
+			graphPanel.addGraphDirectionChangedListener(new GraphDirectionChangedListener() {
+				public boolean graphDirectionChanged(GraphDirection direction) {
+					if (onGraphDirectionChanged != null) {
+						try {
+							onGraphDirectionChanged.call(direction);
+							return false;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					return true;
+				}
+			});
+			
+			//set the node selection change listener
+			graphPanel.addSelectionChangedListener(new SelectionChangedListener<DotElement>() {
+				public void selectionChanged(Set<DotElement> selectedElements) {
 					//selection of nodes changed; keep track of them
 
 					Set<UnfoldedNode> resultNodes = new HashSet<>();
@@ -275,20 +295,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 						}
 					}
 				}
-				
-				@Override
-				public boolean graphDirectionChanged(GraphDirection direction) {
-					if (onGraphDirectionChanged != null) {
-						try {
-							onGraphDirectionChanged.call(direction);
-							return false;
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-					return true;
-				}
-			};
+			});
+			
 			GridBagConstraints cGraphPanel = new GridBagConstraints();
 			cGraphPanel.gridx = 0;
 			cGraphPanel.gridy = 0;
