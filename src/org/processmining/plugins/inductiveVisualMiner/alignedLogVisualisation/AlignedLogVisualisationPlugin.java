@@ -17,7 +17,7 @@ import org.processmining.processtree.ProcessTree;
 
 public class AlignedLogVisualisationPlugin {
 	
-	@Plugin(name = "Aligned log visualisation (IvM)", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Aligned Log" }, userAccessible = false)
+	@Plugin(name = "Aligned log visualisation (Inductive visual Miner)", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Aligned Log" }, userAccessible = false)
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Visualise aligned log", requiredParameterLabels = { 0 })
@@ -32,7 +32,7 @@ public class AlignedLogVisualisationPlugin {
 		return new DotPanel(dot);
 	}
 	
-	@Plugin(name = "Process tree visualisation (IvM)", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process tree" }, userAccessible = false)
+	@Plugin(name = "Process tree visualisation (Inductive visual Miner)", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process tree" }, userAccessible = false)
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Visualise process tree", requiredParameterLabels = { 0 })
