@@ -13,7 +13,6 @@
 	<classpathentry kind="lib" path="stdlib/flanagan.jar"/>
 	<classpathentry kind="lib" path="stdlib/jargs.jar"/>
 	<classpathentry kind="lib" path="stdlib/jcommon-1.0.16.jar"/>
-	<classpathentry kind="lib" path="stdlib/jfreechart-1.0.13.jar"/>
 	<classpathentry kind="lib" path="stdlib/jlfgr-1_0.jar"/>
 	<classpathentry kind="lib" path="stdlib/jung-algorithms-2.0.jar"/>
 	<classpathentry kind="lib" path="stdlib/jung-api-2.0.jar"/>
@@ -56,7 +55,6 @@
 	<classpathentry kind="lib" path="stdlib/freehep-xml-2.1.1.jar"/>
 	<classpathentry kind="lib" path="stdlib/jas-plotter-2.2.jar"/>
 	<classpathentry kind="lib" path="stdlib/jdom-1.0.jar"/>
-	<classpathentry kind="lib" path="stdlib/junit-3.8.2.jar"/>
 	<classpathentry kind="lib" path="stdlib/junit-4.8.1.jar"/>
 	<classpathentry kind="lib" path="stdlib/openide-lookup-1.9-patched-1.0.jar"/>
 	<classpathentry kind="lib" path="packagelib/ProcessTree.jar"/>
