@@ -10,13 +10,10 @@ import nl.tue.astar.Trace;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.classification.XEventClassifier;
-import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.extension.std.XLifecycleExtension;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
-import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.model.impl.XEventImpl;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
@@ -172,19 +169,7 @@ public class AlignmentETM {
 
 	public static void addAllLeaves(XEventClasses classes, Node node) {
 		if (node instanceof Manual) {
-			XEvent event = new XEventImpl();
-			UnfoldedNode unode = new UnfoldedNode(node);
-			XConceptExtension.instance().assignName(event, Performance.getActivity(unode));
-
-			if (Performance.isStart(unode)) {
-				XLifecycleExtension.instance().assignTransition(event,
-						XLifecycleExtension.StandardModel.START.getEncoding());
-			} else {
-				XLifecycleExtension.instance().assignTransition(event,
-						XLifecycleExtension.StandardModel.COMPLETE.getEncoding());
-			}
-			classes.register(event);
-//			classes.register("bla");
+			classes.register(node.getName());
 		} else if (node instanceof Block) {
 			for (Node child : ((Block) node).getChildren()) {
 				addAllLeaves(classes, child);
