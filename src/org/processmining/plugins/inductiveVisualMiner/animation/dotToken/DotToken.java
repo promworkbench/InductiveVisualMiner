@@ -70,23 +70,26 @@ public class DotToken implements Iterable<DotTokenStep> {
 	}
 
 	/**
-	 * Gets 
+	 * Gets
 	 * 
 	 * @param index
-	 * @return the arrival time stamp of the step at the given index. -1 gives the start
-	 * time.
+	 * @return the arrival time stamp of the step at the given index. -1 gives
+	 *         the start time.
 	 */
 	public Double getTimestamp(int index) {
 		if (index == -1) {
 			return getStartTime();
-		} else if (steps.get(index).hasArrivalTime()){
+		} else if (steps.get(index).hasArrivalTime()) {
 			return steps.get(index).getArrivalTime();
 		} else {
 			return null;
 		}
 	}
 
-	public void setTimestampOfPoint(int index, double timestamp) {
+	public void setTimestampOfPoint(int index, Double timestamp) {
+		if (timestamp == null) {
+			return;
+		}
 		//set this token
 		steps.get(index).setArrivalTime(timestamp);
 
@@ -134,7 +137,7 @@ public class DotToken implements Iterable<DotTokenStep> {
 
 		for (int i = 0; i < steps.size(); i++) {
 			DotTokenStep p = steps.get(i);
-			
+
 			if (p.hasArrivalTime()) {
 				if (p.getArrivalTime() < last) {
 					System.out.println("===========");
@@ -152,7 +155,7 @@ public class DotToken implements Iterable<DotTokenStep> {
 
 		return last;
 	}
-	
+
 	public void addStepInNode(LocalDotNode node, Double arrivalTime) {
 		steps.add(DotTokenStep.node(node, arrivalTime));
 		subTokens.add(new THashSet<DotToken>());
@@ -175,7 +178,7 @@ public class DotToken implements Iterable<DotTokenStep> {
 		subTokens.get(subTokens.size() - 1).add(token);
 		//		System.out.println("  add subtoken at " + (subTokens.size() - 1));
 	}
-	
+
 	public DotTokenStep getLastStep() {
 		return steps.get(steps.size() - 1);
 	}
@@ -327,23 +330,23 @@ public class DotToken implements Iterable<DotTokenStep> {
 			if (!steps.get(i).hasArrivalTime()) {
 				return false;
 			}
-			
+
 			for (DotToken subToken : getSubTokensAtPoint(i)) {
 				if (!subToken.isAllTimestampsSet()) {
 					return false;
 				}
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	//collection-like functions
 
 	public Iterator<DotTokenStep> iterator() {
 		return Collections.unmodifiableList(steps).iterator();
 	}
-	
+
 	public int size() {
 		return steps.size();
 	}

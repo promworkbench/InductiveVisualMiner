@@ -209,7 +209,7 @@ public class Trace2DotToken {
 		}
 		if (path.size() != 0) {
 			dotToken.addStepOverEdge(path.get(path.size() - 1), endPosition.getRight());
-		} else {
+		} else if (endPosition.getRight() != null) {
 			//the trace has already ended, fill in the end time
 			dotToken.setTimestampOfPoint(dotToken.size() - 1, endPosition.getRight());
 		}

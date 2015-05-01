@@ -52,14 +52,14 @@ public class DotTokens2SVGtokens {
 		svgTokens.addTrace(result.toString(), token.getLastTime(), token.isFade());
 	}
 
-	public static double fadeDuration = 0.5;
+	public static float fadeDuration = 0.5f;
 
 	public static void fade(boolean fade, boolean trueInFalseOut, Double beginTime, Double endTime, StringBuilder result) {
 		//we would use set if svgsalamander would support
 		//it does not, so we have to use an animate tag
-		double fadeDuration2;
+		float fadeDuration2;
 		if (!fade) {
-			fadeDuration2 = 0.05;
+			fadeDuration2 = 0.05f;
 			fade = true;
 		} else {
 			fadeDuration2 = fadeDuration;

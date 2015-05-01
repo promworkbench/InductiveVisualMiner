@@ -184,6 +184,7 @@ public class AlignmentETM {
 						XLifecycleExtension.StandardModel.COMPLETE.getEncoding());
 			}
 			classes.register(event);
+//			classes.register("bla");
 		} else if (node instanceof Block) {
 			for (Node child : ((Block) node).getChildren()) {
 				addAllLeaves(classes, child);
