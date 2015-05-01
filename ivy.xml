@@ -1,0 +1,10 @@
+<ivy-module version="2.0">
+    <info organisation="prom" module="InductiveVisualMiner" revision="latest"/>
+    <dependencies>
+        <dependency org="prom" name="InductiveMiner" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="GraphViz" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="EvolutionaryTreeMiner" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="Widgets" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="EfficientStorage" rev="latest" changing="true" transitive="true" />
+     </dependencies>
+</ivy-module>

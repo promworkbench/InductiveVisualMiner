@@ -1,4 +1,4 @@
-<project name="InductiveVisualMiner" default="Compile Sources" basedir=".">
+<project name="InductiveVisualMiner" default="Compile Sources" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 		<!-- set global properties for this build -->
 		<property environment="env" />
 		<property name="src" location="src" />
@@ -9,6 +9,14 @@
 		<property name="release" location="latestrelease" />
 		<property name="version" value="${major_minor}.${env.BUILD_NUMBER}" />
 		<property name="project" value="InductiveVisualMiner" />
+	
+		<property name="ivy.lib.dir" value="ivy" />
+	
+		<property name="author" value="SJJ Leemans" />
+		<property name="organization" value="Eindhoven University of Technology" />
+		<property name="description" value="Inductive visual Miner" />
+		<property name="license" value="L-GPL" />
+		<property name="logo" value="http://www.promtools.org/prom6/packages/prom_subtitle_hat_300.png" />
 
 		<!-- Set the os to win32, win64, lin32, lin64, mac, or all -->
 		<property name="os" value="all" />
@@ -22,6 +30,7 @@
  			<pathelement path="${build}" />
  			<pathelement path="${java.class.path}" />
  			<fileset dir=".">
+ 				<include name="ivy/**/*.jar" />
  				<include name="lib/**/*.jar" />
  				<include name="stdlib/**/*.jar" />
  				<include name="packagelib/**/*.jar" />
@@ -121,40 +130,27 @@
 				<copy todir="${release}/lib" overwrite="true">
 					<fileset dir="${lib}"/>
 				</copy>
-				<echoxml file="${release}/packages.xml">
-					<packages>
-						<package 
-							name="${project}" 
-							version="${version}" 
-							os="all" 
-							url="http://www.promtools.org/prom6/packages/${project}/${project}-${version}-${os}.zip"
-							desc="Inductive Visual Miner"
-							org="Eindhoven University of Technology" 
-							license="LGPL" 
-							author="Sander Leemans"
-							auto="false"
-							hasPlugins="true"
-							logo="http://www.promtools.org/prom6/packages/prom_subtitle_hat_300.png"
-						>
-							<dependency name="BasicUtils"/>
-							<dependency name="Log"/>
-							<dependency name="DataAwareReplayer"/>
-							<dependency name="DataPetriNets"/>
-							<dependency name="EvolutionaryTreeMiner"/>
-							<dependency name="GraphViz"/>
-							<dependency name="InductiveMiner"/>
-							<dependency name="PetriNets"/>
-							<dependency name="PNetReplayer"/>
-							<dependency name="ProcessTree"/>
-							<dependency name="Properties"/>
-							<dependency name="Widgets"/>
-						</package>
-					</packages>
-				</echoxml>
+				<exec executable="grep">
+								<redirector output="ivypack.xml" />
+								<arg value="&lt;dependency .*org=&quot;prom&quot; " />
+								<arg value="ivy.xml" />
+							</exec>
+							<echo file="${release}/packages.xml">
+						&lt;packages&gt;
+								&lt;package name="${project}" version="${version}" os="${os}" url="http://www.promtools.org/prom6/packages/${project}/${project}-${version}-${os}.zip" desc="${description}" org="${organization}" license="${license}" author="${author}" auto="false" hasPlugins="true" logo="${logo}"&gt;
+					</echo>
+							<concat destfile="${release}/packages.xml" append="true">
+								<filelist files="ivypack.xml" />
+							</concat>
+							<echo file="${release}/packages.xml" append="true">
+							&lt;/package&gt;
+						&lt;/packages&gt;
+					</echo>
+							<copy file="ivy.xml" tofile="${release}/ivy.xml" overwrite="true" />
 			</sequential>
 		</target>
 
-		<target name="Compile Sources">
+		<target name="Compile Sources" depends="resolve">
 			<!-- Create the build directory structure used by compile -->
 			<!-- Create the time stamp -->
 			<tstamp />
@@ -164,6 +160,10 @@
 			<compile />
 			<echo message="Making jar" />
 			<makejar />
+		</target>
+	
+		<target name="resolve">
+			<ivy:retrieve />
 		</target>
 
 
