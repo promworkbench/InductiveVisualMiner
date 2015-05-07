@@ -46,6 +46,9 @@ public class ComputeAnimation {
 			final AlignedLogVisualisationInfo info, final Dot dot, final SVGDiagram svg, final Canceller canceller) {
 
 		Pair<SVGTokens, Scaler> p = computeSVGTokens(timedLog, info, colourMode, svg, canceller);
+		if (p == null) {
+			return null;
+		}
 		final SVGTokens animatedTokens = p.getA();
 		if (canceller.isCancelled()) {
 			return null;

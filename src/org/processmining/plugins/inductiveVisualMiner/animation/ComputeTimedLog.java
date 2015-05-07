@@ -15,6 +15,7 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
+import org.processmining.plugins.inductiveVisualMiner.resourcePerspective.ResourceFunctions;
 
 public class ComputeTimedLog {
 
@@ -59,21 +60,23 @@ public class ComputeTimedLog {
 		for (Move move : alignedTrace) {
 			if (move.isTauStart()) {
 				//tau-start
-				timedTrace.add(new TimedMove(move, null));
+				timedTrace.add(new TimedMove(move, null, null));
 			} else if (move.getActivityEventClass() != null) {
-				//sync move or 
+				//sync move or log move
 
 				XEvent event = itEvent.next();
 				Long timestamp = TimestampsAdder.getTimestamp(event);
+				
+				String resource = ResourceFunctions.getResource(event);
 
 				//see if this event has a valid timestamp
 				if (timestamp != null && timestamp >= lastSeenTimestamp) {
 					lastSeenTimestamp = timestamp;
 				}
-				timedTrace.add(new TimedMove(move, timestamp));
+				timedTrace.add(new TimedMove(move, timestamp, resource));
 			} else {
 				//model move or tau
-				timedTrace.add(new TimedMove(move, null));
+				timedTrace.add(new TimedMove(move, null, null));
 			}
 		}
 

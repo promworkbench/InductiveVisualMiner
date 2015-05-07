@@ -35,7 +35,7 @@ public class ColouringFiltersView extends SideWindow {
 	private int highFilters;
 
 	public ColouringFiltersView(Component parent) {
-		super(parent, "Inductive visual Miner - colouring filters");
+		super(parent, "Inductive visual Miner - highlighting filters");
 		panel = new JPanel(new GridBagLayout());
 		panel.setBackground(Color.gray);
 		add(panel);

@@ -35,6 +35,7 @@ import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringF
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
+import org.processmining.plugins.inductiveVisualMiner.resourcePerspective.ResourceView;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -63,6 +64,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JButton saveImageButton;
 	private final JButton traceViewButton;
 	private final TraceView traceView;
+	private final JButton resourceViewButton;
+	private final ResourceView resourceView;
 	private final JButton colouringFiltersViewButton;
 	private final ColouringFiltersView colouringFiltersView;
 
@@ -167,6 +170,18 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
 			add(traceViewButton, cTraceViewButton);
 		}
+		
+		//resource view
+		{
+			resourceView = new ResourceView(this);
+			resourceViewButton = SlickerFactory.instance().createButton("resources");
+			GridBagConstraints cResourceViewButton = new GridBagConstraints();
+			cResourceViewButton.gridx = 2;
+			cResourceViewButton.gridy = gridy++;
+			cResourceViewButton.gridwidth = 1;
+			cResourceViewButton.fill = GridBagConstraints.HORIZONTAL;
+			add(resourceViewButton, cResourceViewButton);
+		}
 
 		//colouring filters view
 		{
@@ -254,6 +269,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			dot.addNode("Mining model...");
 			
 			graphPanel = new DotPanel(dot);
+			graphPanel.setFocusable(true);
 			
 			//set the graph direction changed listener
 			//if we are initialised, the dotPanel should not update the layout, as we have to recompute the animation
@@ -365,6 +381,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public void removeNotify() {
 		super.removeNotify();
 		traceView.setVisible(false);
+		resourceView.setVisible(false);
 		colouringFiltersView.setVisible(false);
 	}
 
@@ -460,6 +477,14 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public JButton getTraceViewButton() {
 		return traceViewButton;
+	}
+	
+	public ResourceView getResourceView() {
+		return resourceView;
+	}
+	
+	public JButton getResourceViewButton() {
+		return resourceViewButton;
 	}
 
 	public ColouringFiltersView getColouringFiltersView() {

@@ -23,6 +23,7 @@ import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
+import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Quintuple;
@@ -54,7 +55,9 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeTimedLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
@@ -136,8 +139,7 @@ public class InductiveVisualMinerController {
 	}
 
 	//filter the log using activities threshold
-	private class FilterLogOnActivities
-			extends
+	private class FilterLogOnActivities extends
 			ChainLink<Quadruple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo>, Triple<IMLog, IMLogInfo, Set<XEventClass>>> {
 
 		protected Quadruple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo> generateInput() {
@@ -183,8 +185,7 @@ public class InductiveVisualMinerController {
 					minerParameters);
 		}
 
-		protected ProcessTree executeLink(
-				Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters> input) {
+		protected ProcessTree executeLink(Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters> input) {
 			setStatus("Mining..");
 			canceller.reset();
 			if (input.getA() == null) {
@@ -270,7 +271,7 @@ public class InductiveVisualMinerController {
 			//compute dot
 			AlignedLogVisualisation visualiser = new AlignedLogVisualisation();
 			Pair<Dot, AlignedLogVisualisationInfo> p = visualiser.fancy(input.getA(), input.getB(), input.getC());
-			
+
 			//set the graph direction
 			p.getA().setDirection(state.getGraphDirection());
 
@@ -400,7 +401,45 @@ public class InductiveVisualMinerController {
 		public void cancel() {
 			canceller.cancel();
 		}
+	}
 
+	//mine the resources
+	private class MineResources extends ChainLink<TimedLog, Pair<MultiSet<Pair<String, String>>, MultiSet<String>>> {
+
+		protected TimedLog generateInput() {
+			panel.getGraph().setEnableAnimation(false);
+			panel.getSaveImageButton().setText("image");
+			return state.getTimedLog();
+		}
+
+		protected Pair<MultiSet<Pair<String, String>>, MultiSet<String>> executeLink(TimedLog input) {
+			setStatus("Mining resource model..");
+			MultiSet<String> result = new MultiSet<>();
+			MultiSet<Pair<String, String>> result2 = new MultiSet<>();
+			for (TimedTrace trace : input) {
+				String last = null;
+				for (TimedMove event : trace) {
+					String now = event.getResource();
+					if (now == null) {
+						continue;
+					}
+					result.add(now);
+					if (last != null) {
+						result2.add(Pair.of(last, now));
+					}
+					last = now;
+				}
+			}
+			return Pair.of(result2, result);
+		}
+
+		protected void processResult(Pair<MultiSet<Pair<String, String>>, MultiSet<String>> result) {
+			panel.getResourceView().set(result);
+		}
+
+		public void cancel() {
+
+		}
 	}
 
 	//prepare animation
@@ -480,6 +519,7 @@ public class InductiveVisualMinerController {
 		chain.add(new FilterNodeSelection());
 		chain.add(new ApplyHighlighting());
 		chain.add(new TimeLog());
+		chain.add(new MineResources());
 		chain.add(new Animate());
 
 		//set up plug-ins
@@ -502,6 +542,9 @@ public class InductiveVisualMinerController {
 					state.setPaths(panel.getPathsSlider().getValue());
 					chain.execute(Mine.class);
 				}
+
+				//give the focus back to the graph panel
+				panel.getGraph().requestFocus(true);
 			}
 		});
 
@@ -528,6 +571,9 @@ public class InductiveVisualMinerController {
 					state.setActivitiesThreshold(panel.getActivitiesSlider().getValue());
 					chain.execute(FilterLogOnActivities.class);
 				}
+
+				//give the focus back to the graph panel
+				panel.getGraph().requestFocus(true);
 			}
 		});
 
@@ -547,7 +593,7 @@ public class InductiveVisualMinerController {
 				chain.execute(FilterNodeSelection.class);
 			}
 		});
-		
+
 		//graph direction changed
 		panel.setOnGraphDirectionChanged(new InputFunction<Dot.GraphDirection>() {
 			public void call(GraphDirection input) throws Exception {
@@ -555,7 +601,7 @@ public class InductiveVisualMinerController {
 				chain.execute(Layout.class);
 			}
 		});
-			
+
 		//set model export button
 		panel.getSaveModelButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -668,6 +714,13 @@ public class InductiveVisualMinerController {
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				panel.getTraceView().swapVisibility();
+			}
+		});
+
+		//set resource view button
+		panel.getResourceViewButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				panel.getResourceView().swapVisibility();
 			}
 		});
 
