@@ -12,7 +12,7 @@ import org.processmining.processtree.ProcessTree;
 public class NoLifeCycleSplitLog extends VisualMinerWrapper {
 
 	public String toString() {
-		return "no lifecycle; split log";
+		return "default";
 	}
 
 	public ProcessTree mine(IMLog log, VisualMinerParameters parameters, Canceller canceller) {
