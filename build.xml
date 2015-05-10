@@ -11,6 +11,7 @@
 		<property name="project" value="InductiveVisualMiner" />
 	
 		<property name="ivy.lib.dir" value="ivy" />
+		<property name="ivy.cache.dir" value="/var/lib/hudson/.ivy2/cache" />
 	
 		<property name="author" value="SJJ Leemans" />
 		<property name="organization" value="Eindhoven University of Technology" />
