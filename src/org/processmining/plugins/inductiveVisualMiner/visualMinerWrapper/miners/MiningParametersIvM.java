@@ -32,7 +32,7 @@ public class MiningParametersIvM extends MiningParameters {
 	public MiningParametersIvM() {
 		//determine algorithm
 		
-		setLogConverter(new IMLog2IMLogInfoLifeCycle());
+		setLog2LogInfo(new IMLog2IMLogInfoLifeCycle());
 		
 		setBaseCaseFinders(new ArrayList<BaseCaseFinder>(Arrays.asList(
 				new BaseCaseFinderIMiEmptyLog(),
