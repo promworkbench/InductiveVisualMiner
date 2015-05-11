@@ -114,7 +114,7 @@ public class Move implements Event {
 	}
 
 	public boolean isLogMove() {
-		return type == Type.log;
+		return type == Type.log || type == Type.ignoredLogMove;
 	}
 
 	public boolean isModelMove() {
