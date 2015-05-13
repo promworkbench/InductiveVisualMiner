@@ -283,6 +283,8 @@ public class InductiveVisualMinerController {
 
 		protected void processResult(Triple<Dot, SVGDiagram, AlignedLogVisualisationInfo> result) {
 			panel.getGraph().changeDot(result.getA(), result.getB(), true);
+			
+			panel.getResourceView().set(state.getTree());
 
 			state.setLayout(result.getC());
 			makeNodesSelectable(state.getVisualisationInfo(), panel, state.getSelectedNodes(),
@@ -441,7 +443,7 @@ public class InductiveVisualMinerController {
 
 		}
 	}
-
+	
 	//prepare animation
 	private class Animate
 			extends
@@ -519,7 +521,7 @@ public class InductiveVisualMinerController {
 		chain.add(new FilterNodeSelection());
 		chain.add(new ApplyHighlighting());
 		chain.add(new TimeLog());
-		chain.add(new MineResources());
+//		chain.add(new MineResources());
 		chain.add(new Animate());
 
 		//set up plug-ins
