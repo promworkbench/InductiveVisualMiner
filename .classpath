@@ -58,9 +58,17 @@
 	<classpathentry kind="lib" path="stdlib/junit-4.8.1.jar"/>
 	<classpathentry kind="lib" path="stdlib/openide-lookup-1.9-patched-1.0.jar"/>
 	<classpathentry kind="lib" path="stdlib/guava-16.0.1.jar"/>
-	<classpathentry kind="lib" path="packagelib/EvolutionaryTreeMiner.jar"/>
-	<classpathentry kind="lib" path="packagelib/EvolutionaryTreeMiner-lib/approxlib_v1.0.jar"/>
-	<classpathentry kind="lib" path="packagelib/EvolutionaryTreeMiner-lib/RTED_v1.0.jar"/>
+	<classpathentry kind="lib" path="packagelib/ApacheUtils.jar"/>
+	<classpathentry kind="lib" path="packagelib/BasicUtils.jar"/>
+	<classpathentry kind="lib" path="packagelib/DataAwareReplayer.jar"/>
+	<classpathentry kind="lib" path="packagelib/DataPetriNets.jar"/>
+	<classpathentry kind="lib" path="packagelib/EfficientStorage.jar"/>
+	<classpathentry kind="lib" path="packagelib/Properties.jar"/>
+	<classpathentry kind="lib" path="packagelib/Log.jar"/>
+	<classpathentry kind="lib" path="packagelib/PetriNets.jar"/>
+	<classpathentry kind="lib" path="packagelib/PNetReplayer.jar"/>
+	<classpathentry kind="lib" path="packagelib/lib-EvolutionaryTreeMiner/approxlib_v1.0.jar"/>
+	<classpathentry kind="lib" path="packagelib/lib-EvolutionaryTreeMiner/RTED_v1.0.jar"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=InductiveVisualMiner&amp;ivyXmlPath=ivy.xml&amp;confs=*&amp;ivySettingsPath=ivysettings.xml&amp;loadSettingsOnDemand=false&amp;ivyUserDir=&amp;propertyFiles="/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
