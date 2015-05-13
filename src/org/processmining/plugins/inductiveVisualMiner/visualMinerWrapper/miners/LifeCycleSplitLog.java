@@ -21,7 +21,7 @@ public class LifeCycleSplitLog extends VisualMinerWrapper {
 		//copy the relevant parameters
 		MiningParameters miningParameters = new MiningParametersIvM();
 		miningParameters.setNoiseThreshold((float) (1 - parameters.getPaths()));
-		miningParameters.setLog2LogInfo(new IMLog2IMLogInfoLifeCycle());
+		miningParameters.setLogConverter(new IMLog2IMLogInfoLifeCycle());
 		
 		return IMProcessTree.mineProcessTree(log, miningParameters);
 	}
