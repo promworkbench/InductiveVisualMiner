@@ -14,14 +14,15 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogI
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
@@ -30,6 +31,8 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.MiningParametersIvM;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+
+import com.kitfox.svg.SVGDiagram;
 
 public class InductiveVisualMinerState {
 
@@ -176,11 +179,23 @@ public class InductiveVisualMinerState {
 	}
 
 	//==layout==
+	private Dot dot;
+	private SVGDiagram svgDiagram;
 	private AlignedLogVisualisationInfo visualisationInfo;
 	private GraphDirection graphDirection = GraphDirection.leftRight;
 
-	public void setLayout(AlignedLogVisualisationInfo visualisationInfo) {
+	public void setLayout(Dot dot, SVGDiagram svgDiagram, AlignedLogVisualisationInfo visualisationInfo) {
+		this.dot = dot;
+		this.svgDiagram = svgDiagram;
 		this.visualisationInfo = visualisationInfo;
+	}
+	
+	public Dot getDot() {
+		return dot;
+	}
+	
+	public SVGDiagram getSVGDiagram() {
+		return svgDiagram;
 	}
 
 	public AlignedLogVisualisationInfo getVisualisationInfo() {
@@ -301,25 +316,31 @@ public class InductiveVisualMinerState {
 	}
 
 	//==timed log==
-	private TimedLog timedLog;
+	private IvMLog timedLog;
 
-	public void setTimedLog(TimedLog timedLog) {
+	public void setTimedLog(IvMLog timedLog) {
 		this.timedLog = timedLog;
 	}
 
-	public TimedLog getTimedLog() {
+	public IvMLog getTimedLog() {
 		return timedLog;
 	}
 
 	//==playing animation
 	private Scaler animationTimeScaler;
+	private SVGDiagram animatedSVGDiagram;
 
-	public void setAnimationTimeScaler(Scaler animationTimeScaler) {
+	public void setAnimation(Scaler animationTimeScaler, SVGDiagram animatedSVGDiagram) {
 		this.animationTimeScaler = animationTimeScaler;
+		this.animatedSVGDiagram = animatedSVGDiagram;
 	}
 
 	public Scaler getAnimationTimeScaler() {
 		return animationTimeScaler;
+	}
+	
+	public SVGDiagram getAnimatedSVGDiagram() {
+		return animatedSVGDiagram;
 	}
 
 	//==queue lengths

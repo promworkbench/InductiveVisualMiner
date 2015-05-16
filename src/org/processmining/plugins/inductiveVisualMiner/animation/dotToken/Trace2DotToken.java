@@ -11,9 +11,9 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Lo
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.LogSplitter;
 import org.processmining.processtree.Node;
@@ -23,14 +23,14 @@ import org.processmining.processtree.impl.AbstractTask.Automatic;
 
 public class Trace2DotToken {
 
-	public static DotToken trace2token(TimedTrace trace, boolean showDeviations, ShortestPathGraph shortestPath,
+	public static DotToken trace2token(IvMTrace trace, boolean showDeviations, ShortestPathGraph shortestPath,
 			AlignedLogVisualisationInfo info, Scaler scaler) {
 
 		debug("", 0);
 
 		//copy the trace; remove ignored log moves
-		List<TimedMove> copyTrace = new ArrayList<TimedMove>();
-		for (TimedMove t : trace) {
+		List<IvMMove> copyTrace = new ArrayList<IvMMove>();
+		for (IvMMove t : trace) {
 			if (!t.isIgnoredLogMove()) {
 				copyTrace.add(t);
 			}
@@ -52,7 +52,7 @@ public class Trace2DotToken {
 		return token;
 	}
 
-	public static DotToken trace2dotToken(List<TimedMove> trace, Pair<LocalDotNode, Double> startPosition,
+	public static DotToken trace2dotToken(List<IvMMove> trace, Pair<LocalDotNode, Double> startPosition,
 			Pair<LocalDotNode, Double> endPosition, List<UnfoldedNode> inParallelUnodes, boolean showDeviations,
 			ShortestPathGraph shortestPath, AlignedLogVisualisationInfo info, int indent, Scaler scaler) {
 
@@ -63,7 +63,7 @@ public class Trace2DotToken {
 
 		//walk through the trace
 		for (int i = 0; i < trace.size(); i++) {
-			TimedMove move = trace.get(i);
+			IvMMove move = trace.get(i);
 
 			if (move.isLogMove()) {
 				debug(" consider move " + move + " (" + move.getLogMoveUnode() + " before "
@@ -217,9 +217,9 @@ public class Trace2DotToken {
 		return dotToken;
 	}
 
-	private static void enterParallelSubTrace(List<TimedMove> trace, boolean showDeviations,
+	private static void enterParallelSubTrace(List<IvMMove> trace, boolean showDeviations,
 			ShortestPathGraph shortestPath, AlignedLogVisualisationInfo info, int indent, Scaler scaler,
-			DotToken token, List<UnfoldedNode> localInParallelUnodes, int i, TimedMove move,
+			DotToken token, List<UnfoldedNode> localInParallelUnodes, int i, IvMMove move,
 			UnfoldedNode enteringParallel) {
 		//find out where we are exiting it again
 		int exitsAt = findParallelExit(trace, enteringParallel, i);
@@ -228,11 +228,11 @@ public class Trace2DotToken {
 		debug("  will exit at " + exitsAt, indent);
 
 		//extract parallel subtrace we're entering
-		List<TimedMove> parallelSubtrace = trace.subList(i, exitsAt + 1);
+		List<IvMMove> parallelSubtrace = trace.subList(i, exitsAt + 1);
 		debug("  parallel subtrace " + parallelSubtrace, indent);
 
 		//spit the subtrace into sublogs
-		List<List<TimedMove>> subsubTraces = splitTrace(enteringParallel, parallelSubtrace);
+		List<List<IvMMove>> subsubTraces = splitTrace(enteringParallel, parallelSubtrace);
 		debug("  subsub traces " + subsubTraces, indent);
 
 		//move the token up to the parallel split
@@ -250,7 +250,7 @@ public class Trace2DotToken {
 			for (int j = i; j < exitsAt + 1; j++) {
 				trace.remove(i);
 			}
-			List<TimedMove> subsubTrace = subsubTraces.get(0);
+			List<IvMMove> subsubTrace = subsubTraces.get(0);
 			for (int j = 0; j < subsubTrace.size(); j++) {
 				trace.add(i + j, subsubTrace.get(j));
 			}
@@ -264,7 +264,7 @@ public class Trace2DotToken {
 		//recurse on other subsubTraces
 		LocalDotNode parallelJoin = Animation.getParallelJoin(enteringParallel, info);
 		for (int j = 1; j < subsubTraces.size(); j++) {
-			List<TimedMove> subsubTrace = subsubTraces.get(j);
+			List<IvMMove> subsubTrace = subsubTraces.get(j);
 			List<UnfoldedNode> childInParallelUnodes = new ArrayList<>(localInParallelUnodes);
 			DotToken childToken = trace2dotToken(subsubTrace, Pair.of(parallelSplit, (Double) null),
 					Pair.of(parallelJoin, (Double) null), childInParallelUnodes, showDeviations, shortestPath, info,
@@ -275,7 +275,7 @@ public class Trace2DotToken {
 	}
 
 	private static void leaveParallelSubtrace(ShortestPathGraph shortestPath, AlignedLogVisualisationInfo info,
-			int indent, DotToken token, List<UnfoldedNode> localInParallelUnodes, TimedMove move) {
+			int indent, DotToken token, List<UnfoldedNode> localInParallelUnodes, IvMMove move) {
 		for (int j = localInParallelUnodes.size() - 1; j >= 0; j--) {
 			UnfoldedNode parallel = localInParallelUnodes.get(j);
 			if (!isInNode(move, parallel)) {
@@ -309,7 +309,7 @@ public class Trace2DotToken {
 	 * returns the parallel unode that is being entered to move, if any
 	 * inParallelUnodes parallel nodes are not reported
 	 */
-	private static UnfoldedNode entersParallel(TimedMove move, List<UnfoldedNode> inParallelUnodes) {
+	private static UnfoldedNode entersParallel(IvMMove move, List<UnfoldedNode> inParallelUnodes) {
 
 		if (move == null) {
 			//there's nothing being entered here
@@ -339,7 +339,7 @@ public class Trace2DotToken {
 	 * finds the position of the last move in trace (from offset) that is still
 	 * in unode
 	 */
-	private static int findParallelExit(List<TimedMove> trace, UnfoldedNode unode, int offset) {
+	private static int findParallelExit(List<IvMMove> trace, UnfoldedNode unode, int offset) {
 		for (int i = offset + 1; i < trace.size(); i++) {
 			Move move = trace.get(i);
 			if (!isInNode(move, unode)) {
@@ -374,12 +374,12 @@ public class Trace2DotToken {
 	/*
 	 * split a trace according to a node
 	 */
-	public static List<List<TimedMove>> splitTrace(UnfoldedNode unode, List<TimedMove> trace) {
+	public static List<List<IvMMove>> splitTrace(UnfoldedNode unode, List<IvMMove> trace) {
 
-		LogSplitter.SigmaMaps<TimedMove> maps = LogSplitter.makeSigmaMaps(unode);
+		LogSplitter.SigmaMaps<IvMMove> maps = LogSplitter.makeSigmaMaps(unode);
 
 		//split the trace
-		for (TimedMove move : trace) {
+		for (IvMMove move : trace) {
 			Set<UnfoldedNode> sigma = maps.mapUnode2sigma.get(move.getPositionUnode());
 			if (sigma != null) {
 				maps.mapSigma2subtrace.get(sigma).add(move);
@@ -405,7 +405,7 @@ public class Trace2DotToken {
 	 * @param trace
 	 * @return the index of the first complete after @i in @trace.
 	 */
-	public static int findCompleteIndex(int i, List<TimedMove> trace) {
+	public static int findCompleteIndex(int i, List<IvMMove> trace) {
 		//walk over log moves until the complete is encountered
 		//by construction, only log moves will occur until the complete that belongs to this start
 		int j = i + 1;

@@ -45,8 +45,8 @@ import org.processmining.plugins.graphviz.visualisation.AnimatedSVGExporter;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.svgToken.SVGTokens;
 
 import com.kitfox.svg.SVGDiagram;
@@ -86,7 +86,7 @@ public class ExportAnimation {
 		writer.close();
 	}
 
-	public static void saveSVGtoFile(final TimedLog timedLog, final AlignedLogVisualisationInfo info,
+	public static void saveSVGtoFile(final IvMLog timedLog, final AlignedLogVisualisationInfo info,
 			final ColourMode colourMode, final SVGDiagram svg, final Canceller canceller, final Dot dot, final File file)
 			throws IOException {
 		final Pair<SVGTokens, Scaler> p = ComputeAnimation.computeSVGTokens(timedLog, info, colourMode, svg, canceller);
@@ -94,7 +94,7 @@ public class ExportAnimation {
 		ExportAnimation.exportSVG(p.getA(), streamOut, dot);
 	}
 
-	public static boolean saveAVItoFile(final TimedLog timedLog, final AlignedLogVisualisationInfo info,
+	public static boolean saveAVItoFile(final IvMLog timedLog, final AlignedLogVisualisationInfo info,
 			final ColourMode colourMode, final SVGDiagram svg, final Dot dot, final File file, final JPanel panel)
 			throws IOException {
 

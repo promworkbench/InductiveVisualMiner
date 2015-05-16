@@ -6,10 +6,10 @@ import gnu.trove.set.hash.THashSet;
 import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace.ActivityInstanceIterator;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMTrace;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMTrace.ActivityInstanceIterator;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -17,13 +17,13 @@ public class QueueLengthsUsingResources implements QueueLengths {
 
 	THashMap<UnfoldedNode, QueueActivityLog> timestamps;
 
-	public QueueLengthsUsingResources(ProcessTree tree, TimedLog tLog) {
+	public QueueLengthsUsingResources(ProcessTree tree, IvMLog tLog) {
 		timestamps = new THashMap<>();
 		init(tLog);
 	}
 
-	private void init(TimedLog tLog) {
-		for (TimedTrace tTrace : tLog) {
+	private void init(IvMLog tLog) {
+		for (IvMTrace tTrace : tLog) {
 			init(tTrace);
 		}
 	}
@@ -33,10 +33,10 @@ public class QueueLengthsUsingResources implements QueueLengths {
 	 * 
 	 * @param tTrace
 	 */
-	private void init(TimedTrace tTrace) {
+	private void init(IvMTrace tTrace) {
 		ActivityInstanceIterator it = tTrace.activityInstanceIterator();
 		while (it.hasNext()) {
-			Sextuple<UnfoldedNode, String, TimedMove, TimedMove, TimedMove, TimedMove> activityInstance = it.next();
+			Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> activityInstance = it.next();
 
 			if (activityInstance != null) {
 

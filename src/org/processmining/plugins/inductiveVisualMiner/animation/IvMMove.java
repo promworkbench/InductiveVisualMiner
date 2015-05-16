@@ -3,7 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.animation;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
-public class TimedMove extends Move {
+public class IvMMove extends Move {
 
 	public static class Scaler {
 		private final double animationDuration;
@@ -48,7 +48,7 @@ public class TimedMove extends Move {
 	private final Long logTimestamp;
 	private final String resource;
 
-	public TimedMove(Move move, Long logTimestamp, String resource) {
+	public IvMMove(Move move, Long logTimestamp, String resource) {
 		super(move.getType(), move.getUnode(), move.getActivityEventClass(), move.getPerformanceEventClass(), move
 				.getLifeCycleTransition());
 		setLogMove(LogMovePosition.beforeChild(move.getLogMoveUnode(), move.getLogMoveBeforeChild()));
@@ -62,7 +62,7 @@ public class TimedMove extends Move {
 		if (!super.equals(obj)) {
 			return false;
 		}
-		return logTimestamp == ((TimedMove) obj).logTimestamp;
+		return logTimestamp == ((IvMMove) obj).logTimestamp;
 	}
 
 	public Double getScaledTimestamp(Scaler scaler) {

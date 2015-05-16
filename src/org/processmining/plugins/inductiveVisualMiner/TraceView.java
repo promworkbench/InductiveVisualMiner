@@ -24,9 +24,9 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.processtree.Task.Automatic;
@@ -231,18 +231,18 @@ public class TraceView extends SideWindow {
 	private static class TimedLogTraceBuilder implements TraceBuilder<Object> {
 
 		public Trace<? extends Event> build(final Object trace) {
-			return new ProMTraceView.Trace<TimedMove>() {
+			return new ProMTraceView.Trace<IvMMove>() {
 
-				public Iterator<TimedMove> iterator() {
-					return FluentIterable.from((TimedTrace) trace).filter(new Predicate<TimedMove>() {
-						public boolean apply(final TimedMove input) {
+				public Iterator<IvMMove> iterator() {
+					return FluentIterable.from((IvMTrace) trace).filter(new Predicate<IvMMove>() {
+						public boolean apply(final IvMMove input) {
 							return !((input.isSyncMove() && input.getUnode().getNode() instanceof Automatic) || input.isTauStart());
 						}
 					}).iterator();
 				}
 
 				public String getName() {
-					String s = ((TimedTrace) trace).getId();
+					String s = ((IvMTrace) trace).getId();
 					if (s.length() > 9) {
 						return s.substring(0, 7) + "..";
 					}
@@ -329,7 +329,7 @@ public class TraceView extends SideWindow {
 	 * @param tlog
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void set(TimedLog tlog) {
+	public void set(IvMLog tlog) {
 		if (!tlog.equals(showing)) {
 			traceView.clear();
 			traceView.setTraceBuilder(new TimedLogTraceBuilder());

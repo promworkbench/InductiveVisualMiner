@@ -15,7 +15,7 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.DotToken;
 import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.Trace2DotToken;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
@@ -33,16 +33,16 @@ public class ComputeAnimation {
 	public static double beginEndEdgeDuration = 1;
 	private static Random random = new Random(123);
 
-	public static Pair<SVGDiagram, Scaler> computeAnimation(final TimedLog timedLog, final ColourMode colourMode,
+	public static Pair<SVGDiagram, Scaler> computeAnimation(final IvMLog timedLog, final ColourMode colourMode,
 			final AlignedLogVisualisationInfo info, final int maxTraces, final Dot dot, final SVGDiagram svg,
 			final Canceller canceller) {
 		
 		//filter the log to show only the first traces in the animation
-		final Iterable<TimedTrace> filteredTimedLog = FluentIterable.from(timedLog).limit(maxTraces);
+		final Iterable<IvMTrace> filteredTimedLog = FluentIterable.from(timedLog).limit(maxTraces);
 		return computeAnimation(filteredTimedLog, colourMode, info, dot, svg, canceller);
 	}
 
-	public static Pair<SVGDiagram, Scaler> computeAnimation(final Iterable<TimedTrace> timedLog, final ColourMode colourMode,
+	public static Pair<SVGDiagram, Scaler> computeAnimation(final Iterable<IvMTrace> timedLog, final ColourMode colourMode,
 			final AlignedLogVisualisationInfo info, final Dot dot, final SVGDiagram svg, final Canceller canceller) {
 
 		Pair<SVGTokens, Scaler> p = computeSVGTokens(timedLog, info, colourMode, svg, canceller);
@@ -70,7 +70,7 @@ public class ComputeAnimation {
 		}
 	}
 
-	public static Pair<SVGTokens, Scaler> computeSVGTokens(final Iterable<TimedTrace> timedLog,
+	public static Pair<SVGTokens, Scaler> computeSVGTokens(final Iterable<IvMTrace> timedLog,
 			final AlignedLogVisualisationInfo info, final ColourMode colourMode, final SVGDiagram svg,
 			final Canceller canceller) {
 		//make a shortest path graph
@@ -91,12 +91,12 @@ public class ComputeAnimation {
 		return Pair.of(DotTokens2SVGtokens.animateTokens(tokens, svg), scaler);
 	}
 
-	public static List<DotToken> computeTokens(Iterable<TimedTrace> timedLog,
+	public static List<DotToken> computeTokens(Iterable<IvMTrace> timedLog,
 			final AlignedLogVisualisationInfo info, final ColourMode colourMode, Scaler scaler,
 			ShortestPathGraph graph, final Canceller canceller) {
 		boolean showDeviations = colourMode != ColourMode.paths;
 		final List<DotToken> tokens = new ArrayList<>();
-		for (TimedTrace timedTrace : timedLog) {
+		for (IvMTrace timedTrace : timedLog) {
 			try {
 				//guess start and end time of the trace
 				timedTrace.setStartTime(guessStartTime(timedTrace, graph, info, scaler));
@@ -116,11 +116,11 @@ public class ComputeAnimation {
 		return tokens;
 	}
 
-	public static Scaler getScaler(Iterable<TimedTrace> timedLog, final Canceller canceller) {
+	public static Scaler getScaler(Iterable<IvMTrace> timedLog, final Canceller canceller) {
 		long logMin = Long.MAX_VALUE;
 		long logMax = Long.MIN_VALUE;
-		for (TimedTrace trace : timedLog) {
-			for (TimedMove move : trace) {
+		for (IvMTrace trace : timedLog) {
+			for (IvMMove move : trace) {
 				if (move.getLogTimestamp() != null) {
 					logMin = Math.min(logMin, move.getLogTimestamp());
 					logMax = Math.max(logMax, move.getLogTimestamp());
@@ -137,10 +137,10 @@ public class ComputeAnimation {
 		return new Scaler(animationDuration, logMin, logMax);
 	}
 
-	public static double guessStartTime(List<TimedMove> trace, ShortestPathGraph shortestGraph,
+	public static double guessStartTime(List<IvMMove> trace, ShortestPathGraph shortestGraph,
 			AlignedLogVisualisationInfo info, Scaler scaler) {
 		//find the first timed move
-		TimedMove firstTimedMove = null;
+		IvMMove firstTimedMove = null;
 		int firstTimedMoveIndex;
 		for (firstTimedMoveIndex = 0; firstTimedMoveIndex < trace.size(); firstTimedMoveIndex++) {
 			if (trace.get(firstTimedMoveIndex).getLogTimestamp() != null) {
@@ -154,7 +154,7 @@ public class ComputeAnimation {
 		}
 
 		//find the edges the trace is going through before the first timed move
-		List<TimedMove> partialTrace;
+		List<IvMMove> partialTrace;
 		try {
 			partialTrace = trace.subList(0, firstTimedMoveIndex + 1);
 		} catch (Exception e) {
@@ -167,10 +167,10 @@ public class ComputeAnimation {
 				* beginEndEdgeDuration;
 	}
 
-	public static double guessEndTime(List<TimedMove> trace, double startTime, ShortestPathGraph shortestGraph,
+	public static double guessEndTime(List<IvMMove> trace, double startTime, ShortestPathGraph shortestGraph,
 			AlignedLogVisualisationInfo info, Scaler scaler) {
 		//find the last timed move
-		TimedMove lastTimedMove = null;
+		IvMMove lastTimedMove = null;
 		int lastTimedMoveIndex;
 		for (lastTimedMoveIndex = trace.size() - 1; lastTimedMoveIndex >= 0; lastTimedMoveIndex--) {
 			if (trace.get(lastTimedMoveIndex).getScaledTimestamp(scaler) != null) {
@@ -184,7 +184,7 @@ public class ComputeAnimation {
 		}
 
 		//find the edges the trace is going through after the last timed move
-		List<TimedMove> partialTrace = trace.subList(lastTimedMoveIndex, trace.size());
+		List<IvMMove> partialTrace = trace.subList(lastTimedMoveIndex, trace.size());
 
 		//the trace ends with 2 seconds per edge
 		return lastTimedMove.getScaledTimestamp(scaler)

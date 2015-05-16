@@ -19,15 +19,15 @@ import org.processmining.plugins.inductiveVisualMiner.resourcePerspective.Resour
 
 public class ComputeTimedLog {
 
-	public static TimedLog computeTimedLog(final AlignedLog aLog, final IMLog log, final XLogInfo xLogInfoPerformance,
+	public static IvMLog computeTimedLog(final AlignedLog aLog, final IMLog log, final XLogInfo xLogInfoPerformance,
 			final Canceller canceller) {
 
 		//make a log-projection-hashmap
 		THashMap<List<XEventClass>, AlignedTrace> map = TimestampsAdder.getIMTrace2AlignedTrace(aLog);
 
-		TimedLog timedLog = new TimedLog();
+		IvMLog timedLog = new IvMLog();
 		for (IMTrace trace : log) {
-			TimedTrace tTrace = timeTrace(log, map, trace, xLogInfoPerformance);
+			IvMTrace tTrace = timeTrace(log, map, trace, xLogInfoPerformance);
 			if (tTrace != null) {
 				timedLog.add(tTrace);
 			}
@@ -38,7 +38,7 @@ public class ComputeTimedLog {
 		return timedLog;
 	}
 
-	private static TimedTrace timeTrace(IMLog log, THashMap<List<XEventClass>, AlignedTrace> map, IMTrace trace, XLogInfo xLogInfoPerformance) {
+	private static IvMTrace timeTrace(IMLog log, THashMap<List<XEventClass>, AlignedTrace> map, IMTrace trace, XLogInfo xLogInfoPerformance) {
 
 		//find the corresponding aligned trace
 		List<XEventClass> lTrace = TimestampsAdder.getTraceLogProjection(trace, xLogInfoPerformance);
@@ -54,13 +54,13 @@ public class ComputeTimedLog {
 		} else {
 			name = "";
 		}
-		TimedTrace timedTrace = new TimedTrace(name);
+		IvMTrace timedTrace = new IvMTrace(name);
 		Iterator<XEvent> itEvent = trace.iterator();
 		double lastSeenTimestamp = 0;
 		for (Move move : alignedTrace) {
 			if (move.isTauStart()) {
 				//tau-start
-				timedTrace.add(new TimedMove(move, null, null));
+				timedTrace.add(new IvMMove(move, null, null));
 			} else if (move.getActivityEventClass() != null) {
 				//sync move or log move
 
@@ -73,10 +73,10 @@ public class ComputeTimedLog {
 				if (timestamp != null && timestamp >= lastSeenTimestamp) {
 					lastSeenTimestamp = timestamp;
 				}
-				timedTrace.add(new TimedMove(move, timestamp, resource));
+				timedTrace.add(new IvMMove(move, timestamp, resource));
 			} else {
 				//model move or tau
-				timedTrace.add(new TimedMove(move, null, null));
+				timedTrace.add(new IvMMove(move, null, null));
 			}
 		}
 

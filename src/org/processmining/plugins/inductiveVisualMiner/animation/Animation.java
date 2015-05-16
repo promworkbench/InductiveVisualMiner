@@ -15,7 +15,7 @@ import org.processmining.processtree.impl.AbstractTask.Automatic;
 
 public class Animation {
 
-	public static List<LocalDotEdge> getEdgesOnMovePath(List<TimedMove> movePath, ShortestPathGraph shortestPath,
+	public static List<LocalDotEdge> getEdgesOnMovePath(List<IvMMove> movePath, ShortestPathGraph shortestPath,
 			AlignedLogVisualisationInfo info, boolean addSource, boolean addSink) {
 
 		//make a node-path
@@ -23,7 +23,7 @@ public class Animation {
 		if (addSource) {
 			nodePath.add(info.getSource());
 		}
-		for (TimedMove move : movePath) {
+		for (IvMMove move : movePath) {
 			LocalDotNode node = getDotNodeFromActivity(move, info);
 			if (node != null) {
 				nodePath.add(node);
@@ -56,7 +56,7 @@ public class Animation {
 		return result;
 	}
 
-	public static LocalDotEdge getModelMoveEdge(TimedMove move, AlignedLogVisualisationInfo info) {
+	public static LocalDotEdge getModelMoveEdge(IvMMove move, AlignedLogVisualisationInfo info) {
 		List<LocalDotEdge> edges = info.getModelMoveEdges(move.getUnode());
 		if (!edges.isEmpty()) {
 			return edges.get(0);
@@ -69,7 +69,7 @@ public class Animation {
 		return info.getLogMoveEdge(logMoveUnode, logMoveBeforeChild);
 	}
 
-	public static LocalDotEdge getTauEdge(TimedMove move, AlignedLogVisualisationInfo info) {
+	public static LocalDotEdge getTauEdge(IvMMove move, AlignedLogVisualisationInfo info) {
 		return info.getModelEdges(move.getUnode()).get(0);
 	}
 
@@ -91,7 +91,7 @@ public class Animation {
 		return null;
 	}
 
-	public static LocalDotNode getDotNodeFromActivity(TimedMove move, AlignedLogVisualisationInfo info) {
+	public static LocalDotNode getDotNodeFromActivity(IvMMove move, AlignedLogVisualisationInfo info) {
 		return getDotNodeFromActivity(move.getUnode(), info);
 	}
 	

@@ -1,9 +1,11 @@
-package org.processmining.plugins.inductiveVisualMiner.helperClasses;
+package org.processmining.plugins.inductiveVisualMiner.Chain;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
+
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
 /**
  * @author sleemans
@@ -15,10 +17,14 @@ public class Chain {
 	private final Executor executor;
 	private UUID currentExecutionId;
 	private int currentExecutionLinkNumber;
+	@SuppressWarnings("rawtypes")
 	private ChainLink currentExecutionLink;
+	
+	private final InductiveVisualMinerState state;
 
-	public Chain(Executor executor) {
+	public Chain(Executor executor, InductiveVisualMinerState state) {
 		this.executor = executor;
+		this.state = state;
 		currentExecutionId = null;
 		currentExecutionLinkNumber = Integer.MAX_VALUE;
 		currentExecutionLink = null;
@@ -35,7 +41,7 @@ public class Chain {
 			if (indexInChain + 1 < chain.size()) {
 				currentExecutionLinkNumber = indexInChain + 1;
 				currentExecutionLink = chain.get(indexInChain + 1);
-				chain.get(indexInChain + 1).execute(currentExecutionId, indexInChain + 1);
+				chain.get(indexInChain + 1).execute(currentExecutionId, indexInChain + 1, state);
 			} else {
 				currentExecutionLink = null;
 			}
@@ -60,7 +66,7 @@ public class Chain {
 					currentExecutionLinkNumber = i;
 					currentExecutionLink = cl;
 
-					cl.execute(currentExecutionId, currentExecutionLinkNumber);
+					cl.execute(currentExecutionId, currentExecutionLinkNumber, state);
 				}
 				return;
 			}

@@ -6,7 +6,7 @@ import java.util.Iterator;
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class TimedTrace extends ArrayList<TimedMove> {
+public class IvMTrace extends ArrayList<IvMMove> {
 
 	private static final long serialVersionUID = 9214941352493005077L;
 
@@ -14,7 +14,7 @@ public class TimedTrace extends ArrayList<TimedMove> {
 	private Double endTime = null;
 	private String id;
 
-	public TimedTrace(String id) {
+	public IvMTrace(String id) {
 		this.id = id;
 	}
 
@@ -42,8 +42,8 @@ public class TimedTrace extends ArrayList<TimedMove> {
 		return id;
 	}
 
-	public TimedTrace clone() {
-		TimedTrace copy = new TimedTrace(id);
+	public IvMTrace clone() {
+		IvMTrace copy = new IvMTrace(id);
 		copy.addAll(this);
 		copy.setStartTime(startTime);
 		copy.setEndTime(endTime);
@@ -55,10 +55,10 @@ public class TimedTrace extends ArrayList<TimedMove> {
 	}
 
 	public class ActivityInstanceIterator implements
-			Iterator<Sextuple<UnfoldedNode, String, TimedMove, TimedMove, TimedMove, TimedMove>> {
+			Iterator<Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove>> {
 
-		private TimedMove lastSequentialComplete = null;
-		private Iterator<TimedMove> it = iterator();
+		private IvMMove lastSequentialComplete = null;
+		private Iterator<IvMMove> it = iterator();
 
 		public boolean hasNext() {
 			return it.hasNext();
@@ -67,19 +67,19 @@ public class TimedTrace extends ArrayList<TimedMove> {
 		/**
 		 * Returns the next activity instance. Might return null if the trace is inconsistent.
 		 */
-		public Sextuple<UnfoldedNode, String, TimedMove, TimedMove, TimedMove, TimedMove> next() {
-			TimedMove enqueue = null;
-			TimedMove start = null;
+		public Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> next() {
+			IvMMove enqueue = null;
+			IvMMove start = null;
 
 			while (it.hasNext()) {
-				TimedMove tMove = it.next();
+				IvMMove tMove = it.next();
 				if (!tMove.isLogMove()) {
 
 					switch (tMove.getLifeCycleTransition()) {
 						case complete :
 
 							//this activity instance is finished
-							Sextuple<UnfoldedNode, String, TimedMove, TimedMove, TimedMove, TimedMove> result = Sextuple
+							Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> result = Sextuple
 									.of(tMove.getUnode(), tMove.getResource(), lastSequentialComplete, enqueue, start,
 											tMove);
 
