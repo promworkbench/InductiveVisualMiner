@@ -23,6 +23,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
+import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.LifeCycleSplitLog;
@@ -31,7 +32,7 @@ import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class InductiveVisualMinerState {
-	
+
 	public InductiveVisualMinerState(XLog xLog, ProcessTree preMinedTree) {
 		this.xLog = xLog;
 		miningParameters = new MiningParametersIvM();
@@ -42,7 +43,8 @@ public class InductiveVisualMinerState {
 	}
 
 	//==log==
-	private XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(new XEventNameClassifier());
+	private XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(
+			new XEventNameClassifier());
 	private IMLog2IMLogInfo log2logInfo = new IMLog2IMLogInfoDefault();
 	private final XLog xLog;
 	private XLogInfo xLogInfo;
@@ -53,12 +55,12 @@ public class InductiveVisualMinerState {
 	public XEventPerformanceClassifier getPerformanceClassifier() {
 		return performanceClassifier;
 	}
-	
+
 	public XEventClassifier getActivityClassifier() {
 		return performanceClassifier.getActivityClassifier();
 	}
-	
-	public synchronized void setClassifier (XEventClassifier classifier) {
+
+	public synchronized void setClassifier(XEventClassifier classifier) {
 		this.performanceClassifier = new XEventPerformanceClassifier(classifier);
 	}
 
@@ -69,7 +71,7 @@ public class InductiveVisualMinerState {
 	public void setLog2logInfo(IMLog2IMLogInfo log2logInfo) {
 		this.log2logInfo = log2logInfo;
 	}
-	
+
 	public XLog getXLog() {
 		return xLog;
 	}
@@ -77,7 +79,7 @@ public class InductiveVisualMinerState {
 	public XLogInfo getXLogInfo() {
 		return xLogInfo;
 	}
-	
+
 	public XLogInfo getXLogInfoPerformance() {
 		return xLogInfoPerformance;
 	}
@@ -102,11 +104,11 @@ public class InductiveVisualMinerState {
 	private IMLog activityFilteredIMLog;
 	private IMLogInfo activityFilteredIMLogInfo;
 	private Set<XEventClass> filteredActivities;
-	
+
 	public double getActivitiesThreshold() {
 		return activitiesThreshold;
 	}
-	
+
 	public synchronized void setActivitiesThreshold(double activitiesThreshold) {
 		this.activitiesThreshold = activitiesThreshold;
 	}
@@ -140,19 +142,19 @@ public class InductiveVisualMinerState {
 	public MiningParameters getMiningParameters2() {
 		return miningParameters;
 	}
-	
+
 	public synchronized void setMiningParameters(MiningParameters miningParameters) {
 		this.miningParameters = miningParameters;
 	}
-	
+
 	public VisualMinerWrapper getMiner() {
 		return miner;
 	}
-	
+
 	public void setMiner(VisualMinerWrapper miner) {
 		this.miner = miner;
 	}
-	
+
 	public double getPaths() {
 		return paths;
 	}
@@ -160,15 +162,15 @@ public class InductiveVisualMinerState {
 	public synchronized void setPaths(double paths) {
 		this.paths = paths;
 	}
-	
+
 	public ProcessTree getTree() {
 		return tree;
 	}
-	
+
 	public synchronized void setTree(ProcessTree tree) {
 		this.tree = tree;
 	}
-	
+
 	public ProcessTree getPreMinedTree() {
 		return preMinedTree;
 	}
@@ -219,7 +221,7 @@ public class InductiveVisualMinerState {
 	public AlignedLogInfo getAlignedFilteredLogInfo() {
 		return alignedFilteredLogInfo;
 	}
-	
+
 	public IMLog getAlignedFilteredXLog() {
 		return alignedFilteredXLog;
 	}
@@ -256,11 +258,11 @@ public class InductiveVisualMinerState {
 
 	//==gui-parameters==
 	private ColourMode colourMode = ColourMode.paths;
-	
+
 	public enum ColourMode {
 		paths, deviations, both
 	};
-	
+
 	public ColourMode getColourMode() {
 		return colourMode;
 	}
@@ -281,11 +283,11 @@ public class InductiveVisualMinerState {
 	public synchronized void setSelectedNodes(Set<UnfoldedNode> selectedNodes) {
 		this.selectedNodes = selectedNodes;
 	}
-	
+
 	public Set<LogMovePosition> getSelectedLogMoves() {
 		return selectedLogMoves;
 	}
-	
+
 	public synchronized void setSelectedLogMoves(Set<LogMovePosition> selectedLogMoves) {
 		this.selectedLogMoves = selectedLogMoves;
 	}
@@ -308,15 +310,26 @@ public class InductiveVisualMinerState {
 	public TimedLog getTimedLog() {
 		return timedLog;
 	}
-	
+
 	//==playing animation
 	private Scaler animationTimeScaler;
-	
+
 	public void setAnimationTimeScaler(Scaler animationTimeScaler) {
 		this.animationTimeScaler = animationTimeScaler;
 	}
-	
+
 	public Scaler getAnimationTimeScaler() {
 		return animationTimeScaler;
+	}
+
+	//==queue lengths
+	private QueueLengths queueLengths;
+
+	public void setQueueLengths(QueueLengths queueLengths) {
+		this.queueLengths = queueLengths;
+	}
+
+	public QueueLengths getQueueLengths() {
+		return queueLengths;
 	}
 }

@@ -23,6 +23,7 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class ResourceView extends SideWindow {
 
+	private static final long serialVersionUID = 1692315875174614767L;
 	DotPanel graphPanel;
 
 	public ResourceView(Component parent) {

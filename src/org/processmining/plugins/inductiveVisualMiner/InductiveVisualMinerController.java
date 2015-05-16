@@ -23,7 +23,6 @@ import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
-import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Quintuple;
@@ -55,9 +54,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeTimedLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedLog;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimedMove.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimedTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
@@ -71,6 +68,9 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.Chain;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ChainLink;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
+import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
+import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsUsingResources;
+import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsVisualiser;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
@@ -78,6 +78,7 @@ import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 import com.kitfox.svg.SVGDiagram;
+import com.kitfox.svg.SVGException;
 
 public class InductiveVisualMinerController {
 
@@ -283,7 +284,7 @@ public class InductiveVisualMinerController {
 
 		protected void processResult(Triple<Dot, SVGDiagram, AlignedLogVisualisationInfo> result) {
 			panel.getGraph().changeDot(result.getA(), result.getB(), true);
-			
+
 			panel.getResourceView().set(state.getTree());
 
 			state.setLayout(result.getC());
@@ -405,45 +406,6 @@ public class InductiveVisualMinerController {
 		}
 	}
 
-	//mine the resources
-	private class MineResources extends ChainLink<TimedLog, Pair<MultiSet<Pair<String, String>>, MultiSet<String>>> {
-
-		protected TimedLog generateInput() {
-			panel.getGraph().setEnableAnimation(false);
-			panel.getSaveImageButton().setText("image");
-			return state.getTimedLog();
-		}
-
-		protected Pair<MultiSet<Pair<String, String>>, MultiSet<String>> executeLink(TimedLog input) {
-			setStatus("Mining resource model..");
-			MultiSet<String> result = new MultiSet<>();
-			MultiSet<Pair<String, String>> result2 = new MultiSet<>();
-			for (TimedTrace trace : input) {
-				String last = null;
-				for (TimedMove event : trace) {
-					String now = event.getResource();
-					if (now == null) {
-						continue;
-					}
-					result.add(now);
-					if (last != null) {
-						result2.add(Pair.of(last, now));
-					}
-					last = now;
-				}
-			}
-			return Pair.of(result2, result);
-		}
-
-		protected void processResult(Pair<MultiSet<Pair<String, String>>, MultiSet<String>> result) {
-			panel.getResourceView().set(result);
-		}
-
-		public void cancel() {
-
-		}
-	}
-	
 	//prepare animation
 	private class Animate
 			extends
@@ -489,13 +451,34 @@ public class InductiveVisualMinerController {
 					maxAnimatedTraces);
 
 			panel.getSaveImageButton().setText("animation");
-			setStatus(" ");
 			panel.getGraph().setImage(result.getA(), false);
 			panel.getGraph().setEnableAnimation(true);
 		}
 
 		public void cancel() {
 			canceller.cancel();
+		}
+	}
+
+	//compute queues
+	public class ComputeQueues extends ChainLink<Pair<ProcessTree, TimedLog>, QueueLengths> {
+
+		protected Pair<ProcessTree, TimedLog> generateInput() {
+			return Pair.of(state.getTree(), state.getTimedLog());
+		}
+
+		protected QueueLengths executeLink(Pair<ProcessTree, TimedLog> input) {
+			setStatus("Estimating queues..");
+			return new QueueLengthsUsingResources(input.getA(), input.getB());
+		}
+
+		protected void processResult(QueueLengths result) {
+			state.setQueueLengths(result);
+			setStatus(" ");
+		}
+
+		public void cancel() {
+
 		}
 	}
 
@@ -521,8 +504,8 @@ public class InductiveVisualMinerController {
 		chain.add(new FilterNodeSelection());
 		chain.add(new ApplyHighlighting());
 		chain.add(new TimeLog());
-//		chain.add(new MineResources());
 		chain.add(new Animate());
+		chain.add(new ComputeQueues());
 
 		//set up plug-ins
 		List<ColouringFilter> colouringFilters = ColouringFilterPluginFinder.findFilteringPlugins(context, panel,
@@ -739,10 +722,23 @@ public class InductiveVisualMinerController {
 				Scaler scaler = state.getAnimationTimeScaler();
 				if (scaler != null && scaler.getMin() != Long.MAX_VALUE && scaler.getMax() != Long.MIN_VALUE
 						&& panel.getGraph().isEnableAnimation()) {
-					panel.getAnimationTimeLabel().setText(
-							TimestampsAdder.toString(state.getAnimationTimeScaler().scaleBack(arg)));
+					Long time = scaler.scaleBack(arg);
+					panel.getAnimationTimeLabel().setText(TimestampsAdder.toString(time));
+					
+					//draw queues
+					if (state.getQueueLengths() != null) {
+						try {
+							QueueLengthsVisualiser.drawQueues(panel.getGraph().getSVG(), state.getTree(),
+									state.getVisualisationInfo(), state.getQueueLengths(), time);
+						} catch (SVGException e) {
+							e.printStackTrace();
+						}
+					}
 				} else {
 					panel.getAnimationTimeLabel().setText(" ");
+					
+					//undo drawing queues
+					QueueLengthsVisualiser.resetQueues(panel);
 				}
 				return null;
 			}

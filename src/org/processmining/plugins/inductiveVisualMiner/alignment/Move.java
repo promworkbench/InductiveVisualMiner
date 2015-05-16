@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
+import org.processmining.plugins.InductiveMiner.mining.logs.LifeCycles.Transition;
 import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -17,28 +18,28 @@ public class Move implements Event {
 	private final UnfoldedNode unode;
 	private final XEventClass activityEventClass;
 	private final XEventClass performanceEventClass;
-	private final boolean start;
+	private final Transition lifeCycleTransition;
 
 	private UnfoldedNode logMoveUnode;
 	private UnfoldedNode logMoveBeforeChild;
 	private UnfoldedNode logMoveParallelBranchMappedTo;
 
 	public Move(Type type, UnfoldedNode unode, XEventClass activityEventClass, XEventClass performanceEventClass,
-			boolean start) {
+			Transition start) {
 		this.type = type;
 		this.unode = unode;
 		this.activityEventClass = activityEventClass;
 		this.performanceEventClass = performanceEventClass;
-		this.start = start;
+		this.lifeCycleTransition = start;
 	}
 
 	public String toString() {
 		if (isModelSync()) {
-			return getType() + " " + getUnode().toString() + " " + (start ? "start" : "complete");
+			return getType() + " " + getUnode().toString() + " " + lifeCycleTransition;
 		} else {
 			//			return getType() + " " + getEventClass().toString() + " " + getLogMoveUnode() + " "
 			//					+ getLogMoveBeforeChild();
-			return getType() + " " + getActivityEventClass().toString() + " " + (start ? "start" : "complete");
+			return getType() + " " + getActivityEventClass().toString() + " " + lifeCycleTransition;
 		}
 	}
 
@@ -125,12 +126,16 @@ public class Move implements Event {
 		return type == Type.synchronous;
 	}
 
+	public Transition getLifeCycleTransition() {
+		return lifeCycleTransition;
+	}
+	
 	public boolean isStart() {
-		return start;
+		return lifeCycleTransition == Transition.start;
 	}
 
 	public boolean isComplete() {
-		return !isStart();
+		return lifeCycleTransition == Transition.complete;
 	}
 	
 	/**

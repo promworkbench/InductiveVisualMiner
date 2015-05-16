@@ -2,9 +2,28 @@ package org.processmining.plugins.inductiveVisualMiner.performance;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClasses;
+import org.processmining.plugins.InductiveMiner.mining.logs.LifeCycles.Transition;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Performance {
+
+	public static Transition getLifeCycleTransition(XEventClass performanceActivity) {
+		return getLifeCycleTransition(performanceActivity.getId());
+	}
+	
+	public static Transition getLifeCycleTransition(UnfoldedNode performanceUnode) {
+		return getLifeCycleTransition(performanceUnode.getNode().getName());
+	}
+
+	public static Transition getLifeCycleTransition(String performanceActivity) {
+		if (performanceActivity.endsWith("+start")) {
+			return Transition.start;
+		} else if (performanceActivity.endsWith("complete")) {
+			return Transition.complete;
+		} else {
+			return Transition.other;
+		}
+	}
 
 	public static boolean isStart(UnfoldedNode performanceUnode) {
 		return performanceUnode.getNode().getName().endsWith("+start");

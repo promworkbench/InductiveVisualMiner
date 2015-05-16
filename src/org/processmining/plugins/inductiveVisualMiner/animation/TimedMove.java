@@ -4,7 +4,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
 public class TimedMove extends Move {
-	
+
 	public static class Scaler {
 		private final double animationDuration;
 		private final long min;
@@ -25,7 +25,7 @@ public class TimedMove extends Move {
 			}
 			return animationDuration * (value - min) / (max - 1.0 * min);
 		}
-		
+
 		public Long scaleBack(Double value2) {
 			if (value2 == null) {
 				return null;
@@ -35,11 +35,11 @@ public class TimedMove extends Move {
 			}
 			return (long) ((value2 / (1.0 * animationDuration)) * (max - 1.0 * min) + min);
 		}
-		
+
 		public long getMin() {
 			return min;
 		}
-		
+
 		public long getMax() {
 			return max;
 		}
@@ -49,7 +49,8 @@ public class TimedMove extends Move {
 	private final String resource;
 
 	public TimedMove(Move move, Long logTimestamp, String resource) {
-		super(move.getType(), move.getUnode(), move.getActivityEventClass(), move.getPerformanceEventClass(), move.isStart());
+		super(move.getType(), move.getUnode(), move.getActivityEventClass(), move.getPerformanceEventClass(), move
+				.getLifeCycleTransition());
 		setLogMove(LogMovePosition.beforeChild(move.getLogMoveUnode(), move.getLogMoveBeforeChild()));
 		setLogMoveParallelBranchMappedTo(move.getLogMoveParallelBranchMappedTo());
 		this.logTimestamp = logTimestamp;
@@ -63,15 +64,15 @@ public class TimedMove extends Move {
 		}
 		return logTimestamp == ((TimedMove) obj).logTimestamp;
 	}
-	
+
 	public Double getScaledTimestamp(Scaler scaler) {
 		return scaler.scale(logTimestamp);
 	}
-	
+
 	public Long getLogTimestamp() {
 		return logTimestamp;
 	}
-	
+
 	public String getResource() {
 		return resource;
 	}
@@ -79,7 +80,7 @@ public class TimedMove extends Move {
 	public String toString() {
 		return super.toString() + " @" + logTimestamp;
 	}
-	
+
 	//Event functions from list-view widget
 	public String getTopLabel() {
 		return TimestampsAdder.toString(logTimestamp);

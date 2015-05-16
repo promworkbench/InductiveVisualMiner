@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.alignment;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.mining.logs.LifeCycles.Transition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Block.And;
@@ -25,7 +26,7 @@ public class AlignedLogMetrics {
 	
 	public static long getNumberOfTracesRepresented(UnfoldedNode unode, boolean includeModelMoves, AlignedLogInfo logInfo) {
 		if (unode.getNode() instanceof Automatic || unode.getNode() instanceof Manual) {
-			long c = logInfo.getActivities().getCardinalityOf(new Move(Type.synchronous, unode, null, null, false));
+			long c = logInfo.getActivities().getCardinalityOf(new Move(Type.synchronous, unode, null, null, Transition.complete));
 			if (includeModelMoves) {
 				c += getModelMovesLocal(unode, logInfo);
 			}

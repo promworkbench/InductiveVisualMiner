@@ -19,7 +19,9 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.conversion.ExpandProcessTree;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersIM;
+import org.processmining.plugins.InductiveMiner.mining.logs.LifeCycles.Transition;
 import org.processmining.plugins.etm.CentralRegistry;
 import org.processmining.plugins.etm.fitness.BehaviorCounter;
 import org.processmining.plugins.etm.fitness.metrics.FitnessReplay;
@@ -29,7 +31,6 @@ import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
-import org.processmining.plugins.inductiveVisualMiner.performance.ConvertTreeForPerformance;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.processtree.Block;
@@ -63,7 +64,7 @@ public class AlignmentETM {
 		CentralRegistry registry = new CentralRegistry(log, performanceClassifier, new Random());
 
 		//transform tree for performance measurement
-		Pair<ProcessTree, Map<UnfoldedNode, UnfoldedNode>> p = ConvertTreeForPerformance.convert(tree);
+		Pair<ProcessTree, Map<UnfoldedNode, UnfoldedNode>> p = ExpandProcessTree.expand(tree);
 		ProcessTree performanceTree = p.getA();
 		Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping = p.getB(); //mapping performance node -> original node
 
@@ -102,12 +103,12 @@ public class AlignmentETM {
 				//get log part of move
 				XEventClass performanceActivity = null;
 				XEventClass activity = null;
-				boolean start = false;
+				Transition lifeCycleTransition = null;
 				if (naryMove.getMovedEvent() >= 0) {
 					//an ETM-log-move happened
 					performanceActivity = registry.getEventClassByID(naryTrace.get(naryMove.getMovedEvent()));
 					activity = Performance.getActivity(performanceActivity, activityEventClasses);
-					start = Performance.isStart(performanceActivity);
+					lifeCycleTransition = Performance.getLifeCycleTransition(performanceActivity);
 				}
 
 				//get model part of move
@@ -117,11 +118,11 @@ public class AlignmentETM {
 					//an ETM-model-move happened
 					performanceUnode = nodeId2performanceNode[naryMove.getModelMove()];
 					unode = performanceNodeMapping.get(performanceUnode);
-					start = Performance.isStart(performanceUnode);
+					lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode);
 
 					if (performanceUnode.getNode() instanceof Automatic && unode.getNode() instanceof Manual) {
 						//this is a tau that represents that the start of an activity is skipped
-						start = true;
+						lifeCycleTransition = Transition.start;
 						activity = activityEventClasses.getByIdentity(unode.getNode().getName());
 						performanceActivity = performanceEventClasses.getByIdentity(unode.getNode().getName()
 								+ "+" + XLifecycleExtension.StandardModel.START);
@@ -139,21 +140,21 @@ public class AlignmentETM {
 					if (performanceUnode != null && performanceUnode.getNode() instanceof Automatic
 							&& unode.getNode() instanceof Manual) {
 						//tau-start
-						move = new Move(Type.tauStart, unode, activity, performanceActivity, start);
+						move = new Move(Type.tauStart, unode, activity, performanceActivity, lifeCycleTransition);
 					} else if ((performanceUnode != null && performanceActivity != null)
 							|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)) {
 						//synchronous move
-						move = new Move(Type.synchronous, unode, activity, performanceActivity, start);
+						move = new Move(Type.synchronous, unode, activity, performanceActivity, lifeCycleTransition);
 					} else if (performanceUnode != null) {
 						//model move
-						move = new Move(Type.model, unode, activity, performanceActivity, start);
+						move = new Move(Type.model, unode, activity, performanceActivity, lifeCycleTransition);
 					} else {
 						//log move
-						if (start) {
+						if (lifeCycleTransition == Transition.start) {
 							//log moves of start events are ignored
-							move = new Move(Type.ignoredLogMove, null, activity, performanceActivity, start);
+							move = new Move(Type.ignoredLogMove, null, activity, performanceActivity, lifeCycleTransition);
 						} else {
-							move = new Move(Type.log, unode, activity, performanceActivity, start);
+							move = new Move(Type.log, unode, activity, performanceActivity, lifeCycleTransition);
 						}
 					}
 					trace.add(move);
