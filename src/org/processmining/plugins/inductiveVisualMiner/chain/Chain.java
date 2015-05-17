@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.Chain;
+package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import java.util.ArrayList;
 import java.util.List;

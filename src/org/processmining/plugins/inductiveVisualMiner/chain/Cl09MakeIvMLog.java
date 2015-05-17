@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.Chain;
+package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.deckfour.xes.info.XLogInfo;
 import org.processmining.plugins.InductiveMiner.Triple;

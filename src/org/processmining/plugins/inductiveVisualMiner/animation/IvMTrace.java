@@ -1,9 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Iterator;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class IvMTrace extends ArrayList<IvMMove> {
@@ -50,6 +52,46 @@ public class IvMTrace extends ArrayList<IvMMove> {
 		return copy;
 	}
 
+	public EventIterator eventIterator() {
+		return new EventIterator();
+	}
+
+	public class EventIterator implements Iterator<IvMMove> {
+		private int i = 0;
+
+		public boolean hasNext() {
+			return i < size();
+		}
+
+		public IvMMove next() {
+			i++;
+			return get(i - 1);
+		}
+
+		public boolean hasPrevious() {
+			return i > 0;
+		}
+
+		public IvMMove previous() {
+			i--;
+			return get(i);
+		}
+
+		public void remove() {
+
+		}
+
+		public int getIndexOfLast() {
+			return i - 1;
+		}
+
+		public EventIterator cloneOneBack() {
+			EventIterator result = new EventIterator();
+			result.i = i - 1;
+			return result;
+		}
+	}
+
 	public ActivityInstanceIterator activityInstanceIterator() {
 		return new ActivityInstanceIterator();
 	}
@@ -57,46 +99,73 @@ public class IvMTrace extends ArrayList<IvMMove> {
 	public class ActivityInstanceIterator implements
 			Iterator<Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove>> {
 
-		private IvMMove lastSequentialComplete = null;
-		private Iterator<IvMMove> it = iterator();
+		private EventIterator it = eventIterator();
+		private BitSet visited = new BitSet(size());
 
 		public boolean hasNext() {
 			return it.hasNext();
 		}
 
 		/**
-		 * Returns the next activity instance. Might return null if the trace is inconsistent.
+		 * Returns the next activity instance. Might return null if the trace is
+		 * inconsistent.
 		 */
 		public Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> next() {
-			IvMMove enqueue = null;
-			IvMMove start = null;
 
 			while (it.hasNext()) {
 				IvMMove tMove = it.next();
-				if (!tMove.isLogMove()) {
+				if (!visited.get(it.getIndexOfLast()) && !tMove.isLogMove()) {
+					//we've hit a new activity instance
+					UnfoldedNode unode = tMove.getUnode();
 
-					switch (tMove.getLifeCycleTransition()) {
-						case complete :
+					//for initiate, find the last sequential complete
+					IvMMove initiate = getLastSequentialComplete(unode);
 
-							//this activity instance is finished
-							Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> result = Sextuple
-									.of(tMove.getUnode(), tMove.getResource(), lastSequentialComplete, enqueue, start,
-											tMove);
+					//walk through the trace, until the corresponding complete is found
+					EventIterator it2 = it.cloneOneBack();
+					IvMMove enqueue = null;
+					IvMMove start = null;
+					while (it2.hasNext()) {
+						IvMMove tMove2 = it2.next();
 
-							//keep track of last sequential complete;
-							lastSequentialComplete = tMove;
+						if (!tMove.isLogMove() && unode.equals(tMove2.getUnode())) {
+							visited.set(it2.getIndexOfLast());
+							switch (tMove2.getLifeCycleTransition()) {
+								case complete :
 
-							return result;
-						case other :
-							break;
-						case start :
-							start = tMove;
-							break;
+									//this activity instance is finished
+									Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> result = Sextuple
+											.of(unode, tMove2.getResource(), initiate, enqueue, start, tMove2);
+
+									//keep track of last sequential complete;
+									initiate = tMove;
+
+									return result;
+								case other :
+									break;
+								case start :
+									start = tMove;
+									break;
+							}
+						}
 					}
+					//inconsistent trace, as this trace does not end with complete.
+					return null;
 				}
 			}
 
 			//inconsistent trace, as this trace does not end with complete.
+			return null;
+		}
+
+		public IvMMove getLastSequentialComplete(UnfoldedNode unode) {
+			EventIterator itBack = it.cloneOneBack();
+			while (itBack.hasPrevious()) {
+				IvMMove m = itBack.previous();
+				if (m.isComplete() && !TreeUtils.areParallel(unode, m.getUnode())) {
+					return m;
+				}
+			}
 			return null;
 		}
 

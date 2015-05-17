@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.Chain;
+package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
