@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.performance;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
@@ -20,6 +21,16 @@ public class QueueLengthsUsingResources implements QueueLengths {
 	public QueueLengthsUsingResources(ProcessTree tree, IvMLog tLog) {
 		timestamps = new THashMap<>();
 		init(tLog);
+
+		//debug
+		for (Entry<UnfoldedNode, QueueActivityLog> e : timestamps.entrySet()) {
+			System.out.println("log for activity " + e.getKey());
+			QueueActivityLog l = e.getValue();
+			for (int index = 0; index < l.size(); index++) {
+				System.out.println(l.getResource(index) + "," + l.getInitiate(index) + "," + l.getEnqueue(index) + ","
+						+ l.getStart(index) + "," + l.getComplete(index));
+			}
+		}
 	}
 
 	private void init(IvMLog tLog) {
