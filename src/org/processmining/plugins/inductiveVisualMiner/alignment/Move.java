@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
-import org.processmining.plugins.InductiveMiner.mining.logs.LifeCycles.Transition;
+import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
 import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -18,19 +18,19 @@ public class Move implements Event {
 	private final UnfoldedNode unode;
 	private final XEventClass activityEventClass;
 	private final XEventClass performanceEventClass;
-	private final Transition lifeCycleTransition;
+	private final PerformanceTransition lifeCycleTransition;
 
 	private UnfoldedNode logMoveUnode;
 	private UnfoldedNode logMoveBeforeChild;
 	private UnfoldedNode logMoveParallelBranchMappedTo;
 
 	public Move(Type type, UnfoldedNode unode, XEventClass activityEventClass, XEventClass performanceEventClass,
-			Transition start) {
+			PerformanceTransition lifeCycle) {
 		this.type = type;
 		this.unode = unode;
 		this.activityEventClass = activityEventClass;
 		this.performanceEventClass = performanceEventClass;
-		this.lifeCycleTransition = start;
+		this.lifeCycleTransition = lifeCycle;
 	}
 
 	public String toString() {
@@ -61,7 +61,7 @@ public class Move implements Event {
 		if (!getType().equals(arg.getType())) {
 			return false;
 		}
-		if (((Move) obj).isStart() != isStart()) {
+		if (((Move) obj).isComplete() != isComplete()) {
 			return false;
 		}
 		if (getUnode() != null) {
@@ -126,16 +126,16 @@ public class Move implements Event {
 		return type == Type.synchronous;
 	}
 
-	public Transition getLifeCycleTransition() {
+	public PerformanceTransition getLifeCycleTransition() {
 		return lifeCycleTransition;
 	}
 	
 	public boolean isStart() {
-		return lifeCycleTransition == Transition.start;
+		return lifeCycleTransition == PerformanceTransition.start;
 	}
 
 	public boolean isComplete() {
-		return lifeCycleTransition == Transition.complete;
+		return lifeCycleTransition == PerformanceTransition.complete;
 	}
 	
 	/**
@@ -184,16 +184,16 @@ public class Move implements Event {
 	}
 
 	public String getBottomLabel() {
-		return isStart() ? "start" : "complete";
+		return lifeCycleTransition.toString();
 	}
 
 	public String getBottomLabel2() {
 		if (isModelMove()) {
 			return "only in model";
-		} else if (isLogMove()) {
-			return "only in log";
 		} else if (isIgnoredLogMove()) {
 			return "only in log; ignored";
+		} else if (isLogMove()) {
+			return "only in log";
 		}
 		return null;
 	}

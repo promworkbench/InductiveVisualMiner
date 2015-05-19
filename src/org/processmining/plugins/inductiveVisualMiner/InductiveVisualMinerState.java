@@ -316,14 +316,14 @@ public class InductiveVisualMinerState {
 	}
 
 	//==timed log==
-	private IvMLog timedLog;
+	private IvMLog ivmLog;
 
-	public void setTimedLog(IvMLog timedLog) {
-		this.timedLog = timedLog;
+	public void setIvMLog(IvMLog ivmLog) {
+		this.ivmLog = ivmLog;
 	}
 
-	public IvMLog getTimedLog() {
-		return timedLog;
+	public IvMLog getIvMLog() {
+		return ivmLog;
 	}
 
 	//==playing animation

@@ -16,6 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.LogSplitter;
+import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractBlock.And;
@@ -28,10 +29,11 @@ public class Trace2DotToken {
 
 		debug("", 0);
 
-		//copy the trace; remove ignored log moves
+		//copy the trace; remove ignored log moves and everything not start or complete
 		List<IvMMove> copyTrace = new ArrayList<IvMMove>();
 		for (IvMMove t : trace) {
-			if (!t.isIgnoredLogMove()) {
+			if (!t.isIgnoredLogMove()
+					&& (t.getLifeCycleTransition() == PerformanceTransition.start || t.getLifeCycleTransition() == PerformanceTransition.complete)) {
 				copyTrace.add(t);
 			}
 		}
@@ -141,8 +143,8 @@ public class Trace2DotToken {
 
 				dotToken.addStepOverEdge(tauEdge, null);
 				continue;
-			} 
-			
+			}
+
 			if (move.isSyncMove() || (move.isModelMove() && !showDeviations)) {
 				//synchronous move or model move without deviations showing
 				LocalDotNode nextDestination = Animation.getDotNodeFromActivity(move, info);
@@ -219,8 +221,7 @@ public class Trace2DotToken {
 
 	private static void enterParallelSubTrace(List<IvMMove> trace, boolean showDeviations,
 			ShortestPathGraph shortestPath, AlignedLogVisualisationInfo info, int indent, Scaler scaler,
-			DotToken token, List<UnfoldedNode> localInParallelUnodes, int i, IvMMove move,
-			UnfoldedNode enteringParallel) {
+			DotToken token, List<UnfoldedNode> localInParallelUnodes, int i, IvMMove move, UnfoldedNode enteringParallel) {
 		//find out where we are exiting it again
 		int exitsAt = findParallelExit(trace, enteringParallel, i);
 
@@ -416,8 +417,8 @@ public class Trace2DotToken {
 	}
 
 	private static void debug(Object s, int indent) {
-//		String sIndent = new String(new char[indent]).replace("\0", "   ");
-//		System.out.print(sIndent);
-//		System.out.println(s);
+		//		String sIndent = new String(new char[indent]).replace("\0", "   ");
+		//		System.out.print(sIndent);
+		//		System.out.println(s);
 	}
 }

@@ -151,11 +151,7 @@ public class TraceView extends SideWindow {
 								}
 								
 								public String getBottomLabel() {
-									if (log.isStart(input)) {
-										return "start";
-									} else {
-										return "complete";
-									}
+									return log.getLifeCycle(input).toString();
 								}
 							};
 						}

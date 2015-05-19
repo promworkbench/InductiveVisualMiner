@@ -2,26 +2,34 @@ package org.processmining.plugins.inductiveVisualMiner.performance;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClasses;
-import org.processmining.plugins.InductiveMiner.mining.logs.LifeCycles.Transition;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Performance {
+	
+	public enum PerformanceTransition {
+		start,
+		complete,
+		enqueue,
+		other
+	}
 
-	public static Transition getLifeCycleTransition(XEventClass performanceActivity) {
+	public static PerformanceTransition getLifeCycleTransition(XEventClass performanceActivity) {
 		return getLifeCycleTransition(performanceActivity.getId());
 	}
 	
-	public static Transition getLifeCycleTransition(UnfoldedNode performanceUnode) {
+	public static PerformanceTransition getLifeCycleTransition(UnfoldedNode performanceUnode) {
 		return getLifeCycleTransition(performanceUnode.getNode().getName());
 	}
 
-	public static Transition getLifeCycleTransition(String performanceActivity) {
+	public static PerformanceTransition getLifeCycleTransition(String performanceActivity) {
 		if (performanceActivity.endsWith("+start")) {
-			return Transition.start;
+			return PerformanceTransition.start;
 		} else if (performanceActivity.endsWith("complete")) {
-			return Transition.complete;
+			return PerformanceTransition.complete;
+		} else if (performanceActivity.endsWith("enqueue")) {
+			return PerformanceTransition.enqueue;
 		} else {
-			return Transition.other;
+			return PerformanceTransition.other;
 		}
 	}
 

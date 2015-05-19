@@ -19,7 +19,7 @@ public class Cl09MakeIvMLog extends ChainLink<Triple<AlignedLog, IMLog, XLogInfo
 	}
 
 	protected void processResult(IvMLog result, InductiveVisualMinerState state) {
-		state.setTimedLog(result);
+		state.setIvMLog(result);
 	}
 
 }

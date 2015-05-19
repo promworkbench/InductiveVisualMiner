@@ -19,9 +19,7 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.conversion.ExpandProcessTree;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersIM;
-import org.processmining.plugins.InductiveMiner.mining.logs.LifeCycles.Transition;
 import org.processmining.plugins.etm.CentralRegistry;
 import org.processmining.plugins.etm.fitness.BehaviorCounter;
 import org.processmining.plugins.etm.fitness.metrics.FitnessReplay;
@@ -31,7 +29,9 @@ import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
+import org.processmining.plugins.inductiveVisualMiner.performance.ExpandProcessTreeForQueues;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
+import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Node;
@@ -64,7 +64,7 @@ public class AlignmentETM {
 		CentralRegistry registry = new CentralRegistry(log, performanceClassifier, new Random());
 
 		//transform tree for performance measurement
-		Pair<ProcessTree, Map<UnfoldedNode, UnfoldedNode>> p = ExpandProcessTree.expand(tree);
+		Pair<ProcessTree, Map<UnfoldedNode, UnfoldedNode>> p = ExpandProcessTreeForQueues.expand(tree);
 		ProcessTree performanceTree = p.getA();
 		Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping = p.getB(); //mapping performance node -> original node
 
@@ -103,7 +103,7 @@ public class AlignmentETM {
 				//get log part of move
 				XEventClass performanceActivity = null;
 				XEventClass activity = null;
-				Transition lifeCycleTransition = null;
+				PerformanceTransition lifeCycleTransition = null;
 				if (naryMove.getMovedEvent() >= 0) {
 					//an ETM-log-move happened
 					performanceActivity = registry.getEventClassByID(naryTrace.get(naryMove.getMovedEvent()));
@@ -121,11 +121,16 @@ public class AlignmentETM {
 					lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode);
 
 					if (performanceUnode.getNode() instanceof Automatic && unode.getNode() instanceof Manual) {
-						//this is a tau that represents that the start of an activity is skipped
-						lifeCycleTransition = Transition.start;
+						//this is a tau that represents that the start/enqueue of an activity is skipped
+						lifeCycleTransition = PerformanceTransition.start;
 						activity = activityEventClasses.getByIdentity(unode.getNode().getName());
-						performanceActivity = performanceEventClasses.getByIdentity(unode.getNode().getName()
-								+ "+" + XLifecycleExtension.StandardModel.START);
+						performanceActivity = performanceEventClasses.getByIdentity(unode.getNode().getName() + "+"
+								+ XLifecycleExtension.StandardModel.START);
+					}
+					
+					if (performanceUnode.getNode() instanceof Automatic) {
+						//a model move happened on a tau; make it a completion
+						lifeCycleTransition = PerformanceTransition.complete;
 					}
 
 					//we are only interested in moves on leaves, not in moves on nodes
@@ -150,11 +155,13 @@ public class AlignmentETM {
 						move = new Move(Type.model, unode, activity, performanceActivity, lifeCycleTransition);
 					} else {
 						//log move
-						if (lifeCycleTransition == Transition.start) {
-							//log moves of start events are ignored
-							move = new Move(Type.ignoredLogMove, null, activity, performanceActivity, lifeCycleTransition);
-						} else {
+						if (lifeCycleTransition == PerformanceTransition.complete) {
+							//only log moves of complete events are interesting
 							move = new Move(Type.log, unode, activity, performanceActivity, lifeCycleTransition);
+						} else {
+							//log moves of other transitions are ignored
+							move = new Move(Type.ignoredLogMove, null, activity, performanceActivity,
+									lifeCycleTransition);
 						}
 					}
 					trace.add(move);

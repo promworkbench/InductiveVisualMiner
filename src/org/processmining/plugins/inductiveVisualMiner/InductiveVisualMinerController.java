@@ -41,6 +41,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl02FilterLogOnActiv
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl03Mine;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl04Layout;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Align;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl06Layout;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl07FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl08ApplyHighlighting;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl09MakeIvMLog;
@@ -66,7 +67,7 @@ public class InductiveVisualMinerController {
 
 	final InductiveVisualMinerPanel panel;
 	final InductiveVisualMinerState state;
-	public static final int maxAnimatedTraces = 50;	
+	public static final int maxAnimatedTraces = 50;
 
 	private final Chain chain;
 	private final PluginContext context;
@@ -139,9 +140,10 @@ public class InductiveVisualMinerController {
 		}
 
 		//layout
-		Cl04Layout chainLinkLayout = new Cl04Layout();
+		Runnable layoutStart;
+		Runnable layoutComplete;
 		{
-			chainLinkLayout.setOnStart(new Runnable() {
+			layoutStart = new Runnable() {
 				public void run() {
 					setStatus("Layouting graph..");
 
@@ -153,8 +155,8 @@ public class InductiveVisualMinerController {
 						state.setSelectedLogMoves(new HashSet<LogMovePosition>());
 					}
 				}
-			});
-			chainLinkLayout.setOnComplete(new Runnable() {
+			};
+			layoutComplete = new Runnable() {
 				public void run() {
 					panel.getGraph().changeDot(state.getDot(), state.getSVGDiagram(), true);
 
@@ -164,7 +166,10 @@ public class InductiveVisualMinerController {
 							state.getSelectedLogMoves());
 
 				}
-			});
+			};
+			Cl04Layout chainLinkLayout = new Cl04Layout();
+			chainLinkLayout.setOnStart(layoutStart);
+			chainLinkLayout.setOnComplete(layoutComplete);
 			chain.add(chainLinkLayout);
 		}
 
@@ -185,9 +190,16 @@ public class InductiveVisualMinerController {
 			});
 			chain.add(a);
 		}
+		
+		//layout
+		{
+			Cl06Layout l = new Cl06Layout();
+			l.setOnStart(layoutStart);
+			l.setOnComplete(layoutComplete);
+			chain.add(l);
+		}
 
-		chain.add(chainLinkLayout);
-
+		//filter node selection
 		{
 			Cl07FilterNodeSelection f = new Cl07FilterNodeSelection();
 			f.setOnStart(new Runnable() {
@@ -241,7 +253,7 @@ public class InductiveVisualMinerController {
 			});
 			m.setOnComplete(new Runnable() {
 				public void run() {
-					panel.getTraceView().set(state.getTimedLog());
+					panel.getTraceView().set(state.getIvMLog());
 				}
 			});
 			chain.add(m);
@@ -260,9 +272,9 @@ public class InductiveVisualMinerController {
 			a.setOnComplete(new Runnable() {
 				public void run() {
 					//re-colour the selected nodes (i.e. the dashed red border)
-					InductiveVisualMinerSelectionColourer.colourSelection(state.getAnimatedSVGDiagram(), state.getSelectedNodes(),
-							state.getSelectedLogMoves(), state.getVisualisationInfo());
-					
+					InductiveVisualMinerSelectionColourer.colourSelection(state.getAnimatedSVGDiagram(),
+							state.getSelectedNodes(), state.getSelectedLogMoves(), state.getVisualisationInfo());
+
 					//re-highlight the model
 					TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(
 							state.getAnimatedSVGDiagram(), state.getVisualisationInfo(), state.getTree(),
@@ -298,7 +310,7 @@ public class InductiveVisualMinerController {
 					setStatus(" ");
 				}
 			});
-			chain.add(q);
+			//			chain.add(q);
 		}
 
 		//set up plug-ins
@@ -360,7 +372,7 @@ public class InductiveVisualMinerController {
 		panel.getColourModeSelection().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				state.setColourMode((ColourMode) panel.getColourModeSelection().getSelectedItem());
-				chain.execute(Cl04Layout.class);
+				chain.execute(Cl06Layout.class);
 			}
 		});
 
@@ -377,7 +389,7 @@ public class InductiveVisualMinerController {
 		panel.setOnGraphDirectionChanged(new InputFunction<Dot.GraphDirection>() {
 			public void call(GraphDirection input) throws Exception {
 				state.setGraphDirection(input);
-				chain.execute(Cl04Layout.class);
+				chain.execute(Cl06Layout.class);
 			}
 		});
 
@@ -443,7 +455,7 @@ public class InductiveVisualMinerController {
 						final SVGDiagram svg = panel.getGraph().getSVG();
 						final ColourMode colourMode = state.getColourMode();
 						final Dot dot = panel.getGraph().getDot();
-						final IvMLog timedLog = state.getTimedLog();
+						final IvMLog timedLog = state.getIvMLog();
 						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
 						new Thread(new Runnable() {
 							public void run() {
@@ -466,7 +478,7 @@ public class InductiveVisualMinerController {
 						final SVGDiagram svg = panel.getGraph().getSVG();
 						final ColourMode colourMode = state.getColourMode();
 						final Dot dot = panel.getGraph().getDot();
-						final IvMLog timedLog = state.getTimedLog();
+						final IvMLog timedLog = state.getIvMLog();
 						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
 						new Thread(new Runnable() {
 							public void run() {

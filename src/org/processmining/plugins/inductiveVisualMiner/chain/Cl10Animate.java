@@ -19,7 +19,7 @@ public class Cl10Animate
 
 	protected Quintuple<IvMLog, ColourMode, AlignedLogVisualisationInfo, Dot, SVGDiagram> generateInput(
 			InductiveVisualMinerState state) {
-		return Quintuple.of(state.getTimedLog(), state.getColourMode(), state.getVisualisationInfo(), state.getDot(),
+		return Quintuple.of(state.getIvMLog(), state.getColourMode(), state.getVisualisationInfo(), state.getDot(),
 				state.getSVGDiagram());
 	}
 

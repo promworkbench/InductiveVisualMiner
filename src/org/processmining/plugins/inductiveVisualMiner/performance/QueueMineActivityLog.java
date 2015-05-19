@@ -1,60 +1,40 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
 import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
 
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Map;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMTrace.ActivityInstanceIterator;
-import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsUsingResources implements QueueLengths {
+public class QueueMineActivityLog {
 
-	THashMap<UnfoldedNode, QueueActivityLog> timestamps;
-
-	public QueueLengthsUsingResources(ProcessTree tree, IvMLog tLog) {
-		timestamps = new THashMap<>();
-		init(tLog);
-
-		//debug
-		for (Entry<UnfoldedNode, QueueActivityLog> e : timestamps.entrySet()) {
-			System.out.println("log for activity " + e.getKey());
-			QueueActivityLog l = e.getValue();
-			for (int index = 0; index < l.size(); index++) {
-				System.out.println(l.getResource(index) + "," + l.getInitiate(index) + "," + l.getEnqueue(index) + ","
-						+ l.getStart(index) + "," + l.getComplete(index));
-			}
-		}
-	}
-
-	private void init(IvMLog tLog) {
+	public static Map<UnfoldedNode, QueueActivityLog> mine(IvMLog tLog, boolean requireInitiate,
+			boolean requireEnqueue, boolean requireStart, boolean requireComplete) {
+		Map<UnfoldedNode, QueueActivityLog> queueActivityLogs = new THashMap<>();
 		for (IvMTrace tTrace : tLog) {
-			init(tTrace);
+			mine(tTrace, queueActivityLogs, requireInitiate, requireEnqueue, requireStart, requireComplete);
 		}
+		return queueActivityLogs;
 	}
 
-	/**
-	 * Gather all activity instances
-	 * 
-	 * @param tTrace
-	 */
-	private void init(IvMTrace tTrace) {
+	public static void mine(IvMTrace tTrace, Map<UnfoldedNode, QueueActivityLog> timestamps, boolean requireInitiate,
+			boolean requireEnqueue, boolean requireStart, boolean requireComplete) {
 		ActivityInstanceIterator it = tTrace.activityInstanceIterator();
 		while (it.hasNext()) {
 			Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> activityInstance = it.next();
 
 			if (activityInstance != null) {
 
-				//we are only interested in activity instances where both completes are known
-				if (activityInstance.getC() != null && activityInstance.getF() != null
-						&& activityInstance.getC().getLogTimestamp() != null
-						&& activityInstance.getF().getLogTimestamp() != null) {
+				//we are only interested in activity instances according to the parameters
+				if (((activityInstance.getC() != null && activityInstance.getC().getLogTimestamp() != null) || !requireInitiate)
+						&& ((activityInstance.getD() != null && activityInstance.getD().getLogTimestamp() != null) || !requireEnqueue)
+						&& ((activityInstance.getE() != null && activityInstance.getE().getLogTimestamp() != null) || !requireStart)
+						&& ((activityInstance.getF() != null && activityInstance.getF().getLogTimestamp() != null) || !requireComplete)) {
 
 					Long initiate = null;
 					Long enqueue = null;
@@ -85,22 +65,4 @@ public class QueueLengthsUsingResources implements QueueLengths {
 			}
 		}
 	}
-
-	public long getQueueLength(UnfoldedNode unode, long time) {
-		QueueActivityLog l = timestamps.get(unode);
-		if (l == null) {
-			return -1;
-		}
-		Set<String> resources = new THashSet<>();
-		long count = 0;
-		for (int index = 0; index < l.size(); index++) {
-			if (l.getInitiate(index) <= time && time <= l.getComplete(index)) {
-				//this activity instance is now in this activity
-				count++;
-				resources.add(l.getResource(index));
-			}
-		}
-		return count - resources.size();
-	}
-
 }
