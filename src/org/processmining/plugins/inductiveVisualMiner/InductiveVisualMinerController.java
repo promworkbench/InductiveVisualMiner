@@ -190,7 +190,7 @@ public class InductiveVisualMinerController {
 			});
 			chain.add(a);
 		}
-		
+
 		//layout
 		{
 			Cl06Layout l = new Cl06Layout();
@@ -310,7 +310,7 @@ public class InductiveVisualMinerController {
 					setStatus(" ");
 				}
 			});
-			//			chain.add(q);
+			chain.add(q);
 		}
 
 		//set up plug-ins
