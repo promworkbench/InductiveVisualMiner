@@ -137,14 +137,14 @@ public class IvMTrace extends ArrayList<IvMMove> {
 									Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> result = Sextuple
 											.of(unode, tMove2.getResource(), initiate, enqueue, start, tMove2);
 
-									//keep track of last sequential complete;
-									initiate = tMove;
-
 									return result;
-								case other :
-									break;
 								case start :
-									start = tMove;
+									start = tMove2;
+									break;
+								case enqueue :
+									enqueue = tMove2;
+									break;
+								case other :
 									break;
 							}
 						}

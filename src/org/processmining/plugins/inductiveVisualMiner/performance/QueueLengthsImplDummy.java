@@ -6,7 +6,7 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class QueueLengthsImplDummy implements QueueLengths {
 
-	public long getQueueLength(UnfoldedNode unode, long time) {
+	public double getQueueLength(UnfoldedNode unode, long time) {
 		return (new Date()).getTime();
 	}
 	

@@ -5,25 +5,36 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class QueueLengthsImplCombination implements QueueLengths {
 
-//	private final QueueLengths qC;
-	private final QueueLengths qCR;
-//	private final QueueLengths qSC;
-	private final QueueLengths qESC;
+	private final QueueLengths qEstimate;
+	private final QueueLengthsImplEnqueueStartComplete qReal;
 
 	public QueueLengthsImplCombination(IvMLog iLog) {
-//		qC = new QueueLengthsImplComplete(iLog);
-		qCR = new QueueLengthsImplCompleteResource(iLog);
-//		qSC = new QueueLengthsImplStartComplete(iLog);
-		qESC = new QueueLengthsImplEnqueueStartComplete(iLog);
+		
+//		new QueueLengthsImplOutput(iLog);
+		
+		qEstimate = new QueueLengthsImplNPEM(iLog);
+		qReal = new QueueLengthsImplEnqueueStartComplete(iLog);
+		
+		new QueueLengthsImplOutput(iLog);
+
+		for (UnfoldedNode unode : qReal.queueActivityLogs.keySet()) {
+
+			//find min and max
+			long min = Long.MAX_VALUE;
+			long max = Long.MIN_VALUE;
+			QueueActivityLog l = qReal.queueActivityLogs.get(unode);
+			for (int i = 0; i < l.size(); i++) {
+				min = Math.min(min, l.getEnqueue(i));
+				max = Math.max(max, l.getStart(i));
+			}
+
+			//compute mean square error
+			double mse = RMSE.rmse(unode, qReal, qEstimate, min, max);
+			System.out.println("RMSE for activity " + unode + ": " + mse);
+		}
 	}
 
-	public long getQueueLength(UnfoldedNode unode, long time) {
-		System.out.println("queue @" + time);
-//		System.out.println("complete 		       " + qC.getQueueLength(unode, time));
-		System.out.println("complete resource      " + qCR.getQueueLength(unode, time));
-//		System.out.println("start complete         " + qSC.getQueueLength(unode, time));
-		System.out.println("enqueue start complete " + qESC.getQueueLength(unode, time));
-		
-		return qCR.getQueueLength(unode, time);
+	public double getQueueLength(UnfoldedNode unode, long time) {
+		return qReal.getQueueLength(unode, time);
 	}
 }

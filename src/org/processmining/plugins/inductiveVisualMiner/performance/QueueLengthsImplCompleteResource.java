@@ -16,7 +16,7 @@ public class QueueLengthsImplCompleteResource implements QueueLengths {
 		queueActivityLogs = QueueMineActivityLog.mine(iLog, true, false, false, true);
 	}
 
-	public long getQueueLength(UnfoldedNode unode, long time) {
+	public double getQueueLength(UnfoldedNode unode, long time) {
 		QueueActivityLog l = queueActivityLogs.get(unode);
 		if (l == null) {
 			return -1;

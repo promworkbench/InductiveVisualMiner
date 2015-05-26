@@ -32,7 +32,7 @@ public class QueueLengthsVisualiser {
 		}
 	}
 
-	private static void drawQueue(SVGDiagram svg, AlignedLogVisualisationInfo info, UnfoldedNode unode, long length)
+	private static void drawQueue(SVGDiagram svg, AlignedLogVisualisationInfo info, UnfoldedNode unode, double length)
 			throws SVGException {
 		LocalDotNode dotNode = info.getActivityNode(unode);
 

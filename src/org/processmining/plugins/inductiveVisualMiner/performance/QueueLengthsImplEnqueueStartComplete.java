@@ -7,13 +7,13 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class QueueLengthsImplEnqueueStartComplete implements QueueLengths {
 
-	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
+	public final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
 
 	public QueueLengthsImplEnqueueStartComplete(IvMLog iLog) {
 		queueActivityLogs = QueueMineActivityLog.mine(iLog, false, true, true, false);
 	}
 
-	public long getQueueLength(UnfoldedNode unode, long time) {
+	public double getQueueLength(UnfoldedNode unode, long time) {
 		QueueActivityLog l = queueActivityLogs.get(unode);
 		if (l == null) {
 			return -1;

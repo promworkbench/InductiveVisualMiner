@@ -10,5 +10,5 @@ public interface QueueLengths {
 	 * @param time, use new Date(time) to make a Date-object
 	 * @return the number of cases in queue for this unode
 	 */
-	public long getQueueLength(UnfoldedNode unode, long time);
+	public double getQueueLength(UnfoldedNode unode, long time);
 }
