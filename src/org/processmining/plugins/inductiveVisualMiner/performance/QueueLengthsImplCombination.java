@@ -12,7 +12,7 @@ public class QueueLengthsImplCombination implements QueueLengths {
 		
 //		new QueueLengthsImplOutput(iLog);
 		
-		qEstimate = new QueueLengthsImplNPEM(iLog);
+		qEstimate = new QueueLengthsImplPHComplete(iLog);
 		qReal = new QueueLengthsImplEnqueueStartComplete(iLog);
 		
 		new QueueLengthsImplOutput(iLog);

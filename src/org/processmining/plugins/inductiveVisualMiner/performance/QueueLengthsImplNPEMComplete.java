@@ -15,7 +15,7 @@ import org.apache.commons.math3.ml.clustering.FuzzyKMeansClusterer;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsImplNPEM implements QueueLengths {
+public class QueueLengthsImplNPEMComplete implements QueueLengths {
 
 	private class Cluster implements Comparable<Cluster> {
 		public int size;
@@ -30,10 +30,10 @@ public class QueueLengthsImplNPEM implements QueueLengths {
 	private final Map<UnfoldedNode, Cluster[]> clusters;
 	private final TObjectDoubleMap<UnfoldedNode> priors;
 
-	private final static int k = 4;
+	private final static int k = 5;
 
-	public QueueLengthsImplNPEM(IvMLog iLog) {
-		queueActivityLogs = QueueMineActivityLog.mine(iLog, true, false, true, false);
+	public QueueLengthsImplNPEMComplete(IvMLog iLog) {
+		queueActivityLogs = QueueMineActivityLog.mine(iLog, true, false, false, true);
 		clusters = new THashMap<>();
 		priors = new TObjectDoubleHashMap<>();
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
@@ -42,7 +42,7 @@ public class QueueLengthsImplNPEM implements QueueLengths {
 			//create intervals
 			List<DoublePoint> intervals = new ArrayList<DoublePoint>(l.size());
 			for (int index = 0; index < l.size(); index++) {
-				double[] d = { (double) l.getStart(index) - l.getInitiate(index) };
+				double[] d = { (double) l.getComplete(index) - l.getInitiate(index) };
 				intervals.add(new DoublePoint(d));
 			}
 
@@ -68,7 +68,7 @@ public class QueueLengthsImplNPEM implements QueueLengths {
 			}
 			Arrays.sort(css);
 			clusters.put(unode, css);
-			
+
 			//determine the prior
 			priors.put(unode, (l.size() - css[0].size) / (l.size() * 1.0));
 		}
@@ -84,17 +84,15 @@ public class QueueLengthsImplNPEM implements QueueLengths {
 		double queueLength = 0;
 		double priorA = priors.get(unode);
 		for (int index = 0; index < l.size(); index++) {
-			if (l.getInitiate(index) <= time && time <= l.getStart(index)) {
+			if (l.getInitiate(index) <= time && time <= l.getComplete(index)) {
 
 				long xI = time - l.getInitiate(index);
-				long durationI = l.getStart(index) - l.getInitiate(index);
-				int clusterI = getClusterNumber(cs, durationI);
 
 				int likelihoodCount = 0;
 				int posteriorCount = 0;
 				for (int index2 = 0; index2 < l.size(); index2++) {
 					//count for likelihood if longer than durationI
-					long durationJ = l.getStart(index2) - l.getInitiate(index2);
+					long durationJ = l.getComplete(index2) - l.getInitiate(index2);
 					if (durationJ > xI) {
 						likelihoodCount++;
 
@@ -108,9 +106,9 @@ public class QueueLengthsImplNPEM implements QueueLengths {
 				double likelihoodI = likelihoodCount / (l.size() * 1.0);
 				double posteriorI = posteriorCount / (l.size() - cs[0].size * 1.0);
 				double p = priorA * posteriorI / likelihoodI;
-//				System.out.println("l  " + likelihoodI);
-//				System.out.println("po " + posteriorI);
-//				System.out.println("pr " + priorA);
+				//				System.out.println("l  " + likelihoodI);
+				//				System.out.println("po " + posteriorI);
+				//				System.out.println("pr " + priorA);
 				queueLength += p;
 			}
 		}
@@ -119,15 +117,11 @@ public class QueueLengthsImplNPEM implements QueueLengths {
 	}
 
 	public int getClusterNumber(Cluster[] cs, long duration) {
-		if (duration < (cs[0].center + cs[1].center) / 2.0) {
-			return 0;
-		} else if (duration < (cs[1].center + cs[2].center) / 2.0) {
-			return 1;
-		} else if (duration < (cs[2].center + cs[3].center) / 2.0) {
-			return 2;
-		} else {
-			return 3;
+		for (int i = 0; i < cs.length - 1; i++) {
+			if (duration < (cs[i].center + cs[i + 1].center) / 2.0) {
+				return i;
+			}
 		}
+		return cs.length - 1;
 	}
-
 }
