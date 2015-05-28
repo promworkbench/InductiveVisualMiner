@@ -70,6 +70,7 @@
 	<classpathentry kind="lib" path="packagelib/PNetReplayer.jar"/>
 	<classpathentry kind="lib" path="packagelib/BasicUtils-lib/jbpt-0.2.429.jar"/>
 	<classpathentry kind="lib" path="packagelib/LpSolve-lib/lpsolve55j.jar"/>
+	<classpathentry kind="lib" path="lib/jblas-1.2.4.jar"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=InductiveVisualMiner&amp;ivyXmlPath=ivy.xml&amp;confs=*&amp;ivySettingsPath=ivysettings.xml&amp;loadSettingsOnDemand=false&amp;ivyUserDir=&amp;propertyFiles="/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
