@@ -11,15 +11,6 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class QueueLengthsImplPHComplete implements QueueLengths {
 
-	private class Cluster implements Comparable<Cluster> {
-		public int size;
-		public double center;
-
-		public int compareTo(Cluster arg0) {
-			return Double.compare(center, arg0.center);
-		}
-	}
-
 	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
 
 	private final double lambda1;
