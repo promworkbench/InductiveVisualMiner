@@ -1,8 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,14 +10,18 @@ import java.util.Map;
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
+import org.jblas.DoubleMatrix;
+import org.jblas.MatrixFunctions;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsImplNPEMComplete implements QueueLengths {
+public class QueueLengthsImplCPHComplete implements QueueLengths {
 
 	private class Cluster implements Comparable<Cluster> {
-		public int size;
 		public double center;
+		public double lambda1;
+		public double lambda2;
+		public double lambda3;
 
 		public int compareTo(Cluster arg0) {
 			return Double.compare(center, arg0.center);
@@ -28,14 +30,12 @@ public class QueueLengthsImplNPEMComplete implements QueueLengths {
 
 	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
 	private final Map<UnfoldedNode, Cluster[]> clusters;
-	private final TObjectDoubleMap<UnfoldedNode> priors;
 
 	private final static int k = 5;
 
-	public QueueLengthsImplNPEMComplete(IvMLog iLog) {
+	public QueueLengthsImplCPHComplete(IvMLog iLog) {
 		queueActivityLogs = QueueMineActivityLog.mine(iLog, true, false, false, true);
 		clusters = new THashMap<>();
-		priors = new TObjectDoubleHashMap<>();
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
 			QueueActivityLog l = queueActivityLogs.get(unode);
 
@@ -46,11 +46,8 @@ public class QueueLengthsImplNPEMComplete implements QueueLengths {
 				intervals.add(new DoublePoint(d));
 			}
 
-			
 			KMeansPlusPlusClusterer<DoublePoint> clusterer = new KMeansPlusPlusClusterer<>(k);
 			List<CentroidCluster<DoublePoint>> cs = clusterer.cluster(intervals);
-//			FuzzyKMeansClusterer<DoublePoint> clusterer = new FuzzyKMeansClusterer<>(k, 1.01);
-//			List<CentroidCluster<DoublePoint>> cs = clusterer.cluster(intervals);
 
 			Cluster[] css = new Cluster[k];
 			{
@@ -63,17 +60,45 @@ public class QueueLengthsImplNPEMComplete implements QueueLengths {
 					//denote the center point of the cluster
 					c.center = cluster.getCenter().getPoint()[0];
 
-					//keep track of the number of ... in the cluster
-					c.size = cluster.getPoints().size();
-
 					i++;
 				}
 			}
 			Arrays.sort(css);
 			clusters.put(unode, css);
-
-			//determine the prior
-			priors.put(unode, (l.size() - css[0].size) / (l.size() * 1.0));
+			
+			//L2
+//			css[0].lambda1 = 0.00001721049;
+//			css[0].lambda2 = 0.00001720265;
+//			css[0].lambda3 = 0.00001724251;
+//			
+//			css[1].lambda1 = 0.000007458071;
+//			css[1].lambda2 = 0.000007449284;
+//			css[1].lambda3 = 0.000007454065;
+//			
+//			css[2].lambda1 = 0.000003741333;
+//			css[2].lambda2 = 0.000003743186;
+//			css[2].lambda3 = 0.000003743619;
+//			
+//			css[3].lambda1 = 0.000001794651;
+//			css[3].lambda2 = 0.000001805033;
+//			css[3].lambda3 = 0.000001791622;
+			
+			//L3
+			css[0].lambda1 = 0.00002417718;
+			css[0].lambda2 = 0.00002422288;
+			css[0].lambda3 = 0.00002421426;
+			
+			css[1].lambda1 = 0.000008849225;
+			css[1].lambda2 = 0.000008844158;
+			css[1].lambda3 = 0.000008870430;
+			
+			css[2].lambda1 = 0.000004172628;
+			css[2].lambda2 = 0.000004153202;
+			css[2].lambda3 = 0.000004147342;
+			
+			css[3].lambda1 = 0.000001926176;
+			css[3].lambda2 = 0.000001940269;
+			css[3].lambda3 = 0.000001916556;
 		}
 	}
 
@@ -85,30 +110,22 @@ public class QueueLengthsImplNPEMComplete implements QueueLengths {
 		}
 
 		double queueLength = 0;
-		double priorA = priors.get(unode);
 		for (int index = 0; index < l.size(); index++) {
 			if (l.getInitiate(index) <= time && time <= l.getComplete(index)) {
 
 				long xI = time - l.getInitiate(index);
+				int c = getClusterNumber(cs, l.getComplete(index) - l.getInitiate(index));
 
-				int likelihoodCount = 0;
-				int posteriorCount = 0;
-				for (int index2 = 0; index2 < l.size(); index2++) {
-					//count for likelihood if longer than durationI
-					long durationJ = l.getComplete(index2) - l.getInitiate(index2);
-					if (durationJ > xI) {
-						likelihoodCount++;
+				DoubleMatrix m = DoubleMatrix.zeros(3, 3);
+				m.put(0, 0, (-cs[c].lambda1) * xI);
+				m.put(0, 1, cs[c].lambda1 * xI);
+				m.put(1, 1, (-cs[c].lambda2) * xI);
+				m.put(1, 2, cs[c].lambda2 * xI);
+				m.put(2, 2, (-cs[c].lambda3) * xI);
+				DoubleMatrix m2 = MatrixFunctions.expm(m);
 
-						//count for posterior if in cluster and longer than duration
-						int clusterJ = getClusterNumber(cs, durationJ);
-						if (clusterJ != 0) {
-							posteriorCount++;
-						}
-					}
-				}
-				double likelihoodI = likelihoodCount / (l.size() * 1.0);
-				double posteriorI = posteriorCount / (l.size() - cs[0].size * 1.0);
-				double p = priorA * posteriorI / likelihoodI;
+				double p = m2.get(0, 1);
+
 				queueLength += p;
 			}
 		}

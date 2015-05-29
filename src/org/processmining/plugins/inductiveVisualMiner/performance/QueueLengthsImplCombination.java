@@ -12,10 +12,11 @@ public class QueueLengthsImplCombination implements QueueLengths {
 		
 //		new QueueLengthsImplOutput(iLog);
 		
-		qEstimate = new QueueLengthsImplPHComplete(iLog);
+		qEstimate = new QueueLengthsImplCPHComplete(iLog);
+		
 		qReal = new QueueLengthsImplEnqueueStartComplete(iLog);
 		
-		new QueueLengthsImplOutput(iLog);
+//		new QueueLengthsImplOutput(iLog);
 
 		for (UnfoldedNode unode : qReal.queueActivityLogs.keySet()) {
 
@@ -35,6 +36,6 @@ public class QueueLengthsImplCombination implements QueueLengths {
 	}
 
 	public double getQueueLength(UnfoldedNode unode, long time) {
-		return qReal.getQueueLength(unode, time);
+		return qEstimate.getQueueLength(unode, time);
 	}
 }
