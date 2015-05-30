@@ -96,10 +96,10 @@ public class GraphvizDirectlyFollowsGraph {
 
 		if (includeParalelEdges) {
 			//add the parallel directly-follows edges
-			for (long edge : dfg.getParallelGraph().getEdges()) {
-				XEventClass from = dfg.getParallelGraph().getEdgeSource((int) edge);
-				XEventClass to = dfg.getParallelGraph().getEdgeTarget((int) edge);
-				int weight = (int) dfg.getParallelGraph().getEdgeWeight((int) edge);
+			for (long edge : dfg.getConcurrencyGraph().getEdges()) {
+				XEventClass from = dfg.getConcurrencyGraph().getEdgeSource((int) edge);
+				XEventClass to = dfg.getConcurrencyGraph().getEdgeTarget((int) edge);
+				int weight = (int) dfg.getConcurrencyGraph().getEdgeWeight((int) edge);
 
 				DotNode source = activityToNode.get(from);
 				DotNode target = activityToNode.get(to);
@@ -138,8 +138,8 @@ public class GraphvizDirectlyFollowsGraph {
 		}
 
 		long maxParallel = Long.MIN_VALUE;
-		for (long edge : dfg.getParallelGraph().getEdges()) {
-			maxParallel = Math.max(maxParallel, dfg.getParallelGraph().getEdgeWeight((int) edge));
+		for (long edge : dfg.getConcurrencyGraph().getEdges()) {
+			maxParallel = Math.max(maxParallel, dfg.getConcurrencyGraph().getEdgeWeight((int) edge));
 		}
 
 		return Sextuple.of(startMin, startMax, endMin, endMax, (int) maxWeight, (int) maxParallel);
