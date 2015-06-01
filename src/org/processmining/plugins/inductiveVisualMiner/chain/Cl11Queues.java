@@ -6,7 +6,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplComplete;
+import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplBPTComplete;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsMeasure;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActivityLog;
@@ -20,8 +20,8 @@ public class Cl11Queues extends ChainLink<IvMLog, QueueLengthsWrapper> {
 
 	protected QueueLengthsWrapper executeLink(IvMLog input) {
 		Map<UnfoldedNode, QueueActivityLog> queueActivityLogs = QueueMineActivityLog.mine(input);
-//		QueueLengths method = new QueueLengthsImplBPTComplete(queueActivityLogs);
-		QueueLengths method = new QueueLengthsImplComplete();
+		QueueLengths method = new QueueLengthsImplBPTComplete(queueActivityLogs, 2);
+//		QueueLengths method = new QueueLengthsImplComplete()
 //		QueueLengths method = new QueueLengthsImplEnqueueStartComplete();
 				
 		QueueLengthsMeasure.measure(queueActivityLogs, method);

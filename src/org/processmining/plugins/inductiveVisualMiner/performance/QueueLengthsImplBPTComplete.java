@@ -16,7 +16,7 @@ public class QueueLengthsImplBPTComplete extends QueueLengths {
 	private final QueueLengths cli;
 	private final Map<UnfoldedNode, TLongArrayList> busyPeriods;
 
-	public QueueLengthsImplBPTComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
+	public QueueLengthsImplBPTComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs, int k) {
 		cli = new QueueLengthsImplCLIComplete(queueActivityLogs, 2);
 		busyPeriods = new THashMap<UnfoldedNode, TLongArrayList>();
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
