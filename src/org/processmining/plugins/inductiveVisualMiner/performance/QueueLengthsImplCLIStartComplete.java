@@ -28,9 +28,7 @@ public class QueueLengthsImplCLIStartComplete extends QueueLengths {
 	private final Map<UnfoldedNode, Cluster[]> clusters;
 	private final TObjectDoubleMap<UnfoldedNode> priors;
 
-	private final static int k = 4;
-
-	public QueueLengthsImplCLIStartComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
+	public QueueLengthsImplCLIStartComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs, int k) {
 		clusters = new THashMap<>();
 		priors = new TObjectDoubleHashMap<>();
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
