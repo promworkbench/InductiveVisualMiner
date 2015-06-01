@@ -5,18 +5,12 @@ import gnu.trove.set.hash.THashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsImplCompleteResource implements QueueLengths {
+public class QueueLengthsImplCompleteResource extends QueueLengths {
 
-	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
-
-	public QueueLengthsImplCompleteResource(IvMLog iLog) {
-		queueActivityLogs = QueueMineActivityLog.mine(iLog, true, false, false, true);
-	}
-
-	public double getQueueLength(UnfoldedNode unode, long time) {
+	@Override
+	public double getQueueLength(UnfoldedNode unode, long time, Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
 		QueueActivityLog l = queueActivityLogs.get(unode);
 		if (l == null) {
 			return -1;
@@ -24,7 +18,8 @@ public class QueueLengthsImplCompleteResource implements QueueLengths {
 		Set<String> resources = new THashSet<>();
 		long count = 0;
 		for (int index = 0; index < l.size(); index++) {
-			if (l.getInitiate(index) <= time && time <= l.getComplete(index)) {
+			if (l.getInitiate(index) > 0 && l.getComplete(index) > 0 && l.getInitiate(index) <= time
+					&& time <= l.getComplete(index)) {
 				//this activity instance is now in this activity
 				count++;
 				resources.add(l.getResource(index));
@@ -33,4 +28,7 @@ public class QueueLengthsImplCompleteResource implements QueueLengths {
 		return count - resources.size();
 	}
 
+	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+		throw new RuntimeException("You shouldn't arrive here.");
+	}
 }

@@ -4,33 +4,36 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsImplComplete implements QueueLengths {
+public class QueueLengthsImplComplete extends QueueLengths {
 
-	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
 	private final int resources;
 
-	public QueueLengthsImplComplete(IvMLog iLog) {
-		queueActivityLogs = QueueMineActivityLog.mine(iLog, true, false, false, true);
+	public QueueLengthsImplComplete() {
 		resources = Integer.valueOf((String) JOptionPane.showInputDialog(null, "Number of resources", "Resources",
 				JOptionPane.PLAIN_MESSAGE, null, null, ""));
 	}
 
-	public double getQueueLength(UnfoldedNode unode, long time) {
+	@Override
+	public double getQueueLength(UnfoldedNode unode, long time, Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
 		QueueActivityLog l = queueActivityLogs.get(unode);
 		if (l == null) {
 			return -1;
 		}
 		long count = 0;
 		for (int index = 0; index < l.size(); index++) {
-			if (l.getInitiate(index) <= time && time <= l.getComplete(index)) {
+			if (l.getInitiate(index) > 0 && l.getComplete(index) > 0 && l.getInitiate(index) <= time
+					&& time <= l.getComplete(index)) {
 				//this activity instance is now in this activity
 				count++;
 			}
 		}
 		return Math.max(0, count - resources);
+	}
+
+	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+		throw new RuntimeException("You shouldn't arrive here.");
 	}
 
 }

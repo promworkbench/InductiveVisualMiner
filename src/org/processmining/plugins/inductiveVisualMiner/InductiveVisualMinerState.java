@@ -24,7 +24,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
+import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.LifeCycleSplitLog;
@@ -344,13 +344,13 @@ public class InductiveVisualMinerState {
 	}
 
 	//==queue lengths
-	private QueueLengths queueLengths;
+	private QueueLengthsWrapper queueLengths;
 
-	public void setQueueLengths(QueueLengths queueLengths) {
+	public void setQueueLengths(QueueLengthsWrapper queueLengths) {
 		this.queueLengths = queueLengths;
 	}
 
-	public QueueLengths getQueueLengths() {
+	public QueueLengthsWrapper getQueueLengths() {
 		return queueLengths;
 	}
 }

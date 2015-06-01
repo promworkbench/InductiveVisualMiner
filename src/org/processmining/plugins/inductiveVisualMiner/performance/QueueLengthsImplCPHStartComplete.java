@@ -12,10 +12,9 @@ import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsImplCPHStartComplete implements QueueLengths {
+public class QueueLengthsImplCPHStartComplete extends QueueLengths {
 
 	private class Cluster implements Comparable<Cluster> {
 		public double center;
@@ -27,13 +26,11 @@ public class QueueLengthsImplCPHStartComplete implements QueueLengths {
 		}
 	}
 
-	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
 	private final Map<UnfoldedNode, Cluster[]> clusters;
 
 	private final static int k = 5;
 
-	public QueueLengthsImplCPHStartComplete(IvMLog iLog) {
-		queueActivityLogs = QueueMineActivityLog.mine(iLog, true, false, true, false);
+	public QueueLengthsImplCPHStartComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
 		clusters = new THashMap<>();
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
 			QueueActivityLog l = queueActivityLogs.get(unode);
@@ -64,62 +61,33 @@ public class QueueLengthsImplCPHStartComplete implements QueueLengths {
 			}
 			Arrays.sort(css);
 			clusters.put(unode, css);
-			
+
 			//L2
 			css[0].lambda1 = 0.00003208256;
 			css[0].lambda2 = 0.00003208085;
-			
+
 			css[1].lambda1 = 0.00001378153;
 			css[1].lambda2 = 0.00001376297;
-			
+
 			css[2].lambda1 = 0.000007196115;
 			css[2].lambda2 = 0.000007188530;
-			
+
 			css[3].lambda1 = 0.000002222535;
 			css[3].lambda2 = 0.000002198928;
-			
+
 			//L3
-//			css[0].lambda1 = 0.00006698487;
-//			css[0].lambda2 = 0.00027087680;
-//			
-//			css[1].lambda1 = 0.00002102458;
-//			css[1].lambda2 = 0.00002112377;
-//			
-//			css[2].lambda1 = 0.000009177158;
-//			css[2].lambda2 = 0.000009199203;
-//			
-//			css[3].lambda1 = 0.000002331028;
-//			css[3].lambda2 = 0.000002336724;
+			//			css[0].lambda1 = 0.00006698487;
+			//			css[0].lambda2 = 0.00027087680;
+			//			
+			//			css[1].lambda1 = 0.00002102458;
+			//			css[1].lambda2 = 0.00002112377;
+			//			
+			//			css[2].lambda1 = 0.000009177158;
+			//			css[2].lambda2 = 0.000009199203;
+			//			
+			//			css[3].lambda1 = 0.000002331028;
+			//			css[3].lambda2 = 0.000002336724;
 		}
-	}
-
-	public double getQueueLength(UnfoldedNode unode, long time) {
-		QueueActivityLog l = queueActivityLogs.get(unode);
-		Cluster[] cs = clusters.get(unode);
-		if (l == null) {
-			return -1;
-		}
-
-		double queueLength = 0;
-		for (int index = 0; index < l.size(); index++) {
-			if (l.getInitiate(index) <= time && time <= l.getStart(index)) {
-
-				long xI = time - l.getInitiate(index);
-				int c = getClusterNumber(cs, l.getStart(index) - l.getInitiate(index));
-
-				DoubleMatrix m = DoubleMatrix.zeros(2, 2);
-				m.put(0, 0, (-cs[c].lambda1) * xI);
-				m.put(0, 1, cs[c].lambda1 * xI);
-				m.put(1,  1, (-cs[c].lambda2) * xI);
-				DoubleMatrix m2 = MatrixFunctions.expm(m);
-
-				double p = m2.get(0, 1);
-
-				queueLength += p;
-			}
-		}
-
-		return queueLength;
 	}
 
 	public int getClusterNumber(Cluster[] cs, long duration) {
@@ -129,5 +97,23 @@ public class QueueLengthsImplCPHStartComplete implements QueueLengths {
 			}
 		}
 		return cs.length - 1;
+	}
+
+	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+		if (l.getInitiate(traceIndex) > 0 && l.getStart(traceIndex) > 0 && l.getInitiate(traceIndex) <= time
+				&& time <= l.getStart(traceIndex)) {
+			Cluster[] cs = clusters.get(unode);
+			long xI = time - l.getInitiate(traceIndex);
+			int c = getClusterNumber(cs, l.getStart(traceIndex) - l.getInitiate(traceIndex));
+
+			DoubleMatrix m = DoubleMatrix.zeros(2, 2);
+			m.put(0, 0, (-cs[c].lambda1) * xI);
+			m.put(0, 1, cs[c].lambda1 * xI);
+			m.put(1, 1, (-cs[c].lambda2) * xI);
+			DoubleMatrix m2 = MatrixFunctions.expm(m);
+
+			return m2.get(0, 1);
+		}
+		return 0;
 	}
 }

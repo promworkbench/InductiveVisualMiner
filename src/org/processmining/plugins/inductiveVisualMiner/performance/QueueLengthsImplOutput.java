@@ -6,16 +6,11 @@ import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsImplOutput implements QueueLengths {
-
-	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
-
-	public QueueLengthsImplOutput(IvMLog iLog) {
-		queueActivityLogs = QueueMineActivityLog.mine(iLog, true, true, true, true);
-
+public class QueueLengthsImplOutput {
+	
+	public QueueLengthsImplOutput(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
 		for (Entry<UnfoldedNode, QueueActivityLog> e : queueActivityLogs.entrySet()) {
 			try {
 				File f = new File("d:\\output\\activity-queue-log " + e.getKey() + ".csv");
@@ -33,9 +28,5 @@ public class QueueLengthsImplOutput implements QueueLengths {
 				e1.printStackTrace();
 			}
 		}
-	}
-
-	public double getQueueLength(UnfoldedNode unode, long time) {
-		return -1;
 	}
 }

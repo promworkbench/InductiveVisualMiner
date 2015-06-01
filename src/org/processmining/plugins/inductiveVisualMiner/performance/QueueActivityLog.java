@@ -41,27 +41,20 @@ public class QueueActivityLog {
 	public String getResource(int index) {
 		return resources.get(index);
 	}
-	
-	private Long mask(long result) {
-		if (result < 0) {
-			return null;
-		}
-		return result;
+
+	public long getInitiate(int traceIndex) {
+		return moves.get(traceIndex * 4);
 	}
 
-	public Long getInitiate(int index) {
-		return mask(moves.get(index * 4));
+	public long getEnqueue(int traceIndex) {
+		return moves.get(traceIndex * 4 + 1);
 	}
 
-	public Long getEnqueue(int index) {
-		return mask(moves.get(index * 4 + 1));
+	public long getStart(int traceIndex) {
+		return moves.get(traceIndex * 4 + 2);
 	}
 
-	public Long getStart(int index) {
-		return mask(moves.get(index * 4 + 2));
-	}
-
-	public Long getComplete(int index) {
-		return mask(moves.get(index * 4 + 3));
+	public long getComplete(int traceIndex) {
+		return moves.get(traceIndex * 4 + 3);
 	}
 }

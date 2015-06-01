@@ -12,10 +12,9 @@ import java.util.Map;
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.clustering.FuzzyKMeansClusterer;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsImplNPEMStartComplete implements QueueLengths {
+public class QueueLengthsImplCLIStartComplete extends QueueLengths {
 
 	private class Cluster implements Comparable<Cluster> {
 		public int size;
@@ -26,14 +25,12 @@ public class QueueLengthsImplNPEMStartComplete implements QueueLengths {
 		}
 	}
 
-	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
 	private final Map<UnfoldedNode, Cluster[]> clusters;
 	private final TObjectDoubleMap<UnfoldedNode> priors;
 
 	private final static int k = 4;
 
-	public QueueLengthsImplNPEMStartComplete(IvMLog iLog) {
-		queueActivityLogs = QueueMineActivityLog.mine(iLog, true, false, true, false);
+	public QueueLengthsImplCLIStartComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
 		clusters = new THashMap<>();
 		priors = new TObjectDoubleHashMap<>();
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
@@ -68,64 +65,49 @@ public class QueueLengthsImplNPEMStartComplete implements QueueLengths {
 			}
 			Arrays.sort(css);
 			clusters.put(unode, css);
-			
+
 			//determine the prior
 			priors.put(unode, (l.size() - css[0].size) / (l.size() * 1.0));
 		}
 	}
 
-	public double getQueueLength(UnfoldedNode unode, long time) {
-		QueueActivityLog l = queueActivityLogs.get(unode);
-		Cluster[] cs = clusters.get(unode);
-		if (l == null) {
-			return -1;
-		}
-
-		double queueLength = 0;
-		double priorA = priors.get(unode);
-		for (int index = 0; index < l.size(); index++) {
-			if (l.getInitiate(index) <= time && time <= l.getStart(index)) {
-
-				long xI = time - l.getInitiate(index);
-
-				int likelihoodCount = 0;
-				int posteriorCount = 0;
-				for (int index2 = 0; index2 < l.size(); index2++) {
-					//count for likelihood if longer than durationI
-					long durationJ = l.getStart(index2) - l.getInitiate(index2);
-					if (durationJ > xI) {
-						likelihoodCount++;
-
-						//count for posterior if in cluster and longer than duration
-						int clusterJ = getClusterNumber(cs, durationJ);
-						if (clusterJ != 0) {
-							posteriorCount++;
-						}
-					}
-				}
-				double likelihoodI = likelihoodCount / (l.size() * 1.0);
-				double posteriorI = posteriorCount / (l.size() - cs[0].size * 1.0);
-				double p = priorA * posteriorI / likelihoodI;
-//				System.out.println("l  " + likelihoodI);
-//				System.out.println("po " + posteriorI);
-//				System.out.println("pr " + priorA);
-				queueLength += p;
+	public int getClusterNumber(Cluster[] cs, long duration) {
+		for (int i = 0; i < cs.length - 1; i++) {
+			if (duration < (cs[i].center + cs[i + 1].center) / 2.0) {
+				return i;
 			}
 		}
-
-		return queueLength;
+		return cs.length - 1;
 	}
 
-	public int getClusterNumber(Cluster[] cs, long duration) {
-		if (duration < (cs[0].center + cs[1].center) / 2.0) {
-			return 0;
-		} else if (duration < (cs[1].center + cs[2].center) / 2.0) {
-			return 1;
-		} else if (duration < (cs[2].center + cs[3].center) / 2.0) {
-			return 2;
-		} else {
-			return 3;
+	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+		if (l.getInitiate(traceIndex) > 0 && l.getStart(traceIndex) > 0 && l.getInitiate(traceIndex) <= time
+				&& time <= l.getStart(traceIndex)) {
+			Cluster[] cs = clusters.get(unode);
+			double priorA = priors.get(unode);
+
+			long xI = time - l.getInitiate(traceIndex);
+
+			int likelihoodCount = 0;
+			int posteriorCount = 0;
+			for (int index2 = 0; index2 < l.size(); index2++) {
+				//count for likelihood if longer than durationI
+				long durationJ = l.getStart(index2) - l.getInitiate(index2);
+				if (durationJ > xI) {
+					likelihoodCount++;
+
+					//count for posterior if in cluster and longer than duration
+					int clusterJ = getClusterNumber(cs, durationJ);
+					if (clusterJ != 0) {
+						posteriorCount++;
+					}
+				}
+			}
+			double likelihoodI = likelihoodCount / (l.size() * 1.0);
+			double posteriorI = posteriorCount / (l.size() - cs[0].size * 1.0);
+			return priorA * posteriorI / likelihoodI;
 		}
+		return 0;
 	}
 
 }

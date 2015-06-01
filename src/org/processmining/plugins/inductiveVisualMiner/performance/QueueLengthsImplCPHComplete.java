@@ -12,10 +12,9 @@ import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsImplCPHComplete implements QueueLengths {
+public class QueueLengthsImplCPHComplete extends QueueLengths {
 
 	private class Cluster implements Comparable<Cluster> {
 		public double center;
@@ -28,13 +27,11 @@ public class QueueLengthsImplCPHComplete implements QueueLengths {
 		}
 	}
 
-	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
 	private final Map<UnfoldedNode, Cluster[]> clusters;
 
 	private final static int k = 5;
 
-	public QueueLengthsImplCPHComplete(IvMLog iLog) {
-		queueActivityLogs = QueueMineActivityLog.mine(iLog, true, false, false, true);
+	public QueueLengthsImplCPHComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
 		clusters = new THashMap<>();
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
 			QueueActivityLog l = queueActivityLogs.get(unode);
@@ -65,72 +62,41 @@ public class QueueLengthsImplCPHComplete implements QueueLengths {
 			}
 			Arrays.sort(css);
 			clusters.put(unode, css);
-			
+
 			//L2
-//			css[0].lambda1 = 0.00001721049;
-//			css[0].lambda2 = 0.00001720265;
-//			css[0].lambda3 = 0.00001724251;
-//			
-//			css[1].lambda1 = 0.000007458071;
-//			css[1].lambda2 = 0.000007449284;
-//			css[1].lambda3 = 0.000007454065;
-//			
-//			css[2].lambda1 = 0.000003741333;
-//			css[2].lambda2 = 0.000003743186;
-//			css[2].lambda3 = 0.000003743619;
-//			
-//			css[3].lambda1 = 0.000001794651;
-//			css[3].lambda2 = 0.000001805033;
-//			css[3].lambda3 = 0.000001791622;
-			
+			//			css[0].lambda1 = 0.00001721049;
+			//			css[0].lambda2 = 0.00001720265;
+			//			css[0].lambda3 = 0.00001724251;
+			//			
+			//			css[1].lambda1 = 0.000007458071;
+			//			css[1].lambda2 = 0.000007449284;
+			//			css[1].lambda3 = 0.000007454065;
+			//			
+			//			css[2].lambda1 = 0.000003741333;
+			//			css[2].lambda2 = 0.000003743186;
+			//			css[2].lambda3 = 0.000003743619;
+			//			
+			//			css[3].lambda1 = 0.000001794651;
+			//			css[3].lambda2 = 0.000001805033;
+			//			css[3].lambda3 = 0.000001791622;
+
 			//L3
 			css[0].lambda1 = 0.00002417718;
 			css[0].lambda2 = 0.00002422288;
 			css[0].lambda3 = 0.00002421426;
-			
+
 			css[1].lambda1 = 0.000008849225;
 			css[1].lambda2 = 0.000008844158;
 			css[1].lambda3 = 0.000008870430;
-			
+
 			css[2].lambda1 = 0.000004172628;
 			css[2].lambda2 = 0.000004153202;
 			css[2].lambda3 = 0.000004147342;
-			
+
 			css[3].lambda1 = 0.000001926176;
 			css[3].lambda2 = 0.000001940269;
 			css[3].lambda3 = 0.000001916556;
 		}
-	}
-
-	public double getQueueLength(UnfoldedNode unode, long time) {
-		QueueActivityLog l = queueActivityLogs.get(unode);
-		Cluster[] cs = clusters.get(unode);
-		if (l == null) {
-			return -1;
-		}
-
-		double queueLength = 0;
-		for (int index = 0; index < l.size(); index++) {
-			if (l.getInitiate(index) <= time && time <= l.getComplete(index)) {
-
-				long xI = time - l.getInitiate(index);
-				int c = getClusterNumber(cs, l.getComplete(index) - l.getInitiate(index));
-
-				DoubleMatrix m = DoubleMatrix.zeros(3, 3);
-				m.put(0, 0, (-cs[c].lambda1) * xI);
-				m.put(0, 1, cs[c].lambda1 * xI);
-				m.put(1, 1, (-cs[c].lambda2) * xI);
-				m.put(1, 2, cs[c].lambda2 * xI);
-				m.put(2, 2, (-cs[c].lambda3) * xI);
-				DoubleMatrix m2 = MatrixFunctions.expm(m);
-
-				double p = m2.get(0, 1);
-
-				queueLength += p;
-			}
-		}
-
-		return queueLength;
 	}
 
 	public int getClusterNumber(Cluster[] cs, long duration) {
@@ -140,5 +106,25 @@ public class QueueLengthsImplCPHComplete implements QueueLengths {
 			}
 		}
 		return cs.length - 1;
+	}
+
+	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+		if (l.getInitiate(traceIndex) > 0 && l.getComplete(traceIndex) > 0 && l.getInitiate(traceIndex) <= time
+				&& time <= l.getComplete(traceIndex)) {
+			Cluster[] cs = clusters.get(unode);
+			long xI = time - l.getInitiate(traceIndex);
+			int c = getClusterNumber(cs, l.getComplete(traceIndex) - l.getInitiate(traceIndex));
+
+			DoubleMatrix m = DoubleMatrix.zeros(3, 3);
+			m.put(0, 0, (-cs[c].lambda1) * xI);
+			m.put(0, 1, cs[c].lambda1 * xI);
+			m.put(1, 1, (-cs[c].lambda2) * xI);
+			m.put(1, 2, cs[c].lambda2 * xI);
+			m.put(2, 2, (-cs[c].lambda3) * xI);
+			DoubleMatrix m2 = MatrixFunctions.expm(m);
+
+			return m2.get(0, 1);
+		}
+		return 0;
 	}
 }

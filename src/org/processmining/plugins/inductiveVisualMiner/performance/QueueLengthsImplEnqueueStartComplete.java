@@ -1,31 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import java.util.Map;
-
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsImplEnqueueStartComplete implements QueueLengths {
+public class QueueLengthsImplEnqueueStartComplete extends QueueLengths {
 
-	public final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
-
-	public QueueLengthsImplEnqueueStartComplete(IvMLog iLog) {
-		queueActivityLogs = QueueMineActivityLog.mine(iLog, false, true, true, false);
+	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+		return (l.getEnqueue(traceIndex) > 0 && l.getStart(traceIndex) > 0 && l.getEnqueue(traceIndex) <= time && time <= l
+				.getStart(traceIndex)) ? 1 : 0;
 	}
-
-	public double getQueueLength(UnfoldedNode unode, long time) {
-		QueueActivityLog l = queueActivityLogs.get(unode);
-		if (l == null) {
-			return -1;
-		}
-		long count = 0;
-		for (int index = 0; index < l.size(); index++) {
-			if (l.getEnqueue(index) <= time && time <= l.getStart(index)) {
-				//this activity instance is now queueing
-				count++;
-			}
-		}
-		return count;
-	}
-
 }

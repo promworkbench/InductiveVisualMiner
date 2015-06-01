@@ -24,7 +24,7 @@ public class QueueLengthsVisualiser {
 	 * @throws SVGException
 	 */
 	public static void drawQueues(SVGDiagram svg, ProcessTree tree, AlignedLogVisualisationInfo info,
-			QueueLengths lengths, long time) throws SVGException {
+			QueueLengthsWrapper lengths, long time) throws SVGException {
 		for (UnfoldedNode unode : TreeUtils.unfoldAllNodes(new UnfoldedNode(tree.getRoot()))) {
 			if (unode.getNode() instanceof Manual) {
 				drawQueue(svg, info, unode, lengths.getQueueLength(unode, time));

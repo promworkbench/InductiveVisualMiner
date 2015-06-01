@@ -13,17 +13,15 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class QueueMineActivityLog {
 
-	public static Map<UnfoldedNode, QueueActivityLog> mine(IvMLog tLog, boolean requireInitiate,
-			boolean requireEnqueue, boolean requireStart, boolean requireComplete) {
+	public static Map<UnfoldedNode, QueueActivityLog> mine(IvMLog tLog) {
 		Map<UnfoldedNode, QueueActivityLog> queueActivityLogs = new THashMap<>();
 		for (IvMTrace tTrace : tLog) {
-			mine(tTrace, queueActivityLogs, requireInitiate, requireEnqueue, requireStart, requireComplete);
+			mine(tTrace, queueActivityLogs);
 		}
 		return queueActivityLogs;
 	}
 
-	public static void mine(IvMTrace tTrace, Map<UnfoldedNode, QueueActivityLog> timestamps, boolean requireInitiate,
-			boolean requireEnqueue, boolean requireStart, boolean requireComplete) {
+	public static void mine(IvMTrace tTrace, Map<UnfoldedNode, QueueActivityLog> timestamps) {
 		ActivityInstanceIterator it = tTrace.activityInstanceIterator();
 		while (it.hasNext()) {
 			Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> activityInstance = it.next();
@@ -31,10 +29,10 @@ public class QueueMineActivityLog {
 			if (activityInstance != null) {
 
 				//we are only interested in activity instances according to the parameters
-				if (((activityInstance.getC() != null && activityInstance.getC().getLogTimestamp() != null) || !requireInitiate)
-						&& ((activityInstance.getD() != null && activityInstance.getD().getLogTimestamp() != null) || !requireEnqueue)
-						&& ((activityInstance.getE() != null && activityInstance.getE().getLogTimestamp() != null) || !requireStart)
-						&& ((activityInstance.getF() != null && activityInstance.getF().getLogTimestamp() != null) || !requireComplete)) {
+				if (((activityInstance.getC() != null && activityInstance.getC().getLogTimestamp() != null) || (activityInstance
+						.getD() != null && activityInstance.getD().getLogTimestamp() != null))
+						&& ((activityInstance.getE() != null && activityInstance.getE().getLogTimestamp() != null)
+						|| (activityInstance.getF() != null && activityInstance.getF().getLogTimestamp() != null))) {
 
 					Long initiate = null;
 					Long enqueue = null;
