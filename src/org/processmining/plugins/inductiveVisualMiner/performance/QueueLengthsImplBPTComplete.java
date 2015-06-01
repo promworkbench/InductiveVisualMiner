@@ -32,8 +32,6 @@ public class QueueLengthsImplBPTComplete extends QueueLengths {
 			timestamps[i * 2 + 1] = l.getComplete(i);
 		}
 		Arrays.sort(timestamps);
-		
-		System.out.println(timestamps.length);
 
 		//for each timestamp, determine whether it is a busy period
 		BitSet busyPeriods = new BitSet();
@@ -45,20 +43,16 @@ public class QueueLengthsImplBPTComplete extends QueueLengths {
 			}
 		}
 		
-		System.out.println(busyPeriods);
-
 		//make a list of timestamps where busy periods change
 		boolean isBusy = false;
 		TLongArrayList result = new TLongArrayList();
 		for (int i = 0; i < timestamps.length; i++) {
 			if (busyPeriods.get(i) != isBusy) {
-				System.out.println("change at timestamp #" +i + " @" + timestamps[i]);
 				isBusy = !isBusy;
 				result.add(timestamps[i]);
 			}
 		}
 
-		System.out.println(result);
 		return result;
 	}
 

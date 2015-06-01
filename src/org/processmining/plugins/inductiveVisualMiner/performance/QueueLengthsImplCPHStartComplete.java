@@ -28,9 +28,7 @@ public class QueueLengthsImplCPHStartComplete extends QueueLengths {
 
 	private final Map<UnfoldedNode, Cluster[]> clusters;
 
-	private final static int k = 5;
-
-	public QueueLengthsImplCPHStartComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
+	public QueueLengthsImplCPHStartComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs, int k) {
 		clusters = new THashMap<>();
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
 			QueueActivityLog l = queueActivityLogs.get(unode);
