@@ -10,6 +10,7 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersIM;
+import org.processmining.plugins.InductiveMiner.mining.operators.Interleaved;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
@@ -97,8 +98,10 @@ public class AlignedLogVisualisation {
 			convertSequence(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof XorLoop) {
 			convertLoop(unode, source, sink, directionForward);
+		} else if (unode.getNode() instanceof Interleaved) {
+			convertParallel(unode, source, sink, directionForward, "\u2194");
 		} else if (unode.getNode() instanceof And) {
-			convertParallel(unode, source, sink, directionForward);
+			convertParallel(unode, source, sink, directionForward, "+");
 		} else if (unode.getNode() instanceof Or) {
 			convertOr(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof Xor) {
@@ -221,14 +224,14 @@ public class AlignedLogVisualisation {
 		}
 	}
 
-	private void convertParallel(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
+	private void convertParallel(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward, String sign) {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.parallelSplit, "+", unode);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.parallelSplit, sign, unode);
 		addArc(source, split, unode, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, "+", unode);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, sign, unode);
 		addArc(join, sink, unode, directionForward, true);
 
 		for (Node child : unode.getBlock().getChildren()) {

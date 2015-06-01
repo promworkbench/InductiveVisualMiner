@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
+import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class IvMTrace extends ArrayList<IvMMove> {
@@ -162,7 +163,8 @@ public class IvMTrace extends ArrayList<IvMMove> {
 			EventIterator itBack = it.cloneOneBack();
 			while (itBack.hasPrevious()) {
 				IvMMove m = itBack.previous();
-				if (m.isComplete() && !TreeUtils.areParallel(unode, m.getUnode())) {
+				if (m.isModelSync() && !(m.getUnode().getNode() instanceof Automatic) && m.isComplete()
+						&& !TreeUtils.areParallel(unode, m.getUnode())) {
 					return m;
 				}
 			}
