@@ -62,38 +62,38 @@ public class QueueLengthsImplCPHComplete extends QueueLengths {
 			clusters.put(unode, css);
 
 			//L2
-			//			css[0].lambda1 = 0.00001721049;
-			//			css[0].lambda2 = 0.00001720265;
-			//			css[0].lambda3 = 0.00001724251;
-			//			
-			//			css[1].lambda1 = 0.000007458071;
-			//			css[1].lambda2 = 0.000007449284;
-			//			css[1].lambda3 = 0.000007454065;
-			//			
-			//			css[2].lambda1 = 0.000003741333;
-			//			css[2].lambda2 = 0.000003743186;
-			//			css[2].lambda3 = 0.000003743619;
-			//			
-			//			css[3].lambda1 = 0.000001794651;
-			//			css[3].lambda2 = 0.000001805033;
-			//			css[3].lambda3 = 0.000001791622;
+			css[0].lambda1 = 0.00001721049;
+			css[0].lambda2 = 0.00001720265;
+			css[0].lambda3 = 0.00001724251;
+
+			css[1].lambda1 = 0.000007458071;
+			css[1].lambda2 = 0.000007449284;
+			css[1].lambda3 = 0.000007454065;
+
+			css[2].lambda1 = 0.000003741333;
+			css[2].lambda2 = 0.000003743186;
+			css[2].lambda3 = 0.000003743619;
+
+			css[3].lambda1 = 0.000001794651;
+			css[3].lambda2 = 0.000001805033;
+			css[3].lambda3 = 0.000001791622;
 
 			//L3
-			css[0].lambda1 = 0.00002417718;
-			css[0].lambda2 = 0.00002422288;
-			css[0].lambda3 = 0.00002421426;
-
-			css[1].lambda1 = 0.000008849225;
-			css[1].lambda2 = 0.000008844158;
-			css[1].lambda3 = 0.000008870430;
-
-			css[2].lambda1 = 0.000004172628;
-			css[2].lambda2 = 0.000004153202;
-			css[2].lambda3 = 0.000004147342;
-
-			css[3].lambda1 = 0.000001926176;
-			css[3].lambda2 = 0.000001940269;
-			css[3].lambda3 = 0.000001916556;
+//			css[0].lambda1 = 0.00002417718;
+//			css[0].lambda2 = 0.00002422288;
+//			css[0].lambda3 = 0.00002421426;
+//
+//			css[1].lambda1 = 0.000008849225;
+//			css[1].lambda2 = 0.000008844158;
+//			css[1].lambda3 = 0.000008870430;
+//
+//			css[2].lambda1 = 0.000004172628;
+//			css[2].lambda2 = 0.000004153202;
+//			css[2].lambda3 = 0.000004147342;
+//
+//			css[3].lambda1 = 0.000001926176;
+//			css[3].lambda2 = 0.000001940269;
+//			css[3].lambda3 = 0.000001916556;
 		}
 	}
 
