@@ -28,7 +28,7 @@ public class QueueLengthsImplCLIComplete extends QueueLengths {
 	private final Map<UnfoldedNode, Cluster[]> clusters;
 	private final TObjectDoubleMap<UnfoldedNode> priors;
 
-	private final static int k = 5;
+	private final static int k = 2;
 
 	public QueueLengthsImplCLIComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
 		clusters = new THashMap<>();

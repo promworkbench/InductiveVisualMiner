@@ -11,7 +11,7 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class QueueLengthsImplBPTComplete extends QueueLengths {
 
-	private final static double theta = 0.5;
+	private final static double theta = 1.5;
 
 	private final QueueLengths cli;
 	private final Map<UnfoldedNode, TLongArrayList> busyPeriods;
@@ -32,28 +32,33 @@ public class QueueLengthsImplBPTComplete extends QueueLengths {
 			timestamps[i * 2 + 1] = l.getComplete(i);
 		}
 		Arrays.sort(timestamps);
+		
+		System.out.println(timestamps.length);
 
 		//for each timestamp, determine whether it is a busy period
 		BitSet busyPeriods = new BitSet();
 		for (int i = 0; i < timestamps.length; i++) {
-			if (i > 0) {
-				long time = timestamps[i];
-				busyPeriods.set(i, isBusy(unode, l, time));
+			if (timestamps[i] > 0) {
+				busyPeriods.set(i, isBusy(unode, l, timestamps[i]));
 			} else {
 				busyPeriods.set(i, false);
 			}
 		}
+		
+		System.out.println(busyPeriods);
 
 		//make a list of timestamps where busy periods change
 		boolean isBusy = false;
 		TLongArrayList result = new TLongArrayList();
 		for (int i = 0; i < timestamps.length; i++) {
-			if (!busyPeriods.get(i) == isBusy) {
+			if (busyPeriods.get(i) != isBusy) {
+				System.out.println("change at timestamp #" +i + " @" + timestamps[i]);
 				isBusy = !isBusy;
 				result.add(timestamps[i]);
 			}
 		}
 
+		System.out.println(result);
 		return result;
 	}
 
