@@ -9,7 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplBPTComplete;
+import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplBPComplete;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCLIComplete;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCLIStartComplete;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCPHComplete;
@@ -38,7 +38,7 @@ public class Cl11Queues extends ChainLink<IvMLog, QueueLengthsWrapper> {
 			new QueueLengthsImplUPStartComplete(),
 			new QueueLengthsImplCPHComplete(queueActivityLogs, k),
 			new QueueLengthsImplCPHStartComplete(queueActivityLogs, k),
-			new QueueLengthsImplBPTComplete(queueActivityLogs, k)
+			new QueueLengthsImplBPComplete(queueActivityLogs)
 		));
 		
 		
@@ -50,7 +50,7 @@ public class Cl11Queues extends ChainLink<IvMLog, QueueLengthsWrapper> {
 		}
 				
 		
-		QueueLengths method = new QueueLengthsImplBPTComplete(queueActivityLogs, 2);
+		QueueLengths method = new QueueLengthsImplBPComplete(queueActivityLogs);
 		return new QueueLengthsWrapper(method, queueActivityLogs);
 	}
 
