@@ -9,15 +9,15 @@ import java.util.Map;
 
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class QueueLengthsImplBPTComplete extends QueueLengths {
+public class QueueLengthsImplBPComplete extends QueueLengths {
 
 	private final static double theta = 1.5;
 
 	private final QueueLengths cli;
 	private final Map<UnfoldedNode, TLongArrayList> busyPeriods;
 
-	public QueueLengthsImplBPTComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs, int k) {
-		cli = new QueueLengthsImplCLIComplete(queueActivityLogs, k);
+	public QueueLengthsImplBPComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
+		cli = new QueueLengthsImplUPEnqueueStartComplete();
 		busyPeriods = new THashMap<UnfoldedNode, TLongArrayList>();
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
 			busyPeriods.put(unode, findBusyPeriods(unode, queueActivityLogs.get(unode)));

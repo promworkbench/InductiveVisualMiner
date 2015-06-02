@@ -9,7 +9,7 @@ public class QueueLengthsMeasure {
 	
 	public static void measure(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs, QueueLengths method) {
 		
-		QueueLengthsImplEnqueueStartComplete qReal = new QueueLengthsImplEnqueueStartComplete();
+		QueueLengthsImplUPEnqueueStartComplete qReal = new QueueLengthsImplUPEnqueueStartComplete();
 		
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
 
@@ -32,7 +32,7 @@ public class QueueLengthsMeasure {
 		}
 	}
 
-	public static Pair<Double, Double> rmse(UnfoldedNode unode, QueueLengthsImplEnqueueStartComplete real, QueueLengths method,
+	public static Pair<Double, Double> rmse(UnfoldedNode unode, QueueLengthsImplUPEnqueueStartComplete real, QueueLengths method,
 			long min, long max, Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
 		long sum = 0;
 		long bias = 0;
