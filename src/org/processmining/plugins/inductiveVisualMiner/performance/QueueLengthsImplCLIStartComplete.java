@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
-import org.apache.commons.math3.ml.clustering.FuzzyKMeansClusterer;
+import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsImplCLIStartComplete extends QueueLengths {
@@ -41,7 +41,7 @@ public class QueueLengthsImplCLIStartComplete extends QueueLengths {
 				intervals.add(new DoublePoint(d));
 			}
 
-			FuzzyKMeansClusterer<DoublePoint> clusterer = new FuzzyKMeansClusterer<>(k, 1.01);
+			KMeansPlusPlusClusterer<DoublePoint> clusterer = new KMeansPlusPlusClusterer<>(k);
 			List<CentroidCluster<DoublePoint>> cs = clusterer.cluster(intervals);
 
 			Cluster[] css = new Cluster[k];
@@ -108,4 +108,7 @@ public class QueueLengthsImplCLIStartComplete extends QueueLengths {
 		return 0;
 	}
 
+	public String getName() {
+		return "CLI start complete";
+	}
 }

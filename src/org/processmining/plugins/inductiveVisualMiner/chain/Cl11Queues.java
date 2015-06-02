@@ -10,12 +10,9 @@ import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplBPComplete;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCLIComplete;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCLIStartComplete;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCPHComplete;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCPHStartComplete;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplUPComplete;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplUPStartComplete;
+import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplUPEnqueueStartComplete;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsMeasure;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActivityLog;
@@ -33,12 +30,13 @@ public class Cl11Queues extends ChainLink<IvMLog, QueueLengthsWrapper> {
 		int k = 4;
 		List<QueueLengths> methods = new ArrayList<QueueLengths>(Arrays.asList(
 			new QueueLengthsImplBPComplete(queueActivityLogs),
-			new QueueLengthsImplUPComplete(),
-			new QueueLengthsImplUPStartComplete(),
-			new QueueLengthsImplCLIComplete(queueActivityLogs, k),
+			new QueueLengthsImplUPEnqueueStartComplete(),
+//			new QueueLengthsImplUPComplete(),
+//			new QueueLengthsImplUPStartComplete(),
+//			new QueueLengthsImplCLIComplete(queueActivityLogs, k),
 			new QueueLengthsImplCLIStartComplete(queueActivityLogs, k),
-			new QueueLengthsImplCPHComplete(queueActivityLogs, k),
-			new QueueLengthsImplCPHStartComplete(queueActivityLogs, k)
+			new QueueLengthsImplCPHComplete(queueActivityLogs, k)//,
+//			new QueueLengthsImplCPHStartComplete(queueActivityLogs, k)
 		));
 		
 		for (QueueLengths method : methods) {

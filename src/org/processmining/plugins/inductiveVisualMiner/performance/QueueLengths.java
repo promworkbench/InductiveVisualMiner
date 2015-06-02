@@ -34,4 +34,6 @@ public abstract class QueueLengths {
 	 * @return the probability that the trace is in queue at this moment.
 	 */
 	public abstract double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex);
+	
+	public abstract String getName();
 }

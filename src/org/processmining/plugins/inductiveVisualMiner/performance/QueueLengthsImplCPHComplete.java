@@ -125,4 +125,8 @@ public class QueueLengthsImplCPHComplete extends QueueLengths {
 		}
 		return 0;
 	}
+	
+	public String getName() {
+		return "CPH complete";
+	}
 }

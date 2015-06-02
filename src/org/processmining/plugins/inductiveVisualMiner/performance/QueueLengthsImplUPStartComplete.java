@@ -11,5 +11,9 @@ public class QueueLengthsImplUPStartComplete extends QueueLengths {
 		}
 		return 0;
 	}
+	
+	public String getName() {
+		return "UP start complete";
+	}
 
 }

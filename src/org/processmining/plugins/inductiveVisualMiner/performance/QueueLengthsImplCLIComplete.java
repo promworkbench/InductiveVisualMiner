@@ -106,4 +106,8 @@ public class QueueLengthsImplCLIComplete extends QueueLengths {
 		}
 		return 0;
 	}
+	
+	public String getName() {
+		return "CLI complete";
+	}
 }

@@ -1,5 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import org.processmining.plugins.InductiveMiner.Pair;
@@ -27,7 +30,7 @@ public class QueueLengthsMeasure {
 			
 			System.out.println("RMSE for activity " + unode + ": " + mse.getA());
 			System.out.println("bias for activity " + unode + ": " + mse.getB());
-			System.out.println("with method " + method.toString());
+			System.out.println("with method " + method.getName());
 			System.out.println("");
 		}
 	}
@@ -38,17 +41,17 @@ public class QueueLengthsMeasure {
 		long bias = 0;
 		long count = 0;
 		
-//		File f = new File("d:\\output\\graph.csv");
-//		PrintWriter w;
-//		try {
-//			w = new PrintWriter(f);
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//			return Pair.of(-1d, -1d);
-//		}
+		File f = new File("d:\\output\\graph-"+ method.getName() +".csv");
+		PrintWriter w;
+		try {
+			w = new PrintWriter(f);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return Pair.of(-1d, -1d);
+		}
 		
-//		w.write("minute,real,estimated");
-//		w.write("\n");
+		w.write("minute," + method.getName());
+		w.write("\n");
 		for (long t = min; t <= max; t += 60000) {
 			long sumReal = 0;
 			long sumMethod = 0;
@@ -57,14 +60,14 @@ public class QueueLengthsMeasure {
 				sumMethod += method.getQueueLength(unode, t, queueActivityLogs);
 			}
 			
-//			w.write( t + "," + (sumReal / 60.0) + "," + (sumMethod / 60.0));
-//			w.write("\n");
+			w.write( t + "," + (sumReal / 60.0) + "," + (sumMethod / 60.0));
+			w.write("\n");
 			
 			sum += Math.pow((sumReal / 60.0) - (sumMethod / 60.0), 2);
 			bias += (sumReal / 60.0) - (sumMethod / 60.0);
 			count++;
 		}
-//		w.close();
+		w.close();
 
 		return Pair.of(Math.pow(sum / (count * 1.0), 0.5), bias / (count * 1.0));
 	}

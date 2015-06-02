@@ -31,4 +31,8 @@ public class QueueLengthsImplCompleteResource extends QueueLengths {
 	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
 		throw new RuntimeException("You shouldn't arrive here.");
 	}
+	
+	public String getName() {
+		return "dumb counting complete resource";
+	}
 }

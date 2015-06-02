@@ -114,4 +114,8 @@ public class QueueLengthsImplCPHStartComplete extends QueueLengths {
 		}
 		return 0;
 	}
+	
+	public String getName() {
+		return "CPH start complete";
+	}
 }

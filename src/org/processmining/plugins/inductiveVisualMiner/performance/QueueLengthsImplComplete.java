@@ -36,4 +36,7 @@ public class QueueLengthsImplComplete extends QueueLengths {
 		throw new RuntimeException("You shouldn't arrive here.");
 	}
 
+	public String getName() {
+		return "dumb counting complete";
+	}
 }

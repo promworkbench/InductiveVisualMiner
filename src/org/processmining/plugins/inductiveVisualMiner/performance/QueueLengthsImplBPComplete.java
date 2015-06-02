@@ -98,4 +98,8 @@ public class QueueLengthsImplBPComplete extends QueueLengths {
 		}
 		return 0;
 	}
+
+	public String getName() {
+		return "BP complete";
+	}
 }

@@ -39,4 +39,8 @@ public class QueueLengthsImplPHComplete extends QueueLengths {
 		}
 		return 0;
 	}
+	
+	public String getName() {
+		return "PH complete";
+	}
 }
