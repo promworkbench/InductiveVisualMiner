@@ -41,10 +41,6 @@ public class Cl11Queues extends ChainLink<IvMLog, QueueLengthsWrapper> {
 			new QueueLengthsImplBPComplete(queueActivityLogs)
 		));
 		
-		
-//		QueueLengths method = new QueueLengthsImplComplete()
-//		QueueLengths method = new QueueLengthsImplEnqueueStartComplete();
-		
 		for (QueueLengths method : methods) {
 			QueueLengthsMeasure.measure(queueActivityLogs, method);
 		}
