@@ -9,11 +9,11 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsMeasure {
-	
+
 	public static void measure(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs, QueueLengths method) {
-		
+
 		QueueLengthsImplUPEnqueueStartComplete qReal = new QueueLengthsImplUPEnqueueStartComplete();
-		
+
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
 
 			//find min and max
@@ -27,7 +27,7 @@ public class QueueLengthsMeasure {
 
 			//compute mean square error
 			Pair<Double, Double> mse = rmse(unode, qReal, method, min, max, queueActivityLogs);
-			
+
 			System.out.println("RMSE for activity " + unode + ": " + mse.getA());
 			System.out.println("bias for activity " + unode + ": " + mse.getB());
 			System.out.println("with method " + method.getName());
@@ -35,13 +35,13 @@ public class QueueLengthsMeasure {
 		}
 	}
 
-	public static Pair<Double, Double> rmse(UnfoldedNode unode, QueueLengthsImplUPEnqueueStartComplete real, QueueLengths method,
-			long min, long max, Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
+	public static Pair<Double, Double> rmse(UnfoldedNode unode, QueueLengthsImplUPEnqueueStartComplete real,
+			QueueLengths method, long min, long max, Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
 		long sum = 0;
 		long bias = 0;
 		long count = 0;
-		
-		File f = new File("d:\\output\\graph-"+ method.getName() +".csv");
+
+		File f = new File("d:\\output\\graph-" + unode.getNode().getName() + "-" + method.getName() + ".csv");
 		PrintWriter w;
 		try {
 			w = new PrintWriter(f);
@@ -49,7 +49,7 @@ public class QueueLengthsMeasure {
 			e.printStackTrace();
 			return Pair.of(-1d, -1d);
 		}
-		
+
 		w.write("minute," + method.getName());
 		w.write("\n");
 		for (long t = min; t <= max; t += 60000) {
@@ -59,10 +59,10 @@ public class QueueLengthsMeasure {
 				sumReal += real.getQueueLength(unode, t, queueActivityLogs);
 				sumMethod += method.getQueueLength(unode, t, queueActivityLogs);
 			}
-			
-			w.write( t + "," + (sumReal / 60.0) + "," + (sumMethod / 60.0));
+
+			w.write(t + "," + (sumReal / 60.0) + "," + (sumMethod / 60.0));
 			w.write("\n");
-			
+
 			sum += Math.pow((sumReal / 60.0) - (sumMethod / 60.0), 2);
 			bias += (sumReal / 60.0) - (sumMethod / 60.0);
 			count++;
