@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import javax.swing.JOptionPane;
-
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
@@ -12,10 +10,13 @@ public class QueueLengthsImplPHStartComplete extends QueueLengths {
 	private final double lambda2;
 
 	public QueueLengthsImplPHStartComplete() {
-		lambda1 = Double.valueOf((String) JOptionPane.showInputDialog(null, "Lambda", "Lambda 1",
-				JOptionPane.PLAIN_MESSAGE, null, null, ""));
-		lambda2 = Double.valueOf((String) JOptionPane.showInputDialog(null, "Lambda", "Lambda 2",
-				JOptionPane.PLAIN_MESSAGE, null, null, ""));
+		//L1
+//		lambda1 = 0.00002382820;
+//		lambda2 = 0.00001211212;
+		
+		//L2
+		lambda1 = 0.0005964011;
+		lambda2 = 0.0000154282;
 	}
 
 	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
