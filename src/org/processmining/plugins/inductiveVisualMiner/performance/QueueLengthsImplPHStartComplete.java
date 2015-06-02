@@ -15,8 +15,12 @@ public class QueueLengthsImplPHStartComplete extends QueueLengths {
 //		lambda2 = 0.00001211212;
 		
 		//L2
-		lambda1 = 0.0005964011;
-		lambda2 = 0.0000154282;
+//		lambda1 = 0.0005964011;
+//		lambda2 = 0.0000154282;
+				
+		//L3
+		lambda1 = 0.0000011513989;
+		lambda2 = 0.0000007212469;
 	}
 
 	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {

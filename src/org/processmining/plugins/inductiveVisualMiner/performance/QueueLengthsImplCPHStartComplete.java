@@ -74,17 +74,30 @@ public class QueueLengthsImplCPHStartComplete extends QueueLengths {
 			//			css[3].lambda2 = 0.000002198928;
 
 			//L2
-			css[0].lambda1 = 0.00006698487;
-			css[0].lambda2 = 0.00027087680;
+			//			css[0].lambda1 = 0.00006698487;
+			//			css[0].lambda2 = 0.00027087680;
+			//
+			//			css[1].lambda1 = 0.00002102458;
+			//			css[1].lambda2 = 0.00002112377;
+			//
+			//			css[2].lambda1 = 0.000009177158;
+			//			css[2].lambda2 = 0.000009199203;
+			//
+			//			css[3].lambda1 = 0.000002331028;
+			//			css[3].lambda2 = 0.000002336724;
 
-			css[1].lambda1 = 0.00002102458;
-			css[1].lambda2 = 0.00002112377;
+			//L3
+			css[0].lambda1 = 0.000001513577;
+			css[0].lambda2 = 0.000001503805;
 
-			css[2].lambda1 = 0.000009177158;
-			css[2].lambda2 = 0.000009199203;
+			css[1].lambda1 = 0.0000005987237;
+			css[1].lambda2 = 0.0000006014447;
 
-			css[3].lambda1 = 0.000002331028;
-			css[3].lambda2 = 0.000002336724;
+			css[2].lambda1 = 0.0000003380778;
+			css[2].lambda2 = 0.0000003412313;
+
+			css[3].lambda1 = 0.0000001558959;
+			css[3].lambda2 = 0.0000001538938;
 		}
 	}
 
@@ -114,7 +127,7 @@ public class QueueLengthsImplCPHStartComplete extends QueueLengths {
 		}
 		return 0;
 	}
-	
+
 	public String getName() {
 		return "CPH start complete";
 	}
