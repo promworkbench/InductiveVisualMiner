@@ -32,13 +32,13 @@ public class Cl11Queues extends ChainLink<IvMLog, QueueLengthsWrapper> {
 		
 		int k = 4;
 		List<QueueLengths> methods = new ArrayList<QueueLengths>(Arrays.asList(
-			new QueueLengthsImplCLIComplete(queueActivityLogs, k),
-			new QueueLengthsImplCLIStartComplete(queueActivityLogs, k),
+			new QueueLengthsImplBPComplete(queueActivityLogs),
 			new QueueLengthsImplUPComplete(),
 			new QueueLengthsImplUPStartComplete(),
+			new QueueLengthsImplCLIComplete(queueActivityLogs, k),
+			new QueueLengthsImplCLIStartComplete(queueActivityLogs, k),
 			new QueueLengthsImplCPHComplete(queueActivityLogs, k),
-			new QueueLengthsImplCPHStartComplete(queueActivityLogs, k),
-			new QueueLengthsImplBPComplete(queueActivityLogs)
+			new QueueLengthsImplCPHStartComplete(queueActivityLogs, k)
 		));
 		
 		for (QueueLengths method : methods) {

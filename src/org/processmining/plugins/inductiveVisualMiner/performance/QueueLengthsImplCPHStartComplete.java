@@ -60,31 +60,31 @@ public class QueueLengthsImplCPHStartComplete extends QueueLengths {
 			Arrays.sort(css);
 			clusters.put(unode, css);
 
+			//L1
+			//			css[0].lambda1 = 0.00003208256;
+			//			css[0].lambda2 = 0.00003208085;
+			//
+			//			css[1].lambda1 = 0.00001378153;
+			//			css[1].lambda2 = 0.00001376297;
+			//
+			//			css[2].lambda1 = 0.000007196115;
+			//			css[2].lambda2 = 0.000007188530;
+			//
+			//			css[3].lambda1 = 0.000002222535;
+			//			css[3].lambda2 = 0.000002198928;
+
 			//L2
-			css[0].lambda1 = 0.00003208256;
-			css[0].lambda2 = 0.00003208085;
+			css[0].lambda1 = 0.00006698487;
+			css[0].lambda2 = 0.00027087680;
 
-			css[1].lambda1 = 0.00001378153;
-			css[1].lambda2 = 0.00001376297;
+			css[1].lambda1 = 0.00002102458;
+			css[1].lambda2 = 0.00002112377;
 
-			css[2].lambda1 = 0.000007196115;
-			css[2].lambda2 = 0.000007188530;
+			css[2].lambda1 = 0.000009177158;
+			css[2].lambda2 = 0.000009199203;
 
-			css[3].lambda1 = 0.000002222535;
-			css[3].lambda2 = 0.000002198928;
-
-			//L3
-			//			css[0].lambda1 = 0.00006698487;
-			//			css[0].lambda2 = 0.00027087680;
-			//			
-			//			css[1].lambda1 = 0.00002102458;
-			//			css[1].lambda2 = 0.00002112377;
-			//			
-			//			css[2].lambda1 = 0.000009177158;
-			//			css[2].lambda2 = 0.000009199203;
-			//			
-			//			css[3].lambda1 = 0.000002331028;
-			//			css[3].lambda2 = 0.000002336724;
+			css[3].lambda1 = 0.000002331028;
+			css[3].lambda2 = 0.000002336724;
 		}
 	}
 
