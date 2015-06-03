@@ -12,9 +12,9 @@ public class QueueLengthsImplPHComplete extends QueueLengths {
 
 	public QueueLengthsImplPHComplete() {
 		//L1
-		//		lambda1 = 0.000018868556;
-		//		lambda2 = 0.000004658797;
-		//		lambda3 = 0.000018671884;
+//		lambda1 = 0.000018868556;
+//		lambda2 = 0.000004658797;
+//		lambda3 = 0.000018671884;
 
 		//L2
 		//		lambda1 = 0.000004593318;
@@ -22,9 +22,9 @@ public class QueueLengthsImplPHComplete extends QueueLengths {
 		//		lambda3 = 0.000027511080;
 
 		//L3
-		lambda1 = 0.0000006178375;
-		lambda2 = 0.0000006053810;
-		lambda3 = 0.0000006078836;
+				lambda1 = 0.0000006178375;
+				lambda2 = 0.0000006053810;
+				lambda3 = 0.0000006078836;
 
 	}
 
