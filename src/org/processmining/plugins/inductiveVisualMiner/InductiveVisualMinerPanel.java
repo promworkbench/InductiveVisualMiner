@@ -35,7 +35,6 @@ import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringF
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
-import org.processmining.plugins.inductiveVisualMiner.resourcePerspective.ResourceView;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -64,8 +63,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JButton saveImageButton;
 	private final JButton traceViewButton;
 	private final TraceView traceView;
-	private final JButton resourceViewButton;
-	private final ResourceView resourceView;
+//	private final JButton resourceViewButton;
+//	private final ResourceView resourceView;
 	private final JButton colouringFiltersViewButton;
 	private final ColouringFiltersView colouringFiltersView;
 
@@ -172,16 +171,16 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 		
 		//resource view
-		{
-			resourceView = new ResourceView(this);
-			resourceViewButton = SlickerFactory.instance().createButton("resources");
-			GridBagConstraints cResourceViewButton = new GridBagConstraints();
-			cResourceViewButton.gridx = 2;
-			cResourceViewButton.gridy = gridy++;
-			cResourceViewButton.gridwidth = 1;
-			cResourceViewButton.fill = GridBagConstraints.HORIZONTAL;
-			add(resourceViewButton, cResourceViewButton);
-		}
+//		{
+//			resourceView = new ResourceView(this);
+//			resourceViewButton = SlickerFactory.instance().createButton("resources");
+//			GridBagConstraints cResourceViewButton = new GridBagConstraints();
+//			cResourceViewButton.gridx = 2;
+//			cResourceViewButton.gridy = gridy++;
+//			cResourceViewButton.gridwidth = 1;
+//			cResourceViewButton.fill = GridBagConstraints.HORIZONTAL;
+//			add(resourceViewButton, cResourceViewButton);
+//		}
 
 		//colouring filters view
 		{
@@ -381,7 +380,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public void removeNotify() {
 		super.removeNotify();
 		traceView.setVisible(false);
-		resourceView.setVisible(false);
+//		resourceView.setVisible(false);
 		colouringFiltersView.setVisible(false);
 		graphPanel.stop();
 	}
@@ -480,13 +479,13 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return traceViewButton;
 	}
 	
-	public ResourceView getResourceView() {
-		return resourceView;
-	}
-	
-	public JButton getResourceViewButton() {
-		return resourceViewButton;
-	}
+//	public ResourceView getResourceView() {
+//		return resourceView;
+//	}
+//	
+//	public JButton getResourceViewButton() {
+//		return resourceViewButton;
+//	}
 
 	public ColouringFiltersView getColouringFiltersView() {
 		return colouringFiltersView;

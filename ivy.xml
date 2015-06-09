@@ -9,5 +9,7 @@
     	<dependency org="prom" name="InductiveMiner" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="GraphViz" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="Widgets" rev="latest" changing="true" transitive="true" />
+        
+        <dependency org="prom" name="EfficientStorage" rev="latest" changing="true" transitive="true" />
      </dependencies>
 </ivy-module>
