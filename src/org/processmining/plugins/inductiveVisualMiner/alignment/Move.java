@@ -11,7 +11,7 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 public class Move implements Event {
 
 	public enum Type {
-		model, log, synchronous, ignoredLogMove, tauStart
+		modelMove, logMove, synchronousMove, ignoredLogMove, ignoredModelMove
 	}
 
 	private final Type type;
@@ -72,7 +72,7 @@ public class Move implements Event {
 	}
 
 	public boolean isModelSync() {
-		return type == Type.model || type == Type.synchronous;
+		return type == Type.modelMove || type == Type.synchronousMove || type == Type.ignoredModelMove;
 	}
 
 	public Type getType() {
@@ -95,7 +95,7 @@ public class Move implements Event {
 		return logMoveBeforeChild;
 	}
 
-	public void setLogMove(LogMovePosition logMovePosition) {
+	public void setLogMovePosition(LogMovePosition logMovePosition) {
 		this.logMoveUnode = logMovePosition.getOn();
 		this.logMoveBeforeChild = logMovePosition.getBeforeChild();
 	}
@@ -115,21 +115,21 @@ public class Move implements Event {
 	}
 
 	public boolean isLogMove() {
-		return type == Type.log || type == Type.ignoredLogMove;
+		return type == Type.logMove || type == Type.ignoredLogMove;
 	}
 
 	public boolean isModelMove() {
-		return type == Type.model;
+		return type == Type.modelMove || type == Type.ignoredModelMove;
 	}
 
 	public boolean isSyncMove() {
-		return type == Type.synchronous;
+		return type == Type.synchronousMove || type == Type.ignoredModelMove;
 	}
 
 	public PerformanceTransition getLifeCycleTransition() {
 		return lifeCycleTransition;
 	}
-	
+
 	public boolean isStart() {
 		return lifeCycleTransition == PerformanceTransition.start;
 	}
@@ -137,15 +137,15 @@ public class Move implements Event {
 	public boolean isComplete() {
 		return lifeCycleTransition == PerformanceTransition.complete;
 	}
-	
+
 	/**
 	 * 
 	 * @return whether this move is a missing start
 	 */
 	public boolean isTauStart() {
-		return type == Type.tauStart;
+		return type == Type.ignoredModelMove;
 	}
-	
+
 	public boolean isIgnoredLogMove() {
 		return type == Type.ignoredLogMove;
 	}
@@ -228,5 +228,9 @@ public class Move implements Event {
 		} else {
 			return new Color(0.5f, 0.5f, 0.5f);
 		}
+	}
+
+	public boolean isIgnoredModelMove() {
+		return type == Type.ignoredModelMove;
 	}
 }

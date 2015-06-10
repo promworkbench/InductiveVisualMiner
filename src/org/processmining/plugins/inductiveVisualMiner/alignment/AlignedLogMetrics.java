@@ -26,7 +26,7 @@ public class AlignedLogMetrics {
 	
 	public static long getNumberOfTracesRepresented(UnfoldedNode unode, boolean includeModelMoves, AlignedLogInfo logInfo) {
 		if (unode.getNode() instanceof Automatic || unode.getNode() instanceof Manual) {
-			long c = logInfo.getActivities().getCardinalityOf(new Move(Type.synchronous, unode, null, null, PerformanceTransition.complete));
+			long c = logInfo.getActivities().getCardinalityOf(new Move(Type.synchronousMove, unode, null, null, PerformanceTransition.complete));
 			if (includeModelMoves) {
 				c += getModelMovesLocal(unode, logInfo);
 			}

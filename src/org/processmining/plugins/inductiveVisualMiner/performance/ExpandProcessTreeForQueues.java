@@ -1,10 +1,12 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
 import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.Map;
+import java.util.Set;
 
-import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Block.Def;
@@ -31,15 +33,16 @@ public class ExpandProcessTreeForQueues {
 	 * @param tree
 	 * @return
 	 */
-	public static Pair<ProcessTree, Map<UnfoldedNode, UnfoldedNode>> expand(ProcessTree tree) {
+	public static Triple<ProcessTree, Map<UnfoldedNode, UnfoldedNode>, Set<UnfoldedNode>> expand(ProcessTree tree) {
 		ProcessTree newTree = new ProcessTreeImpl();
 		Map<UnfoldedNode, UnfoldedNode> mapping = new THashMap<>();
-		newTree.setRoot(expand(new UnfoldedNode(tree.getRoot()), newTree, mapping, null));
-		return Pair.of(newTree, mapping);
+		Set<UnfoldedNode> enqueueTaus = new THashSet<>();
+		newTree.setRoot(expand(new UnfoldedNode(tree.getRoot()), newTree, mapping, enqueueTaus, null));
+		return Triple.of(newTree, mapping, enqueueTaus);
 	}
 
 	private static Node expand(UnfoldedNode unode, ProcessTree newTree, Map<UnfoldedNode, UnfoldedNode> mapping,
-			UnfoldedNode newParent) {
+			Set<UnfoldedNode> enqueueTaus, UnfoldedNode newParent) {
 		if (unode.getNode() instanceof Block) {
 			//copy blocks
 			Block newNode;
@@ -70,7 +73,7 @@ public class ExpandProcessTreeForQueues {
 
 			//process children
 			for (Node child : unode.getBlock().getChildren()) {
-				newNode.addChild(expand(unode.unfoldChild(child), newTree, mapping, childParent));
+				newNode.addChild(expand(unode.unfoldChild(child), newTree, mapping, enqueueTaus, childParent));
 			}
 
 			mapping.put(childParent, unode);
@@ -117,6 +120,7 @@ public class ExpandProcessTreeForQueues {
 				newTree.addNode(tau);
 				xor.addChild(tau);
 				mapping.put(childParent.unfoldChild(xor).unfoldChild(tau), unode);
+				enqueueTaus.add(childParent.unfoldChild(xor).unfoldChild(tau));
 
 				Manual aStart = new org.processmining.processtree.impl.AbstractTask.Manual(unode.getNode().getName()
 						+ "+" + enqueue);
@@ -125,7 +129,7 @@ public class ExpandProcessTreeForQueues {
 				xor.addChild(aStart);
 				mapping.put(childParent.unfoldChild(xor).unfoldChild(aStart), unode);
 			}
-			
+
 			{
 				Xor xor = new org.processmining.processtree.impl.AbstractBlock.Xor("performance xor start");
 				xor.setProcessTree(newTree);

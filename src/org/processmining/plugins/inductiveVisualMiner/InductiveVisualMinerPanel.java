@@ -368,7 +368,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			return withoutAlignment;
 		}
 		switch (state.getColourMode()) {
-			case both :
+			case pathsDeviations :
 				return both;
 			case deviations :
 				return moves;

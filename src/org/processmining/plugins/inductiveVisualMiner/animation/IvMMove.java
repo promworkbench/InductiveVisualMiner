@@ -51,7 +51,7 @@ public class IvMMove extends Move {
 	public IvMMove(Move move, Long logTimestamp, String resource) {
 		super(move.getType(), move.getUnode(), move.getActivityEventClass(), move.getPerformanceEventClass(), move
 				.getLifeCycleTransition());
-		setLogMove(LogMovePosition.beforeChild(move.getLogMoveUnode(), move.getLogMoveBeforeChild()));
+		setLogMovePosition(LogMovePosition.beforeChild(move.getLogMoveUnode(), move.getLogMoveBeforeChild()));
 		setLogMoveParallelBranchMappedTo(move.getLogMoveParallelBranchMappedTo());
 		this.logTimestamp = logTimestamp;
 		this.resource = resource;

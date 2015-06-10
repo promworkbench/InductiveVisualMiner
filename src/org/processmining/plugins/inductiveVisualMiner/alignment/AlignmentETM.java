@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.alignment;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import nl.tue.astar.AStarThread.Canceller;
 import nl.tue.astar.Trace;
@@ -18,7 +19,7 @@ import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersIM;
 import org.processmining.plugins.etm.CentralRegistry;
 import org.processmining.plugins.etm.fitness.BehaviorCounter;
@@ -64,9 +65,11 @@ public class AlignmentETM {
 		CentralRegistry registry = new CentralRegistry(log, performanceClassifier, new Random());
 
 		//transform tree for performance measurement
-		Pair<ProcessTree, Map<UnfoldedNode, UnfoldedNode>> p = ExpandProcessTreeForQueues.expand(tree);
-		ProcessTree performanceTree = p.getA();
-		Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping = p.getB(); //mapping performance node -> original node
+		Triple<ProcessTree, Map<UnfoldedNode, UnfoldedNode>, Set<UnfoldedNode>> t = ExpandProcessTreeForQueues
+				.expand(tree);
+		ProcessTree performanceTree = t.getA();
+		Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping = t.getB(); //mapping performance node -> original node
+		Set<UnfoldedNode> enqueueTaus = t.getC(); //set of taus involved in enqueueing
 
 		//add the event classes of the tree manually
 		addAllLeaves(registry.getEventClasses(), performanceTree.getRoot());
@@ -122,13 +125,17 @@ public class AlignmentETM {
 
 					if (performanceUnode.getNode() instanceof Automatic && unode.getNode() instanceof Manual) {
 						//this is a tau that represents that the start/enqueue of an activity is skipped
-						lifeCycleTransition = PerformanceTransition.start;
+						if (enqueueTaus.contains(performanceUnode)) {
+							lifeCycleTransition = PerformanceTransition.enqueue;
+							performanceActivity = performanceEventClasses.getByIdentity(unode.getNode().getName()
+									+ "+enqueue");
+						} else {
+							lifeCycleTransition = PerformanceTransition.start;
+							performanceActivity = performanceEventClasses.getByIdentity(unode.getNode().getName() + "+"
+									+ XLifecycleExtension.StandardModel.START);
+						}
 						activity = activityEventClasses.getByIdentity(unode.getNode().getName());
-						performanceActivity = performanceEventClasses.getByIdentity(unode.getNode().getName() + "+"
-								+ XLifecycleExtension.StandardModel.START);
-					}
-					
-					if (performanceUnode.getNode() instanceof Automatic) {
+					} else if (performanceUnode.getNode() instanceof Automatic) {
 						//a model move happened on a tau; make it a completion
 						lifeCycleTransition = PerformanceTransition.complete;
 					}
@@ -145,19 +152,20 @@ public class AlignmentETM {
 					if (performanceUnode != null && performanceUnode.getNode() instanceof Automatic
 							&& unode.getNode() instanceof Manual) {
 						//tau-start
-						move = new Move(Type.tauStart, unode, activity, performanceActivity, lifeCycleTransition);
+						move = new Move(Type.ignoredModelMove, unode, activity, performanceActivity,
+								lifeCycleTransition);
 					} else if ((performanceUnode != null && performanceActivity != null)
 							|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)) {
 						//synchronous move
-						move = new Move(Type.synchronous, unode, activity, performanceActivity, lifeCycleTransition);
+						move = new Move(Type.synchronousMove, unode, activity, performanceActivity, lifeCycleTransition);
 					} else if (performanceUnode != null) {
 						//model move
-						move = new Move(Type.model, unode, activity, performanceActivity, lifeCycleTransition);
+						move = new Move(Type.modelMove, unode, activity, performanceActivity, lifeCycleTransition);
 					} else {
 						//log move
 						if (lifeCycleTransition == PerformanceTransition.complete) {
 							//only log moves of complete events are interesting
-							move = new Move(Type.log, unode, activity, performanceActivity, lifeCycleTransition);
+							move = new Move(Type.logMove, unode, activity, performanceActivity, lifeCycleTransition);
 						} else {
 							//log moves of other transitions are ignored
 							move = new Move(Type.ignoredLogMove, null, activity, performanceActivity,

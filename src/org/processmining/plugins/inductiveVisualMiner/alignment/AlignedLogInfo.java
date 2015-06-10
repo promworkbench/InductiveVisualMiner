@@ -60,7 +60,7 @@ public class AlignedLogInfo {
 			for (int i = 0; i < trace.size(); i++) {
 				Move move = trace.get(i);
 				activities.add(move, cardinality);
-				if (move.getType() == Type.model) {
+				if (move.getType() == Type.modelMove) {
 					//add model move to list of model moves
 					modelMoves.add(move.getUnode(), cardinality);
 				} else if (move.isLogMove()) {
@@ -111,12 +111,16 @@ public class AlignedLogInfo {
 
 		//position the leading log moves
 		for (Move logMove : trace.subList(0, start)) {
-			addLogMove(logMove, null, root, logMove.getActivityEventClass(), cardinality);
+			if (!logMove.isIgnoredLogMove() && !logMove.isTauStart()) {
+				addLogMove(logMove, null, root, logMove.getActivityEventClass(), cardinality);
+			}
 		}
 
 		//position the trailing log moves
 		for (Move logMove : trace.subList(end + 1, trace.size())) {
-			addLogMove(logMove, root, null, logMove.getActivityEventClass(), cardinality);
+			if (!logMove.isIgnoredLogMove() && !logMove.isTauStart()) {
+				addLogMove(logMove, root, null, logMove.getActivityEventClass(), cardinality);
+			}
 		}
 
 		//recurse on the subtrace
@@ -127,7 +131,7 @@ public class AlignedLogInfo {
 	 * Invariant: the first and the last move of the trace are not log moves.
 	 */
 	private void positionLogMoves(UnfoldedNode unode, List<Move> trace, long cardinality) {
-		debug(" position " + trace + " on " + unode);
+		debug(" process trace " + trace + " on " + unode);
 		if (unode.getNode() instanceof Manual) {
 			//unode is an activity
 			for (Move move : trace) {
@@ -192,7 +196,7 @@ public class AlignedLogInfo {
 
 		//walk through the trace to split it
 		for (Move move : trace) {
-			if (move.isIgnoredLogMove()) {
+			if (move.isIgnoredLogMove() || move.isIgnoredModelMove()) {
 				//skip
 			} else if (move.isLogMove()) {
 				logMoves.add(move);
@@ -259,7 +263,7 @@ public class AlignedLogInfo {
 
 	private void addLogMove(Move move, UnfoldedNode unode, UnfoldedNode beforeChild, XEventClass e, long cardinality) {
 		LogMovePosition logMovePosition = LogMovePosition.beforeChild(unode, beforeChild);
-		move.setLogMove(logMovePosition);
+		move.setLogMovePosition(logMovePosition);
 		if (!logMoves.containsKey(logMovePosition)) {
 			logMoves.put(logMovePosition, new MultiSet<XEventClass>());
 		}
