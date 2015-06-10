@@ -99,7 +99,8 @@ public class AlignedLogVisualisation {
 		} else if (unode.getNode() instanceof XorLoop) {
 			convertLoop(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof Interleaved) {
-			convertParallel(unode, source, sink, directionForward, "\u2194");
+//			convertParallel(unode, source, sink, directionForward, "\u2194");
+			convertParallel(unode, source, sink, directionForward, "-");
 		} else if (unode.getNode() instanceof And) {
 			convertParallel(unode, source, sink, directionForward, "+");
 		} else if (unode.getNode() instanceof Or) {

@@ -160,8 +160,6 @@ public class InductiveVisualMinerController {
 				public void run() {
 					panel.getGraph().changeDot(state.getDot(), state.getSVGDiagram(), true);
 
-//					panel.getResourceView().set(state.getTree());
-
 					makeNodesSelectable(state.getVisualisationInfo(), panel, state.getSelectedNodes(),
 							state.getSelectedLogMoves());
 
@@ -312,7 +310,7 @@ public class InductiveVisualMinerController {
 					setStatus(" ");
 				}
 			});
-//			chain.add(q);
+			chain.add(q);
 		}
 
 		//set up plug-ins
@@ -509,13 +507,6 @@ public class InductiveVisualMinerController {
 				panel.getTraceView().swapVisibility();
 			}
 		});
-
-		//set resource view button
-//		panel.getResourceViewButton().addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				panel.getResourceView().swapVisibility();
-//			}
-//		});
 
 		//set colouring filters button
 		panel.getColouringFiltersViewButton().addActionListener(new ActionListener() {

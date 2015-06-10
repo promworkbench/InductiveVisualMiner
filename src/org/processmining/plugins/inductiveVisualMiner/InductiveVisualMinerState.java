@@ -27,8 +27,8 @@ import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringF
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.LifeCycleSplitLog;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.MiningParametersIvM;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleSplitLog;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -137,7 +137,7 @@ public class InductiveVisualMinerState {
 
 	//==mining==
 	private MiningParameters miningParameters;
-	private VisualMinerWrapper miner = new LifeCycleSplitLog();
+	private VisualMinerWrapper miner = new NoLifeCycleSplitLog();
 	private double paths = 0.8;
 	private ProcessTree tree = null;
 	private ProcessTree preMinedTree = null;
@@ -275,7 +275,8 @@ public class InductiveVisualMinerState {
 	private ColourMode colourMode = ColourMode.paths;
 
 	public enum ColourMode {
-		paths("paths"), deviations("deviations"), pathsDeviations("paths and deviations");
+		paths("paths"), deviations("deviations"), pathsDeviations("paths and deviations"),
+		queueLengths("queue lengths");
 		
 		private String displayName;
 

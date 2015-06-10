@@ -63,16 +63,14 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JButton saveImageButton;
 	private final JButton traceViewButton;
 	private final TraceView traceView;
-//	private final JButton resourceViewButton;
-//	private final ResourceView resourceView;
 	private final JButton colouringFiltersViewButton;
 	private final ColouringFiltersView colouringFiltersView;
 
 	private InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged = null;
 	private InputFunction<GraphDirection> onGraphDirectionChanged = null;
 
-	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state, ClassifierWrapper[] classifiers,
-			VisualMinerWrapper[] miners, boolean enableMining) {
+	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
+			ClassifierWrapper[] classifiers, VisualMinerWrapper[] miners, boolean enableMining) {
 		initVisualisationParameters();
 
 		int gridy = 0;
@@ -91,8 +89,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 
 		{
-			pathsSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0,
-					state.getPaths(), Orientation.VERTICAL);
+			pathsSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0, state.getPaths(),
+					Orientation.VERTICAL);
 			GridBagConstraints cNoiseSlider = new GridBagConstraints();
 			cNoiseSlider.gridx = 2;
 			cNoiseSlider.gridy = gridy++;
@@ -169,18 +167,6 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
 			add(traceViewButton, cTraceViewButton);
 		}
-		
-		//resource view
-//		{
-//			resourceView = new ResourceView(this);
-//			resourceViewButton = SlickerFactory.instance().createButton("resources");
-//			GridBagConstraints cResourceViewButton = new GridBagConstraints();
-//			cResourceViewButton.gridx = 2;
-//			cResourceViewButton.gridy = gridy++;
-//			cResourceViewButton.gridwidth = 1;
-//			cResourceViewButton.fill = GridBagConstraints.HORIZONTAL;
-//			add(resourceViewButton, cResourceViewButton);
-//		}
 
 		//colouring filters view
 		{
@@ -238,7 +224,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cSelectionLabel.fill = GridBagConstraints.HORIZONTAL;
 			add(selectionLabel, cSelectionLabel);
 		}
-		
+
 		{
 			animationTimeLabel = SlickerFactory.instance().createLabel(" ");
 			animationTimeLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -266,10 +252,10 @@ public class InductiveVisualMinerPanel extends JPanel {
 			Dot dot = new Dot();
 			dot.addNode("Inductive visual Miner");
 			dot.addNode("Mining model...");
-			
+
 			graphPanel = new DotPanel(dot);
 			graphPanel.setFocusable(true);
-			
+
 			//set the graph direction changed listener
 			//if we are initialised, the dotPanel should not update the layout, as we have to recompute the animation
 			graphPanel.addGraphDirectionChangedListener(new GraphDirectionChangedListener() {
@@ -285,7 +271,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 					return true;
 				}
 			});
-			
+
 			//set the node selection change listener
 			graphPanel.addSelectionChangedListener(new SelectionChangedListener<DotElement>() {
 				public void selectionChanged(Set<DotElement> selectedElements) {
@@ -308,11 +294,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 							e.printStackTrace();
 						}
 					}
-					
+
 					graphPanel.repaint();
 				}
 			});
-			
+
 			GridBagConstraints cGraphPanel = new GridBagConstraints();
 			cGraphPanel.gridx = 0;
 			cGraphPanel.gridy = 0;
@@ -335,9 +321,10 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	//==visualisation parameters==
 
-	private static AlignedLogVisualisationParameters both = new AlignedLogVisualisationParameters();
+	private static AlignedLogVisualisationParameters pathsMoves = new AlignedLogVisualisationParameters();
 	private static AlignedLogVisualisationParameters moves = new AlignedLogVisualisationParameters();
 	private static AlignedLogVisualisationParameters paths = new AlignedLogVisualisationParameters();
+	private static AlignedLogVisualisationParameters queueLengths = new AlignedLogVisualisationParameters();
 	private static AlignedLogVisualisationParameters withoutAlignment = new AlignedLogVisualisationParameters();
 
 	private static void initVisualisationParameters() {
@@ -356,11 +343,16 @@ public class InductiveVisualMinerPanel extends JPanel {
 		moves.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
 		moves.setColourNodes(new ColourMapLightBlue());
 
-		both.setShowFrequenciesOnModelEdges(true);
-		both.setShowFrequenciesOnMoveEdges(true);
-		both.setColourModelEdges(new ColourMapFixed(new Color(153, 153, 255)));
-		both.setColourMoves(new ColourMapFixed(new Color(255, 0, 0)));
-		both.setRepairLogMoves(false);
+		pathsMoves.setShowFrequenciesOnModelEdges(true);
+		pathsMoves.setShowFrequenciesOnMoveEdges(true);
+		pathsMoves.setColourModelEdges(new ColourMapFixed(new Color(153, 153, 255)));
+		pathsMoves.setColourMoves(new ColourMapFixed(new Color(255, 0, 0)));
+		
+		queueLengths.setShowFrequenciesOnModelEdges(true);
+		queueLengths.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
+		queueLengths.setShowLogMoves(false);
+		queueLengths.setShowModelMoves(false);
+		queueLengths.setColourNodes(new ColourMapLightBlue());
 	}
 
 	public static AlignedLogVisualisationParameters getViewParameters(InductiveVisualMinerState state) {
@@ -369,9 +361,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 		switch (state.getColourMode()) {
 			case pathsDeviations :
-				return both;
+				return pathsMoves;
 			case deviations :
 				return moves;
+			case queueLengths:
+				return queueLengths;
 			default :
 				return paths;
 		}
@@ -380,18 +374,17 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public void removeNotify() {
 		super.removeNotify();
 		traceView.setVisible(false);
-//		resourceView.setVisible(false);
 		colouringFiltersView.setVisible(false);
 		graphPanel.stop();
 	}
 
 	public void makeNodeSelectable(final LocalDotNode dotNode, boolean select) {
 		dotNode.addSelectionListener(new ElementSelectionListener<DotElement>() {
-			
+
 			public void selected(DotElement element) {
 				InductiveVisualMinerSelectionColourer.colourSelectedNode(graphPanel.getSVG(), dotNode, true);
 			}
-			
+
 			public void deselected(DotElement element) {
 				InductiveVisualMinerSelectionColourer.colourSelectedNode(graphPanel.getSVG(), dotNode, false);
 			}
@@ -400,15 +393,15 @@ public class InductiveVisualMinerPanel extends JPanel {
 			graphPanel.select(dotNode);
 		}
 	}
-
+	
 	public void makeEdgeSelectable(final LocalDotEdge dotEdge, boolean select) {
 		dotEdge.addSelectionListener(new ElementSelectionListener<DotElement>() {
-			
+
 			public void selected(DotElement element) {
 				InductiveVisualMinerSelectionColourer.colourSelectedEdge(graphPanel.getSVG(), dotEdge, true);
 				graphPanel.repaint();
 			}
-			
+
 			public void deselected(DotElement element) {
 				InductiveVisualMinerSelectionColourer.colourSelectedEdge(graphPanel.getSVG(), dotEdge, false);
 				graphPanel.repaint();
@@ -466,7 +459,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public void setOnSelectionChanged(InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged) {
 		this.onSelectionChanged = onSelectionChanged;
 	}
-	
+
 	public void setOnGraphDirectionChanged(InputFunction<GraphDirection> onGraphDirectionChanged) {
 		this.onGraphDirectionChanged = onGraphDirectionChanged;
 	}
@@ -478,14 +471,6 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public JButton getTraceViewButton() {
 		return traceViewButton;
 	}
-	
-//	public ResourceView getResourceView() {
-//		return resourceView;
-//	}
-//	
-//	public JButton getResourceViewButton() {
-//		return resourceViewButton;
-//	}
 
 	public ColouringFiltersView getColouringFiltersView() {
 		return colouringFiltersView;
@@ -494,7 +479,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public JButton getColouringFiltersViewButton() {
 		return colouringFiltersViewButton;
 	}
-	
+
 	public JLabel getAnimationTimeLabel() {
 		return animationTimeLabel;
 	}
