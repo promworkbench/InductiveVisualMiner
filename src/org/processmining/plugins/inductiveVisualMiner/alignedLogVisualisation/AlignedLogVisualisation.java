@@ -10,7 +10,7 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersIM;
-//import org.processmining.plugins.InductiveMiner.mining.operators.Interleaved;
+import org.processmining.plugins.InductiveMiner.mining.interleaved.Interleaved;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
@@ -34,6 +34,7 @@ import org.processmining.processtree.impl.AbstractBlock.Xor;
 import org.processmining.processtree.impl.AbstractBlock.XorLoop;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
+//import org.processmining.plugins.InductiveMiner.mining.operators.Interleaved;
 
 public class AlignedLogVisualisation {
 
@@ -98,9 +99,9 @@ public class AlignedLogVisualisation {
 			convertSequence(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof XorLoop) {
 			convertLoop(unode, source, sink, directionForward);
-//		} else if (unode.getNode() instanceof Interleaved) {
+		} else if (unode.getNode() instanceof Interleaved) {
 //			convertParallel(unode, source, sink, directionForward, "\u2194");
-//			convertParallel(unode, source, sink, directionForward, "-");
+			convertParallel(unode, source, sink, directionForward, "-");
 		} else if (unode.getNode() instanceof And) {
 			convertParallel(unode, source, sink, directionForward, "+");
 		} else if (unode.getNode() instanceof Or) {
