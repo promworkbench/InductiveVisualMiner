@@ -6,7 +6,7 @@ import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.plugins.InductiveMiner.mining.operators.Interleaved;
+//import org.processmining.plugins.InductiveMiner.mining.operators.Interleaved;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotNode;
@@ -45,8 +45,8 @@ public class GraphvizProcessTree {
 			convertTau(dot, parent, (AbstractTask.Automatic) node);
 		} else if (node instanceof AbstractTask.Manual) {
 			convertTask(dot, parent, (AbstractTask.Manual) node);
-		} else if (node instanceof Interleaved) {
-			convertInterleaved(dot, parent, (Interleaved) node);
+//		} else if (node instanceof Interleaved) {
+//			convertInterleaved(dot, parent, (Interleaved) node);
 		} else if (node instanceof AbstractBlock.And) {
 			convertAnd(dot, parent, (AbstractBlock.And) node);
 		} else if (node instanceof AbstractBlock.Seq) {
@@ -86,10 +86,10 @@ public class GraphvizProcessTree {
 		addArc(dot, parent, dotNode);
 	}
 
-	private static void convertInterleaved(Dot dot, DotNode parent, Interleaved node) throws NotYetImplementedException {
-		convertBinOperator(dot, parent, node, "int");
-	}
-
+//	private static void convertInterleaved(Dot dot, DotNode parent, Interleaved node) throws NotYetImplementedException {
+//		convertBinOperator(dot, parent, node, "int");
+//	}
+//
 	private static void convertAnd(Dot dot, DotNode parent, AbstractBlock.And node) throws NotYetImplementedException {
 		convertBinOperator(dot, parent, node, "and");
 	}
