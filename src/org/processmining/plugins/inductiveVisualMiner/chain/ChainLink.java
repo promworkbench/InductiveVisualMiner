@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import nl.tue.astar.AStarThread.Canceller;
 
+import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
 public abstract class ChainLink<I, O> {
@@ -15,8 +16,9 @@ public abstract class ChainLink<I, O> {
 	private Executor executor;
 	private Runnable onStart;
 	private Runnable onComplete;
+	private Function<Exception, Object> onException;
 	protected ResettableCanceller canceller = new ResettableCanceller();
-	
+
 	public static class ResettableCanceller implements Canceller {
 
 		private boolean cancelled = false;
@@ -51,7 +53,7 @@ public abstract class ChainLink<I, O> {
 	 *         Performs the computation, given the input. Side-effects not
 	 *         allowed; should be thread-safe and static
 	 */
-	protected abstract O executeLink(I input);
+	protected abstract O executeLink(I input) throws Exception;
 
 	/**
 	 * 
@@ -72,7 +74,18 @@ public abstract class ChainLink<I, O> {
 					SwingUtilities.invokeLater(onStart);
 				}
 				canceller.reset();
-				final O result = executeLink(input);
+				final O result;
+				try {
+					result = executeLink(input);
+				} catch (Exception e) {
+					try {
+						onException.call(e);
+						e.printStackTrace();
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+					return;
+				}
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						if (chain.getCurrentExecution().equals(execution)) {
@@ -110,6 +123,10 @@ public abstract class ChainLink<I, O> {
 	 */
 	public void setOnComplete(Runnable onComplete) {
 		this.onComplete = onComplete;
+	}
+
+	public void setOnException(Function<Exception, Object> onException) {
+		this.onException = onException;
 	}
 
 	public void setExecutor(Executor executor, Chain chain) {

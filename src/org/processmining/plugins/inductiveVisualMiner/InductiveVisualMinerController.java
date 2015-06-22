@@ -19,6 +19,7 @@ import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
+import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
@@ -85,6 +86,7 @@ public class InductiveVisualMinerController {
 		chain = new Chain(context.getExecutor(), state);
 
 		//make log
+		final Function<Exception, Object> onException;
 		{
 			Cl01MakeLog m = new Cl01MakeLog();
 			m.setOnStart(new Runnable() {
@@ -101,6 +103,13 @@ public class InductiveVisualMinerController {
 					panel.getTraceView().set(state.getLog());
 				}
 			});
+			onException = new Function<Exception, Object>() {
+				public Object call(Exception input) throws Exception {
+					setStatus("- error - aborted -");
+					return null;
+				}
+			};
+			m.setOnException(onException);
 			chain.add(m);
 		}
 
@@ -116,6 +125,7 @@ public class InductiveVisualMinerController {
 					setStatus("Filtering activities..");
 				}
 			});
+			f.setOnException(onException);
 			chain.add(f);
 		}
 
@@ -136,12 +146,13 @@ public class InductiveVisualMinerController {
 					panel.getSaveImageButton().setEnabled(true);
 				}
 			});
+			m.setOnException(onException);
 			chain.add(m);
 		}
 
 		//layout
-		Runnable layoutStart;
-		Runnable layoutComplete;
+		final Runnable layoutStart;
+		final Runnable layoutComplete;
 		{
 			layoutStart = new Runnable() {
 				public void run() {
@@ -168,6 +179,7 @@ public class InductiveVisualMinerController {
 			Cl04Layout chainLinkLayout = new Cl04Layout();
 			chainLinkLayout.setOnStart(layoutStart);
 			chainLinkLayout.setOnComplete(layoutComplete);
+			chainLinkLayout.setOnException(onException);
 			chain.add(chainLinkLayout);
 		}
 
@@ -186,6 +198,7 @@ public class InductiveVisualMinerController {
 					panel.getTraceView().set(state.getAlignedLog());
 				}
 			});
+			a.setOnException(onException);
 			chain.add(a);
 		}
 
@@ -194,6 +207,7 @@ public class InductiveVisualMinerController {
 			Cl06Layout l = new Cl06Layout();
 			l.setOnStart(layoutStart);
 			l.setOnComplete(layoutComplete);
+			l.setOnException(onException);
 			chain.add(l);
 		}
 
@@ -212,6 +226,7 @@ public class InductiveVisualMinerController {
 					panel.getTraceView().set(state.getAlignedFilteredLog());
 				}
 			});
+			f.setOnException(onException);
 			chain.add(f);
 		}
 
@@ -236,6 +251,7 @@ public class InductiveVisualMinerController {
 					panel.repaint();
 				}
 			});
+			a.setOnException(onException);
 			chain.add(a);
 		}
 
@@ -254,6 +270,7 @@ public class InductiveVisualMinerController {
 					panel.getTraceView().set(state.getIvMLog());
 				}
 			});
+			m.setOnException(onException);
 			chain.add(m);
 		}
 
@@ -294,6 +311,7 @@ public class InductiveVisualMinerController {
 					setStatus(" ");
 				}
 			});
+			a.setOnException(onException);
 			chain.add(a);
 		}
 
@@ -310,6 +328,7 @@ public class InductiveVisualMinerController {
 					setStatus(" ");
 				}
 			});
+			q.setOnException(onException);
 			chain.add(q);
 		}
 
