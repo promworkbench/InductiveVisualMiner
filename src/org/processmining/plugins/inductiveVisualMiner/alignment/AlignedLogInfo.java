@@ -11,6 +11,7 @@ import java.util.Map;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Block.Def;
@@ -196,7 +197,7 @@ public class AlignedLogInfo {
 
 		//walk through the trace to split it
 		for (Move move : trace) {
-			if (move.isIgnoredLogMove() || move.isIgnoredModelMove()) {
+			if (move.isIgnoredLogMove()) {
 				//skip
 			} else if (move.isLogMove()) {
 				logMoves.add(move);
@@ -211,7 +212,7 @@ public class AlignedLogInfo {
 				} else {
 					//we are leaving the last child with this move
 
-					//recurse on subtrace
+					//recurse on the subtrace up till now
 					positionLogMoves(lastSeenChild, subTrace, cardinality);
 
 					//the log moves we have seen now are external to both subtraces; position them on this unode
@@ -223,7 +224,6 @@ public class AlignedLogInfo {
 					logMoves.clear();
 					subTrace.add(move);
 					lastSeenChild = child;
-
 				}
 			}
 		}
@@ -291,7 +291,7 @@ public class AlignedLogInfo {
 	}
 
 	private static void debug(Object s) {
-//		InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
+		InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
 	}
 
 }
