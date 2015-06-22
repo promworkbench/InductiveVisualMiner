@@ -316,6 +316,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 			pathsSlider.setVisible(false);
 			classifierLabel.setVisible(false);
 			classifiersCombobox.setVisible(false);
+			minerLabel.setVisible(false);
+			minerCombobox.setVisible(false);
 		}
 	}
 
