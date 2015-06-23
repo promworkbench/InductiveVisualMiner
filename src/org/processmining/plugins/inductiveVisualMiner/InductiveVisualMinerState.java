@@ -275,8 +275,8 @@ public class InductiveVisualMinerState {
 	private ColourMode colourMode = ColourMode.paths;
 
 	public enum ColourMode {
-		paths("paths"), deviations("deviations"), pathsDeviations("paths and deviations"),
-		queueLengths("queue lengths");
+		paths("paths"), deviations("deviations"), pathsDeviations("paths and deviations");//,
+		//queueLengths("queue lengths");
 		
 		private String displayName;
 

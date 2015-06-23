@@ -366,8 +366,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 				return pathsMoves;
 			case deviations :
 				return moves;
-			case queueLengths:
-				return queueLengths;
+//			case queueLengths:
+//				return queueLengths;
 			default :
 				return paths;
 		}

@@ -47,7 +47,6 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl07FilterNodeSelect
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl08ApplyHighlighting;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl09MakeIvMLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl10Animate;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Queues;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
@@ -315,22 +314,22 @@ public class InductiveVisualMinerController {
 			chain.add(a);
 		}
 
-		//mine queues
-		{
-			Cl11Queues q = new Cl11Queues();
-			q.setOnStart(new Runnable() {
-				public void run() {
-					setStatus("Mining queues..");
-				}
-			});
-			q.setOnComplete(new Runnable() {
-				public void run() {
-					setStatus(" ");
-				}
-			});
-			q.setOnException(onException);
-			chain.add(q);
-		}
+//		//mine queues
+//		{
+//			Cl11Queues q = new Cl11Queues();
+//			q.setOnStart(new Runnable() {
+//				public void run() {
+//					setStatus("Mining queues..");
+//				}
+//			});
+//			q.setOnComplete(new Runnable() {
+//				public void run() {
+//					setStatus(" ");
+//				}
+//			});
+//			q.setOnException(onException);
+//			chain.add(q);
+//		}
 
 		//set up plug-ins
 		List<ColouringFilter> colouringFilters = ColouringFilterPluginFinder.findFilteringPlugins(context, panel,
