@@ -19,6 +19,7 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapLightBlue;
+import org.processmining.plugins.graphviz.colourMaps.ColourMapRed;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
@@ -26,12 +27,15 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.listeners.ElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphDirectionChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
+import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePaths;
+import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsDeviations;
+import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsQueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
@@ -147,7 +151,9 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cColourLabel.anchor = GridBagConstraints.WEST;
 			add(colourLabel, cColourLabel);
 
-			colourSelection = SlickerFactory.instance().createComboBox(ColourMode.values());
+			colourSelection = SlickerFactory.instance().createComboBox(
+					new ColouringMode[] { new ColouringModePaths(), new ColouringModePathsDeviations(),
+							new ColouringModePathsQueueLengths() });
 			GridBagConstraints ccolourSelection = new GridBagConstraints();
 			ccolourSelection.gridx = 2;
 			ccolourSelection.gridy = gridy++;
@@ -349,28 +355,12 @@ public class InductiveVisualMinerPanel extends JPanel {
 		pathsMoves.setShowFrequenciesOnMoveEdges(true);
 		pathsMoves.setColourModelEdges(new ColourMapFixed(new Color(153, 153, 255)));
 		pathsMoves.setColourMoves(new ColourMapFixed(new Color(255, 0, 0)));
-		
+
 		queueLengths.setShowFrequenciesOnModelEdges(true);
 		queueLengths.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
 		queueLengths.setShowLogMoves(false);
 		queueLengths.setShowModelMoves(false);
-		queueLengths.setColourNodes(new ColourMapLightBlue());
-	}
-
-	public static AlignedLogVisualisationParameters getViewParameters(InductiveVisualMinerState state) {
-		if (!state.isAlignmentReady()) {
-			return withoutAlignment;
-		}
-		switch (state.getColourMode()) {
-			case pathsDeviations :
-				return pathsMoves;
-			case deviations :
-				return moves;
-//			case queueLengths:
-//				return queueLengths;
-			default :
-				return paths;
-		}
+		queueLengths.setColourNodes(new ColourMapRed());
 	}
 
 	public void removeNotify() {
@@ -395,7 +385,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			graphPanel.select(dotNode);
 		}
 	}
-	
+
 	public void makeEdgeSelectable(final LocalDotEdge dotEdge, boolean select) {
 		dotEdge.addSelectionListener(new ElementSelectionListener<DotElement>() {
 

@@ -256,16 +256,16 @@ public class DotTokens2SVGtokens {
 		}
 	}
 
-	private static String getTargetLocation(LocalDotEdge edge, SVGDiagram image) {
-		SVGElement SVGline = DotPanel.getSVGElementOf(image, edge).getChild(1);
-		String path = DotPanel.getAttributeOf(SVGline, "d");
-
-		if (!edge.isDirectionForward()) {
-			return getFirstLocation(path);
-		} else {
-			return getLastLocation(path);
-		}
-	}
+//	private static String getTargetLocation(LocalDotEdge edge, SVGDiagram image) {
+//		SVGElement SVGline = DotPanel.getSVGElementOf(image, edge).getChild(1);
+//		String path = DotPanel.getAttributeOf(SVGline, "d");
+//
+//		if (!edge.isDirectionForward()) {
+//			return getFirstLocation(path);
+//		} else {
+//			return getLastLocation(path);
+//		}
+//	}
 
 	private static String getFirstLocation(String path) {
 		Matcher matcher = pattern.matcher(path);

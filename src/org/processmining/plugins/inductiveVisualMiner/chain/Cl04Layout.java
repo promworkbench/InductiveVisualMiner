@@ -6,7 +6,6 @@ import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
@@ -23,8 +22,8 @@ public class Cl04Layout
 
 	protected Quadruple<ProcessTree, AlignedLogInfo, AlignedLogVisualisationParameters, GraphDirection> generateInput(
 			InductiveVisualMinerState state) {
-		AlignedLogVisualisationParameters parameters = InductiveVisualMinerPanel.getViewParameters(state);
-		return Quadruple.of(state.getTree(), state.getAlignedFilteredLogInfo(), parameters, state.getGraphDirection());
+		return Quadruple.of(state.getTree(), state.getAlignedFilteredLogInfo(), state.getColourMode()
+				.getVisualisationParameters(state), state.getGraphDirection());
 	}
 
 	protected Triple<Dot, SVGDiagram, AlignedLogVisualisationInfo> executeLink(

@@ -24,6 +24,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
+import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
+import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePaths;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
@@ -189,11 +191,11 @@ public class InductiveVisualMinerState {
 		this.svgDiagram = svgDiagram;
 		this.visualisationInfo = visualisationInfo;
 	}
-	
+
 	public Dot getDot() {
 		return dot;
 	}
-	
+
 	public SVGDiagram getSVGDiagram() {
 		return svgDiagram;
 	}
@@ -272,29 +274,13 @@ public class InductiveVisualMinerState {
 	}
 
 	//==gui-parameters==
-	private ColourMode colourMode = ColourMode.paths;
+	private ColouringMode colourMode = new ColouringModePaths();
 
-	public enum ColourMode {
-		paths("paths"), deviations("deviations"), pathsDeviations("paths and deviations");//,
-		//queueLengths("queue lengths");
-		
-		private String displayName;
-
-	    ColourMode(String displayName) {
-	        this.displayName = displayName;
-	    }
-	    
-	    @Override
-	    public String toString() {
-	    	return displayName;
-	    }
-	};
-
-	public ColourMode getColourMode() {
+	public ColouringMode getColourMode() {
 		return colourMode;
 	}
 
-	public synchronized void setColourMode(ColourMode modus) {
+	public synchronized void setColourMode(ColouringMode modus) {
 		colourMode = modus;
 	}
 
@@ -350,7 +336,7 @@ public class InductiveVisualMinerState {
 	public Scaler getAnimationTimeScaler() {
 		return animationTimeScaler;
 	}
-	
+
 	public SVGDiagram getAnimatedSVGDiagram() {
 		return animatedSVGDiagram;
 	}
@@ -364,5 +350,13 @@ public class InductiveVisualMinerState {
 
 	public QueueLengthsWrapper getQueueLengths() {
 		return queueLengths;
+	}
+	
+	public void resetQueueLengths() {
+		queueLengths = null;
+	}
+	
+	public boolean isQueueLengthsReady() {
+		return queueLengths != null;
 	}
 }

@@ -42,12 +42,12 @@ import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.AnimatedSVGExporter;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.svgToken.SVGTokens;
+import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
 
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGUniverse;
@@ -87,7 +87,7 @@ public class ExportAnimation {
 	}
 
 	public static void saveSVGtoFile(final IvMLog timedLog, final AlignedLogVisualisationInfo info,
-			final ColourMode colourMode, final SVGDiagram svg, final Canceller canceller, final Dot dot, final File file)
+			final ColouringMode colourMode, final SVGDiagram svg, final Canceller canceller, final Dot dot, final File file)
 			throws IOException {
 		final Pair<SVGTokens, Scaler> p = ComputeAnimation.computeSVGTokens(timedLog, info, colourMode, svg, canceller);
 		OutputStream streamOut = new FileOutputStream(file);
@@ -95,7 +95,7 @@ public class ExportAnimation {
 	}
 
 	public static boolean saveAVItoFile(final IvMLog timedLog, final AlignedLogVisualisationInfo info,
-			final ColourMode colourMode, final SVGDiagram svg, final Dot dot, final File file, final JPanel panel)
+			final ColouringMode colourMode, final SVGDiagram svg, final Dot dot, final File file, final JPanel panel)
 			throws IOException {
 
 		final GuaranteedProgressMonitor progressMonitor = new GuaranteedProgressMonitor(panel, "",

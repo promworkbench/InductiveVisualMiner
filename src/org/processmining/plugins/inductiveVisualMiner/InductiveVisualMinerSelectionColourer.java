@@ -78,8 +78,9 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
-	public static TraceViewColourMap colourHighlighting(SVGDiagram svg, AlignedLogVisualisationInfo info, ProcessTree tree,
-			AlignedLogInfo alignedFilteredLogInfo, AlignedLogVisualisationParameters visualisationParameters) {
+	public static TraceViewColourMap colourHighlighting(SVGDiagram svg, AlignedLogVisualisationInfo info,
+			ProcessTree tree, AlignedLogInfo alignedFilteredLogInfo,
+			AlignedLogVisualisationParameters visualisationParameters) {
 
 		UnfoldedNode uroot = new UnfoldedNode(tree.getRoot());
 		TraceViewColourMap colourMap = new TraceViewColourMap();
@@ -94,7 +95,7 @@ public class InductiveVisualMinerSelectionColourer {
 			for (UnfoldedNode unode : TreeUtils.unfoldAllNodes(uroot)) {
 				long cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, alignedFilteredLogInfo);
 				Pair<Color, Color> colour = styleUnfoldedNode(unode, svg, info, cardinality, minCardinality,
-						maxCardinality, visualisationParameters);
+						maxCardinality, "", "", visualisationParameters);
 
 				if (unode.getNode() instanceof Manual) {
 					colourMap.set(unode, colour.getA(), colour.getB());
@@ -111,11 +112,13 @@ public class InductiveVisualMinerSelectionColourer {
 		return colourMap;
 	}
 
-	private static Pair<Color, Color> styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg,
+	public static Pair<Color, Color> styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg,
 			AlignedLogVisualisationInfo info, long cardinality, long minCardinality, long maxCardinality,
-			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
+			String prefix, String postfix, AlignedLogVisualisationParameters visualisationParameters)
+			throws SVGException {
 		if (unode.getNode() instanceof Manual) {
-			return styleManual(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
+			return styleManual(unode, svg, info, cardinality, minCardinality, maxCardinality, prefix, postfix,
+					visualisationParameters);
 		} else {
 			styleNonManualNode(unode, svg, info, cardinality);
 			return null;
@@ -123,7 +126,7 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	private static Pair<Color, Color> styleManual(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
-			long cardinality, long minCardinality, long maxCardinality,
+			long cardinality, long minCardinality, long maxCardinality, String prefix, String postfix,
 			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
 
 		LocalDotNode dotNode = info.getActivityNode(unode);
@@ -158,7 +161,11 @@ public class InductiveVisualMinerSelectionColourer {
 
 		//set title
 		titleCount.getContent().clear();
-		titleCount.getContent().add(cardinality + "");
+		if (cardinality >= 0) {
+			titleCount.getContent().add(prefix + cardinality + postfix);
+		} else {
+			titleCount.getContent().add("-");
+		}
 		titleCount.rebuild();
 
 		return Pair.of(fillColour, fontColour);

@@ -164,7 +164,7 @@ public class Trace2DotToken {
 				//second: walk over the node
 				dotToken.addStepInNode(nextDestination, move.getScaledTimestamp(scaler));
 
-			} else if (move.isModelMove()) {
+			} else if (move.isModelMove() && showDeviations) {
 				//model move, showing deviations
 
 				//move from the last known position to the start of the move edge,

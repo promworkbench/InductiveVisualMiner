@@ -13,7 +13,6 @@ import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState.ColourMode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.DotToken;
@@ -21,6 +20,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.Trace2D
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.animation.svgToken.DotTokens2SVGtokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.svgToken.SVGTokens;
+import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAnimation;
 
 import com.google.common.collect.FluentIterable;
@@ -33,7 +33,7 @@ public class ComputeAnimation {
 	public static double beginEndEdgeDuration = 1;
 	private static Random random = new Random(123);
 
-	public static Pair<SVGDiagram, Scaler> computeAnimation(final IvMLog timedLog, final ColourMode colourMode,
+	public static Pair<SVGDiagram, Scaler> computeAnimation(final IvMLog timedLog, final ColouringMode colourMode,
 			final AlignedLogVisualisationInfo info, final int maxTraces, final Dot dot, final SVGDiagram svg,
 			final Canceller canceller) {
 		
@@ -42,7 +42,7 @@ public class ComputeAnimation {
 		return computeAnimation(filteredTimedLog, colourMode, info, dot, svg, canceller);
 	}
 
-	public static Pair<SVGDiagram, Scaler> computeAnimation(final Iterable<IvMTrace> timedLog, final ColourMode colourMode,
+	public static Pair<SVGDiagram, Scaler> computeAnimation(final Iterable<IvMTrace> timedLog, final ColouringMode colourMode,
 			final AlignedLogVisualisationInfo info, final Dot dot, final SVGDiagram svg, final Canceller canceller) {
 
 		Pair<SVGTokens, Scaler> p = computeSVGTokens(timedLog, info, colourMode, svg, canceller);
@@ -71,7 +71,7 @@ public class ComputeAnimation {
 	}
 
 	public static Pair<SVGTokens, Scaler> computeSVGTokens(final Iterable<IvMTrace> timedLog,
-			final AlignedLogVisualisationInfo info, final ColourMode colourMode, final SVGDiagram svg,
+			final AlignedLogVisualisationInfo info, final ColouringMode colourMode, final SVGDiagram svg,
 			final Canceller canceller) {
 		//make a shortest path graph
 		final ShortestPathGraph graph = new ShortestPathGraph(info.getNodes(), info.getEdges());
@@ -92,9 +92,9 @@ public class ComputeAnimation {
 	}
 
 	public static List<DotToken> computeTokens(Iterable<IvMTrace> timedLog,
-			final AlignedLogVisualisationInfo info, final ColourMode colourMode, Scaler scaler,
+			final AlignedLogVisualisationInfo info, final ColouringMode colourMode, Scaler scaler,
 			ShortestPathGraph graph, final Canceller canceller) {
-		boolean showDeviations = colourMode != ColourMode.paths;
+		boolean showDeviations = colourMode.isShowDeviations();
 		final List<DotToken> tokens = new ArrayList<>();
 		for (IvMTrace timedTrace : timedLog) {
 			try {

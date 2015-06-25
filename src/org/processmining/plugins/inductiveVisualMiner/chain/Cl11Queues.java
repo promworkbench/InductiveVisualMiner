@@ -14,14 +14,22 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 public class Cl11Queues extends ChainLink<IvMLog, QueueLengthsWrapper> {
 
 	protected IvMLog generateInput(InductiveVisualMinerState state) {
-		return state.getIvMLog();
+		if (state.getColourMode().isShowQueueLengths()) {
+			return state.getIvMLog();
+		} else {
+			return null;
+		}
 	}
 
 	protected QueueLengthsWrapper executeLink(IvMLog input) {
-		Map<UnfoldedNode, QueueActivityLog> queueActivityLogs = QueueMineActivityLog.mine(input);
-
-		QueueLengths method = new QueueLengthsImplCombination(queueActivityLogs);
-		return new QueueLengthsWrapper(method, queueActivityLogs);
+		if (input != null) {
+			Map<UnfoldedNode, QueueActivityLog> queueActivityLogs = QueueMineActivityLog.mine(input);
+	
+			QueueLengths method = new QueueLengthsImplCombination(queueActivityLogs);
+			return new QueueLengthsWrapper(method, queueActivityLogs);
+		} else {
+			return null;
+		}
 	}
 
 	protected void processResult(QueueLengthsWrapper result, InductiveVisualMinerState state) {

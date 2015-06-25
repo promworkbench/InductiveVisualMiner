@@ -40,6 +40,10 @@ public class QueueLengthsImplCLIComplete extends QueueLengths {
 				double[] d = { (double) l.getComplete(index) - l.getInitiate(index) };
 				intervals.add(new DoublePoint(d));
 			}
+			
+			if (intervals.size() < k) {
+				continue;
+			}
 
 			KMeansPlusPlusClusterer<DoublePoint> clusterer = new KMeansPlusPlusClusterer<>(k);
 			List<CentroidCluster<DoublePoint>> cs = clusterer.cluster(intervals);
