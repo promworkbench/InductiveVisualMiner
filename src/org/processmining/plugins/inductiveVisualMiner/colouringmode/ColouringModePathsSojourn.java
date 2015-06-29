@@ -7,23 +7,24 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMapRed;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationDataImplFrequencies;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationDataImplQueues;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationDataImplSojourn;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 
-public class ColouringModePathsQueueLengths extends ColouringMode {
+public class ColouringModePathsSojourn extends ColouringMode {
 
+	
 	public AlignedLogVisualisationParameters visualisationParametersBeforeQueues = new AlignedLogVisualisationParameters();
 	public AlignedLogVisualisationParameters visualisationParameters = new AlignedLogVisualisationParameters();
 
-	public ColouringModePathsQueueLengths() {
+	public ColouringModePathsSojourn() {
 		visualisationParameters.setShowFrequenciesOnModelEdges(true);
 		visualisationParameters.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
 		visualisationParameters.setShowLogMoves(false);
 		visualisationParameters.setShowModelMoves(false);
 		visualisationParameters.setColourNodes(new ColourMapRed());
 		visualisationParameters.setModelEdgesWidth(new SizeMapFixed(1));
-
+		
 		visualisationParametersBeforeQueues.setShowFrequenciesOnModelEdges(true);
 		visualisationParametersBeforeQueues.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
 		visualisationParametersBeforeQueues.setShowLogMoves(false);
@@ -40,7 +41,7 @@ public class ColouringModePathsQueueLengths extends ColouringMode {
 
 	@Override
 	public String toString() {
-		return "paths and queue lengths";
+		return "paths and sojourn times";
 	}
 
 	public boolean isShowDeviations() {
@@ -52,14 +53,14 @@ public class ColouringModePathsQueueLengths extends ColouringMode {
 	}
 
 	public boolean isUpdateWithTimeStep(InductiveVisualMinerState state) {
-		return state.isQueueLengthsReady();
+		return false;
 	}
-
+	
 	protected AlignedLogVisualisationData getFinalVisualisationData(InductiveVisualMinerState state) {
 		if (!state.isQueueLengthsReady()) {
 			return new AlignedLogVisualisationDataImplFrequencies(state.getTree(), state.getAlignedFilteredLogInfo());
 		}
-		return new AlignedLogVisualisationDataImplQueues(state.getTree(), state.getQueueLengths(),
+		return new AlignedLogVisualisationDataImplSojourn(state.getTree(), state.getQueueLengths(),
 				state.getAlignedFilteredLogInfo());
 	}
 }

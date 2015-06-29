@@ -16,6 +16,8 @@ import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
+import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
@@ -184,12 +186,16 @@ public class InductiveVisualMinerState {
 	private Dot dot;
 	private SVGDiagram svgDiagram;
 	private AlignedLogVisualisationInfo visualisationInfo;
+	private AlignedLogVisualisationData visualisationData;
 	private GraphDirection graphDirection = GraphDirection.leftRight;
+	private TraceViewColourMap traceViewColourMap;
 
-	public void setLayout(Dot dot, SVGDiagram svgDiagram, AlignedLogVisualisationInfo visualisationInfo) {
+	public void setLayout(Dot dot, SVGDiagram svgDiagram, AlignedLogVisualisationInfo visualisationInfo,
+			TraceViewColourMap traceViewColourMap) {
 		this.dot = dot;
 		this.svgDiagram = svgDiagram;
 		this.visualisationInfo = visualisationInfo;
+		this.traceViewColourMap = traceViewColourMap;
 	}
 
 	public Dot getDot() {
@@ -210,6 +216,18 @@ public class InductiveVisualMinerState {
 
 	public void setGraphDirection(GraphDirection graphDirection) {
 		this.graphDirection = graphDirection;
+	}
+	
+	public TraceViewColourMap getTraceViewColourMap() {
+		return traceViewColourMap;
+	}
+	
+	public void setVisualisationData(AlignedLogVisualisationData visualisationData) {
+		this.visualisationData = visualisationData;
+	}
+	
+	public AlignedLogVisualisationData getVisualisationData() {
+		return visualisationData;
 	}
 
 	//==alignment==
@@ -351,11 +369,11 @@ public class InductiveVisualMinerState {
 	public QueueLengthsWrapper getQueueLengths() {
 		return queueLengths;
 	}
-	
+
 	public void resetQueueLengths() {
 		queueLengths = null;
 	}
-	
+
 	public boolean isQueueLengthsReady() {
 		return queueLengths != null;
 	}

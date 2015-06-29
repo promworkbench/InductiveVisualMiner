@@ -11,7 +11,6 @@ import java.util.Map;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Block.Def;
@@ -93,12 +92,10 @@ public class AlignedLogInfo {
 			}
 		}
 
-		debug(logMoves);
+//		debug(logMoves);
 	}
 
 	public void positionLogMovesRoot(UnfoldedNode root, UnfoldedNode continueOn, AlignedTrace trace, long cardinality) {
-		debug("");
-
 		//remove the leading and trailing log moves and position them on the root
 		int start = 0;
 		while (!trace.get(start).isModelSync()) {
@@ -291,7 +288,7 @@ public class AlignedLogInfo {
 	}
 
 	private static void debug(Object s) {
-		InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
+//		InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
 	}
 
 }

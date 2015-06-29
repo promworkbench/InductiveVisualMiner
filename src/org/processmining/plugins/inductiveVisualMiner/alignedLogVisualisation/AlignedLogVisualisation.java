@@ -9,6 +9,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersIM;
 import org.processmining.plugins.InductiveMiner.mining.interleaved.Interleaved;
 import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
@@ -16,10 +17,9 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
+import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentETM;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
@@ -34,7 +34,8 @@ import org.processmining.processtree.impl.AbstractBlock.Xor;
 import org.processmining.processtree.impl.AbstractBlock.XorLoop;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
-//import org.processmining.plugins.InductiveMiner.mining.operators.Interleaved;
+
+// import org.processmining.plugins.InductiveMiner.mining.operators.Interleaved;
 
 public class AlignedLogVisualisation {
 
@@ -43,38 +44,35 @@ public class AlignedLogVisualisation {
 				new XEventPerformanceClassifier(MiningParametersIM.getDefaultClassifier()), xLog,
 				xLogInfo.getEventClasses(), XLogInfoPerformance.getEventClasses(),
 				ProMCancelTerminationCondition.buildDummyCanceller());
-		return fancy(tree, result.logInfo, new AlignedLogVisualisationParameters()).getLeft();
+		return fancy(tree, new AlignedLogVisualisationDataImplFrequencies(tree, result.logInfo),
+				new AlignedLogVisualisationParameters()).getA();
 	}
 
-	Dot dot;
-	private AlignedLogInfo logInfo;
 	private long maxCardinality;
 	private long minCardinality;
 	AlignedLogVisualisationParameters parameters;
 
+	private AlignedLogVisualisationData data;
+	
+	private Dot dot;
 	private AlignedLogVisualisationInfo info;
+	private TraceViewColourMap traceViewColourMap;
 
-	public Pair<Dot, AlignedLogVisualisationInfo> fancy(ProcessTree tree, AlignedLogInfo logInfo,
+	public Triple<Dot, AlignedLogVisualisationInfo, TraceViewColourMap> fancy(ProcessTree tree, AlignedLogVisualisationData data,
 			AlignedLogVisualisationParameters parameters) {
 		this.parameters = parameters;
-		if (logInfo == null) {
-			//use empty logInfo
-			logInfo = new AlignedLogInfo();
-			//set parameters to not show frequencies
-			parameters.setShowFrequenciesOnModelEdges(false);
-			parameters.setShowFrequenciesOnMoveEdges(false);
-			parameters.setShowFrequenciesOnNodes(false);
-		}
-		this.logInfo = logInfo;
+		this.data = data;
 
 		//find maximum and mimimum occurrences
-		Pair<Long, Long> p = AlignedLogMetrics.getExtremes(new UnfoldedNode(tree.getRoot()), logInfo);
+		Pair<Long, Long> p = data.getExtremeCardinalities();
 		minCardinality = p.getLeft();
 		maxCardinality = p.getRight();
 
 		dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
 		UnfoldedNode root = new UnfoldedNode(tree.getRoot());
+		
+		traceViewColourMap = new TraceViewColourMap();
 
 		//source & sink
 		info = new AlignedLogVisualisationInfo();
@@ -91,7 +89,7 @@ public class AlignedLogVisualisation {
 			visualiseLogMove(sink, sink, root, LogMovePosition.atSink(root), false);
 		}
 
-		return Pair.of(dot, info);
+		return Triple.of(dot, info, traceViewColourMap);
 	}
 
 	private void convertNode(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
@@ -100,7 +98,7 @@ public class AlignedLogVisualisation {
 		} else if (unode.getNode() instanceof XorLoop) {
 			convertLoop(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof Interleaved) {
-//			convertParallel(unode, source, sink, directionForward, "\u2194");
+			//			convertParallel(unode, source, sink, directionForward, "\u2194");
 			convertParallel(unode, source, sink, directionForward, "-");
 		} else if (unode.getNode() instanceof And) {
 			convertParallel(unode, source, sink, directionForward, "+");
@@ -116,7 +114,7 @@ public class AlignedLogVisualisation {
 	}
 
 	private void convertActivity(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
-		long cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, false, logInfo);
+		Triple<String, Long, String> cardinality = data.getNodeLabel(unode, false);
 		LocalDotNode dotNode = convertActivity(unode, cardinality);
 
 		addArc(source, dotNode, unode, directionForward, false);
@@ -124,8 +122,8 @@ public class AlignedLogVisualisation {
 
 		//draw model moves
 		if (parameters.isShowModelMoves()) {
-			long modelMoves = AlignedLogMetrics.getModelMovesLocal(unode, logInfo);
-			if (modelMoves != 0) {
+			Triple<String, Long, String> modelMoves = data.getModelMoveEdgeLabel(unode);
+			if (modelMoves.getB() != 0) {
 				addMoveArc(source, sink, unode, EdgeType.modelMove, null, null, modelMoves, directionForward);
 			}
 		}
@@ -136,11 +134,11 @@ public class AlignedLogVisualisation {
 		}
 	}
 
-	private LocalDotNode convertActivity(UnfoldedNode unode, long cardinality) {
+	private LocalDotNode convertActivity(UnfoldedNode unode, Triple<String, Long, String> cardinality) {
 		//style the activity by the occurrences of it
 		Color fillColour = Color.white;
-		if (cardinality != 0 && parameters.getColourNodes() != null) {
-			fillColour = parameters.getColourNodes().colour((long) (getOccurrenceFactor(cardinality) * 100), 0, 100);
+		if (cardinality.getB() != 0 && parameters.getColourNodes() != null) {
+			fillColour = parameters.getColourNodes().colour((long) (getOccurrenceFactor(cardinality.getB()) * 100), 0, 100);
 		}
 
 		//determine label colour
@@ -148,14 +146,17 @@ public class AlignedLogVisualisation {
 		if (ColourMaps.getLuma(fillColour) < 128) {
 			fontColour = Color.white;
 		}
+		traceViewColourMap.set(unode, fillColour, fontColour);
 
 		String label = unode.getNode().getName();
 		if (label.length() == 0) {
 			label = " ";
 		}
-		if (cardinality != -1 && parameters.isShowFrequenciesOnNodes()) {
-			label += "\n" + cardinality;
+		label += "\n" + cardinality.getA();
+		if (cardinality.getB() != -1 && parameters.isShowFrequenciesOnNodes()) {
+			label += cardinality.getB();
 		}
+		label += cardinality.getC();
 
 		final LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.activity, label, unode);
 		dotNode.setOption("fillcolor", ColourMap.toHexString(fillColour));
@@ -226,7 +227,8 @@ public class AlignedLogVisualisation {
 		}
 	}
 
-	private void convertParallel(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward, String sign) {
+	private void convertParallel(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward,
+			String sign) {
 
 		//operator split
 		LocalDotNode split = new LocalDotNode(dot, info, NodeType.parallelSplit, sign, unode);
@@ -292,14 +294,13 @@ public class AlignedLogVisualisation {
 		//are never put on xor
 	}
 
-	private LocalDotEdge addArc(LocalDotNode from, LocalDotNode to, final UnfoldedNode unode, boolean directionForward,
-			boolean includeModelMoves) {
-		return addModelArc(from, to, unode, directionForward,
-				AlignedLogMetrics.getNumberOfTracesRepresented(unode, includeModelMoves, logInfo));
+	private LocalDotEdge addArc(final LocalDotNode from, final LocalDotNode to, final UnfoldedNode unode,
+			boolean directionForward, boolean includeModelMoves) {
+		return addModelArc(from, to, unode, directionForward, data.getEdgeLabel(unode, includeModelMoves));
 	}
 
-	private LocalDotEdge addModelArc(LocalDotNode from, LocalDotNode to, final UnfoldedNode unode,
-			boolean directionForward, long cardinality) {
+	private LocalDotEdge addModelArc(final LocalDotNode from, final LocalDotNode to, final UnfoldedNode unode,
+			final boolean directionForward, final Triple<String, Long, String> cardinality) {
 
 		final LocalDotEdge edge;
 		if (directionForward) {
@@ -310,15 +311,16 @@ public class AlignedLogVisualisation {
 		}
 
 		if (parameters.getColourModelEdges() != null) {
-			String lineColour = parameters.getColourModelEdges().colourString(cardinality, minCardinality,
+			String lineColour = parameters.getColourModelEdges().colourString(cardinality.getB(), minCardinality,
 					maxCardinality);
 			edge.setOption("color", lineColour);
 		}
 
-		edge.setOption("penwidth", "" + parameters.getModelEdgesWidth().size(cardinality, minCardinality, maxCardinality));
+		edge.setOption("penwidth",
+				"" + parameters.getModelEdgesWidth().size(cardinality.getB(), minCardinality, maxCardinality));
 
 		if (parameters.isShowFrequenciesOnModelEdges()) {
-			edge.setLabel(cardinality + "");
+			edge.setLabel(cardinality.getA() + cardinality.getB() + cardinality.getC());
 		}
 
 		return edge;
@@ -326,50 +328,50 @@ public class AlignedLogVisualisation {
 
 	private void visualiseLogMove(LocalDotNode from, LocalDotNode to, UnfoldedNode unode,
 			LogMovePosition logMovePosition, boolean directionForward) {
-		MultiSet<XEventClass> logMoves = AlignedLogMetrics.getLogMoves(logMovePosition, logInfo);
-		if (logMoves.size() > 0) {
+		Triple<String, MultiSet<XEventClass>, String> logMoves = data.getLogMoveEdgeLabel(logMovePosition);
+		Triple<String, Long, String> t = Triple.of(logMoves.getA(), logMoves.getB().size(), logMoves.getC());
+		if (logMoves.getB().size() > 0) {
 			if (parameters.isRepairLogMoves()) {
-				for (XEventClass e : logMoves) {
-					long cardinality = logMoves.getCardinalityOf(e);
+				for (XEventClass e : logMoves.getB()) {
+					long cardinality = logMoves.getB().getCardinalityOf(e);
 					LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.logMoveActivity, e.toString(), unode);
 					addMoveArc(from, dotNode, unode, EdgeType.logMove, logMovePosition.getOn(),
-							logMovePosition.getBeforeChild(), cardinality, directionForward);
+							logMovePosition.getBeforeChild(), t, directionForward);
 					addMoveArc(dotNode, to, unode, EdgeType.logMove, logMovePosition.getOn(),
-							logMovePosition.getBeforeChild(), cardinality, directionForward);
+							logMovePosition.getBeforeChild(), t, directionForward);
 				}
 			} else {
 				addMoveArc(from, to, unode, EdgeType.logMove, logMovePosition.getOn(),
-						logMovePosition.getBeforeChild(), logMoves.size(), directionForward);
+						logMovePosition.getBeforeChild(), t, directionForward);
 			}
 		}
 	}
 
 	private LocalDotEdge addMoveArc(LocalDotNode from, LocalDotNode to, UnfoldedNode unode, EdgeType type,
-			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, long cardinality, boolean directionForward) {
+			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, Triple<String, Long, String> cardinality, boolean directionForward) {
 
 		LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(dot, info, from, to, "", unode, type, lookupNode1, lookupNode2,
-					directionForward);
+			edge = new LocalDotEdge(dot, info, from, to, "", unode, type, lookupNode1, lookupNode2, directionForward);
 		} else {
-			edge = new LocalDotEdge(dot, info, to, from, "", unode, type,
-					lookupNode1, lookupNode2, directionForward);
+			edge = new LocalDotEdge(dot, info, to, from, "", unode, type, lookupNode1, lookupNode2, directionForward);
 			edge.setOption("dir", "back");
 		}
-		
+
 		edge.setOption("style", "dashed");
 		edge.setOption("arrowsize", ".5");
 
 		if (parameters.getColourMoves() != null) {
-			String lineColour = parameters.getColourMoves().colourString(cardinality, minCardinality, maxCardinality);
+			String lineColour = parameters.getColourMoves().colourString(cardinality.getB(), minCardinality, maxCardinality);
 			edge.setOption("color", lineColour);
 			edge.setOption("fontcolor", lineColour);
 		}
 
-		edge.setOption("penwidth", "" + parameters.getMoveEdgesWidth().size(cardinality, minCardinality, maxCardinality));
+		edge.setOption("penwidth", ""
+				+ parameters.getMoveEdgesWidth().size(cardinality.getB(), minCardinality, maxCardinality));
 
 		if (parameters.isShowFrequenciesOnMoveEdges()) {
-			edge.setLabel(cardinality + "");
+			edge.setLabel(cardinality.getA() + cardinality.getB() + cardinality.getC());
 		}
 
 		return edge;

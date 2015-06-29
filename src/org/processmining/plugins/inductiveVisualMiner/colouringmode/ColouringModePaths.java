@@ -2,6 +2,8 @@ package org.processmining.plugins.inductiveVisualMiner.colouringmode;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationDataImplFrequencies;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
 
@@ -18,7 +20,7 @@ public class ColouringModePaths extends ColouringMode {
 		visualisationParameters.setShowModelMoves(false);
 	}
 
-	public AlignedLogVisualisationParameters getFinalVisualisationParameters() {
+	public AlignedLogVisualisationParameters getFinalVisualisationParameters(InductiveVisualMinerState state) {
 		return visualisationParameters;
 	}
 
@@ -31,11 +33,15 @@ public class ColouringModePaths extends ColouringMode {
 		return false;
 	}
 
-	public boolean isShowQueueLengths() {
+	public boolean isShowPerformance() {
 		return false;
 	}
 
 	public boolean isUpdateWithTimeStep(InductiveVisualMinerState state) {
 		return false;
+	}
+
+	protected AlignedLogVisualisationData getFinalVisualisationData(InductiveVisualMinerState state) {
+		return new AlignedLogVisualisationDataImplFrequencies(state.getTree(), state.getAlignedFilteredLogInfo());
 	}
 }

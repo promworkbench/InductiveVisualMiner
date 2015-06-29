@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.resourcePerspective;
+package org.processmining.plugins.inductiveVisualMiner.animation;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.classification.XEventResourceClassifier;

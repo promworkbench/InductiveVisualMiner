@@ -41,6 +41,22 @@ public class QueueActivityLog {
 	public String getResource(int index) {
 		return resources.get(index);
 	}
+	
+	public boolean hasInitiate(int traceIndex) {
+		return moves.get(traceIndex * 4) != -1;
+	}
+	
+	public boolean hasEnqueue(int traceIndex) {
+		return moves.get(traceIndex * 4 + 1) != -1;
+	}
+
+	public boolean hasStart(int traceIndex) {
+		return moves.get(traceIndex * 4 + 2) != -1;
+	}
+
+	public boolean hasComplete(int traceIndex) {
+		return moves.get(traceIndex * 4 + 3) != -1;
+	}
 
 	public long getInitiate(int traceIndex) {
 		return moves.get(traceIndex * 4);

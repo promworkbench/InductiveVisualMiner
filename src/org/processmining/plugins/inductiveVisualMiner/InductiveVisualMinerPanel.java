@@ -36,6 +36,7 @@ import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMod
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePaths;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsDeviations;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsQueueLengths;
+import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsSojourn;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
@@ -153,7 +154,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 			colourSelection = SlickerFactory.instance().createComboBox(
 					new ColouringMode[] { new ColouringModePaths(), new ColouringModePathsDeviations(),
-							new ColouringModePathsQueueLengths() });
+							new ColouringModePathsQueueLengths(), new ColouringModePathsSojourn() });
 			GridBagConstraints ccolourSelection = new GridBagConstraints();
 			ccolourSelection.gridx = 2;
 			ccolourSelection.gridy = gridy++;
