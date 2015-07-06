@@ -53,13 +53,13 @@ public class AlignedLogVisualisation {
 	AlignedLogVisualisationParameters parameters;
 
 	private AlignedLogVisualisationData data;
-	
+
 	private Dot dot;
 	private AlignedLogVisualisationInfo info;
 	private TraceViewColourMap traceViewColourMap;
 
-	public Triple<Dot, AlignedLogVisualisationInfo, TraceViewColourMap> fancy(ProcessTree tree, AlignedLogVisualisationData data,
-			AlignedLogVisualisationParameters parameters) {
+	public Triple<Dot, AlignedLogVisualisationInfo, TraceViewColourMap> fancy(ProcessTree tree,
+			AlignedLogVisualisationData data, AlignedLogVisualisationParameters parameters) {
 		this.parameters = parameters;
 		this.data = data;
 
@@ -71,7 +71,7 @@ public class AlignedLogVisualisation {
 		dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
 		UnfoldedNode root = new UnfoldedNode(tree.getRoot());
-		
+
 		traceViewColourMap = new TraceViewColourMap();
 
 		//source & sink
@@ -98,8 +98,8 @@ public class AlignedLogVisualisation {
 		} else if (unode.getNode() instanceof XorLoop) {
 			convertLoop(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof Interleaved) {
-			//			convertParallel(unode, source, sink, directionForward, "\u2194");
-			convertParallel(unode, source, sink, directionForward, "-");
+			convertParallel(unode, source, sink, directionForward, "\u2194");
+			//			convertParallel(unode, source, sink, directionForward, "-");
 		} else if (unode.getNode() instanceof And) {
 			convertParallel(unode, source, sink, directionForward, "+");
 		} else if (unode.getNode() instanceof Or) {
@@ -138,7 +138,8 @@ public class AlignedLogVisualisation {
 		//style the activity by the occurrences of it
 		Color fillColour = Color.white;
 		if (cardinality.getB() != 0 && parameters.getColourNodes() != null) {
-			fillColour = parameters.getColourNodes().colour((long) (getOccurrenceFactor(cardinality.getB()) * 100), 0, 100);
+			fillColour = parameters.getColourNodes().colour((long) (getOccurrenceFactor(cardinality.getB()) * 100), 0,
+					100);
 		}
 
 		//determine label colour
@@ -348,7 +349,8 @@ public class AlignedLogVisualisation {
 	}
 
 	private LocalDotEdge addMoveArc(LocalDotNode from, LocalDotNode to, UnfoldedNode unode, EdgeType type,
-			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, Triple<String, Long, String> cardinality, boolean directionForward) {
+			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, Triple<String, Long, String> cardinality,
+			boolean directionForward) {
 
 		LocalDotEdge edge;
 		if (directionForward) {
@@ -362,13 +364,14 @@ public class AlignedLogVisualisation {
 		edge.setOption("arrowsize", ".5");
 
 		if (parameters.getColourMoves() != null) {
-			String lineColour = parameters.getColourMoves().colourString(cardinality.getB(), minCardinality, maxCardinality);
+			String lineColour = parameters.getColourMoves().colourString(cardinality.getB(), minCardinality,
+					maxCardinality);
 			edge.setOption("color", lineColour);
 			edge.setOption("fontcolor", lineColour);
 		}
 
-		edge.setOption("penwidth", ""
-				+ parameters.getMoveEdgesWidth().size(cardinality.getB(), minCardinality, maxCardinality));
+		edge.setOption("penwidth",
+				"" + parameters.getMoveEdgesWidth().size(cardinality.getB(), minCardinality, maxCardinality));
 
 		if (parameters.isShowFrequenciesOnMoveEdges()) {
 			edge.setLabel(cardinality.getA() + cardinality.getB() + cardinality.getC());

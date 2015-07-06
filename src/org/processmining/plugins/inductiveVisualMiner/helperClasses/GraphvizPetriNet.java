@@ -18,7 +18,7 @@ import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotNode;
-import org.processmining.plugins.graphviz.visualisation.DotVisualisation;
+import org.processmining.plugins.graphviz.visualisation.DotPanel;
 
 @Plugin(name = "Graphviz Petri net visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Petri net" }, userAccessible = false)
 @Visualizer
@@ -28,7 +28,7 @@ public class GraphvizPetriNet {
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0 })
 	public JComponent visualize(PluginContext context, Petrinet petrinet) {
 		Dot dot = convert(petrinet, null, null, "");
-		return (new DotVisualisation()).visualize(context, dot);
+		return new DotPanel(dot);
 	}
 
 	public static Dot convert(Petrinet petrinet, Marking initialMarking, Marking finalMarking, String sinkColour) {
