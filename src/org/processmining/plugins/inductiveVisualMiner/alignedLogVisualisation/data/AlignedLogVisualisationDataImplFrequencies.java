@@ -1,9 +1,8 @@
-package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
+package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
@@ -24,24 +23,24 @@ public class AlignedLogVisualisationDataImplFrequencies implements AlignedLogVis
 		return AlignedLogMetrics.getExtremes(new UnfoldedNode(tree.getRoot()), logInfo);
 	}
 
-	public Triple<String, Long, String> getNodeLabel(UnfoldedNode unode, boolean includeModelMoves) {
+	public Pair<String, Long> getNodeLabel(UnfoldedNode unode, boolean includeModelMoves) {
 		long cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, includeModelMoves, logInfo);
-		return Triple.of("", cardinality, "");
+		return Pair.of(String.valueOf(cardinality), cardinality);
 	}
 	
-	public Triple<String, Long, String> getEdgeLabel(UnfoldedNode unode, boolean includeModelMoves) {
+	public Pair<String, Long> getEdgeLabel(UnfoldedNode unode, boolean includeModelMoves) {
 		long cardinality = AlignedLogMetrics.getNumberOfTracesRepresented(unode, includeModelMoves, logInfo);
-		return Triple.of("", cardinality, "");
+		return Pair.of(String.valueOf(cardinality), cardinality);
 	}
 
-	public Triple<String, Long, String> getModelMoveEdgeLabel(UnfoldedNode unode) {
+	public Pair<String, Long> getModelMoveEdgeLabel(UnfoldedNode unode) {
 		long cardinality = AlignedLogMetrics.getModelMovesLocal(unode, logInfo);
-		return Triple.of("", cardinality, "");
+		return Pair.of(String.valueOf(cardinality), cardinality);
 	}
 
-	public Triple<String, MultiSet<XEventClass>, String> getLogMoveEdgeLabel(LogMovePosition logMovePosition) {
+	public Pair<String, MultiSet<XEventClass>> getLogMoveEdgeLabel(LogMovePosition logMovePosition) {
 		MultiSet<XEventClass> cardinality = AlignedLogMetrics.getLogMoves(logMovePosition, logInfo);
-		return Triple.of("", cardinality, "");
+		return Pair.of(String.valueOf(cardinality.size()), cardinality);
 	}
 
 	public void setTime(long time) {

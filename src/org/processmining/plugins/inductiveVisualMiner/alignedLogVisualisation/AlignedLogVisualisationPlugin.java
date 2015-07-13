@@ -9,6 +9,7 @@ import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;

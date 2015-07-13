@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,18 +15,11 @@ import javax.swing.JTextArea;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
-import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
-import org.processmining.plugins.graphviz.colourMaps.ColourMapLightBlue;
-import org.processmining.plugins.graphviz.colourMaps.ColourMapRed;
-import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
-import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphDirectionChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
@@ -36,10 +28,9 @@ import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMod
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePaths;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsDeviations;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsQueueLengths;
+import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsService;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsSojourn;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -53,7 +44,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private static final long serialVersionUID = -1078786029763735572L;
 
 	//gui elements
-	private final DotPanel graphPanel;
+	private final InductiveVisualMinerGraphPanel graphPanel;
 	private final JComboBox<?> colourSelection;
 	private final JLabel colourLabel;
 	private final JLabel statusLabel;
@@ -77,8 +68,6 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
 			ClassifierWrapper[] classifiers, VisualMinerWrapper[] miners, boolean enableMining) {
-		initVisualisationParameters();
-
 		int gridy = 0;
 
 		setLayout(new GridBagLayout());
@@ -155,7 +144,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 			colourSelection = SlickerFactory.instance().createComboBox(
 					new ColouringMode[] { new ColouringModePaths(), new ColouringModePathsDeviations(),
-							new ColouringModePathsQueueLengths(), new ColouringModePathsSojourn() });
+							new ColouringModePathsQueueLengths(), new ColouringModePathsSojourn(), new ColouringModePathsService() });
 			GridBagConstraints ccolourSelection = new GridBagConstraints();
 			ccolourSelection.gridx = 2;
 			ccolourSelection.gridy = gridy++;
@@ -256,12 +245,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		//graph panel
 		{
-			//set up intialisation splash screen
-			Dot dot = new Dot();
-			dot.addNode("Inductive visual Miner");
-			dot.addNode("Mining model...");
-
-			graphPanel = new DotPanel(dot);
+			graphPanel = new InductiveVisualMinerGraphPanel();
 			graphPanel.setFocusable(true);
 
 			//set the graph direction changed listener
@@ -329,42 +313,6 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 	}
 
-	//==visualisation parameters==
-
-	private static AlignedLogVisualisationParameters pathsMoves = new AlignedLogVisualisationParameters();
-	private static AlignedLogVisualisationParameters moves = new AlignedLogVisualisationParameters();
-	private static AlignedLogVisualisationParameters paths = new AlignedLogVisualisationParameters();
-	private static AlignedLogVisualisationParameters queueLengths = new AlignedLogVisualisationParameters();
-	private static AlignedLogVisualisationParameters withoutAlignment = new AlignedLogVisualisationParameters();
-
-	private static void initVisualisationParameters() {
-		withoutAlignment.setColourModelEdges(null);
-		withoutAlignment.setShowFrequenciesOnModelEdges(false);
-		withoutAlignment.setShowFrequenciesOnNodes(false);
-		withoutAlignment.setModelEdgesWidth(new SizeMapFixed(1));
-
-		paths.setShowFrequenciesOnModelEdges(true);
-		paths.setColourModelEdges(new ColourMapBlue());
-		paths.setModelEdgesWidth(new SizeMapLinear(1, 3));
-		paths.setShowFrequenciesOnMoveEdges(false);
-		paths.setShowLogMoves(false);
-		paths.setShowModelMoves(false);
-
-		moves.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
-		moves.setColourNodes(new ColourMapLightBlue());
-
-		pathsMoves.setShowFrequenciesOnModelEdges(true);
-		pathsMoves.setShowFrequenciesOnMoveEdges(true);
-		pathsMoves.setColourModelEdges(new ColourMapFixed(new Color(153, 153, 255)));
-		pathsMoves.setColourMoves(new ColourMapFixed(new Color(255, 0, 0)));
-
-		queueLengths.setShowFrequenciesOnModelEdges(true);
-		queueLengths.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
-		queueLengths.setShowLogMoves(false);
-		queueLengths.setShowModelMoves(false);
-		queueLengths.setColourNodes(new ColourMapRed());
-	}
-
 	public void removeNotify() {
 		super.removeNotify();
 		traceView.setVisible(false);
@@ -404,7 +352,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 	}
 
-	public DotPanel getGraph() {
+	public InductiveVisualMinerGraphPanel getGraph() {
 		return graphPanel;
 	}
 

@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,11 +26,14 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
+import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel.Callback;
+import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
@@ -55,8 +59,10 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog.FileType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
+import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 import com.kitfox.svg.SVGDiagram;
@@ -93,7 +99,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveImageButton().setEnabled(false);
 					panel.getSaveImageButton().setText("image");
 					state.resetAlignment();
-					state.resetQueueLengths();
+					state.resetPerformance();
 					setStatus("Making log..");
 				}
 			});
@@ -122,7 +128,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveImageButton().setEnabled(false);
 					panel.getSaveImageButton().setText("image");
 					state.resetAlignment();
-					state.resetQueueLengths();
+					state.resetPerformance();
 					setStatus("Filtering activities..");
 				}
 			});
@@ -139,7 +145,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveImageButton().setText("image");
 					panel.getTraceView().set(state.getLog());
 					state.resetAlignment();
-					state.resetQueueLengths();
+					state.resetPerformance();
 					setStatus("Mining..");
 				}
 			});
@@ -195,7 +201,7 @@ public class InductiveVisualMinerController {
 					panel.getGraph().setEnableAnimation(false);
 					panel.getSaveImageButton().setText("image");
 					state.resetAlignment();
-					state.resetQueueLengths();
+					state.resetPerformance();
 					setStatus("Aligning log and model..");
 				}
 			});
@@ -224,7 +230,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					panel.getGraph().setEnableAnimation(false);
 					panel.getSaveImageButton().setText("image");
-					state.resetQueueLengths();
+					state.resetPerformance();
 					setStatus("Highlighting selection..");
 				}
 			});
@@ -242,7 +248,7 @@ public class InductiveVisualMinerController {
 			Cl08ApplyHighlighting a = new Cl08ApplyHighlighting();
 			a.setOnComplete(new Runnable() {
 				public void run() {
-					state.resetQueueLengths();
+					state.resetPerformance();
 
 					ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(), state
 							.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
@@ -250,6 +256,7 @@ public class InductiveVisualMinerController {
 
 					//tell trace view the colour map and the selection
 					updateHighlighting();
+					updatePopup();
 
 					panel.repaint();
 				}
@@ -265,7 +272,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					panel.getGraph().setEnableAnimation(false);
 					panel.getSaveImageButton().setText("image");
-					state.resetQueueLengths();
+					state.resetPerformance();
 					setStatus("Creating IvM log..");
 				}
 			});
@@ -285,7 +292,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					panel.getGraph().setEnableAnimation(false);
 					panel.getSaveImageButton().setText("image");
-					state.resetQueueLengths();
+					state.resetPerformance();
 					setStatus("Creating animation..");
 				}
 			});
@@ -325,7 +332,7 @@ public class InductiveVisualMinerController {
 			Cl11Queues q = new Cl11Queues();
 			q.setOnStart(new Runnable() {
 				public void run() {
-					state.resetQueueLengths();
+					state.resetPerformance();
 					setStatus("Mining queues..");
 				}
 			});
@@ -333,6 +340,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					setStatus(" ");
 					updateHighlighting();
+					updatePopup();
 				}
 			});
 			q.setOnException(onException);
@@ -541,6 +549,15 @@ public class InductiveVisualMinerController {
 			}
 		});
 
+		//set mouse-in-out node updater
+		panel.getGraph().addMouseInElementsChangedListener(new MouseInElementsChangedListener<DotElement>() {
+			public void mouseInElementsChanged(Set<DotElement> mouseInElements) {
+				panel.getGraph().setShowPopup(!mouseInElements.isEmpty());
+				updatePopup();
+				panel.repaint();
+			}
+		});
+
 		//set animation time updater
 		panel.getGraph().setTimeStepCallback(new Callback<Double, Object>() {
 			public Object call(Double arg) {
@@ -609,6 +626,59 @@ public class InductiveVisualMinerController {
 				.getColourMode().getVisualisationParameters(state));
 		panel.getTraceView().setColourMap(colourMap);
 		colourMap.setSelectedNodes(state.getSelectedNodes(), state.getSelectedLogMoves());
+	}
+
+	private void updatePopup() {
+		if (panel.getGraph().getMouseInElements().isEmpty()) {
+			panel.getGraph().setShowPopup(false);
+		} else {
+			//output statistics about the node
+			DotElement element = panel.getGraph().getMouseInElements().iterator().next();
+			if (element instanceof LocalDotNode) {
+				UnfoldedNode unode = ((LocalDotNode) element).getUnode();
+				if (state.isAlignmentReady() && unode.getNode() instanceof Manual) {
+					List<String> popup = new ArrayList<>();
+
+					//frequencies
+					popup.add("frequency             "
+							+ AlignedLogMetrics.getNumberOfTracesRepresented(unode, false,
+									state.getAlignedFilteredLogInfo()));
+
+					if (state.isPerformanceReady()) {
+						//waiting time
+						if (state.getPerformance().getWaitingTime(unode) > -0.1) {
+							popup.add("average waiting time  "
+									+ Performance.timeToString((long) state.getPerformance().getWaitingTime(unode)));
+						} else {
+							popup.add("average waiting time  -");
+						}
+						
+						//service time
+						if (state.getPerformance().getSojournTime(unode) > -0.1) {
+							popup.add("average service time  "
+									+ Performance.timeToString((long) state.getPerformance().getServiceTime(unode)));
+						} else {
+							popup.add("average service time  -");
+						}
+						
+						//sojourn time
+						if (state.getPerformance().getSojournTime(unode) > -0.1) {
+							popup.add("average sojourn time  "
+									+ Performance.timeToString((long) state.getPerformance().getSojournTime(unode)));
+						} else {
+							popup.add("average sojourn time  -");
+						}
+					}
+
+					panel.getGraph().setPopup(popup);
+					panel.getGraph().setShowPopup(true);
+				} else {
+					panel.getGraph().setShowPopup(false);
+				}
+			} else {
+				panel.getGraph().setShowPopup(false);
+			}
+		}
 	}
 
 	public static void debug(Object s) {

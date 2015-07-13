@@ -5,10 +5,10 @@ import java.awt.Color;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapRed;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationData;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationDataImplFrequencies;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationDataImplSojourn;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplSojourn;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 
 public class ColouringModePathsSojourn extends ColouringMode {
@@ -33,7 +33,7 @@ public class ColouringModePathsSojourn extends ColouringMode {
 	}
 
 	public AlignedLogVisualisationParameters getFinalVisualisationParameters(InductiveVisualMinerState state) {
-		if (!state.isQueueLengthsReady()) {
+		if (!state.isPerformanceReady()) {
 			return visualisationParametersBeforeQueues;
 		}
 		return visualisationParameters;
@@ -57,10 +57,10 @@ public class ColouringModePathsSojourn extends ColouringMode {
 	}
 	
 	protected AlignedLogVisualisationData getFinalVisualisationData(InductiveVisualMinerState state) {
-		if (!state.isQueueLengthsReady()) {
+		if (!state.isPerformanceReady()) {
 			return new AlignedLogVisualisationDataImplFrequencies(state.getTree(), state.getAlignedFilteredLogInfo());
 		}
-		return new AlignedLogVisualisationDataImplSojourn(state.getTree(), state.getQueueLengths(),
+		return new AlignedLogVisualisationDataImplSojourn(state.getTree(), state.getPerformance(),
 				state.getAlignedFilteredLogInfo());
 	}
 }

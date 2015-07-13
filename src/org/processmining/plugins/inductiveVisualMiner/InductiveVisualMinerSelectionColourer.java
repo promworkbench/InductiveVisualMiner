@@ -6,17 +6,16 @@ import java.util.Set;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
@@ -95,7 +94,7 @@ public class InductiveVisualMinerSelectionColourer {
 		try {
 			//style nodes
 			for (UnfoldedNode unode : TreeUtils.unfoldAllNodes(uroot)) {
-				Triple<String, Long, String> cardinality = data.getNodeLabel(unode, false);
+				Pair<String, Long> cardinality = data.getNodeLabel(unode, false);
 				Pair<Color, Color> colour = styleUnfoldedNode(unode, svg, info, cardinality, minCardinality,
 						maxCardinality, visualisationParameters);
 
@@ -115,7 +114,7 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	public static Pair<Color, Color> styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg,
-			AlignedLogVisualisationInfo info, Triple<String, Long, String> cardinality, long minCardinality,
+			AlignedLogVisualisationInfo info, Pair<String, Long> cardinality, long minCardinality,
 			long maxCardinality, AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
 		if (unode.getNode() instanceof Manual) {
 			return styleManual(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
@@ -126,7 +125,7 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	private static Pair<Color, Color> styleManual(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
-			Triple<String, Long, String> cardinality, long minCardinality, long maxCardinality,
+			Pair<String, Long> cardinality, long minCardinality, long maxCardinality,
 			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
 
 		LocalDotNode dotNode = info.getActivityNode(unode);
@@ -162,18 +161,14 @@ public class InductiveVisualMinerSelectionColourer {
 
 		//set title
 		titleCount.getContent().clear();
-		if (cardinality.getB() >= -0.1) {
-			titleCount.getContent().add(cardinality.getA() + cardinality.getB() + cardinality.getC());
-		} else {
-			titleCount.getContent().add(cardinality.getA() + cardinality.getC());
-		}
+		titleCount.getContent().add(cardinality.getA());
 		titleCount.rebuild();
 
 		return Pair.of(fillColour, fontColour);
 	}
 
 	private static void styleNonManualNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
-			Triple<String, Long, String> cardinality) {
+			Pair<String, Long> cardinality) {
 		//colour non-activity nodes
 		for (LocalDotNode dotNode : info.getNodes(unode)) {
 			if (cardinality.getB() > 0) {
@@ -194,7 +189,7 @@ public class InductiveVisualMinerSelectionColourer {
 			AlignedLogVisualisationData data, AlignedLogVisualisationParameters parameters, long minCardinality,
 			long maxCardinality) throws SVGException {
 		for (LocalDotEdge dotEdge : info.getAllModelEdges()) {
-			Triple<String, Long, String> cardinality = data.getEdgeLabel(dotEdge.getUnode(), false);
+			Pair<String, Long> cardinality = data.getEdgeLabel(dotEdge.getUnode(), false);
 			styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality, parameters.getColourModelEdges(),
 					parameters.isShowFrequenciesOnModelEdges(), parameters.getModelEdgesWidth());
 		}
@@ -205,7 +200,7 @@ public class InductiveVisualMinerSelectionColourer {
 			long maxCardinality) throws SVGException {
 		//style model move edges
 		for (LocalDotEdge dotEdge : info.getAllModelMoveEdges()) {
-			Triple<String, Long, String> cardinality = data.getModelMoveEdgeLabel(dotEdge.getUnode());
+			Pair<String, Long> cardinality = data.getModelMoveEdgeLabel(dotEdge.getUnode());
 			styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality, parameters.getColourMoves(),
 					parameters.isShowFrequenciesOnMoveEdges(), parameters.getMoveEdgesWidth());
 		}
@@ -213,14 +208,14 @@ public class InductiveVisualMinerSelectionColourer {
 		//style log moves
 		for (LocalDotEdge dotEdge : info.getAllLogMoveEdges()) {
 			LogMovePosition logMovePosition = LogMovePosition.of(dotEdge);
-			Triple<String, MultiSet<XEventClass>, String> cardinality = data.getLogMoveEdgeLabel(logMovePosition);
-			styleEdge(dotEdge, svg, Triple.of(cardinality.getA(), cardinality.getB().size(), cardinality.getC()),
+			Pair<String, MultiSet<XEventClass>> cardinality = data.getLogMoveEdgeLabel(logMovePosition);
+			styleEdge(dotEdge, svg, Pair.of(cardinality.getA(), cardinality.getB().size()),
 					minCardinality, maxCardinality, parameters.getColourMoves(),
 					parameters.isShowFrequenciesOnMoveEdges(), parameters.getMoveEdgesWidth());
 		}
 	}
 
-	private static void styleEdge(DotEdge edge, SVGDiagram svg, Triple<String, Long, String> cardinality,
+	private static void styleEdge(DotEdge edge, SVGDiagram svg, Pair<String, Long> cardinality,
 			long minCardinality, long maxCardinality, ColourMap colourMap, boolean showFrequency, SizeMap widthMap)
 			throws SVGException {
 
@@ -248,7 +243,7 @@ public class InductiveVisualMinerSelectionColourer {
 		if (showFrequency) {
 			Text label = (Text) group.getChild(group.getChildren(null).size() - 1);
 			label.getContent().clear();
-			label.getContent().add(cardinality.getA() + cardinality.getB() + cardinality.getC());
+			label.getContent().add(cardinality.getA());
 			label.rebuild();
 		}
 	}

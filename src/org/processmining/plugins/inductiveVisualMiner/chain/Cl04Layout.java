@@ -8,10 +8,10 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisation;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationData;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationDataImplEmpty;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplEmpty;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.processtree.ProcessTree;
 

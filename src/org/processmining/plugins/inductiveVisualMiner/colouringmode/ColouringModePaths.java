@@ -2,9 +2,9 @@ package org.processmining.plugins.inductiveVisualMiner.colouringmode;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationData;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationDataImplFrequencies;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
 
 public class ColouringModePaths extends ColouringMode {

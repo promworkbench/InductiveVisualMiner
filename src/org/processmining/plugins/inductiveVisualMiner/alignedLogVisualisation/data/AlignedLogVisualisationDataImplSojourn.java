@@ -1,25 +1,25 @@
-package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation;
+package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsWrapper;
+import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisualisationData {
 
-	private long minQueueLength;
-	private long maxQueueLength;
+	protected long minQueueLength;
+	protected long maxQueueLength;
 
-	private final QueueLengthsWrapper queueLengths;
+	protected final PerformanceWrapper queueLengths;
 
-	private final AlignedLogVisualisationData dataForEdges;
+	protected final AlignedLogVisualisationData dataForEdges;
 
-	public AlignedLogVisualisationDataImplSojourn(ProcessTree tree, QueueLengthsWrapper queueLengths,
+	public AlignedLogVisualisationDataImplSojourn(ProcessTree tree, PerformanceWrapper queueLengths,
 			AlignedLogInfo logInfo) {
 		this.queueLengths = queueLengths;
 		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(tree, logInfo);
@@ -45,24 +45,24 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 		return Pair.of(minQueueLength, maxQueueLength);
 	}
 
-	public Triple<String, Long, String> getNodeLabel(UnfoldedNode unode, boolean includeModelMoves) {
+	public Pair<String, Long> getNodeLabel(UnfoldedNode unode, boolean includeModelMoves) {
 		long length = Math.round(queueLengths.getSojournTime(unode));
 		if (length >= 0) {
-			return Triple.of("sojourn ", length, " ms");
+			return Pair.of(Performance.timeToString(length), length);
 		} else {
-			return Triple.of("-", -1l, "");
+			return Pair.of("-", -1l);
 		}
 	}
 
-	public Triple<String, Long, String> getEdgeLabel(UnfoldedNode unode, boolean includeModelMoves) {
+	public Pair<String, Long> getEdgeLabel(UnfoldedNode unode, boolean includeModelMoves) {
 		return dataForEdges.getEdgeLabel(unode, includeModelMoves);
 	}
 
-	public Triple<String, Long, String> getModelMoveEdgeLabel(UnfoldedNode unode) {
+	public Pair<String, Long> getModelMoveEdgeLabel(UnfoldedNode unode) {
 		return dataForEdges.getModelMoveEdgeLabel(unode);
 	}
 
-	public Triple<String, MultiSet<XEventClass>, String> getLogMoveEdgeLabel(LogMovePosition logMovePosition) {
+	public Pair<String, MultiSet<XEventClass>> getLogMoveEdgeLabel(LogMovePosition logMovePosition) {
 		return dataForEdges.getLogMoveEdgeLabel(logMovePosition);
 	}
 

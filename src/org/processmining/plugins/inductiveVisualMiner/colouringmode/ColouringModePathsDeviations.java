@@ -4,9 +4,9 @@ import java.awt.Color;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationData;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationDataImplFrequencies;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
 
 public class ColouringModePathsDeviations extends ColouringMode {
 

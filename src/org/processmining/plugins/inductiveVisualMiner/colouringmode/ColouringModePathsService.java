@@ -8,22 +8,23 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplQueues;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplService;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 
-public class ColouringModePathsQueueLengths extends ColouringMode {
+public class ColouringModePathsService extends ColouringMode {
 
+	
 	public AlignedLogVisualisationParameters visualisationParametersBeforeQueues = new AlignedLogVisualisationParameters();
 	public AlignedLogVisualisationParameters visualisationParameters = new AlignedLogVisualisationParameters();
 
-	public ColouringModePathsQueueLengths() {
+	public ColouringModePathsService() {
 		visualisationParameters.setShowFrequenciesOnModelEdges(true);
 		visualisationParameters.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
 		visualisationParameters.setShowLogMoves(false);
 		visualisationParameters.setShowModelMoves(false);
 		visualisationParameters.setColourNodes(new ColourMapRed());
 		visualisationParameters.setModelEdgesWidth(new SizeMapFixed(1));
-
+		
 		visualisationParametersBeforeQueues.setShowFrequenciesOnModelEdges(true);
 		visualisationParametersBeforeQueues.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
 		visualisationParametersBeforeQueues.setShowLogMoves(false);
@@ -40,7 +41,7 @@ public class ColouringModePathsQueueLengths extends ColouringMode {
 
 	@Override
 	public String toString() {
-		return "paths and queue lengths";
+		return "paths and service times";
 	}
 
 	public boolean isShowDeviations() {
@@ -52,14 +53,14 @@ public class ColouringModePathsQueueLengths extends ColouringMode {
 	}
 
 	public boolean isUpdateWithTimeStep(InductiveVisualMinerState state) {
-		return state.isPerformanceReady();
+		return false;
 	}
-
+	
 	protected AlignedLogVisualisationData getFinalVisualisationData(InductiveVisualMinerState state) {
 		if (!state.isPerformanceReady()) {
 			return new AlignedLogVisualisationDataImplFrequencies(state.getTree(), state.getAlignedFilteredLogInfo());
 		}
-		return new AlignedLogVisualisationDataImplQueues(state.getTree(), state.getPerformance(),
+		return new AlignedLogVisualisationDataImplService(state.getTree(), state.getPerformance(),
 				state.getAlignedFilteredLogInfo());
 	}
 }

@@ -17,8 +17,8 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
@@ -28,7 +28,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePaths;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsWrapper;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.MiningParametersIvM;
@@ -360,21 +360,21 @@ public class InductiveVisualMinerState {
 	}
 
 	//==queue lengths
-	private QueueLengthsWrapper queueLengths;
+	private PerformanceWrapper performance;
 
-	public void setQueueLengths(QueueLengthsWrapper queueLengths) {
-		this.queueLengths = queueLengths;
+	public void setPerformance(PerformanceWrapper performance) {
+		this.performance = performance;
 	}
 
-	public QueueLengthsWrapper getQueueLengths() {
-		return queueLengths;
+	public PerformanceWrapper getPerformance() {
+		return performance;
 	}
 
-	public void resetQueueLengths() {
-		queueLengths = null;
+	public void resetPerformance() {
+		performance = null;
 	}
 
-	public boolean isQueueLengthsReady() {
-		return queueLengths != null;
+	public boolean isPerformanceReady() {
+		return performance != null;
 	}
 }
