@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,8 +12,6 @@ import java.util.concurrent.Executor;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import nl.tue.astar.AStarThread.Canceller;
 
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.model.XLog;
@@ -35,8 +32,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Lo
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01MakeLog;
@@ -54,7 +49,6 @@ import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringF
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
-import org.processmining.plugins.inductiveVisualMiner.export.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog.FileType;
@@ -65,13 +59,10 @@ import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-import com.kitfox.svg.SVGDiagram;
-
 public class InductiveVisualMinerController {
 
 	final InductiveVisualMinerPanel panel;
 	final InductiveVisualMinerState state;
-	public static final int maxAnimatedTraces = 50;
 
 	private final Chain chain;
 	private final PluginContext context;
@@ -251,8 +242,7 @@ public class InductiveVisualMinerController {
 					state.resetPerformance();
 
 					ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(), state
-							.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
-							maxAnimatedTraces);
+							.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size());
 
 					//tell trace view the colour map and the selection
 					updateHighlighting();
@@ -298,29 +288,11 @@ public class InductiveVisualMinerController {
 			});
 			a.setOnComplete(new Runnable() {
 				public void run() {
-					//re-colour the selected nodes (i.e. the dashed red border)
-					InductiveVisualMinerSelectionColourer.colourSelection(state.getAnimatedSVGDiagram(),
-							state.getSelectedNodes(), state.getSelectedLogMoves(), state.getVisualisationInfo());
-
-					//re-highlight the model
-					TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(
-							state.getAnimatedSVGDiagram(), state.getVisualisationInfo(), state.getTree(),
-							state.getVisualisationData(), state.getColourMode().getVisualisationParameters(state));
-
-					//tell trace view the colour map and the selection
-					panel.getTraceView().setColourMap(colourMap);
-					colourMap.setSelectedNodes(state.getSelectedNodes(), state.getSelectedLogMoves());
-
-					//update selection description
-					ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(), state
-							.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
-							maxAnimatedTraces);
-
 					panel.getSaveImageButton().setText("animation");
-					panel.getGraph().setImage(state.getAnimatedSVGDiagram(), false);
+					panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
+					panel.getGraph().setAnimationExtremeTimes(state.getAnimationScaler().getMinInUserTime(),
+							state.getAnimationScaler().getMaxInUserTime());
 					panel.getGraph().setEnableAnimation(true);
-
-					setStatus(" ");
 				}
 			});
 			a.setOnException(onException);
@@ -483,54 +455,54 @@ public class InductiveVisualMinerController {
 							}
 						}).start();
 						break;
-					case aviMovie :
-					//save avi asynchronously
-					{
-						final SVGDiagram svg = panel.getGraph().getSVG();
-						final ColouringMode colourMode = state.getColourMode();
-						final Dot dot = panel.getGraph().getDot();
-						final IvMLog timedLog = state.getIvMLog();
-						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
-						new Thread(new Runnable() {
-							public void run() {
-								try {
-									if (!ExportAnimation.saveAVItoFile(timedLog, info, colourMode, svg, dot, p.getA(),
-											panel)) {
-										System.out.println("deleted");
-										p.getA().delete();
-									}
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-							}
-						}).start();
-					}
-						break;
-					case svgMovie :
-					//save svg asynchronously
-					{
-						final SVGDiagram svg = panel.getGraph().getSVG();
-						final ColouringMode colourMode = state.getColourMode();
-						final Dot dot = panel.getGraph().getDot();
-						final IvMLog timedLog = state.getIvMLog();
-						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
-						new Thread(new Runnable() {
-							public void run() {
-								try {
-									Canceller canceller = new Canceller() {
-										public boolean isCancelled() {
-											return false;
-										}
-									};
-									ExportAnimation.saveSVGtoFile(timedLog, info, colourMode, svg, canceller, dot,
-											p.getA());
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-							}
-						}).start();
-					}
-						break;
+				//					case aviMovie :
+				//					//save avi asynchronously
+				//					{
+				//						final SVGDiagram svg = panel.getGraph().getSVG();
+				//						final ColouringMode colourMode = state.getColourMode();
+				//						final Dot dot = panel.getGraph().getDot();
+				//						final IvMLog timedLog = state.getIvMLog();
+				//						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
+				//						new Thread(new Runnable() {
+				//							public void run() {
+				//								try {
+				//									if (!ExportAnimation.saveAVItoFile(timedLog, info, colourMode, svg, dot, p.getA(),
+				//											panel)) {
+				//										System.out.println("deleted");
+				//										p.getA().delete();
+				//									}
+				//								} catch (IOException e) {
+				//									e.printStackTrace();
+				//								}
+				//							}
+				//						}).start();
+				//					}
+				//						break;
+				//					case svgMovie :
+				//					//save svg asynchronously
+				//					{
+				//						final SVGDiagram svg = panel.getGraph().getSVG();
+				//						final ColouringMode colourMode = state.getColourMode();
+				//						final Dot dot = panel.getGraph().getDot();
+				//						final IvMLog timedLog = state.getIvMLog();
+				//						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
+				//						new Thread(new Runnable() {
+				//							public void run() {
+				//								try {
+				//									Canceller canceller = new Canceller() {
+				//										public boolean isCancelled() {
+				//											return false;
+				//										}
+				//									};
+				//									ExportAnimation.saveSVGtoFile(timedLog, info, colourMode, svg, canceller, dot,
+				//											p.getA());
+				//								} catch (IOException e) {
+				//									e.printStackTrace();
+				//								}
+				//							}
+				//						}).start();
+				//					}
+				//						break;
 				}
 			}
 		});
@@ -560,16 +532,14 @@ public class InductiveVisualMinerController {
 
 		//set animation time updater
 		panel.getGraph().setTimeStepCallback(new Callback<Double, Object>() {
-			public Object call(Double arg) {
-				Scaler scaler = state.getAnimationTimeScaler();
-				if (scaler != null && scaler.getMin() != Long.MAX_VALUE && scaler.getMax() != Long.MIN_VALUE
-						&& panel.getGraph().isEnableAnimation()) {
-					Long time = scaler.scaleBack(arg);
-					panel.getAnimationTimeLabel().setText(TimestampsAdder.toString(time));
+			public Object call(Double userTime) {
+				if (panel.getGraph().isEnableAnimation()) {
+					long logTime = Math.round(state.getAnimationScaler().userTime2LogTime(userTime));
+					panel.getAnimationTimeLabel().setText(TimestampsAdder.toString(logTime));
 
 					//draw queues
 					if (state.getColourMode().isUpdateWithTimeStep(state)) {
-						state.getVisualisationData().setTime(time);
+						state.getVisualisationData().setTime(logTime);
 						updateHighlighting();
 						panel.getTraceView().repaint();
 					}
@@ -644,30 +614,40 @@ public class InductiveVisualMinerController {
 							+ AlignedLogMetrics.getNumberOfTracesRepresented(unode, false,
 									state.getAlignedFilteredLogInfo()));
 
+					//waiting time
 					if (state.isPerformanceReady()) {
-						//waiting time
 						if (state.getPerformance().getWaitingTime(unode) > -0.1) {
 							popup.add("average waiting time  "
 									+ Performance.timeToString((long) state.getPerformance().getWaitingTime(unode)));
 						} else {
 							popup.add("average waiting time  -");
 						}
-						
-						//service time
+					} else {
+						popup.add(" ");
+					}
+
+					//service time
+					if (state.isPerformanceReady()) {
 						if (state.getPerformance().getSojournTime(unode) > -0.1) {
 							popup.add("average service time  "
 									+ Performance.timeToString((long) state.getPerformance().getServiceTime(unode)));
 						} else {
 							popup.add("average service time  -");
 						}
-						
-						//sojourn time
+					} else {
+						popup.add(" ");
+					}
+
+					//sojourn time
+					if (state.isPerformanceReady()) {
 						if (state.getPerformance().getSojournTime(unode) > -0.1) {
 							popup.add("average sojourn time  "
 									+ Performance.timeToString((long) state.getPerformance().getSojournTime(unode)));
 						} else {
 							popup.add("average sojourn time  -");
 						}
+					} else {
+						popup.add(" ");
 					}
 
 					panel.getGraph().setPopup(popup);

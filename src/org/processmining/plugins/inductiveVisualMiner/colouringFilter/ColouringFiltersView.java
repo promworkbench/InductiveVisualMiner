@@ -129,8 +129,7 @@ public class ColouringFiltersView extends SideWindow {
 	 * @param numberOfTraces
 	 */
 	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Set<UnfoldedNode> selectedNodes,
-			Set<LogMovePosition> selectedLogMoves, List<ColouringFilter> colouringFilters, long numberOfTraces,
-			long maxAnimatedTraces) {
+			Set<LogMovePosition> selectedLogMoves, List<ColouringFilter> colouringFilters, long numberOfTraces) {
 		//show the user which traces are shown
 
 		String[] criteria = new String[3];
@@ -204,13 +203,7 @@ public class ColouringFiltersView extends SideWindow {
 			//all criteria active
 			s = "Highlighting traces that " + criteria[0] + " or " + criteria[1] + ", and that " + criteria[2];
 		}
-
-		//add animation message
-		if (maxAnimatedTraces < numberOfTraces) {
-			s += "; animating the first " + maxAnimatedTraces + ".";
-		} else {
-			s += ".";
-		}
+		s += ".";
 
 		panel.getSelectionLabel().setText(s);
 	}

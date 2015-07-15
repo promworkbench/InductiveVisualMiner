@@ -24,7 +24,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePaths;
@@ -343,20 +344,25 @@ public class InductiveVisualMinerState {
 	}
 
 	//==playing animation
-	private Scaler animationTimeScaler;
-	private SVGDiagram animatedSVGDiagram;
+	private Scaler animationScaler;
+	private GraphVizTokens animationGraphVizTokens;
 
-	public void setAnimation(Scaler animationTimeScaler, SVGDiagram animatedSVGDiagram) {
-		this.animationTimeScaler = animationTimeScaler;
-		this.animatedSVGDiagram = animatedSVGDiagram;
+	public void setAnimation(Scaler animationScaler, GraphVizTokens animationGraphVizTokens) {
+		this.animationScaler = animationScaler;
+		this.animationGraphVizTokens = animationGraphVizTokens;
+	}
+	
+	public void resetAnimation() {
+		animationScaler = null;
+		animationGraphVizTokens = null;
+	}
+	
+	public Scaler getAnimationScaler() {
+		return animationScaler;
 	}
 
-	public Scaler getAnimationTimeScaler() {
-		return animationTimeScaler;
-	}
-
-	public SVGDiagram getAnimatedSVGDiagram() {
-		return animatedSVGDiagram;
+	public GraphVizTokens getAnimationGraphVizTokens() {
+		return animationGraphVizTokens;
 	}
 
 	//==queue lengths

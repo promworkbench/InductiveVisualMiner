@@ -12,8 +12,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Lo
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.IvMTrace;
+import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.LogSplitter;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
@@ -115,7 +115,7 @@ public class Trace2DotToken {
 						for (int j = 0; j < path.size() - 1; j++) {
 							dotToken.addStepOverEdge(path.get(j), null);
 						}
-						dotToken.addStepOverEdge(path.get(path.size() - 1), move.getScaledTimestamp(scaler));
+						dotToken.addStepOverEdge(path.get(path.size() - 1), move.getUserTimestamp(scaler));
 					}
 
 					continue;
@@ -158,11 +158,11 @@ public class Trace2DotToken {
 					for (int j = 0; j < path.size() - 1; j++) {
 						dotToken.addStepOverEdge(path.get(j), null);
 					}
-					dotToken.addStepOverEdge(path.get(path.size() - 1), move.getScaledTimestamp(scaler));
+					dotToken.addStepOverEdge(path.get(path.size() - 1), move.getUserTimestamp(scaler));
 				}
 
 				//second: walk over the node
-				dotToken.addStepInNode(nextDestination, move.getScaledTimestamp(scaler));
+				dotToken.addStepInNode(nextDestination, move.getUserTimestamp(scaler));
 
 			} else if (move.isModelMove() && showDeviations) {
 				//model move, showing deviations
@@ -193,7 +193,7 @@ public class Trace2DotToken {
 				}
 
 				//add the move edge
-				dotToken.addStepOverEdge(moveEdge, move.getScaledTimestamp(scaler));
+				dotToken.addStepOverEdge(moveEdge, move.getUserTimestamp(scaler));
 			}
 		}
 

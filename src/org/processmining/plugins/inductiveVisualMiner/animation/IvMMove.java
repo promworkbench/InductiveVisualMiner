@@ -5,46 +5,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 
 public class IvMMove extends Move {
 
-	public static class Scaler {
-		private final double animationDuration;
-		private final long min;
-		private final long max;
-
-		public Scaler(final double animationDuration, final long min, final long max) {
-			this.min = min;
-			this.max = max;
-			this.animationDuration = animationDuration;
-		}
-
-		public Double scale(Long value) {
-			if (value == null) {
-				return null;
-			}
-			if (max == min) {
-				return animationDuration * value;
-			}
-			return animationDuration * (value - min) / (max - 1.0 * min);
-		}
-
-		public Long scaleBack(Double value2) {
-			if (value2 == null) {
-				return null;
-			}
-			if (max == min) {
-				return (long) (value2 / animationDuration);
-			}
-			return (long) ((value2 / (1.0 * animationDuration)) * (max - 1.0 * min) + min);
-		}
-
-		public long getMin() {
-			return min;
-		}
-
-		public long getMax() {
-			return max;
-		}
-	}
-
 	private final Long logTimestamp;
 	private final String resource;
 
@@ -65,8 +25,8 @@ public class IvMMove extends Move {
 		return logTimestamp == ((IvMMove) obj).logTimestamp;
 	}
 
-	public Double getScaledTimestamp(Scaler scaler) {
-		return scaler.scale(logTimestamp);
+	public Double getUserTimestamp(Scaler scaler) {
+		return scaler.logTime2UserTime(logTimestamp);
 	}
 
 	public Long getLogTimestamp() {

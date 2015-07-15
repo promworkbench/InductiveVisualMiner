@@ -70,12 +70,6 @@ public class ExportAnimation {
 				}
 				writer.write(lastLine);
 				writer.write("\n");
-				
-				//trying animation
-//				if (lastLine.endsWith("xlink\">") && line.startsWith("<g id=")) {
-//					writer.write("<animate attributeName=\"viewBox\" begin=\"0.5s\" dur=\"3s\" values=\"0 0 500 195; 1100 0 500 195\" fill=\"freeze\" />");
-//					writer.write("\n");
-//				}
 			}
 			lastLine = line;
 		}

@@ -22,7 +22,7 @@ import com.kitfox.svg.SVGException;
 
 public class DotTokens2SVGtokens {
 
-	public static SVGTokens animateTokens(List<DotToken> tokens, SVGDiagram svg) {
+	public static SVGTokens animateTokens(Iterable<DotToken> tokens, SVGDiagram svg) {
 		SVGTokens svgTokens = new SVGTokens();
 		for (DotToken token : tokens) {
 			for (DotToken subToken : token.getAllTokensRecursively()) {
@@ -245,7 +245,7 @@ public class DotTokens2SVGtokens {
 		result.append("/>\n");
 	}
 
-	private static String getSourceLocation(LocalDotEdge edge, SVGDiagram image) {
+	public static String getSourceLocation(LocalDotEdge edge, SVGDiagram image) {
 		SVGElement SVGline = DotPanel.getSVGElementOf(image, edge).getChild(1);
 		String path = DotPanel.getAttributeOf(SVGline, "d");
 
@@ -283,7 +283,7 @@ public class DotTokens2SVGtokens {
 		return location;
 	}
 
-	private static String getCenter(LocalDotNode node, SVGDiagram image) {
+	public static String getCenter(LocalDotNode node, SVGDiagram image) {
 		Group nodeGroup = DotPanel.getSVGElementOf(image, node);
 		Rectangle2D bb = null;
 		try {
@@ -340,7 +340,7 @@ public class DotTokens2SVGtokens {
 		return result.toString();
 	}
 
-	private static String getArrowHeadPoint(LocalDotEdge edge, SVGDiagram image) {
+	public static String getArrowHeadPoint(LocalDotEdge edge, SVGDiagram image) {
 		//the arrowhead polygon is the second child of the edge object
 		SVGElement svgArrowHead = DotPanel.getSVGElementOf(image, edge).getChild(2);
 		String path = DotPanel.getAttributeOf(svgArrowHead, "points");
