@@ -346,10 +346,12 @@ public class InductiveVisualMinerState {
 	//==playing animation
 	private Scaler animationScaler;
 	private GraphVizTokens animationGraphVizTokens;
+	private double animationCompleted; //how much of the tokens was rendered
 
 	public void setAnimation(Scaler animationScaler, GraphVizTokens animationGraphVizTokens) {
 		this.animationScaler = animationScaler;
 		this.animationGraphVizTokens = animationGraphVizTokens;
+		animationCompleted = 1;
 	}
 	
 	public void resetAnimation() {
@@ -363,6 +365,14 @@ public class InductiveVisualMinerState {
 
 	public GraphVizTokens getAnimationGraphVizTokens() {
 		return animationGraphVizTokens;
+	}
+	
+	public void setAnimationCompleted(double animationCompleted) {
+		this.animationCompleted = animationCompleted;
+	}
+	
+	public double getAnimationCompleted() {
+		return animationCompleted;
 	}
 
 	//==queue lengths

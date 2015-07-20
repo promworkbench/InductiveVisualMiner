@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
+import java.awt.geom.NoninvertibleTransformException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,13 +21,13 @@ import com.kitfox.svg.SVGDiagram;
 
 public class ComputeAnimation {
 
-	public static final double initDuration = 1;
+	public static final double initDuration = 2;
 	public static final double animationDuration = 180;
 	private static Random random = new Random(123);
 
 	public static Pair<Scaler, GraphVizTokens> computeAnimation(final IvMLog ivmLog, final ColouringMode colourMode,
-			final AlignedLogVisualisationInfo info, final SVGDiagram svg,
-			final Canceller canceller) {
+			final AlignedLogVisualisationInfo info, final SVGDiagram svg, final Canceller canceller)
+			throws NoninvertibleTransformException {
 
 		//scale timestamps
 		final Scaler scaler = Scaler.fromLog(ivmLog, initDuration, animationDuration, canceller);
@@ -41,16 +42,21 @@ public class ComputeAnimation {
 		if (canceller.isCancelled()) {
 			return null;
 		}
+		
+		//set up result object
+		GraphVizTokens graphVizTokens = new GraphVizTokens();
+		
+		for (IvMTrace ivmTrace : ivmLog) {
+			//make dot tokens
+			final List<DotToken> dotTokens = computeDotTokens(ivmTrace, info, colourMode, scaler, graph, canceller);
+			
+			//add to graphviz tokens
+			DotToken2GraphVizToken.convertTokens(dotTokens, graphVizTokens, svg);
 
-		//make dot tokens
-		final List<DotToken> dotTokens = computeDotTokens(ivmLog, info, colourMode, scaler, graph, canceller);
-
-		if (canceller.isCancelled()) {
-			return null;
+			if (canceller.isCancelled()) {
+				return null;
+			}
 		}
-
-		//make graphviz tokens
-		GraphVizTokens graphVizTokens = DotToken2GraphVizToken.convert(dotTokens, svg);
 
 		if (canceller.isCancelled()) {
 			return null;
@@ -59,27 +65,26 @@ public class ComputeAnimation {
 		return Pair.of(scaler, graphVizTokens);
 	}
 
-	public static List<DotToken> computeDotTokens(Iterable<IvMTrace> timedLog, final AlignedLogVisualisationInfo info,
+	public static List<DotToken> computeDotTokens(IvMTrace trace, final AlignedLogVisualisationInfo info,
 			final ColouringMode colourMode, Scaler scaler, ShortestPathGraph graph, final Canceller canceller) {
 		boolean showDeviations = colourMode.isShowDeviations();
 		final List<DotToken> tokens = new ArrayList<>();
-		for (IvMTrace timedTrace : timedLog) {
-			try {
-				//guess start and end time of the trace
-				timedTrace.setStartTime(guessStartTime(timedTrace, graph, info, scaler));
-				timedTrace.setEndTime(guessEndTime(timedTrace, timedTrace.getStartTime(), graph, info, scaler));
+		try {
+			//guess start and end time of the trace
+			trace.setStartTime(guessStartTime(trace, graph, info, scaler));
+			trace.setEndTime(guessEndTime(trace, trace.getStartTime(), graph, info, scaler));
 
-				//compute the tokens of this trace
-				tokens.add(Trace2DotToken.trace2token(timedTrace, showDeviations, graph, info, scaler));
-			} catch (Exception e) {
-				//for the demo, just ignore this case
-				InductiveVisualMinerController.debug(timedTrace);
-			}
-
-			if (canceller.isCancelled()) {
-				return null;
-			}
+			//compute the tokens of this trace
+			tokens.add(Trace2DotToken.trace2token(trace, showDeviations, graph, info, scaler));
+		} catch (Exception e) {
+			//for the demo, just ignore this case
+			InductiveVisualMinerController.debug("trace skipped animation");
 		}
+
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
 		return tokens;
 	}
 

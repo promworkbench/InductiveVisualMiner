@@ -242,7 +242,8 @@ public class InductiveVisualMinerController {
 					state.resetPerformance();
 
 					ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(), state
-							.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size());
+							.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
+							state.getAnimationCompleted());
 
 					//tell trace view the colour map and the selection
 					updateHighlighting();
@@ -396,6 +397,26 @@ public class InductiveVisualMinerController {
 			public void call(GraphDirection input) throws Exception {
 				state.setGraphDirection(input);
 				chain.execute(Cl06Layout.class);
+			}
+		});
+
+		//animation succeeded
+		panel.getGraph().setOnAnimationCompleted(new Runnable() {
+			public void run() {
+				state.setAnimationCompleted(1);
+				ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
+						state.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
+						state.getAnimationCompleted());
+			}
+		});
+
+		//animation timed out
+		panel.getGraph().setOnAnimationTimeOut(new InputFunction<Double>() {
+			public void call(Double animationCompleted) throws Exception {
+				state.setAnimationCompleted(animationCompleted);
+				ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
+						state.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
+						state.getAnimationCompleted());
 			}
 		});
 

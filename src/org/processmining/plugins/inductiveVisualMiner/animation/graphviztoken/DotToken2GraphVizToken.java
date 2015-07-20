@@ -1,36 +1,38 @@
 package org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+
+import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.DotToken;
 import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.DotTokenStep;
 import org.processmining.plugins.inductiveVisualMiner.animation.svgToken.DotTokens2SVGtokens;
 
+import com.kitfox.svg.Path;
 import com.kitfox.svg.SVGDiagram;
-import com.kitfox.svg.SVGElement;
+import com.kitfox.svg.SVGRoot;
+import com.kitfox.svg.TransformableElement;
 
 public class DotToken2GraphVizToken {
 
-	public static GraphVizTokens convert(Iterable<DotToken> tokens, SVGDiagram svg) {
-		//convert each token
-		GraphVizTokens result = new GraphVizTokens();
+	public static void convertTokens(Iterable<DotToken> tokens, GraphVizTokens result, SVGDiagram svg)
+			throws NoninvertibleTransformException {
 		for (DotToken token : tokens) {
-			boolean first = true;
 			for (DotToken subToken : token.getAllTokensRecursively()) {
-				animateToken(subToken, first, first, result, svg);
-				first = false;
+				convertToken(subToken, result, svg);
 			}
 		}
 
-		return result;
 	}
 
-	public static void animateToken(DotToken token, boolean fadeIn, boolean fadeOut, GraphVizTokens result,
-			SVGDiagram svg) {
+	public static void convertToken(DotToken token, GraphVizTokens result,
+			SVGDiagram svg) throws NoninvertibleTransformException {
 		assert (token.isAllTimestampsSet());
 
 		for (int i = 0; i < token.size(); i++) {
-			animateDotTokenStep(token, i, fadeIn && i == 0, fadeOut && i == token.size() - 1, result, svg);
+			animateDotTokenStep(token, i, token.isFade() && i == 0, token.isFade() && i == token.size() - 1, result, svg);
 		}
 	}
 
@@ -41,9 +43,10 @@ public class DotToken2GraphVizToken {
 	 * @param stepIndex
 	 * @param result
 	 * @param svg
+	 * @throws NoninvertibleTransformException
 	 */
 	public static void animateDotTokenStep(DotToken dotToken, int stepIndex, boolean fadeIn, boolean fadeOut,
-			GraphVizTokens result, SVGDiagram svg) {
+			GraphVizTokens result, SVGDiagram svg) throws NoninvertibleTransformException {
 		DotTokenStep step = dotToken.get(stepIndex);
 		if (step.isOverEdge()) {
 			animateDotTokenStepEdge(dotToken, stepIndex, fadeIn, fadeOut, result, svg);
@@ -61,9 +64,10 @@ public class DotToken2GraphVizToken {
 	 * @param fadeOut
 	 * @param result
 	 * @param image
+	 * @throws NoninvertibleTransformException
 	 */
 	public static void animateDotTokenStepEdge(DotToken dotToken, int stepIndex, boolean fadeIn, boolean fadeOut,
-			GraphVizTokens result, SVGDiagram image) {
+			GraphVizTokens result, SVGDiagram image) throws NoninvertibleTransformException {
 		DotTokenStep step = dotToken.get(stepIndex);
 
 		LocalDotEdge edge = step.getEdge();
@@ -76,9 +80,6 @@ public class DotToken2GraphVizToken {
 		} else {
 			startTime = dotToken.get(stepIndex - 1).getArrivalTime();
 		}
-
-		//get the svg-line with the edge
-		SVGElement SVGline = DotPanel.getSVGElementOf(image, edge).getChild(1);
 
 		//compute the path
 		String path;
@@ -93,10 +94,11 @@ public class DotToken2GraphVizToken {
 		}
 
 		//move over the edge
+		Path line = (Path) DotPanel.getSVGElementOf(image, edge).getChild(1);
 		if (edge.isDirectionForward()) {
-			path += "L" + DotPanel.getAttributeOf(SVGline, "d").substring(1);
+			path += "L" + DotPanel.getAttributeOf(line, "d").substring(1);
 		} else {
-			path += DotTokens2SVGtokens.reversePath(DotPanel.getAttributeOf(SVGline, "d"));
+			path += DotTokens2SVGtokens.reversePath(DotPanel.getAttributeOf(line, "d"));
 		}
 
 		//Leave the token in a nice place.
@@ -109,11 +111,11 @@ public class DotToken2GraphVizToken {
 		}
 
 		//add to the result
-		result.add(startTime, endTime, path, fadeIn, fadeOut);
+		result.add(startTime, endTime, path, fadeIn, fadeOut, getTotalTransform(image, edge));
 	}
 
 	public static void animateDotTokenStepNode(DotToken dotToken, int stepIndex, boolean fadeIn, boolean fadeOut,
-			GraphVizTokens result, SVGDiagram image) {
+			GraphVizTokens result, SVGDiagram image) throws NoninvertibleTransformException {
 		DotTokenStep step = dotToken.get(stepIndex);
 
 		//get the start time and compute the duration
@@ -134,7 +136,28 @@ public class DotToken2GraphVizToken {
 		//line to the first point on the edge after this 
 		path += "L" + DotTokens2SVGtokens.getSourceLocation(dotToken.get(stepIndex + 1).getEdge(), image);
 
+		//get the transformation
+		AffineTransform transform = getTotalTransform(image, dotToken.get(stepIndex - 1).getEdge());
+
 		//put it all together
-		result.add(startTime, endTime, path, fadeIn, fadeOut);
+		result.add(startTime, endTime, path, fadeIn, fadeOut, transform);
+	}
+
+	public static AffineTransform getTotalTransform(SVGDiagram image, DotEdge edge) {
+		//get the svg-line with the edge
+		Path line = (Path) DotPanel.getSVGElementOf(image, edge).getChild(1);
+
+		//get the viewbox transformation
+		SVGRoot root = line.getRoot();
+		AffineTransform transform = root.getViewXform();
+
+		//walk through the path downwards
+		for (Object parent : line.getPath(null)) {
+			if (parent instanceof TransformableElement) {
+				transform.concatenate(((TransformableElement) parent).getTranform());
+			}
+		}
+
+		return transform;
 	}
 }

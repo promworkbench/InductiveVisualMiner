@@ -1,17 +1,21 @@
 package org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken;
 
 import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.Triple;
 
 import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.animation.Bezier;
@@ -27,32 +31,88 @@ public class GraphVizTokens {
 
 	private final TDoubleArrayList startTimes;
 	private final TDoubleArrayList endTimes;
-	private final BitSet fadeIn;
-	private final BitSet fadeOut;
+	private final TDoubleArrayList startOpacities;
+	private final TDoubleArrayList endOpacities;
 
-	private final List<List<Bezier>> segments;
-	private final TDoubleArrayList lengths;
+	private final TIntArrayList bezierPointers;
+	private final PersistentlyOrderedSet<Bezier, AffineTransform, AffineTransform> beziers;
+
+	private final Map<String, Pair<List<Bezier>, Double>> pathCache;
 
 	public GraphVizTokens() {
 		startTimes = new TDoubleArrayList();
 		endTimes = new TDoubleArrayList();
-		fadeIn = new BitSet();
-		fadeOut = new BitSet();
+		startOpacities = new TDoubleArrayList();
+		endOpacities = new TDoubleArrayList();
 
-		segments = new ArrayList<>();
-		lengths = new TDoubleArrayList();
+		bezierPointers = new TIntArrayList();
+		beziers = new PersistentlyOrderedSet<>();
+
+		pathCache = new THashMap<>();
 	}
 
-	public void add(double beginTime, double endTime, String path, boolean fadeIn, boolean fadeOut) {
+	public void add(double startTime, double endTime, String path, boolean fadeIn, boolean fadeOut,
+			AffineTransform transform) throws NoninvertibleTransformException {
+
+		double startOpacity;
+		double endOpacity;
+		if (fadeIn && fadeOut) {
+			startOpacity = 0;
+			endOpacity = 0;
+		} else if (fadeIn) {
+			startOpacity = 0;
+			endOpacity = 1;
+		} else if (fadeOut) {
+			startOpacity = 1;
+			endOpacity = 0;
+		} else {
+			startOpacity = 1;
+			endOpacity = 1;
+		}
+
+		//split the path into bezier curves (or get from cache)
+		Pair<List<Bezier>, Double> p;
+		if (pathCache.containsKey(path)) {
+			p = pathCache.get(path);
+		} else {
+			p = processPath(path);
+			pathCache.put(path, p);
+		}
+
+		double lastTime = startTime;
+		double lastOpacity = startOpacity;
+		double lastLength = 0;
+		for (Bezier bezier : p.getA()) {
+
+			//move t
+			double length = bezier.getLength();
+
+			double t = (lastLength + length) / p.getB(); //the [0..1] how far we are on the path
+
+			double newEndTime = startTime + t * (endTime - startTime);
+			double newEndOpacity = startOpacity + t * (endOpacity - startOpacity);
+
+			add(lastTime, newEndTime, bezier, lastOpacity, newEndOpacity, transform);
+
+			//move for the next round
+			lastTime = newEndTime;
+			lastOpacity = newEndOpacity;
+			lastLength = lastLength + length;
+		}
+	}
+
+	private void add(double beginTime, double endTime, Bezier bezier, double startOpacity, double endOpacity,
+			AffineTransform transform) throws NoninvertibleTransformException {
 		startTimes.add(beginTime);
 		endTimes.add(endTime);
-		this.fadeIn.set(this.startTimes.size() - 1, fadeIn);
-		this.fadeIn.set(this.startTimes.size() - 1, fadeOut);
+		startOpacities.add(startOpacity);
+		endOpacities.add(endOpacity);
+		bezierPointers.add(beziers.add(bezier, transform, transform.createInverse()));
+	}
 
-		//do magic with the path
-		Pair<List<Bezier>, Double> p = processPath(path);
-		segments.add(p.getA());
-		lengths.add(p.getB());
+	public void cleanUp() {
+		beziers.cleanUp();
+		pathCache.clear();
 	}
 
 	/**
@@ -60,37 +120,54 @@ public class GraphVizTokens {
 	 * @param time
 	 * @return Walks over the tokens that span the time
 	 */
-	public Iterable<Integer> getTokensAtTime(final double time) {
-		return new Iterable<Integer>() {
-			public Iterator<Integer> iterator() {
-				return new Iterator<Integer>() {
+	public TokenIterator getTokensAtTime(final double time) {
+		return new TokenIterator(time);
+	}
 
-					int next = getNext(0);
-					int now = next - 1;
+	public class TokenIterator implements Iterator<Integer> {
 
-					private int getNext(int i) {
-						while (i < startTimes.size() && (startTimes.get(i) > time || time > endTimes.get(i))) {
-							i++;
-						}
-						return i;
-					}
+		private final double time;
+		private int next;
+		private int now;
 
-					public void remove() {
-						throw new RuntimeException();
-					}
+		public TokenIterator(final double time) {
+			this.time = time;
+			next = getNext(0);
+			now = next - 1;
+		}
 
-					public Integer next() {
-						now = next;
-						next = getNext(next + 1);
-						return now;
-					}
-
-					public boolean hasNext() {
-						return next < startTimes.size();
-					}
-				};
+		private int getNext(int i) {
+			while (i < startTimes.size() && (startTimes.get(i) > time || time > endTimes.get(i))) {
+				i++;
 			}
-		};
+			return i;
+		}
+
+		public void remove() {
+			throw new RuntimeException();
+		}
+
+		public Integer next() {
+			now = next;
+			next = getNext(next + 1);
+			return now;
+		}
+
+		public boolean hasNext() {
+			return next < startTimes.size();
+		}
+
+		public int getPosition() {
+			return next;
+		}
+	}
+
+	public AffineTransform getTransform(int tokenIndex) {
+		return beziers.getPayload1(bezierPointers.get(tokenIndex));
+	}
+
+	public AffineTransform getTransformInverse(int tokenIndex) {
+		return beziers.getPayload2(bezierPointers.get(tokenIndex));
 	}
 
 	public double getStart(int tokenIndex) {
@@ -101,23 +178,16 @@ public class GraphVizTokens {
 		return endTimes.get(tokenIndex);
 	}
 
-	public boolean isFadeIn(int tokenIndex) {
-		return fadeIn.get(tokenIndex);
-	}
-
-	public boolean isFadeOut(int tokenIndex) {
-		return fadeOut.get(tokenIndex);
-	}
-
 	public String toString() {
 		StringBuilder result = new StringBuilder();
+		result.append("size ");
+		result.append(startTimes.size());
+		result.append("\n");
 		for (int tokenIndex = 0; tokenIndex < startTimes.size(); tokenIndex++) {
-			result.append(fadeIn.get(tokenIndex) ? "fade " : "");
 			result.append("@");
 			result.append(startTimes.get(tokenIndex));
 			result.append(" - @");
 			result.append(endTimes.get(tokenIndex));
-			result.append(fadeOut.get(tokenIndex) ? " fade" : "");
 			result.append("\n");
 		}
 		return result.toString();
@@ -182,25 +252,33 @@ public class GraphVizTokens {
 	/**
 	 * 
 	 * @param tokenIndex
-	 * @param t
-	 *            [0..1]
-	 * @return the point at which the curve is at time t
+	 * @param time
+	 * @return the point at which the curve is at time t and its opacity
 	 */
-	public Point2D.Double eval(int tokenIndex, double t) {
-		double curLength = lengths.get(tokenIndex) * t;
+	public Triple<Double, Double, Double> eval(int tokenIndex, double time) {
+		//normalise how far we are on the bezier to [0..1]
+		double t = (time - startTimes.get(tokenIndex)) / (endTimes.get(tokenIndex) - startTimes.get(tokenIndex));
+
+		//compute the position
 		Point2D.Double point = new Point2D.Double();
-		for (Iterator<Bezier> it = segments.get(tokenIndex).iterator(); it.hasNext();) {
-			Bezier bez = it.next();
+		beziers.get(bezierPointers.get(tokenIndex)).eval(t, point);
 
-			double bezLength = bez.getLength();
-			if (curLength < bezLength) {
-				double param = curLength / bezLength;
-				bez.eval(param, point);
-				break;
-			}
+		//compute opacity
+		double opacity = 1;
+		double startOpacity = startOpacities.get(tokenIndex);
+		double endOpacity = endOpacities.get(tokenIndex);
+		if (startOpacity == 1 && endOpacity == 1) {
 
-			curLength -= bezLength;
+		} else if (startOpacity == 0 && endOpacity == 0) {
+			opacity = Math.abs(t - 0.5) * 2;
+		} else {
+			opacity = (1 - t) * startOpacity + t * endOpacity;
 		}
-		return point;
+
+		return Triple.of(point.x, point.y, opacity);
+	}
+
+	public int size() {
+		return startTimes.size();
 	}
 }
