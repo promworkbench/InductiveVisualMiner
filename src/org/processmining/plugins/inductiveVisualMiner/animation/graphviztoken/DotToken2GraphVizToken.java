@@ -2,16 +2,27 @@ package org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.DotToken;
 import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.DotTokenStep;
-import org.processmining.plugins.inductiveVisualMiner.animation.svgToken.DotTokens2SVGtokens;
 
+import com.kitfox.svg.Group;
 import com.kitfox.svg.Path;
 import com.kitfox.svg.SVGDiagram;
+import com.kitfox.svg.SVGElement;
+import com.kitfox.svg.SVGException;
 import com.kitfox.svg.SVGRoot;
 import com.kitfox.svg.TransformableElement;
 
@@ -87,10 +98,10 @@ public class DotToken2GraphVizToken {
 		//start the token in its last position
 		if (stepIndex == 0 || dotToken.get(stepIndex - 1).isOverEdge()) {
 			//If there was no activity before, start at the center of the source node.
-			path = "M" + DotTokens2SVGtokens.getCenter(edge.getSource(), image);
+			path = "M" + getCenter(edge.getSource(), image);
 		} else {
 			//If there was an activity before, then the token was gracefully put on the source already.
-			path = "M" + DotTokens2SVGtokens.getSourceLocation(edge, image);
+			path = "M" + getSourceLocation(edge, image);
 		}
 
 		//move over the edge
@@ -98,16 +109,16 @@ public class DotToken2GraphVizToken {
 		if (edge.isDirectionForward()) {
 			path += "L" + DotPanel.getAttributeOf(line, "d").substring(1);
 		} else {
-			path += DotTokens2SVGtokens.reversePath(DotPanel.getAttributeOf(line, "d"));
+			path += reversePath(DotPanel.getAttributeOf(line, "d"));
 		}
 
 		//Leave the token in a nice place.
 		if (stepIndex == dotToken.size() - 1 || dotToken.get(stepIndex + 1).isOverEdge()) {
 			//If there's no activity afterwards, leave it on the center of the target node.
-			path += "L" + DotTokens2SVGtokens.getCenter(edge.getTarget(), image);
+			path += "L" + getCenter(edge.getTarget(), image);
 		} else {
 			//If there is an activity afterwards, move over the arrowhead.
-			path += "L" + DotTokens2SVGtokens.getArrowHeadPoint(edge, image);
+			path += "L" + getArrowHeadPoint(edge, image);
 		}
 
 		//add to the result
@@ -128,13 +139,13 @@ public class DotToken2GraphVizToken {
 		}
 
 		//move to last point on the preceding edge
-		String path = "M" + DotTokens2SVGtokens.getArrowHeadPoint(dotToken.get(stepIndex - 1).getEdge(), image);
+		String path = "M" + getArrowHeadPoint(dotToken.get(stepIndex - 1).getEdge(), image);
 
 		//line to the center of the node
-		path += "L" + DotTokens2SVGtokens.getCenter(step.getNode(), image);
+		path += "L" + getCenter(step.getNode(), image);
 
 		//line to the first point on the edge after this 
-		path += "L" + DotTokens2SVGtokens.getSourceLocation(dotToken.get(stepIndex + 1).getEdge(), image);
+		path += "L" + getSourceLocation(dotToken.get(stepIndex + 1).getEdge(), image);
 
 		//get the transformation
 		AffineTransform transform = getTotalTransform(image, dotToken.get(stepIndex - 1).getEdge());
@@ -159,5 +170,101 @@ public class DotToken2GraphVizToken {
 		}
 
 		return transform;
+	}
+	
+	public static String getSourceLocation(LocalDotEdge edge, SVGDiagram image) {
+		SVGElement SVGline = DotPanel.getSVGElementOf(image, edge).getChild(1);
+		String path = DotPanel.getAttributeOf(SVGline, "d");
+
+		if (edge.isDirectionForward()) {
+			return getFirstLocation(path);
+		} else {
+			return getLastLocation(path);
+		}
+	}
+	
+	public static String getFirstLocation(String path) {
+		Matcher matcher = pattern.matcher(path);
+		matcher.find();
+		String point = matcher.group();
+		return point;
+	}
+
+	public static String getLastLocation(String path) {
+		Matcher matcher = pattern.matcher(path);
+		String location = null;
+		while (matcher.find()) {
+			location = matcher.group();
+		}
+		return location;
+	}
+
+	public static String getCenter(LocalDotNode node, SVGDiagram image) {
+		Group nodeGroup = DotPanel.getSVGElementOf(image, node);
+		Rectangle2D bb = null;
+		try {
+			bb = nodeGroup.getBoundingBox();
+		} catch (SVGException e) {
+			e.printStackTrace();
+		}
+		double centerX = bb.getCenterX();
+		double centerY = bb.getCenterY();
+		return centerX + "," + centerY;
+	}
+
+	public static final Pattern pattern = Pattern.compile("-?(\\d*\\.)?\\d+,-?(\\d*\\.)?\\d+");
+
+	/**
+	 * 
+	 * @param path
+	 * @return The reversed path, assuming the original path consists of one
+	 *         move/line followed by one or more cubic bezier curves.
+	 */
+	public static String reversePath(String path) {
+
+		//get the points from the path
+		Matcher matcher = pattern.matcher(path);
+
+		List<String> points = new ArrayList<String>();
+		while (matcher.find()) {
+			points.add(matcher.group());
+		}
+
+		//reverse the list of points
+		Collections.reverse(points);
+
+		//output as a new path
+		StringBuilder result = new StringBuilder();
+		Iterator<String> it = points.iterator();
+
+		result.append("L");
+		result.append(it.next());
+
+		try {
+			while (it.hasNext()) {
+				result.append("C");
+				result.append(it.next());
+				result.append(" ");
+				result.append(it.next());
+				result.append(" ");
+				result.append(it.next());
+			}
+		} catch (NoSuchElementException e) {
+			return path;
+		}
+
+		return result.toString();
+	}
+
+	public static String getArrowHeadPoint(LocalDotEdge edge, SVGDiagram image) {
+		//the arrowhead polygon is the second child of the edge object
+		SVGElement svgArrowHead = DotPanel.getSVGElementOf(image, edge).getChild(2);
+		String path = DotPanel.getAttributeOf(svgArrowHead, "points");
+
+		//the point we're looking for is the second point
+		Matcher matcher = pattern.matcher(path);
+		matcher.find();
+		matcher.find();
+		return matcher.group();
 	}
 }

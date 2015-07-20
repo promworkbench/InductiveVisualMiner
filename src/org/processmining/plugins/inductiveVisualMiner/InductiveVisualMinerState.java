@@ -357,6 +357,7 @@ public class InductiveVisualMinerState {
 	public void resetAnimation() {
 		animationScaler = null;
 		animationGraphVizTokens = null;
+		animationCompleted = 1;
 	}
 	
 	public Scaler getAnimationScaler() {

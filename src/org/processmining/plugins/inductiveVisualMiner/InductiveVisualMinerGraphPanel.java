@@ -37,7 +37,7 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 	public static final Color tokenStrokeColour = Color.black;
 	public static final Stroke tokenStroke = new BasicStroke(1.5f);
 	public static final int maxAnimationDuration = 20; //after spending xx ms in drawing circles, just quit.
-	public static final int maxAnimationPausedDuration = 500; //after spending xx ms in drawing circles, just quit.
+	public static final int maxAnimationPausedDuration = 400; //after spending xx ms in drawing circles, just quit.
 
 	private Runnable onAnimationCompleted = null;
 	private InputFunction<Double> onAnimationTimeOut = null;
@@ -63,7 +63,7 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 		if (isEnableAnimation() && tokens != null) {
 
 			//paint tokens
-			int tokensPainted = paintTokens(g, getAnimationCurrentTime());
+			int tokensPainted = paintTokens(g, tokens, getAnimationCurrentTime(), true, animationPlaying());
 
 			//report whether we finished on time
 			if (tokensPainted < tokens.size()) {
@@ -111,10 +111,14 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 	 * Paints tokens
 	 * 
 	 * @param g
+	 * @param tokens
 	 * @param time
-	 * @return the next token that will be painted
+	 * @param timeOutPossible
+	 * @param animationPlaying
+	 * @return the last token that was painted
 	 */
-	public int paintTokens(Graphics2D g, double time) {
+	public static int paintTokens(Graphics2D g, GraphVizTokens tokens, double time, boolean timeOutPossible,
+			boolean animationPlaying) {
 		int result = tokens.size();
 
 		long startTime = System.currentTimeMillis();
@@ -128,10 +132,11 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 		TokenIterator it = tokens.getTokensAtTime(time);
 		while (it.hasNext()) {
 			int tokenIndex = it.next();
-			paintToken(g, time, tokenIndex);
+			paintToken(g, tokens, time, tokenIndex);
 
 			nowTime = System.currentTimeMillis() - startTime;
-			if ((animationPlaying() && nowTime > maxAnimationDuration) || nowTime > maxAnimationPausedDuration) {
+			if (timeOutPossible
+					&& ((animationPlaying && nowTime > maxAnimationDuration) || nowTime > maxAnimationPausedDuration)) {
 				result = it.getPosition();
 				break;
 			}
@@ -143,7 +148,7 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 		return result;
 	}
 
-	public void paintToken(Graphics2D g, double time, int tokenIndex) {
+	public static void paintToken(Graphics2D g, GraphVizTokens tokens, double time, int tokenIndex) {
 		//ask for the point
 		Triple<Double, Double, Double> point = tokens.eval(tokenIndex, time);
 
@@ -168,7 +173,6 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 					(int) Math.round(point.getC() * 255)));
 		}
 		g.drawOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
-		//		g.drawRect(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
 
 		g.translate(-point.getA(), -point.getB());
 

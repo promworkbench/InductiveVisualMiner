@@ -2,7 +2,9 @@ package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.NoninvertibleTransformException;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +34,9 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.Lo
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
+import org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01MakeLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl02FilterLogOnActivities;
@@ -49,6 +53,7 @@ import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringF
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
+import org.processmining.plugins.inductiveVisualMiner.export.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog.FileType;
@@ -58,6 +63,8 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+
+import com.kitfox.svg.SVGDiagram;
 
 public class InductiveVisualMinerController {
 
@@ -476,54 +483,28 @@ public class InductiveVisualMinerController {
 							}
 						}).start();
 						break;
-				//					case aviMovie :
-				//					//save avi asynchronously
-				//					{
-				//						final SVGDiagram svg = panel.getGraph().getSVG();
-				//						final ColouringMode colourMode = state.getColourMode();
-				//						final Dot dot = panel.getGraph().getDot();
-				//						final IvMLog timedLog = state.getIvMLog();
-				//						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
-				//						new Thread(new Runnable() {
-				//							public void run() {
-				//								try {
-				//									if (!ExportAnimation.saveAVItoFile(timedLog, info, colourMode, svg, dot, p.getA(),
-				//											panel)) {
-				//										System.out.println("deleted");
-				//										p.getA().delete();
-				//									}
-				//								} catch (IOException e) {
-				//									e.printStackTrace();
-				//								}
-				//							}
-				//						}).start();
-				//					}
-				//						break;
-				//					case svgMovie :
-				//					//save svg asynchronously
-				//					{
-				//						final SVGDiagram svg = panel.getGraph().getSVG();
-				//						final ColouringMode colourMode = state.getColourMode();
-				//						final Dot dot = panel.getGraph().getDot();
-				//						final IvMLog timedLog = state.getIvMLog();
-				//						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
-				//						new Thread(new Runnable() {
-				//							public void run() {
-				//								try {
-				//									Canceller canceller = new Canceller() {
-				//										public boolean isCancelled() {
-				//											return false;
-				//										}
-				//									};
-				//									ExportAnimation.saveSVGtoFile(timedLog, info, colourMode, svg, canceller, dot,
-				//											p.getA());
-				//								} catch (IOException e) {
-				//									e.printStackTrace();
-				//								}
-				//							}
-				//						}).start();
-				//					}
-				//						break;
+					case aviMovie :
+						//save avi asynchronously
+						final SVGDiagram svg = panel.getGraph().getSVG();
+						final ColouringMode colourMode = state.getColourMode();
+						final Dot dot = panel.getGraph().getDot();
+						final GraphVizTokens tokens = state.getAnimationGraphVizTokens();
+						final Scaler scaler = state.getAnimationScaler();
+						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
+						new Thread(new Runnable() {
+							public void run() {
+								try {
+									if (!ExportAnimation.saveAVItoFile(tokens, info, colourMode, svg, dot, p.getA(),
+											panel, scaler)) {
+										System.out.println("deleted");
+										p.getA().delete();
+									}
+								} catch (IOException | NoninvertibleTransformException e) {
+									e.printStackTrace();
+								}
+							}
+						}).start();
+						break;
 				}
 			}
 		});

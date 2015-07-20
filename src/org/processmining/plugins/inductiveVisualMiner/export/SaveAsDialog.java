@@ -17,7 +17,7 @@ public class SaveAsDialog extends JFileChooser {
 	private static final long serialVersionUID = 6614457648530087883L;
 	
 	public enum FileType {
-		pngImage, pdfImage, svgImage, svgMovie, aviMovie
+		pngImage, pdfImage, svgImage, aviMovie
 	}
 	
 	private class IvMFileFilter extends FileFilter {
@@ -60,7 +60,6 @@ public class SaveAsDialog extends JFileChooser {
 		addChoosableFileFilter(new IvMFileFilter(FileType.pdfImage, "pdf", "pdf"));
 		addChoosableFileFilter(new IvMFileFilter(FileType.svgImage, "svg", "svg"));
 		if (animationExportPossible) {
-			addChoosableFileFilter(new IvMFileFilter(FileType.svgMovie, "svg", "svg (animation)"));
 			addChoosableFileFilter(new IvMFileFilter(FileType.aviMovie, "avi", "avi (animation)"));
 		}
 	}
