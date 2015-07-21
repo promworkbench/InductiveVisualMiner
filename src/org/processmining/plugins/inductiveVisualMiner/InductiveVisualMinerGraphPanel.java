@@ -38,7 +38,7 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 	public static final Color tokenFillColour = Color.yellow;
 	public static final Color tokenStrokeColour = Color.black;
 	public static final Stroke tokenStroke = new BasicStroke(1.5f);
-	public static final int maxAnimationDuration = 25; //after spending xx ms in drawing circles, just quit.
+	public static final int maxAnimationDuration = 20; //after spending xx ms in drawing circles, just quit.
 	public static final int maxAnimationPausedDuration = 200; //after spending xx ms in drawing circles, just quit.
 
 	private Runnable onAnimationCompleted = null;
