@@ -9,13 +9,13 @@ import nl.tue.astar.AStarThread.Canceller;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
-import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.DotToken;
-import org.processmining.plugins.inductiveVisualMiner.animation.dotToken.Trace2DotToken;
-import org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken.DotToken2GraphVizToken;
-import org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken.GraphVizTokens;
-import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.ShortestPathGraph;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
+import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 import com.kitfox.svg.SVGDiagram;
 
@@ -25,8 +25,8 @@ public class ComputeAnimation {
 	public static final double animationDuration = 180;
 	private static Random random = new Random(123);
 
-	public static Pair<Scaler, GraphVizTokens> computeAnimation(final IvMLog ivmLog, final ColouringMode colourMode,
-			final AlignedLogVisualisationInfo info, final SVGDiagram svg, final Canceller canceller)
+	public static Pair<Scaler, GraphVizTokens> computeAnimation(final IvMLog ivmLog, final Mode colourMode,
+			final ProcessTreeVisualisationInfo info, final SVGDiagram svg, final Canceller canceller)
 			throws NoninvertibleTransformException {
 
 		//scale timestamps
@@ -46,12 +46,15 @@ public class ComputeAnimation {
 		//set up result object
 		GraphVizTokens graphVizTokens = new GraphVizTokens();
 		
-		for (IvMTrace ivmTrace : ivmLog) {
+		IteratorWithPosition<IvMTrace> it = ivmLog.iterator();
+		while (it.hasNext()) {
+			IvMTrace ivmTrace = it.next();
+			
 			//make dot tokens
 			final List<DotToken> dotTokens = computeDotTokens(ivmTrace, info, colourMode, scaler, graph, canceller);
 			
 			//add to graphviz tokens
-			DotToken2GraphVizToken.convertTokens(dotTokens, graphVizTokens, svg);
+			DotToken2GraphVizToken.convertTokens(dotTokens, graphVizTokens, svg, it.getPosition());
 
 			if (canceller.isCancelled()) {
 				return null;
@@ -65,8 +68,8 @@ public class ComputeAnimation {
 		return Pair.of(scaler, graphVizTokens);
 	}
 
-	public static List<DotToken> computeDotTokens(IvMTrace trace, final AlignedLogVisualisationInfo info,
-			final ColouringMode colourMode, Scaler scaler, ShortestPathGraph graph, final Canceller canceller) {
+	public static List<DotToken> computeDotTokens(IvMTrace trace, final ProcessTreeVisualisationInfo info,
+			final Mode colourMode, Scaler scaler, ShortestPathGraph graph, final Canceller canceller) {
 		boolean showDeviations = colourMode.isShowDeviations();
 		final List<DotToken> tokens = new ArrayList<>();
 		try {
@@ -75,7 +78,7 @@ public class ComputeAnimation {
 			trace.setEndTime(guessEndTime(trace, trace.getStartTime(), graph, info, scaler));
 
 			//compute the tokens of this trace
-			tokens.add(Trace2DotToken.trace2token(trace, showDeviations, graph, info, scaler));
+			tokens.add(IvMTrace2DotToken.trace2token(trace, showDeviations, graph, info, scaler));
 		} catch (Exception e) {
 			//for the demo, just ignore this case
 			InductiveVisualMinerController.debug("trace skipped animation");
@@ -89,7 +92,7 @@ public class ComputeAnimation {
 	}
 
 	public static double guessStartTime(List<IvMMove> trace, ShortestPathGraph shortestGraph,
-			AlignedLogVisualisationInfo info, Scaler scaler) {
+			ProcessTreeVisualisationInfo info, Scaler scaler) {
 		//find the first timed move
 		for (int i = 0; i < trace.size(); i++) {
 			IvMMove firstTimedMove = trace.get(i);
@@ -103,7 +106,7 @@ public class ComputeAnimation {
 	}
 
 	public static double guessEndTime(List<IvMMove> trace, double startTime, ShortestPathGraph shortestGraph,
-			AlignedLogVisualisationInfo info, Scaler scaler) {
+			ProcessTreeVisualisationInfo info, Scaler scaler) {
 		//find the last timed move
 		for (int i = trace.size() - 1; i >= 0; i--) {
 			IvMMove lastTimedMove = trace.get(i);

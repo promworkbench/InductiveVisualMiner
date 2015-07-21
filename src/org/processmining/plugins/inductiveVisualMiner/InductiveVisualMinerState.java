@@ -17,23 +17,22 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentResult;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePaths;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogBase;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
+import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.MiningParametersIvM;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleSplitLog;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -186,12 +185,12 @@ public class InductiveVisualMinerState {
 	//==layout==
 	private Dot dot;
 	private SVGDiagram svgDiagram;
-	private AlignedLogVisualisationInfo visualisationInfo;
+	private ProcessTreeVisualisationInfo visualisationInfo;
 	private AlignedLogVisualisationData visualisationData;
 	private GraphDirection graphDirection = GraphDirection.leftRight;
 	private TraceViewColourMap traceViewColourMap;
 
-	public void setLayout(Dot dot, SVGDiagram svgDiagram, AlignedLogVisualisationInfo visualisationInfo,
+	public void setLayout(Dot dot, SVGDiagram svgDiagram, ProcessTreeVisualisationInfo visualisationInfo,
 			TraceViewColourMap traceViewColourMap) {
 		this.dot = dot;
 		this.svgDiagram = svgDiagram;
@@ -207,7 +206,7 @@ public class InductiveVisualMinerState {
 		return svgDiagram;
 	}
 
-	public AlignedLogVisualisationInfo getVisualisationInfo() {
+	public ProcessTreeVisualisationInfo getVisualisationInfo() {
 		return visualisationInfo;
 	}
 
@@ -231,76 +230,15 @@ public class InductiveVisualMinerState {
 		return visualisationData;
 	}
 
-	//==alignment==
-	private AlignedLog alignedLog = null;
-	private AlignedLogInfo alignedLogInfo = null;
-	private AlignedLog alignedFilteredLog = null;
-	private AlignedLogInfo alignedFilteredLogInfo = null;
-	private IMLog alignedFilteredXLog = null;
-
-	public boolean isAlignmentReady() {
-		return alignedLog != null;
-	}
-
-	public AlignedLog getAlignedLog() {
-		return alignedLog;
-	}
-
-	public AlignedLogInfo getAlignedLogInfo() {
-		return alignedLogInfo;
-	}
-
-	public AlignedLog getAlignedFilteredLog() {
-		return alignedFilteredLog;
-	}
-
-	public AlignedLogInfo getAlignedFilteredLogInfo() {
-		return alignedFilteredLogInfo;
-	}
-
-	public IMLog getAlignedFilteredXLog() {
-		return alignedFilteredXLog;
-	}
-
-	/*
-	 * Reset alignment to null
-	 */
-	public synchronized void resetAlignment() {
-		this.alignedLog = null;
-		this.alignedFilteredLog = null;
-		this.alignedLogInfo = null;
-		this.alignedFilteredLogInfo = null;
-	}
-
-	/*
-	 * Finish alignment computation
-	 */
-	public synchronized void setAlignment(AlignmentResult alignment) {
-		this.alignedLog = alignment.log;
-		this.alignedFilteredLog = alignment.log;
-		this.alignedLogInfo = alignment.logInfo;
-		this.alignedFilteredLogInfo = alignment.logInfo;
-	}
-
-	/*
-	 * Apply a new filter
-	 */
-	public synchronized void setAlignedFilteredLog(AlignedLog alignedFilteredLog,
-			AlignedLogInfo alignedFilteredLogInfo, IMLog alignedFilteredXLog) {
-		this.alignedFilteredLog = alignedFilteredLog;
-		this.alignedFilteredLogInfo = alignedFilteredLogInfo;
-		this.alignedFilteredXLog = alignedFilteredXLog;
-	}
-
 	//==gui-parameters==
-	private ColouringMode colourMode = new ColouringModePaths();
+	private Mode mode = new ModePaths();
 
-	public ColouringMode getColourMode() {
-		return colourMode;
+	public Mode getMode() {
+		return mode;
 	}
 
-	public synchronized void setColourMode(ColouringMode modus) {
-		colourMode = modus;
+	public synchronized void setMode(Mode mode) {
+		this.mode = mode;
 	}
 
 	//==colour filtering ( & node selection)==
@@ -333,14 +271,50 @@ public class InductiveVisualMinerState {
 	}
 
 	//==timed log==
-	private IvMLog ivmLog;
+	private IvMLogBase ivmLog;
+	private IvMLogInfo ivmLogInfo;
+	private IvMLogFiltered ivmLogFiltered;
+	private IvMLogInfo ivmLogInfoFiltered;
 
-	public void setIvMLog(IvMLog ivmLog) {
+	public void setIvMLog(IvMLogBase ivmLog, IvMLogInfo ivmLogInfo) {
 		this.ivmLog = ivmLog;
+		this.ivmLogInfo = ivmLogInfo;
+		this.ivmLogFiltered = new IvMLogFiltered(ivmLog);
+		this.ivmLogInfoFiltered = ivmLogInfo;
 	}
 
-	public IvMLog getIvMLog() {
+	public IvMLogBase getIvMLog() {
 		return ivmLog;
+	}
+	
+	public void setIvMLogFiltered(IvMLogFiltered ivmLogFiltered, IvMLogInfo ivmLogInfoFiltered) {
+		this.ivmLogFiltered = ivmLogFiltered;
+		this.ivmLogInfoFiltered = ivmLogInfoFiltered;
+	}
+	
+	public IvMLogInfo getIvMLogInfo() {
+		return ivmLogInfo;
+	}
+	
+	public IvMLogFiltered getIvMLogFiltered() {
+		return ivmLogFiltered;
+	}
+	
+	public IvMLogInfo getIvMLogInfoFiltered() {
+		return ivmLogInfoFiltered;
+	}
+	
+	public boolean isAlignmentReady() {
+		return ivmLog != null;
+	}
+	
+	/*
+	 * Reset alignment to null
+	 */
+	public synchronized void resetAlignment() {
+		ivmLog = null;
+		ivmLogFiltered = null;
+		ivmLogInfoFiltered = null;
 	}
 
 	//==playing animation

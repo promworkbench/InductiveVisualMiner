@@ -20,18 +20,18 @@ import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphDirectionChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePaths;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsDeviations;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsQueueLengths;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsService;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringModePathsSojourn;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsQueueLengths;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsService;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 import com.fluxicon.slickerbox.components.NiceDoubleSlider;
@@ -143,8 +143,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 			add(colourLabel, cColourLabel);
 
 			colourSelection = SlickerFactory.instance().createComboBox(
-					new ColouringMode[] { new ColouringModePaths(), new ColouringModePathsDeviations(),
-							new ColouringModePathsQueueLengths(), new ColouringModePathsSojourn(), new ColouringModePathsService() });
+					new Mode[] { new ModePaths(), new ModePathsDeviations(),
+							new ModePathsQueueLengths(), new ModePathsSojourn(), new ModePathsService() });
 			GridBagConstraints ccolourSelection = new GridBagConstraints();
 			ccolourSelection.gridx = 2;
 			ccolourSelection.gridy = gridy++;

@@ -6,9 +6,9 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Manual;
@@ -28,7 +28,7 @@ public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualis
 	
 	private final AlignedLogVisualisationData dataForEdges;
 	
-	public AlignedLogVisualisationDataImplQueues(ProcessTree tree, PerformanceWrapper queueLengths, AlignedLogInfo logInfo) {
+	public AlignedLogVisualisationDataImplQueues(ProcessTree tree, PerformanceWrapper queueLengths, IvMLogInfo logInfo) {
 		this.tree = tree;
 		this.queueLengths = queueLengths;
 		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(tree, logInfo);

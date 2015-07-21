@@ -127,10 +127,9 @@ public class ColouringFiltersView extends SideWindow {
 	 * @param colouringFilters
 	 * @param maxAnimatedTraces
 	 * @param numberOfTraces
-	 * @param animationCompleted 
 	 */
 	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Set<UnfoldedNode> selectedNodes,
-			Set<LogMovePosition> selectedLogMoves, List<ColouringFilter> colouringFilters, long numberOfTraces, double animationCompleted) {
+			Set<LogMovePosition> selectedLogMoves, List<ColouringFilter> colouringFilters, double animationCompleted) {
 		//show the user which traces are shown
 
 		String[] criteria = new String[3];
@@ -208,7 +207,7 @@ public class ColouringFiltersView extends SideWindow {
 		if (animationCompleted < 1) {
 			s += "; animating " + String.format("%02d", (int) (animationCompleted * 100)) + "% of the tokens.";
 		} else {
-			s += ".";
+			s += ".                              ";
 		}
 
 		panel.getSelectionLabel().setText(s);

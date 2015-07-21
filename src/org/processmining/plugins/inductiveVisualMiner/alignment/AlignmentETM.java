@@ -10,26 +10,21 @@ import nl.tue.astar.Trace;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClasses;
-import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.std.XLifecycleExtension;
-import org.deckfour.xes.info.XLogInfo;
-import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
-import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
-import org.processmining.framework.plugin.PluginContext;
-import org.processmining.framework.plugin.annotations.Plugin;
-import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.mining.MiningParametersIM;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.etm.CentralRegistry;
 import org.processmining.plugins.etm.fitness.BehaviorCounter;
 import org.processmining.plugins.etm.fitness.metrics.FitnessReplay;
 import org.processmining.plugins.etm.model.narytree.NAryTree;
 import org.processmining.plugins.etm.model.narytree.conversion.ProcessTreeToNAryTree;
 import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
-import org.processmining.plugins.etm.termination.ProMCancelTerminationCondition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.Alignment2IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogBase;
 import org.processmining.plugins.inductiveVisualMiner.performance.ExpandProcessTreeForQueues;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
@@ -43,26 +38,10 @@ import org.processmining.processtree.impl.AbstractTask.Manual;
 
 public class AlignmentETM {
 
-	@Plugin(name = "Replay log on process tree using ETM", returnLabels = { "Aligned log" }, returnTypes = { AlignedLog.class }, parameterLabels = {
-			"Process tree", "log" }, userAccessible = true)
-	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
-	@PluginVariant(variantLabel = "Batch compare miners, default", requiredParameterLabels = { 0, 1 })
-	public AlignedLog alignTree(PluginContext context, ProcessTree tree, XLog log) {
-		XEventClassifier activityClassifier = MiningParametersIM.getDefaultClassifier();
-		XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(activityClassifier);
+	public static IvMLogBase align(ProcessTree tree, XEventPerformanceClassifier performanceClassifier,
+			XLog xLog, IMLog log, XEventClasses activityEventClasses, XEventClasses performanceEventClasses, Canceller canceller) {
 
-		XLogInfo logInfo = XLogInfoFactory.createLogInfo(log, activityClassifier);
-		XLogInfo logInfoPerformance = XLogInfoFactory.createLogInfo(log, performanceClassifier);
-
-		return alignTree(tree, new XEventPerformanceClassifier(MiningParametersIM.getDefaultClassifier()), log,
-				logInfo.getEventClasses(), logInfoPerformance.getEventClasses(),
-				ProMCancelTerminationCondition.buildDummyCanceller()).log;
-	}
-
-	public static AlignmentResult alignTree(ProcessTree tree, XEventPerformanceClassifier performanceClassifier,
-			XLog log, XEventClasses activityEventClasses, XEventClasses performanceEventClasses, Canceller canceller) {
-
-		CentralRegistry registry = new CentralRegistry(log, performanceClassifier, new Random());
+		CentralRegistry registry = new CentralRegistry(xLog, performanceClassifier, new Random());
 
 		//transform tree for performance measurement
 		Triple<ProcessTree, Map<UnfoldedNode, UnfoldedNode>, Set<UnfoldedNode>> t = ExpandProcessTreeForQueues
@@ -92,7 +71,7 @@ public class AlignmentETM {
 		UnfoldedNode[] nodeId2performanceNode = l.toArray(new UnfoldedNode[l.size()]);
 
 		//read moves and create aligned log
-		AlignedLog alignedLog = new AlignedLog();
+		MultiSet<AlignedTrace> alignedLog = new MultiSet<>();
 		for (Trace naryTrace : behC.getAlignments().keySet()) {
 
 			AlignedTrace trace = new AlignedTrace();
@@ -178,9 +157,7 @@ public class AlignmentETM {
 			alignedLog.add(trace, cardinality);
 		}
 
-		AlignedLogInfo alignedLogInfo = new AlignedLogInfo(alignedLog);
-
-		return new AlignmentResult(alignedLog, alignedLogInfo);
+		return Alignment2IvMLog.convert(alignedLog, log, performanceEventClasses, canceller);
 	}
 
 	public static void addAllLeaves(XEventClasses classes, Node node) {

@@ -29,37 +29,35 @@ import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel.Callback;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
-import org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01MakeLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl02FilterLogOnActivities;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl03Mine;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl04Layout;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl04LayoutModel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Align;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl06Layout;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl07FilterNodeSelection;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl08ApplyHighlighting;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl09MakeIvMLog;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl10Animate;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Queues;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutWithAlignment;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl07Animate;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl08FilterNodeSelection;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl09Performance;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog.FileType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
+import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
@@ -169,7 +167,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveImageButton().setText("image");
 
 					//if the view does not show deviations, do not select any log moves
-					if (!state.getColourMode().isShowDeviations()) {
+					if (!state.getMode().isShowDeviations()) {
 						state.setSelectedLogMoves(new HashSet<LogMovePosition>());
 					}
 				}
@@ -184,7 +182,7 @@ public class InductiveVisualMinerController {
 
 				}
 			};
-			Cl04Layout chainLinkLayout = new Cl04Layout();
+			Cl04LayoutModel chainLinkLayout = new Cl04LayoutModel();
 			chainLinkLayout.setOnStart(layoutStart);
 			chainLinkLayout.setOnComplete(layoutComplete);
 			chainLinkLayout.setOnException(onException);
@@ -205,7 +203,7 @@ public class InductiveVisualMinerController {
 			});
 			a.setOnComplete(new Runnable() {
 				public void run() {
-					panel.getTraceView().set(state.getAlignedLog());
+					panel.getTraceView().set(state.getIvMLog());
 				}
 			});
 			a.setOnException(onException);
@@ -214,78 +212,16 @@ public class InductiveVisualMinerController {
 
 		//layout
 		{
-			Cl06Layout l = new Cl06Layout();
+			Cl06LayoutWithAlignment l = new Cl06LayoutWithAlignment();
 			l.setOnStart(layoutStart);
 			l.setOnComplete(layoutComplete);
 			l.setOnException(onException);
 			chain.add(l);
 		}
 
-		//filter node selection
-		{
-			Cl07FilterNodeSelection f = new Cl07FilterNodeSelection();
-			f.setOnStart(new Runnable() {
-				public void run() {
-					panel.getGraph().setEnableAnimation(false);
-					panel.getSaveImageButton().setText("image");
-					state.resetPerformance();
-					setStatus("Highlighting selection..");
-				}
-			});
-			f.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getTraceView().set(state.getAlignedFilteredLog());
-				}
-			});
-			f.setOnException(onException);
-			chain.add(f);
-		}
-
-		//apply highlighting
-		{
-			Cl08ApplyHighlighting a = new Cl08ApplyHighlighting();
-			a.setOnComplete(new Runnable() {
-				public void run() {
-					state.resetPerformance();
-
-					ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(), state
-							.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
-							state.getAnimationCompleted());
-
-					//tell trace view the colour map and the selection
-					updateHighlighting();
-					updatePopup();
-
-					panel.repaint();
-				}
-			});
-			a.setOnException(onException);
-			chain.add(a);
-		}
-
-		//IvM log
-		{
-			Cl09MakeIvMLog m = new Cl09MakeIvMLog();
-			m.setOnStart(new Runnable() {
-				public void run() {
-					panel.getGraph().setEnableAnimation(false);
-					panel.getSaveImageButton().setText("image");
-					state.resetPerformance();
-					setStatus("Creating IvM log..");
-				}
-			});
-			m.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getTraceView().set(state.getIvMLog());
-				}
-			});
-			m.setOnException(onException);
-			chain.add(m);
-		}
-
 		//animate
 		{
-			Cl10Animate a = new Cl10Animate();
+			Cl07Animate a = new Cl07Animate();
 			a.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setEnableAnimation(false);
@@ -307,13 +243,46 @@ public class InductiveVisualMinerController {
 			chain.add(a);
 		}
 
-		//mine queues
+		//filter node selection
 		{
-			Cl11Queues q = new Cl11Queues();
+			Cl08FilterNodeSelection f = new Cl08FilterNodeSelection();
+			f.setOnStart(new Runnable() {
+				public void run() {
+					state.resetPerformance();
+					setStatus("Highlighting selection..");
+				}
+			});
+			f.setOnComplete(new Runnable() {
+				public void run() {
+					
+					state.resetPerformance();
+
+					ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
+							state.getSelectedLogMoves(), state.getColouringFilters(), state.getAnimationCompleted());
+
+					//tell trace view the colour map and the selection
+					panel.getTraceView().set(state.getIvMLogFiltered());
+					
+					updateHighlighting();
+					updatePopup();
+					
+					//tell the animation the filtered log
+					panel.getGraph().setFilteredLog(state.getIvMLogFiltered());
+
+					panel.repaint();
+				}
+			});
+			f.setOnException(onException);
+			chain.add(f);
+		}
+
+		//mine performance
+		{
+			Cl09Performance q = new Cl09Performance();
 			q.setOnStart(new Runnable() {
 				public void run() {
 					state.resetPerformance();
-					setStatus("Mining queues..");
+					setStatus("Measuring performance..");
 				}
 			});
 			q.setOnComplete(new Runnable() {
@@ -382,11 +351,11 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		//colour mode
+		//display mode
 		panel.getColourModeSelection().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				state.setColourMode((ColouringMode) panel.getColourModeSelection().getSelectedItem());
-				chain.execute(Cl06Layout.class);
+				state.setMode((Mode) panel.getColourModeSelection().getSelectedItem());
+				chain.execute(Cl06LayoutWithAlignment.class);
 			}
 		});
 
@@ -395,7 +364,7 @@ public class InductiveVisualMinerController {
 			public void call(Pair<Set<UnfoldedNode>, Set<LogMovePosition>> input) throws Exception {
 				state.setSelectedNodes(input.getA());
 				state.setSelectedLogMoves(input.getB());
-				chain.execute(Cl07FilterNodeSelection.class);
+				chain.execute(Cl08FilterNodeSelection.class);
 			}
 		});
 
@@ -403,7 +372,7 @@ public class InductiveVisualMinerController {
 		panel.setOnGraphDirectionChanged(new InputFunction<Dot.GraphDirection>() {
 			public void call(GraphDirection input) throws Exception {
 				state.setGraphDirection(input);
-				chain.execute(Cl06Layout.class);
+				chain.execute(Cl06LayoutWithAlignment.class);
 			}
 		});
 
@@ -412,8 +381,7 @@ public class InductiveVisualMinerController {
 			public void run() {
 				state.setAnimationCompleted(1);
 				ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
-						state.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
-						state.getAnimationCompleted());
+						state.getSelectedLogMoves(), state.getColouringFilters(), state.getAnimationCompleted());
 			}
 		});
 
@@ -422,8 +390,7 @@ public class InductiveVisualMinerController {
 			public void call(Double animationCompleted) throws Exception {
 				state.setAnimationCompleted(animationCompleted);
 				ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
-						state.getSelectedLogMoves(), state.getColouringFilters(), state.getAlignedFilteredLog().size(),
-						state.getAnimationCompleted());
+						state.getSelectedLogMoves(), state.getColouringFilters(), state.getAnimationCompleted());
 			}
 		});
 
@@ -486,11 +453,11 @@ public class InductiveVisualMinerController {
 					case aviMovie :
 						//save avi asynchronously
 						final SVGDiagram svg = panel.getGraph().getSVG();
-						final ColouringMode colourMode = state.getColourMode();
+						final Mode colourMode = state.getMode();
 						final Dot dot = panel.getGraph().getDot();
 						final GraphVizTokens tokens = state.getAnimationGraphVizTokens();
 						final Scaler scaler = state.getAnimationScaler();
-						final AlignedLogVisualisationInfo info = state.getVisualisationInfo();
+						final ProcessTreeVisualisationInfo info = state.getVisualisationInfo();
 						new Thread(new Runnable() {
 							public void run() {
 								try {
@@ -540,7 +507,7 @@ public class InductiveVisualMinerController {
 					panel.getAnimationTimeLabel().setText(TimestampsAdder.toString(logTime));
 
 					//draw queues
-					if (state.getColourMode().isUpdateWithTimeStep(state)) {
+					if (state.getMode().isUpdateWithTimeStep(state)) {
 						state.getVisualisationData().setTime(logTime);
 						updateHighlighting();
 						panel.getTraceView().repaint();
@@ -553,7 +520,7 @@ public class InductiveVisualMinerController {
 		});
 	}
 
-	private static void makeNodesSelectable(AlignedLogVisualisationInfo info, InductiveVisualMinerPanel panel,
+	private static void makeNodesSelectable(ProcessTreeVisualisationInfo info, InductiveVisualMinerPanel panel,
 			Set<UnfoldedNode> selectedNodes, Set<LogMovePosition> selectedLogMoves) {
 		for (LocalDotNode dotNode : info.getAllActivityNodes()) {
 			panel.makeNodeSelectable(dotNode, selectedNodes.contains(dotNode.getUnode()));
@@ -576,7 +543,7 @@ public class InductiveVisualMinerController {
 	private void initialiseColourFilters(final XLog xLog, Executor executor) {
 		final Runnable onUpdate = new Runnable() {
 			public void run() {
-				chain.execute(Cl07FilterNodeSelection.class);
+				chain.execute(Cl08FilterNodeSelection.class);
 			}
 		};
 		for (final ColouringFilter colouringFilter : state.getColouringFilters()) {
@@ -595,9 +562,9 @@ public class InductiveVisualMinerController {
 	public void updateHighlighting() {
 		TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(panel.getGraph()
 				.getSVG(), state.getVisualisationInfo(), state.getTree(), state.getVisualisationData(), state
-				.getColourMode().getVisualisationParameters(state));
-		panel.getTraceView().setColourMap(colourMap);
+				.getMode().getVisualisationParameters(state));
 		colourMap.setSelectedNodes(state.getSelectedNodes(), state.getSelectedLogMoves());
+		panel.getTraceView().setColourMap(colourMap);
 	}
 
 	private void updatePopup() {
@@ -613,8 +580,8 @@ public class InductiveVisualMinerController {
 
 					//frequencies
 					popup.add("frequency             "
-							+ AlignedLogMetrics.getNumberOfTracesRepresented(unode, false,
-									state.getAlignedFilteredLogInfo()));
+							+ IvMLogMetrics.getNumberOfTracesRepresented(unode, false,
+									state.getIvMLogInfoFiltered()));
 
 					//waiting time
 					if (state.isPerformanceReady()) {

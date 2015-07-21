@@ -1,62 +1,18 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode.NodeType;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.plugins.inductiveVisualMiner.animation.shortestPath.ShortestPathGraph;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
-import org.processmining.processtree.impl.AbstractTask.Automatic;
 
 public class Animation {
 
-	public static List<LocalDotEdge> getEdgesOnMovePath(List<IvMMove> movePath, ShortestPathGraph shortestPath,
-			AlignedLogVisualisationInfo info, boolean addSource, boolean addSink) {
-
-		//make a node-path
-		List<LocalDotNode> nodePath = new ArrayList<>();
-		if (addSource) {
-			nodePath.add(info.getSource());
-		}
-		for (IvMMove move : movePath) {
-			LocalDotNode node = getDotNodeFromActivity(move, info);
-			if (node != null) {
-				nodePath.add(node);
-			} else if (move.isModelSync() && move.getUnode().getNode() instanceof Automatic) {
-				nodePath.add(info.getModelEdges(move.getUnode()).get(0).getSource());
-			}
-		}
-		if (addSink) {
-			nodePath.add(info.getSink());
-		}
-
-		//construct edge-path
-		List<LocalDotEdge> result = new ArrayList<>();
-		Iterator<LocalDotNode> it = nodePath.iterator();
-
-		if (nodePath.size() < 2) {
-			return result;
-		}
-
-		LocalDotNode from;
-		LocalDotNode to = it.next();
-
-		while (it.hasNext()) {
-			from = to;
-			to = it.next();
-
-			result.addAll(shortestPath.getShortestPath(from, to));
-		}
-
-		return result;
-	}
-
-	public static LocalDotEdge getModelMoveEdge(IvMMove move, AlignedLogVisualisationInfo info) {
+	public static LocalDotEdge getModelMoveEdge(IvMMove move, ProcessTreeVisualisationInfo info) {
 		List<LocalDotEdge> edges = info.getModelMoveEdges(move.getUnode());
 		if (!edges.isEmpty()) {
 			return edges.get(0);
@@ -65,15 +21,15 @@ public class Animation {
 	}
 
 	public static LocalDotEdge getLogMoveEdge(UnfoldedNode logMoveUnode, UnfoldedNode logMoveBeforeChild,
-			AlignedLogVisualisationInfo info) {
+			ProcessTreeVisualisationInfo info) {
 		return info.getLogMoveEdge(logMoveUnode, logMoveBeforeChild);
 	}
 
-	public static LocalDotEdge getTauEdge(IvMMove move, AlignedLogVisualisationInfo info) {
+	public static LocalDotEdge getTauEdge(IvMMove move, ProcessTreeVisualisationInfo info) {
 		return info.getModelEdges(move.getUnode()).get(0);
 	}
 
-	public static LocalDotNode getParallelSplit(UnfoldedNode unode, AlignedLogVisualisationInfo info) {
+	public static LocalDotNode getParallelSplit(UnfoldedNode unode, ProcessTreeVisualisationInfo info) {
 		for (LocalDotNode node : info.getNodes(unode)) {
 			if (node.getType() == NodeType.parallelSplit) {
 				return node;
@@ -82,7 +38,7 @@ public class Animation {
 		return null;
 	}
 
-	public static LocalDotNode getParallelJoin(UnfoldedNode unode, AlignedLogVisualisationInfo info) {
+	public static LocalDotNode getParallelJoin(UnfoldedNode unode, ProcessTreeVisualisationInfo info) {
 		for (LocalDotNode node : info.getNodes(unode)) {
 			if (node.getType() == NodeType.parallelJoin) {
 				return node;
@@ -91,11 +47,11 @@ public class Animation {
 		return null;
 	}
 
-	public static LocalDotNode getDotNodeFromActivity(IvMMove move, AlignedLogVisualisationInfo info) {
+	public static LocalDotNode getDotNodeFromActivity(IvMMove move, ProcessTreeVisualisationInfo info) {
 		return getDotNodeFromActivity(move.getUnode(), info);
 	}
 	
-	public static LocalDotNode getDotNodeFromActivity(UnfoldedNode unode, AlignedLogVisualisationInfo info) {
+	public static LocalDotNode getDotNodeFromActivity(UnfoldedNode unode, ProcessTreeVisualisationInfo info) {
 		for (LocalDotNode node : info.getNodes(unode)) {
 			if (node.getType() == NodeType.activity) {
 				return node;
@@ -104,7 +60,7 @@ public class Animation {
 		return null;
 	}
 	
-	public static LocalDotEdge getDotEdgeFromLogMove(LogMovePosition logMovePosition, AlignedLogVisualisationInfo info) {
+	public static LocalDotEdge getDotEdgeFromLogMove(LogMovePosition logMovePosition, ProcessTreeVisualisationInfo info) {
 		for (LocalDotEdge edge: info.getAllLogMoveEdges()) {
 			if (logMovePosition.equals(LogMovePosition.of(edge))) {
 				return edge;
@@ -113,7 +69,4 @@ public class Animation {
 		return null;
 	}
 
-	private static void debug(Object s) {
-		//		System.out.println(s.toString().replaceAll("\\n", " "));
-	}
 }

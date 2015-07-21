@@ -27,17 +27,17 @@ import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerGraphPanel;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken.GraphVizTokens;
-import org.processmining.plugins.inductiveVisualMiner.colouringmode.ColouringMode;
+import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 import com.kitfox.svg.SVGDiagram;
 
 public class ExportAnimation {
 
-	public static boolean saveAVItoFile(GraphVizTokens tokens, final AlignedLogVisualisationInfo info,
-			final ColouringMode colourMode, final SVGDiagram svg, final Dot dot, final File file, final JPanel panel,
+	public static boolean saveAVItoFile(GraphVizTokens tokens, final ProcessTreeVisualisationInfo info,
+			final Mode colourMode, final SVGDiagram svg, final Dot dot, final File file, final JPanel panel,
 			final Scaler scaler) throws IOException, NoninvertibleTransformException {
 
 		final GuaranteedProgressMonitor progressMonitor = new GuaranteedProgressMonitor(panel, "",
@@ -113,7 +113,7 @@ public class ExportAnimation {
 				g.transform(transform);
 				
 				//paint the tokens
-				InductiveVisualMinerGraphPanel.paintTokens(g, tokens, time, false, false);
+				InductiveVisualMinerGraphPanel.paintTokens(g, tokens, null, time, false, false);
 				
 				g.transform(transformInverse);
 

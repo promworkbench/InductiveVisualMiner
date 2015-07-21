@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -13,7 +12,6 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.dfgCutFinder.DfgCutFinde
 import org.processmining.plugins.InductiveMiner.dfgOnly.dfgFallThrough.DfgFallThrough;
 import org.processmining.plugins.InductiveMiner.dfgOnly.dfgFallThrough.DfgFallThroughFlower;
 import org.processmining.plugins.InductiveMiner.dfgOnly.dfgSplitter.SimpleDfgSplitter;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.DfgFallThroughSaveDfg;
 
 public class DfgMiningParametersIvMLifecycle extends DfgMiningParameters {
 	public DfgMiningParametersIvMLifecycle() {
@@ -27,7 +25,6 @@ public class DfgMiningParametersIvMLifecycle extends DfgMiningParameters {
 				));
 
 		setDfgFallThroughs(new ArrayList<DfgFallThrough>(Arrays.asList(
-				new DfgFallThroughSaveDfg(new File("d://output")),
 				new DfgFallThroughFlower()
 				)));
 

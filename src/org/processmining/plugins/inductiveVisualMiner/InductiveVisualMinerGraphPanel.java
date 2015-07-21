@@ -11,9 +11,10 @@ import java.util.List;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
-import org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken.GraphVizTokens;
-import org.processmining.plugins.inductiveVisualMiner.animation.graphviztoken.GraphVizTokens.TokenIterator;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 /**
  * This class takes care of the node popups and render an animation
@@ -32,12 +33,13 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 
 	//animation
 	private GraphVizTokens tokens = null;
+	private IvMLogFiltered filteredLog = null;
 	public static final int tokenRadius = 4;
 	public static final Color tokenFillColour = Color.yellow;
 	public static final Color tokenStrokeColour = Color.black;
 	public static final Stroke tokenStroke = new BasicStroke(1.5f);
-	public static final int maxAnimationDuration = 20; //after spending xx ms in drawing circles, just quit.
-	public static final int maxAnimationPausedDuration = 400; //after spending xx ms in drawing circles, just quit.
+	public static final int maxAnimationDuration = 25; //after spending xx ms in drawing circles, just quit.
+	public static final int maxAnimationPausedDuration = 200; //after spending xx ms in drawing circles, just quit.
 
 	private Runnable onAnimationCompleted = null;
 	private InputFunction<Double> onAnimationTimeOut = null;
@@ -63,11 +65,10 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 		if (isEnableAnimation() && tokens != null) {
 
 			//paint tokens
-			int tokensPainted = paintTokens(g, tokens, getAnimationCurrentTime(), true, animationPlaying());
+			double progress = paintTokens(g, tokens, filteredLog, getAnimationCurrentTime(), true, animationPlaying());
 
 			//report whether we finished on time
-			if (tokensPainted < tokens.size()) {
-				double progress = tokensPainted / (tokens.size() * 1.0);
+			if (progress < 1) {
 				if (onAnimationTimeOut != null) {
 					try {
 						onAnimationTimeOut.call(progress);
@@ -117,35 +118,43 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 	 * @param animationPlaying
 	 * @return the last token that was painted
 	 */
-	public static int paintTokens(Graphics2D g, GraphVizTokens tokens, double time, boolean timeOutPossible,
-			boolean animationPlaying) {
-		int result = tokens.size();
+	public static double paintTokens(Graphics2D g, GraphVizTokens tokens, IvMLogFiltered filteredLog, double time,
+			boolean timeOutPossible, boolean animationPlaying) {
 
 		long startTime = System.currentTimeMillis();
 		long nowTime;
+		int countTotal = 0;
+		int countPainted = 0;
+		boolean stillPainting = true;
 
 		Color backupColour = g.getColor();
 		Stroke backupStroke = g.getStroke();
 
 		g.setStroke(tokenStroke);
 
-		TokenIterator it = tokens.getTokensAtTime(time);
+		IteratorWithPosition<Integer> it = tokens.getTokensAtTime(time);
 		while (it.hasNext()) {
 			int tokenIndex = it.next();
-			paintToken(g, tokens, time, tokenIndex);
 
-			nowTime = System.currentTimeMillis() - startTime;
-			if (timeOutPossible
-					&& ((animationPlaying && nowTime > maxAnimationDuration) || nowTime > maxAnimationPausedDuration)) {
-				result = it.getPosition();
-				break;
+			//only paint tokens that are not filtered out
+			if (filteredLog == null || !filteredLog.isFilteredOut(tokens.getTraceIndex(tokenIndex))) {
+				countTotal++;
+				
+				if (stillPainting) {
+					paintToken(g, tokens, time, tokenIndex);
+					countPainted++;
+
+					//see if it's already time to stop
+					nowTime = System.currentTimeMillis() - startTime;
+					stillPainting = !timeOutPossible || !((animationPlaying && nowTime > maxAnimationDuration) || nowTime > maxAnimationPausedDuration);
+				}
 			}
 		}
 
 		g.setColor(backupColour);
 		g.setStroke(backupStroke);
 
-		return result;
+		return countPainted / (countTotal * 1.0);
 	}
 
 	public static void paintToken(Graphics2D g, GraphVizTokens tokens, double time, int tokenIndex) {
@@ -200,6 +209,10 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 
 	public void setTokens(GraphVizTokens tokens) {
 		this.tokens = tokens;
+	}
+
+	public void setFilteredLog(IvMLogFiltered filteredLog) {
+		this.filteredLog = filteredLog;
 	}
 
 	public void setOnAnimationCompleted(Runnable callBack) {

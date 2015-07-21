@@ -1,5 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
+
 import nl.tue.astar.AStarThread.Canceller;
 
 public class Scaler {

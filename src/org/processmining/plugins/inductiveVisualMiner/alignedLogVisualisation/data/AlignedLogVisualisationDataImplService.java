@@ -1,7 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.processtree.ProcessTree;
@@ -10,7 +10,7 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 public class AlignedLogVisualisationDataImplService extends AlignedLogVisualisationDataImplSojourn {
 
 	public AlignedLogVisualisationDataImplService(ProcessTree tree, PerformanceWrapper queueLengths,
-			AlignedLogInfo logInfo) {
+			IvMLogInfo logInfo) {
 		super(tree, queueLengths, logInfo);
 	}
 

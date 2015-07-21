@@ -4,7 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Stroke;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,15 +19,13 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLog;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMLog;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMMove;
-import org.processmining.plugins.inductiveVisualMiner.animation.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -144,12 +141,12 @@ public class TraceView extends SideWindow {
 								public String getLabel() {
 									return log.classify(input).toString();
 								}
-								
+
 								public String getTopLabel() {
 									Long timestamp = TimestampsAdder.getTimestamp(input);
 									return TimestampsAdder.toString(timestamp);
 								}
-								
+
 								public String getBottomLabel() {
 									return log.getLifeCycle(input).toString();
 								}
@@ -186,44 +183,6 @@ public class TraceView extends SideWindow {
 		}
 	}
 
-	private static class AlignedLogTraceBuilder implements TraceBuilder<Object> {
-
-		private final AlignedLog alignedLog;
-
-		public AlignedLogTraceBuilder(AlignedLog alignedLog) {
-			this.alignedLog = alignedLog;
-		}
-
-		public Trace<? extends Event> build(final Object trace) {
-			return new ProMTraceView.Trace<Move>() {
-
-				public Iterator<Move> iterator() {
-					return FluentIterable.from((AlignedTrace) trace).filter(new Predicate<Move>() {
-						public boolean apply(final Move input) {
-							return !((input.isSyncMove() && input.getUnode().getNode() instanceof Automatic) || input.isTauStart());
-						}
-					}).iterator();
-				}
-
-				public String getName() {
-					return alignedLog.getCardinalityOf(trace) + "x";
-				}
-
-				public Color getNameColor() {
-					return Color.white;
-				}
-
-				public String getInfo() {
-					return null;
-				}
-
-				public Color getInfoColor() {
-					return null;
-				}
-			};
-		}
-	}
-
 	private static class TimedLogTraceBuilder implements TraceBuilder<Object> {
 
 		public Trace<? extends Event> build(final Object trace) {
@@ -232,7 +191,8 @@ public class TraceView extends SideWindow {
 				public Iterator<IvMMove> iterator() {
 					return FluentIterable.from((IvMTrace) trace).filter(new Predicate<IvMMove>() {
 						public boolean apply(final IvMMove input) {
-							return !((input.isSyncMove() && input.getUnode().getNode() instanceof Automatic) || input.isTauStart());
+							return !((input.isSyncMove() && input.getUnode().getNode() instanceof Automatic) || input
+									.isTauStart());
 						}
 					}).iterator();
 				}
@@ -305,21 +265,6 @@ public class TraceView extends SideWindow {
 	}
 
 	/**
-	 * update the trace view with an aligned log
-	 * 
-	 * @param alog
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void set(AlignedLog alog) {
-		if (!alog.equals(showing)) {
-			traceView.clear();
-			traceView.setTraceBuilder(new AlignedLogTraceBuilder(alog));
-			traceView.addAll((Collection) alog.toSet());
-		}
-		showing = alog;
-	}
-
-	/**
 	 * update the trace view with a timed log
 	 * 
 	 * @param tlog
@@ -329,7 +274,7 @@ public class TraceView extends SideWindow {
 		if (!tlog.equals(showing)) {
 			traceView.clear();
 			traceView.setTraceBuilder(new TimedLogTraceBuilder());
-			traceView.addAll((Collection) tlog);
+			traceView.addAll((Iterable<Object>) ((Iterable<? extends Object>) tlog));
 		}
 		showing = tlog;
 	}

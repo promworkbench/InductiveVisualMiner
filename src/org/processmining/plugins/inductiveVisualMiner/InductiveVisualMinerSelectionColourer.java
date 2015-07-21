@@ -11,15 +11,15 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationInfo;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.AlignedLogVisualisationParameters;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractTask.Manual;
@@ -33,7 +33,7 @@ import com.kitfox.svg.Text;
 public class InductiveVisualMinerSelectionColourer {
 
 	public static void colourSelection(SVGDiagram diagram, Set<UnfoldedNode> selectedNodes,
-			Set<LogMovePosition> selectedLogMoves, AlignedLogVisualisationInfo visualisationInfo) {
+			Set<LogMovePosition> selectedLogMoves, ProcessTreeVisualisationInfo visualisationInfo) {
 		for (UnfoldedNode unode : selectedNodes) {
 			LocalDotNode dotNode = Animation.getDotNodeFromActivity(unode, visualisationInfo);
 			colourSelectedNode(diagram, dotNode, true);
@@ -79,9 +79,9 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
-	public static TraceViewColourMap colourHighlighting(SVGDiagram svg, AlignedLogVisualisationInfo info,
+	public static TraceViewColourMap colourHighlighting(SVGDiagram svg, ProcessTreeVisualisationInfo info,
 			ProcessTree tree, AlignedLogVisualisationData data,
-			AlignedLogVisualisationParameters visualisationParameters) {
+			ProcessTreeVisualisationParameters visualisationParameters) {
 
 		UnfoldedNode uroot = new UnfoldedNode(tree.getRoot());
 		TraceViewColourMap colourMap = new TraceViewColourMap();
@@ -114,8 +114,8 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	public static Pair<Color, Color> styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg,
-			AlignedLogVisualisationInfo info, Pair<String, Long> cardinality, long minCardinality,
-			long maxCardinality, AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
+			ProcessTreeVisualisationInfo info, Pair<String, Long> cardinality, long minCardinality,
+			long maxCardinality, ProcessTreeVisualisationParameters visualisationParameters) throws SVGException {
 		if (unode.getNode() instanceof Manual) {
 			return styleManual(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
 		} else {
@@ -124,9 +124,9 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
-	private static Pair<Color, Color> styleManual(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
+	private static Pair<Color, Color> styleManual(UnfoldedNode unode, SVGDiagram svg, ProcessTreeVisualisationInfo info,
 			Pair<String, Long> cardinality, long minCardinality, long maxCardinality,
-			AlignedLogVisualisationParameters visualisationParameters) throws SVGException {
+			ProcessTreeVisualisationParameters visualisationParameters) throws SVGException {
 
 		LocalDotNode dotNode = info.getActivityNode(unode);
 
@@ -167,7 +167,7 @@ public class InductiveVisualMinerSelectionColourer {
 		return Pair.of(fillColour, fontColour);
 	}
 
-	private static void styleNonManualNode(UnfoldedNode unode, SVGDiagram svg, AlignedLogVisualisationInfo info,
+	private static void styleNonManualNode(UnfoldedNode unode, SVGDiagram svg, ProcessTreeVisualisationInfo info,
 			Pair<String, Long> cardinality) {
 		//colour non-activity nodes
 		for (LocalDotNode dotNode : info.getNodes(unode)) {
@@ -179,14 +179,14 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
-	private static void styleEdges(SVGDiagram svg, AlignedLogVisualisationInfo info, AlignedLogVisualisationData data,
-			AlignedLogVisualisationParameters parameters, long minCardinality, long maxCardinality) throws SVGException {
+	private static void styleEdges(SVGDiagram svg, ProcessTreeVisualisationInfo info, AlignedLogVisualisationData data,
+			ProcessTreeVisualisationParameters parameters, long minCardinality, long maxCardinality) throws SVGException {
 		styleModelEdges(svg, info, data, parameters, minCardinality, maxCardinality);
 		styleMoveEdges(svg, info, data, parameters, minCardinality, maxCardinality);
 	}
 
-	private static void styleModelEdges(SVGDiagram svg, AlignedLogVisualisationInfo info,
-			AlignedLogVisualisationData data, AlignedLogVisualisationParameters parameters, long minCardinality,
+	private static void styleModelEdges(SVGDiagram svg, ProcessTreeVisualisationInfo info,
+			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters, long minCardinality,
 			long maxCardinality) throws SVGException {
 		for (LocalDotEdge dotEdge : info.getAllModelEdges()) {
 			Pair<String, Long> cardinality = data.getEdgeLabel(dotEdge.getUnode(), false);
@@ -195,8 +195,8 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
-	private static void styleMoveEdges(SVGDiagram svg, AlignedLogVisualisationInfo info,
-			AlignedLogVisualisationData data, AlignedLogVisualisationParameters parameters, long minCardinality,
+	private static void styleMoveEdges(SVGDiagram svg, ProcessTreeVisualisationInfo info,
+			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters, long minCardinality,
 			long maxCardinality) throws SVGException {
 		//style model move edges
 		for (LocalDotEdge dotEdge : info.getAllModelMoveEdges()) {

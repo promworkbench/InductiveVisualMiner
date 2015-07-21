@@ -3,8 +3,8 @@ package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.d
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.processtree.ProcessTree;
@@ -20,7 +20,7 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 	protected final AlignedLogVisualisationData dataForEdges;
 
 	public AlignedLogVisualisationDataImplSojourn(ProcessTree tree, PerformanceWrapper queueLengths,
-			AlignedLogInfo logInfo) {
+			IvMLogInfo logInfo) {
 		this.queueLengths = queueLengths;
 		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(tree, logInfo);
 

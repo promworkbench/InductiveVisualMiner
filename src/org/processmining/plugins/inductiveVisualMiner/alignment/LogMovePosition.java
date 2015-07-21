@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class LogMovePosition {
