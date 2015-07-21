@@ -28,6 +28,8 @@ public class Cl09Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 		//compute times
 		TObjectDoubleHashMap<UnfoldedNode> waitingTimes = new TObjectDoubleHashMap<ProcessTree2Petrinet.UnfoldedNode>(
 				10, 0.5f, -1);
+		TObjectDoubleHashMap<UnfoldedNode> queueingTimes = new TObjectDoubleHashMap<ProcessTree2Petrinet.UnfoldedNode>(
+				10, 0.5f, -1);
 		TObjectDoubleHashMap<UnfoldedNode> serviceTimes = new TObjectDoubleHashMap<ProcessTree2Petrinet.UnfoldedNode>(
 				10, 0.5f, -1);
 		TObjectDoubleHashMap<UnfoldedNode> sojournTimes = new TObjectDoubleHashMap<ProcessTree2Petrinet.UnfoldedNode>(
@@ -36,6 +38,8 @@ public class Cl09Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 			QueueActivityLog activityLog = queueActivityLogs.get(unode);
 			long sumWaiting = 0;
 			int countWaiting = 0;
+			long sumQueueing = 0;
+			int countQueueing = 0;
 			long sumService = 0;
 			int countService = 0;
 			long sumSojourn = 0;
@@ -46,6 +50,12 @@ public class Cl09Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 				if (activityLog.hasInitiate(i) && activityLog.hasStart(i)) {
 					sumWaiting += activityLog.getStart(i) - activityLog.getInitiate(i);
 					countWaiting++;
+				}
+				
+				//queueing time
+				if (activityLog.hasEnqueue(i) && activityLog.hasStart(i)) {
+					sumQueueing += activityLog.getStart(i) - activityLog.getEnqueue(i);
+					countQueueing++;
 				}
 
 				//service time
@@ -61,11 +71,12 @@ public class Cl09Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 				}
 			}
 			waitingTimes.put(unode, sumWaiting / (countWaiting * 1.0));
+			queueingTimes.put(unode, sumQueueing / (countQueueing * 1.0));
 			serviceTimes.put(unode, sumService / (countService * 1.0));
 			sojournTimes.put(unode, sumSojourn / (countSojourn * 1.0));
 		}
 
-		return new PerformanceWrapper(method, queueActivityLogs, waitingTimes, serviceTimes, sojournTimes);
+		return new PerformanceWrapper(method, queueActivityLogs, waitingTimes, queueingTimes, serviceTimes, sojournTimes);
 	}
 
 	protected void processResult(PerformanceWrapper result, InductiveVisualMinerState state) {

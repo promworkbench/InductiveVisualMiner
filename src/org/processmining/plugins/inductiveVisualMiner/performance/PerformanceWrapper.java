@@ -10,15 +10,17 @@ public class PerformanceWrapper {
 
 	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
 	private final TObjectDoubleMap<UnfoldedNode> waitingTimes;
+	private final TObjectDoubleMap<UnfoldedNode> queueingTimes;
 	private final TObjectDoubleMap<UnfoldedNode> serviceTimes;
 	private final TObjectDoubleMap<UnfoldedNode> sojournTimes;
 	private final QueueLengths lengths;
 
 	public PerformanceWrapper(QueueLengths lengths, Map<UnfoldedNode, QueueActivityLog> queueActivityLogs,
-			TObjectDoubleMap<UnfoldedNode> waitingTimes, TObjectDoubleMap<UnfoldedNode> serviceTimes,
-			TObjectDoubleMap<UnfoldedNode> sojournTimes) {
+			TObjectDoubleMap<UnfoldedNode> waitingTimes, TObjectDoubleMap<UnfoldedNode> queueingTimes,
+			TObjectDoubleMap<UnfoldedNode> serviceTimes, TObjectDoubleMap<UnfoldedNode> sojournTimes) {
 		this.lengths = lengths;
 		this.waitingTimes = waitingTimes;
+		this.queueingTimes = queueingTimes;
 		this.serviceTimes = serviceTimes;
 		this.sojournTimes = sojournTimes;
 		this.queueActivityLogs = queueActivityLogs;
@@ -30,6 +32,10 @@ public class PerformanceWrapper {
 
 	public double getWaitingTime(UnfoldedNode unode) {
 		return waitingTimes.get(unode);
+	}
+
+	public double getQueueingTime(UnfoldedNode unode) {
+		return queueingTimes.get(unode);
 	}
 
 	public double getServiceTime(UnfoldedNode unode) {

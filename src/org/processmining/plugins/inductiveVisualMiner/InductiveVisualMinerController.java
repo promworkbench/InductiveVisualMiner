@@ -290,6 +290,7 @@ public class InductiveVisualMinerController {
 					setStatus(" ");
 					updateHighlighting();
 					updatePopup();
+					panel.getGraph().repaint();
 				}
 			});
 			q.setOnException(onException);
@@ -590,6 +591,18 @@ public class InductiveVisualMinerController {
 									+ Performance.timeToString((long) state.getPerformance().getWaitingTime(unode)));
 						} else {
 							popup.add("average waiting time  -");
+						}
+					} else {
+						popup.add(" ");
+					}
+					
+					//queueing time
+					if (state.isPerformanceReady()) {
+						if (state.getPerformance().getWaitingTime(unode) > -0.1) {
+							popup.add("average queueing time "
+									+ Performance.timeToString((long) state.getPerformance().getQueueingTime(unode)));
+						} else {
+							popup.add("average queueing time -");
 						}
 					} else {
 						popup.add(" ");
