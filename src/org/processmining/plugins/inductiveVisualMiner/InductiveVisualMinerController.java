@@ -221,7 +221,7 @@ public class InductiveVisualMinerController {
 
 		//animate
 		{
-			Cl07Animate a = new Cl07Animate();
+			Cl07Animate a = new Cl07Animate(state, panel);
 			a.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setEnableAnimation(false);
@@ -232,11 +232,7 @@ public class InductiveVisualMinerController {
 			});
 			a.setOnComplete(new Runnable() {
 				public void run() {
-					panel.getSaveImageButton().setText("animation");
-					panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
-					panel.getGraph().setAnimationExtremeTimes(state.getAnimationScaler().getMinInUserTime(),
-							state.getAnimationScaler().getMaxInUserTime());
-					panel.getGraph().setEnableAnimation(true);
+					//this is located in the chainlink
 				}
 			});
 			a.setOnException(onException);
@@ -268,6 +264,7 @@ public class InductiveVisualMinerController {
 					
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(state.getIvMLogFiltered());
+					panel.getGraph().renderAnimationFrame();
 
 					panel.repaint();
 				}
@@ -377,7 +374,7 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		//animation succeeded
+		//set animation succeeded
 		panel.getGraph().setOnAnimationCompleted(new Runnable() {
 			public void run() {
 				state.setAnimationCompleted(1);
@@ -386,7 +383,7 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		//animation timed out
+		//set animation timed out
 		panel.getGraph().setOnAnimationTimeOut(new InputFunction<Double>() {
 			public void call(Double animationCompleted) throws Exception {
 				state.setAnimationCompleted(animationCompleted);
@@ -506,6 +503,10 @@ public class InductiveVisualMinerController {
 				if (panel.getGraph().isEnableAnimation()) {
 					long logTime = Math.round(state.getAnimationScaler().userTime2LogTime(userTime));
 					panel.getAnimationTimeLabel().setText(TimestampsAdder.toString(logTime));
+					
+					if (!panel.getGraph().isAnimationPlaying()) {
+						panel.getGraph().renderAnimationFrame();
+					}
 
 					//draw queues
 					if (state.getMode().isUpdateWithTimeStep(state)) {

@@ -16,7 +16,6 @@ import java.util.Map;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.PersistentlyOrderedSet;
 
 import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.animation.Bezier;
@@ -32,24 +31,20 @@ public class GraphVizTokens {
 
 	private final TDoubleArrayList startTimes;
 	private final TDoubleArrayList endTimes;
-	private final TDoubleArrayList startOpacities;
-	private final TDoubleArrayList endOpacities;
 	private final TIntArrayList tracePointers;
 
 	private final TIntArrayList bezierPointers;
-	private final PersistentlyOrderedSet<Bezier, AffineTransform, AffineTransform> beziers;
+	private final BezierList beziers;
 
 	private final Map<String, Pair<List<Bezier>, Double>> pathCache;
 
 	public GraphVizTokens() {
 		startTimes = new TDoubleArrayList();
 		endTimes = new TDoubleArrayList();
-		startOpacities = new TDoubleArrayList();
-		endOpacities = new TDoubleArrayList();
 		tracePointers = new TIntArrayList();
 
 		bezierPointers = new TIntArrayList();
-		beziers = new PersistentlyOrderedSet<>();
+		beziers = new BezierList();
 
 		pathCache = new THashMap<>();
 	}
@@ -108,10 +103,8 @@ public class GraphVizTokens {
 			AffineTransform transform, int traceIndex) throws NoninvertibleTransformException {
 		startTimes.add(beginTime);
 		endTimes.add(endTime);
-		startOpacities.add(startOpacity);
 		tracePointers.add(traceIndex);
-		endOpacities.add(endOpacity);
-		bezierPointers.add(beziers.add(bezier, transform, transform.createInverse()));
+		bezierPointers.add(beziers.add(bezier, transform, transform.createInverse(), startOpacity, endOpacity));
 	}
 
 	public void cleanUp() {
@@ -158,11 +151,11 @@ public class GraphVizTokens {
 	}
 
 	public AffineTransform getTransform(int tokenIndex) {
-		return beziers.getPayload1(bezierPointers.get(tokenIndex));
+		return beziers.getTransform(bezierPointers.get(tokenIndex));
 	}
 
 	public AffineTransform getTransformInverse(int tokenIndex) {
-		return beziers.getPayload2(bezierPointers.get(tokenIndex));
+		return beziers.getTransformInverse(bezierPointers.get(tokenIndex));
 	}
 
 	public double getStart(int tokenIndex) {
@@ -258,14 +251,16 @@ public class GraphVizTokens {
 		//normalise how far we are on the bezier to [0..1]
 		double t = (time - startTimes.get(tokenIndex)) / (endTimes.get(tokenIndex) - startTimes.get(tokenIndex));
 
+		int bezier = bezierPointers.get(tokenIndex);
+
 		//compute the position
 		Point2D.Double point = new Point2D.Double();
-		beziers.get(bezierPointers.get(tokenIndex)).eval(t, point);
+		beziers.getBezier(bezier).eval(t, point);
 
 		//compute opacity
 		double opacity = 1;
-		double startOpacity = startOpacities.get(tokenIndex);
-		double endOpacity = endOpacities.get(tokenIndex);
+		double startOpacity = beziers.getStartOpacity(bezier);
+		double endOpacity = beziers.getEndOpacity(bezier);
 		if (startOpacity == 1 && endOpacity == 1) {
 
 		} else if (startOpacity == 0 && endOpacity == 0) {
@@ -279,5 +274,104 @@ public class GraphVizTokens {
 
 	public int size() {
 		return startTimes.size();
+	}
+
+	//build-in no-object creating iterator
+	private double itTime;
+	private int itNext;
+	private int itNow;
+	private int itBezierPointer;
+	private double itOpacity;
+	private double itX;
+	private double itY;
+
+	public void itInit(double time) {
+		itTime = time;
+		itNext = itGetNext(0);
+		itNow = itNext - 1;
+	}
+
+	private int itGetNext(int i) {
+		while (i < startTimes.size() && (startTimes.get(i) > itTime || itTime > endTimes.get(i))) {
+			i++;
+		}
+		return i;
+	}
+
+	public Integer itNext() {
+		itNow = itNext;
+		itNext = itGetNext(itNext + 1);
+		return itNow;
+	}
+
+	public boolean itHasNext() {
+		return itNext < startTimes.size();
+	}
+
+	public int itGetPosition() {
+		return itNext;
+	}
+
+	private double itT;
+	public void itEval() {
+		//normalise how far we are on the current bezier to [0..1]
+		itT = (itTime - startTimes.get(itNow)) / (endTimes.get(itNow) - startTimes.get(itNow));
+
+		itBezierPointer = bezierPointers.get(itNow);
+
+		//compute the position
+		Point2D.Double point = new Point2D.Double();
+		beziers.getBezier(itBezierPointer).eval(itT, point);
+		itX = point.getX();
+		itY = point.getY();
+
+		//compute opacity
+		if (beziers.getStartOpacity(itBezierPointer) == 1 && beziers.getEndOpacity(itBezierPointer) == 1) {
+			itOpacity = 1;
+		} else if (beziers.getStartOpacity(itBezierPointer) == 0 && beziers.getEndOpacity(itBezierPointer) == 0) {
+			itOpacity = Math.abs(itT - 0.5) * 2;
+		} else {
+			itOpacity = (1 - itT) * beziers.getStartOpacity(itBezierPointer) + itT * beziers.getEndOpacity(itBezierPointer);
+		}
+	}
+	
+	/**
+	 * 
+	 * @return the opacity of the last bezier itEval() was called on.
+	 */
+	public double itGetOpacity() {
+		return itOpacity;
+	}
+	
+	/**
+	 * 
+	 * @return the x of the last bezier itEval() was called on.
+	 */
+	public double itGetX() {
+		return itX;
+	}
+	
+	/**
+	 * 
+	 * @return the y of the last bezier itEval() was called on.
+	 */
+	public double itGetY() {
+		return itY;
+	}
+	
+	/**
+	 * 
+	 * @return the current trace index.
+	 */
+	public int itGetTraceIndex() {
+		return tracePointers.get(itNow);
+	}
+	
+	public AffineTransform itGetTransform() {
+		return getTransform(itNow);
+	}
+	
+	public AffineTransform itGetTransformInverse() {
+		return getTransformInverse(itNow);
 	}
 }

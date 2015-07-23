@@ -64,6 +64,8 @@ public class ComputeAnimation {
 		if (canceller.isCancelled()) {
 			return null;
 		}
+		
+		System.out.println("animation completed " + graphVizTokens.size());
 
 		return Pair.of(scaler, graphVizTokens);
 	}

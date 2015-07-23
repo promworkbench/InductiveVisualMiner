@@ -84,7 +84,7 @@ public class QueueLengthsImplCLIComplete extends QueueLengths {
 
 	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
 		if (l.getInitiate(traceIndex) > 0 && l.getComplete(traceIndex) > 0 && l.getInitiate(traceIndex) <= time
-				&& time <= l.getComplete(traceIndex)) {
+				&& time <= l.getComplete(traceIndex) && clusters.containsKey(unode)) {
 			Cluster[] cs = clusters.get(unode);
 			double priorA = priors.get(unode);
 			long xI = time - l.getInitiate(traceIndex);

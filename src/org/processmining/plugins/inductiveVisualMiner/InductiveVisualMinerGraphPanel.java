@@ -1,19 +1,29 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Stroke;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.util.List;
 
-import org.processmining.plugins.InductiveMiner.Triple;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Timer;
+
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
+import org.processmining.plugins.graphviz.visualisation.Transformation;
+import org.processmining.plugins.graphviz.visualisation.ZoomPan;
+import org.processmining.plugins.graphviz.visualisation.ZoomPanState;
+import org.processmining.plugins.graphviz.visualisation.listeners.ZoomPanChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.animation.AnimationRenderer;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.RenderingThread;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 /**
@@ -34,23 +44,71 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 	//animation
 	private GraphVizTokens tokens = null;
 	private IvMLogFiltered filteredLog = null;
-	public static final int tokenRadius = 4;
-	public static final Color tokenFillColour = Color.yellow;
-	public static final Color tokenStrokeColour = Color.black;
-	public static final Stroke tokenStroke = new BasicStroke(1.5f);
-	public static final int maxAnimationDuration = 20; //after spending xx ms in drawing circles, just quit.
-	public static final int maxAnimationPausedDuration = 200; //after spending xx ms in drawing circles, just quit.
+	private BufferedImage animationImage = null; //this is the lastly rendered animation image
+	RenderingThread renderingThread;
 
+	private AnimationRenderer animationRenderer = new AnimationRenderer(
+			new InputFunction<Pair<Double, BufferedImage>>() {
+				public void call(Pair<Double, BufferedImage> result) throws Exception {
+					animationFrameComplete(result.getA(), result.getB());
+				}
+			});
 	private Runnable onAnimationCompleted = null;
 	private InputFunction<Double> onAnimationTimeOut = null;
 
+	//animation buffer
+	private Action timeStepAction2 = new AbstractAction() {
+		private static final long serialVersionUID = -7525967531724409532L;
+
+		public void actionPerformed(ActionEvent arg0) {
+
+			if (isAnimationPlaying()) {
+				renderAnimationFrame();
+			}
+		}
+	};
+	private Timer animationTimer2 = new Timer(30, timeStepAction2);
+
 	public InductiveVisualMinerGraphPanel() {
 		super(getSplashScreen());
+		animationTimer2.start();
+
+		renderingThread = new RenderingThread(0, 180, 0, 0);
+
+		//set up listener for zooming and panning
+		setZoomPanChangedListener(new ZoomPanChangedListener() {
+			public void zoomPanChanged(ZoomPanState zoomPanState) {
+				//if we are panning, we need to rerender.
+				if (isAnimationEnabled()) {
+					animationImage = null;
+					animationRenderer.cancelAsynchronousRendering();
+					if (isAnimationPlaying()) {
+						//if the animation is playing anyway, there's no need to trigger a render.
+					} else {
+						renderAnimationFrame();
+					}
+				}
+			}
+		});
 	}
+
+	
+	boolean initialised = false;
 
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
+
+		if (!initialised) {
+			renderingThread.resizeTo(getWidth(), getHeight());
+			renderingThread.start();
+			initialised = true;
+		}
+
+		if (animationImage != null && isAnimationEnabled()) {
+			Rectangle bb = getVisibleImageBoundingBoxInUserCoordinates();
+			g.drawImage(animationImage, (int) bb.getX(), (int) bb.getY(), null);
+		}
 
 		//draw a pop-up if the mouse is over a node
 		if (showPopup && popupText != null) {
@@ -61,27 +119,6 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 	@Override
 	public void paintImage(Graphics2D g) {
 		super.paintImage(g);
-
-		if (isEnableAnimation() && tokens != null) {
-
-			//paint tokens
-			double progress = paintTokens(g, tokens, filteredLog, getAnimationCurrentTime(), true, animationPlaying());
-
-			//report whether we finished on time
-			if (progress < 1) {
-				if (onAnimationTimeOut != null) {
-					try {
-						onAnimationTimeOut.call(progress);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			} else {
-				if (onAnimationCompleted != null) {
-					onAnimationCompleted.run();
-				}
-			}
-		}
 	}
 
 	public void paintPopup(Graphics2D g) {
@@ -109,83 +146,36 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 	}
 
 	/**
-	 * Paints tokens
-	 * 
-	 * @param g
-	 * @param tokens
-	 * @param time
-	 * @param timeOutPossible
-	 * @param animationPlaying
-	 * @return the last token that was painted
+	 * Render an animation frame.
 	 */
-	public static double paintTokens(Graphics2D g, GraphVizTokens tokens, IvMLogFiltered filteredLog, double time,
-			boolean timeOutPossible, boolean animationPlaying) {
+	public void renderAnimationFrame() {
+		if (tokens != null && filteredLog != null) {
+			//paint on it
+			Transformation t = ZoomPan.getImage2PanelTransformation(image, panel);
+			animationRenderer.paintAsynchronous(tokens, filteredLog, getAnimationCurrentTime(), true,
+					isAnimationPlaying(), getVisibleImageBoundingBoxInUserCoordinates(),
+					getImageBoundingBoxInUserCoordinates(), t, state.getZoomPanState());
+		}
+	}
 
-		long startTime = System.currentTimeMillis();
-		long nowTime;
-		int countTotal = 0;
-		int countPainted = 0;
-		boolean stillPainting = true;
+	public void animationFrameComplete(double progress, BufferedImage image) {
+		animationImage = image;
 
-		Color backupColour = g.getColor();
-		Stroke backupStroke = g.getStroke();
-
-		g.setStroke(tokenStroke);
-
-		IteratorWithPosition<Integer> it = tokens.getTokensAtTime(time);
-		while (it.hasNext()) {
-			int tokenIndex = it.next();
-
-			//only paint tokens that are not filtered out
-			if (filteredLog == null || !filteredLog.isFilteredOut(tokens.getTraceIndex(tokenIndex))) {
-				countTotal++;
-				
-				if (stillPainting) {
-					paintToken(g, tokens, time, tokenIndex);
-					countPainted++;
-
-					//see if it's already time to stop
-					nowTime = System.currentTimeMillis() - startTime;
-					stillPainting = !timeOutPossible || !((animationPlaying && nowTime > maxAnimationDuration) || nowTime > maxAnimationPausedDuration);
+		if (progress < 1) {
+			if (onAnimationTimeOut != null) {
+				try {
+					onAnimationTimeOut.call(progress);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
+			}
+		} else {
+			if (onAnimationCompleted != null) {
+				onAnimationCompleted.run();
 			}
 		}
 
-		g.setColor(backupColour);
-		g.setStroke(backupStroke);
-
-		return countPainted / (countTotal * 1.0);
-	}
-
-	public static void paintToken(Graphics2D g, GraphVizTokens tokens, double time, int tokenIndex) {
-		//ask for the point
-		Triple<Double, Double, Double> point = tokens.eval(tokenIndex, time);
-
-		g.transform(tokens.getTransform(tokenIndex));
-
-		g.translate(point.getA(), point.getB());
-
-		//draw the oval
-		if (point.getC() == 1) {
-			g.setPaint(tokenFillColour);
-		} else {
-			g.setPaint(new Color(tokenFillColour.getRed(), tokenFillColour.getGreen(), tokenFillColour.getBlue(),
-					(int) Math.round(point.getC() * 255)));
-		}
-		g.fillOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
-
-		//draw the fill
-		if (point.getC() == 1) {
-			g.setColor(tokenStrokeColour);
-		} else {
-			g.setColor(new Color(tokenStrokeColour.getRed(), tokenStrokeColour.getGreen(), tokenStrokeColour.getBlue(),
-					(int) Math.round(point.getC() * 255)));
-		}
-		g.drawOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
-
-		g.translate(-point.getA(), -point.getB());
-
-		g.transform(tokens.getTransformInverse(tokenIndex));
+		repaint();
 	}
 
 	public void setPopup(List<String> popup) {
@@ -209,10 +199,12 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 
 	public void setTokens(GraphVizTokens tokens) {
 		this.tokens = tokens;
+		renderingThread.setTokens(tokens);
 	}
 
 	public void setFilteredLog(IvMLogFiltered filteredLog) {
 		this.filteredLog = filteredLog;
+		renderingThread.setFilteredLog(filteredLog);
 	}
 
 	public void setOnAnimationCompleted(Runnable callBack) {

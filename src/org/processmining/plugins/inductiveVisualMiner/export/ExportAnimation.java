@@ -26,7 +26,7 @@ import org.monte.media.math.Rational;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerGraphPanel;
+import org.processmining.plugins.inductiveVisualMiner.animation.AnimationRenderer;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -113,7 +113,7 @@ public class ExportAnimation {
 				g.transform(transform);
 				
 				//paint the tokens
-				InductiveVisualMinerGraphPanel.paintTokens(g, tokens, null, time, false, false);
+				AnimationRenderer.paintTokens(g, tokens, null, time, false, false, canceller);
 				
 				g.transform(transformInverse);
 
