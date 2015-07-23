@@ -9,7 +9,10 @@ import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.Transparency;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+
+import javax.swing.SwingUtilities;
 
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
@@ -48,6 +51,7 @@ public class RenderingThread implements Runnable {
 		//rendering variables
 		IvMLogFiltered filteredLog;
 		GraphVizTokens tokens;
+		AffineTransform transform;
 
 		public Settings clone() {
 			Settings result = new Settings();
@@ -57,6 +61,7 @@ public class RenderingThread implements Runnable {
 			result.maxTime = maxTime;
 			result.filteredLog = filteredLog;
 			result.tokens = tokens;
+			result.transform = transform;
 			return result;
 		}
 	}
@@ -71,15 +76,27 @@ public class RenderingThread implements Runnable {
 	private long lastUpdated; //in ms
 	private double time; //in s
 
-	public RenderingThread(int minTime, int maxTime, int width, int height) {
+	private final Runnable onFrameComplete;
+
+	/**
+	 * Initialise the rendering thread. To function, it will need calls to
+	 * setSize(), setTokens(), setFilteredLog() and start().
+	 * 
+	 * @param minTime
+	 * @param maxTime
+	 * @param onFrameComplete
+	 */
+	public RenderingThread(int minTime, int maxTime, Runnable onFrameComplete) {
 		settings.minTime = minTime;
 		settings.maxTime = maxTime;
-		settings.width = width;
-		settings.height = height;
+		settings.width = 0;
+		settings.height = 0;
 
 		now = System.currentTimeMillis();
 		lastUpdated = System.currentTimeMillis();
 		time = minTime;
+
+		this.onFrameComplete = onFrameComplete;
 	}
 
 	//settings handling
@@ -90,7 +107,7 @@ public class RenderingThread implements Runnable {
 	 * @param width
 	 * @param height
 	 */
-	public void resizeTo(int width, int height) {
+	public void setSize(int width, int height) {
 		Settings s = getNewSettings();
 		s.width = width;
 		s.height = height;
@@ -108,9 +125,25 @@ public class RenderingThread implements Runnable {
 		newSettings = s;
 	}
 
+	/**
+	 * Set the log, which denotes which tokens should be drawn.
+	 * 
+	 * @param filteredLog
+	 */
 	public void setFilteredLog(IvMLogFiltered filteredLog) {
 		Settings s = getNewSettings();
 		s.filteredLog = filteredLog;
+		newSettings = s;
+	}
+
+	/**
+	 * Set a new transformation
+	 * 
+	 * @param transform
+	 */
+	public void setImageTransformation(AffineTransform transform) {
+		Settings s = getNewSettings();
+		s.transform = transform;
 		newSettings = s;
 	}
 
@@ -197,7 +230,15 @@ public class RenderingThread implements Runnable {
 	private final static Color backgroundColor = new Color(255, 255, 255, 0);
 
 	public void render() {
-		if (settings.filteredLog != null && settings.tokens != null) {
+		if (newSettings != null) {
+			synchronized (this) {
+				settings = newSettings;
+				newSettings = null;
+			}
+		}
+
+		if (settings.filteredLog != null && settings.tokens != null && settings.transform != null) {
+
 			//resize the image if necessary
 			if (internalResult.image == null || internalResult.image.getWidth() != settings.width
 					|| internalResult.image.getHeight() != settings.height) {
@@ -212,13 +253,24 @@ public class RenderingThread implements Runnable {
 				internalResult.graphics = internalResult.image.createGraphics();
 				internalResult.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 						RenderingHints.VALUE_ANTIALIAS_ON);
+
+				internalResult.graphics.setBackground(backgroundColor);
 			}
+
+			//clear the background
+			internalResult.graphics.clearRect(0, 0, internalResult.image.getWidth(), internalResult.image.getHeight());
+
+			//transform
+			internalResult.graphics.setTransform(settings.transform);
 
 			//compute the next timestep
 			takeTimeStep();
 
 			//render the tokens		
 			renderTokens();
+
+			//transform back
+			internalResult.graphics.setTransform(new AffineTransform());
 		}
 
 		//rendering done, swap the images
@@ -227,12 +279,9 @@ public class RenderingThread implements Runnable {
 			externalResult = internalResult;
 			internalResult = swapResult;
 			swapResult = null;
-
-			if (newSettings != null) {
-				settings = newSettings;
-				newSettings = null;
-			}
 		}
+
+		SwingUtilities.invokeLater(onFrameComplete);
 	}
 
 	private void takeTimeStep() {
@@ -245,10 +294,6 @@ public class RenderingThread implements Runnable {
 	}
 
 	private void renderTokens() {
-		//clear the background
-		internalResult.graphics.setBackground(backgroundColor);
-		internalResult.graphics.clearRect(0, 0, settings.width, settings.height);
-
 		internalResult.graphics.setStroke(tokenStroke);
 
 		settings.tokens.itInit(time);

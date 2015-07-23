@@ -254,7 +254,7 @@ public class InductiveVisualMinerController {
 					state.resetPerformance();
 
 					ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
-							state.getSelectedLogMoves(), state.getColouringFilters(), state.getAnimationCompleted());
+							state.getSelectedLogMoves(), state.getColouringFilters());
 
 					//tell trace view the colour map and the selection
 					panel.getTraceView().set(state.getIvMLogFiltered());
@@ -264,7 +264,6 @@ public class InductiveVisualMinerController {
 					
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(state.getIvMLogFiltered());
-					panel.getGraph().renderAnimationFrame();
 
 					panel.repaint();
 				}
@@ -371,24 +370,6 @@ public class InductiveVisualMinerController {
 			public void call(GraphDirection input) throws Exception {
 				state.setGraphDirection(input);
 				chain.execute(Cl06LayoutWithAlignment.class);
-			}
-		});
-
-		//set animation succeeded
-		panel.getGraph().setOnAnimationCompleted(new Runnable() {
-			public void run() {
-				state.setAnimationCompleted(1);
-				ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
-						state.getSelectedLogMoves(), state.getColouringFilters(), state.getAnimationCompleted());
-			}
-		});
-
-		//set animation timed out
-		panel.getGraph().setOnAnimationTimeOut(new InputFunction<Double>() {
-			public void call(Double animationCompleted) throws Exception {
-				state.setAnimationCompleted(animationCompleted);
-				ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
-						state.getSelectedLogMoves(), state.getColouringFilters(), state.getAnimationCompleted());
 			}
 		});
 
@@ -500,13 +481,9 @@ public class InductiveVisualMinerController {
 		//set animation time updater
 		panel.getGraph().setTimeStepCallback(new Callback<Double, Object>() {
 			public Object call(Double userTime) {
-				if (panel.getGraph().isEnableAnimation()) {
+				if (panel.getGraph().isAnimationEnabled()) {
 					long logTime = Math.round(state.getAnimationScaler().userTime2LogTime(userTime));
 					panel.getAnimationTimeLabel().setText(TimestampsAdder.toString(logTime));
-					
-					if (!panel.getGraph().isAnimationPlaying()) {
-						panel.getGraph().renderAnimationFrame();
-					}
 
 					//draw queues
 					if (state.getMode().isUpdateWithTimeStep(state)) {

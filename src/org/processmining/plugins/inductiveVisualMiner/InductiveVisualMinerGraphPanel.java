@@ -4,26 +4,17 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Timer;
-
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
-import org.processmining.plugins.graphviz.visualisation.Transformation;
-import org.processmining.plugins.graphviz.visualisation.ZoomPan;
-import org.processmining.plugins.graphviz.visualisation.ZoomPanState;
-import org.processmining.plugins.graphviz.visualisation.listeners.ZoomPanChangedListener;
-import org.processmining.plugins.inductiveVisualMiner.animation.AnimationRenderer;
+import org.processmining.plugins.graphviz.visualisation.listeners.ImageTransformationChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.RenderingThread;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 /**
@@ -42,72 +33,44 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 	public static final int popupWidth = 300;
 
 	//animation
-	private GraphVizTokens tokens = null;
-	private IvMLogFiltered filteredLog = null;
 	private BufferedImage animationImage = null; //this is the lastly rendered animation image
 	RenderingThread renderingThread;
 
-	private AnimationRenderer animationRenderer = new AnimationRenderer(
-			new InputFunction<Pair<Double, BufferedImage>>() {
-				public void call(Pair<Double, BufferedImage> result) throws Exception {
-					animationFrameComplete(result.getA(), result.getB());
-				}
-			});
-	private Runnable onAnimationCompleted = null;
-	private InputFunction<Double> onAnimationTimeOut = null;
-
-	//animation buffer
-	private Action timeStepAction2 = new AbstractAction() {
-		private static final long serialVersionUID = -7525967531724409532L;
-
-		public void actionPerformed(ActionEvent arg0) {
-
-			if (isAnimationPlaying()) {
-				renderAnimationFrame();
-			}
-		}
-	};
-	private Timer animationTimer2 = new Timer(30, timeStepAction2);
-
 	public InductiveVisualMinerGraphPanel() {
 		super(getSplashScreen());
-		animationTimer2.start();
 
-		renderingThread = new RenderingThread(0, 180, 0, 0);
+		renderingThread = new RenderingThread(0, 180, new Runnable() {
 
-		//set up listener for zooming and panning
-		setZoomPanChangedListener(new ZoomPanChangedListener() {
-			public void zoomPanChanged(ZoomPanState zoomPanState) {
-				//if we are panning, we need to rerender.
-				if (isAnimationEnabled()) {
-					animationImage = null;
-					animationRenderer.cancelAsynchronousRendering();
-					if (isAnimationPlaying()) {
-						//if the animation is playing anyway, there's no need to trigger a render.
-					} else {
-						renderAnimationFrame();
-					}
-				}
+			//set up callbak for animation frame complete
+			public void run() {
+				repaint();
+			}
+		});
+		renderingThread.start();
+
+		//set up listener for image transformation (zooming, panning, resizing) changes
+		setImageTransformationChangedListener(new ImageTransformationChangedListener() {
+			public void imageTransformationChanged(AffineTransform image2user, AffineTransform user2image) {
+				renderingThread.setImageTransformation(image2user);
+			}
+		});
+
+		//set up listener for resizing
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				renderingThread.setSize(getWidth(), getHeight());
 			}
 		});
 	}
 
-	
 	boolean initialised = false;
 
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		if (!initialised) {
-			renderingThread.resizeTo(getWidth(), getHeight());
-			renderingThread.start();
-			initialised = true;
-		}
-
-		if (animationImage != null && isAnimationEnabled()) {
-			Rectangle bb = getVisibleImageBoundingBoxInUserCoordinates();
-			g.drawImage(animationImage, (int) bb.getX(), (int) bb.getY(), null);
+		if (renderingThread.getLastRenderedImage() != null && isAnimationEnabled()) {
+			g.drawImage(renderingThread.getLastRenderedImage(), 0, 0, null);
 		}
 
 		//draw a pop-up if the mouse is over a node
@@ -145,39 +108,6 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 		g.setFont(backupFont);
 	}
 
-	/**
-	 * Render an animation frame.
-	 */
-	public void renderAnimationFrame() {
-		if (tokens != null && filteredLog != null) {
-			//paint on it
-			Transformation t = ZoomPan.getImage2PanelTransformation(image, panel);
-			animationRenderer.paintAsynchronous(tokens, filteredLog, getAnimationCurrentTime(), true,
-					isAnimationPlaying(), getVisibleImageBoundingBoxInUserCoordinates(),
-					getImageBoundingBoxInUserCoordinates(), t, state.getZoomPanState());
-		}
-	}
-
-	public void animationFrameComplete(double progress, BufferedImage image) {
-		animationImage = image;
-
-		if (progress < 1) {
-			if (onAnimationTimeOut != null) {
-				try {
-					onAnimationTimeOut.call(progress);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		} else {
-			if (onAnimationCompleted != null) {
-				onAnimationCompleted.run();
-			}
-		}
-
-		repaint();
-	}
-
 	public void setPopup(List<String> popup) {
 		this.popupText = popup;
 	}
@@ -198,20 +128,10 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 	}
 
 	public void setTokens(GraphVizTokens tokens) {
-		this.tokens = tokens;
 		renderingThread.setTokens(tokens);
 	}
 
 	public void setFilteredLog(IvMLogFiltered filteredLog) {
-		this.filteredLog = filteredLog;
 		renderingThread.setFilteredLog(filteredLog);
-	}
-
-	public void setOnAnimationCompleted(Runnable callBack) {
-		this.onAnimationCompleted = callBack;
-	}
-
-	public void setOnAnimationTimeOut(InputFunction<Double> callBack) {
-		this.onAnimationTimeOut = callBack;
 	}
 }
