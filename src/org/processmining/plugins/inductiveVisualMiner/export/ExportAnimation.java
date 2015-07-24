@@ -26,15 +26,30 @@ import org.monte.media.math.Rational;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
-import org.processmining.plugins.inductiveVisualMiner.animation.AnimationRenderer;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIterator;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensLazyIterator;
+import org.processmining.plugins.inductiveVisualMiner.animation.RenderingThread;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 import com.kitfox.svg.SVGDiagram;
 
 public class ExportAnimation {
+	
+	public static class DummyIvMFilteredLog implements IvMLogFilter {
+
+		public boolean isSomethingFiltered() {
+			return false;
+		}
+
+		public boolean isFilteredOut(int traceIndex) {
+			return false;
+		}
+		
+	}
 
 	public static boolean saveAVItoFile(GraphVizTokens tokens, final ProcessTreeVisualisationInfo info,
 			final Mode colourMode, final SVGDiagram svg, final Dot dot, final File file, final JPanel panel,
@@ -99,6 +114,9 @@ public class ExportAnimation {
 			AffineTransform transform = new AffineTransform();
 			transform.scale(height / svg.getHeight(), height / svg.getHeight());
 			AffineTransform transformInverse = transform.createInverse();
+			
+			IvMLogFilter filteredLog = new DummyIvMFilteredLog();
+			GraphVizTokensIterator tokensIterator = new GraphVizTokensLazyIterator(tokens);
 
 			//			System.out.println("frames " + frames);
 
@@ -113,8 +131,8 @@ public class ExportAnimation {
 				g.transform(transform);
 				
 				//paint the tokens
-				AnimationRenderer.paintTokens(g, tokens, null, time, false, false, canceller);
-				
+				RenderingThread.renderTokens(g, tokensIterator, filteredLog, time);
+
 				g.transform(transformInverse);
 
 				// write it to the writer

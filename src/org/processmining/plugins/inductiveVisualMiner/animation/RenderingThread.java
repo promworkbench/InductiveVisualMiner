@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.SwingUtilities;
 
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 public class RenderingThread implements Runnable {
@@ -49,7 +50,7 @@ public class RenderingThread implements Runnable {
 		double maxTime; //in seconds
 
 		//rendering variables
-		IvMLogFiltered filteredLog;
+		IvMLogFilter filteredLog;
 		GraphVizTokens tokens;
 		AffineTransform transform;
 
@@ -267,7 +268,7 @@ public class RenderingThread implements Runnable {
 			takeTimeStep();
 
 			//render the tokens		
-			renderTokens();
+			renderTokens(internalResult.graphics, settings.tokens, settings.filteredLog, time);
 
 			//transform back
 			internalResult.graphics.setTransform(new AffineTransform());
@@ -293,43 +294,42 @@ public class RenderingThread implements Runnable {
 		lastUpdated = now;
 	}
 
-	private void renderTokens() {
-		internalResult.graphics.setStroke(tokenStroke);
+	public static void renderTokens(Graphics2D graphics, GraphVizTokensIterator tokens, IvMLogFilter filteredLog, double time) {
+		graphics.setStroke(tokenStroke);
 
-		settings.tokens.itInit(time);
-		while (settings.tokens.itHasNext()) {
-			settings.tokens.itNext();
-			settings.tokens.itEval();
+		tokens.itInit(time);
+		while (tokens.itHasNext()) {
+			tokens.itNext();
+			tokens.itEval();
 
 			//only paint tokens that are not filtered out
-			if (settings.filteredLog == null || !settings.filteredLog.isFilteredOut(settings.tokens.itGetTraceIndex())) {
+			if (filteredLog == null || !filteredLog.isFilteredOut(tokens.itGetTraceIndex())) {
 
 				//transform
-				internalResult.graphics.transform(settings.tokens.itGetTransform());
-				internalResult.graphics.translate(settings.tokens.itGetX(), settings.tokens.itGetY());
+				graphics.transform(tokens.itGetTransform());
+				graphics.translate(tokens.itGetX(), tokens.itGetY());
 
 				//draw the oval
-				if (settings.tokens.itGetOpacity() == 1) {
-					internalResult.graphics.setPaint(tokenFillColour);
+				if (tokens.itGetOpacity() == 1) {
+					graphics.setPaint(tokenFillColour);
 				} else {
-					internalResult.graphics.setPaint(new Color(tokenFillColour.getRed(), tokenFillColour.getGreen(),
-							tokenFillColour.getBlue(), (int) Math.round(settings.tokens.itGetOpacity() * 255)));
+					graphics.setPaint(new Color(tokenFillColour.getRed(), tokenFillColour.getGreen(), tokenFillColour
+							.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
 				}
-				internalResult.graphics.fillOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
+				graphics.fillOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
 
 				//draw the fill
-				if (settings.tokens.itGetOpacity() == 1) {
-					internalResult.graphics.setColor(tokenStrokeColour);
+				if (tokens.itGetOpacity() == 1) {
+					graphics.setColor(tokenStrokeColour);
 				} else {
-					internalResult.graphics.setColor(new Color(tokenStrokeColour.getRed(),
-							tokenStrokeColour.getGreen(), tokenStrokeColour.getBlue(), (int) Math.round(settings.tokens
-									.itGetOpacity() * 255)));
+					graphics.setColor(new Color(tokenStrokeColour.getRed(), tokenStrokeColour.getGreen(),
+							tokenStrokeColour.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
 				}
-				internalResult.graphics.drawOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
+				graphics.drawOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
 
 				//transform back
-				internalResult.graphics.translate(-settings.tokens.itGetX(), -settings.tokens.itGetY());
-				internalResult.graphics.transform(settings.tokens.itGetTransformInverse());
+				graphics.translate(-tokens.itGetX(), -tokens.itGetY());
+				graphics.transform(tokens.itGetTransformInverse());
 			}
 		}
 	}

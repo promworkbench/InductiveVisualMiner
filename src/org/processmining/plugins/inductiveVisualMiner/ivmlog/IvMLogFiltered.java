@@ -4,7 +4,7 @@ import java.util.BitSet;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 
-public class IvMLogFiltered implements IvMLog {
+public class IvMLogFiltered implements IvMLog, IvMLogFilter {
 	
 	private final BitSet traceIsFilteredOut;
 	private final IvMLogBase log;

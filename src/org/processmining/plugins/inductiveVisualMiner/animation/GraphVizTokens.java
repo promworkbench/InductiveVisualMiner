@@ -27,7 +27,7 @@ import com.kitfox.svg.animation.Bezier;
  * @author sleemans
  *
  */
-public class GraphVizTokens {
+public class GraphVizTokens implements GraphVizTokensIterator {
 
 	private final TDoubleArrayList startTimes;
 	private final TDoubleArrayList endTimes;
@@ -275,7 +275,7 @@ public class GraphVizTokens {
 	public int size() {
 		return startTimes.size();
 	}
-
+	
 	//build-in no-object creating iterator
 	private double itTime;
 	private int itNext;
