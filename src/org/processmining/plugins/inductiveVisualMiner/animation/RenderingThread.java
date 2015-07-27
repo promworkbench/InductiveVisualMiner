@@ -29,6 +29,7 @@ public class RenderingThread implements Runnable {
 	public static final int tokenRadius = 4;
 	public static final Color tokenFillColour = Color.yellow;
 	public static final Color tokenStrokeColour = Color.black;
+	public static final Color backgroundColor = new Color(255, 255, 255, 0);
 	public static final Stroke tokenStroke = new BasicStroke(1.5f);
 	public static final int maxAnimationDuration = 10; //after spending xx ms in drawing circles, just quit.
 	public static final int maxAnimationPausedDuration = 1000; //after spending xx ms in drawing circles, just quit.
@@ -38,6 +39,9 @@ public class RenderingThread implements Runnable {
 		//result variables
 		BufferedImage image;
 		Graphics2D graphics;
+		double time;
+		double minTime;
+		double maxTime;
 	}
 
 	private static class Settings {
@@ -46,6 +50,8 @@ public class RenderingThread implements Runnable {
 		int height;
 
 		//time variables
+		boolean pauseRequested;
+		Double time;
 		double minTime; //in seconds
 		double maxTime; //in seconds
 
@@ -58,6 +64,8 @@ public class RenderingThread implements Runnable {
 			Settings result = new Settings();
 			result.width = width;
 			result.height = height;
+			result.pauseRequested = result.pauseRequested;
+			result.time = time;
 			result.minTime = minTime;
 			result.maxTime = maxTime;
 			result.filteredLog = filteredLog;
@@ -138,13 +146,37 @@ public class RenderingThread implements Runnable {
 	}
 
 	/**
-	 * Set a new transformation
+	 * Set a new transformation.
 	 * 
 	 * @param transform
 	 */
 	public void setImageTransformation(AffineTransform transform) {
 		Settings s = getNewSettings();
 		s.transform = transform;
+		newSettings = s;
+	}
+
+	/**
+	 * Sets the bounds of the animation.
+	 * 
+	 * @param minTime
+	 * @param maxTime
+	 */
+	public void setExtremeTimes(double minTime, double maxTime) {
+		Settings s = getNewSettings();
+		s.minTime = minTime;
+		s.maxTime = maxTime;
+		newSettings = s;
+	}
+
+	/**
+	 * Sets the next rendered time of the animation.
+	 * 
+	 * @param time
+	 */
+	public void setTime(double time) {
+		Settings s = getNewSettings();
+		s.time = time;
 		newSettings = s;
 	}
 
@@ -165,16 +197,18 @@ public class RenderingThread implements Runnable {
 	public void start() {
 		running = true;
 		paused = false;
-		if (runThread == null || !runThread.isAlive())
+		if (runThread == null || !runThread.isAlive()) {
 			runThread = new Thread(this);
-		else if (runThread.isAlive())
-			throw new IllegalStateException("Thread already started.");
+		} else if (runThread.isAlive()) {
+			return;
+		}
 		runThread.start();
 	}
 
 	public void stop() {
-		if (runThread == null)
-			throw new IllegalStateException("Thread not started.");
+		if (runThread == null) {
+			return;
+		}
 		synchronized (runThread) {
 			try {
 				running = false;
@@ -187,19 +221,59 @@ public class RenderingThread implements Runnable {
 	}
 
 	public void pause() {
-		if (runThread == null)
-			throw new IllegalStateException("Thread not started.");
+		if (runThread == null) {
+			return;
+		}
 		synchronized (runThread) {
 			paused = true;
 		}
 	}
-
+	
 	public void resume() {
-		if (runThread == null)
-			throw new IllegalStateException("Thread not started.");
+		if (runThread == null) {
+			return;
+		}
 		synchronized (runThread) {
 			paused = false;
 			runThread.notify();
+		}
+	}
+
+	public void pauseResume() {
+		if (runThread == null) {
+			return;
+		}
+		synchronized (runThread) {
+			if (paused) {
+				//resume
+				Settings s = getNewSettings();
+				s.time = getLastRenderedTime();
+				newSettings = s;
+
+				paused = false;
+				runThread.notify();
+			} else {
+				paused = true;
+			}
+		}
+	}
+
+	/**
+	 * If playing, has no effect. If paused, runs for one frame and pauses
+	 * again.
+	 */
+	public void startOneFrame() {
+		synchronized (runThread) {
+			if (paused) {
+				//set a pause request
+				Settings s = getNewSettings();
+				s.pauseRequested = true;
+				newSettings = s;
+				
+				//resume
+				paused = false;
+				runThread.notify();
+			}			
 		}
 	}
 
@@ -228,7 +302,13 @@ public class RenderingThread implements Runnable {
 		paused = false;
 	}
 
-	private final static Color backgroundColor = new Color(255, 255, 255, 0);
+	/**
+	 * 
+	 * @return whether the animation is running.
+	 */
+	public boolean isPlaying() {
+		return runThread != null && runThread.isAlive() && running && !paused;
+	}
 
 	public void render() {
 		if (newSettings != null) {
@@ -265,21 +345,35 @@ public class RenderingThread implements Runnable {
 			internalResult.graphics.setTransform(settings.transform);
 
 			//compute the next timestep
-			takeTimeStep();
+			if (settings.time != null) {
+				lastUpdated = System.currentTimeMillis();
+				time = settings.time;
+				settings.time = null;
+			} else {
+				takeTimeStep();
+			}
 
 			//render the tokens		
 			renderTokens(internalResult.graphics, settings.tokens, settings.filteredLog, time);
 
 			//transform back
 			internalResult.graphics.setTransform(new AffineTransform());
+			internalResult.time = time;
+			internalResult.minTime = settings.minTime;
+			internalResult.maxTime = settings.maxTime;
 		}
 
-		//rendering done, swap the images
-		synchronized (this) {
+		//rendering done, swap the images (if we're not got paused in the meantime)
+		if (!paused) {
 			swapResult = externalResult;
 			externalResult = internalResult;
 			internalResult = swapResult;
 			swapResult = null;
+		}
+
+		if (settings.pauseRequested) {
+			pause();
+			settings.pauseRequested = false;
 		}
 
 		SwingUtilities.invokeLater(onFrameComplete);
@@ -288,13 +382,17 @@ public class RenderingThread implements Runnable {
 	private void takeTimeStep() {
 		now = System.currentTimeMillis();
 		time = time + ((now - lastUpdated) / 1000.0);
+		while (time < settings.minTime) {
+			time += (settings.maxTime - settings.minTime);
+		}
 		while (time > settings.maxTime) {
 			time -= (settings.maxTime - settings.minTime);
 		}
 		lastUpdated = now;
 	}
 
-	public static void renderTokens(Graphics2D graphics, GraphVizTokensIterator tokens, IvMLogFilter filteredLog, double time) {
+	public static void renderTokens(Graphics2D graphics, GraphVizTokensIterator tokens, IvMLogFilter filteredLog,
+			double time) {
 		graphics.setStroke(tokenStroke);
 
 		tokens.itInit(time);
@@ -336,5 +434,17 @@ public class RenderingThread implements Runnable {
 
 	public BufferedImage getLastRenderedImage() {
 		return externalResult.image;
+	}
+
+	public double getLastRenderedTime() {
+		return externalResult.time;
+	}
+
+	public double getLastRenderedMinTime() {
+		return externalResult.minTime;
+	}
+
+	public double getLastRenderedMaxTime() {
+		return externalResult.maxTime;
 	}
 }

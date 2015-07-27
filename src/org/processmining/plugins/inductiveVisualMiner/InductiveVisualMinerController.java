@@ -26,10 +26,10 @@ import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.Dot2Image;
 import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.graphviz.dot.DotElement;
-import org.processmining.plugins.graphviz.visualisation.AnimatableSVGPanel.Callback;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
@@ -90,7 +90,7 @@ public class InductiveVisualMinerController {
 			Cl01MakeLog m = new Cl01MakeLog();
 			m.setOnStart(new Runnable() {
 				public void run() {
-					panel.getGraph().setEnableAnimation(false);
+					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveModelButton().setEnabled(false);
 					panel.getSaveImageButton().setEnabled(false);
 					panel.getSaveImageButton().setText("image");
@@ -119,7 +119,7 @@ public class InductiveVisualMinerController {
 			Cl02FilterLogOnActivities f = new Cl02FilterLogOnActivities();
 			f.setOnStart(new Runnable() {
 				public void run() {
-					panel.getGraph().setEnableAnimation(false);
+					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveModelButton().setEnabled(false);
 					panel.getSaveImageButton().setEnabled(false);
 					panel.getSaveImageButton().setText("image");
@@ -137,7 +137,7 @@ public class InductiveVisualMinerController {
 			Cl03Mine m = new Cl03Mine();
 			m.setOnStart(new Runnable() {
 				public void run() {
-					panel.getGraph().setEnableAnimation(false);
+					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
 					panel.getTraceView().set(state.getLog());
 					state.resetAlignment();
@@ -163,7 +163,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					setStatus("Layouting graph..");
 
-					panel.getGraph().setEnableAnimation(false);
+					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
 
 					//if the view does not show deviations, do not select any log moves
@@ -194,7 +194,7 @@ public class InductiveVisualMinerController {
 			Cl05Align a = new Cl05Align();
 			a.setOnStart(new Runnable() {
 				public void run() {
-					panel.getGraph().setEnableAnimation(false);
+					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
 					state.resetAlignment();
 					state.resetPerformance();
@@ -224,7 +224,7 @@ public class InductiveVisualMinerController {
 			Cl07Animate a = new Cl07Animate(state, panel);
 			a.setOnStart(new Runnable() {
 				public void run() {
-					panel.getGraph().setEnableAnimation(false);
+					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
 					state.resetPerformance();
 					setStatus("Creating animation..");
@@ -399,7 +399,7 @@ public class InductiveVisualMinerController {
 		//set image/animation export button
 		panel.getSaveImageButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SaveAsDialog dialog = new SaveAsDialog(panel.getGraph().isEnableAnimation());
+				SaveAsDialog dialog = new SaveAsDialog(panel.getGraph().isAnimationEnabled());
 				final Pair<File, FileType> p = dialog.askUser(panel);
 				if (p == null) {
 					return;
@@ -479,8 +479,8 @@ public class InductiveVisualMinerController {
 		});
 
 		//set animation time updater
-		panel.getGraph().setTimeStepCallback(new Callback<Double, Object>() {
-			public Object call(Double userTime) {
+		panel.getGraph().setAnimationTimeChangedListener(new AnimationTimeChangedListener() {
+			public void timeStepTaken(double userTime) {
 				if (panel.getGraph().isAnimationEnabled()) {
 					long logTime = Math.round(state.getAnimationScaler().userTime2LogTime(userTime));
 					panel.getAnimationTimeLabel().setText(TimestampsAdder.toString(logTime));
@@ -494,7 +494,6 @@ public class InductiveVisualMinerController {
 				} else {
 					panel.getAnimationTimeLabel().setText(" ");
 				}
-				return null;
 			}
 		});
 	}

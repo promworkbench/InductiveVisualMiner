@@ -42,7 +42,7 @@ public class Cl07Animate extends ChainLink<Double, Double> {
 					panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
 					panel.getGraph().setAnimationExtremeTimes(state.getAnimationScaler().getMinInUserTime(),
 							state.getAnimationScaler().getMaxInUserTime());
-					panel.getGraph().setEnableAnimation(true);
+					panel.getGraph().setAnimationEnabled(true);
 				}
 
 			});

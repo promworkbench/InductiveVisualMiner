@@ -317,7 +317,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		super.removeNotify();
 		traceView.setVisible(false);
 		colouringFiltersView.setVisible(false);
-		graphPanel.stop();
+		graphPanel.pause();
 	}
 
 	public void makeNodeSelectable(final LocalDotNode dotNode, boolean select) {
