@@ -28,7 +28,6 @@ import org.processmining.processtree.impl.AbstractBlock.XorLoop;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
-
 public class ProcessTreeVisualisation {
 
 	private long maxCardinality;
@@ -332,8 +331,7 @@ public class ProcessTreeVisualisation {
 	}
 
 	private LocalDotEdge addMoveArc(LocalDotNode from, LocalDotNode to, UnfoldedNode unode, EdgeType type,
-			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, Pair<String, Long> cardinality,
-			boolean directionForward) {
+			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, Pair<String, Long> cardinality, boolean directionForward) {
 
 		LocalDotEdge edge;
 		if (directionForward) {

@@ -9,15 +9,15 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 public class AlignedLogVisualisationDataImplEmpty implements AlignedLogVisualisationData {
 
 	public Pair<Long, Long> getExtremeCardinalities() {
-		return Pair.of(1l, 1l);
+		return Pair.of(0l, 0l);
 	}
 
 	public Pair<String, Long> getNodeLabel(UnfoldedNode unode, boolean includeModelMoves) {
-		return Pair.of("", 1l);
+		return Pair.of("", 0l);
 	}
 
 	public Pair<String, Long> getModelMoveEdgeLabel(UnfoldedNode unode) {
-		return Pair.of("", -1l);
+		return Pair.of("", 0l);
 	}
 
 	public Pair<String, MultiSet<XEventClass>> getLogMoveEdgeLabel(LogMovePosition logMovePosition) {
@@ -25,7 +25,7 @@ public class AlignedLogVisualisationDataImplEmpty implements AlignedLogVisualisa
 	}
 
 	public Pair<String, Long> getEdgeLabel(UnfoldedNode unode, boolean includeModelMoves) {
-		return Pair.of("", -1l);
+		return Pair.of("", 0l);
 	}
 
 	public void setTime(long time) {
