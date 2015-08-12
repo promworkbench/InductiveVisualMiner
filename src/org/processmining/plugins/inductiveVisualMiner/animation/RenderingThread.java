@@ -228,7 +228,7 @@ public class RenderingThread implements Runnable {
 			paused = true;
 		}
 	}
-	
+
 	public void resume() {
 		if (runThread == null) {
 			return;
@@ -269,14 +269,17 @@ public class RenderingThread implements Runnable {
 				Settings s = getNewSettings();
 				s.pauseRequested = true;
 				newSettings = s;
-				
+
 				//resume
 				paused = false;
 				runThread.notify();
-			}			
+			}
 		}
 	}
 
+	/**
+	 * Run the thread.
+	 */
 	public void run() {
 		long sleep = 0, before;
 		while (running) {
@@ -310,7 +313,7 @@ public class RenderingThread implements Runnable {
 		return runThread != null && runThread.isAlive() && running && !paused;
 	}
 
-	public void render() {
+	private void render() {
 		if (newSettings != null) {
 			synchronized (this) {
 				settings = newSettings;
@@ -345,7 +348,9 @@ public class RenderingThread implements Runnable {
 			internalResult.graphics.setTransform(settings.transform);
 
 			//compute the next timestep
-			if (settings.time != null) {
+			if (paused || settings.pauseRequested) {
+				
+			} else if (settings.time != null) {
 				lastUpdated = System.currentTimeMillis();
 				time = settings.time;
 				settings.time = null;

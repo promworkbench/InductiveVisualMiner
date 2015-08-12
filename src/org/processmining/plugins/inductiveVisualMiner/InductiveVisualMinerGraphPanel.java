@@ -56,6 +56,7 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 		setImageTransformationChangedListener(new ImageTransformationChangedListener() {
 			public void imageTransformationChanged(AffineTransform image2user, AffineTransform user2image) {
 				renderingThread.setImageTransformation(image2user);
+				renderingThread.startOneFrame();
 			}
 		});
 
