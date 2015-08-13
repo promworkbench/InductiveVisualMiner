@@ -3,7 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoLifeCycle;
+import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.baseCases.BaseCaseFinder;
 import org.processmining.plugins.InductiveMiner.mining.baseCases.BaseCaseFinderIM;
@@ -24,16 +24,16 @@ import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterPa
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterSequenceFiltering;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterXor;
 
-public class MiningParametersIvM extends MiningParameters {
+public class NoLifeCycleMiningParametersIvM extends MiningParameters {
 
 	/*
 	 * No other parameter, except mentioned in this file, has influence on the mined model
 	 */
 	
-	public MiningParametersIvM() {
+	public NoLifeCycleMiningParametersIvM() {
 		//determine algorithm
 		
-		setLogConverter(new IMLog2IMLogInfoLifeCycle());
+		setLogConverter(new IMLog2IMLogInfoDefault());
 		
 		setBaseCaseFinders(new ArrayList<BaseCaseFinder>(Arrays.asList(
 				new BaseCaseFinderIMiEmptyLog(),
@@ -57,12 +57,11 @@ public class MiningParametersIvM extends MiningParameters {
 		
 		setFallThroughs(new ArrayList<FallThrough>(Arrays.asList(
 				new FallThroughLeaveOutActivitiesThenApplyOthers(),
-				new FallThroughTauLoop(),
+				new FallThroughTauLoop(false),
 				new FallThroughFlower()
 				)));
 		
 		//set parameters
 		setNoiseThreshold((float) 0.2);
-		setReduce(true);
 	}
 }

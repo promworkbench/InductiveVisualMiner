@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners
 
 import nl.tue.astar.AStarThread.Canceller;
 
-import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
@@ -19,9 +18,8 @@ public class NoLifeCycleSplitLog extends VisualMinerWrapper {
 	public ProcessTree mine(IMLog log, VisualMinerParameters parameters, Canceller canceller) {
 		
 		//copy the relevant parameters
-		MiningParameters miningParameters = new MiningParametersIvM();
+		MiningParameters miningParameters = new NoLifeCycleMiningParametersIvM();
 		miningParameters.setNoiseThreshold((float) (1 - parameters.getPaths()));
-		miningParameters.setLogConverter(new IMLog2IMLogInfoDefault());
 		
 		return IMProcessTree.mineProcessTree(log, miningParameters);
 	}
