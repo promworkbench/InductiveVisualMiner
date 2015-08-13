@@ -15,7 +15,7 @@ import org.processmining.plugins.InductiveMiner.mining.cuts.Cut;
 import org.processmining.plugins.InductiveMiner.mining.cuts.Cut.Operator;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitter.LogSplitResult;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.MiningParametersIvM;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleMiningParametersIvM;
 
 public class FilterLeastOccurringActivities {
 	public static Triple<IMLog, IMLogInfo, Set<XEventClass>> filter(IMLog log, IMLogInfo logInfo, double threshold,
@@ -30,7 +30,7 @@ public class FilterLeastOccurringActivities {
 		partition.add(keep);
 		partition.add(remove);
 		Cut cut = new Cut(Operator.parallel, partition);
-		MinerState minerState = new MinerState(new MiningParametersIvM());
+		MinerState minerState = new MinerState(new NoLifeCycleMiningParametersIvM());
 		LogSplitResult result = Miner.splitLog(log, logInfo, cut, minerState);
 		
 		IMLogInfo filteredLogInfo = log2logInfo.createLogInfo(result.sublogs.get(0));

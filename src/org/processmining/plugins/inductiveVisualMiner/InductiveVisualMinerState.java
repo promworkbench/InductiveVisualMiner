@@ -30,7 +30,7 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.MiningParametersIvM;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleMiningParametersIvM;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleSplitLog;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.ProcessTree;
@@ -42,7 +42,7 @@ public class InductiveVisualMinerState {
 
 	public InductiveVisualMinerState(XLog xLog, ProcessTree preMinedTree) {
 		this.xLog = xLog;
-		miningParameters = new MiningParametersIvM();
+		miningParameters = new NoLifeCycleMiningParametersIvM();
 		if (preMinedTree != null) {
 			this.tree = preMinedTree;
 			this.preMinedTree = preMinedTree;
