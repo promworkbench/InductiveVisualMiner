@@ -38,6 +38,7 @@ public class RenderingThread implements Runnable {
 	private static class Result {
 		//result variables
 		BufferedImage image;
+		boolean lock;
 		Graphics2D graphics;
 		double time;
 		double minTime;
@@ -277,9 +278,6 @@ public class RenderingThread implements Runnable {
 		}
 	}
 
-	/**
-	 * Run the thread.
-	 */
 	public void run() {
 		long sleep = 0, before;
 		while (running) {
@@ -310,7 +308,7 @@ public class RenderingThread implements Runnable {
 	 * @return whether the animation is running.
 	 */
 	public boolean isPlaying() {
-		return runThread != null && runThread.isAlive() && running && !paused;
+		return runThread != null && runThread.isAlive() && running && !paused && !settings.pauseRequested;
 	}
 
 	private void render() {
@@ -348,13 +346,11 @@ public class RenderingThread implements Runnable {
 			internalResult.graphics.setTransform(settings.transform);
 
 			//compute the next timestep
-			if (paused || settings.pauseRequested) {
-				
-			} else if (settings.time != null) {
+			if (settings.time != null) {
 				lastUpdated = System.currentTimeMillis();
 				time = settings.time;
 				settings.time = null;
-			} else {
+			} else if (!paused && !settings.pauseRequested) {
 				takeTimeStep();
 			}
 
@@ -369,7 +365,7 @@ public class RenderingThread implements Runnable {
 		}
 
 		//rendering done, swap the images (if we're not got paused in the meantime)
-		if (!paused) {
+		if (!paused && !externalResult.lock) {
 			swapResult = externalResult;
 			externalResult = internalResult;
 			internalResult = swapResult;
@@ -377,8 +373,8 @@ public class RenderingThread implements Runnable {
 		}
 
 		if (settings.pauseRequested) {
-			pause();
 			settings.pauseRequested = false;
+			pause();
 		}
 
 		SwingUtilities.invokeLater(onFrameComplete);
@@ -437,8 +433,21 @@ public class RenderingThread implements Runnable {
 		}
 	}
 
+	/**
+	 * This method will cause a lock on the returned rendered image.
+	 * 
+	 * @return the last rendered image
+	 */
 	public BufferedImage getLastRenderedImage() {
+		externalResult.lock = true;
 		return externalResult.image;
+	}
+
+	/**
+	 * signal the rendering thread that the image can be reused
+	 */
+	public void releaseLastRenderedImage() {
+		externalResult.lock = false;
 	}
 
 	public double getLastRenderedTime() {

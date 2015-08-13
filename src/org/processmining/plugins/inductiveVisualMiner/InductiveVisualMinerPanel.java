@@ -44,7 +44,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private static final long serialVersionUID = -1078786029763735572L;
 
 	//gui elements
-	private final InductiveVisualMinerGraphPanel graphPanel;
+	private final InductiveVisualMinerAnimationPanel graphPanel;
 	private final JComboBox<?> colourSelection;
 	private final JLabel colourLabel;
 	private final JLabel statusLabel;
@@ -245,7 +245,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		//graph panel
 		{
-			graphPanel = new InductiveVisualMinerGraphPanel();
+			graphPanel = new InductiveVisualMinerAnimationPanel();
 			graphPanel.setFocusable(true);
 
 			//set the graph direction changed listener
@@ -352,7 +352,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 	}
 
-	public InductiveVisualMinerGraphPanel getGraph() {
+	public InductiveVisualMinerAnimationPanel getGraph() {
 		return graphPanel;
 	}
 

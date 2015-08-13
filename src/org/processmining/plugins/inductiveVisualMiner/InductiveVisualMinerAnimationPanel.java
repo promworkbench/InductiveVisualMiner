@@ -23,7 +23,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
  * @author sleemans
  *
  */
-public class InductiveVisualMinerGraphPanel extends DotPanel {
+public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	private static final long serialVersionUID = 5688379065627860575L;
 
@@ -37,7 +37,7 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 	RenderingThread renderingThread;
 	private AnimationTimeChangedListener animationTimeChangedListener = null;
 
-	public InductiveVisualMinerGraphPanel() {
+	public InductiveVisualMinerAnimationPanel() {
 		super(getSplashScreen());
 
 		renderingThread = new RenderingThread(0, 180, new Runnable() {
@@ -84,6 +84,7 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 		if (renderingThread.getLastRenderedImage() != null && isAnimationEnabled()) {
 			g.drawImage(renderingThread.getLastRenderedImage(), 0, 0, null);
 		}
+		renderingThread.releaseLastRenderedImage();
 		
 		super.drawAnimation(g);
 	}
@@ -181,11 +182,14 @@ public class InductiveVisualMinerGraphPanel extends DotPanel {
 		renderingThread.setExtremeTimes(animationMinUserTime, animationMaxUserTime);
 	}
 
-	/**
-	 * Pauses the animation
-	 */
+	@Override
 	public void pause() {
 		renderingThread.pause();
+	}
+	
+	@Override
+	public void resume() {
+		renderingThread.resume();
 	}
 
 	/**
