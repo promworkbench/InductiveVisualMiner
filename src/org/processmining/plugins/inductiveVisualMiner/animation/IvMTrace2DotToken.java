@@ -15,17 +15,17 @@ import org.processmining.plugins.inductiveVisualMiner.performance.Performance.Pe
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
+import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Node;
+import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
-import org.processmining.processtree.impl.AbstractBlock.And;
-import org.processmining.processtree.impl.AbstractTask.Automatic;
 
 public class IvMTrace2DotToken {
 
 	public static DotToken trace2token(IvMTrace trace, boolean showDeviations, ShortestPathGraph shortestPath,
 			ProcessTreeVisualisationInfo info, Scaler scaler) {
 
-//		debug("", 0);
+		//		debug("", 0);
 
 		//copy the trace; remove ignored log moves and everything not start or complete
 		List<IvMMove> copyTrace = new ArrayList<IvMMove>();
@@ -41,13 +41,9 @@ public class IvMTrace2DotToken {
 				shortestPath, info, 0, scaler);
 
 		//interpolate the missing timestamps from the token
-		try {
-			DotTokenInterpolate.interpolateToken(token);
-		} catch (Exception e) {
-			throw e;
-		}
+		DotTokenInterpolate.interpolateToken(token);
 
-//		debug(token, 0);
+		//		debug(token, 0);
 
 		return token;
 	}
@@ -56,7 +52,7 @@ public class IvMTrace2DotToken {
 			Pair<LocalDotNode, Double> endPosition, List<UnfoldedNode> inParallelUnodes, boolean showDeviations,
 			ShortestPathGraph shortestPath, ProcessTreeVisualisationInfo info, int indent, Scaler scaler) {
 
-//		debug("translate trace " + trace, indent);
+		//		debug("translate trace " + trace, indent);
 
 		DotToken dotToken = new DotToken(startPosition.getLeft(), startPosition.getRight(), inParallelUnodes.isEmpty());
 		List<UnfoldedNode> localInParallelUnodes = new ArrayList<>(inParallelUnodes);
@@ -66,10 +62,10 @@ public class IvMTrace2DotToken {
 			IvMMove move = trace.get(i);
 
 			if (move.isLogMove()) {
-//				debug(" consider move " + move + " (" + move.getLogMoveUnode() + " before "
-//						+ move.getLogMoveBeforeChild() + ")", indent);
+				//				debug(" consider move " + move + " (" + move.getLogMoveUnode() + " before "
+				//						+ move.getLogMoveBeforeChild() + ")", indent);
 			} else {
-//				debug(" consider move " + move, indent);
+				//				debug(" consider move " + move, indent);
 			}
 
 			//see if we are leaving a parallel subtrace
@@ -223,16 +219,16 @@ public class IvMTrace2DotToken {
 		//find out where we are exiting it again
 		int exitsAt = findParallelExit(trace, enteringParallel, i);
 
-//		debug("  entering parallel " + enteringParallel + " with move " + move, indent);
-//		debug("  will exit at " + exitsAt, indent);
+		//		debug("  entering parallel " + enteringParallel + " with move " + move, indent);
+		//		debug("  will exit at " + exitsAt, indent);
 
 		//extract parallel subtrace we're entering
 		List<IvMMove> parallelSubtrace = trace.subList(i, exitsAt + 1);
-//		debug("  parallel subtrace " + parallelSubtrace, indent);
+		//		debug("  parallel subtrace " + parallelSubtrace, indent);
 
 		//spit the subtrace into sublogs
 		List<List<IvMMove>> subsubTraces = splitTrace(enteringParallel, parallelSubtrace);
-//		debug("  subsub traces " + subsubTraces, indent);
+		//		debug("  subsub traces " + subsubTraces, indent);
 
 		//move the token up to the parallel split
 		LocalDotNode parallelSplit = Animation.getParallelSplit(enteringParallel, info);
@@ -255,7 +251,7 @@ public class IvMTrace2DotToken {
 			}
 		}
 
-//		debug(" trace after parallel reduction " + trace, indent);
+		//		debug(" trace after parallel reduction " + trace, indent);
 
 		//denote that we have entered this parallel unode (prevents infinite loops)
 		localInParallelUnodes.add(enteringParallel);
@@ -301,7 +297,7 @@ public class IvMTrace2DotToken {
 			token.addStepOverEdge(edge, null);
 		}
 
-//		debug("  leaving parallel " + parallel, indent);
+		//		debug("  leaving parallel " + parallel, indent);
 	}
 
 	/*

@@ -170,10 +170,8 @@ public class DotToken implements Iterable<DotTokenStep> {
 
 	public void addSubToken(DotToken token) {
 
-		//check whether this sub token is added to a parallel split
-		if (getLastPosition().getType() != NodeType.parallelSplit) {
-			throw new RuntimeException("A sub token can only be added to a parallel split node.");
-		}
+		//check whether this sub token is added to a parallel/interleaved split
+		assert(getLastPosition().getType() == NodeType.parallelSplit || getLastPosition().getType() == NodeType.interleavedSplit);
 
 		subTokens.get(subTokens.size() - 1).add(token);
 		//		System.out.println("  add subtoken at " + (subTokens.size() - 1));
@@ -282,15 +280,15 @@ public class DotToken implements Iterable<DotTokenStep> {
 	 * @param index
 	 * @return
 	 */
-	public int getParallelDestination(int index) {
+	public int getTokenDestination(int index) {
 		DotToken subToken = getSubTokensAtPoint(index).iterator().next();
-		LocalDotNode parallelJoin = subToken.getLastPosition();
+		LocalDotNode tokenJoin = subToken.getLastPosition();
 
 		//search for the parallel join in the token, starting from offset
 		//that is, the last parallel join of the first list of matching parallel joins
 		for (int i = index + 1; i < steps.size(); i++) {
-			if (getTarget(i).equals(parallelJoin)) {
-				if (index == steps.size() - 1 || !getTarget(i + 1).equals(parallelJoin)) {
+			if (getTarget(i).equals(tokenJoin)) {
+				if (index == steps.size() - 1 || !getTarget(i + 1).equals(tokenJoin)) {
 					return i;
 				}
 			}

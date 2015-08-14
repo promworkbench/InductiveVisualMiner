@@ -51,7 +51,7 @@ public class ComputeAnimation {
 			IvMTrace ivmTrace = it.next();
 			
 			//make dot tokens
-			final List<DotToken> dotTokens = computeDotTokens(ivmTrace, info, colourMode, scaler, graph, canceller);
+			final List<DotToken> dotTokens = computeDotTokensOfTrace(ivmTrace, info, colourMode, scaler, graph, canceller);
 			
 			//add to graphviz tokens
 			DotToken2GraphVizToken.convertTokens(dotTokens, graphVizTokens, svg, it.getPosition());
@@ -65,12 +65,12 @@ public class ComputeAnimation {
 			return null;
 		}
 		
-		System.out.println("animation completed " + graphVizTokens.size());
+		System.out.println("animation completed with " + graphVizTokens.size() + " tokens");
 
 		return Pair.of(scaler, graphVizTokens);
 	}
 
-	public static List<DotToken> computeDotTokens(IvMTrace trace, final ProcessTreeVisualisationInfo info,
+	public static List<DotToken> computeDotTokensOfTrace(IvMTrace trace, final ProcessTreeVisualisationInfo info,
 			final Mode colourMode, Scaler scaler, ShortestPathGraph graph, final Canceller canceller) {
 		boolean showDeviations = colourMode.isShowDeviations();
 		final List<DotToken> tokens = new ArrayList<>();
@@ -83,6 +83,7 @@ public class ComputeAnimation {
 			tokens.add(IvMTrace2DotToken.trace2token(trace, showDeviations, graph, info, scaler));
 		} catch (Exception e) {
 			//for the demo, just ignore this case
+			e.printStackTrace();
 			InductiveVisualMinerController.debug("trace skipped animation");
 		}
 

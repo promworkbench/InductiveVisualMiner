@@ -20,9 +20,9 @@ public class DotTokenInterpolate {
 		for (int i = 0; i < token.size(); i++) {
 
 			if (token.getTimestamp(i) == null) {
-				//this timestamp needs to be filled in
+				//this time stamp needs to be filled in
 
-				//compute the timestamp for this point
+				//compute the time stamp for this point
 
 				Pair<Integer, Double> splitForwardTimestamp = getTimestampForward(token, i, Integer.MAX_VALUE,
 						lastSeenTimestamp, 1);
@@ -30,18 +30,18 @@ public class DotTokenInterpolate {
 						splitForwardTimestamp.getRight());
 				token.setTimestampOfPoint(i, splitTimestamp);
 			}
-			
-			if (token.getTarget(i).getType() == NodeType.parallelSplit && token.hasSubTokensAt(i)) {
-				//if this node is a parallel split, we need to set the corresponding join now
-				int indexOfJoin = token.getParallelDestination(i);
 
-				//get the latest timestamp from the parallel branches
+			if (isTokenSplit(token, i) && token.hasSubTokensAt(i)) {
+				//if this node is a parallel split, we need to set the corresponding join now
+				int indexOfJoin = token.getTokenDestination(i);
+
+				//get the latest time stamp from the parallel branches
 				Pair<Integer, Double> joinBackwardsTimestamp = getTimestampBackward(token, indexOfJoin, 0);
 				debug(" backward timestamp " + joinBackwardsTimestamp);
 
-				//now compute the timestamp of the join
-				Pair<Integer, Double> joinForwardTimestamp = getTimestampForward(token, indexOfJoin,
-						Integer.MAX_VALUE, joinBackwardsTimestamp.getRight(), joinBackwardsTimestamp.getLeft());
+				//now compute the time stamp of the join
+				Pair<Integer, Double> joinForwardTimestamp = getTimestampForward(token, indexOfJoin, Integer.MAX_VALUE,
+						joinBackwardsTimestamp.getRight(), joinBackwardsTimestamp.getLeft());
 				debug(" forward timestamp " + joinForwardTimestamp);
 
 				double joinTimestamp = getLocalArrivalTime(joinBackwardsTimestamp.getLeft(),
@@ -61,7 +61,7 @@ public class DotTokenInterpolate {
 
 			}
 			debug(token);
-			
+
 			lastSeenTimestamp = token.getTimestamp(i);
 		}
 	}
@@ -70,8 +70,8 @@ public class DotTokenInterpolate {
 	 * returns the number of edges till the first timestamp and that timestamp,
 	 * limited to to; notice: offset means "after the #offset edge in the token"
 	 */
-	private static Pair<Integer, Double> getTimestampForward(DotToken token, int offset, int to, double previousTimestamp,
-			int edgesFromPreviousTimestamp) {
+	private static Pair<Integer, Double> getTimestampForward(DotToken token, int offset, int to,
+			double previousTimestamp, int edgesFromPreviousTimestamp) {
 
 		debug(" get timestamp: offset " + offset + ", to " + to + ", edges from previous timestamp "
 				+ edgesFromPreviousTimestamp);
@@ -100,7 +100,7 @@ public class DotTokenInterpolate {
 
 			//see if somewhere in this parallel sub trace, a timestamp is present
 			//if multiple, pick the one that needs to arrive first
-			int parallelPieceTill = token.getParallelDestination(offset);
+			int parallelPieceTill = token.getTokenDestination(offset);
 
 			//recurse on the parallel sub trace that is within this token
 			//triple(edges, timestamp, arrivalTime)
@@ -149,6 +149,7 @@ public class DotTokenInterpolate {
 	/**
 	 * Returns the number of edges from the last timestamp and that timestamp;
 	 * notice: offset means "after the #offset edge in the token"
+	 * 
 	 * @param token
 	 * @param offset
 	 * @param edgesTillNow
@@ -179,11 +180,11 @@ public class DotTokenInterpolate {
 			Set<DotToken> subTokens = getSubTokensOfParallelJoin(token, offset);
 
 			for (DotToken subToken : subTokens) {
-				Pair<Integer, Double> subPair = getTimestampBackward(subToken, subToken.size() - 1,
-						edgesTillNow);
+				Pair<Integer, Double> subPair = getTimestampBackward(subToken, subToken.size() - 1, edgesTillNow);
 				if (bestPair.getRight() == subPair.getRight() && subPair.getLeft() > bestPair.getLeft()) {
 					bestPair = subPair;
-				} else if (subPair.getRight() != null && (bestPair.getRight() == null || subPair.getRight() > bestPair.getRight())) {
+				} else if (subPair.getRight() != null
+						&& (bestPair.getRight() == null || subPair.getRight() > bestPair.getRight())) {
 					bestPair = subPair;
 				}
 			}
@@ -201,17 +202,17 @@ public class DotTokenInterpolate {
 		if (arrivalTime == null) {
 			return null;
 		}
-		
+
 		//total duration of this part
 		double duration = arrivalTime - departureTime;
-		
+
 		//ratio of part that is already travelled
 		if (totalEdges == 0) {
 			//if there are no edges to be travelled, we are already at the destination
 			return departureTime;
 		}
 		double p = edgesFromDeparture / (1.0 * totalEdges);
-		
+
 		//compute the time with this ratio
 		return departureTime + duration * p;
 	}
@@ -231,8 +232,13 @@ public class DotTokenInterpolate {
 		return null;
 	}
 
+	public static boolean isTokenSplit(DotToken token, int i) {
+		return token.getTarget(i).getType() == NodeType.parallelSplit
+				|| token.getTarget(i).getType() == NodeType.interleavedSplit;
+	}
+
 	private static void debug(Object s) {
-//		System.out.println(s);
-//		System.out.println(s.toString().replaceAll("\\n", " "));
+//				System.out.println(s);
+		//		System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }

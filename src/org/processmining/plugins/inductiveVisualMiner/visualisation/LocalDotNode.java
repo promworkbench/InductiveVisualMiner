@@ -15,7 +15,7 @@ public class LocalDotNode extends DotNode {
 	}
 	
 	public enum NodeType {
-		source, sink, activity, xor, parallelSplit, parallelJoin, logMoveActivity
+		source, sink, activity, xor, parallelSplit, parallelJoin, interleavedSplit, interleavedJoin, logMoveActivity
 	}
 	
 	private NodeType type;
@@ -42,6 +42,8 @@ public class LocalDotNode extends DotNode {
 				break;
 			case parallelSplit :
 			case parallelJoin:
+			case interleavedSplit :
+			case interleavedJoin:
 				setOption("shape", "diamond");
 				setOption("fixedsize", "true");
 				setOption("height", "0.25");

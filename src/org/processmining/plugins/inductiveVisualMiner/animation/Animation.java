@@ -31,7 +31,7 @@ public class Animation {
 
 	public static LocalDotNode getParallelSplit(UnfoldedNode unode, ProcessTreeVisualisationInfo info) {
 		for (LocalDotNode node : info.getNodes(unode)) {
-			if (node.getType() == NodeType.parallelSplit) {
+			if (node.getType() == NodeType.parallelSplit || node.getType() == NodeType.interleavedSplit) {
 				return node;
 			}
 		}
@@ -40,7 +40,7 @@ public class Animation {
 
 	public static LocalDotNode getParallelJoin(UnfoldedNode unode, ProcessTreeVisualisationInfo info) {
 		for (LocalDotNode node : info.getNodes(unode)) {
-			if (node.getType() == NodeType.parallelJoin) {
+			if (node.getType() == NodeType.parallelJoin || node.getType() == NodeType.interleavedJoin) {
 				return node;
 			}
 		}

@@ -80,10 +80,9 @@ public class ProcessTreeVisualisation {
 		} else if (unode.getNode() instanceof XorLoop) {
 			convertLoop(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof Interleaved) {
-			convertParallel(unode, source, sink, directionForward, "\u2194");
-			//			convertParallel(unode, source, sink, directionForward, "-");
+			convertInterleaved(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof And) {
-			convertParallel(unode, source, sink, directionForward, "+");
+			convertParallel(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof Or) {
 			convertOr(unode, source, sink, directionForward);
 		} else if (unode.getNode() instanceof Xor) {
@@ -208,15 +207,38 @@ public class ProcessTreeVisualisation {
 		}
 	}
 
-	private void convertParallel(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward,
-			String sign) {
+	private void convertParallel(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.parallelSplit, sign, unode);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.parallelSplit, "+", unode);
 		addArc(source, split, unode, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, sign, unode);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, "+", unode);
+		addArc(join, sink, unode, directionForward, true);
+
+		for (Node child : unode.getBlock().getChildren()) {
+			convertNode(unode.unfoldChild(child), split, join, directionForward);
+		}
+
+		//put log-moves, if necessary
+		if (parameters.isShowLogMoves()) {
+			//on split
+			visualiseLogMove(split, split, unode, LogMovePosition.atSource(unode), directionForward);
+
+			//on join
+			visualiseLogMove(join, join, unode, LogMovePosition.atSink(unode), directionForward);
+		}
+	}
+	
+	private void convertInterleaved(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
+
+		//operator split
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.interleavedSplit, "\u2194", unode);
+		addArc(source, split, unode, directionForward, true);
+
+		//operator join
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.interleavedJoin, "\u2194", unode);
 		addArc(join, sink, unode, directionForward, true);
 
 		for (Node child : unode.getBlock().getChildren()) {

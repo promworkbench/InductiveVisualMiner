@@ -11,8 +11,8 @@ import org.processmining.plugins.InductiveMiner.mining.baseCases.BaseCaseFinderI
 import org.processmining.plugins.InductiveMiner.mining.baseCases.BaseCaseFinderIMiEmptyLog;
 import org.processmining.plugins.InductiveMiner.mining.baseCases.BaseCaseFinderIMiEmptyTrace;
 import org.processmining.plugins.InductiveMiner.mining.cuts.CutFinder;
-import org.processmining.plugins.InductiveMiner.mining.cuts.IM.CutFinderIM;
 import org.processmining.plugins.InductiveMiner.mining.cuts.IMi.CutFinderIMi;
+import org.processmining.plugins.InductiveMiner.mining.cuts.IMlc.CutFinderIMlc;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThrough;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughFlower;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughLeaveOutActivitiesThenApplyOthers;
@@ -43,7 +43,7 @@ public class LifeCycleMiningParametersIvM extends MiningParameters {
 				)));
 		
 		setCutFinder(new ArrayList<CutFinder>(Arrays.asList(
-				new CutFinderIM(),
+				new CutFinderIMlc(),
 				new CutFinderIMi()
 				)));
 		
@@ -63,5 +63,6 @@ public class LifeCycleMiningParametersIvM extends MiningParameters {
 		
 		//set parameters
 		setNoiseThreshold((float) 0.2);
+		setRepairLifeCycle(true);
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Triple;
+import org.processmining.plugins.InductiveMiner.mining.interleaved.Interleaved;
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Block.Def;
@@ -19,6 +20,7 @@ import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.impl.AbstractBlock;
 import org.processmining.processtree.impl.ProcessTreeImpl;
 
 public class ExpandProcessTreeForQueues {
@@ -47,17 +49,52 @@ public class ExpandProcessTreeForQueues {
 			//copy blocks
 			Block newNode;
 			if (unode.getNode() instanceof Seq) {
-				newNode = new org.processmining.processtree.impl.AbstractBlock.Seq(unode.getNode().getName());
+				newNode = new AbstractBlock.Seq(unode.getNode().getName());
+			} else if (unode.getNode() instanceof Interleaved) {
+
+				//before: int( A, B, C)
+				//after: xor(seq(A, int(B, C)),  seq(B, int(A, C)), seq(B, int(C, A)))
+
+				newNode = new AbstractBlock.Xor("");
+				newTree.addNode(newNode);
+				
+				UnfoldedNode childParent;
+				if (newParent == null) {
+					childParent = new UnfoldedNode(newNode);
+				} else {
+					childParent = newParent.unfoldChild(newNode);
+				}
+
+				for (Node child : ((Block) unode.getNode()).getChildren()) {
+					Seq seq = new AbstractBlock.Seq("");
+					UnfoldedNode uSeq = childParent.unfoldChild(seq);
+					newTree.addNode(seq);
+					newNode.addChild(seq);
+					
+					seq.addChild(expand(unode.unfoldChild(child), newTree, mapping, enqueueTaus, uSeq));
+
+					for (Node child2 : ((Block) unode.getNode()).getChildren()) {
+						if (!child.equals(child2)) {
+							seq.addChild(expand(unode.unfoldChild(child2), newTree, mapping, enqueueTaus, uSeq));
+						}
+					}
+					
+					mapping.put(uSeq, unode);
+				}
+				
+				mapping.put(childParent, unode);
+
+				return newNode;
 			} else if (unode.getNode() instanceof And) {
-				newNode = new org.processmining.processtree.impl.AbstractBlock.And(unode.getNode().getName());
+				newNode = new AbstractBlock.And(unode.getNode().getName());
 			} else if (unode.getNode() instanceof XorLoop) {
-				newNode = new org.processmining.processtree.impl.AbstractBlock.XorLoop(unode.getNode().getName());
+				newNode = new AbstractBlock.XorLoop(unode.getNode().getName());
 			} else if (unode.getNode() instanceof DefLoop) {
-				newNode = new org.processmining.processtree.impl.AbstractBlock.DefLoop(unode.getNode().getName());
-			} else if (unode.getNode() instanceof Xor) {
-				newNode = new org.processmining.processtree.impl.AbstractBlock.Xor(unode.getNode().getName());
+				newNode = new AbstractBlock.DefLoop(unode.getNode().getName());
+			} else if (unode.getNode() instanceof Xor || unode.getNode() instanceof Def) {
+				newNode = new AbstractBlock.Xor(unode.getNode().getName());
 			} else if (unode.getNode() instanceof Def) {
-				newNode = new org.processmining.processtree.impl.AbstractBlock.Def(unode.getNode().getName());
+				newNode = new AbstractBlock.Def(unode.getNode().getName());
 			} else {
 				throw new RuntimeException("construct not implemented");
 			}
