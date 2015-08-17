@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.HashSet;
@@ -224,7 +223,6 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		{
 			animationTimeLabel = SlickerFactory.instance().createLabel(" ");
-			animationTimeLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
 			GridBagConstraints cAnimationTimeLabel = new GridBagConstraints();
 			cAnimationTimeLabel.gridx = 1;
 			cAnimationTimeLabel.gridy = gridy++;

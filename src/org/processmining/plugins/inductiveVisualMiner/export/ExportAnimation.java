@@ -29,8 +29,8 @@ import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIterator;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensLazyIterator;
-import org.processmining.plugins.inductiveVisualMiner.animation.RenderingThread;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.Renderer;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
@@ -131,7 +131,7 @@ public class ExportAnimation {
 				g.transform(transform);
 				
 				//paint the tokens
-				RenderingThread.renderTokens(g, tokensIterator, filteredLog, time);
+				Renderer.renderTokens(g, tokensIterator, filteredLog, time);
 
 				g.transform(transformInverse);
 

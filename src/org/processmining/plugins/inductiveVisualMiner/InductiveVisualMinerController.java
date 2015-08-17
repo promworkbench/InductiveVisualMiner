@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.NoninvertibleTransformException;
@@ -97,6 +98,7 @@ public class InductiveVisualMinerController {
 					state.resetAlignment();
 					state.resetPerformance();
 					setStatus("Making log..");
+					setAnimationStatus(" ", false);
 				}
 			});
 			m.setOnComplete(new Runnable() {
@@ -126,6 +128,7 @@ public class InductiveVisualMinerController {
 					state.resetAlignment();
 					state.resetPerformance();
 					setStatus("Filtering activities..");
+					setAnimationStatus(" ", false);
 				}
 			});
 			f.setOnException(onException);
@@ -143,6 +146,7 @@ public class InductiveVisualMinerController {
 					state.resetAlignment();
 					state.resetPerformance();
 					setStatus("Mining..");
+					setAnimationStatus(" ", false);
 				}
 			});
 			m.setOnComplete(new Runnable() {
@@ -162,6 +166,7 @@ public class InductiveVisualMinerController {
 			layoutStart = new Runnable() {
 				public void run() {
 					setStatus("Layouting graph..");
+					setAnimationStatus(" ", false);
 
 					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
@@ -195,6 +200,7 @@ public class InductiveVisualMinerController {
 			a.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
+					setAnimationStatus(" ", false);
 					panel.getSaveImageButton().setText("image");
 					state.resetAlignment();
 					state.resetPerformance();
@@ -227,7 +233,7 @@ public class InductiveVisualMinerController {
 					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
 					state.resetPerformance();
-					setStatus("Creating animation..");
+					setAnimationStatus("Creating animation.. ", false);
 				}
 			});
 			a.setOnComplete(new Runnable() {
@@ -483,7 +489,7 @@ public class InductiveVisualMinerController {
 			public void timeStepTaken(double userTime) {
 				if (panel.getGraph().isAnimationEnabled()) {
 					long logTime = Math.round(state.getAnimationScaler().userTime2LogTime(userTime));
-					panel.getAnimationTimeLabel().setText(TimestampsAdder.toString(logTime));
+					setAnimationStatus(TimestampsAdder.toString(logTime), true);
 
 					//draw queues
 					if (state.getMode().isUpdateWithTimeStep(state)) {
@@ -491,8 +497,6 @@ public class InductiveVisualMinerController {
 						updateHighlighting();
 						panel.getTraceView().repaint();
 					}
-				} else {
-					panel.getAnimationTimeLabel().setText(" ");
 				}
 			}
 		});
@@ -510,6 +514,16 @@ public class InductiveVisualMinerController {
 
 	public synchronized void setStatus(String s) {
 		panel.getStatusLabel().setText(s);
+	}
+	
+	public synchronized void setAnimationStatus(String s, boolean isTime) {
+		if (isTime) {
+			panel.getAnimationTimeLabel().setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+			panel.getAnimationTimeLabel().setText(s);
+		} else {
+			panel.getAnimationTimeLabel().setFont(panel.getStatusLabel().getFont());
+			panel.getAnimationTimeLabel().setText(s);
+		}
 	}
 
 	/**

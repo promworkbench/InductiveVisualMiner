@@ -14,7 +14,8 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.listeners.ImageTransformationChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
-import org.processmining.plugins.inductiveVisualMiner.animation.RenderingThread;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderingThread;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 /**
@@ -45,7 +46,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			//set up callback for animation frame complete
 			public void run() {
 				if (animationTimeChangedListener != null) {
-					animationTimeChangedListener.timeStepTaken(renderingThread.getLastRenderedTime());
+					animationTimeChangedListener.timeStepTaken(renderingThread.getRenderedFrameManager()
+							.getLastRenderedFrame().time);
 				}
 				repaint();
 			}
@@ -55,8 +57,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		//set up listener for image transformation (zooming, panning, resizing) changes
 		setImageTransformationChangedListener(new ImageTransformationChangedListener() {
 			public void imageTransformationChanged(AffineTransform image2user, AffineTransform user2image) {
-				renderingThread.setImageTransformation(image2user);
-				renderingThread.startOneFrame();
+				int s = renderingThread.getExternalSettingsManager().setImageTransformation(image2user);
+				renderingThread.renderOneFrame();
 			}
 		});
 
@@ -64,7 +66,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
 				//tell the animation thread
-				renderingThread.setSize(getWidth(), getHeight());
+				renderingThread.getExternalSettingsManager().setSize(getWidth(), getHeight());
+				renderingThread.renderOneFrame();
 			}
 		});
 	}
@@ -78,14 +81,21 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			paintPopup((Graphics2D) g);
 		}
 	};
-	
+
 	@Override
 	protected void drawAnimation(Graphics2D g) {
-		if (renderingThread.getLastRenderedImage() != null && isAnimationEnabled()) {
-			g.drawImage(renderingThread.getLastRenderedImage(), 0, 0, null);
+		RenderedFrame frame = renderingThread.getRenderedFrameManager().getLastRenderedFrame();
+
+		if (frame != null) {
+			frame.startDrawing();
+			if (frame.image != null && isAnimationEnabled() && !isDraggingImage) {
+				g.drawImage(frame.image, 0, 0, null);
+			} else {
+				System.out.println("don't draw");
+			}
+			frame.doneDrawing();
 		}
-		renderingThread.releaseLastRenderedImage();
-		
+
 		super.drawAnimation(g);
 	}
 
@@ -137,14 +147,6 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		return dot;
 	}
 
-	public void setTokens(GraphVizTokens tokens) {
-		renderingThread.setTokens(tokens);
-	}
-
-	public void setFilteredLog(IvMLogFiltered filteredLog) {
-		renderingThread.setFilteredLog(filteredLog);
-	}
-
 	public AnimationTimeChangedListener getAnimationTimeChangedListener() {
 		return animationTimeChangedListener;
 	}
@@ -157,7 +159,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	public void setAnimationTimeChangedListener(AnimationTimeChangedListener listener) {
 		this.animationTimeChangedListener = listener;
 	}
-	
+
 	/**
 	 * Sets whether the animation is rendered and controls are displayed.
 	 * 
@@ -166,7 +168,17 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	public void setAnimationEnabled(boolean enabled) {
 		animationEnabled = enabled;
 	}
-	
+
+	/**
+	 * Sets the tokens to be rendered.
+	 * 
+	 * @param animationGraphVizTokens
+	 */
+	public void setTokens(GraphVizTokens animationGraphVizTokens) {
+		renderingThread.settingsManager.setTokens(animationGraphVizTokens);
+		renderingThread.renderOneFrame();
+	}
+
 	@Override
 	public boolean isAnimationEnabled() {
 		return animationEnabled;
@@ -179,55 +191,60 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	 * @param animationMaxUserTime
 	 */
 	public void setAnimationExtremeTimes(double animationMinUserTime, double animationMaxUserTime) {
-		renderingThread.setExtremeTimes(animationMinUserTime, animationMaxUserTime);
+		renderingThread.getTimeManager().setExtremeTimes(animationMinUserTime, animationMaxUserTime);
+	}
+
+	public void setFilteredLog(IvMLogFiltered ivMLogFiltered) {
+		renderingThread.getExternalSettingsManager().setFilteredLog(ivMLogFiltered);
+		renderingThread.renderOneFrame();
 	}
 
 	@Override
 	public void pause() {
 		renderingThread.pause();
 	}
-	
+
 	@Override
 	public void resume() {
 		renderingThread.resume();
 	}
 
-	/**
-	 * 
-	 * @param time
-	 */
 	@Override
 	public void seek(double time) {
-		renderingThread.setTime(time);
+		renderingThread.seek(time);
 	}
-	
+
 	@Override
 	public void pauseResume() {
 		renderingThread.pauseResume();
 	}
-	
+
 	@Override
 	public boolean isAnimationPlaying() {
 		return renderingThread.isPlaying();
 	}
-	
+
 	@Override
 	public double getAnimationTime() {
-		return renderingThread.getLastRenderedTime();
+		RenderedFrame frame = renderingThread.getRenderedFrameManager().getLastRenderedFrame();
+		if (frame != null) {
+			return frame.time;
+		}
+		return -1;
 	}
-	
+
 	@Override
 	public double getAnimationMinimumTime() {
-		return renderingThread.getLastRenderedMinTime();
+		return renderingThread.getTimeManager().getMinTime();
 	}
 
 	@Override
 	public double getAnimationMaximumTime() {
-		return renderingThread.getLastRenderedMaxTime();
+		return renderingThread.getTimeManager().getMaxTime();
 	}
-	
+
 	@Override
-	public void startOneFrame() {
-		renderingThread.startOneFrame();
+	public void renderOneFrame() {
+		renderingThread.renderOneFrame();
 	}
 }
