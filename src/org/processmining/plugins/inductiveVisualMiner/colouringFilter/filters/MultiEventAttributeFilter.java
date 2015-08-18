@@ -63,7 +63,8 @@ public class MultiEventAttributeFilter extends ColouringFilter {
 	public boolean countInColouring(IvMTrace trace) {
 		String key = panel.getSelectedKey();
 		for (IvMMove event : trace) {
-			if (event.getAttributes().containsKey(key) && panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
+			if (event.getAttributes() != null && event.getAttributes().containsKey(key)
+					&& panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
 				return true;
 			}
 		}

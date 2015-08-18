@@ -20,7 +20,7 @@ public class ColouringFilterTraceWithEventTwice extends ColouringFilter {
 
 	MultiAttributeFilterGui panel = null;
 	boolean block = true;
-	
+
 	public String getName() {
 		return "Event happening twice filter";
 	}
@@ -64,7 +64,8 @@ public class ColouringFilterTraceWithEventTwice extends ColouringFilter {
 		String key = panel.getSelectedKey();
 		int count = 0;
 		for (IvMMove move : trace) {
-			if (move.getAttributes().containsKey(key) && panel.getSelectedAttributes().contains(move.getAttributes().get(key))) {
+			if (move.getAttributes() != null && move.getAttributes().containsKey(key)
+					&& panel.getSelectedAttributes().contains(move.getAttributes().get(key))) {
 				count++;
 				if (count >= 2) {
 					return true;
@@ -73,7 +74,7 @@ public class ColouringFilterTraceWithEventTwice extends ColouringFilter {
 		}
 		return false;
 	}
-	
+
 	public void updateExplanation() {
 		if (panel.getSelectedAttributes().isEmpty()) {
 			panel.getExplanation().setText(
@@ -101,5 +102,5 @@ public class ColouringFilterTraceWithEventTwice extends ColouringFilter {
 			panel.getExplanation().setText(s.toString());
 		}
 	}
-	
+
 }
