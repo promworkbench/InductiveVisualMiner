@@ -43,7 +43,6 @@ public class RenderingThread implements Runnable {
 	}
 	
 	public void renderOneFrame() {
-		System.out.println("render one frame");
 		singleFrameRequested.set(true);
 	}
 

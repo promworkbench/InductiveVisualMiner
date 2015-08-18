@@ -91,7 +91,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			if (frame.image != null && isAnimationEnabled() && !isDraggingImage) {
 				g.drawImage(frame.image, 0, 0, null);
 			} else {
-				System.out.println("don't draw");
+				
 			}
 			frame.doneDrawing();
 		}
