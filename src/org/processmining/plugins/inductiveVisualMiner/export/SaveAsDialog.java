@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.export;
 
 import java.io.File;
+import java.util.prefs.Preferences;
 
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -15,6 +16,7 @@ public class SaveAsDialog extends JFileChooser {
 	 * 
 	 */
 	private static final long serialVersionUID = 6614457648530087883L;
+	private static final Preferences preferences = Preferences.userRoot().node("org.processmining.graphviz");
 	
 	public enum FileType {
 		pngImage, pdfImage, svgImage, aviMovie
@@ -55,6 +57,7 @@ public class SaveAsDialog extends JFileChooser {
 	}
 
 	public SaveAsDialog(boolean animationExportPossible) {
+		super(preferences.get("lastUsedFolder", new File(".").getAbsolutePath()));
 		setAcceptAllFileFilterUsed(false);
 		addChoosableFileFilter(new IvMFileFilter(FileType.pngImage, "png", "png"));
 		addChoosableFileFilter(new IvMFileFilter(FileType.pdfImage, "pdf", "pdf"));
