@@ -38,7 +38,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import com.kitfox.svg.SVGDiagram;
 
 public class ExportAnimation {
-	
+
 	public static class DummyIvMFilteredLog implements IvMLogFilter {
 
 		public boolean isSomethingFiltered() {
@@ -48,7 +48,7 @@ public class ExportAnimation {
 		public boolean isFilteredOut(int traceIndex) {
 			return false;
 		}
-		
+
 	}
 
 	public static boolean saveAVItoFile(GraphVizTokens tokens, final ProcessTreeVisualisationInfo info,
@@ -110,26 +110,35 @@ public class ExportAnimation {
 			// initialize the animation
 			g.setBackground(Color.WHITE);
 			g.clearRect(0, 0, img.getWidth(), img.getHeight());
-			
+
 			AffineTransform transform = new AffineTransform();
 			transform.scale(height / svg.getHeight(), height / svg.getHeight());
 			AffineTransform transformInverse = transform.createInverse();
-			
+
 			IvMLogFilter filteredLog = new DummyIvMFilteredLog();
 			GraphVizTokensIterator tokensIterator = new GraphVizTokensLazyIterator(tokens);
 
 			//			System.out.println("frames " + frames);
 
+			//render the background once
+			BufferedImage background = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			{
+				Graphics2D backgroundG = background.createGraphics();
+				backgroundG.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				NavigableSVGPanel.drawSVG(backgroundG, svg, 0, 0, width, height);
+				backgroundG.dispose();
+			}
+
 			for (long frame = 0; frame < frames; frame++) {
 
 				double time = minDuration + ((frame / (1.0 * frames)) * (maxDuration - minDuration));
 
-				//paint the background
-				NavigableSVGPanel.drawSVG(g, svg, 0, 0, width, height);
+				//draw the background
+				g.drawImage(background, 0, 0, width, height, null);
 
 				//transform
 				g.transform(transform);
-				
+
 				//paint the tokens
 				Renderer.renderTokens(g, tokensIterator, filteredLog, time);
 
