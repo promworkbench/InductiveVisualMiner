@@ -52,6 +52,7 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog;
 import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog.FileType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
@@ -256,7 +257,7 @@ public class InductiveVisualMinerController {
 			});
 			f.setOnComplete(new Runnable() {
 				public void run() {
-					
+
 					state.resetPerformance();
 
 					ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
@@ -264,10 +265,10 @@ public class InductiveVisualMinerController {
 
 					//tell trace view the colour map and the selection
 					panel.getTraceView().set(state.getIvMLogFiltered());
-					
+
 					updateHighlighting();
 					updatePopup();
-					
+
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(state.getIvMLogFiltered());
 
@@ -443,11 +444,12 @@ public class InductiveVisualMinerController {
 						final GraphVizTokens tokens = state.getAnimationGraphVizTokens();
 						final Scaler scaler = state.getAnimationScaler();
 						final ProcessTreeVisualisationInfo info = state.getVisualisationInfo();
+						final IvMLogFilter filteredLog = state.getIvMLogFiltered();
 						new Thread(new Runnable() {
 							public void run() {
 								try {
-									if (!ExportAnimation.saveAVItoFile(tokens, info, colourMode, svg, dot, p.getA(),
-											panel, scaler)) {
+									if (!ExportAnimation.saveAVItoFile(filteredLog, tokens, info, colourMode, svg, dot,
+											p.getA(), panel, scaler)) {
 										System.out.println("deleted");
 										p.getA().delete();
 									}
@@ -515,7 +517,7 @@ public class InductiveVisualMinerController {
 	public synchronized void setStatus(String s) {
 		panel.getStatusLabel().setText(s);
 	}
-	
+
 	public synchronized void setAnimationStatus(String s, boolean isTime) {
 		if (isTime) {
 			panel.getAnimationTimeLabel().setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -553,8 +555,8 @@ public class InductiveVisualMinerController {
 	 */
 	public void updateHighlighting() {
 		TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(panel.getGraph()
-				.getSVG(), state.getVisualisationInfo(), state.getTree(), state.getVisualisationData(), state
-				.getMode().getVisualisationParameters(state));
+				.getSVG(), state.getVisualisationInfo(), state.getTree(), state.getVisualisationData(), state.getMode()
+				.getVisualisationParameters(state));
 		colourMap.setSelectedNodes(state.getSelectedNodes(), state.getSelectedLogMoves());
 		panel.getTraceView().setColourMap(colourMap);
 	}
@@ -572,8 +574,7 @@ public class InductiveVisualMinerController {
 
 					//frequencies
 					popup.add("frequency             "
-							+ IvMLogMetrics.getNumberOfTracesRepresented(unode, false,
-									state.getIvMLogInfoFiltered()));
+							+ IvMLogMetrics.getNumberOfTracesRepresented(unode, false, state.getIvMLogInfoFiltered()));
 
 					//waiting time
 					if (state.isPerformanceReady()) {
@@ -586,7 +587,7 @@ public class InductiveVisualMinerController {
 					} else {
 						popup.add(" ");
 					}
-					
+
 					//queueing time
 					if (state.isPerformanceReady()) {
 						if (state.getPerformance().getWaitingTime(unode) > -0.1) {

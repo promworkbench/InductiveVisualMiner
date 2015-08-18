@@ -39,21 +39,10 @@ import com.kitfox.svg.SVGDiagram;
 
 public class ExportAnimation {
 
-	public static class DummyIvMFilteredLog implements IvMLogFilter {
-
-		public boolean isSomethingFiltered() {
-			return false;
-		}
-
-		public boolean isFilteredOut(int traceIndex) {
-			return false;
-		}
-
-	}
-
-	public static boolean saveAVItoFile(GraphVizTokens tokens, final ProcessTreeVisualisationInfo info,
-			final Mode colourMode, final SVGDiagram svg, final Dot dot, final File file, final JPanel panel,
-			final Scaler scaler) throws IOException, NoninvertibleTransformException {
+	public static boolean saveAVItoFile(IvMLogFilter filteredLog, GraphVizTokens tokens,
+			final ProcessTreeVisualisationInfo info, final Mode colourMode, final SVGDiagram svg, final Dot dot,
+			final File file, final JPanel panel, final Scaler scaler) throws IOException,
+			NoninvertibleTransformException {
 
 		final GuaranteedProgressMonitor progressMonitor = new GuaranteedProgressMonitor(panel, "",
 				"Preparing animation", 0, 100);
@@ -115,7 +104,6 @@ public class ExportAnimation {
 			transform.scale(height / svg.getHeight(), height / svg.getHeight());
 			AffineTransform transformInverse = transform.createInverse();
 
-			IvMLogFilter filteredLog = new DummyIvMFilteredLog();
 			GraphVizTokensIterator tokensIterator = new GraphVizTokensLazyIterator(tokens);
 
 			//			System.out.println("frames " + frames);
