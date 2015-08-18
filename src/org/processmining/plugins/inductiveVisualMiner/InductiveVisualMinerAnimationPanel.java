@@ -88,7 +88,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 		if (frame != null) {
 			frame.startDrawing();
-			if (frame.image != null && isAnimationEnabled() && !isDraggingImage) {
+//			if (frame.image != null && isAnimationEnabled() && !isDraggingImage) {
+			if (frame.image != null && isAnimationEnabled()) {
 				g.drawImage(frame.image, 0, 0, null);
 			} else {
 				System.out.println("don't draw");
@@ -243,7 +244,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		return renderingThread.getTimeManager().getMaxTime();
 	}
 
-	@Override
+	//@Override
 	public void renderOneFrame() {
 		renderingThread.renderOneFrame();
 	}
