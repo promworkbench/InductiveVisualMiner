@@ -499,8 +499,6 @@ public class InductiveVisualMinerController {
 						updateHighlighting();
 						panel.getTraceView().repaint();
 					}
-					
-					panel.repaint();
 				}
 			}
 		});
