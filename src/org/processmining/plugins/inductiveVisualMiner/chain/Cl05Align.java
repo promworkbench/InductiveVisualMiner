@@ -25,6 +25,9 @@ public class Cl05Align
 	protected Pair<IvMLogBase, IvMLogInfo> executeLink(
 			Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> input) {
 		IvMLogBase log = AlignmentETM.align(input.getA(), input.getB(), input.getC(), input.getD(), input.getE(), input.getF(), canceller);
+		if (log == null) {
+			return null;
+		}
 		IvMLogInfo logInfo = new IvMLogInfo(log);
 		return Pair.of(log, logInfo);
 	}

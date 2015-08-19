@@ -53,6 +53,10 @@ public class ComputeAnimation {
 			//make dot tokens
 			final List<DotToken> dotTokens = computeDotTokensOfTrace(ivmTrace, info, colourMode, scaler, graph, canceller);
 			
+			if (canceller.isCancelled()) {
+				return null;
+			}
+			
 			//add to graphviz tokens
 			DotToken2GraphVizToken.convertTokens(dotTokens, graphVizTokens, svg, it.getPosition());
 

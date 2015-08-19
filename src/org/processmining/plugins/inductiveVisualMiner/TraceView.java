@@ -253,15 +253,14 @@ public class TraceView extends SideWindow {
 	 * 
 	 * @param log
 	 */
+	@SuppressWarnings({ "unchecked" })
 	public void set(IMLog log) {
 		if (!log.equals(showing)) {
+			showing = log;
 			traceView.clear();
 			traceView.setTraceBuilder(new IMLog2TraceBuilder(log));
-			for (IMTrace t : log) {
-				traceView.add(t);
-			}
+			traceView.addAll((Iterable<Object>) ((Iterable<? extends Object>) log));
 		}
-		showing = log;
 	}
 
 	/**
@@ -269,14 +268,14 @@ public class TraceView extends SideWindow {
 	 * 
 	 * @param tlog
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	public void set(IvMLog tlog) {
 		if (!tlog.equals(showing)) {
+			showing = tlog;
 			traceView.clear();
 			traceView.setTraceBuilder(new TimedLogTraceBuilder());
 			traceView.addAll((Iterable<Object>) ((Iterable<? extends Object>) tlog));
 		}
-		showing = tlog;
 	}
 
 	public void setColourMap(TraceViewColourMap colourMap) {

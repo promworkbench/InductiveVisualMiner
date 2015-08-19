@@ -2,6 +2,8 @@ package org.processmining.plugins.inductiveVisualMiner.animation;
 
 import gnu.trove.map.hash.THashMap;
 
+import java.lang.ref.SoftReference;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,20 +55,41 @@ public class TimestampsAdder {
 		}
 		return null;
 	}
-	
+
+	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_0 = new ThreadLocal<SoftReference<DateFormat>>();
+	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_1 = new ThreadLocal<SoftReference<DateFormat>>();
+	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_2 = new ThreadLocal<SoftReference<DateFormat>>();
+	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_3 = new ThreadLocal<SoftReference<DateFormat>>();
+	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_4 = new ThreadLocal<SoftReference<DateFormat>>();
+
+	private static DateFormat getThreadLocaleDateFormat(String formatString,
+			ThreadLocal<SoftReference<DateFormat>> threadLocal) {
+		SoftReference<DateFormat> softReference = threadLocal.get();
+		if (softReference != null) {
+			DateFormat dateFormat = softReference.get();
+			if (dateFormat != null) {
+				return dateFormat;
+			}
+		}
+		DateFormat result = new SimpleDateFormat(formatString);
+		softReference = new SoftReference<DateFormat>(result);
+		threadLocal.set(softReference);
+		return result;
+	}
+
 	public static String toString(Long timestamp) {
 		if (timestamp != null) {
 			Date date = new Date(timestamp);
 			if (date.getTime() % 1000 != 0) {
-				return (new SimpleDateFormat ("dd-MM-yyyy HH:mm:ss:SSS")).format(date);
+				return getThreadLocaleDateFormat("dd-MM-yyyy HH:mm:ss:SSS", DATE_FORMAT_0).format(date);
 			} else if (date.getSeconds() != 0) {
-				return (new SimpleDateFormat ("dd-MM-yyyy HH:mm:ss")).format(date);
+				return getThreadLocaleDateFormat("dd-MM-yyyy HH:mm:ss", DATE_FORMAT_1).format(date);
 			} else if (date.getMinutes() != 0) {
-				return (new SimpleDateFormat ("dd-MM-yyyy HH:mm")).format(date);
+				return getThreadLocaleDateFormat("dd-MM-yyyy HH:mm", DATE_FORMAT_2).format(date);
 			} else if (date.getHours() != 0) {
-				return (new SimpleDateFormat ("dd-MM-yyyy HHh")).format(date);
+				return getThreadLocaleDateFormat("dd-MM-yyyy HHh", DATE_FORMAT_3).format(date);
 			} else {
-				return (new SimpleDateFormat ("dd-MM-yyyy")).format(date);
+				return getThreadLocaleDateFormat("dd-MM-yyyy", DATE_FORMAT_4).format(date);
 			}
 		} else {
 			return null;
