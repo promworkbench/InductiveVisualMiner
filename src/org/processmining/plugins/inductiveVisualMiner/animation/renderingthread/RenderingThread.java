@@ -72,6 +72,7 @@ public class RenderingThread implements Runnable {
 	}
 
 	public void resume() {
+		timeManager.resume();
 		pauseRequested.set(false);
 	}
 
@@ -80,10 +81,14 @@ public class RenderingThread implements Runnable {
 		do {
 			v = pauseRequested.get();
 		} while (!pauseRequested.compareAndSet(v, !v));
+		if (v) {
+			timeManager.resume();
+		}
 	}
 
 	public void run() {
-		long sleep = 0, before;
+		long sleep = 0;
+		long before = 0;
 		while (!stopRequested.get()) {
 			//get the time before we do our game logic
 			before = System.currentTimeMillis();

@@ -27,6 +27,10 @@ public class TimeManager {
 		timeRequestedAt = System.currentTimeMillis();
 		this.timeRequested = timeRequested;
 	}
+	
+	public void resume() {
+		lastUpdated = System.currentTimeMillis();
+	}
 
 	public void setExtremeTimes(double minTime, double maxTime) {
 		minTimeRequested = minTime;
