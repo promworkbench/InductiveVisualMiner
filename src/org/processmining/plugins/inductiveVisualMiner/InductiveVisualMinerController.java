@@ -602,7 +602,7 @@ public class InductiveVisualMinerController {
 
 					//service time
 					if (state.isPerformanceReady()) {
-						if (state.getPerformance().getSojournTime(unode) > -0.1) {
+						if (state.getPerformance().getServiceTime(unode) > -0.1) {
 							popup.add("average service time  "
 									+ Performance.timeToString((long) state.getPerformance().getServiceTime(unode)));
 						} else {
