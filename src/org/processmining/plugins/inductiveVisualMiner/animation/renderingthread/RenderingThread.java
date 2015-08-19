@@ -15,13 +15,13 @@ public class RenderingThread implements Runnable {
 	private static final int minRenderDuration = 30;
 
 	//time
-	public final TimeManager timeManager;
+	private final TimeManager timeManager;
 
 	//external settings (tokens, log, ...)
-	public final ExternalSettingsManager settingsManager;
+	private final ExternalSettingsManager settingsManager;
 
 	//result
-	public final RenderedFrameManager renderedFrameManager;
+	private final RenderedFrameManager renderedFrameManager;
 
 	/**
 	 * Initialise the rendering thread.

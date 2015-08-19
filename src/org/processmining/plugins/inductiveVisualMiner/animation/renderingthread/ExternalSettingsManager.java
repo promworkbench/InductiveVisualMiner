@@ -23,9 +23,9 @@ public class ExternalSettingsManager {
 		int height;
 
 		//rendering variables
-		IvMLogFilter filteredLog;
-		GraphVizTokens tokens;
-		AffineTransform transform;
+		public IvMLogFilter filteredLog;
+		public GraphVizTokens tokens;
+		public AffineTransform transform;
 
 		//traceability
 		int id;

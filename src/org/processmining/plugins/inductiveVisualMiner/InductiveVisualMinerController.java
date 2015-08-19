@@ -406,62 +406,22 @@ public class InductiveVisualMinerController {
 		//set image/animation export button
 		panel.getSaveImageButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SaveAsDialog dialog = new SaveAsDialog(panel.getGraph().isAnimationEnabled());
-				final Pair<File, FileType> p = dialog.askUser(panel);
-				if (p == null) {
-					return;
-				}
-				switch (p.getRight()) {
-					case pdfImage :
-						//save the file asynchronously
-						new Thread(new Runnable() {
-							public void run() {
-								Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.pdf);
-							}
-						}).start();
-						break;
-					case pngImage :
-						//save the file asynchronously
-						new Thread(new Runnable() {
-							public void run() {
-								Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.png);
-							}
-						}).start();
-						break;
-					case svgImage :
-						//save the file asynchronously
-						new Thread(new Runnable() {
-							public void run() {
-								Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.svg);
-							}
-						}).start();
-						break;
-					case aviMovie :
-						//save avi asynchronously
-						final SVGDiagram svg = panel.getGraph().getSVG();
-						final Mode colourMode = state.getMode();
-						final Dot dot = panel.getGraph().getDot();
-						final GraphVizTokens tokens = state.getAnimationGraphVizTokens();
-						final Scaler scaler = state.getAnimationScaler();
-						final ProcessTreeVisualisationInfo info = state.getVisualisationInfo();
-						final IvMLogFilter filteredLog = state.getIvMLogFiltered();
-						new Thread(new Runnable() {
-							public void run() {
-								try {
-									if (!ExportAnimation.saveAVItoFile(filteredLog, tokens, info, colourMode, svg, dot,
-											p.getA(), panel, scaler)) {
-										System.out.println("deleted");
-										p.getA().delete();
-									}
-								} catch (IOException | NoninvertibleTransformException e) {
-									e.printStackTrace();
-								}
-							}
-						}).start();
-						break;
-				}
+				exportImage();
 			}
 		});
+
+		//listen to ctrl s to save image/animation (should override keyboard shortcut of GraphViz)
+//		{
+//			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+//					KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), "saveAs"); // - key
+//			panel.getActionMap().put("saveAs", new AbstractAction() {
+//				private static final long serialVersionUID = -4780600363000017631L;
+//
+//				public void actionPerformed(ActionEvent arg0) {
+//					exportImage();
+//				}
+//			});
+//		}
 
 		//set trace view button
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
@@ -632,6 +592,63 @@ public class InductiveVisualMinerController {
 			} else {
 				panel.getGraph().setShowPopup(false);
 			}
+		}
+	}
+
+	public void exportImage() {
+		SaveAsDialog dialog = new SaveAsDialog(panel.getGraph().isAnimationEnabled());
+		final Pair<File, FileType> p = dialog.askUser(panel);
+		if (p == null) {
+			return;
+		}
+		switch (p.getRight()) {
+			case pdfImage :
+				//save the file asynchronously
+				new Thread(new Runnable() {
+					public void run() {
+						Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.pdf);
+					}
+				}).start();
+				break;
+			case pngImage :
+				//save the file asynchronously
+				new Thread(new Runnable() {
+					public void run() {
+						Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.png);
+					}
+				}).start();
+				break;
+			case svgImage :
+				//save the file asynchronously
+				new Thread(new Runnable() {
+					public void run() {
+						Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.svg);
+					}
+				}).start();
+				break;
+			case aviMovie :
+				//save avi asynchronously
+				final SVGDiagram svg = panel.getGraph().getSVG();
+				final Mode colourMode = state.getMode();
+				final Dot dot = panel.getGraph().getDot();
+				final GraphVizTokens tokens = state.getAnimationGraphVizTokens();
+				final Scaler scaler = state.getAnimationScaler();
+				final ProcessTreeVisualisationInfo info = state.getVisualisationInfo();
+				final IvMLogFilter filteredLog = state.getIvMLogFiltered();
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							if (!ExportAnimation.saveAVItoFile(filteredLog, tokens, info, colourMode, svg, dot,
+									p.getA(), panel, scaler)) {
+								System.out.println("deleted");
+								p.getA().delete();
+							}
+						} catch (IOException | NoninvertibleTransformException e) {
+							e.printStackTrace();
+						}
+					}
+				}).start();
+				break;
 		}
 	}
 

@@ -14,7 +14,9 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.listeners.ImageTransformationChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.Renderer;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderingThread;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
@@ -84,16 +86,25 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	@Override
 	protected void drawAnimation(Graphics2D g) {
-		RenderedFrame frame = renderingThread.getRenderedFrameManager().getLastRenderedFrame();
+		if (!isPaintingForPrint()) {
+			//draw for screen display (optimised)
+			RenderedFrame frame = renderingThread.getRenderedFrameManager().getLastRenderedFrame();
 
-		if (frame != null) {
-			frame.startDrawing();
-			if (frame.image != null && isAnimationEnabled() && !isDraggingImage) {
-				g.drawImage(frame.image, 0, 0, null);
-			} else {
-				
+			if (frame != null) {
+				frame.startDrawing();
+				if (frame.image != null && isAnimationEnabled() && !isDraggingImage) {
+					g.drawImage(frame.image, 0, 0, null);
+				} else {
+
+				}
+				frame.doneDrawing();
 			}
-			frame.doneDrawing();
+		} else {
+			//draw for printing (non-optimised)
+
+			ExternalSettings settings = renderingThread.getExternalSettingsManager().getExternalSettings();
+			double time = renderingThread.getTimeManager().getLastRenderedTime();
+			Renderer.renderTokens(g, settings.tokens, settings.filteredLog, time);
 		}
 
 		super.drawAnimation(g);
@@ -175,7 +186,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	 * @param animationGraphVizTokens
 	 */
 	public void setTokens(GraphVizTokens animationGraphVizTokens) {
-		renderingThread.settingsManager.setTokens(animationGraphVizTokens);
+		renderingThread.getExternalSettingsManager().setTokens(animationGraphVizTokens);
 		renderingThread.renderOneFrame();
 	}
 

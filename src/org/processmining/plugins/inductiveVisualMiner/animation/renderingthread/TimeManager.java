@@ -66,6 +66,10 @@ public class TimeManager {
 		lastUpdated = now;
 		return time;
 	}
+	
+	public double getLastRenderedTime() {
+		return time;
+	}
 
 	public double getMinTime() {
 		return minTime;
