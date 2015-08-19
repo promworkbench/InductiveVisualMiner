@@ -243,6 +243,7 @@ public class TraceView extends SideWindow {
 		traceView.getScrollPane().setForeground(Color.white);
 		setForeground(Color.white);
 		traceView.getScrollPane().getViewport().setForeground(Color.white);
+		traceView.setMaxWedgeWidth(130);
 
 		traceView.setBackground(new Color(30, 30, 30));
 		traceView.setOpaque(true);
