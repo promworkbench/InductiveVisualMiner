@@ -121,7 +121,7 @@ public class ExportAnimation {
 
 				double time = minDuration + ((frame / (1.0 * frames)) * (maxDuration - minDuration));
 				
-				System.out.println("frame " + frame + ", time " + time);
+//				System.out.println("frame " + frame + ", time " + time);
 
 				//draw the background
 				g.drawImage(background, 0, 0, width, height, null);

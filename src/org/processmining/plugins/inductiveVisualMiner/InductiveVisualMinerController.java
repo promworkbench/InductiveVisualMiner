@@ -3,16 +3,18 @@ package org.processmining.plugins.inductiveVisualMiner;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.NoninvertibleTransformException;
-import java.io.File;
-import java.io.IOException;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -24,15 +26,12 @@ import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
-import org.processmining.plugins.graphviz.dot.Dot2Image;
-import org.processmining.plugins.graphviz.dot.Dot2Image.Type;
 import org.processmining.plugins.graphviz.dot.DotElement;
+import org.processmining.plugins.graphviz.visualisation.export.ExportDialog;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
-import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
-import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01MakeLog;
@@ -47,12 +46,9 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl09Performance;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
-import org.processmining.plugins.inductiveVisualMiner.export.ExportAnimation;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
-import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog;
-import org.processmining.plugins.inductiveVisualMiner.export.SaveAsDialog.FileType;
+import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
@@ -63,8 +59,6 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
-
-import com.kitfox.svg.SVGDiagram;
 
 public class InductiveVisualMinerController {
 
@@ -406,22 +400,30 @@ public class InductiveVisualMinerController {
 		//set image/animation export button
 		panel.getSaveImageButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				exportImage();
+				if (panel.getGraph().isAnimationEnabled()) {
+					new ExportDialog(panel.getGraph(), new ExporterAvi(state));
+				} else {
+					new ExportDialog(panel.getGraph());
+				}
 			}
 		});
 
 		//listen to ctrl s to save image/animation (should override keyboard shortcut of GraphViz)
-//		{
-//			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-//					KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), "saveAs"); // - key
-//			panel.getActionMap().put("saveAs", new AbstractAction() {
-//				private static final long serialVersionUID = -4780600363000017631L;
-//
-//				public void actionPerformed(ActionEvent arg0) {
-//					exportImage();
-//				}
-//			});
-//		}
+		{
+			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+					KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), "saveAs"); // - key
+			panel.getActionMap().put("saveAs", new AbstractAction() {
+				private static final long serialVersionUID = -4780600363000017631L;
+
+				public void actionPerformed(ActionEvent arg0) {
+					if (panel.getGraph().isAnimationEnabled()) {
+						new ExportDialog(panel.getGraph(), new ExporterAvi(state));
+					} else {
+						new ExportDialog(panel.getGraph());
+					}
+				}
+			});
+		}
 
 		//set trace view button
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
@@ -592,63 +594,6 @@ public class InductiveVisualMinerController {
 			} else {
 				panel.getGraph().setShowPopup(false);
 			}
-		}
-	}
-
-	public void exportImage() {
-		SaveAsDialog dialog = new SaveAsDialog(panel.getGraph().isAnimationEnabled());
-		final Pair<File, FileType> p = dialog.askUser(panel);
-		if (p == null) {
-			return;
-		}
-		switch (p.getRight()) {
-			case pdfImage :
-				//save the file asynchronously
-				new Thread(new Runnable() {
-					public void run() {
-						Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.pdf);
-					}
-				}).start();
-				break;
-			case pngImage :
-				//save the file asynchronously
-				new Thread(new Runnable() {
-					public void run() {
-						Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.png);
-					}
-				}).start();
-				break;
-			case svgImage :
-				//save the file asynchronously
-				new Thread(new Runnable() {
-					public void run() {
-						Dot2Image.dot2image(panel.getGraph().getDot(), p.getLeft(), Type.svg);
-					}
-				}).start();
-				break;
-			case aviMovie :
-				//save avi asynchronously
-				final SVGDiagram svg = panel.getGraph().getSVG();
-				final Mode colourMode = state.getMode();
-				final Dot dot = panel.getGraph().getDot();
-				final GraphVizTokens tokens = state.getAnimationGraphVizTokens();
-				final Scaler scaler = state.getAnimationScaler();
-				final ProcessTreeVisualisationInfo info = state.getVisualisationInfo();
-				final IvMLogFilter filteredLog = state.getIvMLogFiltered();
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							if (!ExportAnimation.saveAVItoFile(filteredLog, tokens, info, colourMode, svg, dot,
-									p.getA(), panel, scaler)) {
-								System.out.println("deleted");
-								p.getA().delete();
-							}
-						} catch (IOException | NoninvertibleTransformException e) {
-							e.printStackTrace();
-						}
-					}
-				}).start();
-				break;
 		}
 	}
 
