@@ -38,7 +38,7 @@ public class Cl07Animate extends ChainLink<Double, Double> {
 				public void call(Pair<Scaler, GraphVizTokens> result) throws Exception {
 					state.setAnimation(result.getA(), result.getB());
 					
-					panel.getSaveImageButton().setText("animation");
+					panel.getSaveImageButton().setText("image/animation");
 					panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
 					panel.getGraph().setAnimationExtremeTimes(state.getAnimationScaler().getMinInUserTime(),
 							state.getAnimationScaler().getMaxInUserTime());
