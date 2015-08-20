@@ -453,7 +453,11 @@ public class InductiveVisualMinerController {
 			public void timeStepTaken(double userTime) {
 				if (panel.getGraph().isAnimationEnabled()) {
 					long logTime = Math.round(state.getAnimationScaler().userTime2LogTime(userTime));
-					setAnimationStatus(TimestampsAdder.toString(logTime), true);
+					if (state.getAnimationScaler().isCorrectTime()) {
+						setAnimationStatus(TimestampsAdder.toString(logTime), true);
+					} else {
+						setAnimationStatus("animation random", true);
+					}
 
 					//draw queues
 					if (state.getMode().isUpdateWithTimeStep(state)) {

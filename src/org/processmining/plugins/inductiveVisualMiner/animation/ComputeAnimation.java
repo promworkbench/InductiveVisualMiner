@@ -30,7 +30,10 @@ public class ComputeAnimation {
 			throws NoninvertibleTransformException {
 
 		//scale timestamps
-		final Scaler scaler = Scaler.fromLog(ivmLog, initDuration, animationDuration, canceller);
+		Scaler scaler = Scaler.fromLog(ivmLog, initDuration, animationDuration, canceller);
+		if (scaler == null) {
+			scaler = Scaler.fromValues(animationDuration);
+		}
 
 		if (canceller.isCancelled()) {
 			return null;
