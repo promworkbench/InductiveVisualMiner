@@ -456,7 +456,7 @@ public class InductiveVisualMinerController {
 					if (state.getAnimationScaler().isCorrectTime()) {
 						setAnimationStatus(TimestampsAdder.toString(logTime), true);
 					} else {
-						setAnimationStatus("animation random", true);
+						setAnimationStatus("animation times are random", true);
 					}
 
 					//draw queues
