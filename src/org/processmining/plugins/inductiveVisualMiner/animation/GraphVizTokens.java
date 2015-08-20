@@ -249,6 +249,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	 */
 	public Triple<Double, Double, Double> eval(int tokenIndex, double time) {
 		
+		//normalise how far we are on the bezier to [0..1]
 		double t;
 		if (endTimes.get(tokenIndex) == startTimes.get(tokenIndex)) {
 			//single-time token point
@@ -257,9 +258,6 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 			t = (time - startTimes.get(tokenIndex)) / (endTimes.get(tokenIndex) - startTimes.get(tokenIndex));
 		}
 		
-		//normalise how far we are on the bezier to [0..1]
-		
-
 		int bezier = bezierPointers.get(tokenIndex);
 
 		//compute the position

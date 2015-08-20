@@ -233,7 +233,7 @@ public class InductiveVisualMinerController {
 			});
 			a.setOnComplete(new Runnable() {
 				public void run() {
-					//this is located in the chainlink
+					//animation is performed asynchronously, so we must do the complete in the animation chain link.
 				}
 			});
 			a.setOnException(onException);

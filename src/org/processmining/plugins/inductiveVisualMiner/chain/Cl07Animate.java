@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import javax.swing.SwingUtilities;
+
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
@@ -38,11 +40,16 @@ public class Cl07Animate extends ChainLink<Double, Double> {
 				public void call(Pair<Scaler, GraphVizTokens> result) throws Exception {
 					state.setAnimation(result.getA(), result.getB());
 					
-					panel.getSaveImageButton().setText("image/animation");
-					panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
-					panel.getGraph().setAnimationExtremeTimes(state.getAnimationScaler().getMinInUserTime(),
-							state.getAnimationScaler().getMaxInUserTime());
-					panel.getGraph().setAnimationEnabled(true);
+					//update the gui (in the main thread)
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							panel.getSaveImageButton().setText("image/animation");
+							panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
+							panel.getGraph().setAnimationExtremeTimes(state.getAnimationScaler().getMinInUserTime(),
+									state.getAnimationScaler().getMaxInUserTime());
+							panel.getGraph().setAnimationEnabled(true);
+						}
+					});
 				}
 
 			});
