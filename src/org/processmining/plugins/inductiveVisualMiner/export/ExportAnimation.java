@@ -40,7 +40,7 @@ import com.kitfox.svg.SVGDiagram;
 public class ExportAnimation {
 
 	public static final double timeMargin = 0.5; //idle time before first tokens start and after final token ends
-	public static final int framerate = 10;
+	public static final int framerate = 30;
 	public static final int width = 1500; //width of the movie
 
 	public static boolean saveAVItoFile(IvMLogFilter filteredLog, GraphVizTokens tokens,
