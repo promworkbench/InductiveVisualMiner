@@ -53,6 +53,8 @@ public class RenderedFrameManager {
 			drawing = rendering;
 			SwingUtilities.invokeLater(onFrameComplete);
 			return true;
+		} else {
+			drawing = -1;
 		}
 		return false;
 	}
@@ -71,6 +73,13 @@ public class RenderedFrameManager {
 			return null;
 		}
 		return results[drawing];
+	}
+	
+	public void invalidateLastRenderedFrame() {
+		if (drawing != -1) {
+			results[drawing].doneDrawing();
+		}
+		drawing = -1;
 	}
 
 	public class RenderedFrame {

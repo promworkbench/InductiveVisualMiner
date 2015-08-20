@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.util.Random;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensLazyIterator;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
@@ -24,7 +25,7 @@ public class ExternalSettingsManager {
 
 		//rendering variables
 		public IvMLogFilter filteredLog;
-		public GraphVizTokens tokens;
+		public GraphVizTokensLazyIterator tokens;
 		public AffineTransform transform;
 
 		//traceability
@@ -81,7 +82,7 @@ public class ExternalSettingsManager {
 		ExternalSettings newExternalSettings = new ExternalSettings();
 		newExternalSettings.width = settings.width;
 		newExternalSettings.height = settings.height;
-		newExternalSettings.tokens = animationGraphVizTokens;
+		newExternalSettings.tokens = new GraphVizTokensLazyIterator(animationGraphVizTokens);
 		newExternalSettings.filteredLog = settings.filteredLog;
 		newExternalSettings.transform = settings.transform;
 		newExternalSettings.id = random.nextInt();

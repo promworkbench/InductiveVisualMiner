@@ -48,8 +48,10 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			//set up callback for animation frame complete
 			public void run() {
 				if (animationTimeChangedListener != null) {
-					animationTimeChangedListener.timeStepTaken(renderingThread.getRenderedFrameManager()
-							.getLastRenderedFrame().time);
+					RenderedFrame lastRenderedFrame = renderingThread.getRenderedFrameManager().getLastRenderedFrame();
+					if (lastRenderedFrame != null) {
+						animationTimeChangedListener.timeStepTaken(lastRenderedFrame.time);
+					}
 				}
 				repaint();
 			}
@@ -60,6 +62,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		setImageTransformationChangedListener(new ImageTransformationChangedListener() {
 			public void imageTransformationChanged(AffineTransform image2user, AffineTransform user2image) {
 				renderingThread.getExternalSettingsManager().setImageTransformation(image2user);
+				renderingThread.getRenderedFrameManager().invalidateLastRenderedFrame();
 				renderingThread.renderOneFrame();
 			}
 		});
