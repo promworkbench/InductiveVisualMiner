@@ -90,9 +90,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 			double newEndTime = startTime + t * (endTime - startTime);
 			double newEndOpacity = startOpacity + t * (endOpacity - startOpacity);
 
-			if (lastTime != newEndTime) {
-				add(lastTime, newEndTime, bezier, lastOpacity, newEndOpacity, transform, traceIndex);
-			}
+			add(lastTime, newEndTime, bezier, lastOpacity, newEndOpacity, transform, traceIndex);
 
 			//move for the next round
 			lastTime = newEndTime;
@@ -250,8 +248,17 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	 * @return the point at which the curve is at time t and its opacity
 	 */
 	public Triple<Double, Double, Double> eval(int tokenIndex, double time) {
+		
+		double t;
+		if (endTimes.get(tokenIndex) == startTimes.get(tokenIndex)) {
+			//single-time token point
+			t = 0;
+		} else {
+			t = (time - startTimes.get(tokenIndex)) / (endTimes.get(tokenIndex) - startTimes.get(tokenIndex));
+		}
+		
 		//normalise how far we are on the bezier to [0..1]
-		double t = (time - startTimes.get(tokenIndex)) / (endTimes.get(tokenIndex) - startTimes.get(tokenIndex));
+		
 
 		int bezier = bezierPointers.get(tokenIndex);
 
