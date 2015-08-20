@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
-import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JPanel;
@@ -39,9 +38,9 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import com.kitfox.svg.SVGDiagram;
 
 public class ExportAnimation {
-	
+
 	public static final double timeMargin = 0.5; //idle time before first tokens start and after final token ends
-	public static final int framerate = 20;
+	public static final int framerate = 10;
 	public static final int width = 1500; //width of the movie
 
 	public static boolean saveAVItoFile(IvMLogFilter filteredLog, GraphVizTokens tokens,
@@ -106,8 +105,6 @@ public class ExportAnimation {
 
 			GraphVizTokensIterator tokensIterator = new GraphVizTokensLazyIterator(tokens);
 
-			//			System.out.println("frames " + frames);
-
 			//render the background once
 			BufferedImage background = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 			{
@@ -120,8 +117,6 @@ public class ExportAnimation {
 			for (long frame = 0; frame < frames; frame++) {
 
 				double time = minDuration + ((frame / (1.0 * frames)) * (maxDuration - minDuration));
-				
-//				System.out.println("frame " + frame + ", time " + time);
 
 				//draw the background
 				g.drawImage(background, 0, 0, width, height, null);
@@ -129,13 +124,9 @@ public class ExportAnimation {
 				//transform
 				g.transform(transform);
 
-				//paint the tokens
 				Renderer.renderTokens(g, tokensIterator, filteredLog, time);
 
 				g.transform(transformInverse);
-				
-				//write it to file
-				ImageIO.write(img, "png", new File("d:\\output\\movie\\frame " + frame + ".png"));
 
 				// write it to the writer
 				out.write(0, img, 1);
@@ -146,8 +137,10 @@ public class ExportAnimation {
 					return false;
 				}
 			}
-
 		} finally {
+			//close the progress monitor
+			progressMonitor.close();
+			
 			// Close the writer
 			if (out != null) {
 				out.close();
@@ -156,8 +149,7 @@ public class ExportAnimation {
 			// Dispose the graphics object
 			g.dispose();
 		}
-
-		progressMonitor.close();
+		
 		return !canceller.isCancelled();
 	}
 

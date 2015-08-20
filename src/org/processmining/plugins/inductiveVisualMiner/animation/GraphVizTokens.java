@@ -90,7 +90,9 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 			double newEndTime = startTime + t * (endTime - startTime);
 			double newEndOpacity = startOpacity + t * (endOpacity - startOpacity);
 
-			add(lastTime, newEndTime, bezier, lastOpacity, newEndOpacity, transform, traceIndex);
+			if (lastTime != newEndTime) {
+				add(lastTime, newEndTime, bezier, lastOpacity, newEndOpacity, transform, traceIndex);
+			}
 
 			//move for the next round
 			lastTime = newEndTime;
@@ -275,7 +277,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	public int size() {
 		return startTimes.size();
 	}
-	
+
 	//build-in no-object creating iterator
 	private double itTime;
 	private int itNext;
@@ -313,6 +315,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	}
 
 	private double itT;
+
 	public void itEval() {
 		//normalise how far we are on the current bezier to [0..1]
 		itT = (itTime - startTimes.get(itNow)) / (endTimes.get(itNow) - startTimes.get(itNow));
@@ -331,10 +334,11 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 		} else if (beziers.getStartOpacity(itBezierPointer) == 0 && beziers.getEndOpacity(itBezierPointer) == 0) {
 			itOpacity = Math.abs(itT - 0.5) * 2;
 		} else {
-			itOpacity = (1 - itT) * beziers.getStartOpacity(itBezierPointer) + itT * beziers.getEndOpacity(itBezierPointer);
+			itOpacity = (1 - itT) * beziers.getStartOpacity(itBezierPointer) + itT
+					* beziers.getEndOpacity(itBezierPointer);
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @return the opacity of the last bezier itEval() was called on.
@@ -342,7 +346,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	public double itGetOpacity() {
 		return itOpacity;
 	}
-	
+
 	/**
 	 * 
 	 * @return the x of the last bezier itEval() was called on.
@@ -350,7 +354,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	public double itGetX() {
 		return itX;
 	}
-	
+
 	/**
 	 * 
 	 * @return the y of the last bezier itEval() was called on.
@@ -358,7 +362,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	public double itGetY() {
 		return itY;
 	}
-	
+
 	/**
 	 * 
 	 * @return the current trace index.
@@ -366,11 +370,11 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	public int itGetTraceIndex() {
 		return tracePointers.get(itNow);
 	}
-	
+
 	public AffineTransform itGetTransform() {
 		return getTransform(itNow);
 	}
-	
+
 	public AffineTransform itGetTransformInverse() {
 		return getTransformInverse(itNow);
 	}
