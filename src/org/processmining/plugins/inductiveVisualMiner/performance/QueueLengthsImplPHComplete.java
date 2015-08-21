@@ -2,7 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.performance;
 
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsImplPHComplete extends QueueLengths {
 

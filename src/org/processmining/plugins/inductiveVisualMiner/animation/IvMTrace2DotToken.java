@@ -18,7 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.Task.Automatic;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 public class IvMTrace2DotToken {
 

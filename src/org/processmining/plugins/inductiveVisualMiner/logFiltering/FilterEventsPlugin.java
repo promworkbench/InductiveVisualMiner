@@ -48,10 +48,10 @@ public class FilterEventsPlugin {
 
 	private XLog log;
 	private XLogInfo logInfo;
-	private DefaultListModel eventClassList = new DefaultListModel();
-	private JList cEventClasses;
+	private DefaultListModel<XEventClass> eventClassList = new DefaultListModel<>();
+	private JList<XEventClass> cEventClasses;
 
-	private JComboBox cClassifiers;
+	private JComboBox<?> cClassifiers;
 	private JRadioButton removeSelected;
 	private JRadioButton replaceSelected;
 	private JRadioButton removeUnselected;
@@ -75,7 +75,7 @@ public class FilterEventsPlugin {
 		cClassifiers.setAlignmentX(0.5f);
 		thresholdsPanel.add(cClassifiers);
 
-		cEventClasses = new JList(eventClassList);
+		cEventClasses = new JList<>(eventClassList);
 		cEventClasses.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		cEventClasses.setLayoutOrientation(JList.VERTICAL);
 		cEventClasses.setVisibleRowCount(-1);
@@ -138,8 +138,8 @@ public class FilterEventsPlugin {
 	public XLog filter() {
 		//make set of selected event classes
 		Set<XEventClass> selectedEventClasses = new HashSet<XEventClass>();
-		for (Object e : cEventClasses.getSelectedValues()) {
-			selectedEventClasses.add((XEventClass) e);
+		for (XEventClass e : cEventClasses.getSelectedValuesList()) {
+			selectedEventClasses.add(e);
 		}
 
 		//copy only the events with event class that was selected

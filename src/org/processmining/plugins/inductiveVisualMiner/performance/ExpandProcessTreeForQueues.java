@@ -19,9 +19,9 @@ import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.Task.Manual;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractBlock;
 import org.processmining.processtree.impl.ProcessTreeImpl;
+import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 public class ExpandProcessTreeForQueues {
 	public static final String enqueue = "enqueue";

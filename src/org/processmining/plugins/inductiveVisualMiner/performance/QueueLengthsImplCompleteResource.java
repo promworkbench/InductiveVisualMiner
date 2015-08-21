@@ -5,7 +5,7 @@ import gnu.trove.set.hash.THashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsImplCompleteResource extends QueueLengths {
 

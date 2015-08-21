@@ -77,6 +77,7 @@ public class TimestampsAdder {
 		return result;
 	}
 
+	@SuppressWarnings("deprecation")
 	public static String toString(Long timestamp) {
 		if (timestamp != null) {
 			Date date = new Date(timestamp);

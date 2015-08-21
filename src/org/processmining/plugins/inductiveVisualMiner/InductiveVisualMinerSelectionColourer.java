@@ -16,13 +16,13 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
-import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
-import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
 import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractTask.Manual;
+import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 import com.kitfox.svg.Group;
 import com.kitfox.svg.SVGDiagram;
@@ -124,6 +124,7 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private static Pair<Color, Color> styleManual(UnfoldedNode unode, SVGDiagram svg, ProcessTreeVisualisationInfo info,
 			Pair<String, Long> cardinality, long minCardinality, long maxCardinality,
 			ProcessTreeVisualisationParameters visualisationParameters) throws SVGException {
@@ -215,6 +216,7 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void styleEdge(DotEdge edge, SVGDiagram svg, Pair<String, Long> cardinality,
 			long minCardinality, long maxCardinality, ColourMap colourMap, boolean showFrequency, SizeMap widthMap)
 			throws SVGException {

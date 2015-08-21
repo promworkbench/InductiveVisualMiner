@@ -11,8 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityL
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCombination;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActivityLog;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Cl09Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 
@@ -26,13 +25,13 @@ public class Cl09Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 		QueueLengths method = new QueueLengthsImplCombination(queueActivityLogs);
 
 		//compute times
-		TObjectDoubleHashMap<UnfoldedNode> waitingTimes = new TObjectDoubleHashMap<ProcessTree2Petrinet.UnfoldedNode>(
+		TObjectDoubleHashMap<UnfoldedNode> waitingTimes = new TObjectDoubleHashMap<UnfoldedNode>(
 				10, 0.5f, -1);
-		TObjectDoubleHashMap<UnfoldedNode> queueingTimes = new TObjectDoubleHashMap<ProcessTree2Petrinet.UnfoldedNode>(
+		TObjectDoubleHashMap<UnfoldedNode> queueingTimes = new TObjectDoubleHashMap<UnfoldedNode>(
 				10, 0.5f, -1);
-		TObjectDoubleHashMap<UnfoldedNode> serviceTimes = new TObjectDoubleHashMap<ProcessTree2Petrinet.UnfoldedNode>(
+		TObjectDoubleHashMap<UnfoldedNode> serviceTimes = new TObjectDoubleHashMap<UnfoldedNode>(
 				10, 0.5f, -1);
-		TObjectDoubleHashMap<UnfoldedNode> sojournTimes = new TObjectDoubleHashMap<ProcessTree2Petrinet.UnfoldedNode>(
+		TObjectDoubleHashMap<UnfoldedNode> sojournTimes = new TObjectDoubleHashMap<UnfoldedNode>(
 				10, 0.5f, -1);
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
 			QueueActivityLog activityLog = queueActivityLogs.get(unode);

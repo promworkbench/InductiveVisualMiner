@@ -248,7 +248,7 @@ public class GuaranteedProgressMonitor extends Object implements Accessible {
 					noteLabel = new JLabel(note);
 				pane = new ProgressOptionPane(new Object[] { message, noteLabel, myBar });
 				dialog = pane.createDialog(parentComponent, UIManager.getString("ProgressMonitor.progressText"));
-				dialog.show();
+				dialog.setVisible(true);
 			}
 		}
 	}
@@ -265,7 +265,7 @@ public class GuaranteedProgressMonitor extends Object implements Accessible {
 				noteLabel = new JLabel(note);
 			pane = new ProgressOptionPane(new Object[] { message, noteLabel, myBar });
 			dialog = pane.createDialog(parentComponent, UIManager.getString("ProgressMonitor.progressText"));
-			dialog.show();
+			dialog.setVisible(true);
 		}
 	}
 
@@ -606,20 +606,20 @@ public class GuaranteedProgressMonitor extends Object implements Accessible {
 		 */
 		public Accessible getAccessibleParent() {
 			if (dialog != null) {
-				return (Accessible) dialog;
+				return dialog;
 			}
 			return null;
 		}
 
-		/*
-		 * Returns the parent AccessibleContext
-		 */
-		private AccessibleContext getParentAccessibleContext() {
-			if (dialog != null) {
-				return dialog.getAccessibleContext();
-			}
-			return null;
-		}
+//		/*
+//		 * Returns the parent AccessibleContext
+//		 */
+//		private AccessibleContext getParentAccessibleContext() {
+//			if (dialog != null) {
+//				return dialog.getAccessibleContext();
+//			}
+//			return null;
+//		}
 
 		/**
 		 * Gets the 0-based index of this object in its accessible parent.

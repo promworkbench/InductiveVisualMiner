@@ -12,13 +12,11 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Manual;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 
 public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualisationData {
 
-	private long time;
 	private long minQueueLength;
 	private long maxQueueLength;
 	private TObjectDoubleMap<UnfoldedNode> computedLengths;
@@ -37,7 +35,7 @@ public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualis
 	
 	public void setTime(long time) {
 		//compute queue lengths
-		computedLengths = new TObjectDoubleHashMap<ProcessTree2Petrinet.UnfoldedNode>(10,
+		computedLengths = new TObjectDoubleHashMap<UnfoldedNode>(10,
 				0.5f, -1);
 		minQueueLength = Long.MAX_VALUE;
 		maxQueueLength = Long.MIN_VALUE;

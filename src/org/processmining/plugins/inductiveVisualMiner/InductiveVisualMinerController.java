@@ -58,7 +58,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Manual;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 public class InductiveVisualMinerController {
 

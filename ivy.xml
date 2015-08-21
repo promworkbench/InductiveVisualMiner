@@ -5,6 +5,8 @@
     	</description>
     </info>
     <dependencies>
+    	<dependency org="prom" name="PTConversions" rev="latest" changing="true" transitive="true" />
+    
     	<dependency org="prom" name="EvolutionaryTreeMiner" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="InductiveMiner" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="GraphViz" rev="latest" changing="true" transitive="true" />
