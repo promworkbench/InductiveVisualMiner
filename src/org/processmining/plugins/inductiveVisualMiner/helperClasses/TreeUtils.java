@@ -1,12 +1,17 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Node;
+import org.processmining.processtree.ProcessTree;
+import org.processmining.processtree.Task.Manual;
 import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 public class TreeUtils {
@@ -52,5 +57,21 @@ public class TreeUtils {
 			n2 = it2.next();
 		}
 		return lastEqual;
+	}
+	
+	/**
+	 * 
+	 * @param tree
+	 * @return a set of the names of all leaves in this tree.
+	 */
+	public static Set<String> getNodeNames(ProcessTree tree) {
+		Set<String> result = new THashSet<>();
+		for (UnfoldedNode unode : TreeUtils.unfoldAllNodes(new UnfoldedNode(tree.getRoot()))) {
+			String name = unode.getNode().getName();
+			if (unode.getNode() instanceof Manual) {
+				result.add(name);
+			}
+		}
+		return result;
 	}
 }
