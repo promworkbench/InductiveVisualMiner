@@ -15,8 +15,10 @@ public class ModePathsDeviations extends Mode {
 	public ModePathsDeviations() {
 		visualisationParameters.setShowFrequenciesOnModelEdges(true);
 		visualisationParameters.setShowFrequenciesOnMoveEdges(true);
-		visualisationParameters.setColourModelEdges(new ColourMapFixed(new Color(153, 153, 255)));
-		visualisationParameters.setColourMoves(new ColourMapFixed(new Color(255, 0, 0)));
+		//visualisationParameters.setColourModelEdges(new ColourMapFixed(new Color(153, 153, 255)));
+		visualisationParameters.setColourModelEdges(new ColourMapFixed(Color.black));
+		//visualisationParameters.setColourMoves(new ColourMapFixed(new Color(255, 0, 0)));
+		visualisationParameters.setColourMoves(new ColourMapFixed(Color.black));
 	}
 
 	public ProcessTreeVisualisationParameters getFinalVisualisationParameters(InductiveVisualMinerState state) {

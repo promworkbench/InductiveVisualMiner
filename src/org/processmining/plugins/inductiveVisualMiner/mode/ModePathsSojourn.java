@@ -3,7 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.mode;
 import java.awt.Color;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
-import org.processmining.plugins.graphviz.colourMaps.ColourMapRed;
+import org.processmining.plugins.graphviz.colourMaps.ColourMapGreyBlack;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
@@ -19,14 +19,17 @@ public class ModePathsSojourn extends Mode {
 
 	public ModePathsSojourn() {
 		visualisationParameters.setShowFrequenciesOnModelEdges(true);
-		visualisationParameters.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
+		//visualisationParameters.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
+		visualisationParameters.setColourModelEdges(new ColourMapFixed(Color.black));
 		visualisationParameters.setShowLogMoves(false);
 		visualisationParameters.setShowModelMoves(false);
-		visualisationParameters.setColourNodes(new ColourMapRed());
+		//visualisationParameters.setColourNodes(new ColourMapRed());
+		visualisationParameters.setColourNodes(new ColourMapGreyBlack());
 		visualisationParameters.setModelEdgesWidth(new SizeMapFixed(1));
 		
 		visualisationParametersBeforeQueues.setShowFrequenciesOnModelEdges(true);
-		visualisationParametersBeforeQueues.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
+		//visualisationParametersBeforeQueues.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
+		visualisationParametersBeforeQueues.setColourModelEdges(new ColourMapFixed(Color.black));
 		visualisationParametersBeforeQueues.setShowLogMoves(false);
 		visualisationParametersBeforeQueues.setShowModelMoves(false);
 		visualisationParametersBeforeQueues.setColourNodes(new ColourMapFixed(Color.white));
