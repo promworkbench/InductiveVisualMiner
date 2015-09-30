@@ -556,7 +556,7 @@ public class InductiveVisualMinerController {
 
 					//queueing time
 					if (state.isPerformanceReady()) {
-						if (state.getPerformance().getWaitingTime(unode) > -0.1) {
+						if (state.getPerformance().getQueueingTime(unode) > -0.1) {
 							popup.add("average queueing time "
 									+ Performance.timeToString((long) state.getPerformance().getQueueingTime(unode)));
 						} else {
