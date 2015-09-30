@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.mode;
 
-import org.processmining.plugins.graphviz.colourMaps.ColourMapGreyBlack;
+import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
@@ -13,8 +13,7 @@ public class ModePaths extends Mode {
 
 	public ModePaths() {
 		visualisationParameters.setShowFrequenciesOnModelEdges(true);
-		//visualisationParameters.setColourModelEdges(new ColourMapBlue());
-		visualisationParameters.setColourModelEdges(new ColourMapGreyBlack());
+		visualisationParameters.setColourModelEdges(new ColourMapBlue());
 		visualisationParameters.setModelEdgesWidth(new SizeMapLinear(1, 3));
 		visualisationParameters.setShowFrequenciesOnMoveEdges(false);
 		visualisationParameters.setShowLogMoves(false);

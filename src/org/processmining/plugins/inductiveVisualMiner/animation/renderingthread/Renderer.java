@@ -20,8 +20,7 @@ public class Renderer {
 
 	//rendering constants
 	public static final int tokenRadius = 4;
-	//public static final Color tokenFillColour = Color.yellow;
-	public static final Color tokenFillColour = Color.black;
+	public static final Color tokenFillColour = Color.yellow;
 	public static final Color tokenStrokeColour = Color.black;
 	public static final Color backgroundColor = new Color(255, 255, 255, 0);
 	public static final Stroke tokenStroke = new BasicStroke(1.5f);

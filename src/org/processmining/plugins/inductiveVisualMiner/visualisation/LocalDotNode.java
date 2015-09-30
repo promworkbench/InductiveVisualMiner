@@ -53,15 +53,13 @@ public class LocalDotNode extends DotNode {
 				setOption("width", "0.2");
 				setOption("shape", "circle");
 				setOption("style", "filled");
-				//setOption("fillcolor", "red");
-				setOption("fillcolor", "black");
+				setOption("fillcolor", "red");
 				break;
 			case source :
 				setOption("width", "0.2");
 				setOption("shape", "circle");
 				setOption("style", "filled");
-				//setOption("fillcolor", "green");
-				setOption("fillcolor", "black");
+				setOption("fillcolor", "green");
 				break;
 			case xor :
 				setOption("width", "0.05");

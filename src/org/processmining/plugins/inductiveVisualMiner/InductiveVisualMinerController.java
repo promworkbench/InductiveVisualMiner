@@ -306,8 +306,6 @@ public class InductiveVisualMinerController {
 	}
 
 	private void initGui() {
-		
-		panel.getGraph().pause();
 
 		//noise filter
 		panel.getPathsSlider().addChangeListener(new ChangeListener() {

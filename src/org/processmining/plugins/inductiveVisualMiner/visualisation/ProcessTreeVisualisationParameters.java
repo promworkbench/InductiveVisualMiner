@@ -3,8 +3,8 @@ package org.processmining.plugins.inductiveVisualMiner.visualisation;
 import java.awt.Color;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
+import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
-import org.processmining.plugins.graphviz.colourMaps.ColourMapGreyBlack;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapOpacity;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
@@ -13,8 +13,7 @@ public class ProcessTreeVisualisationParameters {
 	
 	//nodes
 	private boolean showFrequenciesOnNodes = true;
-	//private ColourMap colourNodes = new ColourMapBlue();
-	private ColourMap colourNodes = new ColourMapGreyBlack();
+	private ColourMap colourNodes = new ColourMapBlue();
 	
 	//model edges
 	private ColourMap colourModelEdges = new ColourMapOpacity(new ColourMapFixed(Color.black));
@@ -24,8 +23,7 @@ public class ProcessTreeVisualisationParameters {
 	//moves
 	private boolean showLogMoves = true;
 	private boolean showModelMoves = true;
-	//private ColourMap colourMoves = new ColourMapFixed(Color.red);
-	private ColourMap colourMoves = new ColourMapGreyBlack();
+	private ColourMap colourMoves = new ColourMapFixed(Color.red);
 	private SizeMap moveEdgesWidth = new SizeMapLinear(3, 4);
 	private boolean showFrequenciesOnMoveEdges = true;
 	private boolean repairLogMoves = false;
