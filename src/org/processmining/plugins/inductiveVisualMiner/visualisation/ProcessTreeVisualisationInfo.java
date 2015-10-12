@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class ProcessTreeVisualisationInfo {
 	private final Set<LocalDotNode> nodes;

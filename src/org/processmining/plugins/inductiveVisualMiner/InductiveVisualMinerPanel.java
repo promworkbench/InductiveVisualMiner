@@ -31,7 +31,7 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 import com.fluxicon.slickerbox.components.NiceDoubleSlider;
 import com.fluxicon.slickerbox.components.NiceSlider.Orientation;

@@ -12,7 +12,7 @@ import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Manual;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class TreeUtils {
 	public static List<UnfoldedNode> unfoldAllNodes(UnfoldedNode unode) {

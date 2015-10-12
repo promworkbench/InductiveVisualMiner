@@ -9,7 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Cl03Mine extends
 		ChainLink<Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters>, ProcessTree> {

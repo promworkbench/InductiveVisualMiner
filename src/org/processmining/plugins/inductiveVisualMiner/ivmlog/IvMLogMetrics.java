@@ -18,7 +18,7 @@ import org.processmining.processtree.Block.XorLoop;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.Task.Manual;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class IvMLogMetrics {
 

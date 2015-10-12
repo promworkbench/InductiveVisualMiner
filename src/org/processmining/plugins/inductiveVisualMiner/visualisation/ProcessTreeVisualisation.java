@@ -19,6 +19,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractBlock.And;
 import org.processmining.processtree.impl.AbstractBlock.Or;
 import org.processmining.processtree.impl.AbstractBlock.Seq;
@@ -26,7 +27,6 @@ import org.processmining.processtree.impl.AbstractBlock.Xor;
 import org.processmining.processtree.impl.AbstractBlock.XorLoop;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 public class ProcessTreeVisualisation {
 

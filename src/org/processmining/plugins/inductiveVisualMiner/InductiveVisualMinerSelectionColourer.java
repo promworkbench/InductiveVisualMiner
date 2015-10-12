@@ -21,8 +21,8 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
 import org.processmining.processtree.ProcessTree;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractTask.Manual;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 import com.kitfox.svg.Group;
 import com.kitfox.svg.SVGDiagram;

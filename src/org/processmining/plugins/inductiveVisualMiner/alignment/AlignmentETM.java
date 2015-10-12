@@ -32,9 +32,9 @@ import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerforma
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
 
 public class AlignmentETM {
 

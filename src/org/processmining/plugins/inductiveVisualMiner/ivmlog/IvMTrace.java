@@ -8,7 +8,7 @@ import org.deckfour.xes.model.XAttributeMap;
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.processtree.Task.Automatic;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class IvMTrace extends ArrayList<IvMMove> {
 

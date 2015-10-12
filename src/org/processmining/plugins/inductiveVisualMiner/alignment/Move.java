@@ -6,7 +6,7 @@ import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
 import org.processmining.processtree.Task.Automatic;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Move implements Event {
 

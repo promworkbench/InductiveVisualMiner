@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsMeasure {
 

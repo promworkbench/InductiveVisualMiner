@@ -5,7 +5,7 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 import java.util.Map;
 
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsImplPHEnqueueStartComplete extends QueueLengths {
 

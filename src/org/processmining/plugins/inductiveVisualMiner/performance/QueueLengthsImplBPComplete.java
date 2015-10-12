@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Map;
 
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsImplBPComplete extends QueueLengths {
 

@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityL
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCombination;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActivityLog;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Cl09Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 

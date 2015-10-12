@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.processmining.processtree.Node;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class LogSplitter {
 	

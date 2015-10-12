@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Manual;
-import org.processmining.ptconversions.pn.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 
 public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualisationData {
