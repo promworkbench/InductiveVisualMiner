@@ -24,7 +24,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
  * This class takes care of the node popups and render an animation
  * 
  * @author sleemans
- *
+ * 
  */
 public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
@@ -106,8 +106,10 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			//draw for printing (non-optimised)
 
 			ExternalSettings settings = renderingThread.getExternalSettingsManager().getExternalSettings();
-			double time = renderingThread.getTimeManager().getLastRenderedTime();
-			Renderer.renderTokens(g, settings.tokens, settings.filteredLog, time);
+			if (settings.tokens != null) {
+				double time = renderingThread.getTimeManager().getLastRenderedTime();
+				Renderer.renderTokens(g, settings.tokens, settings.filteredLog, time);
+			}
 		}
 
 		super.drawAnimation(g);
