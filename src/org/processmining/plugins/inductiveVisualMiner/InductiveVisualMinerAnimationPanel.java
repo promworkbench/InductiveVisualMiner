@@ -14,6 +14,8 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.listeners.ImageTransformationChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIterator;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensLazyIterator;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.Renderer;
@@ -108,7 +110,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			ExternalSettings settings = renderingThread.getExternalSettingsManager().getExternalSettings();
 			if (settings.tokens != null) {
 				double time = renderingThread.getTimeManager().getLastRenderedTime();
-				Renderer.renderTokens(g, settings.tokens, settings.filteredLog, time);
+				GraphVizTokensIterator tokens = new GraphVizTokensLazyIterator(settings.tokens);
+				Renderer.renderTokens(g, tokens, settings.filteredLog, time);
 			}
 		}
 
