@@ -59,6 +59,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			}
 		});
 		renderingThread.start();
+		renderingThread.pause();
 
 		//set up listener for image transformation (zooming, panning, resizing) changes
 		setImageTransformationChangedListener(new ImageTransformationChangedListener() {

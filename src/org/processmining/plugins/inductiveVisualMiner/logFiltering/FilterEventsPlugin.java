@@ -39,11 +39,13 @@ import org.deckfour.xes.model.impl.XTraceImpl;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.annotations.Plugin;
+import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 
 import com.fluxicon.slickerbox.factory.SlickerFactory;
 
-@Plugin(name = "Filter events", returnLabels = { "Filtered log" }, returnTypes = { XLog.class }, parameterLabels = { "Log" }, userAccessible = true)
+@Plugin(name = "Filter events", returnLabels = { "Filtered log" }, returnTypes = { XLog.class }, parameterLabels = { "Log" }, userAccessible = true,
+		categories = { PluginCategory.Filtering}, help = "Filter events based on attribute values.")
 public class FilterEventsPlugin {
 
 	private XLog log;
@@ -57,7 +59,7 @@ public class FilterEventsPlugin {
 	private JRadioButton removeUnselected;
 	private JRadioButton replaceUnselected;
 
-	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
+	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl", pack = "InductiveVisualMiner")
 	@PluginVariant(variantLabel = "Filter log on life cycle, default", requiredParameterLabels = { 0 })
 	public XLog filterLog(UIPluginContext context, final XLog log) throws Exception {
 

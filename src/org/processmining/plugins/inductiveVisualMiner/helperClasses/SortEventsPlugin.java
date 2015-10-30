@@ -10,11 +10,13 @@ import org.deckfour.xes.model.XTrace;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
+import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 
 public class SortEventsPlugin {
-	@Plugin(name = "Sort events in traces, based on time stamp (in place)", returnLabels = { "Log" }, returnTypes = { XLog.class }, parameterLabels = { "Log with sorted events" }, userAccessible = true)
-	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
+	@Plugin(name = "Sort events in traces, based on time stamp (in place)", returnLabels = { "Log" }, returnTypes = { XLog.class }, parameterLabels = { "Log with sorted events" }, userAccessible = true,
+			categories = { PluginCategory.Filtering}, help = "Sort events in traces, based on time stamp (in place).")
+	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl", pack = "InductiveVisualMiner")
 	@PluginVariant(variantLabel = "Mine a Process Tree, dialog", requiredParameterLabels = { 0 })
 	public XLog sort(PluginContext context, XLog log) {
 		for (XTrace trace : log) {
