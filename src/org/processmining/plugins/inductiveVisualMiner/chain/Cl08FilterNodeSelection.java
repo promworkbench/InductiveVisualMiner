@@ -7,6 +7,7 @@ import java.util.Set;
 
 import nl.tue.astar.AStarThread.Canceller;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
@@ -22,6 +23,10 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 public class Cl08FilterNodeSelection
 		extends
 		ChainLink<Quintuple<IvMLogBase, Set<UnfoldedNode>, Set<LogMovePosition>, List<ColouringFilter>, IvMLogInfo>, Pair<IvMLogFiltered, IvMLogInfo>> {
+
+	public Cl08FilterNodeSelection(ProMCanceller globalCanceller) {
+		super(globalCanceller);
+	}
 
 	protected Quintuple<IvMLogBase, Set<UnfoldedNode>, Set<LogMovePosition>, List<ColouringFilter>, IvMLogInfo> generateInput(
 			InductiveVisualMinerState state) {

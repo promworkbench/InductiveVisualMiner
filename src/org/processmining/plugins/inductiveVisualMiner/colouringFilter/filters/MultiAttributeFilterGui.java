@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.colouringFilter.filters;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -41,7 +40,6 @@ public class MultiAttributeFilterGui extends ColouringFilterGui {
 		{
 			explanation = new JLabel("Only highlight traces of which the ");
 			explanation.setPreferredSize(new Dimension(100, 50));
-			explanation.setBackground(Color.yellow);
 			GridBagConstraints c = new GridBagConstraints();
 			c.gridx = 1;
 			c.gridy = 1;

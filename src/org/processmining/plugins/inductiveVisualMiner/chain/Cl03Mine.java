@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import java.util.HashSet;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
@@ -13,6 +14,10 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class Cl03Mine extends
 		ChainLink<Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters>, ProcessTree> {
+
+	public Cl03Mine(ProMCanceller globalCanceller) {
+		super(globalCanceller);
+	}
 
 	protected Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters> generateInput(InductiveVisualMinerState state) {
 		VisualMinerParameters minerParameters = new VisualMinerParameters(state.getPaths());

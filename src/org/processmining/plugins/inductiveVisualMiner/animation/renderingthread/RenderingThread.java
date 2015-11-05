@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.animation.renderingthread
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
 
@@ -13,6 +14,7 @@ public class RenderingThread implements Runnable {
 	private final AtomicBoolean pauseRequested = new AtomicBoolean(false);
 	private final AtomicBoolean singleFrameRequested = new AtomicBoolean(false);
 	private static final int minRenderDuration = 30;
+	private final ProMCanceller canceller;
 
 	//time
 	private final TimeManager timeManager;
@@ -32,10 +34,11 @@ public class RenderingThread implements Runnable {
 	 * @param width
 	 * @param height
 	 */
-	public RenderingThread(int minTime, int maxTime, Runnable onFrameComplete) {
+	public RenderingThread(int minTime, int maxTime, Runnable onFrameComplete, ProMCanceller canceller) {
 		timeManager = new TimeManager(minTime, maxTime);
 		settingsManager = new ExternalSettingsManager();
 		renderedFrameManager = new RenderedFrameManager(onFrameComplete, settingsManager);
+		this.canceller = canceller;
 	}
 
 	public void seek(double time) {
@@ -89,13 +92,14 @@ public class RenderingThread implements Runnable {
 	public void run() {
 		long sleep = 0;
 		long before = 0;
-		while (!stopRequested.get()) {
+		while (!stopRequested.get() && !canceller.isCancelled()) {
+			System.out.println(canceller.isCancelled());
 			//get the time before we do our game logic
 			before = System.currentTimeMillis();
 
 			//do the work
 			if (singleFrameRequested.compareAndSet(true, false)) {
-				while (!performRender()) {
+				while (!performRender() && !canceller.isCancelled()) {
 				}
 			} else if (!pauseRequested.get()) {
 				performRender();

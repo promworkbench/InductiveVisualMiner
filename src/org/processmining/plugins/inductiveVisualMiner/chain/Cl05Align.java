@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
@@ -15,6 +16,10 @@ import org.processmining.processtree.ProcessTree;
 public class Cl05Align
 		extends
 		ChainLink<Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses>, Pair<IvMLogBase, IvMLogInfo>> {
+
+	public Cl05Align(ProMCanceller globalCanceller) {
+		super(globalCanceller);
+	}
 
 	protected Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> generateInput(
 			InductiveVisualMinerState state) {

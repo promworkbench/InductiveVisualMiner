@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.chain.ChainLink.ResettableCanceller;
@@ -34,12 +35,12 @@ public class ThreadedComputer<I, O> {
 		currentExecution = null;
 	}
 
-	public synchronized void compute(final I input) {
+	public synchronized void compute(final I input, ProMCanceller globalCanceller) {
 		if (currentCanceller != null) {
 			currentCanceller.cancel();
 		}
 		
-		final ResettableCanceller newCanceller = new ResettableCanceller();
+		final ResettableCanceller newCanceller = new ResettableCanceller(globalCanceller);
 		final UUID newExecution = UUID.randomUUID();
 		currentExecution = newExecution;
 		currentCanceller = newCanceller;

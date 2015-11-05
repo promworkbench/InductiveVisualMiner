@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import org.processmining.framework.plugin.PluginContext;
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
@@ -66,7 +67,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private InputFunction<GraphDirection> onGraphDirectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			ClassifierWrapper[] classifiers, VisualMinerWrapper[] miners, boolean enableMining) {
+			ClassifierWrapper[] classifiers, VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
 		int gridy = 0;
 
 		setLayout(new GridBagLayout());
@@ -142,8 +143,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 			add(colourLabel, cColourLabel);
 
 			colourSelection = SlickerFactory.instance().createComboBox(
-					new Mode[] { new ModePaths(), new ModePathsDeviations(),
-							new ModePathsQueueLengths(), new ModePathsSojourn(), new ModePathsService() });
+					new Mode[] { new ModePaths(), new ModePathsDeviations(), new ModePathsQueueLengths(),
+							new ModePathsSojourn(), new ModePathsService() });
 			GridBagConstraints ccolourSelection = new GridBagConstraints();
 			ccolourSelection.gridx = 2;
 			ccolourSelection.gridy = gridy++;
@@ -243,7 +244,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		//graph panel
 		{
-			graphPanel = new InductiveVisualMinerAnimationPanel();
+			graphPanel = new InductiveVisualMinerAnimationPanel(canceller);
 			graphPanel.setFocusable(true);
 
 			//set the graph direction changed listener

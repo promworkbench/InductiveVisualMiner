@@ -4,6 +4,7 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 import java.util.Map;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
@@ -14,6 +15,10 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActiv
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Cl09Performance extends ChainLink<IvMLog, PerformanceWrapper> {
+
+	public Cl09Performance(ProMCanceller globalCanceller) {
+		super(globalCanceller);
+	}
 
 	protected IvMLog generateInput(InductiveVisualMinerState state) {
 		return state.getIvMLogFiltered();

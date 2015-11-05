@@ -9,6 +9,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.util.List;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.listeners.ImageTransformationChangedListener;
@@ -42,7 +43,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	RenderingThread renderingThread;
 	private AnimationTimeChangedListener animationTimeChangedListener = null;
 
-	public InductiveVisualMinerAnimationPanel() {
+	public InductiveVisualMinerAnimationPanel(ProMCanceller canceller) {
 		super(getSplashScreen());
 
 		renderingThread = new RenderingThread(0, 180, new Runnable() {
@@ -57,7 +58,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 				}
 				repaint();
 			}
-		});
+		}, canceller);
 		renderingThread.start();
 		renderingThread.pause();
 

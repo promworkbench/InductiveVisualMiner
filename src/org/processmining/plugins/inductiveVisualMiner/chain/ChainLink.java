@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import nl.tue.astar.AStarThread.Canceller;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
@@ -17,11 +18,21 @@ public abstract class ChainLink<I, O> {
 	private Runnable onStart;
 	private Runnable onComplete;
 	private Function<Exception, Object> onException;
-	protected ResettableCanceller canceller = new ResettableCanceller();
+	protected final ResettableCanceller canceller;
+
+	public ChainLink(ProMCanceller globalCanceller) {
+		canceller = new ResettableCanceller(globalCanceller);
+	}
 
 	public static class ResettableCanceller implements Canceller {
 
 		private boolean cancelled = false;
+
+		private ProMCanceller globalCanceller;
+
+		public ResettableCanceller(ProMCanceller globalCanceller) {
+			this.globalCanceller = globalCanceller;
+		}
 
 		public void cancel() {
 			this.cancelled = true;
@@ -32,7 +43,11 @@ public abstract class ChainLink<I, O> {
 		}
 
 		public boolean isCancelled() {
-			return cancelled;
+			return cancelled || globalCanceller.isCancelled();
+		}
+
+		public boolean isGlobalCancelled() {
+			return globalCanceller.isCancelled();
 		}
 
 	}
@@ -88,7 +103,7 @@ public abstract class ChainLink<I, O> {
 				}
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						if (chain.getCurrentExecution().equals(execution)) {
+						if (chain.getCurrentExecution().equals(execution) && !canceller.isGlobalCancelled()) {
 							processResult(result, state);
 							if (onComplete != null) {
 								onComplete.run();

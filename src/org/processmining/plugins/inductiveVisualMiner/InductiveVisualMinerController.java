@@ -21,6 +21,7 @@ import javax.swing.event.ChangeListener;
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.Pair;
@@ -69,7 +70,7 @@ public class InductiveVisualMinerController {
 	private final PluginContext context;
 
 	public InductiveVisualMinerController(PluginContext context, final InductiveVisualMinerPanel panel,
-			final InductiveVisualMinerState state) {
+			final InductiveVisualMinerState state, ProMCanceller canceller) {
 		this.panel = panel;
 		this.state = state;
 		this.context = context;
@@ -78,12 +79,12 @@ public class InductiveVisualMinerController {
 		initGui();
 
 		//set up the chain
-		chain = new Chain(context.getExecutor(), state);
+		chain = new Chain(context.getExecutor(), state, canceller);
 
 		//make log
 		final Function<Exception, Object> onException;
 		{
-			Cl01MakeLog m = new Cl01MakeLog();
+			Cl01MakeLog m = new Cl01MakeLog(canceller);
 			m.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
@@ -113,7 +114,7 @@ public class InductiveVisualMinerController {
 
 		//filter on activities
 		{
-			Cl02FilterLogOnActivities f = new Cl02FilterLogOnActivities();
+			Cl02FilterLogOnActivities f = new Cl02FilterLogOnActivities(canceller);
 			f.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
@@ -132,7 +133,7 @@ public class InductiveVisualMinerController {
 
 		//mine a model
 		{
-			Cl03Mine m = new Cl03Mine();
+			Cl03Mine m = new Cl03Mine(canceller);
 			m.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
@@ -182,7 +183,7 @@ public class InductiveVisualMinerController {
 
 				}
 			};
-			Cl04LayoutModel chainLinkLayout = new Cl04LayoutModel();
+			Cl04LayoutModel chainLinkLayout = new Cl04LayoutModel(canceller);
 			chainLinkLayout.setOnStart(layoutStart);
 			chainLinkLayout.setOnComplete(layoutComplete);
 			chainLinkLayout.setOnException(onException);
@@ -191,7 +192,7 @@ public class InductiveVisualMinerController {
 
 		//align
 		{
-			Cl05Align a = new Cl05Align();
+			Cl05Align a = new Cl05Align(canceller);
 			a.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
@@ -213,7 +214,7 @@ public class InductiveVisualMinerController {
 
 		//layout
 		{
-			Cl06LayoutWithAlignment l = new Cl06LayoutWithAlignment();
+			Cl06LayoutWithAlignment l = new Cl06LayoutWithAlignment(canceller);
 			l.setOnStart(layoutStart);
 			l.setOnComplete(layoutComplete);
 			l.setOnException(onException);
@@ -222,7 +223,7 @@ public class InductiveVisualMinerController {
 
 		//animate
 		{
-			Cl07Animate a = new Cl07Animate(state, panel);
+			Cl07Animate a = new Cl07Animate(state, panel, canceller);
 			a.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
@@ -242,7 +243,7 @@ public class InductiveVisualMinerController {
 
 		//filter node selection
 		{
-			Cl08FilterNodeSelection f = new Cl08FilterNodeSelection();
+			Cl08FilterNodeSelection f = new Cl08FilterNodeSelection(canceller);
 			f.setOnStart(new Runnable() {
 				public void run() {
 					state.resetPerformance();
@@ -275,7 +276,7 @@ public class InductiveVisualMinerController {
 
 		//mine performance
 		{
-			Cl09Performance q = new Cl09Performance();
+			Cl09Performance q = new Cl09Performance(canceller);
 			q.setOnStart(new Runnable() {
 				public void run() {
 					state.resetPerformance();

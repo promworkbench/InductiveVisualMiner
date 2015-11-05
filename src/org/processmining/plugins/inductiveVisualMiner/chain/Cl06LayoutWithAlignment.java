@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -10,9 +11,9 @@ import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourM
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
-import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisation;
 import org.processmining.processtree.ProcessTree;
 
 import com.kitfox.svg.SVGDiagram;
@@ -21,6 +22,10 @@ import com.kitfox.svg.SVGDiagram;
 public class Cl06LayoutWithAlignment
 		extends
 		ChainLink<Quadruple<ProcessTree, IvMLogInfo, ProcessTreeVisualisationParameters, GraphDirection>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap>> {
+
+	public Cl06LayoutWithAlignment(ProMCanceller globalCanceller) {
+		super(globalCanceller);
+	}
 
 	protected Quadruple<ProcessTree, IvMLogInfo, ProcessTreeVisualisationParameters, GraphDirection> generateInput(
 			InductiveVisualMinerState state) {

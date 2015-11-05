@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -9,9 +10,9 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplEmpty;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
-import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisation;
 import org.processmining.processtree.ProcessTree;
 
 import com.kitfox.svg.SVGDiagram;
@@ -20,6 +21,10 @@ import com.kitfox.svg.SVGDiagram;
 public class Cl04LayoutModel
 		extends
 		ChainLink<Triple<ProcessTree, ProcessTreeVisualisationParameters, GraphDirection>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap>> {
+
+	public Cl04LayoutModel(ProMCanceller globalCanceller) {
+		super(globalCanceller);
+	}
 
 	protected Triple<ProcessTree, ProcessTreeVisualisationParameters, GraphDirection> generateInput(
 			InductiveVisualMinerState state) {

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
 /**
@@ -19,12 +20,14 @@ public class Chain {
 	private int currentExecutionLinkNumber;
 	@SuppressWarnings("rawtypes")
 	private ChainLink currentExecutionLink;
+	private final ProMCanceller globalCanceller;
 	
 	private final InductiveVisualMinerState state;
 
-	public Chain(Executor executor, InductiveVisualMinerState state) {
+	public Chain(Executor executor, InductiveVisualMinerState state, ProMCanceller canceller) {
 		this.executor = executor;
 		this.state = state;
+		this.globalCanceller = canceller;
 		currentExecutionId = null;
 		currentExecutionLinkNumber = Integer.MAX_VALUE;
 		currentExecutionLink = null;
@@ -37,7 +40,7 @@ public class Chain {
 
 	public synchronized void executeNext(UUID execution, final int indexInChain) {
 		//execute next link in the chain
-		if (currentExecutionId.equals(execution)) {
+		if (currentExecutionId.equals(execution) && !globalCanceller.isCancelled()) {
 			if (indexInChain + 1 < chain.size()) {
 				currentExecutionLinkNumber = indexInChain + 1;
 				currentExecutionLink = chain.get(indexInChain + 1);

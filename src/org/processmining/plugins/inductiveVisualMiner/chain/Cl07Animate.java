@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import javax.swing.SwingUtilities;
 
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
@@ -22,6 +23,7 @@ public class Cl07Animate extends ChainLink<Double, Double> {
 
 	private final InductiveVisualMinerState state;
 	private final InductiveVisualMinerPanel panel;
+	private final ProMCanceller globalCanceller;
 
 	private ThreadedComputer<Quadruple<IvMLogBase, Mode, ProcessTreeVisualisationInfo, SVGDiagram>, Pair<Scaler, GraphVizTokens>> pool = new ThreadedComputer<Quadruple<IvMLogBase, Mode, ProcessTreeVisualisationInfo, SVGDiagram>, Pair<Scaler, GraphVizTokens>>(
 			new Function<Pair<ResettableCanceller, Quadruple<IvMLogBase, Mode, ProcessTreeVisualisationInfo, SVGDiagram>>, Pair<Scaler, GraphVizTokens>>() {
@@ -54,7 +56,9 @@ public class Cl07Animate extends ChainLink<Double, Double> {
 
 			});
 
-	public Cl07Animate(InductiveVisualMinerState state, InductiveVisualMinerPanel panel) {
+	public Cl07Animate(InductiveVisualMinerState state, InductiveVisualMinerPanel panel, ProMCanceller canceller) {
+		super(canceller);
+		this.globalCanceller = canceller;
 		this.state = state;
 		this.panel = panel;
 	}
@@ -66,7 +70,7 @@ public class Cl07Animate extends ChainLink<Double, Double> {
 		 * compute it asynchronously.
 		 */
 		pool.compute(Quadruple.of(state.getIvMLog(), state.getMode(), state.getVisualisationInfo(),
-				state.getSVGDiagram()));
+				state.getSVGDiagram()), globalCanceller);
 
 		return null;
 	}
