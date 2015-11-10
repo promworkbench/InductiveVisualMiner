@@ -32,7 +32,7 @@ public class LocalDotNode extends DotNode {
 			case activity :
 				setOption("shape", "box");
 				setOption("style", "rounded,filled");
-				setOption("fontsize", "9");
+				setOption("fontsize", "12");
 				break;
 			case logMoveActivity :
 				setOption("shape", "box");
