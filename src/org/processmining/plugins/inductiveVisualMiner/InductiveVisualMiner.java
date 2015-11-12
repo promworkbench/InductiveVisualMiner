@@ -22,7 +22,7 @@ public class InductiveVisualMiner {
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0, 1 })
-	public JComponent visualise(final UIPluginContext context, XLog xLog, ProMCanceller canceller) {
+	public JComponent visualise(final PluginContext context, XLog xLog, ProMCanceller canceller) {
 
 		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog, null);
 		InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state,
