@@ -1,8 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
 
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
@@ -17,15 +16,15 @@ import org.processmining.plugins.inductiveVisualMiner.chain.ChainLink.Resettable
  *
  */
 public class ThreadedComputer<I, O> {
-	private final ExecutorService executor;
+	private final Executor executor;
 	private final Function<Pair<ResettableCanceller, I>, O> computation;
 	private final InputFunction<O> onComplete;
 	
 	private ResettableCanceller currentCanceller = null;
 	private UUID currentExecution = null;
 
-	public ThreadedComputer(Function<Pair<ResettableCanceller, I>, O> computation, InputFunction<O> onComplete) {
-		executor = Executors.newFixedThreadPool(3);
+	public ThreadedComputer(Executor executor, Function<Pair<ResettableCanceller, I>, O> computation, InputFunction<O> onComplete) {
+		this.executor = executor;
 		this.computation = computation;
 		this.onComplete = onComplete;
 	}
@@ -44,7 +43,7 @@ public class ThreadedComputer<I, O> {
 		final UUID newExecution = UUID.randomUUID();
 		currentExecution = newExecution;
 		currentCanceller = newCanceller;
-		executor.submit(new Runnable() {
+		executor.execute(new Runnable() {
 			public void run() {
 				try {
 					O result = computation.call(Pair.of(newCanceller, input));

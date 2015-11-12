@@ -223,7 +223,7 @@ public class InductiveVisualMinerController {
 
 		//animate
 		{
-			Cl07Animate a = new Cl07Animate(state, panel, canceller);
+			Cl07Animate a = new Cl07Animate(context.getExecutor(), state, panel, canceller);
 			a.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
