@@ -93,7 +93,6 @@ public class RenderingThread implements Runnable {
 		long sleep = 0;
 		long before = 0;
 		while (!stopRequested.get() && !canceller.isCancelled()) {
-			System.out.println(canceller.isCancelled());
 			//get the time before we do our game logic
 			before = System.currentTimeMillis();
 
