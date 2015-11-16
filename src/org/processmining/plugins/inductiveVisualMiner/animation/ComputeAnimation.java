@@ -101,7 +101,7 @@ public class ComputeAnimation {
 		return tokens;
 	}
 
-	public static double guessStartTime(List<IvMMove> trace, ShortestPathGraph shortestGraph,
+	public static double guessStartTime(IvMTrace trace, ShortestPathGraph shortestGraph,
 			ProcessTreeVisualisationInfo info, Scaler scaler) {
 		//find the first timed move
 		for (int i = 0; i < trace.size(); i++) {
@@ -115,7 +115,7 @@ public class ComputeAnimation {
 		return randomStartTime();
 	}
 
-	public static double guessEndTime(List<IvMMove> trace, double startTime, ShortestPathGraph shortestGraph,
+	public static double guessEndTime(IvMTrace trace, double startTime, ShortestPathGraph shortestGraph,
 			ProcessTreeVisualisationInfo info, Scaler scaler) {
 		//find the last timed move
 		for (int i = trace.size() - 1; i >= 0; i--) {

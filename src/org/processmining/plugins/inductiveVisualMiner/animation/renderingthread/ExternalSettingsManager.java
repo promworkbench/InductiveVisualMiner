@@ -5,8 +5,8 @@ import java.util.Random;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensLazyIterator;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogImplFiltered;
+import org.processmining.plugins.inductiveVisualMiner.logFiltering.IvMLogFilter;
 
 /**
  * Keeps track of the external settings of the animation. Thread-safe.
@@ -91,7 +91,7 @@ public class ExternalSettingsManager {
 		return newExternalSettings.id;
 	}
 
-	public synchronized int setFilteredLog(IvMLogFiltered ivMLogFiltered) {
+	public synchronized int setFilteredLog(IvMLogImplFiltered ivMLogFiltered) {
 		ExternalSettings newExternalSettings = new ExternalSettings();
 		newExternalSettings.width = settings.width;
 		newExternalSettings.height = settings.height;

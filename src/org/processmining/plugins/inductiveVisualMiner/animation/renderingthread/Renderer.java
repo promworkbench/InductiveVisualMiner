@@ -14,7 +14,7 @@ import java.awt.geom.AffineTransform;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIterator;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilter;
+import org.processmining.plugins.inductiveVisualMiner.logFiltering.IvMLogFilter;
 
 public class Renderer {
 

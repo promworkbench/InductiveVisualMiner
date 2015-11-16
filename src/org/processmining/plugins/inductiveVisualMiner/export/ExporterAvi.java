@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimat
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilter;
+import org.processmining.plugins.inductiveVisualMiner.logFiltering.IvMLogFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 

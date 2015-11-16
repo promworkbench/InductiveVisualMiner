@@ -99,6 +99,10 @@ public class RenderingThread implements Runnable {
 			//do the work
 			if (singleFrameRequested.compareAndSet(true, false)) {
 				while (!performRender() && !canceller.isCancelled()) {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+					}
 				}
 			} else if (!pauseRequested.get()) {
 				performRender();

@@ -3,7 +3,8 @@ package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 
 /**
- * Provides an iterator over a traces.
+ * Provides an iterator over traces.
+ * 
  * @author sleemans
  *
  */

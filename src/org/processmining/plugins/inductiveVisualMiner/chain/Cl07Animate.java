@@ -15,7 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ThreadedComputer;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogBase;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
@@ -25,20 +25,20 @@ public class Cl07Animate extends ChainLink<Double, Double> {
 
 	private final ProMCanceller globalCanceller;
 
-	private final ThreadedComputer<Quadruple<IvMLogBase, Mode, ProcessTreeVisualisationInfo, SVGDiagram>, Pair<Scaler, GraphVizTokens>> pool;
+	private final ThreadedComputer<Quadruple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram>, Pair<Scaler, GraphVizTokens>> pool;
 
 	public Cl07Animate(final Executor executor, final InductiveVisualMinerState state,
 			final InductiveVisualMinerPanel panel, final ProMCanceller canceller) {
 		super(canceller);
 		this.globalCanceller = canceller;
 
-		pool = new ThreadedComputer<Quadruple<IvMLogBase, Mode, ProcessTreeVisualisationInfo, SVGDiagram>, Pair<Scaler, GraphVizTokens>>(
+		pool = new ThreadedComputer<Quadruple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram>, Pair<Scaler, GraphVizTokens>>(
 				executor,
-				new Function<Pair<ResettableCanceller, Quadruple<IvMLogBase, Mode, ProcessTreeVisualisationInfo, SVGDiagram>>, Pair<Scaler, GraphVizTokens>>() {
+				new Function<Pair<ResettableCanceller, Quadruple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram>>, Pair<Scaler, GraphVizTokens>>() {
 
 					//this function performs the computation
 					public Pair<Scaler, GraphVizTokens> call(
-							Pair<org.processmining.plugins.inductiveVisualMiner.chain.ChainLink.ResettableCanceller, Quadruple<IvMLogBase, Mode, ProcessTreeVisualisationInfo, SVGDiagram>> input)
+							Pair<org.processmining.plugins.inductiveVisualMiner.chain.ChainLink.ResettableCanceller, Quadruple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram>> input)
 							throws Exception {
 						return ComputeAnimation.computeAnimation(input.getB().getA(), input.getB().getB(), input.getB()
 								.getC(), input.getB().getD(), input.getA());

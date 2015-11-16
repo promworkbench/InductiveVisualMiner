@@ -183,7 +183,7 @@ public class TraceView extends SideWindow {
 		}
 	}
 
-	private static class TimedLogTraceBuilder implements TraceBuilder<Object> {
+	private static class IvMLogTraceBuilder implements TraceBuilder<Object> {
 
 		public Trace<? extends Event> build(final Object trace) {
 			return new ProMTraceView.Trace<IvMMove>() {
@@ -198,7 +198,7 @@ public class TraceView extends SideWindow {
 				}
 
 				public String getName() {
-					String s = ((IvMTrace) trace).getId();
+					String s = ((IvMTrace) trace).getName();
 					if (s.length() > 9) {
 						return s.substring(0, 7) + "..";
 					}
@@ -274,7 +274,7 @@ public class TraceView extends SideWindow {
 		if (!tlog.equals(showing)) {
 			showing = tlog;
 			traceView.clear();
-			traceView.setTraceBuilder(new TimedLogTraceBuilder());
+			traceView.setTraceBuilder(new IvMLogTraceBuilder());
 			traceView.addAll((Iterable<Object>) ((Iterable<? extends Object>) tlog));
 		}
 	}

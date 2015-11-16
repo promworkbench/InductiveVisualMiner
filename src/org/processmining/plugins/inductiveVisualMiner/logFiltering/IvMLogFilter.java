@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.ivmlog;
+package org.processmining.plugins.inductiveVisualMiner.logFiltering;
 
 /**
  * Defines the basic methods to find out whether a trace is filtered out.

@@ -11,7 +11,6 @@ import java.util.Map;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.alignment.AlignedTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
@@ -47,7 +46,7 @@ public class IvMLogInfo {
 		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
 		activities = new MultiSet<>();
 	}
-	
+
 	public IvMLogInfo(IvMLog log) {
 		modelMoves = new MultiSet<UnfoldedNode>();
 		logMoves = new THashMap<LogMovePosition, MultiSet<XEventClass>>();
@@ -95,7 +94,7 @@ public class IvMLogInfo {
 		}
 	}
 
-	public void positionLogMovesRoot(UnfoldedNode root, UnfoldedNode continueOn, List<? extends Move> trace, long cardinality) {
+	public void positionLogMovesRoot(UnfoldedNode root, UnfoldedNode continueOn, List<IvMMove> trace, long cardinality) {
 		//remove the leading and trailing log moves and position them on the root
 		int start = 0;
 		while (!trace.get(start).isModelSync()) {
@@ -105,7 +104,7 @@ public class IvMLogInfo {
 		while (!trace.get(end).isModelSync()) {
 			end--;
 		}
-		List<? extends Move> subtrace = trace.subList(start, end + 1);
+		List<IvMMove> subtrace = trace.subList(start, end + 1);
 
 		//position the leading log moves
 		for (Move logMove : trace.subList(0, start)) {
@@ -128,7 +127,7 @@ public class IvMLogInfo {
 	/*
 	 * Invariant: the first and the last move of the trace are not log moves.
 	 */
-	private void positionLogMoves(UnfoldedNode unode, List<? extends Move> trace, long cardinality) {
+	private void positionLogMoves(UnfoldedNode unode, List<IvMMove> trace, long cardinality) {
 		debug(" process trace " + trace + " on " + unode);
 		if (unode.getNode() instanceof Manual) {
 			//unode is an activity
@@ -155,16 +154,16 @@ public class IvMLogInfo {
 		} else if (unode.getBlock() instanceof And) {
 
 			//set up subtraces for children
-			Map<UnfoldedNode, AlignedTrace> subTraces = new THashMap<>();
+			Map<UnfoldedNode, List<IvMMove>> subTraces = new THashMap<>();
 			for (Node child : unode.getBlock().getChildren()) {
-				subTraces.put(unode.unfoldChild(child), new AlignedTrace());
+				subTraces.put(unode.unfoldChild(child), new ArrayList<IvMMove>());
 			}
 
 			//by the invariant, the first move is not a log move
 			UnfoldedNode lastSeenChild = null;
 
 			//walk through the trace to split it
-			for (Move move : trace) {
+			for (IvMMove move : trace) {
 				if (move.isLogMove()) {
 					//put this log move on the last seen child
 					//we cannot know a better place to put it
@@ -180,20 +179,20 @@ public class IvMLogInfo {
 			//invariant might be invalid on sub traces; position leading and trailing log moves
 			for (Node child : unode.getBlock().getChildren()) {
 				UnfoldedNode uChild = unode.unfoldChild(child);
-				AlignedTrace subTrace = subTraces.get(uChild);
+				List<IvMMove> subTrace = subTraces.get(uChild);
 				positionLogMovesRoot(unode, uChild, subTrace, cardinality);
 			}
 		}
 	}
 
-	private void splitSequenceLoop(UnfoldedNode unode, List<? extends Move> trace, long cardinality) {
+	private void splitSequenceLoop(UnfoldedNode unode, List<IvMMove> trace, long cardinality) {
 		//by the invariant, the first move is not a log move
 		UnfoldedNode lastSeenChild = findChildWith(unode, trace.get(0).getUnode());
-		List<Move> logMoves = new ArrayList<Move>();
-		List<Move> subTrace = new ArrayList<Move>();
+		List<IvMMove> logMoves = new ArrayList<IvMMove>();
+		List<IvMMove> subTrace = new ArrayList<IvMMove>();
 
 		//walk through the trace to split it
-		for (Move move : trace) {
+		for (IvMMove move : trace) {
 			if (move.isIgnoredLogMove()) {
 				//skip
 			} else if (move.isLogMove()) {
@@ -213,7 +212,7 @@ public class IvMLogInfo {
 					positionLogMoves(lastSeenChild, subTrace, cardinality);
 
 					//the log moves we have seen now are external to both subtraces; position them on this unode
-					for (Move logMove : logMoves) {
+					for (IvMMove logMove : logMoves) {
 						addLogMove(logMove, unode, child, logMove.getActivityEventClass(), cardinality);
 					}
 
@@ -288,7 +287,7 @@ public class IvMLogInfo {
 	}
 
 	private static void debug(Object s) {
-//		InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
+		//		InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
 	}
 
 }
