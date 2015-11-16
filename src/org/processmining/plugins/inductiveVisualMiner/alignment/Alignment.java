@@ -45,7 +45,7 @@ public class Alignment {
 
 	public final static int maxStates = 1 << 24;;
 	public final static double traceTimeOutInSec = -1;
-	public final static int numberOfThreads = Runtime.getRuntime().availableProcessors();
+	public final static int numberOfThreads = Math.max(Runtime.getRuntime().availableProcessors() - 2, 1);
 	private static final int modelCost = 2;
 	private static final Integer logCost = 2;
 
