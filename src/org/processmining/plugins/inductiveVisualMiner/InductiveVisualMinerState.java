@@ -15,7 +15,7 @@ import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
-import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
+import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
@@ -187,7 +187,7 @@ public class InductiveVisualMinerState {
 	private SVGDiagram svgDiagram;
 	private ProcessTreeVisualisationInfo visualisationInfo;
 	private AlignedLogVisualisationData visualisationData;
-	private GraphDirection graphDirection = GraphDirection.leftRight;
+	private DotPanelUserSettings graphUserSettings;
 	private TraceViewColourMap traceViewColourMap;
 
 	public void setLayout(Dot dot, SVGDiagram svgDiagram, ProcessTreeVisualisationInfo visualisationInfo,
@@ -210,12 +210,12 @@ public class InductiveVisualMinerState {
 		return visualisationInfo;
 	}
 
-	public GraphDirection getGraphDirection() {
-		return graphDirection;
+	public DotPanelUserSettings getGraphUserSettings() {
+		return graphUserSettings;
 	}
-
-	public void setGraphDirection(GraphDirection graphDirection) {
-		this.graphDirection = graphDirection;
+	
+	public void setGraphUserSettings(DotPanelUserSettings graphUserSettings) {
+		this.graphUserSettings = graphUserSettings;
 	}
 	
 	public TraceViewColourMap getTraceViewColourMap() {

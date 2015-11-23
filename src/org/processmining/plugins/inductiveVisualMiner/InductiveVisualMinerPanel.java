@@ -15,10 +15,9 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
-import org.processmining.plugins.graphviz.visualisation.listeners.GraphDirectionChangedListener;
+import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
@@ -64,7 +63,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final ColouringFiltersView colouringFiltersView;
 
 	private InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged = null;
-	private InputFunction<GraphDirection> onGraphDirectionChanged = null;
+	private Runnable onGraphDirectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
 			ClassifierWrapper[] classifiers, VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
@@ -247,19 +246,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 			graphPanel = new InductiveVisualMinerAnimationPanel(canceller);
 			graphPanel.setFocusable(true);
 
-			//set the graph direction changed listener
+			//set the graph changed listener
 			//if we are initialised, the dotPanel should not update the layout, as we have to recompute the animation
-			graphPanel.addGraphDirectionChangedListener(new GraphDirectionChangedListener() {
-				public boolean graphDirectionChanged(GraphDirection direction) {
-					if (onGraphDirectionChanged != null) {
-						try {
-							onGraphDirectionChanged.call(direction);
-							return false;
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-					return true;
+			graphPanel.addGraphChangedListener(new GraphChangedListener() {
+				public void graphChanged(GraphChangedReason reason, Object newState) {
+					onGraphDirectionChanged.run();
 				}
 			});
 
@@ -399,7 +390,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		this.onSelectionChanged = onSelectionChanged;
 	}
 
-	public void setOnGraphDirectionChanged(InputFunction<GraphDirection> onGraphDirectionChanged) {
+	public void setOnGraphDirectionChanged(Runnable onGraphDirectionChanged) {
 		this.onGraphDirectionChanged = onGraphDirectionChanged;
 	}
 

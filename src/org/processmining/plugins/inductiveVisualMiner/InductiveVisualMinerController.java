@@ -25,7 +25,6 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.export.ExportDialog;
@@ -74,6 +73,8 @@ public class InductiveVisualMinerController {
 		this.panel = panel;
 		this.state = state;
 		this.context = context;
+		state.setGraphUserSettings(panel.getGraph().getUserSettings());
+		state.getGraphUserSettings().setDirection(GraphDirection.leftRight);
 
 		//initialise gui handlers
 		initGui();
@@ -368,9 +369,8 @@ public class InductiveVisualMinerController {
 		});
 
 		//graph direction changed
-		panel.setOnGraphDirectionChanged(new InputFunction<Dot.GraphDirection>() {
-			public void call(GraphDirection input) throws Exception {
-				state.setGraphDirection(input);
+		panel.setOnGraphDirectionChanged(new Runnable() {
+			public void run() {
 				chain.execute(Cl06LayoutWithAlignment.class);
 			}
 		});
