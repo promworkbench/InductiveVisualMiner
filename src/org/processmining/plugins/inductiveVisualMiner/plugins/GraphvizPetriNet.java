@@ -27,11 +27,11 @@ public class GraphvizPetriNet {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0 })
 	public JComponent visualize(PluginContext context, Petrinet petrinet) {
-		Dot dot = convert(petrinet, null, null, "");
+		Dot dot = convert(petrinet, null, null);
 		return new DotPanel(dot);
 	}
 
-	public static Dot convert(Petrinet petrinet, Marking initialMarking, Marking finalMarking, String sinkColour) {
+	public static Dot convert(Petrinet petrinet, Marking initialMarking, Marking finalMarking) {
 		Dot dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
 		convert(dot, petrinet, initialMarking, finalMarking, "red");
