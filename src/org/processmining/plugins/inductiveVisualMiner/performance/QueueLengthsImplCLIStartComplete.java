@@ -27,6 +27,7 @@ public class QueueLengthsImplCLIStartComplete extends QueueLengths {
 
 	private final Map<UnfoldedNode, Cluster[]> clusters;
 	private final TObjectDoubleMap<UnfoldedNode> priors;
+	private final static int maxIterations = 100;
 
 	public QueueLengthsImplCLIStartComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs, int k) {
 		clusters = new THashMap<>();
@@ -45,7 +46,7 @@ public class QueueLengthsImplCLIStartComplete extends QueueLengths {
 				continue;
 			}
 
-			KMeansPlusPlusClusterer<DoublePoint> clusterer = new KMeansPlusPlusClusterer<>(k);
+			KMeansPlusPlusClusterer<DoublePoint> clusterer = new KMeansPlusPlusClusterer<>(k, maxIterations);
 			List<CentroidCluster<DoublePoint>> cs = clusterer.cluster(intervals);
 
 			Cluster[] css = new Cluster[k];
