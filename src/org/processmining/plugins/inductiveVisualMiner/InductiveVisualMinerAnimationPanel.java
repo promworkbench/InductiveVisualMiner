@@ -86,7 +86,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		super.paintComponent(g);
 
 		//draw a pop-up if the mouse is over a node
-		if (showPopup && popupText != null) {
+		if (showPopup && popupText != null && !isPaintingForPrint()) {
 			paintPopup((Graphics2D) g);
 		}
 	};
