@@ -34,7 +34,7 @@ public class GraphvizPetriNet {
 	public static Dot convert(Petrinet petrinet, Marking initialMarking, Marking finalMarking) {
 		Dot dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
-		convert(dot, petrinet, initialMarking, finalMarking, "red");
+		convert(dot, petrinet, initialMarking, finalMarking);
 		return dot;
 	}
 
@@ -62,8 +62,7 @@ public class GraphvizPetriNet {
 		}
 	}
 
-	private static void convert(Dot dot, Petrinet petrinet, Marking initialMarking, Marking finalMarking,
-			String sinkColour) {
+	private static void convert(Dot dot, Petrinet petrinet, Marking initialMarking, Marking finalMarking) {
 		HashMap<PetrinetNode, DotNode> mapPetrinet2Dot = new HashMap<PetrinetNode, DotNode>();
 
 		//add places
@@ -76,7 +75,7 @@ public class GraphvizPetriNet {
 			} else if (finalMarking != null && finalMarking.contains(p)) {
 				place = new LocalDotPlace();
 				place.setOption("style", "filled");
-				place.setOption("fillcolor", sinkColour);
+				place.setOption("fillcolor", "red");
 			} else {
 				place = new LocalDotPlace();
 			}
