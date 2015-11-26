@@ -34,6 +34,8 @@ import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 /**
  * Align a log with the ETM replayer, but do not compute precision.
  * 
@@ -103,35 +105,40 @@ public class Alignment {
 				(StorageAwareDelegate<NAryTreeHead, Tail>) delegate);
 
 		final Trace[] traces = algorithm.getConvertedLog().keys(new Trace[algorithm.getConvertedLog().size()]);
-		ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
-		for (int t = 0; t < numberOfThreads; t++) {
-			executor.execute(new Runnable() {
-				public void run() {
-					while (wasReliable.get() && !canceller.isCancelled()) {
-						int traceIndex = tracesStarted.incrementAndGet();
-						if (traceIndex < traces.length) {
-							TreeRecord traceAlignment;
-							try {
-								traceAlignment = alignTrace(nTree, traces[traceIndex], delegate, memEffAlg);
-								if (wasReliable.get()) {
-									callback.traceAlignmentComplete(traces[traceIndex], traceAlignment, algorithm
-											.getXTracesOf(traces[traceIndex]).toArray());
+		ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads, new ThreadFactoryBuilder()
+				.setNameFormat("ivm-thread-alignment-%d").build());
+		try {
+			for (int t = 0; t < numberOfThreads; t++) {
+				executor.execute(new Runnable() {
+					public void run() {
+						while (wasReliable.get() && !canceller.isCancelled()) {
+							int traceIndex = tracesStarted.incrementAndGet();
+							if (traceIndex < traces.length && !canceller.isCancelled()) {
+								TreeRecord traceAlignment;
+								try {
+									traceAlignment = alignTrace(nTree, traces[traceIndex], delegate, memEffAlg);
+									if (wasReliable.get() && !canceller.isCancelled()) {
+										callback.traceAlignmentComplete(traces[traceIndex], traceAlignment, algorithm
+												.getXTracesOf(traces[traceIndex]).toArray());
+									}
+								} catch (AStarException e) {
+									wasReliable.set(false);
+									e.printStackTrace();
 								}
-							} catch (AStarException e) {
-								wasReliable.set(false);
-								e.printStackTrace();
+							} else {
+								return;
 							}
-						} else {
-							return;
 						}
 					}
-				}
-			});
+				});
+			}
+			executor.shutdown();
+			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+		} finally {
+			executor.shutdownNow();
 		}
-		executor.shutdown();
-		executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-		if (!wasReliable.get()) {
+		if (!wasReliable.get() && !canceller.isCancelled()) {
 			callback.alignmentFailed();
 		}
 	}

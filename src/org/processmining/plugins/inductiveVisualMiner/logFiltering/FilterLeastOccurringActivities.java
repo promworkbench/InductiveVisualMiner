@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClass;
+import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
@@ -30,7 +31,11 @@ public class FilterLeastOccurringActivities {
 		partition.add(keep);
 		partition.add(remove);
 		Cut cut = new Cut(Operator.parallel, partition);
-		MinerState minerState = new MinerState(new NoLifeCycleMiningParametersIvM());
+		MinerState minerState = new MinerState(new NoLifeCycleMiningParametersIvM(), new Canceller() {
+			public boolean isCancelled() {
+				return false;
+			}
+		});
 		LogSplitResult result = Miner.splitLog(log, logInfo, cut, minerState);
 		
 		IMLogInfo filteredLogInfo = log2logInfo.createLogInfo(result.sublogs.get(0));

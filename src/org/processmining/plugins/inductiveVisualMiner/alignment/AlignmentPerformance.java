@@ -38,11 +38,14 @@ public class AlignmentPerformance {
 
 		AlignmentResultImplPerformance callback = new AlignmentResultImplPerformance(xLog, activityEventClasses,
 				performanceNodeMapping, performanceEventClasses, nodeId2performanceNode, enqueueTaus);
-		Alignment alignment = new Alignment(performanceTree, xLog, performanceEventClasses,
-				callback, canceller);
+		Alignment alignment = new Alignment(performanceTree, xLog, performanceEventClasses, callback, canceller);
 		alignment.alignLog();
 
-		return callback.getAlignedLog();
+		if (!canceller.isCancelled()) {
+			return callback.getAlignedLog();
+		} else {
+			return null;
+		}
 	}
 
 }
