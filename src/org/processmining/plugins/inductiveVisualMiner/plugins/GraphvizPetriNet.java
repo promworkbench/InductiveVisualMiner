@@ -27,14 +27,14 @@ public class GraphvizPetriNet {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0 })
 	public JComponent visualize(PluginContext context, Petrinet petrinet) {
-		Dot dot = convert(petrinet, null, null);
+		Dot dot = convert(petrinet, null);
 		return new DotPanel(dot);
 	}
 
-	public static Dot convert(Petrinet petrinet, Marking initialMarking, Marking finalMarking) {
+	public static Dot convert(Petrinet petrinet, Marking initialMarking, Marking... finalMarkings) {
 		Dot dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
-		convert(dot, petrinet, initialMarking, finalMarking);
+		convert(dot, petrinet, initialMarking, finalMarkings);
 		return dot;
 	}
 
@@ -62,17 +62,26 @@ public class GraphvizPetriNet {
 		}
 	}
 
-	private static void convert(Dot dot, Petrinet petrinet, Marking initialMarking, Marking finalMarking) {
+	private static void convert(Dot dot, Petrinet petrinet, Marking initialMarking, Marking... finalMarkings) {
 		HashMap<PetrinetNode, DotNode> mapPetrinet2Dot = new HashMap<PetrinetNode, DotNode>();
 
 		//add places
 		for (Place p : petrinet.getPlaces()) {
 			DotNode place;
+
+			//find final marking
+			boolean inFinalMarking = false;
+			if (finalMarkings != null) {
+				for (Marking finalMarking : finalMarkings) {
+					inFinalMarking |= finalMarking.contains(p);
+				}
+			}
+
 			if (initialMarking != null && initialMarking.contains(p)) {
 				place = new LocalDotPlace();
 				place.setOption("style", "filled");
 				place.setOption("fillcolor", "green");
-			} else if (finalMarking != null && finalMarking.contains(p)) {
+			} else if (finalMarkings != null && inFinalMarking) {
 				place = new LocalDotPlace();
 				place.setOption("style", "filled");
 				place.setOption("fillcolor", "red");
