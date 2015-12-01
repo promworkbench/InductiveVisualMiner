@@ -22,6 +22,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
+import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogImplFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -213,19 +214,19 @@ public class InductiveVisualMinerState {
 	public DotPanelUserSettings getGraphUserSettings() {
 		return graphUserSettings;
 	}
-	
+
 	public void setGraphUserSettings(DotPanelUserSettings graphUserSettings) {
 		this.graphUserSettings = graphUserSettings;
 	}
-	
+
 	public TraceViewColourMap getTraceViewColourMap() {
 		return traceViewColourMap;
 	}
-	
+
 	public void setVisualisationData(AlignedLogVisualisationData visualisationData) {
 		this.visualisationData = visualisationData;
 	}
-	
+
 	public AlignedLogVisualisationData getVisualisationData() {
 		return visualisationData;
 	}
@@ -286,28 +287,28 @@ public class InductiveVisualMinerState {
 	public IvMLogNotFiltered getIvMLog() {
 		return ivmLog;
 	}
-	
+
 	public void setIvMLogFiltered(IvMLogImplFiltered ivmLogFiltered, IvMLogInfo ivmLogInfoFiltered) {
 		this.ivmLogFiltered = ivmLogFiltered;
 		this.ivmLogInfoFiltered = ivmLogInfoFiltered;
 	}
-	
+
 	public IvMLogInfo getIvMLogInfo() {
 		return ivmLogInfo;
 	}
-	
+
 	public IvMLogImplFiltered getIvMLogFiltered() {
 		return ivmLogFiltered;
 	}
-	
+
 	public IvMLogInfo getIvMLogInfoFiltered() {
 		return ivmLogInfoFiltered;
 	}
-	
+
 	public boolean isAlignmentReady() {
 		return ivmLog != null;
 	}
-	
+
 	/*
 	 * Reset alignment to null
 	 */
@@ -317,20 +318,47 @@ public class InductiveVisualMinerState {
 		ivmLogInfoFiltered = null;
 	}
 
+	//==histogram==
+	private HistogramData histogramData;
+	private int histogramWidth;
+	
+	public void resetHistogramData() {
+		histogramData = null;
+	}
+
+	public void setHistogramData(HistogramData histogramData) {
+		this.histogramData = histogramData;
+	}
+
+	public HistogramData getHistogramData() {
+		return histogramData;
+	}
+	
+	public void setHistogramWidth(int histogramWidth) {
+		this.histogramWidth = histogramWidth;
+	}
+	
+	public int getHistogramWidth() {
+		return histogramWidth;
+	}
+
 	//==playing animation
 	private Scaler animationScaler;
 	private GraphVizTokens animationGraphVizTokens;
 
-	public void setAnimation(Scaler animationScaler, GraphVizTokens animationGraphVizTokens) {
-		this.animationScaler = animationScaler;
+	public void setAnimation(GraphVizTokens animationGraphVizTokens) {
 		this.animationGraphVizTokens = animationGraphVizTokens;
 	}
 	
+	public void setAnimationScaler(Scaler animationScaler) {
+		this.animationScaler = animationScaler;
+	}
+
 	public void resetAnimation() {
 		animationScaler = null;
 		animationGraphVizTokens = null;
 	}
-	
+
 	public Scaler getAnimationScaler() {
 		return animationScaler;
 	}

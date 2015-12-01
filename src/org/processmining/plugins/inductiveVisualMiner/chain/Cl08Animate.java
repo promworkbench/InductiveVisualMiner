@@ -21,13 +21,13 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl07Animate extends ChainLink<Double, Double> {
+public class Cl08Animate extends ChainLink<Double, Double> {
 
 	private final ProMCanceller globalCanceller;
 
 	private final ThreadedComputer<Quadruple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram>, Pair<Scaler, GraphVizTokens>> pool;
 
-	public Cl07Animate(final Executor executor, final InductiveVisualMinerState state,
+	public Cl08Animate(final Executor executor, final InductiveVisualMinerState state,
 			final InductiveVisualMinerPanel panel, final ProMCanceller canceller) {
 		super(canceller);
 		this.globalCanceller = canceller;
@@ -48,7 +48,7 @@ public class Cl07Animate extends ChainLink<Double, Double> {
 
 					//this function is called on completion
 					public void call(Pair<Scaler, GraphVizTokens> result) throws Exception {
-						state.setAnimation(result.getA(), result.getB());
+						state.setAnimation(result.getB());
 
 						//update the gui (in the main thread)
 						SwingUtilities.invokeLater(new Runnable() {

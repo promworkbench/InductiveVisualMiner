@@ -21,7 +21,7 @@ public class GraphVizTokensLazyIterator implements GraphVizTokensIterator {
 		this.tokens = oldIterator.tokens;
 	}
 	
-	//build-in no-object creating iterator
+	//built-in no-object creating iterator
 	private double itTime;
 	private int itNext;
 	private int itNow;

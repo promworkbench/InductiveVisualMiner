@@ -14,9 +14,9 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsIm
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActivityLog;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class Cl09Performance extends ChainLink<IvMLog, PerformanceWrapper> {
+public class Cl10Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 
-	public Cl09Performance(ProMCanceller globalCanceller) {
+	public Cl10Performance(ProMCanceller globalCanceller) {
 		super(globalCanceller);
 	}
 

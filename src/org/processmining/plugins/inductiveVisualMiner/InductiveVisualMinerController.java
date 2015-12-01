@@ -3,6 +3,8 @@ package org.processmining.plugins.inductiveVisualMiner;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -40,9 +42,11 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl03Mine;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl04LayoutModel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Align;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutWithAlignment;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl07Animate;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl08FilterNodeSelection;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl09Performance;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl07AnimationTimes;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl08Animate;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl09FilterNodeSelection;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl10Performance;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Histogram;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
@@ -94,6 +98,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveImageButton().setText("image");
 					state.resetAlignment();
 					state.resetPerformance();
+					state.resetHistogramData();
 					setStatus("Making log..");
 					setAnimationStatus(" ", false);
 				}
@@ -124,6 +129,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveImageButton().setText("image");
 					state.resetAlignment();
 					state.resetPerformance();
+					state.resetHistogramData();
 					setStatus("Filtering activities..");
 					setAnimationStatus(" ", false);
 				}
@@ -142,6 +148,7 @@ public class InductiveVisualMinerController {
 					panel.getTraceView().set(state.getLog());
 					state.resetAlignment();
 					state.resetPerformance();
+					state.resetHistogramData();
 					setStatus("Mining..");
 					setAnimationStatus(" ", false);
 				}
@@ -201,6 +208,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveImageButton().setText("image");
 					state.resetAlignment();
 					state.resetPerformance();
+					state.resetHistogramData();
 					setStatus("Aligning log and model..");
 				}
 			});
@@ -222,14 +230,37 @@ public class InductiveVisualMinerController {
 			chain.add(l);
 		}
 
+		//compute animation times
+		{
+			Cl07AnimationTimes a = new Cl07AnimationTimes(canceller);
+			a.setOnStart(new Runnable() {
+				public void run() {
+					panel.getGraph().setAnimationEnabled(false);
+					panel.getSaveImageButton().setText("image");
+					state.resetAnimation();
+					state.resetPerformance();
+					state.resetHistogramData();
+					setAnimationStatus("Computing animation times.. ", false);
+				}
+			});
+			a.setOnComplete(new Runnable() {
+				public void run() {
+
+				}
+			});
+			a.setOnException(onException);
+			chain.add(a);
+		}
+
 		//animate
 		{
-			Cl07Animate a = new Cl07Animate(context.getExecutor(), state, panel, canceller);
+			Cl08Animate a = new Cl08Animate(context.getExecutor(), state, panel, canceller);
 			a.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
 					state.resetPerformance();
+					state.resetHistogramData();
 					setAnimationStatus("Creating animation.. ", false);
 				}
 			});
@@ -244,10 +275,11 @@ public class InductiveVisualMinerController {
 
 		//filter node selection
 		{
-			Cl08FilterNodeSelection f = new Cl08FilterNodeSelection(canceller);
+			Cl09FilterNodeSelection f = new Cl09FilterNodeSelection(canceller);
 			f.setOnStart(new Runnable() {
 				public void run() {
 					state.resetPerformance();
+					state.resetHistogramData();
 					setStatus("Highlighting selection..");
 				}
 			});
@@ -277,7 +309,7 @@ public class InductiveVisualMinerController {
 
 		//mine performance
 		{
-			Cl09Performance q = new Cl09Performance(canceller);
+			Cl10Performance q = new Cl10Performance(canceller);
 			q.setOnStart(new Runnable() {
 				public void run() {
 					state.resetPerformance();
@@ -286,7 +318,6 @@ public class InductiveVisualMinerController {
 			});
 			q.setOnComplete(new Runnable() {
 				public void run() {
-					setStatus(" ");
 					updateHighlighting();
 					updatePopup();
 					panel.getGraph().repaint();
@@ -294,6 +325,28 @@ public class InductiveVisualMinerController {
 			});
 			q.setOnException(onException);
 			chain.add(q);
+		}
+
+		//compute histogram
+		{
+			Cl11Histogram f = new Cl11Histogram(canceller);
+			f.setOnStart(new Runnable() {
+				public void run() {
+					state.resetPerformance();
+					state.resetHistogramData();
+					setStatus("Computing histogram..");
+				}
+			});
+			f.setOnComplete(new Runnable() {
+				public void run() {
+					setStatus(" ");
+					//pass the histogram data to the panel
+					panel.getGraph().setHistogramData(state.getHistogramData());
+					panel.getGraph().repaint();
+				}
+			});
+			f.setOnException(onException);
+			chain.add(f);
 		}
 
 		//set up plug-ins
@@ -308,6 +361,15 @@ public class InductiveVisualMinerController {
 	}
 
 	private void initGui() {
+
+		//resize handler
+		panel.addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				//on resize, we have to resize the histogram as well
+				state.setHistogramWidth((int) panel.getGraph().getControlsProgressLine().getWidth());
+				chain.execute(Cl11Histogram.class);
+			}
+		});
 
 		//noise filter
 		panel.getPathsSlider().addChangeListener(new ChangeListener() {
@@ -364,7 +426,7 @@ public class InductiveVisualMinerController {
 			public void call(Pair<Set<UnfoldedNode>, Set<LogMovePosition>> input) throws Exception {
 				state.setSelectedNodes(input.getA());
 				state.setSelectedLogMoves(input.getB());
-				chain.execute(Cl08FilterNodeSelection.class);
+				chain.execute(Cl09FilterNodeSelection.class);
 			}
 		});
 
@@ -504,7 +566,7 @@ public class InductiveVisualMinerController {
 	private void initialiseColourFilters(final XLog xLog, Executor executor) {
 		final Runnable onUpdate = new Runnable() {
 			public void run() {
-				chain.execute(Cl08FilterNodeSelection.class);
+				chain.execute(Cl09FilterNodeSelection.class);
 			}
 		};
 		for (final ColouringFilter colouringFilter : state.getColouringFilters()) {

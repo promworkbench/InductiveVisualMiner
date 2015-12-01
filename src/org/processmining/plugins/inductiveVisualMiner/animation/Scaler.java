@@ -84,6 +84,17 @@ public class Scaler {
 		}
 		return (userTime / (1.0 * animationDuration)) * (max - 1.0 * min) + min;
 	}
+	
+	public Double userTime2Fraction(Double userTime) {
+		Double logTime = userTime2LogTime(userTime);
+		if (logTime == null) {
+			return null;
+		}
+		if (max == min) {
+			return animationDuration * logTime;
+		}
+		return (logTime - min) / (max - 1.0 * min);
+	}
 
 	public double getMinInUserTime() {
 		return 0;

@@ -14,8 +14,16 @@ public interface IvMTrace extends List<IvMMove> {
 	 */
 	public String getName();
 
+	/**
+	 * 
+	 * @return start time of the trace in user time.
+	 */
 	public Double getStartTime();
 
+	/**
+	 * 
+	 * @return end time of the trace in user time.
+	 */
 	public Double getEndTime();
 
 	public void setStartTime(double guessStartTime);

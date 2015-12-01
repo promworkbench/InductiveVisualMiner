@@ -20,11 +20,11 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class Cl08FilterNodeSelection
+public class Cl09FilterNodeSelection
 		extends
 		ChainLink<Quintuple<IvMLogNotFiltered, Set<UnfoldedNode>, Set<LogMovePosition>, List<ColouringFilter>, IvMLogInfo>, Pair<IvMLogImplFiltered, IvMLogInfo>> {
 
-	public Cl08FilterNodeSelection(ProMCanceller globalCanceller) {
+	public Cl09FilterNodeSelection(ProMCanceller globalCanceller) {
 		super(globalCanceller);
 	}
 
