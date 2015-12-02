@@ -34,7 +34,6 @@ import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElement
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01MakeLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl02FilterLogOnActivities;
@@ -42,7 +41,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl03Mine;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl04LayoutModel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Align;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutWithAlignment;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl07AnimationTimes;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl07AnimationScaler;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl08Animate;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl09FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl10Performance;
@@ -54,6 +53,7 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
@@ -230,26 +230,25 @@ public class InductiveVisualMinerController {
 			chain.add(l);
 		}
 
-		//compute animation times
+		//animation scaler
 		{
-			Cl07AnimationTimes a = new Cl07AnimationTimes(canceller);
-			a.setOnStart(new Runnable() {
+			Cl07AnimationScaler f = new Cl07AnimationScaler(canceller);
+			f.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
-					state.resetAnimation();
 					state.resetPerformance();
 					state.resetHistogramData();
-					setAnimationStatus("Computing animation times.. ", false);
+					setStatus("Scaling animation..");
 				}
 			});
-			a.setOnComplete(new Runnable() {
+			f.setOnComplete(new Runnable() {
 				public void run() {
-
+					setStatus(" ");
 				}
 			});
-			a.setOnException(onException);
-			chain.add(a);
+			f.setOnException(onException);
+			chain.add(f);
 		}
 
 		//animate
@@ -313,6 +312,7 @@ public class InductiveVisualMinerController {
 			q.setOnStart(new Runnable() {
 				public void run() {
 					state.resetPerformance();
+					state.resetHistogramData();
 					setStatus("Measuring performance..");
 				}
 			});
@@ -332,7 +332,6 @@ public class InductiveVisualMinerController {
 			Cl11Histogram f = new Cl11Histogram(canceller);
 			f.setOnStart(new Runnable() {
 				public void run() {
-					state.resetPerformance();
 					state.resetHistogramData();
 					setStatus("Computing histogram..");
 				}
@@ -517,7 +516,7 @@ public class InductiveVisualMinerController {
 				if (panel.getGraph().isAnimationEnabled()) {
 					long logTime = Math.round(state.getAnimationScaler().userTime2LogTime(userTime));
 					if (state.getAnimationScaler().isCorrectTime()) {
-						setAnimationStatus(TimestampsAdder.toString(logTime), true);
+						setAnimationStatus(ResourceTimeUtils.timeToString(logTime), true);
 					} else {
 						setAnimationStatus("animation times are random", true);
 					}

@@ -16,6 +16,8 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 
 	private Double startTime = null;
 	private Double endTime = null;
+	private Long realStartTime = null;
+	private Long realEndTime = null;
 	private String name;
 	private final XAttributeMap attributes;
 
@@ -39,6 +41,22 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 
 	public Double getStartTime() {
 		return startTime;
+	}
+	
+	public void setRealEndTime(long endTime) {
+		this.realEndTime = endTime;
+	}
+
+	public void setRealStartTime(long startTime) {
+		this.realStartTime = startTime;
+	}
+
+	public Long getRealEndTime() {
+		return realEndTime;
+	}
+
+	public Long getRealStartTime() {
+		return realStartTime;
 	}
 
 	public String toString() {

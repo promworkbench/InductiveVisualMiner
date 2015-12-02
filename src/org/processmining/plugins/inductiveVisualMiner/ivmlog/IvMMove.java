@@ -4,7 +4,6 @@ import org.deckfour.xes.model.XAttributeMap;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 
 public class IvMMove extends Move {
 
@@ -44,6 +43,6 @@ public class IvMMove extends Move {
 
 	//Event functions from list-view widget
 	public String getTopLabel() {
-		return TimestampsAdder.toString(logTimestamp);
+		return ResourceTimeUtils.timeToString(logTimestamp);
 	}
 }

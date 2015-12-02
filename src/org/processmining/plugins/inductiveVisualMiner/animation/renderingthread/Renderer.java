@@ -14,7 +14,7 @@ import java.awt.geom.AffineTransform;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIterator;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
-import org.processmining.plugins.inductiveVisualMiner.logFiltering.IvMLogFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 public class Renderer {
 
@@ -66,7 +66,7 @@ public class Renderer {
 		return false;
 	}
 
-	public static void renderTokens(Graphics2D graphics, GraphVizTokensIterator tokens, IvMLogFilter filteredLog,
+	public static void renderTokens(Graphics2D graphics, GraphVizTokensIterator tokens, IvMLogFiltered filteredLog,
 			double time) {
 		graphics.setStroke(tokenStroke);
 

@@ -31,7 +31,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIt
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensLazyIterator;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.Renderer;
-import org.processmining.plugins.inductiveVisualMiner.logFiltering.IvMLogFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
@@ -43,7 +43,7 @@ public class ExportAnimation {
 	public static final int framerate = 30;
 	public static final int width = 1500; //width of the movie
 
-	public static boolean saveAVItoFile(IvMLogFilter filteredLog, GraphVizTokens tokens,
+	public static boolean saveAVItoFile(IvMLogFiltered filteredLog, GraphVizTokens tokens,
 			final ProcessTreeVisualisationInfo info, final Mode colourMode, final SVGDiagram svg, final Dot dot,
 			final File file, final JPanel panel, final Scaler scaler) throws IOException,
 			NoninvertibleTransformException {

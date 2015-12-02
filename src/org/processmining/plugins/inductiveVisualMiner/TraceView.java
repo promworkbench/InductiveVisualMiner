@@ -21,11 +21,11 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.ResourceTimeUtils;
 import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -143,8 +143,8 @@ public class TraceView extends SideWindow {
 								}
 
 								public String getTopLabel() {
-									Long timestamp = TimestampsAdder.getTimestamp(input);
-									return TimestampsAdder.toString(timestamp);
+									Long timestamp = ResourceTimeUtils.getTimestamp(input);
+									return ResourceTimeUtils.timeToString(timestamp);
 								}
 
 								public String getBottomLabel() {

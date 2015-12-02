@@ -3,15 +3,14 @@ package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 import java.util.BitSet;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
-import org.processmining.plugins.inductiveVisualMiner.logFiltering.IvMLogFilter;
 
-public class IvMLogImplFiltered implements IvMLog, IvMLogFilter {
+public class IvMLogFilteredImpl implements IvMLog, IvMLogFiltered {
 
 	private final BitSet traceIsFilteredOut;
 	private final IvMLogNotFiltered log;
 	private boolean somethingFiltered;
 
-	public IvMLogImplFiltered(IvMLogNotFiltered log) {
+	public IvMLogFilteredImpl(IvMLogNotFiltered log) {
 		this.log = log;
 		traceIsFilteredOut = new BitSet(log.size());
 		somethingFiltered = false;
@@ -64,5 +63,30 @@ public class IvMLogImplFiltered implements IvMLog, IvMLogFilter {
 
 	public boolean isFilteredOut(int traceIndex) {
 		return traceIsFilteredOut.get(traceIndex);
+	}
+
+	public IteratorWithPosition<IvMTrace> iteratorUnfiltered() {
+		return new IteratorWithPosition<IvMTrace>() {
+			
+			int now = - 1;
+			
+			public IvMTrace next() {
+				now++;
+				return log.get(now);
+			}
+			
+			public boolean hasNext() {
+				return now + 1 < log.size();
+			}
+			
+			public int getPosition() {
+				return now;
+			}
+			
+			public void remove() {
+				traceIsFilteredOut.set(now);
+				somethingFiltered = true;
+			}
+		};
 	}
 }

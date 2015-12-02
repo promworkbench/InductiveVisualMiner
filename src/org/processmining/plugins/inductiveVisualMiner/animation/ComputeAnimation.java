@@ -7,7 +7,6 @@ import java.util.Random;
 
 import nl.tue.astar.AStarThread.Canceller;
 
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ShortestPathGraph;
@@ -25,19 +24,9 @@ public class ComputeAnimation {
 	public static final double animationDuration = 180;
 	private static Random random = new Random(123);
 
-	public static Pair<Scaler, GraphVizTokens> computeAnimation(final IvMLog ivmLog, final Mode colourMode,
-			final ProcessTreeVisualisationInfo info, final SVGDiagram svg, final Canceller canceller)
+	public static GraphVizTokens computeAnimation(final IvMLog ivmLog, final Mode colourMode,
+			final ProcessTreeVisualisationInfo info, final Scaler scaler, final SVGDiagram svg, final Canceller canceller)
 			throws NoninvertibleTransformException {
-
-		//scale timestamps
-		Scaler scaler = Scaler.fromLog(ivmLog, initDuration, animationDuration, canceller);
-		if (scaler == null) {
-			scaler = Scaler.fromValues(animationDuration);
-		}
-
-		if (canceller.isCancelled()) {
-			return null;
-		}
 
 		//make a shortest path graph
 		final ShortestPathGraph graph = new ShortestPathGraph(info.getNodes(), info.getEdges());
@@ -74,7 +63,7 @@ public class ComputeAnimation {
 		
 		System.out.println("animation completed with " + graphVizTokens.size() + " tokens");
 
-		return Pair.of(scaler, graphVizTokens);
+		return graphVizTokens;
 	}
 
 	public static List<DotToken> computeDotTokensOfTrace(IvMTrace trace, final ProcessTreeVisualisationInfo info,

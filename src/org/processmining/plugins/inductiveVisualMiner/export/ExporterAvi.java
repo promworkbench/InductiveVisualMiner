@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimat
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.logFiltering.IvMLogFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
@@ -44,7 +44,7 @@ public class ExporterAvi extends Exporter {
 		final GraphVizTokens tokens = state.getAnimationGraphVizTokens();
 		final Scaler scaler = state.getAnimationScaler();
 		final ProcessTreeVisualisationInfo info = state.getVisualisationInfo();
-		final IvMLogFilter filteredLog = state.getIvMLogFiltered();
+		final IvMLogFiltered filteredLog = state.getIvMLogFiltered();
 		new Thread(new Runnable() {
 			public void run() {
 				try {

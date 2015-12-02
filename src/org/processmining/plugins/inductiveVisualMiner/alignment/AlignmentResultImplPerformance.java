@@ -15,13 +15,12 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
-import org.processmining.plugins.inductiveVisualMiner.animation.TimestampsAdder;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.ResourceFunctions;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
@@ -171,9 +170,9 @@ public class AlignmentResultImplPerformance implements AlignmentResult {
 			//sync move or log move
 
 			XEvent event = trace.get(eventIndex);
-			Long timestamp = TimestampsAdder.getTimestamp(event);
+			Long timestamp = ResourceTimeUtils.getTimestamp(event);
 
-			String resource = ResourceFunctions.getResource(event);
+			String resource = ResourceTimeUtils.getResource(event);
 
 			return new IvMMove(move, timestamp, resource, event.getAttributes());
 		} else {

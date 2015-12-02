@@ -23,7 +23,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogImplFiltered;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -274,13 +274,13 @@ public class InductiveVisualMinerState {
 	//==timed log==
 	private IvMLogNotFiltered ivmLog;
 	private IvMLogInfo ivmLogInfo;
-	private IvMLogImplFiltered ivmLogFiltered;
+	private IvMLogFilteredImpl ivmLogFiltered;
 	private IvMLogInfo ivmLogInfoFiltered;
 
 	public void setIvMLog(IvMLogNotFiltered ivMLog, IvMLogInfo ivmLogInfo) {
 		this.ivmLog = ivMLog;
 		this.ivmLogInfo = ivmLogInfo;
-		this.ivmLogFiltered = new IvMLogImplFiltered(ivMLog);
+		this.ivmLogFiltered = new IvMLogFilteredImpl(ivMLog);
 		this.ivmLogInfoFiltered = ivmLogInfo;
 	}
 
@@ -288,7 +288,7 @@ public class InductiveVisualMinerState {
 		return ivmLog;
 	}
 
-	public void setIvMLogFiltered(IvMLogImplFiltered ivmLogFiltered, IvMLogInfo ivmLogInfoFiltered) {
+	public void setIvMLogFiltered(IvMLogFilteredImpl ivmLogFiltered, IvMLogInfo ivmLogInfoFiltered) {
 		this.ivmLogFiltered = ivmLogFiltered;
 		this.ivmLogInfoFiltered = ivmLogInfoFiltered;
 	}
@@ -297,7 +297,7 @@ public class InductiveVisualMinerState {
 		return ivmLogInfo;
 	}
 
-	public IvMLogImplFiltered getIvMLogFiltered() {
+	public IvMLogFilteredImpl getIvMLogFiltered() {
 		return ivmLogFiltered;
 	}
 

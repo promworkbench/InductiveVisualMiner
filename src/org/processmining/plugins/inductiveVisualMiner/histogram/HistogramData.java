@@ -1,29 +1,48 @@
 package org.processmining.plugins.inductiveVisualMiner.histogram;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class HistogramData {
-	private final int[] count;
+	private final int[] countFiltered;
+	private final int[] countUnfiltered;
 	private double max;
 	private final Scaler scaler;
 	private final int buckets;
 
-	public HistogramData(Scaler scaler, int buckets) {
-		count = new int[buckets];
+	public HistogramData(IvMLogFiltered log, Scaler scaler, int buckets) {
+		countFiltered = new int[buckets];
+		countUnfiltered = new int[buckets];
 		this.scaler = scaler;
 		this.buckets = buckets;
+
+		for (IteratorWithPosition<IvMTrace> it = log.iteratorUnfiltered(); it.hasNext();) {
+			IvMTrace trace = it.next();
+			boolean survivedFiltering = log.isFilteredOut(it.getPosition());
+
+			addTrace(trace, survivedFiltering);
+		}
 	}
 
-	public void incorporate(IvMTrace trace) {
-		Double t = trace.getStartTime();
-		double x = scaler.userTime2Fraction(t) * buckets;
-		int startCount = (int) Math.floor(x);
-		int endCount = (int) (scaler.userTime2Fraction(trace.getEndTime()) * buckets);
+	private void addTrace(IvMTrace trace, boolean isFilteredOut) {
 
-		for (int i = startCount; i < endCount; i++) {
-			count[i]++;
-			max = Math.max(max, count[i]);
+		Long realStartTime = trace.getRealStartTime();
+		Long realEndTime = trace.getRealEndTime();
+
+		if (realStartTime != null) {
+			int startBucket = (int) (scaler.userTime2Fraction(scaler.logTime2UserTime(realStartTime)) * buckets);
+			int endCount = (int) (scaler.userTime2Fraction(scaler.logTime2UserTime(realEndTime)) * buckets);
+
+			for (int i = startBucket; i < endCount; i++) {
+				countUnfiltered[i]++;
+				max = Math.max(max, countUnfiltered[i]);
+
+				if (!isFilteredOut) {
+					countFiltered[i]++;
+				}
+			}
 		}
 	}
 
@@ -32,6 +51,6 @@ public class HistogramData {
 	}
 
 	public double getBucketFraction(int bucketNr) {
-		return count[bucketNr] / max;
+		return countFiltered[bucketNr] / max;
 	}
 }

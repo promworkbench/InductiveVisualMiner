@@ -22,6 +22,11 @@ public class Scaler {
 				if (move.getLogTimestamp() != null) {
 					logMin = Math.min(logMin, move.getLogTimestamp());
 					logMax = Math.max(logMax, move.getLogTimestamp());
+					
+					if (trace.getRealStartTime() == null) {
+						trace.setRealStartTime(move.getLogTimestamp());
+					}
+					trace.setRealEndTime(move.getLogTimestamp());
 				}
 			}
 			if (canceller.isCancelled()) {

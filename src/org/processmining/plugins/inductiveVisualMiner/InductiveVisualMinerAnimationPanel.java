@@ -23,7 +23,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.Renderer;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderingThread;
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogImplFiltered;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 
 /**
  * This class takes care of the node popups and render an animation
@@ -250,7 +250,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		renderingThread.getTimeManager().setExtremeTimes(animationMinUserTime, animationMaxUserTime);
 	}
 
-	public void setFilteredLog(IvMLogImplFiltered ivMLogFiltered) {
+	public void setFilteredLog(IvMLogFilteredImpl ivMLogFiltered) {
 		renderingThread.getExternalSettingsManager().setFilteredLog(ivMLogFiltered);
 		renderingThread.renderOneFrame();
 	}
