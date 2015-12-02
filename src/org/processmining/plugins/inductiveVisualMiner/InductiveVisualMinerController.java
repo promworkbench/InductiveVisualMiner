@@ -321,6 +321,7 @@ public class InductiveVisualMinerController {
 					updateHighlighting();
 					updatePopup();
 					panel.getGraph().repaint();
+					state.setHistogramWidth((int) panel.getGraph().getControlsProgressLine().getWidth());
 				}
 			});
 			q.setOnException(onException);
