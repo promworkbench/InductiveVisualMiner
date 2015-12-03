@@ -124,7 +124,7 @@ public class ExportAnimation {
 				//transform
 				g.transform(transform);
 
-				Renderer.renderTokens(g, tokensIterator, filteredLog, time);
+				Renderer.renderTokens(g, tokensIterator, filteredLog, time, img.getWidth(), img.getHeight());
 
 				g.transform(transformInverse);
 
@@ -140,7 +140,7 @@ public class ExportAnimation {
 		} finally {
 			//close the progress monitor
 			progressMonitor.close();
-			
+
 			// Close the writer
 			if (out != null) {
 				out.close();
@@ -149,7 +149,7 @@ public class ExportAnimation {
 			// Dispose the graphics object
 			g.dispose();
 		}
-		
+
 		return !canceller.isCancelled();
 	}
 

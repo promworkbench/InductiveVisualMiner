@@ -7,9 +7,12 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIterator;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
@@ -26,6 +29,10 @@ public class Renderer {
 	public static final Stroke tokenStroke = new BasicStroke(1.5f);
 	public static final int maxAnimationDuration = 10; //after spending xx ms in drawing circles, just quit.
 	public static final int maxAnimationPausedDuration = 1000; //after spending xx ms in drawing circles, just quit.
+
+	private static final Shape circle = new Ellipse2D.Float(-tokenRadius, -tokenRadius, tokenRadius * 2,
+			tokenRadius * 2);
+	private static final Shape outline = tokenStroke.createStrokedShape(circle);
 
 	public static boolean render(ExternalSettings settings, RenderedFrame result, double time) {
 		if (settings.filteredLog != null && settings.tokens != null && settings.transform != null) {
@@ -53,7 +60,8 @@ public class Renderer {
 			result.graphics.setTransform(settings.transform);
 
 			//render the tokens		
-			renderTokens(result.graphics, settings.tokens, settings.filteredLog, time);
+			renderTokens(result.graphics, settings.tokens, settings.filteredLog, time, result.image.getWidth(),
+					result.image.getHeight());
 
 			//transform back
 			result.graphics.setTransform(new AffineTransform());
@@ -67,38 +75,51 @@ public class Renderer {
 	}
 
 	public static void renderTokens(Graphics2D graphics, GraphVizTokensIterator tokens, IvMLogFiltered filteredLog,
-			double time) {
-		graphics.setStroke(tokenStroke);
-
+			double time, int imgWidth, int imgHeight) {
 		tokens.itInit(time);
+		
+		//initialise points to keep track of  
+		Point2D.Double minTokenCoordinates = new Point2D.Double(tokenRadius, tokenRadius);
+		Point2D.Double minImageCoordinates = new Point2D.Double();
+		Point2D.Double maxTokenCoordinates = new Point2D.Double(-tokenRadius, -tokenRadius);
+		Point2D.Double maxImageCoordinates = new Point2D.Double();
+		
 		while (tokens.itHasNext()) {
 			tokens.itNext();
-			tokens.itEval();
 
 			//only paint tokens that are not filtered out
 			if (filteredLog == null || !filteredLog.isFilteredOut(tokens.itGetTraceIndex())) {
+				tokens.itEval();
 
-				//transform
+				//transform the canvas
 				graphics.transform(tokens.itGetTransform());
 				graphics.translate(tokens.itGetX(), tokens.itGetY());
 
-				//draw the oval
-				if (tokens.itGetOpacity() == 1) {
-					graphics.setPaint(tokenFillColour);
-				} else {
-					graphics.setPaint(new Color(tokenFillColour.getRed(), tokenFillColour.getGreen(), tokenFillColour
-							.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
-				}
-				graphics.fillOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
+				//only attempt to draw if the token is in the visible image
+				graphics.getTransform().transform(minTokenCoordinates, minImageCoordinates);
+				graphics.getTransform().transform(maxTokenCoordinates, maxImageCoordinates);
+				if (minImageCoordinates.y >= 0 && minImageCoordinates.x >= 0 && maxImageCoordinates.x <= imgWidth
+						&& maxImageCoordinates.y <= imgHeight) {
+					
+					//draw the fill
+					if (tokens.itGetOpacity() == 1) {
+						graphics.setPaint(tokenFillColour);
+					} else {
+						graphics.setPaint(new Color(tokenFillColour.getRed(), tokenFillColour.getGreen(),
+								tokenFillColour.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
+					}
+					graphics.fill(circle);
 
-				//draw the fill
-				if (tokens.itGetOpacity() == 1) {
-					graphics.setColor(tokenStrokeColour);
-				} else {
-					graphics.setColor(new Color(tokenStrokeColour.getRed(), tokenStrokeColour.getGreen(),
-							tokenStrokeColour.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
+					//draw the oval
+					if (tokens.itGetOpacity() == 1) {
+						graphics.setColor(tokenStrokeColour);
+					} else {
+						graphics.setColor(new Color(tokenStrokeColour.getRed(), tokenStrokeColour.getGreen(),
+								tokenStrokeColour.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
+					}
+					graphics.fill(outline);
+					//graphics.drawOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
 				}
-				graphics.drawOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
 
 				//transform back
 				graphics.translate(-tokens.itGetX(), -tokens.itGetY());

@@ -123,7 +123,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			if (settings.tokens != null) {
 				double time = renderingThread.getTimeManager().getLastRenderedTime();
 				GraphVizTokensIterator tokens = new GraphVizTokensLazyIterator(settings.tokens);
-				Renderer.renderTokens(g, tokens, settings.filteredLog, time);
+				Renderer.renderTokens(g, tokens, settings.filteredLog, time, Integer.MAX_VALUE, Integer.MAX_VALUE);
 			}
 		}
 

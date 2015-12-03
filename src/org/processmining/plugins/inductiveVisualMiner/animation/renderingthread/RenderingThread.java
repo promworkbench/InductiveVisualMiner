@@ -44,7 +44,7 @@ public class RenderingThread implements Runnable {
 	public void seek(double time) {
 		timeManager.seek(time);
 	}
-	
+
 	public void renderOneFrame() {
 		singleFrameRequested.set(true);
 	}
@@ -92,6 +92,12 @@ public class RenderingThread implements Runnable {
 	public void run() {
 		long sleep = 0;
 		long before = 0;
+		long lastDuration = 0;
+
+		//debug frame rate
+		long frameRateStart = 0;
+		long frameRateCount = 0;
+		int avg = 10;
 		while (!stopRequested.get() && !canceller.isCancelled()) {
 			//get the time before we do our game logic
 			before = System.currentTimeMillis();
@@ -110,8 +116,18 @@ public class RenderingThread implements Runnable {
 
 			try {
 				// sleep for xx - how long it took us to do the rendering
-				sleep = minRenderDuration - (System.currentTimeMillis() - before);
-				Thread.sleep(sleep > 0 ? sleep : 0);
+				lastDuration = System.currentTimeMillis() - before;
+				sleep = minRenderDuration - lastDuration;
+				if (sleep > 0) {
+					Thread.sleep(sleep);
+				}
+
+				//debug framerate
+				if (frameRateCount % avg == 0) {
+					System.out.println((1 / ((System.currentTimeMillis() - frameRateStart) / (1000.0 * avg))));
+					frameRateStart = before;
+				}
+				frameRateCount++;
 			} catch (InterruptedException ex) {
 			}
 		}
