@@ -190,7 +190,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		g.setColor(new Color(255, 255, 255, 150));
 		g.setFont(helperControlsFont);
 		double casesPerMs = histogramData.getLocalMaximum() / histogramData.getLogTimeInMsPerLocalBucket();
-		g.drawString(ResourceTimeUtils.getTimePerUnitString(casesPerMs, "busy executions"), offsetX + 1, offsetY + 10);
+		g.drawString(ResourceTimeUtils.getTimePerUnitString(casesPerMs, "executions"), offsetX + 1, offsetY + 10);
 
 		//histogram itself
 		{
