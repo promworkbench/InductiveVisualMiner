@@ -42,7 +42,7 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 	public Double getStartTime() {
 		return startTime;
 	}
-	
+
 	public void setRealEndTime(long endTime) {
 		this.realEndTime = endTime;
 	}
@@ -66,7 +66,7 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 	public String getName() {
 		return name;
 	}
-	
+
 	public XAttributeMap getAttributes() {
 		return attributes;
 	}
@@ -135,7 +135,13 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 
 		/**
 		 * Returns the next activity instance. Might return null if the trace is
-		 * inconsistent.
+		 * inconsistent. Sextuple of:<br>
+		 * - activity<br>
+		 * - resource<br>
+		 * - initiate move<br>
+		 * - enqueue move<br>
+		 * - start move<br>
+		 * - complete move<br>
 		 */
 		public Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> next() {
 

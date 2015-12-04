@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.ivmlog;
+package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
 import java.lang.ref.SoftReference;
 import java.text.DateFormat;
@@ -11,13 +11,13 @@ import org.deckfour.xes.extension.std.XTimeExtension;
 import org.deckfour.xes.model.XEvent;
 
 public class ResourceTimeUtils {
-	
+
 	private final static XEventClassifier classifier = new XEventResourceClassifier();
-	
+
 	public static String getResource(XEvent event) {
 		return classifier.getClassIdentity(event);
 	}
-	
+
 	public static Long getTimestamp(XEvent event) {
 		Date date = XTimeExtension.instance().extractTimestamp(event);
 		if (date != null) {
@@ -25,13 +25,33 @@ public class ResourceTimeUtils {
 		}
 		return null;
 	}
-	
+
+	public static final String getTimePerUnitString(double ms, String otherUnit) {
+		if (ms > 1) {
+			return String.format("%.2f", ms) + " " + otherUnit + "\\ms";
+		}
+		double s = ms * 1000;
+		if (s > 1) {
+			return String.format("%.2f", s) + " " + otherUnit + "\\s";
+		}
+		double m = s * 60;
+		if (m > 1) {
+			return String.format("%.2f", m) + " " + otherUnit + "\\m";
+		}
+		double h = m * 60;
+		if (h > 1) {
+			return String.format("%.2f", h) + " " + otherUnit + "\\h";
+		}
+		double d = h * 24;
+		return String.format("%.2f", d) + " " + otherUnit + "\\day";
+	}
+
 	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_0 = new ThreadLocal<SoftReference<DateFormat>>();
 	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_1 = new ThreadLocal<SoftReference<DateFormat>>();
 	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_2 = new ThreadLocal<SoftReference<DateFormat>>();
 	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_3 = new ThreadLocal<SoftReference<DateFormat>>();
 	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_4 = new ThreadLocal<SoftReference<DateFormat>>();
-	
+
 	@SuppressWarnings("deprecation")
 	public static String timeToString(Long timestamp) {
 		if (timestamp != null) {
@@ -51,7 +71,7 @@ public class ResourceTimeUtils {
 			return null;
 		}
 	}
-	
+
 	private static DateFormat getThreadLocaleDateFormat(String formatString,
 			ThreadLocal<SoftReference<DateFormat>> threadLocal) {
 		SoftReference<DateFormat> softReference = threadLocal.get();

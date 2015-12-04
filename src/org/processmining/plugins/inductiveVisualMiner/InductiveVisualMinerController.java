@@ -52,8 +52,8 @@ import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringF
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
@@ -653,7 +653,7 @@ public class InductiveVisualMinerController {
 						popup.add(" ");
 					}
 
-					panel.getGraph().setPopup(popup);
+					panel.getGraph().setPopup(popup, unode);
 					panel.getGraph().setShowPopup(true);
 				} else {
 					panel.getGraph().setShowPopup(false);

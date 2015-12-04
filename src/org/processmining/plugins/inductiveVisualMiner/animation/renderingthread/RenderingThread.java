@@ -124,7 +124,8 @@ public class RenderingThread implements Runnable {
 
 				//debug framerate
 				if (frameRateCount % avg == 0) {
-					System.out.println((1 / ((System.currentTimeMillis() - frameRateStart) / (1000.0 * avg))));
+					//System.out.print((1 / ((System.currentTimeMillis() - frameRateStart) / (1000.0 * avg))));
+					//System.out.println(" fps");
 					frameRateStart = before;
 				}
 				frameRateCount++;

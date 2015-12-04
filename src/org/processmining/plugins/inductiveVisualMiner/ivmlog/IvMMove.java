@@ -4,6 +4,7 @@ import org.deckfour.xes.model.XAttributeMap;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 
 public class IvMMove extends Move {
 

@@ -15,6 +15,38 @@ import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class TreeUtils {
+
+	public static List<UnfoldedNode> unfoldAllActivities(ProcessTree tree) {
+		return unfoldAllActivities(new UnfoldedNode(tree.getRoot()));
+	}
+
+	public static List<UnfoldedNode> unfoldAllActivities(UnfoldedNode unode) {
+		List<UnfoldedNode> result = new ArrayList<UnfoldedNode>();
+		if (unode.getNode() instanceof Manual) {
+			result.add(unode);
+		}
+		if (unode.getNode() instanceof Block) {
+			for (Node child : unode.getBlock().getChildren()) {
+				result.addAll(unfoldAllNodes(unode.unfoldChild(child)));
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param tree
+	 * @return all nodes in the tree
+	 */
+	public static List<UnfoldedNode> unfoldAllNodes(ProcessTree tree) {
+		return unfoldAllNodes(new UnfoldedNode(tree.getRoot()));
+	}
+
+	/**
+	 * 
+	 * @param unode
+	 * @return all nodes in the tree.
+	 */
 	public static List<UnfoldedNode> unfoldAllNodes(UnfoldedNode unode) {
 		List<UnfoldedNode> result = new ArrayList<UnfoldedNode>();
 		result.add(unode);
@@ -35,7 +67,7 @@ public class TreeUtils {
 	public static boolean areParallel(UnfoldedNode unode1, UnfoldedNode unode2) {
 		return getLowestCommonParent(unode1, unode2) instanceof And;
 	}
-	
+
 	/**
 	 * 
 	 * @param unode1
@@ -58,7 +90,7 @@ public class TreeUtils {
 		}
 		return lastEqual;
 	}
-	
+
 	/**
 	 * 
 	 * @param tree

@@ -22,8 +22,10 @@ import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.Renderer;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderingThread;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 /**
  * This class takes care of the node popups and render an animation
@@ -38,7 +40,11 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	//popup
 	private boolean showPopup = false;
 	private List<String> popupText = null;
+	private UnfoldedNode popupHistogramUnode = null;
 	public static final int popupWidth = 300;
+	public static final int popupPadding = 10;
+	public static final int popupRightMargin = 40;
+	public static final int popupHistogramHeight = 100;
 
 	//animation
 	protected boolean animationEnabled = false;
@@ -97,7 +103,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 		//draw the histogram
 		if (isAnimationControlsShowing() && histogramData != null) {
-			paintHistogram((Graphics2D) g);
+			paintGlobalHistogram((Graphics2D) g);
 		}
 	};
 
@@ -139,19 +145,32 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		Color backupColour = g.getColor();
 		Font backupFont = g.getFont();
 
-		int x = getWidth() - (25 + popupWidth);
-		int y = getHeight() - (popupText.size() * 20 - 10);
+		int currentPopupHistogramHeight = histogramData == null && popupHistogramUnode != null ? 0
+				: popupHistogramHeight;
+
+		int popupHeight = (popupText.size() * 20) + currentPopupHistogramHeight;
+
+		int x = getWidth() - (popupRightMargin + popupWidth + popupPadding);
+		int y = getHeight() - popupHeight - popupPadding;
 
 		//background
 		g.setColor(new Color(0, 0, 0, 180));
-		g.fillRoundRect(x - 15, y - 20, popupWidth, helperControlsShortcuts.size() * 20 + 20, 10, 10);
+		g.fillRoundRect(x - popupPadding, y - popupPadding, popupWidth + 2 * popupPadding, popupHeight + 2
+				* popupPadding + popupPadding, popupPadding, popupPadding);
+
+		//local (= unode) histogram
+		if (histogramData != null && popupHistogramUnode != null) {
+			paintPopupHistogram(g, x, y);
+		}
+
+		y += currentPopupHistogramHeight;
 
 		//text
 		g.setColor(new Color(255, 255, 255, 220));
 		g.setFont(helperControlsFont);
 		for (int i = 0; i < popupText.size(); i++) {
-			g.drawString(popupText.get(i), x, y);
 			y += 20;
+			g.drawString(popupText.get(i), x, y);
 		}
 
 		//revert colour and font
@@ -159,7 +178,47 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		g.setFont(backupFont);
 	}
 
-	public void paintHistogram(Graphics2D g) {
+	public void paintPopupHistogram(Graphics2D g, int offsetX, int offsetY) {
+		Color backupColour = g.getColor();
+		Font backupFont = g.getFont();
+
+		//border
+		g.setColor(new Color(255, 255, 255, 50));
+		g.drawRect(offsetX, offsetY, popupWidth, popupHistogramHeight);
+
+		//text
+		g.setColor(new Color(255, 255, 255, 150));
+		g.setFont(helperControlsFont);
+		double casesPerMs = histogramData.getLocalMaximum() / histogramData.getLogTimeInMsPerLocalBucket();
+		g.drawString(ResourceTimeUtils.getTimePerUnitString(casesPerMs, "busy executions"), offsetX + 1, offsetY + 10);
+
+		//histogram itself
+		{
+			//create a path
+			GeneralPath path = new GeneralPath();
+			path.moveTo(offsetX, offsetY + popupHistogramHeight);
+			for (int pixel = 0; pixel < histogramData.getNrOfLocalBuckets(); pixel++) {
+				path.lineTo(
+						offsetX + pixel,
+						offsetY + popupHistogramHeight
+								- histogramData.getLocalBucketFraction(popupHistogramUnode, pixel)
+								* popupHistogramHeight);
+			}
+			path.lineTo(offsetX + popupWidth, offsetY + popupHistogramHeight);
+			path.closePath();
+
+			//draw path
+			g.setColor(new Color(255, 255, 255, 150));
+			g.draw(path);
+			g.setColor(new Color(255, 255, 255, 50));
+			g.fill(path);
+		}
+
+		g.setColor(backupColour);
+		g.setFont(backupFont);
+	}
+
+	public void paintGlobalHistogram(Graphics2D g) {
 		Color backupColour = g.getColor();
 
 		double height = getControlsProgressLine().getHeight();
@@ -170,8 +229,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		GeneralPath path = new GeneralPath();
 
 		path.moveTo(offsetX, offsetY);
-		for (int pixel = 0; pixel < histogramData.getNrOfBuckets(); pixel++) {
-			path.lineTo(offsetX + pixel, offsetY - histogramData.getBucketFraction(pixel) * height);
+		for (int pixel = 0; pixel < histogramData.getNrOfGlobalBuckets(); pixel++) {
+			path.lineTo(offsetX + pixel, offsetY - histogramData.getGlobalBucketFraction(pixel) * height);
 		}
 		path.lineTo(offsetX + width, offsetY);
 		path.closePath();
@@ -184,8 +243,9 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		g.setColor(backupColour);
 	}
 
-	public void setPopup(List<String> popup) {
+	public void setPopup(List<String> popup, UnfoldedNode popupHistogramUnode) {
 		this.popupText = popup;
+		this.popupHistogramUnode = popupHistogramUnode;
 	}
 
 	public boolean isShowPopup() {
