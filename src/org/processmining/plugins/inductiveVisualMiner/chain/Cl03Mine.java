@@ -1,16 +1,13 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import java.util.HashSet;
-
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Cl03Mine extends
 		ChainLink<Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters>, ProcessTree> {
@@ -37,8 +34,7 @@ public class Cl03Mine extends
 
 	protected void processResult(ProcessTree result, InductiveVisualMinerState state) {
 		state.setTree(result);
-		state.setSelectedNodes(new HashSet<UnfoldedNode>());
-		state.setSelectedLogMoves(new HashSet<LogMovePosition>());
+		state.setSelection(new Selection());
 		state.resetAlignment();
 	}
 }

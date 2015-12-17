@@ -3,47 +3,44 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import nl.tue.astar.AStarThread.Canceller;
 
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Quintuple;
+import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Cl09FilterNodeSelection
 		extends
-		ChainLink<Quintuple<IvMLogNotFiltered, Set<UnfoldedNode>, Set<LogMovePosition>, List<ColouringFilter>, IvMLogInfo>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
+		ChainLink<Quadruple<IvMLogNotFiltered, Selection, List<ColouringFilter>, IvMLogInfo>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
 
 	public Cl09FilterNodeSelection(ProMCanceller globalCanceller) {
 		super(globalCanceller);
 	}
 
-	protected Quintuple<IvMLogNotFiltered, Set<UnfoldedNode>, Set<LogMovePosition>, List<ColouringFilter>, IvMLogInfo> generateInput(
+	protected Quadruple<IvMLogNotFiltered, Selection, List<ColouringFilter>, IvMLogInfo> generateInput(
 			InductiveVisualMinerState state) {
-		return Quintuple.of(state.getIvMLog(), state.getSelectedNodes(), state.getSelectedLogMoves(),
+		return Quadruple.of(state.getIvMLog(), state.getSelection(),
 				state.getColouringFilters(), state.getIvMLogInfo());
 	}
 
 	protected Pair<IvMLogFilteredImpl, IvMLogInfo> executeLink(
-			Quintuple<IvMLogNotFiltered, Set<UnfoldedNode>, Set<LogMovePosition>, List<ColouringFilter>, IvMLogInfo> input) {
+			Quadruple<IvMLogNotFiltered, Selection, List<ColouringFilter>, IvMLogInfo> input) {
 
 		canceller.reset();
 
 		IvMLogNotFiltered logBase = input.getA();
-		Set<UnfoldedNode> selectedNodes = input.getB();
-		Set<LogMovePosition> selectedLogMoves = input.getC();
-		List<ColouringFilter> colouringFilters = input.getD();
-		IvMLogInfo oldLogInfo = input.getE();
+		Selection selection = input.getB();
+		List<ColouringFilter> colouringFilters = input.getC();
+		IvMLogInfo oldLogInfo = input.getD();
 
 		IvMLogFilteredImpl logFiltered = new IvMLogFilteredImpl(logBase);
 
@@ -51,8 +48,8 @@ public class Cl09FilterNodeSelection
 		applyColouringFilter(logFiltered, colouringFilters, canceller);
 
 		//apply node/edge selection filters
-		if (!selectedNodes.isEmpty() || !selectedLogMoves.isEmpty()) {
-			filterOnSelection(logFiltered, selectedNodes, selectedLogMoves);
+		if (selection.isSomethingSelected()) {
+			filterOnSelection(logFiltered, selection);
 		}
 
 		//create a log info
@@ -107,20 +104,13 @@ public class Cl09FilterNodeSelection
 	 * @param selectedNodes
 	 * @param selectedLogMoves
 	 */
-	private static void filterOnSelection(IvMLogFilteredImpl log, Set<UnfoldedNode> selectedNodes,
-			Set<LogMovePosition> selectedLogMoves) {
+	private static void filterOnSelection(IvMLogFilteredImpl log, Selection selection) {
 
-		boolean useNodes = !selectedNodes.isEmpty();
-		boolean useLogMoves = !selectedLogMoves.isEmpty();
 		for (Iterator<IvMTrace> it = log.iterator(); it.hasNext();) {
-
+			IvMTrace trace = it.next();
 			boolean keepTrace = false;
-			for (IvMMove move : it.next()) {
-				if (useNodes && move.isModelSync() && selectedNodes.contains(move.getUnode())) {
-					keepTrace = true;
-					break;
-				}
-				if (useLogMoves && move.isLogMove() && selectedLogMoves.contains(LogMovePosition.of(move))) {
+			for (IvMMove move : trace) {
+				if (selection.isSelected(move)) {
 					keepTrace = true;
 					break;
 				}

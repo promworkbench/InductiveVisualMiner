@@ -5,10 +5,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Stroke;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.deckfour.xes.model.XEvent;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList;
@@ -19,7 +17,6 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
-import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
@@ -38,17 +35,15 @@ public class TraceView extends SideWindow {
 	public static class TraceViewColourMap implements WedgeBuilder {
 		private final Map<UnfoldedNode, Color> mapFill = new HashMap<>();
 		private final Map<UnfoldedNode, Color> mapFont = new HashMap<>();
-		private Set<UnfoldedNode> selectedNodes = new HashSet<>();
-		private Set<LogMovePosition> selectedLogMoves = new HashSet<>();
+		private Selection selection;
 
 		public void set(UnfoldedNode unode, Color colourFill, Color colourFont) {
 			mapFill.put(unode, colourFill);
 			mapFont.put(unode, colourFont);
 		}
 
-		public void setSelectedNodes(Set<UnfoldedNode> selectedNodes, Set<LogMovePosition> selectedLogMoves) {
-			this.selectedNodes = selectedNodes;
-			this.selectedLogMoves = selectedLogMoves;
+		public void setSelectedNodes(Selection selection) {
+			this.selection = selection;
 		}
 
 		public Color buildWedgeColor(Trace<? extends Event> trace, Event event) {
@@ -67,28 +62,17 @@ public class TraceView extends SideWindow {
 				dash1, 0.0f);
 
 		public Stroke buildBorderStroke(Trace<? extends Event> trace, Event event) {
-			if (event instanceof Move && selectedNodes.contains(((Move) event).getUnode())) {
-				//selected node
-				return selectedStroke;
-			} else if (event instanceof Move && ((Move) event).isLogMove()
-					&& selectedLogMoves.contains(LogMovePosition.of((Move) event))) {
-				//selected log move
+			if (event instanceof Move && selection.isSelected((Move) event)) {
 				return selectedStroke;
 			}
 			return null;
 		}
 
 		public Color buildBorderColor(Trace<? extends Event> trace, Event event) {
-			if (event instanceof Move && selectedNodes.contains(((Move) event).getUnode())) {
-				//selected node
-				return Color.white;
-			} else if (event instanceof Move && ((Move) event).isLogMove()
-					&& selectedLogMoves.contains(LogMovePosition.of((Move) event))) {
-				//selected log move
+			if (event instanceof Move && selection.isSelected((Move) event)) {
 				return Color.white;
 			}
 			return null;
-
 		}
 
 		public Color buildLabelColor(Trace<? extends Event> trace, Event event) {

@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -20,7 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -128,38 +127,43 @@ public class ColouringFiltersView extends SideWindow {
 	 * @param maxAnimatedTraces
 	 * @param numberOfTraces
 	 */
-	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Set<UnfoldedNode> selectedNodes,
-			Set<LogMovePosition> selectedLogMoves, List<ColouringFilter> colouringFilters) {
+	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Selection selection,
+			List<ColouringFilter> colouringFilters) {
 		//show the user which traces are shown
 
-		String[] criteria = new String[3];
+		StringBuilder result = new StringBuilder();
 
 		//selected nodes
-		if (!selectedNodes.isEmpty()) {
-			String nodes = "(should) include ";
-			Iterator<UnfoldedNode> it = selectedNodes.iterator();
-			{
-				nodes += "`" + it.next().getNode() + "'";
-			}
+		if (selection.isAnActivitySelected()) {
+			result.append("include ");
+			Iterator<UnfoldedNode> it = selection.getSelectedActivities().iterator();
+			result.append("'" + it.next().getNode() + "'");
+
 			while (it.hasNext()) {
 				String p = it.next().getNode().toString();
 				if (it.hasNext()) {
-					nodes += ", `" + p + "'";
+					result.append(", `" + p + "'");
 				} else {
-					nodes += " or `" + p + "'";
+					result.append(" or `" + p + "'");
 				}
 			}
-			nodes += " according to the model";
-			criteria[0] = nodes;
-		} else {
-			criteria[0] = "";
+			result.append(" in sync with the model");
 		}
 
 		//selected log moves
-		if (!selectedLogMoves.isEmpty()) {
-			criteria[1] = "have an only-in-log event as selected";
-		} else {
-			criteria[1] = "";
+		if (selection.isALogMoveSelected()) {
+			if (result.length() != 0) {
+				result.append(" or ");
+			}
+			result.append("have an only-in-log event as selected");
+		}
+
+		//selected model moves
+		if (selection.isAModelMoveSelected()) {
+			if (result.length() != 0) {
+				result.append(" or ");
+			}
+			result.append("have an only-in-model event as selected");
 		}
 
 		//colouring filters
@@ -170,40 +174,28 @@ public class ColouringFiltersView extends SideWindow {
 					enabledColouringFilters++;
 				}
 			}
-			if (enabledColouringFilters == 1) {
-				criteria[2] = "pass the highlighting filter";
-			} else if (enabledColouringFilters > 1) {
-				criteria[2] = "pass the highlighting filters";
-			} else {
-				criteria[2] = "";
+			if (enabledColouringFilters >= 1) {
+				if (result.length() != 0) {
+					result.append("; and ");
+				}
+
+				if (enabledColouringFilters == 1) {
+					result.append("pass the highlighting filter");
+				} else {
+					result.append("pass the highlighting filters");
+				}
 			}
 		}
 
 		//construct a sentence
 		String s;
-		int count = 0;
-		for (int i = 0; i < 3; i++) {
-			if (criteria[i] != "") {
-				count++;
-			}
-		}
-		if (count == 0) {
+		if (result.length() == 0) {
 			//no criteria active
-			s = "Highlighting all traces";
-		} else if (count == 1) {
-			//one criterion active
-			s = "Highlighting traces that " + criteria[0] + criteria[1] + criteria[2];
-		} else if (count == 2) {
-			if (criteria[0] != "" && criteria[1] != "") {
-				s = "Highlighting traces that " + criteria[0] + " or " + criteria[1];
-			} else {
-				s = "Highlighting traces that " + criteria[0] + criteria[1] + ", and " + criteria[2];
-			}
+			s = "Highlighting all traces.";
 		} else {
 			//all criteria active
-			s = "Highlighting traces that " + criteria[0] + " or " + criteria[1] + ", and that " + criteria[2];
+			s = "Highlighting traces that " + result.toString() + ".";
 		}
-		s += ".";
 
 		panel.getSelectionLabel().setText(s);
 	}

@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -14,12 +13,10 @@ import javax.swing.JTextArea;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
-import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -31,7 +28,6 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 import com.fluxicon.slickerbox.components.NiceDoubleSlider;
 import com.fluxicon.slickerbox.components.NiceSlider.Orientation;
@@ -62,7 +58,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JButton colouringFiltersViewButton;
 	private final ColouringFiltersView colouringFiltersView;
 
-	private InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged = null;
+	private InputFunction<Selection> onSelectionChanged = null;
 	private Runnable onGraphDirectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
@@ -259,19 +255,14 @@ public class InductiveVisualMinerPanel extends JPanel {
 				public void selectionChanged(Set<DotElement> selectedElements) {
 					//selection of nodes changed; keep track of them
 
-					Set<UnfoldedNode> resultNodes = new HashSet<>();
-					Set<LogMovePosition> resultLogMoveEdges = new HashSet<>();
+					Selection selection = new Selection();
 					for (DotElement dotElement : graphPanel.getSelectedElements()) {
-						if (dotElement instanceof LocalDotNode) {
-							resultNodes.add(((LocalDotNode) dotElement).getUnode());
-						} else if (dotElement instanceof LocalDotEdge) {
-							resultLogMoveEdges.add(LogMovePosition.of(((LocalDotEdge) dotElement)));
-						}
+						selection.select(dotElement);
 					}
 
 					if (onSelectionChanged != null) {
 						try {
-							onSelectionChanged.call(Pair.of(resultNodes, resultLogMoveEdges));
+							onSelectionChanged.call(selection);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -386,7 +377,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return saveImageButton;
 	}
 
-	public void setOnSelectionChanged(InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>> onSelectionChanged) {
+	public void setOnSelectionChanged(InputFunction<Selection> onSelectionChanged) {
 		this.onSelectionChanged = onSelectionChanged;
 	}
 

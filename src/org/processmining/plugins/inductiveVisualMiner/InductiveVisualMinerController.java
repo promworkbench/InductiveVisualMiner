@@ -8,7 +8,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -26,13 +25,11 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Function;
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.export.ExportDialog;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
-import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01MakeLog;
@@ -177,7 +174,7 @@ public class InductiveVisualMinerController {
 
 					//if the view does not show deviations, do not select any log moves
 					if (!state.getMode().isShowDeviations()) {
-						state.setSelectedLogMoves(new HashSet<LogMovePosition>());
+						state.removeModelAndLogMovesSelection();
 					}
 				}
 			};
@@ -186,8 +183,7 @@ public class InductiveVisualMinerController {
 					panel.getGraph().changeDot(state.getDot(), state.getSVGDiagram(), true);
 					panel.getTraceView().setColourMap(state.getTraceViewColourMap());
 
-					makeNodesSelectable(state.getVisualisationInfo(), panel, state.getSelectedNodes(),
-							state.getSelectedLogMoves());
+					makeNodesSelectable(state.getVisualisationInfo(), panel, state.getSelection());
 
 				}
 			};
@@ -287,8 +283,8 @@ public class InductiveVisualMinerController {
 
 					state.resetPerformance();
 
-					ColouringFiltersView.updateSelectionDescription(panel, state.getSelectedNodes(),
-							state.getSelectedLogMoves(), state.getColouringFilters());
+					ColouringFiltersView.updateSelectionDescription(panel, state.getSelection(),
+							state.getColouringFilters());
 
 					//tell trace view the colour map and the selection
 					panel.getTraceView().set(state.getIvMLogFiltered());
@@ -422,10 +418,9 @@ public class InductiveVisualMinerController {
 		});
 
 		//node selection changed
-		panel.setOnSelectionChanged(new InputFunction<Pair<Set<UnfoldedNode>, Set<LogMovePosition>>>() {
-			public void call(Pair<Set<UnfoldedNode>, Set<LogMovePosition>> input) throws Exception {
-				state.setSelectedNodes(input.getA());
-				state.setSelectedLogMoves(input.getB());
+		panel.setOnSelectionChanged(new InputFunction<Selection>() {
+			public void call(Selection input) throws Exception {
+				state.setSelection(input);
 				chain.execute(Cl09FilterNodeSelection.class);
 			}
 		});
@@ -534,12 +529,15 @@ public class InductiveVisualMinerController {
 	}
 
 	private static void makeNodesSelectable(ProcessTreeVisualisationInfo info, InductiveVisualMinerPanel panel,
-			Set<UnfoldedNode> selectedNodes, Set<LogMovePosition> selectedLogMoves) {
+			Selection selection) {
 		for (LocalDotNode dotNode : info.getAllActivityNodes()) {
-			panel.makeNodeSelectable(dotNode, selectedNodes.contains(dotNode.getUnode()));
+			panel.makeNodeSelectable(dotNode, selection.isSelected(dotNode));
 		}
 		for (LocalDotEdge logMoveEdge : info.getAllLogMoveEdges()) {
-			panel.makeEdgeSelectable(logMoveEdge, selectedLogMoves.contains(LogMovePosition.of(logMoveEdge)));
+			panel.makeEdgeSelectable(logMoveEdge, selection.isSelected(logMoveEdge));
+		}
+		for (LocalDotEdge modelMoveEdge : info.getAllModelMoveEdges()) {
+			panel.makeEdgeSelectable(modelMoveEdge, selection.isSelected(modelMoveEdge));
 		}
 	}
 
@@ -586,7 +584,7 @@ public class InductiveVisualMinerController {
 		TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(panel.getGraph()
 				.getSVG(), state.getVisualisationInfo(), state.getTree(), state.getVisualisationData(), state.getMode()
 				.getVisualisationParameters(state));
-		colourMap.setSelectedNodes(state.getSelectedNodes(), state.getSelectedLogMoves());
+		colourMap.setSelectedNodes(state.getSelection());
 		panel.getTraceView().setColourMap(colourMap);
 	}
 

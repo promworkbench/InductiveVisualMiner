@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
-import java.util.HashSet;
+import gnu.trove.set.hash.THashSet;
+
 import java.util.List;
 import java.util.Set;
 
@@ -243,24 +244,19 @@ public class InductiveVisualMinerState {
 	}
 
 	//==colour filtering ( & node selection)==
-	private Set<UnfoldedNode> selectedNodes = new HashSet<>();
-	private Set<LogMovePosition> selectedLogMoves = new HashSet<>();
+	private Selection selection;
 	private List<ColouringFilter> colouringFilters;
 
-	public Set<UnfoldedNode> getSelectedNodes() {
-		return selectedNodes;
+	public Selection getSelection() {
+		return selection;
+	}
+	
+	public void setSelection(Selection selection) {
+		this.selection = selection;
 	}
 
-	public synchronized void setSelectedNodes(Set<UnfoldedNode> selectedNodes) {
-		this.selectedNodes = selectedNodes;
-	}
-
-	public Set<LogMovePosition> getSelectedLogMoves() {
-		return selectedLogMoves;
-	}
-
-	public synchronized void setSelectedLogMoves(Set<LogMovePosition> selectedLogMoves) {
-		this.selectedLogMoves = selectedLogMoves;
+	public void removeModelAndLogMovesSelection() {
+		selection = new Selection(selection.getSelectedActivities(), new THashSet<LogMovePosition>(), new THashSet<UnfoldedNode>());
 	}
 
 	public List<ColouringFilter> getColouringFilters() {
@@ -321,7 +317,7 @@ public class InductiveVisualMinerState {
 	//==histogram==
 	private HistogramData histogramData;
 	private int histogramWidth;
-	
+
 	public void resetHistogramData() {
 		histogramData = null;
 	}
@@ -333,11 +329,11 @@ public class InductiveVisualMinerState {
 	public HistogramData getHistogramData() {
 		return histogramData;
 	}
-	
+
 	public void setHistogramWidth(int histogramWidth) {
 		this.histogramWidth = histogramWidth;
 	}
-	
+
 	public int getHistogramWidth() {
 		return histogramWidth;
 	}
@@ -349,7 +345,7 @@ public class InductiveVisualMinerState {
 	public void setAnimation(GraphVizTokens animationGraphVizTokens) {
 		this.animationGraphVizTokens = animationGraphVizTokens;
 	}
-	
+
 	public void setAnimationScaler(Scaler animationScaler) {
 		this.animationScaler = animationScaler;
 	}
