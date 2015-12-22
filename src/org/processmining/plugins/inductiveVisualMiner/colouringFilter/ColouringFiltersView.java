@@ -167,7 +167,7 @@ public class ColouringFiltersView extends SideWindow {
 		}
 
 		//selected edges
-		if (selection.isATauSelected()) {
+		if (selection.isAModelEdgeSelected()) {
 			if (result.length() != 0) {
 				result.append(" or ");
 			}

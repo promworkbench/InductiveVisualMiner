@@ -106,4 +106,24 @@ public class TreeUtils {
 		}
 		return result;
 	}
+
+	/**
+	 * 
+	 * @param parent
+	 * @param child
+	 * @return whether child is a child of parent, or parent itself.
+	 */
+	public static boolean isParent(UnfoldedNode parent, UnfoldedNode child) {
+		Iterator<Node> it1 = parent.getPath().iterator();
+		Iterator<Node> it2 = child.getPath().iterator();
+		while (it1.hasNext() && it2.hasNext()) {
+			Node n1 = it1.next();
+			Node n2 = it2.next();
+			
+			if (!n1.equals(n2)) {
+				return false;
+			}
+		}
+		return !it1.hasNext();
+	}
 }

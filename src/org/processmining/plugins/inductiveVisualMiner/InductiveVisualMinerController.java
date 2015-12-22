@@ -539,8 +539,8 @@ public class InductiveVisualMinerController {
 		for (LocalDotEdge modelMoveEdge : info.getAllModelMoveEdges()) {
 			panel.makeEdgeSelectable(modelMoveEdge, selection.isSelected(modelMoveEdge));
 		}
-		for (LocalDotEdge tauEdge : info.getAllTauEdges()) {
-			panel.makeEdgeSelectable(tauEdge, selection.isSelected(tauEdge));
+		for (LocalDotEdge edge : info.getAllModelEdges()) {
+			panel.makeEdgeSelectable(edge, selection.isSelected(edge));
 		}
 	}
 
