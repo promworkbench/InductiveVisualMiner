@@ -22,6 +22,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
 import org.processmining.processtree.ProcessTree;
+import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
@@ -70,12 +71,15 @@ public class InductiveVisualMinerSelectionColourer {
 			dotEdge.unselectedAppearance.textFill = DotPanel.setCSSAttributeOf(text, "fill", "none");
 			if (dotEdge.getType() != EdgeType.model) {
 				dotEdge.unselectedAppearance.textStroke = DotPanel.setCSSAttributeOf(text, "stroke", "red");
+				dotEdge.unselectedAppearance.lineStrokeDashArray = DotPanel.setCSSAttributeOf(line, "stroke-dasharray",
+						"2,5");
 			} else {
 				dotEdge.unselectedAppearance.textStroke = DotPanel.setCSSAttributeOf(text, "stroke", "black");
+				dotEdge.unselectedAppearance.lineStrokeDashArray = DotPanel.setCSSAttributeOf(line, "stroke-dasharray",
+						"2,2");
 			}
 			dotEdge.unselectedAppearance.textStrokeWidth = DotPanel.setCSSAttributeOf(text, "stroke-width", "0.55");
-			dotEdge.unselectedAppearance.lineStrokeDashArray = DotPanel.setCSSAttributeOf(line, "stroke-dasharray",
-					"2,5");
+
 		} else {
 			DotPanel.setCSSAttributeOf(text, "fill", dotEdge.unselectedAppearance.textFill);
 			DotPanel.setCSSAttributeOf(text, "stroke", dotEdge.unselectedAppearance.textStroke);
@@ -89,7 +93,7 @@ public class InductiveVisualMinerSelectionColourer {
 			ProcessTreeVisualisationParameters visualisationParameters) {
 
 		UnfoldedNode uroot = new UnfoldedNode(tree.getRoot());
-		TraceViewColourMap colourMap = new TraceViewColourMap();
+		TraceViewColourMap traceViewColourMap = new TraceViewColourMap();
 
 		//compute extreme cardinalities
 		Pair<Long, Long> extremes = data.getExtremeCardinalities();
@@ -104,18 +108,18 @@ public class InductiveVisualMinerSelectionColourer {
 						maxCardinality, visualisationParameters);
 
 				if (unode.getNode() instanceof Manual) {
-					colourMap.set(unode, colour.getA(), colour.getB());
+					traceViewColourMap.set(unode, colour.getA(), colour.getB());
 				}
 			}
 
 			//style edges
-			styleEdges(svg, info, data, visualisationParameters, minCardinality, maxCardinality);
+			styleEdges(svg, info, data, visualisationParameters, traceViewColourMap, minCardinality, maxCardinality);
 
 		} catch (SVGException e) {
 			e.printStackTrace();
 		}
 
-		return colourMap;
+		return traceViewColourMap;
 	}
 
 	public static Pair<Color, Color> styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg,
@@ -130,9 +134,9 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Pair<Color, Color> styleManual(UnfoldedNode unode, SVGDiagram svg, ProcessTreeVisualisationInfo info,
-			Pair<String, Long> cardinality, long minCardinality, long maxCardinality,
-			ProcessTreeVisualisationParameters visualisationParameters) throws SVGException {
+	private static Pair<Color, Color> styleManual(UnfoldedNode unode, SVGDiagram svg,
+			ProcessTreeVisualisationInfo info, Pair<String, Long> cardinality, long minCardinality,
+			long maxCardinality, ProcessTreeVisualisationParameters visualisationParameters) throws SVGException {
 
 		LocalDotNode dotNode = info.getActivityNode(unode);
 
@@ -186,18 +190,23 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	private static void styleEdges(SVGDiagram svg, ProcessTreeVisualisationInfo info, AlignedLogVisualisationData data,
-			ProcessTreeVisualisationParameters parameters, long minCardinality, long maxCardinality) throws SVGException {
-		styleModelEdges(svg, info, data, parameters, minCardinality, maxCardinality);
+			ProcessTreeVisualisationParameters parameters, TraceViewColourMap traceViewColourMap, long minCardinality,
+			long maxCardinality) throws SVGException {
+		styleModelEdges(svg, info, data, parameters, traceViewColourMap, minCardinality, maxCardinality);
 		styleMoveEdges(svg, info, data, parameters, minCardinality, maxCardinality);
 	}
 
 	private static void styleModelEdges(SVGDiagram svg, ProcessTreeVisualisationInfo info,
-			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters, long minCardinality,
-			long maxCardinality) throws SVGException {
+			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters,
+			TraceViewColourMap traceViewColourMap, long minCardinality, long maxCardinality) throws SVGException {
 		for (LocalDotEdge dotEdge : info.getAllModelEdges()) {
 			Pair<String, Long> cardinality = data.getEdgeLabel(dotEdge.getUnode(), false);
-			styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality, parameters.getColourModelEdges(),
-					parameters.isShowFrequenciesOnModelEdges(), parameters.getModelEdgesWidth());
+			Color edgeColour = styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality,
+					parameters.getColourModelEdges(), parameters.isShowFrequenciesOnModelEdges(),
+					parameters.getModelEdgesWidth());
+			if (dotEdge.getUnode().getNode() instanceof Automatic) {
+				traceViewColourMap.set(dotEdge.getUnode(), edgeColour, edgeColour);
+			}
 		}
 	}
 
@@ -215,16 +224,15 @@ public class InductiveVisualMinerSelectionColourer {
 		for (LocalDotEdge dotEdge : info.getAllLogMoveEdges()) {
 			LogMovePosition logMovePosition = LogMovePosition.of(dotEdge);
 			Pair<String, MultiSet<XEventClass>> cardinality = data.getLogMoveEdgeLabel(logMovePosition);
-			styleEdge(dotEdge, svg, Pair.of(cardinality.getA(), cardinality.getB().size()),
-					minCardinality, maxCardinality, parameters.getColourMoves(),
-					parameters.isShowFrequenciesOnMoveEdges(), parameters.getMoveEdgesWidth());
+			styleEdge(dotEdge, svg, Pair.of(cardinality.getA(), cardinality.getB().size()), minCardinality,
+					maxCardinality, parameters.getColourMoves(), parameters.isShowFrequenciesOnMoveEdges(),
+					parameters.getMoveEdgesWidth());
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void styleEdge(DotEdge edge, SVGDiagram svg, Pair<String, Long> cardinality,
-			long minCardinality, long maxCardinality, ColourMap colourMap, boolean showFrequency, SizeMap widthMap)
-			throws SVGException {
+	private static Color styleEdge(DotEdge edge, SVGDiagram svg, Pair<String, Long> cardinality, long minCardinality,
+			long maxCardinality, ColourMap colourMap, boolean showFrequency, SizeMap widthMap) throws SVGException {
 
 		//prepare parts of the rendered dot element
 		Group group = DotPanel.getSVGElementOf(svg, edge);
@@ -253,5 +261,7 @@ public class InductiveVisualMinerSelectionColourer {
 			label.getContent().add(cardinality.getA());
 			label.rebuild();
 		}
+
+		return edgeColour;
 	}
 }
