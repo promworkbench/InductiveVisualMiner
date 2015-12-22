@@ -17,7 +17,6 @@ import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
-import org.processmining.plugins.inductiveVisualMiner.TraceView.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
@@ -31,6 +30,7 @@ import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
+import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleMiningParametersIvM;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleSplitLog;
@@ -250,13 +250,14 @@ public class InductiveVisualMinerState {
 	public Selection getSelection() {
 		return selection;
 	}
-	
+
 	public void setSelection(Selection selection) {
 		this.selection = selection;
 	}
 
 	public void removeModelAndLogMovesSelection() {
-		selection = new Selection(selection.getSelectedActivities(), new THashSet<LogMovePosition>(), new THashSet<UnfoldedNode>());
+		selection = new Selection(selection.getSelectedActivities(), new THashSet<LogMovePosition>(),
+				new THashSet<UnfoldedNode>(), selection.getSelectedTaus());
 	}
 
 	public List<ColouringFilter> getColouringFilters() {

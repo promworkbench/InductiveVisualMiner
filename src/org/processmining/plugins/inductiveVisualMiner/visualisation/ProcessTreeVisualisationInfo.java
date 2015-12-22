@@ -1,16 +1,19 @@
 package org.processmining.plugins.inductiveVisualMiner.visualisation;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
+import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class ProcessTreeVisualisationInfo {
@@ -27,19 +30,21 @@ public class ProcessTreeVisualisationInfo {
 	private final Set<LocalDotEdge> allModelEdges;
 	private final Set<LocalDotEdge> allLogMoveEdges;
 	private final Set<LocalDotEdge> allModelMoveEdges;
+	private final Set<LocalDotEdge> allTauEdges;
 	
 	public ProcessTreeVisualisationInfo() {
-		nodes = new HashSet<>();
-		unodes = new HashMap<>();
-		activityNodes = new HashMap<>();
+		nodes = new THashSet<>();
+		unodes = new THashMap<>();
+		activityNodes = new THashMap<>();
 		
-		edges = new HashSet<>();
+		edges = new THashSet<>();
 		modelEdges = new HashMap<>();
-		modelMoveEdges = new HashMap<>();
-		logMoveEdges = new HashMap<>();
-		allModelEdges = new HashSet<>();
-		allLogMoveEdges = new HashSet<>();
-		allModelMoveEdges = new HashSet<>();
+		modelMoveEdges = new THashMap<>();
+		logMoveEdges = new THashMap<>();
+		allModelEdges = new THashSet<>();
+		allLogMoveEdges = new THashSet<>();
+		allModelMoveEdges = new THashSet<>();
+		allTauEdges = new THashSet<>();
 	}
 	
 	public void setRoot(LocalDotNode source, LocalDotNode sink) {
@@ -75,6 +80,9 @@ public class ProcessTreeVisualisationInfo {
 				}
 				modelEdges.get(unode1).add(edge);
 				allModelEdges.add(edge);
+				if (unode1.getNode() instanceof Automatic) {
+					allTauEdges.add(edge);
+				}
 				break;
 			case modelMove :
 				if (!modelMoveEdges.containsKey(unode1)) {
@@ -153,5 +161,9 @@ public class ProcessTreeVisualisationInfo {
 	
 	public Set<LocalDotEdge> getAllModelMoveEdges() {
 		return Collections.unmodifiableSet(allModelMoveEdges);
+	}
+	
+	public Set<LocalDotEdge> getAllTauEdges() {
+		return Collections.unmodifiableSet(allTauEdges);
 	}
 }

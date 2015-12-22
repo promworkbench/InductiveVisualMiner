@@ -37,8 +37,6 @@ public class Move implements Event {
 		if (isModelSync()) {
 			return getType() + " " + getUnode().toString() + " " + lifeCycleTransition;
 		} else {
-			//			return getType() + " " + getEventClass().toString() + " " + getLogMoveUnode() + " "
-			//					+ getLogMoveBeforeChild();
 			return getType() + " " + getActivityEventClass().toString() + " " + lifeCycleTransition;
 		}
 	}
@@ -165,7 +163,8 @@ public class Move implements Event {
 		this.logMoveParallelBranchMappedTo = logMoveParallelBranch;
 	}
 
-	//methods from the list view widget
+	// ==== methods from the list view widget ====
+
 	public String getLabel() {
 		if (isModelMove()) {
 			return unode.toString();
@@ -173,7 +172,7 @@ public class Move implements Event {
 
 		if (isSyncMove() && unode.getNode() instanceof Automatic) {
 			//tau
-			return null;
+			return "";
 		}
 
 		return activityEventClass.toString();
@@ -184,7 +183,11 @@ public class Move implements Event {
 	}
 
 	public String getBottomLabel() {
-		return lifeCycleTransition.toString();
+		if (isSyncMove() && unode.getNode() instanceof Automatic) {
+			return null;
+		} else {
+			return lifeCycleTransition.toString();
+		}
 	}
 
 	public String getBottomLabel2() {

@@ -17,18 +17,21 @@ public class Selection {
 	private final Set<UnfoldedNode> selectedActivities;
 	private final Set<LogMovePosition> selectedLogMoves;
 	private final Set<UnfoldedNode> selectedModelMoves;
+	private final Set<UnfoldedNode> selectedTaus;
 
 	public Selection() {
 		selectedActivities = new THashSet<>();
 		selectedLogMoves = new THashSet<>();
 		selectedModelMoves = new THashSet<>();
+		selectedTaus = new THashSet<>();
 	}
 
 	public Selection(Set<UnfoldedNode> selectedActivities, Set<LogMovePosition> selectedLogMoves,
-			Set<UnfoldedNode> selectedModelMoves) {
-		this.selectedActivities = selectedActivities;
-		this.selectedLogMoves = selectedLogMoves;
-		this.selectedModelMoves = selectedModelMoves;
+			Set<UnfoldedNode> selectedModelMoves, Set<UnfoldedNode> selectedTaus) {
+		this.selectedActivities = new THashSet<>(selectedActivities);
+		this.selectedLogMoves = new THashSet<>(selectedLogMoves);
+		this.selectedModelMoves = new THashSet<>(selectedModelMoves);
+		this.selectedTaus = new THashSet<>(selectedTaus);
 	}
 
 	public boolean isSelected(Move move) {
@@ -41,6 +44,9 @@ public class Selection {
 		if (move.isLogMove() && selectedLogMoves.contains(LogMovePosition.of(move))) {
 			return true;
 		}
+		if (move.isSyncMove() && selectedTaus.contains(move.getUnode())) {
+			return true;
+		}
 		return !move.isSyncMove() && move.isModelMove() && selectedModelMoves.contains(move.getUnode());
 	}
 
@@ -48,26 +54,30 @@ public class Selection {
 		return selectedActivities.contains(dotNode.getUnode());
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	public boolean isSelected(LocalDotEdge dotEdge) {
 		switch (dotEdge.getType()) {
+			case model :
+				return selectedTaus.contains(dotEdge.getUnode());
 			case logMove :
 				return selectedLogMoves.contains(LogMovePosition.of(dotEdge));
 			case modelMove :
 				return selectedModelMoves.contains(dotEdge.getUnode());
 		}
-		throw new RuntimeException("Only model-move and log-move edges can be clicked on.");
+		throw new RuntimeException("Only model-move, log-move and tau edges can be clicked on.");
 	}
 
 	public Set<UnfoldedNode> getSelectedActivities() {
 		return Collections.unmodifiableSet(selectedActivities);
 	}
 	
+	public Set<UnfoldedNode> getSelectedTaus() {
+		return Collections.unmodifiableSet(selectedTaus);
+	}
+
 	public Set<UnfoldedNode> getSelectedModelMoves() {
 		return Collections.unmodifiableSet(selectedModelMoves);
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	public void select(DotElement dotElement) {
 		if (dotElement instanceof LocalDotNode) {
 			selectedActivities.add(((LocalDotNode) dotElement).getUnode());
@@ -80,8 +90,11 @@ public class Selection {
 				case modelMove :
 					selectedModelMoves.add(((LocalDotEdge) dotElement).getUnode());
 					return;
+				case model :
+					selectedTaus.add(((LocalDotEdge) dotElement).getUnode());
+					return;
 			}
-			throw new RuntimeException("Only ");
+			throw new RuntimeException("Selection not supported.");
 		}
 	}
 
@@ -97,7 +110,11 @@ public class Selection {
 		return !selectedModelMoves.isEmpty();
 	}
 
+	public boolean isATauSelected() {
+		return !selectedTaus.isEmpty();
+	}
+
 	public boolean isSomethingSelected() {
-		return isAnActivitySelected() || isALogMoveSelected() || isAModelMoveSelected();
+		return isAnActivitySelected() || isALogMoveSelected() || isAModelMoveSelected() || isATauSelected();
 	}
 }

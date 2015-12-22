@@ -166,6 +166,14 @@ public class ColouringFiltersView extends SideWindow {
 			result.append("have an only-in-model event as selected");
 		}
 
+		//selected edges
+		if (selection.isATauSelected()) {
+			if (result.length() != 0) {
+				result.append(" or ");
+			}
+			result.append("pass an edge as selected");
+		}
+
 		//colouring filters
 		{
 			int enabledColouringFilters = 0;

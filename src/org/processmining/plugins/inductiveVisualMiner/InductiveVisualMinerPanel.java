@@ -25,6 +25,7 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsQueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsService;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
+import org.processmining.plugins.inductiveVisualMiner.traceview.TraceView;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
