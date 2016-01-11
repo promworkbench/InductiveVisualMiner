@@ -23,6 +23,8 @@ import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterLo
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterParallel;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterSequenceFiltering;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterXor;
+import org.processmining.plugins.InductiveMiner.mining.postprocessor.PostProcessor;
+import org.processmining.plugins.InductiveMiner.mining.postprocessor.PostProcessorInterleaved;
 
 public class LifeCycleMiningParametersIvM extends MiningParameters {
 
@@ -59,6 +61,10 @@ public class LifeCycleMiningParametersIvM extends MiningParameters {
 				new FallThroughLeaveOutActivitiesThenApplyOthers(),
 				new FallThroughTauLoop(true),
 				new FallThroughFlower()
+				)));
+		
+		setPostProcessors(new ArrayList<PostProcessor>(Arrays.asList(
+				new PostProcessorInterleaved()
 				)));
 		
 		//set parameters
