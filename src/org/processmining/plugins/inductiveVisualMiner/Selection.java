@@ -36,7 +36,7 @@ public class Selection {
 	}
 
 	public boolean isSelected(Move move) {
-		if (move.isIgnoredLogMove() || move.isIgnoredModelMove()) {
+		if (move.isIgnoredLogMove() || move.isIgnoredModelMove() || !move.isComplete()) {
 			return false;
 		}
 		if (move.isSyncMove() && selectedActivities.contains(move.getUnode())) {
@@ -45,7 +45,7 @@ public class Selection {
 		if (move.isLogMove() && selectedLogMoveEdges.contains(LogMovePosition.of(move))) {
 			return true;
 		}
-		if (move.isSyncMove() && move.isModelMove() && selectedModelMoveEdges.contains(move.getUnode())) {
+		if (!move.isSyncMove() && move.isModelMove() && selectedModelMoveEdges.contains(move.getUnode())) {
 			return true;
 		}
 		
