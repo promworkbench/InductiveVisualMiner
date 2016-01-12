@@ -19,7 +19,7 @@ import org.processmining.processtree.ProcessTree;
 public class InductiveVisualMiner {
 
 	@Plugin(name = "Inductive visual Miner", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = {
-			"Event log", "canceller" }, userAccessible = false)
+			"Event log", "canceller" }, userAccessible = true)
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0, 1 })
@@ -35,7 +35,7 @@ public class InductiveVisualMiner {
 	}
 
 	@Plugin(name = "Inductive visual Miner", level = PluginLevel.PeerReviewed, returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = {
-			"Interactive Miner launcher", "canceller" }, userAccessible = false)
+			"Interactive Miner launcher", "canceller" }, userAccessible = true)
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0, 1 })
