@@ -28,19 +28,19 @@ public class ResourceTimeUtils {
 
 	public static final String getTimePerUnitString(double ms, String otherUnit) {
 		if (ms > 1) {
-			return String.format("%.2f", ms) + " " + otherUnit + "\\ms";
+			return String.format("%.2f", ms) + " " + otherUnit + "\\milisecond";
 		}
 		double s = ms * 1000;
 		if (s > 1) {
-			return String.format("%.2f", s) + " " + otherUnit + "\\s";
+			return String.format("%.2f", s) + " " + otherUnit + "\\second";
 		}
 		double m = s * 60;
 		if (m > 1) {
-			return String.format("%.2f", m) + " " + otherUnit + "\\m";
+			return String.format("%.2f", m) + " " + otherUnit + "\\minute";
 		}
 		double h = m * 60;
 		if (h > 1) {
-			return String.format("%.2f", h) + " " + otherUnit + "\\h";
+			return String.format("%.2f", h) + " " + otherUnit + "\\hour";
 		}
 		double d = h * 24;
 		return String.format("%.2f", d) + " " + otherUnit + "\\day";
