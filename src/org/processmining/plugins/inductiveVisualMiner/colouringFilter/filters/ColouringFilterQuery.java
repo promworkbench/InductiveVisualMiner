@@ -1,11 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.colouringFilter.filters;
 
 import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
 import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class ColouringFilterQuery extends ColouringFilter {
+public class ColouringFilterQuery {
 
 	public String getName() {
 		return "Query filter";
