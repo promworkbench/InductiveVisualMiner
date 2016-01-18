@@ -24,6 +24,7 @@ import org.processmining.processtree.Task.Automatic;
 import org.processmining.processtree.Task.Manual;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
+@SuppressWarnings("deprecation")
 public class IvMLogInfo {
 
 	private final MultiSet<UnfoldedNode> modelMoves;
@@ -94,28 +95,37 @@ public class IvMLogInfo {
 		}
 	}
 
+	/**
+	 * Position log moves without assuming there are no leading or trailing log
+	 * moves.
+	 * 
+	 * @param root
+	 * @param continueOn
+	 * @param trace
+	 * @param cardinality
+	 */
 	public void positionLogMovesRoot(UnfoldedNode root, UnfoldedNode continueOn, List<IvMMove> trace, long cardinality) {
 		//remove the leading and trailing log moves and position them on the root
 		int start = 0;
-		while (!trace.get(start).isModelSync()) {
+		while (trace.get(start).isLogMove() || trace.get(start).isIgnoredModelMove()) {
 			start++;
 		}
 		int end = trace.size() - 1;
-		while (!trace.get(end).isModelSync()) {
+		while (trace.get(start).isLogMove() || trace.get(start).isIgnoredModelMove()) {
 			end--;
 		}
 		List<IvMMove> subtrace = trace.subList(start, end + 1);
 
 		//position the leading log moves
 		for (Move logMove : trace.subList(0, start)) {
-			if (!logMove.isIgnoredLogMove() && !logMove.isTauStart()) {
+			if (!logMove.isIgnoredLogMove() && !logMove.isTauStart() && !trace.get(start).isIgnoredModelMove()) {
 				addLogMove(logMove, null, root, logMove.getActivityEventClass(), cardinality);
 			}
 		}
 
 		//position the trailing log moves
 		for (Move logMove : trace.subList(end + 1, trace.size())) {
-			if (!logMove.isIgnoredLogMove() && !logMove.isTauStart()) {
+			if (!logMove.isIgnoredLogMove() && !logMove.isTauStart() && !trace.get(start).isIgnoredModelMove()) {
 				addLogMove(logMove, root, null, logMove.getActivityEventClass(), cardinality);
 			}
 		}
@@ -129,6 +139,9 @@ public class IvMLogInfo {
 	 */
 	private void positionLogMoves(UnfoldedNode unode, List<IvMMove> trace, long cardinality) {
 		debug(" process trace " + trace + " on " + unode);
+
+		assert (trace.get(0).isModelSync() && !trace.get(0).isIgnoredLogMove() && !trace.get(0).isIgnoredModelMove());
+
 		if (unode.getNode() instanceof Manual) {
 			//unode is an activity
 			for (Move move : trace) {
@@ -193,7 +206,7 @@ public class IvMLogInfo {
 
 		//walk through the trace to split it
 		for (IvMMove move : trace) {
-			if (move.isIgnoredLogMove()) {
+			if (move.isIgnoredLogMove() || move.isIgnoredModelMove()) {
 				//skip
 			} else if (move.isLogMove()) {
 				logMoves.add(move);
@@ -287,7 +300,7 @@ public class IvMLogInfo {
 	}
 
 	private static void debug(Object s) {
-		//		InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
+		//InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
 	}
 
 }
