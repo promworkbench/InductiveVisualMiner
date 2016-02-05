@@ -5,6 +5,7 @@ import javax.swing.JComponent;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
+import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.InductiveMiner.mining.interleaved.Interleaved;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -17,7 +18,7 @@ import org.processmining.processtree.impl.AbstractBlock;
 import org.processmining.processtree.impl.AbstractTask;
 //import org.processmining.plugins.InductiveMiner.mining.operators.Interleaved;
 
-@Plugin(name = "Graphviz process tree visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process Tree" }, userAccessible = false)
+@Plugin(name = "Graphviz process tree visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process Tree" }, userAccessible = true, level = PluginLevel.PeerReviewed)
 @Visualizer
 public class GraphvizProcessTree {
 
