@@ -603,7 +603,7 @@ public class InductiveVisualMinerController {
 					List<String> popup = new ArrayList<>();
 
 					//frequencies
-					popup.add("frequency             "
+					popup.add("number of occurrences "
 							+ IvMLogMetrics.getNumberOfTracesRepresented(unode, false, state.getIvMLogInfoFiltered()));
 
 					//waiting time
