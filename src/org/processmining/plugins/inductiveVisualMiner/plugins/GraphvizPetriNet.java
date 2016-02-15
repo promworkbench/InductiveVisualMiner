@@ -12,6 +12,7 @@ import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
+import org.processmining.models.graphbased.directed.petrinet.PetrinetGraph;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
@@ -32,7 +33,7 @@ public class GraphvizPetriNet {
 		return new DotPanel(dot);
 	}
 
-	public static Dot convert(Petrinet petrinet, Marking initialMarking, Marking... finalMarkings) {
+	public static Dot convert(PetrinetGraph petrinet, Marking initialMarking, Marking... finalMarkings) {
 		Dot dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
 		convert(dot, petrinet, initialMarking, finalMarkings);
@@ -63,7 +64,7 @@ public class GraphvizPetriNet {
 		}
 	}
 
-	private static void convert(Dot dot, Petrinet petrinet, Marking initialMarking, Marking... finalMarkings) {
+	private static void convert(Dot dot, PetrinetGraph petrinet, Marking initialMarking, Marking... finalMarkings) {
 		HashMap<PetrinetNode, DotNode> mapPetrinet2Dot = new HashMap<PetrinetNode, DotNode>();
 
 		//add places
