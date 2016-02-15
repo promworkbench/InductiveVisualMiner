@@ -14,6 +14,7 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogI
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
+import org.processmining.plugins.InductiveMiner.mining.MiningParametersThesisIM;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
@@ -32,8 +33,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWra
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleMiningParametersIvM;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleSplitLog;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.ThesisMiner;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
@@ -44,7 +44,8 @@ public class InductiveVisualMinerState {
 
 	public InductiveVisualMinerState(XLog xLog, ProcessTree preMinedTree) {
 		this.xLog = xLog;
-		miningParameters = new NoLifeCycleMiningParametersIvM();
+		//miningParameters = new NoLifeCycleMiningParametersIvM();
+		miningParameters = new MiningParametersThesisIM();
 		if (preMinedTree != null) {
 			this.tree = preMinedTree;
 			this.preMinedTree = preMinedTree;
@@ -143,7 +144,7 @@ public class InductiveVisualMinerState {
 
 	//==mining==
 	private MiningParameters miningParameters;
-	private VisualMinerWrapper miner = new NoLifeCycleSplitLog();
+	private VisualMinerWrapper miner = new ThesisMiner();
 	private double paths = 0.8;
 	private ProcessTree tree = null;
 	private ProcessTree preMinedTree = null;
