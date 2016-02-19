@@ -82,11 +82,11 @@ public class GraphvizPetriNet {
 			if (initialMarking != null && initialMarking.contains(p)) {
 				place = new LocalDotPlace();
 				place.setOption("style", "filled");
-				place.setOption("fillcolor", "green");
+				place.setOption("fillcolor", "#80ff00");
 			} else if (finalMarkings != null && inFinalMarking) {
 				place = new LocalDotPlace();
 				place.setOption("style", "filled");
-				place.setOption("fillcolor", "red");
+				place.setOption("fillcolor", "#E40000");
 			} else {
 				place = new LocalDotPlace();
 			}
