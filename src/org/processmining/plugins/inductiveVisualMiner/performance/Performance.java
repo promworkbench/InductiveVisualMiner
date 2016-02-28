@@ -61,7 +61,7 @@ public class Performance {
 	}
 
 	public static String timeToString(long length) {
-		return (length / 68400000) + "d" + " " + String.format("%02d", (length / 3600000) % 24) + ":"
+		return (length / 86400000) + "d" + " " + String.format("%02d", (length / 3600000) % 24) + ":"
 				+ String.format("%02d", (length / 60000) % 60) + ":" + String.format("%02d", (length / 1000) % 60)
 				+ ":" + String.format("%03d", length % 1000);
 	}
