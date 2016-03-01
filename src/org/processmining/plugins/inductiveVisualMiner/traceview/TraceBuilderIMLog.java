@@ -31,7 +31,7 @@ public class TraceBuilderIMLog implements TraceBuilder<Object> {
 					public Event apply(final XEvent input) {
 						return new ProMTraceView.AbstractEvent() {
 							public String getLabel() {
-								return log.classify(input).toString();
+								return log.classify((IMTrace) trace, input).toString();
 							}
 
 							public String getTopLabel() {
