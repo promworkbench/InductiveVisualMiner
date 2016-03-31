@@ -16,7 +16,7 @@ import org.processmining.processtree.ProcessTree;
 
 public class ProcessTreeVisualisationPlugin {
 
-	@Plugin(name = "Process tree visualisation (Inductive visual Miner)", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process tree" }, userAccessible = false)
+	@Plugin(name = "Process tree visualisation (Inductive visual Miner)", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process tree" }, userAccessible = true)
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Visualise process tree", requiredParameterLabels = { 0 })

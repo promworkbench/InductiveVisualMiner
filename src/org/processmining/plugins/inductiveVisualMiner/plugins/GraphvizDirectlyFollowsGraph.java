@@ -23,7 +23,7 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 
 public class GraphvizDirectlyFollowsGraph {
 
-	@Plugin(name = "Graphviz directly-follows graph visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process Tree" }, userAccessible = false)
+	@Plugin(name = "Graphviz directly-follows graph visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process Tree" }, userAccessible = true)
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Display directly-follows graph", requiredParameterLabels = { 0 })
