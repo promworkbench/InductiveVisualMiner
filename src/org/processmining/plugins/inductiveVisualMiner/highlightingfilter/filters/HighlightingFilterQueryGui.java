@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.colouringFilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.highlightingfilter.filters;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -6,14 +6,14 @@ import java.awt.Color;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterGui;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilterGui;
 
-public class ColouringFilterQueryGui extends ColouringFilterGui {
+public class HighlightingFilterQueryGui extends HighlightingFilterGui {
 	
 	private static final long serialVersionUID = 879788371461268561L;
 	private final JComponent queryBox;
 
-	public ColouringFilterQueryGui(String title) {
+	public HighlightingFilterQueryGui(String title) {
 		super(title);
 		
 		usesVerticalSpace = false;

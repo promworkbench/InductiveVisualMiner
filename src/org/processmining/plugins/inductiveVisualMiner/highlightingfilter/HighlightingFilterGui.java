@@ -1,17 +1,17 @@
-package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
+package org.processmining.plugins.inductiveVisualMiner.highlightingfilter;
 
 import java.awt.Color;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-public abstract class ColouringFilterGui extends JPanel {
+public abstract class HighlightingFilterGui extends JPanel {
 
 	private static final long serialVersionUID = -7693755022689210425L;
 	
 	protected boolean usesVerticalSpace = false;
 
-	public ColouringFilterGui(String title) {
+	public HighlightingFilterGui(String title) {
 		setBorder(BorderFactory.createTitledBorder(title));
 		setBackground(Color.gray);
 	}

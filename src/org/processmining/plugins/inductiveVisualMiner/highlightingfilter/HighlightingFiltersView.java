@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
+package org.processmining.plugins.inductiveVisualMiner.highlightingfilter;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -25,15 +25,15 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 import com.fluxicon.slickerbox.factory.SlickerFactory;
 
-public class ColouringFiltersView extends SideWindow {
+public class HighlightingFiltersView extends SideWindow {
 
 	private static final long serialVersionUID = -5500440632866414477L;
 	private final JPanel panel;
-	private final Map<ColouringFilter, JComponent> filter2label;
-	private final Map<ColouringFilter, Integer> filter2position;
+	private final Map<HighlightingFilter, JComponent> filter2label;
+	private final Map<HighlightingFilter, Integer> filter2position;
 	private int highFilters;
 
-	public ColouringFiltersView(Component parent) {
+	public HighlightingFiltersView(Component parent) {
 		super(parent, "Inductive visual Miner - highlighting filters");
 		panel = new JPanel(new GridBagLayout());
 		panel.setBackground(Color.gray);
@@ -43,14 +43,14 @@ public class ColouringFiltersView extends SideWindow {
 		highFilters = 0;
 	}
 
-	public void initialise(List<ColouringFilter> colouringFilters) {
+	public void initialise(List<HighlightingFilter> colouringFilters) {
 		int gridy = 1;
-		Collections.sort(colouringFilters, new Comparator<ColouringFilter>() {
-			public int compare(ColouringFilter o1, ColouringFilter o2) {
+		Collections.sort(colouringFilters, new Comparator<HighlightingFilter>() {
+			public int compare(HighlightingFilter o1, HighlightingFilter o2) {
 				return o1.getName().compareTo(o2.getName());
 			}
 		});
-		for (ColouringFilter colouringFilter : colouringFilters) {
+		for (HighlightingFilter colouringFilter : colouringFilters) {
 			//add label
 			JLabel label = SlickerFactory.instance().createLabel(colouringFilter.getName() + " initialising ...");
 			GridBagConstraints cLabel = new GridBagConstraints();
@@ -67,7 +67,7 @@ public class ColouringFiltersView extends SideWindow {
 		}
 	}
 
-	public void setPanel(final ColouringFilter colouringFilter, final Runnable onUpdate) {
+	public void setPanel(final HighlightingFilter colouringFilter, final Runnable onUpdate) {
 
 		//if the colouringfilter did not initialise, print error message
 		if (colouringFilter.getPanel() == null) {
@@ -128,7 +128,7 @@ public class ColouringFiltersView extends SideWindow {
 	 * @param numberOfTraces
 	 */
 	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Selection selection,
-			List<ColouringFilter> colouringFilters) {
+			List<HighlightingFilter> colouringFilters) {
 		//show the user which traces are shown
 
 		StringBuilder result = new StringBuilder();
@@ -177,7 +177,7 @@ public class ColouringFiltersView extends SideWindow {
 		//colouring filters
 		{
 			int enabledColouringFilters = 0;
-			for (ColouringFilter colouringFilter : colouringFilters) {
+			for (HighlightingFilter colouringFilter : colouringFilters) {
 				if (colouringFilter.isEnabledFilter()) {
 					enabledColouringFilters++;
 				}

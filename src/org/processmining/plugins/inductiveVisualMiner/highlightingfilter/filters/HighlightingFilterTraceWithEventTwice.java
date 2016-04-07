@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.colouringFilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.highlightingfilter.filters;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,12 +11,12 @@ import javax.swing.event.ListSelectionListener;
 
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterGui;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilter;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class ColouringFilterTraceWithEventTwice extends ColouringFilter {
+public class HighlightingFilterTraceWithEventTwice extends HighlightingFilter {
 
 	MultiAttributeFilterGui panel = null;
 	boolean block = true;
@@ -25,7 +25,7 @@ public class ColouringFilterTraceWithEventTwice extends ColouringFilter {
 		return "Event happening twice filter";
 	}
 
-	public ColouringFilterGui createGui(XLog log) {
+	public HighlightingFilterGui createGui(XLog log) {
 		final Map<String, Set<XAttribute>> traceAttributes = MultiEventAttributeFilter.getEventAttributeMap(log);
 		panel = new MultiAttributeFilterGui(traceAttributes, getName());
 

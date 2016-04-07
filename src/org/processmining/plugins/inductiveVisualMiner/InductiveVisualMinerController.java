@@ -42,13 +42,13 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl08Animate;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl09FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl10Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Histogram;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterPluginFinder;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilter;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilterPluginFinder;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
@@ -283,7 +283,7 @@ public class InductiveVisualMinerController {
 
 					state.resetPerformance();
 
-					ColouringFiltersView.updateSelectionDescription(panel, state.getSelection(),
+					HighlightingFiltersView.updateSelectionDescription(panel, state.getSelection(),
 							state.getColouringFilters());
 
 					//tell trace view the colour map and the selection
@@ -346,7 +346,7 @@ public class InductiveVisualMinerController {
 		}
 
 		//set up plug-ins
-		List<ColouringFilter> colouringFilters = ColouringFilterPluginFinder.findFilteringPlugins(context, panel,
+		List<HighlightingFilter> colouringFilters = HighlightingFilterPluginFinder.findFilteringPlugins(context, panel,
 				state.getXLog());
 		state.setColouringFilters(colouringFilters);
 		panel.getColouringFiltersView().initialise(colouringFilters);
@@ -570,7 +570,7 @@ public class InductiveVisualMinerController {
 				chain.execute(Cl09FilterNodeSelection.class);
 			}
 		};
-		for (final ColouringFilter colouringFilter : state.getColouringFilters()) {
+		for (final HighlightingFilter colouringFilter : state.getColouringFilters()) {
 			executor.execute(new Runnable() {
 				public void run() {
 					colouringFilter.initialiseFilter(xLog, onUpdate);

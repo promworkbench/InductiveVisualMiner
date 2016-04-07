@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.colouringFilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.highlightingfilter.filters;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,25 +12,23 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.deckfour.xes.model.XAttribute;
-import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterGui;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilter;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class MultiEventAttributeFilter extends ColouringFilter {
+public class MultiTraceAttributeFilter extends HighlightingFilter {
 
 	MultiAttributeFilterGui panel = null;
 	boolean block = true;
 
 	public String getName() {
-		return "Event attribute filter";
+		return "Trace attribute filter";
 	}
 
-	public ColouringFilterGui createGui(XLog log) {
-		final Map<String, Set<XAttribute>> traceAttributes = getEventAttributeMap(log);
+	public HighlightingFilterGui createGui(XLog log) {
+		final Map<String, Set<XAttribute>> traceAttributes = getTraceAttributeMap(log);
 		panel = new MultiAttributeFilterGui(traceAttributes, getName());
 
 		// Key selector
@@ -62,13 +60,10 @@ public class MultiEventAttributeFilter extends ColouringFilter {
 
 	public boolean countInColouring(IvMTrace trace) {
 		String key = panel.getSelectedKey();
-		for (IvMMove event : trace) {
-			if (event.getAttributes() != null && event.getAttributes().containsKey(key)
-					&& panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
-				return true;
-			}
+		if (!trace.getAttributes().containsKey(key)) {
+			return false;
 		}
-		return false;
+		return panel.getSelectedAttributes().contains(trace.getAttributes().get(key));
 	}
 
 	public boolean isEnabled() {
@@ -77,11 +72,10 @@ public class MultiEventAttributeFilter extends ColouringFilter {
 
 	public void updateExplanation() {
 		if (panel.getSelectedAttributes().isEmpty()) {
-			panel.getExplanation().setText(
-					"<html>Include only traces that have at least one event having an attribute as selected.</html>");
+			panel.getExplanation().setText("<html>Include only traces having an attribute as selected.</html>");
 		} else {
 			StringBuilder s = new StringBuilder();
-			s.append("<html>Include only traces that have at least one event having attribute `");
+			s.append("<html>Include only traces having attribute `");
 			s.append(panel.getSelectedKey());
 			s.append("' being ");
 			List<XAttribute> attributes = panel.getSelectedAttributes();
@@ -103,20 +97,18 @@ public class MultiEventAttributeFilter extends ColouringFilter {
 		}
 	}
 
-	public static Map<String, Set<XAttribute>> getEventAttributeMap(XLog log) {
-		Map<String, Set<XAttribute>> eventAttributes = new TreeMap<String, Set<XAttribute>>();
+	private static Map<String, Set<XAttribute>> getTraceAttributeMap(XLog log) {
+		Map<String, Set<XAttribute>> traceAttributes = new TreeMap<String, Set<XAttribute>>();
 
 		for (XTrace trace : log) {
-			for (XEvent event : trace) {
-				for (XAttribute eventAttribute : event.getAttributes().values()) {
-					if (!eventAttributes.containsKey(eventAttribute.getKey())) {
-						eventAttributes.put(eventAttribute.getKey(), new TreeSet<XAttribute>());
-					}
-					eventAttributes.get(eventAttribute.getKey()).add(eventAttribute);
+			for (XAttribute traceAttribute : trace.getAttributes().values()) {
+				if (!traceAttributes.containsKey(traceAttribute.getKey())) {
+					traceAttributes.put(traceAttribute.getKey(), new TreeSet<XAttribute>());
 				}
+				traceAttributes.get(traceAttribute.getKey()).add(traceAttribute);
 			}
 		}
-		return eventAttributes;
+		return traceAttributes;
 	}
 
 }

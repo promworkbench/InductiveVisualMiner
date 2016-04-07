@@ -22,7 +22,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilter;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
@@ -246,7 +246,7 @@ public class InductiveVisualMinerState {
 
 	//==colour filtering ( & node selection)==
 	private Selection selection;
-	private List<ColouringFilter> colouringFilters;
+	private List<HighlightingFilter> colouringFilters;
 
 	public Selection getSelection() {
 		return selection;
@@ -261,11 +261,11 @@ public class InductiveVisualMinerState {
 				new THashSet<UnfoldedNode>(), selection.getSelectedTaus());
 	}
 
-	public List<ColouringFilter> getColouringFilters() {
+	public List<HighlightingFilter> getColouringFilters() {
 		return colouringFilters;
 	}
 
-	public void setColouringFilters(List<ColouringFilter> colouringFilters) {
+	public void setColouringFilters(List<HighlightingFilter> colouringFilters) {
 		this.colouringFilters = colouringFilters;
 	}
 

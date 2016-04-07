@@ -17,8 +17,8 @@ import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
@@ -57,7 +57,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JButton traceViewButton;
 	private final TraceView traceView;
 	private final JButton colouringFiltersViewButton;
-	private final ColouringFiltersView colouringFiltersView;
+	private final HighlightingFiltersView colouringFiltersView;
 
 	private InputFunction<Selection> onSelectionChanged = null;
 	private Runnable onGraphDirectionChanged = null;
@@ -163,7 +163,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		//colouring filters view
 		{
-			colouringFiltersView = new ColouringFiltersView(this);
+			colouringFiltersView = new HighlightingFiltersView(this);
 			colouringFiltersViewButton = SlickerFactory.instance().createButton("highlighting filters");
 			GridBagConstraints cColouringFiltersViewButton = new GridBagConstraints();
 			cColouringFiltersViewButton.gridx = 2;
@@ -394,7 +394,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return traceViewButton;
 	}
 
-	public ColouringFiltersView getColouringFiltersView() {
+	public HighlightingFiltersView getColouringFiltersView() {
 		return colouringFiltersView;
 	}
 

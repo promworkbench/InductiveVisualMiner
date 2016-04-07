@@ -1,15 +1,15 @@
-package org.processmining.plugins.inductiveVisualMiner.colouringFilter;
+package org.processmining.plugins.inductiveVisualMiner.highlightingfilter;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-@ColouringFilterAnnotation
-public abstract class ColouringFilter {
+@HighlightingFilterAnnotation
+public abstract class HighlightingFilter {
 
 	/**
 	 * Constructor. User is waiting when this function is called.
 	 */
-	public ColouringFilter() {
+	public HighlightingFilter() {
 
 	}
 
@@ -29,7 +29,7 @@ public abstract class ColouringFilter {
 	 * @param log
 	 * @return
 	 */
-	public abstract ColouringFilterGui createGui(XLog log);
+	public abstract HighlightingFilterGui createGui(XLog log);
 
 	/**
 	 * Returns whether this filter is actually filtering something. If this
@@ -60,7 +60,7 @@ public abstract class ColouringFilter {
 	}
 
 	//private methods
-	private ColouringFilterGui panel = null;
+	private HighlightingFilterGui panel = null;
 	private Runnable onUpdate = null;
 	private boolean enabledFilter = false;
 
@@ -83,7 +83,7 @@ public abstract class ColouringFilter {
 		return enabledFilter && (panel != null) && isEnabled();
 	}
 
-	public ColouringFilterGui getPanel() {
+	public HighlightingFilterGui getPanel() {
 		return panel;
 	}
 }

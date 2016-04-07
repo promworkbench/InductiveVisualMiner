@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.colouringFilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.highlightingfilter.filters;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -18,11 +18,11 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 
 import org.deckfour.xes.model.XAttribute;
-import org.processmining.plugins.inductiveVisualMiner.colouringFilter.ColouringFilterGui;
+import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilterGui;
 
 import com.fluxicon.slickerbox.factory.SlickerFactory;
 
-public class MultiAttributeFilterGui extends ColouringFilterGui {
+public class MultiAttributeFilterGui extends HighlightingFilterGui {
 
 	private static final long serialVersionUID = -5662487261061931369L;
 	private final JComboBox<String> keySelector;
