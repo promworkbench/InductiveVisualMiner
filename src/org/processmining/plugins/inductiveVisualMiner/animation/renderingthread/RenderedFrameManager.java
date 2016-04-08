@@ -69,15 +69,17 @@ public class RenderedFrameManager {
 	 *         doneDrawing() when done with that object.
 	 */
 	public RenderedFrame getLastRenderedFrame() {
-		if (drawing == -1) {
+		int atomicDrawing = drawing;
+		if (atomicDrawing == -1) {
 			return null;
 		}
-		return results[drawing];
+		return results[atomicDrawing];
 	}
 	
 	public void invalidateLastRenderedFrame() {
-		if (drawing != -1) {
-			results[drawing].doneDrawing();
+		int atomicDrawing = drawing;
+		if (atomicDrawing != -1) {
+			results[atomicDrawing].doneDrawing();
 		}
 		drawing = -1;
 	}
