@@ -19,8 +19,8 @@ import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughLe
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughSingleParallel;
 import org.processmining.plugins.InductiveMiner.mining.fallthrough.FallThroughTauLoop;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterCombination;
-import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterInterleaving;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterLoop;
+import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterMaybeInterleaved;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterParallel;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterSequenceFiltering;
 import org.processmining.plugins.InductiveMiner.mining.logSplitter.LogSplitterXor;
@@ -55,7 +55,8 @@ public class NoLifeCycleMiningParametersIvM extends MiningParameters {
 						new LogSplitterSequenceFiltering(), 
 						new LogSplitterParallel(),
 						new LogSplitterLoop(),
-						new LogSplitterInterleaving()
+						new LogSplitterMaybeInterleaved(),
+						new LogSplitterParallel()
 		));
 		
 		setFallThroughs(new ArrayList<FallThrough>(Arrays.asList(

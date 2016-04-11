@@ -118,7 +118,6 @@ public class Renderer {
 								tokenStrokeColour.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
 					}
 					graphics.fill(outline);
-					//graphics.drawOval(-tokenRadius, -tokenRadius, tokenRadius * 2, tokenRadius * 2);
 				}
 
 				//transform back
