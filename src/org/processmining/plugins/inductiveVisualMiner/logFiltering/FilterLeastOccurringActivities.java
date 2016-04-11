@@ -30,7 +30,7 @@ public class FilterLeastOccurringActivities {
 		List<Set<XEventClass>> partition = new ArrayList<Set<XEventClass>>();
 		partition.add(keep);
 		partition.add(remove);
-		Cut cut = new Cut(Operator.parallel, partition);
+		Cut cut = new Cut(Operator.concurrent, partition);
 		MinerState minerState = new MinerState(new NoLifeCycleMiningParametersIvM(), new Canceller() {
 			public boolean isCancelled() {
 				return false;
