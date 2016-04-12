@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.plugins;
 
 import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -55,29 +54,28 @@ public class GraphvizDirectlyFollowsGraph {
 			node.setOption("shape", "box");
 
 			//determine node colour using start and end activities
-			if (dfg.getStartActivities().contains(activity) && dfg.getEndActivities().contains(activity)) {
+			if (dfg.isStartActivity(activity) && dfg.isEndActivity(activity)) {
 				node.setOption("style", "filled");
 				node.setOption(
 						"fillcolor",
-						ColourMap.toHexString(ColourMaps.colourMapGreen(
-								dfg.getStartActivities().getCardinalityOf(activity), startMax))
+						ColourMap.toHexString(ColourMaps.colourMapGreen(dfg.getStartActivityCardinality(activity),
+								startMax))
 								+ ":"
-								+ ColourMap.toHexString(ColourMaps.colourMapRed(dfg.getEndActivities()
-										.getCardinalityOf(activity), endMax)));
-			} else if (dfg.getStartActivities().contains(activity)) {
+								+ ColourMap.toHexString(ColourMaps.colourMapRed(
+										dfg.getEndActivityCardinality(activity), endMax)));
+			} else if (dfg.isStartActivity(activity)) {
 				node.setOption("style", "filled");
 				node.setOption(
 						"fillcolor",
-						ColourMap.toHexString(ColourMaps.colourMapGreen(
-								dfg.getStartActivities().getCardinalityOf(activity), startMax))
-								+ ":white");
-			} else if (dfg.getEndActivities().contains(activity)) {
+						ColourMap.toHexString(ColourMaps.colourMapGreen(dfg.getStartActivityCardinality(activity),
+								startMax)) + ":white");
+			} else if (dfg.isEndActivity(activity)) {
 				node.setOption("style", "filled");
 				node.setOption(
 						"fillcolor",
 						"white:"
-								+ ColourMap.toHexString(ColourMaps.colourMapRed(dfg.getEndActivities()
-										.getCardinalityOf(activity), endMax)));
+								+ ColourMap.toHexString(ColourMaps.colourMapRed(
+										dfg.getEndActivityCardinality(activity), endMax)));
 			}
 		}
 
@@ -91,7 +89,8 @@ public class GraphvizDirectlyFollowsGraph {
 			DotNode target = activityToNode.get(to);
 			String label = String.valueOf(weight);
 
-			dot.addEdge(source, target, label).setOption("color", ColourMap.toHexString(ColourMaps.colourMapBlue(weight, dfgMax)));
+			dot.addEdge(source, target, label).setOption("color",
+					ColourMap.toHexString(ColourMaps.colourMapBlue(weight, dfgMax)));
 		}
 
 		if (includeParalelEdges) {
@@ -118,18 +117,18 @@ public class GraphvizDirectlyFollowsGraph {
 	public static Sextuple<Long, Long, Long, Long, Integer, Integer> getExtremeOccurrences(Dfg dfg) {
 		long startMin = Long.MAX_VALUE;
 		long startMax = Long.MIN_VALUE;
-		List<XEventClass> starts = dfg.getStartActivities().sortByCardinality();
-		if (starts.size() > 0) {
-			startMin = dfg.getStartActivities().getCardinalityOf(starts.get(0));
-			startMax = dfg.getStartActivities().getCardinalityOf(starts.get(starts.size() - 1));
+		for (int activityIndex : dfg.getStartActivityIndices()) {
+			long cardinality = dfg.getStartActivityCardinality(activityIndex);
+			startMin = Math.min(startMin, cardinality);
+			startMax = Math.max(startMax, cardinality);
 		}
 
 		long endMin = Long.MAX_VALUE;
 		long endMax = Long.MIN_VALUE;
-		List<XEventClass> ends = dfg.getEndActivities().sortByCardinality();
-		if (ends.size() > 0) {
-			endMin = dfg.getEndActivities().getCardinalityOf(ends.get(0));
-			endMax = dfg.getEndActivities().getCardinalityOf(ends.get(ends.size() - 1));
+		for (int activityIndex : dfg.getEndActivityIndices()) {
+			long cardinality = dfg.getEndActivityCardinality(activityIndex);
+			endMin = Math.min(endMin, cardinality);
+			endMax = Math.max(endMax, cardinality);
 		}
 
 		long maxWeight = Long.MIN_VALUE;
