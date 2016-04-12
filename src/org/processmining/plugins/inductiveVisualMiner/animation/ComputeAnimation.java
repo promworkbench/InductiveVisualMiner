@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import nl.tue.astar.AStarThread.Canceller;
-
+import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ShortestPathGraph;

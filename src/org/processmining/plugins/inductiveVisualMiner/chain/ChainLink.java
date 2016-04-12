@@ -5,8 +5,7 @@ import java.util.concurrent.Executor;
 
 import javax.swing.SwingUtilities;
 
-import nl.tue.astar.AStarThread.Canceller;
-
+import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;

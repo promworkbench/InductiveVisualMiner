@@ -4,10 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import nl.tue.astar.AStarThread.Canceller;
-
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
+import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;

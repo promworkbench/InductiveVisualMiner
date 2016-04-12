@@ -4,8 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import nl.tue.astar.AStarThread.Canceller;
-
+import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;

@@ -73,9 +73,13 @@ public class Alignment {
 	 * @param canceller
 	 */
 	public Alignment(ProcessTree tree, XLog log, XEventClasses eventClasses, AlignmentResult callback,
-			Canceller canceller) {
+			final org.processmining.framework.packages.PackageManager.Canceller canceller) {
 		wasReliable = new AtomicBoolean(true);
-		this.canceller = canceller;
+		this.canceller = new Canceller() {
+			public boolean isCancelled() {
+				return canceller.isCancelled();
+			}
+		};
 		this.log = log;
 		this.callback = callback;
 		this.eventClasses = eventClasses;

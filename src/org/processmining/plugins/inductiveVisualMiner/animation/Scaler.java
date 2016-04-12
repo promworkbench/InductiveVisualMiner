@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import nl.tue.astar.AStarThread.Canceller;
-
+import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
