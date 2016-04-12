@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -23,18 +22,15 @@ public class Cl06LayoutWithAlignment
 		extends
 		ChainLink<Quadruple<ProcessTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap>> {
 
-	public Cl06LayoutWithAlignment(ProMCanceller globalCanceller) {
-		super(globalCanceller);
-	}
-
 	protected Quadruple<ProcessTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> generateInput(
 			InductiveVisualMinerState state) {
-		return Quadruple.of(state.getTree(), state.getIvMLogInfoFiltered(), state.getMode()
-				.getVisualisationParameters(state), state.getGraphUserSettings());
+		return Quadruple.of(state.getTree(), state.getIvMLogInfoFiltered(),
+				state.getMode().getVisualisationParameters(state), state.getGraphUserSettings());
 	}
 
 	protected Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap> executeLink(
-			Quadruple<ProcessTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> input) {
+			Quadruple<ProcessTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> input,
+			ChainLinkCanceller canceller) {
 		//compute dot
 		ProcessTreeVisualisation visualiser = new ProcessTreeVisualisation();
 		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplFrequencies(input.getA(), input.getB());

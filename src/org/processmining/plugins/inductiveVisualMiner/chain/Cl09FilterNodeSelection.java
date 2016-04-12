@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.processmining.framework.packages.PackageManager.Canceller;
-import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
@@ -21,20 +20,15 @@ public class Cl09FilterNodeSelection
 		extends
 		ChainLink<Quadruple<IvMLogNotFiltered, Selection, List<HighlightingFilter>, IvMLogInfo>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
 
-	public Cl09FilterNodeSelection(ProMCanceller globalCanceller) {
-		super(globalCanceller);
-	}
-
 	protected Quadruple<IvMLogNotFiltered, Selection, List<HighlightingFilter>, IvMLogInfo> generateInput(
 			InductiveVisualMinerState state) {
-		return Quadruple.of(state.getIvMLog(), state.getSelection(),
-				state.getColouringFilters(), state.getIvMLogInfo());
+		return Quadruple
+				.of(state.getIvMLog(), state.getSelection(), state.getColouringFilters(), state.getIvMLogInfo());
 	}
 
 	protected Pair<IvMLogFilteredImpl, IvMLogInfo> executeLink(
-			Quadruple<IvMLogNotFiltered, Selection, List<HighlightingFilter>, IvMLogInfo> input) {
-
-		canceller.reset();
+			Quadruple<IvMLogNotFiltered, Selection, List<HighlightingFilter>, IvMLogInfo> input,
+			ChainLinkCanceller canceller) {
 
 		IvMLogNotFiltered logBase = input.getA();
 		Selection selection = input.getB();
@@ -64,7 +58,8 @@ public class Cl09FilterNodeSelection
 		state.setVisualisationData(state.getMode().getVisualisationData(state));
 	}
 
-	public static void applyColouringFilter(IvMLogFilteredImpl log, List<HighlightingFilter> filters, final Canceller canceller) {
+	public static void applyColouringFilter(IvMLogFilteredImpl log, List<HighlightingFilter> filters,
+			final Canceller canceller) {
 		//first, walk through the filters to see there is actually one enabled
 		List<HighlightingFilter> enabledColouringFilters = new LinkedList<>();
 		for (HighlightingFilter filter : filters) {

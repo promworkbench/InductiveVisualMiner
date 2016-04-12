@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
-import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
@@ -17,10 +16,6 @@ public class Cl05Align
 		extends
 		ChainLink<Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
 
-	public Cl05Align(ProMCanceller globalCanceller) {
-		super(globalCanceller);
-	}
-
 	protected Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> generateInput(
 			InductiveVisualMinerState state) {
 		return Sextuple.of(state.getTree(), state.getPerformanceClassifier(), state.getXLog(), state.getLog(), state
@@ -28,7 +23,8 @@ public class Cl05Align
 	}
 
 	protected Pair<IvMLogNotFiltered, IvMLogInfo> executeLink(
-			Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> input) throws Exception {
+			Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> input,
+			ChainLinkCanceller canceller) throws Exception {
 		IvMLogNotFiltered log = AlignmentPerformance.align(input.getA(), input.getB(), input.getC(), input.getD(),
 				input.getE(), input.getF(), canceller);
 		if (log == null) {

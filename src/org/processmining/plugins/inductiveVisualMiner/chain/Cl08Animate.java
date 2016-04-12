@@ -30,23 +30,22 @@ public class Cl08Animate extends ChainLink<Double, Double> {
 
 	public Cl08Animate(final Executor executor, final InductiveVisualMinerState state,
 			final InductiveVisualMinerPanel panel, final ProMCanceller canceller) {
-		super(canceller);
 		this.globalCanceller = canceller;
 
 		pool = new ThreadedComputer<Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>, GraphVizTokens>(
 				executor,
-				new Function<Pair<ResettableCanceller, Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>>, GraphVizTokens>() {
+				new Function<Pair<ChainLinkCanceller, Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>>, GraphVizTokens>() {
 
 					//this function performs the computation
 					public GraphVizTokens call(
-							Pair<org.processmining.plugins.inductiveVisualMiner.chain.ChainLink.ResettableCanceller, Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>> input)
+							Pair<ChainLinkCanceller, Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>> input)
 							throws Exception {
 						IvMLog log = input.getB().getA();
 						Mode colourMode = input.getB().getB();
 						ProcessTreeVisualisationInfo info = input.getB().getC();
 						SVGDiagram svg = input.getB().getD();
 						Scaler scaler = input.getB().getE();
-						org.processmining.plugins.inductiveVisualMiner.chain.ChainLink.ResettableCanceller localCanceller = input
+						ChainLinkCanceller localCanceller = input
 								.getA();
 						return ComputeAnimation.computeAnimation(log, colourMode, info, scaler, svg, localCanceller);
 					}
@@ -85,7 +84,7 @@ public class Cl08Animate extends ChainLink<Double, Double> {
 		return null;
 	}
 
-	protected Double executeLink(Double input) {
+	protected Double executeLink(Double input, ChainLinkCanceller canceller) {
 		return null;
 	}
 

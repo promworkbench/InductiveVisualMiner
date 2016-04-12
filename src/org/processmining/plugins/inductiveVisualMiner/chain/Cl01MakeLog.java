@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
-import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
@@ -18,16 +17,12 @@ public class Cl01MakeLog
 		extends
 		ChainLink<Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo>, Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo>> {
 
-	public Cl01MakeLog(ProMCanceller globalCanceller) {
-		super(globalCanceller);
-	}
-
 	protected Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> generateInput(InductiveVisualMinerState state) {
 		return Triple.of(state.getXLog(), state.getPerformanceClassifier(), state.getLog2logInfo());
 	}
 
 	protected Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo> executeLink(
-			Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> input) {
+			Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> input, ChainLinkCanceller canceller) {
 		IMLog imLog = new IMLogImpl(input.getA(), input.getB().getActivityClassifier());
 		IMLogInfo imLogInfo = input.getC().createLogInfo(imLog);
 		XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(input.getA(), input.getB().getActivityClassifier());

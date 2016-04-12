@@ -6,7 +6,7 @@ import java.util.concurrent.Executor;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.chain.ChainLink.ResettableCanceller;
+import org.processmining.plugins.inductiveVisualMiner.chain.ChainLinkCanceller;
 
 /**
  * Execute a task asynchronously. Kill and discard the result of the previous
@@ -17,13 +17,13 @@ import org.processmining.plugins.inductiveVisualMiner.chain.ChainLink.Resettable
  */
 public class ThreadedComputer<I, O> {
 	private final Executor executor;
-	private final Function<Pair<ResettableCanceller, I>, O> computation;
+	private final Function<Pair<ChainLinkCanceller, I>, O> computation;
 	private final InputFunction<O> onComplete;
 	
-	private ResettableCanceller currentCanceller = null;
+	private ChainLinkCanceller currentCanceller = null;
 	private UUID currentExecution = null;
 
-	public ThreadedComputer(Executor executor, Function<Pair<ResettableCanceller, I>, O> computation, InputFunction<O> onComplete) {
+	public ThreadedComputer(Executor executor, Function<Pair<ChainLinkCanceller, I>, O> computation, InputFunction<O> onComplete) {
 		this.executor = executor;
 		this.computation = computation;
 		this.onComplete = onComplete;
@@ -39,7 +39,7 @@ public class ThreadedComputer<I, O> {
 			currentCanceller.cancel();
 		}
 		
-		final ResettableCanceller newCanceller = new ResettableCanceller(globalCanceller);
+		final ChainLinkCanceller newCanceller = new ChainLinkCanceller(globalCanceller);
 		final UUID newExecution = UUID.randomUUID();
 		currentExecution = newExecution;
 		currentCanceller = newCanceller;

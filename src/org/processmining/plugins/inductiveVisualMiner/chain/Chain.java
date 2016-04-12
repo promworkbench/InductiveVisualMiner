@@ -18,10 +18,11 @@ public class Chain {
 	private final Executor executor;
 	private UUID currentExecutionId;
 	private int currentExecutionLinkNumber;
+	private ChainLinkCanceller currentExecutionCanceller;
 	@SuppressWarnings("rawtypes")
 	private ChainLink currentExecutionLink;
 	private final ProMCanceller globalCanceller;
-	
+
 	private final InductiveVisualMinerState state;
 
 	public Chain(Executor executor, InductiveVisualMinerState state, ProMCanceller canceller) {
@@ -30,6 +31,7 @@ public class Chain {
 		this.globalCanceller = canceller;
 		currentExecutionId = null;
 		currentExecutionLinkNumber = Integer.MAX_VALUE;
+		currentExecutionCanceller = null;
 		currentExecutionLink = null;
 	}
 
@@ -44,7 +46,9 @@ public class Chain {
 			if (indexInChain + 1 < chain.size()) {
 				currentExecutionLinkNumber = indexInChain + 1;
 				currentExecutionLink = chain.get(indexInChain + 1);
-				chain.get(indexInChain + 1).execute(currentExecutionId, indexInChain + 1, state);
+				currentExecutionCanceller = new ChainLinkCanceller(globalCanceller);
+				chain.get(indexInChain + 1).execute(currentExecutionId, indexInChain + 1, state,
+						currentExecutionCanceller);
 			} else {
 				currentExecutionLink = null;
 			}
@@ -61,15 +65,16 @@ public class Chain {
 
 					//cancel current execution
 					if (currentExecutionLink != null) {
-						currentExecutionLink.cancel();
+						currentExecutionCanceller.cancel();
 					}
 
 					//replace execution
 					currentExecutionId = UUID.randomUUID();
 					currentExecutionLinkNumber = i;
 					currentExecutionLink = cl;
+					currentExecutionCanceller = new ChainLinkCanceller(globalCanceller);
 
-					cl.execute(currentExecutionId, currentExecutionLinkNumber, state);
+					cl.execute(currentExecutionId, currentExecutionLinkNumber, state, currentExecutionCanceller);
 				}
 				return;
 			}

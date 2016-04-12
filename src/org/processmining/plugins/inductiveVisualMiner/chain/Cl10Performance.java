@@ -4,7 +4,6 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 import java.util.Map;
 
-import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
@@ -16,28 +15,20 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class Cl10Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 
-	public Cl10Performance(ProMCanceller globalCanceller) {
-		super(globalCanceller);
-	}
-
 	protected IvMLog generateInput(InductiveVisualMinerState state) {
 		return state.getIvMLogFiltered();
 	}
 
-	protected PerformanceWrapper executeLink(IvMLog input) {
+	protected PerformanceWrapper executeLink(IvMLog input, ChainLinkCanceller canceller) {
 		Map<UnfoldedNode, QueueActivityLog> queueActivityLogs = QueueMineActivityLog.mine(input);
 
 		QueueLengths method = new QueueLengthsImplCombination(queueActivityLogs);
 
 		//compute times
-		TObjectDoubleHashMap<UnfoldedNode> waitingTimes = new TObjectDoubleHashMap<UnfoldedNode>(
-				10, 0.5f, -1);
-		TObjectDoubleHashMap<UnfoldedNode> queueingTimes = new TObjectDoubleHashMap<UnfoldedNode>(
-				10, 0.5f, -1);
-		TObjectDoubleHashMap<UnfoldedNode> serviceTimes = new TObjectDoubleHashMap<UnfoldedNode>(
-				10, 0.5f, -1);
-		TObjectDoubleHashMap<UnfoldedNode> sojournTimes = new TObjectDoubleHashMap<UnfoldedNode>(
-				10, 0.5f, -1);
+		TObjectDoubleHashMap<UnfoldedNode> waitingTimes = new TObjectDoubleHashMap<UnfoldedNode>(10, 0.5f, -1);
+		TObjectDoubleHashMap<UnfoldedNode> queueingTimes = new TObjectDoubleHashMap<UnfoldedNode>(10, 0.5f, -1);
+		TObjectDoubleHashMap<UnfoldedNode> serviceTimes = new TObjectDoubleHashMap<UnfoldedNode>(10, 0.5f, -1);
+		TObjectDoubleHashMap<UnfoldedNode> sojournTimes = new TObjectDoubleHashMap<UnfoldedNode>(10, 0.5f, -1);
 		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
 			QueueActivityLog activityLog = queueActivityLogs.get(unode);
 			long sumWaiting = 0;
@@ -55,7 +46,7 @@ public class Cl10Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 					sumWaiting += activityLog.getStart(i) - activityLog.getInitiate(i);
 					countWaiting++;
 				}
-				
+
 				//queueing time
 				if (activityLog.hasEnqueue(i) && activityLog.hasStart(i)) {
 					sumQueueing += activityLog.getStart(i) - activityLog.getEnqueue(i);
@@ -80,7 +71,8 @@ public class Cl10Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 			sojournTimes.put(unode, sumSojourn / (countSojourn * 1.0));
 		}
 
-		return new PerformanceWrapper(method, queueActivityLogs, waitingTimes, queueingTimes, serviceTimes, sojournTimes);
+		return new PerformanceWrapper(method, queueActivityLogs, waitingTimes, queueingTimes, serviceTimes,
+				sojournTimes);
 	}
 
 	protected void processResult(PerformanceWrapper result, InductiveVisualMinerState state) {

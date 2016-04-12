@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
@@ -12,17 +11,15 @@ import org.processmining.processtree.ProcessTree;
 public class Cl03Mine extends
 		ChainLink<Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters>, ProcessTree> {
 
-	public Cl03Mine(ProMCanceller globalCanceller) {
-		super(globalCanceller);
-	}
-
-	protected Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters> generateInput(InductiveVisualMinerState state) {
+	protected Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters> generateInput(
+			InductiveVisualMinerState state) {
 		VisualMinerParameters minerParameters = new VisualMinerParameters(state.getPaths());
 		return Quadruple.of(state.getPreMinedTree(), state.getActivityFilteredIMLog(), state.getMiner(),
 				minerParameters);
 	}
 
-	protected ProcessTree executeLink(Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters> input) {
+	protected ProcessTree executeLink(Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters> input,
+			ChainLinkCanceller canceller) {
 		if (input.getA() == null) {
 			//mine a new tree
 			return input.getC().mine(input.getB(), input.getD(), canceller);

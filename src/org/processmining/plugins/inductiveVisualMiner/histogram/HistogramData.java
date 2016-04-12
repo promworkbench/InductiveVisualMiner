@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.chain.ChainLinkCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -48,7 +49,7 @@ public class HistogramData {
 	 * @param globalBuckets
 	 *            the widht of the histogram (used for pixel-precision)
 	 */
-	public HistogramData(ProcessTree tree, IvMLogFiltered log, Scaler scaler, int globalBuckets, int localBuckets) {
+	public HistogramData(ProcessTree tree, IvMLogFiltered log, Scaler scaler, int globalBuckets, int localBuckets, ChainLinkCanceller canceller) {
 		this.scaler = scaler;
 
 		globalCountFiltered = new int[globalBuckets];
@@ -67,6 +68,9 @@ public class HistogramData {
 		localMax = 0;
 
 		for (IteratorWithPosition<IvMTrace> it = log.iteratorUnfiltered(); it.hasNext();) {
+			if (canceller.isCancelled()) {
+				return;
+			}
 			IvMTrace trace = it.next();
 			boolean isFilteredOut = log.isFilteredOut(it.getPosition());
 

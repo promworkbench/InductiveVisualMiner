@@ -57,7 +57,7 @@ public class ExporterAvi extends Exporter {
 					e.printStackTrace();
 				}
 			}
-		}).start();
+		}, "IvM animation exporter thread").start();
 	}
 
 }

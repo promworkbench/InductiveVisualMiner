@@ -86,7 +86,7 @@ public class InductiveVisualMinerController {
 		//make log
 		final Function<Exception, Object> onException;
 		{
-			Cl01MakeLog m = new Cl01MakeLog(canceller);
+			Cl01MakeLog m = new Cl01MakeLog();
 			m.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
@@ -117,7 +117,7 @@ public class InductiveVisualMinerController {
 
 		//filter on activities
 		{
-			Cl02FilterLogOnActivities f = new Cl02FilterLogOnActivities(canceller);
+			Cl02FilterLogOnActivities f = new Cl02FilterLogOnActivities();
 			f.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
@@ -137,7 +137,7 @@ public class InductiveVisualMinerController {
 
 		//mine a model
 		{
-			Cl03Mine m = new Cl03Mine(canceller);
+			Cl03Mine m = new Cl03Mine();
 			m.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
@@ -187,7 +187,7 @@ public class InductiveVisualMinerController {
 
 				}
 			};
-			Cl04LayoutModel chainLinkLayout = new Cl04LayoutModel(canceller);
+			Cl04LayoutModel chainLinkLayout = new Cl04LayoutModel();
 			chainLinkLayout.setOnStart(layoutStart);
 			chainLinkLayout.setOnComplete(layoutComplete);
 			chainLinkLayout.setOnException(onException);
@@ -196,7 +196,7 @@ public class InductiveVisualMinerController {
 
 		//align
 		{
-			Cl05Align a = new Cl05Align(canceller);
+			Cl05Align a = new Cl05Align();
 			a.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
@@ -219,7 +219,7 @@ public class InductiveVisualMinerController {
 
 		//layout
 		{
-			Cl06LayoutWithAlignment l = new Cl06LayoutWithAlignment(canceller);
+			Cl06LayoutWithAlignment l = new Cl06LayoutWithAlignment();
 			l.setOnStart(layoutStart);
 			l.setOnComplete(layoutComplete);
 			l.setOnException(onException);
@@ -228,7 +228,7 @@ public class InductiveVisualMinerController {
 
 		//animation scaler
 		{
-			Cl07AnimationScaler f = new Cl07AnimationScaler(canceller);
+			Cl07AnimationScaler f = new Cl07AnimationScaler();
 			f.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
@@ -270,7 +270,7 @@ public class InductiveVisualMinerController {
 
 		//filter node selection
 		{
-			Cl09FilterNodeSelection f = new Cl09FilterNodeSelection(canceller);
+			Cl09FilterNodeSelection f = new Cl09FilterNodeSelection();
 			f.setOnStart(new Runnable() {
 				public void run() {
 					state.resetPerformance();
@@ -304,7 +304,7 @@ public class InductiveVisualMinerController {
 
 		//mine performance
 		{
-			Cl10Performance q = new Cl10Performance(canceller);
+			Cl10Performance q = new Cl10Performance();
 			q.setOnStart(new Runnable() {
 				public void run() {
 					state.resetPerformance();
@@ -326,7 +326,7 @@ public class InductiveVisualMinerController {
 
 		//compute histogram
 		{
-			Cl11Histogram f = new Cl11Histogram(canceller);
+			Cl11Histogram f = new Cl11Histogram();
 			f.setOnStart(new Runnable() {
 				public void run() {
 					state.resetHistogramData();

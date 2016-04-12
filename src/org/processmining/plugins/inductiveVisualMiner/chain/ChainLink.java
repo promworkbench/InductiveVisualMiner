@@ -5,8 +5,6 @@ import java.util.concurrent.Executor;
 
 import javax.swing.SwingUtilities;
 
-import org.processmining.framework.packages.PackageManager.Canceller;
-import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
@@ -17,39 +15,6 @@ public abstract class ChainLink<I, O> {
 	private Runnable onStart;
 	private Runnable onComplete;
 	private Function<Exception, Object> onException;
-	protected final ResettableCanceller canceller;
-
-	public ChainLink(ProMCanceller globalCanceller) {
-		canceller = new ResettableCanceller(globalCanceller);
-	}
-
-	public static class ResettableCanceller implements Canceller {
-
-		private boolean cancelled = false;
-
-		private ProMCanceller globalCanceller;
-
-		public ResettableCanceller(ProMCanceller globalCanceller) {
-			this.globalCanceller = globalCanceller;
-		}
-
-		public void cancel() {
-			this.cancelled = true;
-		}
-
-		public void reset() {
-			this.cancelled = false;
-		}
-
-		public boolean isCancelled() {
-			return cancelled || globalCanceller.isCancelled();
-		}
-
-		public boolean isGlobalCancelled() {
-			return globalCanceller.isCancelled();
-		}
-
-	}
 
 	/**
 	 * 
@@ -60,14 +25,15 @@ public abstract class ChainLink<I, O> {
 	protected abstract I generateInput(InductiveVisualMinerState state);
 
 	/**
+	 * Performs the computation, given the input. Side-effects not allowed;
+	 * should be thread-safe and static
 	 * 
 	 * @param input
+	 * @param canceller
 	 * @return
-	 * 
-	 *         Performs the computation, given the input. Side-effects not
-	 *         allowed; should be thread-safe and static
+	 * @throws Exception
 	 */
-	protected abstract O executeLink(I input) throws Exception;
+	protected abstract O executeLink(I input, ChainLinkCanceller canceller) throws Exception;
 
 	/**
 	 * 
@@ -79,7 +45,8 @@ public abstract class ChainLink<I, O> {
 	 */
 	protected abstract void processResult(O result, InductiveVisualMinerState state);
 
-	public void execute(final UUID execution, final int indexInChain, final InductiveVisualMinerState state) {
+	public void execute(final UUID execution, final int indexInChain, final InductiveVisualMinerState state,
+			final ChainLinkCanceller canceller) {
 		final I input = generateInput(state);
 
 		executor.execute(new Runnable() {
@@ -87,10 +54,9 @@ public abstract class ChainLink<I, O> {
 				if (onStart != null) {
 					SwingUtilities.invokeLater(onStart);
 				}
-				canceller.reset();
 				final O result;
 				try {
-					result = executeLink(input);
+					result = executeLink(input, canceller);
 				} catch (Exception e) {
 					try {
 						onException.call(e);
@@ -102,7 +68,7 @@ public abstract class ChainLink<I, O> {
 				}
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						if (chain.getCurrentExecution().equals(execution) && !canceller.isGlobalCancelled()) {
+						if (chain.getCurrentExecution().equals(execution) && !canceller.isCancelled()) {
 							processResult(result, state);
 							if (onComplete != null) {
 								onComplete.run();
@@ -113,10 +79,6 @@ public abstract class ChainLink<I, O> {
 				});
 			}
 		});
-	}
-
-	public void cancel() {
-		canceller.cancel();
 	}
 
 	/**

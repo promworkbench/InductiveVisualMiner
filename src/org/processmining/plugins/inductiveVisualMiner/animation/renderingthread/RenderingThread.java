@@ -54,7 +54,7 @@ public class RenderingThread implements Runnable {
 		pauseRequested.set(false);
 		stopRequested.set(false);
 		if (runThread == null || !runThread.isAlive()) {
-			runThread = new Thread(this);
+			runThread = new Thread(this, "IvM rendering thread");
 		} else if (runThread.isAlive()) {
 			return;
 		}
