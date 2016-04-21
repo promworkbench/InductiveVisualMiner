@@ -111,7 +111,7 @@ public class IvMLogInfo {
 			start++;
 		}
 		int end = trace.size() - 1;
-		while (trace.get(start).isLogMove() || trace.get(start).isIgnoredModelMove()) {
+		while (trace.get(end).isLogMove() || trace.get(end).isIgnoredModelMove()) {
 			end--;
 		}
 		List<IvMMove> subtrace = trace.subList(start, end + 1);
@@ -141,6 +141,8 @@ public class IvMLogInfo {
 		debug(" process trace " + trace + " on " + unode);
 
 		assert (trace.get(0).isModelSync() && !trace.get(0).isIgnoredLogMove() && !trace.get(0).isIgnoredModelMove());
+		int l = trace.size() - 1;
+		assert (trace.get(l).isModelSync() && !trace.get(l).isIgnoredLogMove() && !trace.get(l).isIgnoredModelMove());
 
 		if (unode.getNode() instanceof Manual) {
 			//unode is an activity
@@ -300,6 +302,7 @@ public class IvMLogInfo {
 	}
 
 	private static void debug(Object s) {
+		System.out.println(s);
 		//InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
 	}
 

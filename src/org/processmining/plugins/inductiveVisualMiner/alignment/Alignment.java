@@ -183,7 +183,6 @@ public class Alignment {
 
 		double cost = rec.getCostSoFar();
 
-		int len = 0;
 		TreeRecord r = rec;
 		while (r != null) {
 			if (r.getModelMove() < tree.size()) {
@@ -191,7 +190,6 @@ public class Alignment {
 			}
 			cost -= r.getInternalMovesCost();
 			r = r.getPredecessor();
-			len++;
 		}
 		cost++;
 		assert (cost % delegate.getScaling() == 0);
