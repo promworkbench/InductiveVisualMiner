@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.highlightingfilter;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

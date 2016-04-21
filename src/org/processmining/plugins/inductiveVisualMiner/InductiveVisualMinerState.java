@@ -22,8 +22,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -114,6 +114,7 @@ public class InductiveVisualMinerState {
 	private IMLog activityFilteredIMLog;
 	private IMLogInfo activityFilteredIMLogInfo;
 	private Set<XEventClass> filteredActivities;
+	private List<IvMFilter> preMiningFilters;
 
 	public double getActivitiesThreshold() {
 		return activitiesThreshold;
@@ -140,6 +141,14 @@ public class InductiveVisualMinerState {
 		this.activityFilteredIMLog = activityFilteredIMLog;
 		this.activityFilteredIMLogInfo = activityFilteredIMLogInfo;
 		this.filteredActivities = filteredActivities;
+	}
+	
+	public List<IvMFilter> getPreMiningFilters() {
+		return preMiningFilters;
+	}
+
+	public void setPreMiningFilters(List<IvMFilter> preMiningFilters) {
+		this.preMiningFilters = preMiningFilters;
 	}
 
 	//==mining==
@@ -246,7 +255,7 @@ public class InductiveVisualMinerState {
 
 	//==colour filtering ( & node selection)==
 	private Selection selection;
-	private List<HighlightingFilter> colouringFilters;
+	private List<IvMFilter> colouringFilters;
 
 	public Selection getSelection() {
 		return selection;
@@ -261,12 +270,12 @@ public class InductiveVisualMinerState {
 				new THashSet<UnfoldedNode>(), selection.getSelectedTaus());
 	}
 
-	public List<HighlightingFilter> getColouringFilters() {
+	public List<IvMFilter> getColouringFilters() {
 		return colouringFilters;
 	}
 
-	public void setColouringFilters(List<HighlightingFilter> colouringFilters) {
-		this.colouringFilters = colouringFilters;
+	public void setColouringFilters(List<IvMFilter> colouringFilters2) {
+		this.colouringFilters = colouringFilters2;
 	}
 
 	//==timed log==

@@ -18,7 +18,8 @@ import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSele
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
-import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
@@ -50,6 +51,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final NiceDoubleSlider pathsSlider;
 	private final JLabel classifierLabel;
 	private JComboBox<?> classifiersCombobox;
+	private final JButton preMiningFiltersButton;
+	private final PreMiningFiltersView preMiningFiltersView;
 	private final JLabel minerLabel;
 	private JComboBox<?> minerCombobox;
 	private final JButton saveModelButton;
@@ -108,6 +111,18 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cClassifiers.fill = GridBagConstraints.HORIZONTAL;
 			add(classifiersCombobox, cClassifiers);
 			classifiersCombobox.setSelectedItem(state.getActivityClassifier());
+		}
+
+		//pre-miner filters
+		{
+			preMiningFiltersView = new PreMiningFiltersView(this);
+			preMiningFiltersButton = SlickerFactory.instance().createButton("pre-miner filters");
+			GridBagConstraints cTraceViewButton = new GridBagConstraints();
+			cTraceViewButton.gridx = 2;
+			cTraceViewButton.gridy = gridy++;
+			cTraceViewButton.gridwidth = 1;
+			cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
+			add(preMiningFiltersButton, cTraceViewButton);
 		}
 
 		{
@@ -290,6 +305,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			pathsSlider.setVisible(false);
 			classifierLabel.setVisible(false);
 			classifiersCombobox.setVisible(false);
+			preMiningFiltersButton.setVisible(false);
 			minerLabel.setVisible(false);
 			minerCombobox.setVisible(false);
 		}
@@ -297,6 +313,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public void removeNotify() {
 		super.removeNotify();
+		preMiningFiltersView.setVisible(false);
 		traceView.setVisible(false);
 		colouringFiltersView.setVisible(false);
 		graphPanel.pause();
@@ -356,6 +373,14 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public JComboBox<?> getColourSelection() {
 		return colourSelection;
+	}
+	
+	public JButton getPreMiningFiltersButton() {
+		return preMiningFiltersButton;
+	}
+	
+	public PreMiningFiltersView getPreMiningFiltersView() {
+		return preMiningFiltersView;
 	}
 
 	public JTextArea getSelectionLabel() {

@@ -1,15 +1,13 @@
-package org.processmining.plugins.inductiveVisualMiner.highlightingfilter;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
 import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-@HighlightingFilterAnnotation
-public abstract class HighlightingFilter {
+public abstract class IvMFilter {
 
 	/**
 	 * Constructor. User is waiting when this function is called.
 	 */
-	public HighlightingFilter() {
+	public IvMFilter() {
 
 	}
 
@@ -29,7 +27,7 @@ public abstract class HighlightingFilter {
 	 * @param log
 	 * @return
 	 */
-	public abstract HighlightingFilterGui createGui(XLog log);
+	public abstract IvMFilterGui createGui(XLog log);
 
 	/**
 	 * Returns whether this filter is actually filtering something. If this
@@ -39,15 +37,6 @@ public abstract class HighlightingFilter {
 	 * @return
 	 */
 	protected abstract boolean isEnabled();
-
-	/**
-	 * Main function of the filter. Returns whether the given IvMTrace trace
-	 * should be counted towards the result.
-	 * 
-	 * @param trace
-	 * @return
-	 */
-	public abstract boolean countInColouring(IvMTrace trace);
 
 	/**
 	 * This function is called when the user updates a filter and the filtering
@@ -60,7 +49,7 @@ public abstract class HighlightingFilter {
 	}
 
 	//private methods
-	private HighlightingFilterGui panel = null;
+	private IvMFilterGui panel = null;
 	private Runnable onUpdate = null;
 	private boolean enabledFilter = false;
 
@@ -83,7 +72,7 @@ public abstract class HighlightingFilter {
 		return enabledFilter && (panel != null) && isEnabled();
 	}
 
-	public HighlightingFilterGui getPanel() {
+	public IvMFilterGui getPanel() {
 		return panel;
 	}
 }

@@ -1,14 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
-import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -17,21 +18,20 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class Cl09FilterNodeSelection
 		extends
-		ChainLink<Quadruple<IvMLogNotFiltered, Selection, List<HighlightingFilter>, IvMLogInfo>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
+		ChainLink<Quadruple<IvMLogNotFiltered, Selection, List<IvMFilter>, IvMLogInfo>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
 
-	protected Quadruple<IvMLogNotFiltered, Selection, List<HighlightingFilter>, IvMLogInfo> generateInput(
+	protected Quadruple<IvMLogNotFiltered, Selection, List<IvMFilter>, IvMLogInfo> generateInput(
 			InductiveVisualMinerState state) {
 		return Quadruple
 				.of(state.getIvMLog(), state.getSelection(), state.getColouringFilters(), state.getIvMLogInfo());
 	}
 
 	protected Pair<IvMLogFilteredImpl, IvMLogInfo> executeLink(
-			Quadruple<IvMLogNotFiltered, Selection, List<HighlightingFilter>, IvMLogInfo> input,
-			IvMCanceller canceller) {
+			Quadruple<IvMLogNotFiltered, Selection, List<IvMFilter>, IvMLogInfo> input, IvMCanceller canceller) {
 
 		IvMLogNotFiltered logBase = input.getA();
 		Selection selection = input.getB();
-		List<HighlightingFilter> colouringFilters = input.getC();
+		List<IvMFilter> colouringFilters = input.getC();
 		IvMLogInfo oldLogInfo = input.getD();
 
 		IvMLogFilteredImpl logFiltered = new IvMLogFilteredImpl(logBase);
@@ -57,11 +57,11 @@ public class Cl09FilterNodeSelection
 		state.setVisualisationData(state.getMode().getVisualisationData(state));
 	}
 
-	public static void applyColouringFilter(IvMLogFilteredImpl log, List<HighlightingFilter> filters,
+	public static void applyColouringFilter(IvMLogFilteredImpl log, List<IvMFilter> filters,
 			final IvMCanceller canceller) {
 		//first, walk through the filters to see there is actually one enabled
-		List<HighlightingFilter> enabledColouringFilters = new LinkedList<>();
-		for (HighlightingFilter filter : filters) {
+		List<IvMFilter> enabledColouringFilters = new ArrayList<>();
+		for (IvMFilter filter : filters) {
 			if (filter.isEnabledFilter()) {
 				enabledColouringFilters.add(filter);
 			}
@@ -75,10 +75,12 @@ public class Cl09FilterNodeSelection
 			IvMTrace trace = it.next();
 
 			//feed this trace to each enabled filter
-			for (HighlightingFilter filter : enabledColouringFilters) {
-				if (!filter.countInColouring(trace)) {
-					it.remove();
-					break;
+			for (IvMFilter filter : enabledColouringFilters) {
+				if (filter instanceof HighlightingFilter) {
+					if (!((HighlightingFilter) filter).countInColouring(trace)) {
+						it.remove();
+						break;
+					}
 				}
 			}
 

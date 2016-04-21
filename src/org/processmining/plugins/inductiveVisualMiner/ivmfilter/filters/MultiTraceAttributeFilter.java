@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.highlightingfilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.filters;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,8 +14,8 @@ import javax.swing.event.ListSelectionListener;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
-import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilter;
-import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilterGui;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class MultiTraceAttributeFilter extends HighlightingFilter {
@@ -27,7 +27,7 @@ public class MultiTraceAttributeFilter extends HighlightingFilter {
 		return "Trace attribute filter";
 	}
 
-	public HighlightingFilterGui createGui(XLog log) {
+	public IvMFilterGui createGui(XLog log) {
 		final Map<String, Set<XAttribute>> traceAttributes = getTraceAttributeMap(log);
 		panel = new MultiAttributeFilterGui(traceAttributes, getName());
 

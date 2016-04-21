@@ -1,7 +1,7 @@
-package org.processmining.plugins.inductiveVisualMiner.highlightingfilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.filters;
 
 import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.inductiveVisualMiner.highlightingfilter.HighlightingFilterGui;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class HighlightingFilterQuery {
@@ -10,7 +10,7 @@ public class HighlightingFilterQuery {
 		return "Query filter";
 	}
 
-	public HighlightingFilterGui createGui(XLog log) {
+	public IvMFilterGui createGui(XLog log) {
 		HighlightingFilterQueryGui panel = new HighlightingFilterQueryGui(getName());
 		return panel;
 	}
