@@ -302,7 +302,7 @@ public class IvMLogInfo {
 	}
 
 	private static void debug(Object s) {
-		System.out.println(s);
+		//System.out.println(s);
 		//InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
 	}
 
