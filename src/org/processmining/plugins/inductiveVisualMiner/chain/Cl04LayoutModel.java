@@ -29,7 +29,7 @@ public class Cl04LayoutModel
 
 	protected Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap> executeLink(
 			Triple<ProcessTree, ProcessTreeVisualisationParameters, DotPanelUserSettings> input,
-			ChainLinkCanceller canceller) {
+			IvMCanceller canceller) {
 		//compute dot
 		ProcessTreeVisualisation visualiser = new ProcessTreeVisualisation();
 		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplEmpty();

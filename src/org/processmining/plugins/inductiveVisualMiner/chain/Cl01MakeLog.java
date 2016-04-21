@@ -22,7 +22,7 @@ public class Cl01MakeLog
 	}
 
 	protected Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo> executeLink(
-			Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> input, ChainLinkCanceller canceller) {
+			Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> input, IvMCanceller canceller) {
 		IMLog imLog = new IMLogImpl(input.getA(), input.getB().getActivityClassifier());
 		IMLogInfo imLogInfo = input.getC().createLogInfo(imLog);
 		XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(input.getA(), input.getB().getActivityClassifier());

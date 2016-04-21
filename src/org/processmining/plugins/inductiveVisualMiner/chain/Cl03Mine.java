@@ -19,7 +19,7 @@ public class Cl03Mine extends
 	}
 
 	protected ProcessTree executeLink(Quadruple<ProcessTree, IMLog, VisualMinerWrapper, VisualMinerParameters> input,
-			ChainLinkCanceller canceller) {
+			IvMCanceller canceller) {
 		if (input.getA() == null) {
 			//mine a new tree
 			return input.getC().mine(input.getB(), input.getD(), canceller);

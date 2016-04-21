@@ -6,9 +6,9 @@ import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
-import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.performance.ExpandProcessTreeForQueues;
@@ -20,7 +20,7 @@ public class AlignmentPerformance {
 
 	public static IvMLogNotFiltered align(ProcessTree tree, XEventPerformanceClassifier performanceClassifier,
 			XLog xLog, IMLog log, XEventClasses activityEventClasses, XEventClasses performanceEventClasses,
-			Canceller canceller) throws Exception {
+			IvMCanceller canceller) throws Exception {
 
 		//transform tree for performance measurement
 		Triple<ProcessTree, Map<UnfoldedNode, UnfoldedNode>, Set<UnfoldedNode>> t = ExpandProcessTreeForQueues

@@ -24,7 +24,7 @@ public class Cl05Align
 
 	protected Pair<IvMLogNotFiltered, IvMLogInfo> executeLink(
 			Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> input,
-			ChainLinkCanceller canceller) throws Exception {
+			IvMCanceller canceller) throws Exception {
 		IvMLogNotFiltered log = AlignmentPerformance.align(input.getA(), input.getB(), input.getC(), input.getD(),
 				input.getE(), input.getF(), canceller);
 		if (log == null) {

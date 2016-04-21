@@ -16,7 +16,7 @@ public class Cl11Histogram extends ChainLink<Quadruple<ProcessTree, IvMLogFilter
 	}
 
 	protected HistogramData executeLink(Quadruple<ProcessTree, IvMLogFiltered, Scaler, Integer> input,
-			ChainLinkCanceller canceller) throws Exception {
+			IvMCanceller canceller) throws Exception {
 		HistogramData data = new HistogramData(input.getA(), input.getB(), input.getC(), input.getD(),
 				InductiveVisualMinerAnimationPanel.popupWidth, canceller);
 		if (canceller.isCancelled()) {

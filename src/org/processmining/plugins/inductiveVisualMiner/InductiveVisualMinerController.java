@@ -124,6 +124,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveModelButton().setEnabled(false);
 					panel.getSaveImageButton().setEnabled(false);
 					panel.getSaveImageButton().setText("image");
+					state.resetAnimation();
 					state.resetAlignment();
 					state.resetPerformance();
 					state.resetHistogramData();
@@ -143,6 +144,7 @@ public class InductiveVisualMinerController {
 					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
 					panel.getTraceView().set(state.getLog());
+					state.resetAnimation();
 					state.resetAlignment();
 					state.resetPerformance();
 					state.resetHistogramData();
@@ -202,6 +204,7 @@ public class InductiveVisualMinerController {
 					panel.getGraph().setAnimationEnabled(false);
 					setAnimationStatus(" ", false);
 					panel.getSaveImageButton().setText("image");
+					state.resetAnimation();
 					state.resetAlignment();
 					state.resetPerformance();
 					state.resetHistogramData();
@@ -249,7 +252,7 @@ public class InductiveVisualMinerController {
 
 		//animate
 		{
-			Cl08Animate a = new Cl08Animate(context.getExecutor(), state, panel, canceller);
+			Cl08Animate a = new Cl08Animate(context.getExecutor(), state, panel);
 			a.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);

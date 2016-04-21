@@ -11,7 +11,7 @@ public class Cl07AnimationScaler extends ChainLink<IvMLog, Scaler> {
 		return state.getIvMLog();
 	}
 
-	protected Scaler executeLink(IvMLog input, ChainLinkCanceller canceller) throws Exception {
+	protected Scaler executeLink(IvMLog input, IvMCanceller canceller) throws Exception {
 		Scaler scaler = Scaler.fromLog(input, ComputeAnimation.initDuration, ComputeAnimation.animationDuration,
 				canceller);
 		if (scaler == null) {

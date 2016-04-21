@@ -18,7 +18,7 @@ public class Chain {
 	private final Executor executor;
 	private UUID currentExecutionId;
 	private int currentExecutionLinkNumber;
-	private ChainLinkCanceller currentExecutionCanceller;
+	private IvMCanceller currentExecutionCanceller;
 	@SuppressWarnings("rawtypes")
 	private ChainLink currentExecutionLink;
 	private final ProMCanceller globalCanceller;
@@ -46,7 +46,7 @@ public class Chain {
 			if (indexInChain + 1 < chain.size()) {
 				currentExecutionLinkNumber = indexInChain + 1;
 				currentExecutionLink = chain.get(indexInChain + 1);
-				currentExecutionCanceller = new ChainLinkCanceller(globalCanceller);
+				currentExecutionCanceller = new IvMCanceller(globalCanceller);
 				chain.get(indexInChain + 1).execute(currentExecutionId, indexInChain + 1, state,
 						currentExecutionCanceller);
 			} else {
@@ -72,7 +72,7 @@ public class Chain {
 					currentExecutionId = UUID.randomUUID();
 					currentExecutionLinkNumber = i;
 					currentExecutionLink = cl;
-					currentExecutionCanceller = new ChainLinkCanceller(globalCanceller);
+					currentExecutionCanceller = new IvMCanceller(globalCanceller);
 
 					cl.execute(currentExecutionId, currentExecutionLinkNumber, state, currentExecutionCanceller);
 				}

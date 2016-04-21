@@ -4,15 +4,13 @@ import java.util.concurrent.Executor;
 
 import javax.swing.SwingUtilities;
 
-import org.processmining.framework.plugin.ProMCanceller;
-import org.processmining.plugins.InductiveMiner.Function;
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.FunctionCancellable;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ThreadedComputer;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
@@ -22,43 +20,39 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl08Animate extends ChainLink<Double, Double> {
-
-	private final ProMCanceller globalCanceller;
+public class Cl08Animate extends
+		ChainLink<Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>, Double> {
 
 	private final ThreadedComputer<Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>, GraphVizTokens> pool;
 
 	public Cl08Animate(final Executor executor, final InductiveVisualMinerState state,
-			final InductiveVisualMinerPanel panel, final ProMCanceller canceller) {
-		this.globalCanceller = canceller;
+			final InductiveVisualMinerPanel panel) {
 
 		pool = new ThreadedComputer<Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>, GraphVizTokens>(
 				executor,
-				new Function<Pair<ChainLinkCanceller, Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>>, GraphVizTokens>() {
+				new FunctionCancellable<Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>, GraphVizTokens>() {
 
 					//this function performs the computation
 					public GraphVizTokens call(
-							Pair<ChainLinkCanceller, Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>> input)
-							throws Exception {
-						IvMLog log = input.getB().getA();
-						Mode colourMode = input.getB().getB();
-						ProcessTreeVisualisationInfo info = input.getB().getC();
-						SVGDiagram svg = input.getB().getD();
-						Scaler scaler = input.getB().getE();
-						ChainLinkCanceller localCanceller = input
-								.getA();
-						return ComputeAnimation.computeAnimation(log, colourMode, info, scaler, svg, localCanceller);
+							Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler> input,
+							IvMCanceller canceller) throws Exception {
+						IvMLog log = input.getA();
+						Mode colourMode = input.getB();
+						ProcessTreeVisualisationInfo info = input.getC();
+						SVGDiagram svg = input.getD();
+						Scaler scaler = input.getE();
+						return ComputeAnimation.computeAnimation(log, colourMode, info, scaler, svg, canceller);
 					}
 
 				}, new InputFunction<GraphVizTokens>() {
 
 					//this function is called on completion
-					public void call(GraphVizTokens result) throws Exception {
-						state.setAnimation(result);
+					public void call(final GraphVizTokens result) throws Exception {
 
-						//update the gui (in the main thread)
+						//update the state and gui (in the main thread)
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
+								state.setAnimation(result);
 								panel.getSaveImageButton().setText("image/animation");
 								panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
 								panel.getGraph().setAnimationExtremeTimes(
@@ -72,19 +66,21 @@ public class Cl08Animate extends ChainLink<Double, Double> {
 				});
 	}
 
-	protected Double generateInput(InductiveVisualMinerState state) {
+	protected Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler> generateInput(
+			InductiveVisualMinerState state) {
+		return Quintuple.of(state.getIvMLog(), state.getMode(), state.getVisualisationInfo(), state.getSVGDiagram(),
+				state.getAnimationScaler());
+	}
 
+	protected Double executeLink(
+			Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler> input,
+			IvMCanceller canceller) {
 		/*
 		 * The animation is independent of all other chainlinks. Therefore,
 		 * compute it asynchronously.
 		 */
-		pool.compute(Quintuple.of(state.getIvMLog(), state.getMode(), state.getVisualisationInfo(),
-				state.getSVGDiagram(), state.getAnimationScaler()), globalCanceller);
+		pool.compute(input, canceller);
 
-		return null;
-	}
-
-	protected Double executeLink(Double input, ChainLinkCanceller canceller) {
 		return null;
 	}
 

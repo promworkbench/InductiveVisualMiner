@@ -29,6 +29,7 @@ import org.processmining.plugins.etm.model.narytree.replayer.NAryTreeHead;
 import org.processmining.plugins.etm.model.narytree.replayer.StubbornNAryTreeAStarThread;
 import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.etm.model.narytree.replayer.hybridilp.NAryTreeHybridILPDelegate;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
@@ -73,7 +74,7 @@ public class Alignment {
 	 * @param canceller
 	 */
 	public Alignment(ProcessTree tree, XLog log, XEventClasses eventClasses, AlignmentResult callback,
-			final org.processmining.framework.packages.PackageManager.Canceller canceller) {
+			final IvMCanceller canceller) {
 		wasReliable = new AtomicBoolean(true);
 		this.canceller = new Canceller() {
 			public boolean isCancelled() {

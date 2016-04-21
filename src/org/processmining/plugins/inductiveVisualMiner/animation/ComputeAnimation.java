@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
@@ -24,7 +24,7 @@ public class ComputeAnimation {
 	private static Random random = new Random(123);
 
 	public static GraphVizTokens computeAnimation(final IvMLog ivmLog, final Mode colourMode,
-			final ProcessTreeVisualisationInfo info, final Scaler scaler, final SVGDiagram svg, final Canceller canceller)
+			final ProcessTreeVisualisationInfo info, final Scaler scaler, final SVGDiagram svg, final IvMCanceller canceller)
 			throws NoninvertibleTransformException {
 
 		//make a shortest path graph
@@ -66,7 +66,7 @@ public class ComputeAnimation {
 	}
 
 	public static List<DotToken> computeDotTokensOfTrace(IvMTrace trace, final ProcessTreeVisualisationInfo info,
-			final Mode colourMode, Scaler scaler, ShortestPathGraph graph, final Canceller canceller) {
+			final Mode colourMode, Scaler scaler, ShortestPathGraph graph, final IvMCanceller canceller) {
 		boolean showDeviations = colourMode.isShowDeviations();
 		final List<DotToken> tokens = new ArrayList<>();
 		try {

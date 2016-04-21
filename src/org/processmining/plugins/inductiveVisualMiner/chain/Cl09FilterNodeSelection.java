@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
@@ -28,7 +27,7 @@ public class Cl09FilterNodeSelection
 
 	protected Pair<IvMLogFilteredImpl, IvMLogInfo> executeLink(
 			Quadruple<IvMLogNotFiltered, Selection, List<HighlightingFilter>, IvMLogInfo> input,
-			ChainLinkCanceller canceller) {
+			IvMCanceller canceller) {
 
 		IvMLogNotFiltered logBase = input.getA();
 		Selection selection = input.getB();
@@ -59,7 +58,7 @@ public class Cl09FilterNodeSelection
 	}
 
 	public static void applyColouringFilter(IvMLogFilteredImpl log, List<HighlightingFilter> filters,
-			final Canceller canceller) {
+			final IvMCanceller canceller) {
 		//first, walk through the filters to see there is actually one enabled
 		List<HighlightingFilter> enabledColouringFilters = new LinkedList<>();
 		for (HighlightingFilter filter : filters) {

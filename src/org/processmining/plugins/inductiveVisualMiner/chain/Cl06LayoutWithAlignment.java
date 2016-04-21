@@ -30,7 +30,7 @@ public class Cl06LayoutWithAlignment
 
 	protected Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap> executeLink(
 			Quadruple<ProcessTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> input,
-			ChainLinkCanceller canceller) {
+			IvMCanceller canceller) {
 		//compute dot
 		ProcessTreeVisualisation visualiser = new ProcessTreeVisualisation();
 		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplFrequencies(input.getA(), input.getB());

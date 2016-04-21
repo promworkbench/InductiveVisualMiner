@@ -33,7 +33,7 @@ public abstract class ChainLink<I, O> {
 	 * @return
 	 * @throws Exception
 	 */
-	protected abstract O executeLink(I input, ChainLinkCanceller canceller) throws Exception;
+	protected abstract O executeLink(I input, IvMCanceller canceller) throws Exception;
 
 	/**
 	 * 
@@ -46,7 +46,7 @@ public abstract class ChainLink<I, O> {
 	protected abstract void processResult(O result, InductiveVisualMinerState state);
 
 	public void execute(final UUID execution, final int indexInChain, final InductiveVisualMinerState state,
-			final ChainLinkCanceller canceller) {
+			final IvMCanceller canceller) {
 		final I input = generateInput(state);
 
 		executor.execute(new Runnable() {

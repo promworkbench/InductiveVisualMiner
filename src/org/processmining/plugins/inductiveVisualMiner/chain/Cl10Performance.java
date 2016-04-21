@@ -19,7 +19,7 @@ public class Cl10Performance extends ChainLink<IvMLog, PerformanceWrapper> {
 		return state.getIvMLogFiltered();
 	}
 
-	protected PerformanceWrapper executeLink(IvMLog input, ChainLinkCanceller canceller) {
+	protected PerformanceWrapper executeLink(IvMLog input, IvMCanceller canceller) {
 		Map<UnfoldedNode, QueueActivityLog> queueActivityLogs = QueueMineActivityLog.mine(input);
 
 		QueueLengths method = new QueueLengthsImplCombination(queueActivityLogs);

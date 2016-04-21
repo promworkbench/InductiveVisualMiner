@@ -21,7 +21,7 @@ public class Cl02FilterLogOnActivities extends
 	}
 
 	protected Triple<IMLog, IMLogInfo, Set<XEventClass>> executeLink(
-			Quadruple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo> input, ChainLinkCanceller canceller) {
+			Quadruple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo> input, IvMCanceller canceller) {
 		if (input.getC() < 1.0) {
 			return FilterLeastOccurringActivities.filter(input.getA(), input.getB(), input.getC(), input.getD());
 		} else {

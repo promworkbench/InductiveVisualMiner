@@ -1,7 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper;
 
-import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.processtree.ProcessTree;
 
 @VisualMinerWrapperAnnotation
@@ -28,7 +28,7 @@ public abstract class VisualMinerWrapper implements Comparable<VisualMinerWrappe
 	 * @param canceller 
 	 * @return
 	 */
-	public abstract ProcessTree mine(IMLog log, VisualMinerParameters parameters, Canceller canceller);
+	public abstract ProcessTree mine(IMLog log, VisualMinerParameters parameters, IvMCanceller canceller);
 
 	public int compareTo(VisualMinerWrapper o) {
 		return this.toString().compareTo(o.toString());

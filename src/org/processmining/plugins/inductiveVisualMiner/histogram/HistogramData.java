@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.chain.ChainLinkCanceller;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -49,7 +49,7 @@ public class HistogramData {
 	 * @param globalBuckets
 	 *            the widht of the histogram (used for pixel-precision)
 	 */
-	public HistogramData(ProcessTree tree, IvMLogFiltered log, Scaler scaler, int globalBuckets, int localBuckets, ChainLinkCanceller canceller) {
+	public HistogramData(ProcessTree tree, IvMLogFiltered log, Scaler scaler, int globalBuckets, int localBuckets, IvMCanceller canceller) {
 		this.scaler = scaler;
 
 		globalCountFiltered = new int[globalBuckets];

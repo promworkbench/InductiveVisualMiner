@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import org.processmining.framework.packages.PackageManager.Canceller;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -13,7 +13,7 @@ public class Scaler {
 	private final boolean correctTime; //denotes whether the time comes from the event log or is randomly generated
 
 	public static Scaler fromLog(final IvMLog log, final double fadeDurationInUserTime,
-			final double animationDurationInUserTime, final Canceller canceller) {
+			final double animationDurationInUserTime, final IvMCanceller canceller) {
 		double logMin = Long.MAX_VALUE;
 		double logMax = Long.MIN_VALUE;
 		for (IvMTrace trace : log) {
