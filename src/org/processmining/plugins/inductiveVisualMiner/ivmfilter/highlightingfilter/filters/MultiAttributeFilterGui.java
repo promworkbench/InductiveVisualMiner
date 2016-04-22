@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.ivmfilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
 import java.awt.Component;
 import java.awt.Dimension;

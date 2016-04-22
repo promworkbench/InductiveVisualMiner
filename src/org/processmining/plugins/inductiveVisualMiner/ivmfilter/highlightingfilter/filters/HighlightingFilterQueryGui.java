@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.ivmfilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

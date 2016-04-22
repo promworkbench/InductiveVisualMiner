@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.ivmfilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;

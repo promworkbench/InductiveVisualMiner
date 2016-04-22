@@ -1,36 +1,32 @@
-package org.processmining.plugins.inductiveVisualMiner.ivmfilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.deckfour.xes.model.XAttribute;
-import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class MultiEventAttributeFilter extends HighlightingFilter {
+public class HighlightingFilterTraceWithEventTwice extends HighlightingFilter {
 
 	MultiAttributeFilterGui panel = null;
 	boolean block = true;
 
 	public String getName() {
-		return "Event attribute filter";
+		return "Event happening twice filter";
 	}
 
 	public IvMFilterGui createGui(XLog log) {
-		final Map<String, Set<XAttribute>> traceAttributes = getEventAttributeMap(log);
+		final Map<String, Set<XAttribute>> traceAttributes = MultiEventAttributeFilter.getEventAttributeMap(log);
 		panel = new MultiAttributeFilterGui(traceAttributes, getName());
 
 		// Key selector
@@ -60,28 +56,32 @@ public class MultiEventAttributeFilter extends HighlightingFilter {
 		return panel;
 	}
 
+	protected boolean isEnabled() {
+		return !panel.getSelectedAttributes().isEmpty();
+	}
+
 	public boolean countInColouring(IvMTrace trace) {
 		String key = panel.getSelectedKey();
-		for (IvMMove event : trace) {
-			if (event.getAttributes() != null && event.getAttributes().containsKey(key)
-					&& panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
-				return true;
+		int count = 0;
+		for (IvMMove move : trace) {
+			if (move.getAttributes() != null && move.getAttributes().containsKey(key)
+					&& panel.getSelectedAttributes().contains(move.getAttributes().get(key))) {
+				count++;
+				if (count >= 2) {
+					return true;
+				}
 			}
 		}
 		return false;
 	}
 
-	public boolean isEnabled() {
-		return !panel.getSelectedAttributes().isEmpty();
-	}
-
 	public void updateExplanation() {
 		if (panel.getSelectedAttributes().isEmpty()) {
 			panel.getExplanation().setText(
-					"<html>Include only traces that have at least one event having an attribute as selected.</html>");
+					"<html>Include only traces that have at least two events having an attribute as selected.</html>");
 		} else {
 			StringBuilder s = new StringBuilder();
-			s.append("<html>Include only traces that have at least one event having attribute `");
+			s.append("<html>Include only traces that have at least two events having attribute `");
 			s.append(panel.getSelectedKey());
 			s.append("' being ");
 			List<XAttribute> attributes = panel.getSelectedAttributes();
@@ -101,22 +101,6 @@ public class MultiEventAttributeFilter extends HighlightingFilter {
 			s.append("</html>");
 			panel.getExplanation().setText(s.toString());
 		}
-	}
-
-	public static Map<String, Set<XAttribute>> getEventAttributeMap(XLog log) {
-		Map<String, Set<XAttribute>> eventAttributes = new TreeMap<String, Set<XAttribute>>();
-
-		for (XTrace trace : log) {
-			for (XEvent event : trace) {
-				for (XAttribute eventAttribute : event.getAttributes().values()) {
-					if (!eventAttributes.containsKey(eventAttribute.getKey())) {
-						eventAttributes.put(eventAttribute.getKey(), new TreeSet<XAttribute>());
-					}
-					eventAttributes.get(eventAttribute.getKey()).add(eventAttribute);
-				}
-			}
-		}
-		return eventAttributes;
 	}
 
 }

@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.ivmfilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,32 +12,23 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.deckfour.xes.model.XAttribute;
-import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningEventFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class PreMiningFilterEvents extends PreMiningEventFilter {
+public class MultiTraceAttributeFilter extends HighlightingFilter {
 
 	MultiAttributeFilterGui panel = null;
 	boolean block = true;
-	
-	public boolean staysInLog(XEvent event) {
-		String key = panel.getSelectedKey();
-		if (event.getAttributes() != null && event.getAttributes().containsKey(key)
-				&& panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
-			return true;
-		}
-		return false;
-	}
 
 	public String getName() {
-		return "event attribute filter";
+		return "Trace attribute filter";
 	}
 
 	public IvMFilterGui createGui(XLog log) {
-		final Map<String, Set<XAttribute>> traceAttributes = getEventAttributeMap(log);
+		final Map<String, Set<XAttribute>> traceAttributes = getTraceAttributeMap(log);
 		panel = new MultiAttributeFilterGui(traceAttributes, getName());
 
 		// Key selector
@@ -67,17 +58,24 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 		return panel;
 	}
 
-	protected boolean isEnabled() {
+	public boolean countInColouring(IvMTrace trace) {
+		String key = panel.getSelectedKey();
+		if (!trace.getAttributes().containsKey(key)) {
+			return false;
+		}
+		return panel.getSelectedAttributes().contains(trace.getAttributes().get(key));
+	}
+
+	public boolean isEnabled() {
 		return !panel.getSelectedAttributes().isEmpty();
 	}
 
 	public void updateExplanation() {
 		if (panel.getSelectedAttributes().isEmpty()) {
-			panel.getExplanation().setText(
-					"<html>Include only events having an attribute as selected.</html>");
+			panel.getExplanation().setText("<html>Include only traces having an attribute as selected.</html>");
 		} else {
 			StringBuilder s = new StringBuilder();
-			s.append("<html>Include only events having attribute `");
+			s.append("<html>Include only traces having attribute `");
 			s.append(panel.getSelectedKey());
 			s.append("' being ");
 			List<XAttribute> attributes = panel.getSelectedAttributes();
@@ -98,20 +96,19 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 			panel.getExplanation().setText(s.toString());
 		}
 	}
-	
-	public static Map<String, Set<XAttribute>> getEventAttributeMap(XLog log) {
-		Map<String, Set<XAttribute>> eventAttributes = new TreeMap<String, Set<XAttribute>>();
+
+	private static Map<String, Set<XAttribute>> getTraceAttributeMap(XLog log) {
+		Map<String, Set<XAttribute>> traceAttributes = new TreeMap<String, Set<XAttribute>>();
 
 		for (XTrace trace : log) {
-			for (XEvent event : trace) {
-				for (XAttribute eventAttribute : event.getAttributes().values()) {
-					if (!eventAttributes.containsKey(eventAttribute.getKey())) {
-						eventAttributes.put(eventAttribute.getKey(), new TreeSet<XAttribute>());
-					}
-					eventAttributes.get(eventAttribute.getKey()).add(eventAttribute);
+			for (XAttribute traceAttribute : trace.getAttributes().values()) {
+				if (!traceAttributes.containsKey(traceAttribute.getKey())) {
+					traceAttributes.put(traceAttribute.getKey(), new TreeSet<XAttribute>());
 				}
+				traceAttributes.get(traceAttribute.getKey()).add(traceAttribute);
 			}
 		}
-		return eventAttributes;
+		return traceAttributes;
 	}
+
 }
