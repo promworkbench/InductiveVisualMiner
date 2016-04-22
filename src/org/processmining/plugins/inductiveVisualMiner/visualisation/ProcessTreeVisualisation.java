@@ -200,10 +200,9 @@ public class ProcessTreeVisualisation {
 			visualiseLogMove(join, join, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(redoChild)),
 					directionForward);
 
-			//log moves can be projected before the exit-tau
-			//(assume it's tau)
-			info.registerExtraEdge(unode, unode.unfoldChild(exitChild),
-					info.getLogMoveEdge(unode, unode.unfoldChild(redoChild)));
+			//possible problem: if the log moves before the redo and the exit are on the same node. 
+			visualiseLogMove(join, join, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(exitChild)),
+					directionForward);
 		}
 	}
 
@@ -230,7 +229,7 @@ public class ProcessTreeVisualisation {
 			visualiseLogMove(join, join, unode, LogMovePosition.atSink(unode), directionForward);
 		}
 	}
-	
+
 	private void convertInterleaved(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
 
 		//operator split
