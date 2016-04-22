@@ -81,25 +81,30 @@ public class MultiEventAttributeFilter extends HighlightingFilter {
 					"<html>Include only traces that have at least one event having an attribute as selected.</html>");
 		} else {
 			StringBuilder s = new StringBuilder();
-			s.append("<html>Include only traces that have at least one event having attribute `");
-			s.append(panel.getSelectedKey());
-			s.append("' being ");
-			List<XAttribute> attributes = panel.getSelectedAttributes();
-			if (attributes.size() > 1) {
-				s.append("either ");
-			}
-			for (int i = 0; i < attributes.size(); i++) {
-				s.append("`");
-				s.append(attributes.get(i));
-				s.append("'");
-				if (i == attributes.size() - 2) {
-					s.append(" or ");
-				} else if (i < attributes.size() - 1) {
-					s.append(", ");
-				}
-			}
+			s.append("<html>Include only traces that have at least one event ");
+			printKey(s);
 			s.append("</html>");
 			panel.getExplanation().setText(s.toString());
+		}
+	}
+	
+	public void printKey(StringBuilder s) {
+		s.append("having attribute `");
+		s.append(panel.getSelectedKey());
+		s.append("' being ");
+		List<XAttribute> attributes = panel.getSelectedAttributes();
+		if (attributes.size() > 1) {
+			s.append("either ");
+		}
+		for (int i = 0; i < attributes.size(); i++) {
+			s.append("`");
+			s.append(attributes.get(i));
+			s.append("'");
+			if (i == attributes.size() - 2) {
+				s.append(" or ");
+			} else if (i < attributes.size() - 1) {
+				s.append(", ");
+			}
 		}
 	}
 
