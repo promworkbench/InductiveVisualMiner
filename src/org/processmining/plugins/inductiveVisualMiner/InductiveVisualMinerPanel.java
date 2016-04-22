@@ -113,10 +113,10 @@ public class InductiveVisualMinerPanel extends JPanel {
 			classifiersCombobox.setSelectedItem(state.getActivityClassifier());
 		}
 
-		//pre-miner filters
+		//pre-mining filters
 		{
 			preMiningFiltersView = new PreMiningFiltersView(this);
-			preMiningFiltersButton = SlickerFactory.instance().createButton("pre-miner filters");
+			preMiningFiltersButton = SlickerFactory.instance().createButton("pre-mining filters");
 			GridBagConstraints cTraceViewButton = new GridBagConstraints();
 			cTraceViewButton.gridx = 2;
 			cTraceViewButton.gridy = gridy++;
