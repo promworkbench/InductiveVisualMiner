@@ -199,10 +199,14 @@ public class ProcessTreeVisualisation {
 					directionForward);
 			visualiseLogMove(join, join, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(redoChild)),
 					directionForward);
+			/*
+			 * In principle, there can be log moves before the exit node.
+			 * However, we assume them to be mapped before the redo child, as
+			 * that is the same position in the model.
+			 */
+			assert (data.getLogMoveEdgeLabel(LogMovePosition.beforeChild(unode, unode.unfoldChild(exitChild))).getB()
+					.size() == 0);
 
-			//possible problem: if the log moves before the redo and the exit are on the same node. 
-			visualiseLogMove(join, join, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(exitChild)),
-					directionForward);
 		}
 	}
 

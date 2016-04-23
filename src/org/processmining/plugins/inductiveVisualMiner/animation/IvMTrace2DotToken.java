@@ -107,9 +107,10 @@ public class IvMTrace2DotToken {
 					List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), nextDestination);
 					if (!path.isEmpty()) {
 						for (int j = 0; j < path.size() - 1; j++) {
-							dotToken.addStepOverEdge(path.get(j), null);
+							dotToken.addStepOverEdge(path.get(j), null, "to " + move);
 						}
-						dotToken.addStepOverEdge(path.get(path.size() - 1), move.getUserTimestamp(scaler));
+						dotToken.addStepOverEdge(path.get(path.size() - 1), move.getUserTimestamp(scaler),
+								move.toString());
 					}
 
 					continue;
@@ -132,10 +133,10 @@ public class IvMTrace2DotToken {
 
 				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), tauEdge.getSource());
 				for (LocalDotEdge edge : path) {
-					dotToken.addStepOverEdge(edge, null);
+					dotToken.addStepOverEdge(edge, null, "to " + move.toString());
 				}
 
-				dotToken.addStepOverEdge(tauEdge, null);
+				dotToken.addStepOverEdge(tauEdge, null, move.toString());
 				continue;
 			}
 
@@ -150,13 +151,14 @@ public class IvMTrace2DotToken {
 				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), nextDestination);
 				if (!path.isEmpty()) {
 					for (int j = 0; j < path.size() - 1; j++) {
-						dotToken.addStepOverEdge(path.get(j), null);
+						dotToken.addStepOverEdge(path.get(j), null, "to " + move.toString());
 					}
-					dotToken.addStepOverEdge(path.get(path.size() - 1), move.getUserTimestamp(scaler));
+					dotToken.addStepOverEdge(path.get(path.size() - 1), move.getUserTimestamp(scaler),
+							"to " + move.toString());
 				}
 
 				//second: walk over the node
-				dotToken.addStepInNode(nextDestination, move.getUserTimestamp(scaler));
+				dotToken.addStepInNode(nextDestination, move.getUserTimestamp(scaler), move.toString());
 
 			} else if (move.isModelMove() && showDeviations) {
 				//model move, showing deviations
@@ -168,10 +170,10 @@ public class IvMTrace2DotToken {
 				List<LocalDotEdge> path = shortestPath
 						.getShortestPath(dotToken.getLastPosition(), moveEdge.getSource());
 				for (LocalDotEdge edge : path) {
-					dotToken.addStepOverEdge(edge, null);
+					dotToken.addStepOverEdge(edge, null, "to " + move.toString());
 				}
 
-				dotToken.addStepOverEdge(moveEdge, null);
+				dotToken.addStepOverEdge(moveEdge, null, move.toString());
 			} else if (move.isLogMove() && showDeviations) {
 
 				//log move (should be filtered out if not showing deviations)
@@ -183,11 +185,11 @@ public class IvMTrace2DotToken {
 				List<LocalDotEdge> path = shortestPath
 						.getShortestPath(dotToken.getLastPosition(), moveEdge.getSource());
 				for (LocalDotEdge edge : path) {
-					dotToken.addStepOverEdge(edge, null);
+					dotToken.addStepOverEdge(edge, null, "to " + move.toString());
 				}
 
 				//add the move edge
-				dotToken.addStepOverEdge(moveEdge, move.getUserTimestamp(scaler));
+				dotToken.addStepOverEdge(moveEdge, move.getUserTimestamp(scaler), move.toString());
 			}
 		}
 
@@ -201,10 +203,10 @@ public class IvMTrace2DotToken {
 		//add path to final destination
 		List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), endPosition.getLeft());
 		for (int j = 0; j < path.size() - 1; j++) {
-			dotToken.addStepOverEdge(path.get(j), null);
+			dotToken.addStepOverEdge(path.get(j), null, "to end");
 		}
 		if (path.size() != 0) {
-			dotToken.addStepOverEdge(path.get(path.size() - 1), endPosition.getRight());
+			dotToken.addStepOverEdge(path.get(path.size() - 1), endPosition.getRight(), "to end");
 		} else if (endPosition.getRight() != null) {
 			//the trace has already ended, fill in the end time
 			dotToken.setTimestampOfPoint(dotToken.size() - 1, endPosition.getRight());
@@ -235,7 +237,7 @@ public class IvMTrace2DotToken {
 		{
 			List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), parallelSplit);
 			for (LocalDotEdge edge : path) {
-				token.addStepOverEdge(edge, null);
+				token.addStepOverEdge(edge, null, "to " + move);
 			}
 		}
 
@@ -294,7 +296,7 @@ public class IvMTrace2DotToken {
 		LocalDotNode parallelJoin = Animation.getParallelJoin(parallel, info);
 		List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), parallelJoin);
 		for (LocalDotEdge edge : path) {
-			token.addStepOverEdge(edge, null);
+			token.addStepOverEdge(edge, null, "to end of parallel");
 		}
 
 		//		debug("  leaving parallel " + parallel, indent);

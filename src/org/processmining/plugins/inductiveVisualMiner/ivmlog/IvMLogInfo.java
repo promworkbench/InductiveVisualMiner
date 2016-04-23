@@ -75,7 +75,7 @@ public class IvMLogInfo {
 					root = new UnfoldedNode(move.getUnode().getPath().get(0));
 				}
 
-				if (move.isModelSync()) {
+				if (move.isModelSync() && !move.isIgnoredModelMove()) {
 					lastUnode = move.getUnode();
 				}
 
@@ -164,8 +164,10 @@ public class IvMLogInfo {
 
 			positionLogMoves(child, trace, cardinality);
 
-		} else if (unode.getBlock() instanceof Seq || unode.getBlock() instanceof XorLoop) {
-			splitSequenceLoop(unode, trace, cardinality);
+		} else if (unode.getBlock() instanceof Seq) {
+			splitSequence(unode, trace, cardinality);
+		} else if (unode.getBlock() instanceof XorLoop) {
+			splitLoop(unode, trace, cardinality);
 		} else if (unode.getBlock() instanceof And) {
 
 			//set up subtraces for children
@@ -200,7 +202,7 @@ public class IvMLogInfo {
 		}
 	}
 
-	private void splitSequenceLoop(UnfoldedNode unode, List<IvMMove> trace, long cardinality) {
+	private void splitSequence(UnfoldedNode unode, List<IvMMove> trace, long cardinality) {
 		//by the invariant, the first move is not a log move
 		UnfoldedNode lastSeenChild = findChildWith(unode, trace.get(0).getUnode());
 		List<IvMMove> logMoves = new ArrayList<IvMMove>();
@@ -243,6 +245,66 @@ public class IvMLogInfo {
 		positionLogMoves(lastSeenChild, subTrace, cardinality);
 
 		//the log moves we have seen now are external to both subtraces; position them on this unode
+		for (Move logMove : logMoves) {
+			addLogMove(logMove, unode, null, logMove.getActivityEventClass(), cardinality);
+		}
+	}
+
+	private void splitLoop(UnfoldedNode unode, List<IvMMove> trace, long cardinality) {
+		//by the invariant, the first move is not a log move
+		UnfoldedNode lastSeenChild = findChildWith(unode, trace.get(0).getUnode());
+		List<IvMMove> logMoves = new ArrayList<IvMMove>();
+		List<IvMMove> subTrace = new ArrayList<IvMMove>();
+
+		UnfoldedNode redo = unode.unfoldChild(unode.getBlock().getChildren().get(1));
+		UnfoldedNode exit = unode.unfoldChild(unode.getBlock().getChildren().get(2));
+
+		//walk through the trace to split it
+		for (IvMMove move : trace) {
+			if (move.isIgnoredLogMove() || move.isIgnoredModelMove()) {
+				//skip
+			} else if (move.isLogMove()) {
+				logMoves.add(move);
+			} else {
+				UnfoldedNode child = findChildWith(unode, move.getUnode());
+				if (child.equals(lastSeenChild)) {
+					//we are not leaving the previous child with this move
+					//the log moves we have seen now are internal to the subtrace; add them
+					subTrace.addAll(logMoves);
+					subTrace.add(move);
+					logMoves.clear();
+				} else {
+					//we are leaving the last child with this move
+
+					//recurse on the subtrace up till now
+					positionLogMoves(lastSeenChild, subTrace, cardinality);
+
+					//the log moves we have seen now are external to both subtraces; position them on this unode
+					for (IvMMove logMove : logMoves) {
+						if (child == exit) {
+							/*
+							 * Exception: before the exit is in our
+							 * visualisation the same as before the redo. Design
+							 * decision: merge them here.
+							 */
+							addLogMove(logMove, unode, redo, logMove.getActivityEventClass(), cardinality);
+						} else {
+							addLogMove(logMove, unode, child, logMove.getActivityEventClass(), cardinality);
+						}
+					}
+
+					subTrace.clear();
+					logMoves.clear();
+					subTrace.add(move);
+					lastSeenChild = child;
+				}
+			}
+		}
+
+		//recurse on subtrace
+		positionLogMoves(lastSeenChild, subTrace, cardinality);
+
+		//the log moves we have seen now are external to both subtraces; position them on the end of this unode
 		for (Move logMove : logMoves) {
 			addLogMove(logMove, unode, null, logMove.getActivityEventClass(), cardinality);
 		}

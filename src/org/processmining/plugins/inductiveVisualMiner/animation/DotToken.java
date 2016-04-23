@@ -156,14 +156,14 @@ public class DotToken implements Iterable<DotTokenStep> {
 		return last;
 	}
 
-	public void addStepInNode(LocalDotNode node, Double arrivalTime) {
-		steps.add(DotTokenStep.node(node, arrivalTime));
+	public void addStepInNode(LocalDotNode node, Double arrivalTime, String comment) {
+		steps.add(DotTokenStep.node(node, arrivalTime, comment));
 		subTokens.add(new THashSet<DotToken>());
 		performSanityCheck(null);
 	}
 
-	public void addStepOverEdge(LocalDotEdge edge, Double arrivalTime) {
-		steps.add(DotTokenStep.edge(edge, arrivalTime));
+	public void addStepOverEdge(LocalDotEdge edge, Double arrivalTime, String comment) {
+		steps.add(DotTokenStep.edge(edge, arrivalTime, comment));
 		subTokens.add(new THashSet<DotToken>());
 		performSanityCheck(null);
 	}
