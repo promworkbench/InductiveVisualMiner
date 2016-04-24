@@ -28,18 +28,27 @@ public abstract class IvMFiltersView extends SideWindow {
 	private final Map<IvMFilter, Integer> filter2position;
 	private int highFilters;
 	
-	public IvMFiltersView(Component parent, String title) {
+	public IvMFiltersView(Component parent, String title, String header) {
 		super(parent, title);
+		
 		panel = new JPanel(new GridBagLayout());
 		panel.setBackground(Color.gray);
 		add(panel);
 		filter2label = new HashMap<>();
 		filter2position = new HashMap<>();
 		highFilters = 0;
+		
+		JLabel explanation = new JLabel("<html>" + header + "</html>");
+		GridBagConstraints cLabel = new GridBagConstraints();
+		cLabel.gridx = 1;
+		cLabel.gridy = 1;
+		cLabel.fill = GridBagConstraints.HORIZONTAL;
+		cLabel.anchor = GridBagConstraints.WEST;
+		panel.add(explanation, cLabel);
 	}
 	
 	public void initialise(List<? extends IvMFilter> colouringFilters) {
-		int gridy = 1;
+		int gridy = 2;
 		Collections.sort(colouringFilters, new Comparator<IvMFilter>() {
 			public int compare(IvMFilter o1, IvMFilter o2) {
 				return o1.getName().compareTo(o2.getName());

@@ -34,7 +34,7 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 	}
 
 	public String getName() {
-		return "event attribute filter";
+		return "Event filter";
 	}
 
 	public IvMFilterGui createGui(XLog log) {

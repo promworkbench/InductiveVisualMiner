@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,11 +14,12 @@ import javax.swing.event.ListSelectionListener;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.MultiAttributeFilterGui;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningTraceFilter;
 
-public class MultiTraceAttributeFilter extends HighlightingFilter {
+public class PreMiningMultiTraceAttributeFilter extends PreMiningTraceFilter {
 
 	MultiAttributeFilterGui panel = null;
 	boolean block = true;
@@ -58,7 +59,7 @@ public class MultiTraceAttributeFilter extends HighlightingFilter {
 		return panel;
 	}
 
-	public boolean countInColouring(IvMTrace trace) {
+	public boolean staysInLog(IMTrace trace) {
 		String key = panel.getSelectedKey();
 		if (!trace.getAttributes().containsKey(key)) {
 			return false;

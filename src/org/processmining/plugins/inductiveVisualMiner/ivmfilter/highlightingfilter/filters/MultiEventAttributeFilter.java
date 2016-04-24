@@ -26,7 +26,7 @@ public class MultiEventAttributeFilter extends HighlightingFilter {
 	boolean block = true;
 
 	public String getName() {
-		return "Event attribute filter";
+		return "Event filter";
 	}
 
 	public IvMFilterGui createGui(XLog log) {

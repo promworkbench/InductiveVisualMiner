@@ -7,7 +7,7 @@ public class MultiLogMoveAttributeFilter extends MultiEventAttributeFilter {
 
 	@Override
 	public String getName() {
-		return "Log move attribute filter";
+		return "Log move filter";
 	}
 
 	@Override
