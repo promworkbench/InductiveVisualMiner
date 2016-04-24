@@ -7,6 +7,8 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.processmining.plugins.InductiveMiner.Triple;
+
 import com.kitfox.svg.animation.Bezier;
 
 /**
@@ -17,7 +19,7 @@ import com.kitfox.svg.animation.Bezier;
  */
 public class BezierList {
 
-	private final TObjectIntHashMap<Bezier> hash;
+	private final TObjectIntHashMap<Triple<Bezier, Double, Double>> hash;
 	private final List<Bezier> beziers;
 	private final List<AffineTransform> transforms;
 	private final List<AffineTransform> transformInverses;
@@ -39,7 +41,7 @@ public class BezierList {
 	 * @return
 	 */
 	public int add(Bezier bezier, AffineTransform transform, AffineTransform transformInverse, double startOpacity, double endOpacity) {
-		int result = hash.putIfAbsent(bezier, beziers.size());
+		int result = hash.putIfAbsent(Triple.of(bezier, startOpacity, endOpacity), beziers.size());
 		if (result == hash.getNoEntryValue()) {
 			beziers.add(bezier);
 			transforms.add(transform);
