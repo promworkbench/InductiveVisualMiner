@@ -16,6 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Block.Def;
+import org.processmining.processtree.Block.DefLoop;
 import org.processmining.processtree.Block.Seq;
 import org.processmining.processtree.Block.Xor;
 import org.processmining.processtree.Block.XorLoop;
@@ -139,7 +140,7 @@ public class IvMLogInfo {
 	 */
 	private void positionLogMoves(UnfoldedNode unode, List<IvMMove> trace, long cardinality) {
 		debug(" process trace " + trace + " on " + unode);
-
+		
 		assert (trace.get(0).isModelSync() && !trace.get(0).isIgnoredLogMove() && !trace.get(0).isIgnoredModelMove());
 		int l = trace.size() - 1;
 		assert (trace.get(l).isModelSync() && !trace.get(l).isIgnoredLogMove() && !trace.get(l).isIgnoredModelMove());
@@ -166,7 +167,7 @@ public class IvMLogInfo {
 
 		} else if (unode.getBlock() instanceof Seq) {
 			splitSequence(unode, trace, cardinality);
-		} else if (unode.getBlock() instanceof XorLoop) {
+		} else if (unode.getBlock() instanceof XorLoop || unode.getBlock() instanceof DefLoop) {
 			splitLoop(unode, trace, cardinality);
 		} else if (unode.getBlock() instanceof And) {
 
@@ -281,7 +282,7 @@ public class IvMLogInfo {
 
 					//the log moves we have seen now are external to both subtraces; position them on this unode
 					for (IvMMove logMove : logMoves) {
-						if (child == exit) {
+						if (child.equals(exit)) {
 							/*
 							 * Exception: before the exit is in our
 							 * visualisation the same as before the redo. Design
@@ -364,7 +365,7 @@ public class IvMLogInfo {
 	}
 
 	private static void debug(Object s) {
-		//System.out.println(s);
+		System.out.println(s);
 		//InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
 	}
 
