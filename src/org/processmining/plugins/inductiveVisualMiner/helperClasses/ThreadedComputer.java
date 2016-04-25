@@ -44,7 +44,9 @@ public class ThreadedComputer<I, O> {
 			public void run() {
 				try {
 					O result = computation.call(input, newCanceller);
-					processResult(newExecution, result);
+					if (!newCanceller.isCancelled()) {
+						processResult(newExecution, result);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

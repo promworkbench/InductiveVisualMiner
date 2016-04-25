@@ -240,6 +240,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
+					state.resetAnimation();
 					state.resetPerformance();
 					state.resetHistogramData();
 					setStatus("Scaling animation..");

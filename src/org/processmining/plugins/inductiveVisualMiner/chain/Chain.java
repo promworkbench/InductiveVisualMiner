@@ -18,7 +18,7 @@ public class Chain {
 	private final Executor executor;
 	private UUID currentExecutionId;
 	private int currentExecutionLinkNumber;
-	private IvMCanceller currentExecutionCanceller;
+	private List<IvMCanceller> currentExecutionCancellers; //a current Fcanceller for each chainlink.
 	@SuppressWarnings("rawtypes")
 	private ChainLink currentExecutionLink;
 	private final ProMCanceller globalCanceller;
@@ -31,13 +31,14 @@ public class Chain {
 		this.globalCanceller = canceller;
 		currentExecutionId = null;
 		currentExecutionLinkNumber = Integer.MAX_VALUE;
-		currentExecutionCanceller = null;
+		currentExecutionCancellers = new ArrayList<>();
 		currentExecutionLink = null;
 	}
 
 	public void add(ChainLink<?, ?> link) {
 		link.setExecutor(executor, this);
 		chain.add(link);
+		currentExecutionCancellers.add(null);
 	}
 
 	public synchronized void executeNext(UUID execution, final int indexInChain) {
@@ -46,9 +47,11 @@ public class Chain {
 			if (indexInChain + 1 < chain.size()) {
 				currentExecutionLinkNumber = indexInChain + 1;
 				currentExecutionLink = chain.get(indexInChain + 1);
-				currentExecutionCanceller = new IvMCanceller(globalCanceller);
+				IvMCanceller currentExecutionCanceller = new IvMCanceller(globalCanceller);
+				currentExecutionCancellers.set(indexInChain + 1, currentExecutionCanceller);
 				chain.get(indexInChain + 1).execute(currentExecutionId, indexInChain + 1, state,
 						currentExecutionCanceller);
+
 			} else {
 				currentExecutionLink = null;
 			}
@@ -63,16 +66,20 @@ public class Chain {
 				//if we drop in ahead of an existing execution, our work will have to be redone again anyway 
 				if (i <= currentExecutionLinkNumber) {
 
-					//cancel current execution
-					if (currentExecutionLink != null) {
-						currentExecutionCanceller.cancel();
+					//cancel current executions after this point
+					for (int j = i; j < currentExecutionCancellers.size(); j++) {
+						if (currentExecutionCancellers.get(j) != null) {
+							currentExecutionCancellers.get(j).cancel();
+							currentExecutionCancellers.set(j, null);
+						}
 					}
 
 					//replace execution
 					currentExecutionId = UUID.randomUUID();
 					currentExecutionLinkNumber = i;
 					currentExecutionLink = cl;
-					currentExecutionCanceller = new IvMCanceller(globalCanceller);
+					IvMCanceller currentExecutionCanceller = new IvMCanceller(globalCanceller);
+					currentExecutionCancellers.set(i, currentExecutionCanceller);
 
 					cl.execute(currentExecutionId, currentExecutionLinkNumber, state, currentExecutionCanceller);
 				}
