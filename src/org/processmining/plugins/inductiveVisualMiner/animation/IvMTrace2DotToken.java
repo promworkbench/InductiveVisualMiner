@@ -31,6 +31,7 @@ public class IvMTrace2DotToken {
 		List<IvMMove> copyTrace = new ArrayList<IvMMove>();
 		for (IvMMove t : trace) {
 			if (!t.isIgnoredLogMove()
+					&& !t.isIgnoredModelMove()
 					&& (t.getLifeCycleTransition() == PerformanceTransition.start || t.getLifeCycleTransition() == PerformanceTransition.complete)) {
 				copyTrace.add(t);
 			}

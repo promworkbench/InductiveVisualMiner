@@ -7,10 +7,9 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
 
-public class ThesisMiner extends VisualMinerWrapper {
+public class ThesisMiner  {
 
 	public String toString() {
 		return "use thesis IM";
