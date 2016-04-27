@@ -29,11 +29,13 @@ public class MultiAttributeFilterGui extends IvMFilterGui {
 	private final JList<XAttribute> attributeSelector;
 	private final DefaultListModel<XAttribute> attributeSelectorListModel;
 	private final JLabel explanation;
+	private final boolean empty;
 
 	@SuppressWarnings("unchecked")
 	public MultiAttributeFilterGui(Map<String, Set<XAttribute>> attributes, String title) {
 		super(title);
 		usesVerticalSpace = true;
+		empty = attributes.isEmpty();
 
 		setLayout(new GridBagLayout());
 		//explanation
@@ -53,6 +55,10 @@ public class MultiAttributeFilterGui extends IvMFilterGui {
 		{
 			keySelector = SlickerFactory.instance().createComboBox(
 					attributes.keySet().toArray(new String[attributes.keySet().size()]));
+			if (empty) {
+				keySelector.addItem("(no attributes present)");
+				keySelector.setEnabled(false);
+			}
 			keySelector.setSelectedIndex(0);
 			GridBagConstraints c = new GridBagConstraints();
 			c.gridx = 1;
@@ -65,8 +71,10 @@ public class MultiAttributeFilterGui extends IvMFilterGui {
 
 		{
 			attributeSelectorListModel = new DefaultListModel<XAttribute>();
-			for (XAttribute a : attributes.get(getSelectedKey())) {
-				attributeSelectorListModel.addElement(a);
+			if (!empty) {
+				for (XAttribute a : attributes.get(getSelectedKey())) {
+					attributeSelectorListModel.addElement(a);
+				}
 			}
 
 			attributeSelector = new JList<XAttribute>(attributeSelectorListModel);
