@@ -1,8 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter;
 
+import org.processmining.framework.plugin.annotations.KeepInProMCache;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
+@KeepInProMCache
 @HighlightingFilterAnnotation
 public abstract class HighlightingFilter extends IvMFilter {
 

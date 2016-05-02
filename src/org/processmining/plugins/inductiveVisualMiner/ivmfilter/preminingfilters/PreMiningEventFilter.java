@@ -1,8 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters;
 
 import org.deckfour.xes.model.XEvent;
+import org.processmining.framework.plugin.annotations.KeepInProMCache;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 
+@KeepInProMCache
 @PreMiningEventFilterAnnotation
 public abstract class PreMiningEventFilter extends IvMFilter {
 

@@ -1,9 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper;
 
+import org.processmining.framework.plugin.annotations.KeepInProMCache;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.processtree.ProcessTree;
 
+@KeepInProMCache
 @VisualMinerWrapperAnnotation
 public abstract class VisualMinerWrapper implements Comparable<VisualMinerWrapper> {
 
