@@ -1,11 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.TIntSet;
+
 import java.awt.Color;
 import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.DotEdge;
@@ -13,7 +17,7 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
@@ -21,10 +25,6 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
-import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.Task.Automatic;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
-import org.processmining.processtree.impl.AbstractTask.Manual;
 
 import com.kitfox.svg.Group;
 import com.kitfox.svg.SVGDiagram;
@@ -34,9 +34,10 @@ import com.kitfox.svg.Text;
 
 public class InductiveVisualMinerSelectionColourer {
 
-	public static void colourSelection(SVGDiagram diagram, Set<UnfoldedNode> selectedNodes,
+	public static void colourSelection(SVGDiagram diagram, TIntSet selectedNodes,
 			Set<LogMovePosition> selectedLogMoves, ProcessTreeVisualisationInfo visualisationInfo) {
-		for (UnfoldedNode unode : selectedNodes) {
+		for (TIntIterator it = selectedNodes.iterator(); it.hasNext();) {
+			int unode = it.next();
 			LocalDotNode dotNode = Animation.getDotNodeFromActivity(unode, visualisationInfo);
 			colourSelectedNode(diagram, dotNode, true);
 		}
@@ -89,11 +90,10 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	public static TraceViewColourMap colourHighlighting(SVGDiagram svg, ProcessTreeVisualisationInfo info,
-			ProcessTree tree, AlignedLogVisualisationData data,
-			ProcessTreeVisualisationParameters visualisationParameters) {
+			IvMEfficientTree tree, AlignedLogVisualisationData data,
+			ProcessTreeVisualisationParameters visualisationParameters) throws UnknownTreeNodeException {
 
-		UnfoldedNode uroot = new UnfoldedNode(tree.getRoot());
-		TraceViewColourMap traceViewColourMap = new TraceViewColourMap();
+		TraceViewColourMap traceViewColourMap = new TraceViewColourMap(tree);
 
 		//compute extreme cardinalities
 		Pair<Long, Long> extremes = data.getExtremeCardinalities();
@@ -102,18 +102,19 @@ public class InductiveVisualMinerSelectionColourer {
 
 		try {
 			//style nodes
-			for (UnfoldedNode unode : TreeUtils.unfoldAllNodes(uroot)) {
+			for (int unode : tree.getAllNodes()) {
 				Pair<String, Long> cardinality = data.getNodeLabel(unode, false);
-				Pair<Color, Color> colour = styleUnfoldedNode(unode, svg, info, cardinality, minCardinality,
+				Pair<Color, Color> colour = styleUnfoldedNode(tree, unode, svg, info, cardinality, minCardinality,
 						maxCardinality, visualisationParameters);
 
-				if (unode.getNode() instanceof Manual) {
+				if (tree.isActivity(unode)) {
 					traceViewColourMap.set(unode, colour.getA(), colour.getB());
 				}
 			}
 
 			//style edges
-			styleEdges(svg, info, data, visualisationParameters, traceViewColourMap, minCardinality, maxCardinality);
+			styleEdges(tree, svg, info, data, visualisationParameters, traceViewColourMap, minCardinality,
+					maxCardinality);
 
 		} catch (SVGException e) {
 			e.printStackTrace();
@@ -122,23 +123,24 @@ public class InductiveVisualMinerSelectionColourer {
 		return traceViewColourMap;
 	}
 
-	public static Pair<Color, Color> styleUnfoldedNode(UnfoldedNode unode, SVGDiagram svg,
+	public static Pair<Color, Color> styleUnfoldedNode(IvMEfficientTree tree, int unode, SVGDiagram svg,
 			ProcessTreeVisualisationInfo info, Pair<String, Long> cardinality, long minCardinality,
 			long maxCardinality, ProcessTreeVisualisationParameters visualisationParameters) throws SVGException {
-		if (unode.getNode() instanceof Manual) {
-			return styleManual(unode, svg, info, cardinality, minCardinality, maxCardinality, visualisationParameters);
+		if (tree.isActivity(unode)) {
+			return styleManual(tree, unode, svg, info, cardinality, minCardinality, maxCardinality,
+					visualisationParameters);
 		} else {
-			styleNonManualNode(unode, svg, info, cardinality);
+			styleNonManualNode(tree, unode, svg, info, cardinality);
 			return null;
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Pair<Color, Color> styleManual(UnfoldedNode unode, SVGDiagram svg,
+	private static Pair<Color, Color> styleManual(IvMEfficientTree tree, int unode, SVGDiagram svg,
 			ProcessTreeVisualisationInfo info, Pair<String, Long> cardinality, long minCardinality,
 			long maxCardinality, ProcessTreeVisualisationParameters visualisationParameters) throws SVGException {
 
-		LocalDotNode dotNode = info.getActivityNode(unode);
+		LocalDotNode dotNode = info.getActivityDotNode(unode);
 
 		Group group = DotPanel.getSVGElementOf(svg, dotNode);
 		SVGElement polygon = group.getChild(1);
@@ -177,10 +179,10 @@ public class InductiveVisualMinerSelectionColourer {
 		return Pair.of(fillColour, fontColour);
 	}
 
-	private static void styleNonManualNode(UnfoldedNode unode, SVGDiagram svg, ProcessTreeVisualisationInfo info,
-			Pair<String, Long> cardinality) {
+	private static void styleNonManualNode(IvMEfficientTree tree, int node, SVGDiagram svg,
+			ProcessTreeVisualisationInfo info, Pair<String, Long> cardinality) {
 		//colour non-activity nodes
-		for (LocalDotNode dotNode : info.getNodes(unode)) {
+		for (LocalDotNode dotNode : info.getNodes(node)) {
 			if (cardinality.getB() > 0) {
 				DotPanel.setCSSAttributeOf(svg, dotNode, "opacity", "1.0");
 			} else {
@@ -189,22 +191,24 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
-	private static void styleEdges(SVGDiagram svg, ProcessTreeVisualisationInfo info, AlignedLogVisualisationData data,
-			ProcessTreeVisualisationParameters parameters, TraceViewColourMap traceViewColourMap, long minCardinality,
-			long maxCardinality) throws SVGException {
-		styleModelEdges(svg, info, data, parameters, traceViewColourMap, minCardinality, maxCardinality);
+	private static void styleEdges(IvMEfficientTree tree, SVGDiagram svg, ProcessTreeVisualisationInfo info,
+			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters,
+			TraceViewColourMap traceViewColourMap, long minCardinality, long maxCardinality) throws SVGException,
+			UnknownTreeNodeException {
+		styleModelEdges(tree, svg, info, data, parameters, traceViewColourMap, minCardinality, maxCardinality);
 		styleMoveEdges(svg, info, data, parameters, minCardinality, maxCardinality);
 	}
 
-	private static void styleModelEdges(SVGDiagram svg, ProcessTreeVisualisationInfo info,
+	private static void styleModelEdges(IvMEfficientTree tree, SVGDiagram svg, ProcessTreeVisualisationInfo info,
 			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters,
-			TraceViewColourMap traceViewColourMap, long minCardinality, long maxCardinality) throws SVGException {
+			TraceViewColourMap traceViewColourMap, long minCardinality, long maxCardinality) throws SVGException,
+			UnknownTreeNodeException {
 		for (LocalDotEdge dotEdge : info.getAllModelEdges()) {
 			Pair<String, Long> cardinality = data.getEdgeLabel(dotEdge.getUnode(), false);
 			Color edgeColour = styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality,
 					parameters.getColourModelEdges(), parameters.isShowFrequenciesOnModelEdges(),
 					parameters.getModelEdgesWidth());
-			if (dotEdge.getUnode().getNode() instanceof Automatic) {
+			if (tree.isTau(dotEdge.getUnode())) {
 				traceViewColourMap.set(dotEdge.getUnode(), edgeColour, edgeColour);
 			}
 		}

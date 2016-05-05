@@ -1,30 +1,30 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Map;
-
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsImplBPComplete extends QueueLengths {
 
 	private final static double theta = 1.5;
 
 	private final QueueLengths cli;
-	private final Map<UnfoldedNode, TLongArrayList> busyPeriods;
+	private final TIntObjectMap<TLongArrayList> busyPeriods;
 
-	public QueueLengthsImplBPComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
+	public QueueLengthsImplBPComplete(TIntObjectMap<QueueActivityLog> queueActivityLogs) {
 		cli = new QueueLengthsImplUPEnqueueStartComplete();
-		busyPeriods = new THashMap<UnfoldedNode, TLongArrayList>();
-		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
+		busyPeriods = new TIntObjectHashMap<>(10, 0.5f, -1);
+		for (TIntIterator it = queueActivityLogs.keySet().iterator();it.hasNext();) {
+			int unode = it.next();
 			busyPeriods.put(unode, findBusyPeriods(unode, queueActivityLogs.get(unode)));
 		}
 	}
 
-	private TLongArrayList findBusyPeriods(UnfoldedNode unode, QueueActivityLog l) {
+	private TLongArrayList findBusyPeriods(int unode, QueueActivityLog l) {
 		//make a list of timestamps
 		long[] timestamps = new long[l.size() * 2];
 		for (int i = 0; i < l.size(); i++) {
@@ -56,7 +56,7 @@ public class QueueLengthsImplBPComplete extends QueueLengths {
 		return result;
 	}
 
-	public boolean isBusy(UnfoldedNode unode, QueueActivityLog l, long time) {
+	public boolean isBusy(int unode, QueueActivityLog l, long time) {
 		double queueLength = 0;
 		for (int index = 0; index < l.size(); index++) {
 			queueLength += cli.getQueueProbability(unode, l, time, index);
@@ -64,7 +64,7 @@ public class QueueLengthsImplBPComplete extends QueueLengths {
 		return queueLength > theta;
 	}
 
-	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+	public double getQueueProbability(int unode, QueueActivityLog l, long time, int traceIndex) {
 		if (l.getInitiate(traceIndex) > 0 && l.getComplete(traceIndex) > 0) {
 
 			//find the interval we're in and whether it's busy

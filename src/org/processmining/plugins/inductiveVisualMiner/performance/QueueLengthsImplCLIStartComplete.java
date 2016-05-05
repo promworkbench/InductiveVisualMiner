@@ -1,18 +1,18 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.TIntDoubleMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsImplCLIStartComplete extends QueueLengths {
 
@@ -25,14 +25,15 @@ public class QueueLengthsImplCLIStartComplete extends QueueLengths {
 		}
 	}
 
-	private final Map<UnfoldedNode, Cluster[]> clusters;
-	private final TObjectDoubleMap<UnfoldedNode> priors;
+	private final TIntObjectMap<Cluster[]> clusters;
+	private final TIntDoubleMap priors;
 	private final static int maxIterations = 100;
 
-	public QueueLengthsImplCLIStartComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs, int k) {
-		clusters = new THashMap<>();
-		priors = new TObjectDoubleHashMap<>();
-		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
+	public QueueLengthsImplCLIStartComplete(TIntObjectMap<QueueActivityLog> queueActivityLogs, int k) {
+		clusters = new TIntObjectHashMap<>(10, 0.5f, -1);
+		priors = new TIntDoubleHashMap(10, 0.5f, -1, 0);
+		for (TIntIterator it = queueActivityLogs.keySet().iterator(); it.hasNext();) {
+			int unode = it.next();
 			QueueActivityLog l = queueActivityLogs.get(unode);
 
 			//create intervals
@@ -41,7 +42,7 @@ public class QueueLengthsImplCLIStartComplete extends QueueLengths {
 				double[] d = { (double) l.getStart(index) - l.getInitiate(index) };
 				intervals.add(new DoublePoint(d));
 			}
-			
+
 			if (intervals.size() < k) {
 				continue;
 			}
@@ -83,7 +84,7 @@ public class QueueLengthsImplCLIStartComplete extends QueueLengths {
 		return cs.length - 1;
 	}
 
-	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+	public double getQueueProbability(int unode, QueueActivityLog l, long time, int traceIndex) {
 		if (l.getInitiate(traceIndex) > 0 && l.getStart(traceIndex) > 0 && l.getInitiate(traceIndex) <= time
 				&& time <= l.getStart(traceIndex)) {
 			Cluster[] cs = clusters.get(unode);

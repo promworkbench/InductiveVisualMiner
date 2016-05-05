@@ -4,7 +4,7 @@ import java.util.concurrent.Executor;
 
 import javax.swing.SwingUtilities;
 
-import org.processmining.plugins.InductiveMiner.Quintuple;
+import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
@@ -12,6 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.FunctionCancellable;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ThreadedComputer;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -20,28 +21,30 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl08Animate extends
-		ChainLink<Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>, Double> {
+public class Cl08Animate
+		extends
+		ChainLink<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree>, Double> {
 
-	private final ThreadedComputer<Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>, GraphVizTokens> pool;
+	private final ThreadedComputer<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree>, GraphVizTokens> pool;
 
 	public Cl08Animate(final Executor executor, final InductiveVisualMinerState state,
 			final InductiveVisualMinerPanel panel) {
 
-		pool = new ThreadedComputer<Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>, GraphVizTokens>(
+		pool = new ThreadedComputer<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree>, GraphVizTokens>(
 				executor,
-				new FunctionCancellable<Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler>, GraphVizTokens>() {
+				new FunctionCancellable<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree>, GraphVizTokens>() {
 
 					//this function performs the computation
 					public GraphVizTokens call(
-							Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler> input,
+							Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree> input,
 							IvMCanceller canceller) throws Exception {
 						IvMLog log = input.getA();
 						Mode colourMode = input.getB();
 						ProcessTreeVisualisationInfo info = input.getC();
 						SVGDiagram svg = input.getD();
 						Scaler scaler = input.getE();
-						return ComputeAnimation.computeAnimation(log, colourMode, info, scaler, svg, canceller);
+						IvMEfficientTree tree = input.getF();
+						return ComputeAnimation.computeAnimation(tree, log, colourMode, info, scaler, svg, canceller);
 					}
 
 				}, new InputFunction<GraphVizTokens>() {
@@ -66,14 +69,14 @@ public class Cl08Animate extends
 				});
 	}
 
-	protected Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler> generateInput(
+	protected Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree> generateInput(
 			InductiveVisualMinerState state) {
-		return Quintuple.of(state.getIvMLog(), state.getMode(), state.getVisualisationInfo(), state.getSVGDiagram(),
-				state.getAnimationScaler());
+		return Sextuple.of(state.getIvMLog(), state.getMode(), state.getVisualisationInfo(), state.getSVGDiagram(),
+				state.getAnimationScaler(), state.getTree());
 	}
 
 	protected Double executeLink(
-			Quintuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler> input,
+			Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree> input,
 			IvMCanceller canceller) {
 		/*
 		 * The animation is independent of all other chainlinks. Therefore,

@@ -7,8 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.processmining.plugins.InductiveMiner.mining.interleaved.Interleaved;
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Block.And;
+import org.processmining.processtree.Block.Or;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.Task.Manual;
@@ -62,10 +64,12 @@ public class TreeUtils {
 	 * 
 	 * @param unode1
 	 * @param unode2
-	 * @return whether both are in parallel
+	 * @return whether both are in parallel (interleaved, concurrent, inclusive
+	 *         choice)
 	 */
 	public static boolean areParallel(UnfoldedNode unode1, UnfoldedNode unode2) {
-		return getLowestCommonParent(unode1, unode2) instanceof And;
+		Node lcp = getLowestCommonParent(unode1, unode2);
+		return lcp instanceof And || lcp instanceof Or || lcp instanceof Interleaved;
 	}
 
 	/**
@@ -119,7 +123,7 @@ public class TreeUtils {
 		while (it1.hasNext() && it2.hasNext()) {
 			Node n1 = it1.next();
 			Node n2 = it2.next();
-			
+
 			if (!n1.equals(n2)) {
 				return false;
 			}

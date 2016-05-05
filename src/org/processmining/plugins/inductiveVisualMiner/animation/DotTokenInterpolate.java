@@ -233,12 +233,13 @@ public class DotTokenInterpolate {
 	}
 
 	public static boolean isTokenSplit(DotToken token, int i) {
-		return token.getTarget(i).getType() == NodeType.parallelSplit
-				|| token.getTarget(i).getType() == NodeType.interleavedSplit;
+		return token.getTarget(i).getType() == NodeType.concurrentSplit
+				|| token.getTarget(i).getType() == NodeType.interleavedSplit
+				|| token.getTarget(i).getType() == NodeType.orSplit;
 	}
 
 	private static void debug(Object s) {
-//				System.out.println(s);
+		//				System.out.println(s);
 		//		System.out.println(s.toString().replaceAll("\\n", " "));
 	}
 }

@@ -20,7 +20,6 @@ import nl.tue.astar.impl.memefficient.MemoryEfficientAStarAlgorithm;
 import nl.tue.astar.impl.memefficient.StorageAwareDelegate;
 
 import org.deckfour.xes.classification.XEventClass;
-import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.etm.model.narytree.NAryTree;
 import org.processmining.plugins.etm.model.narytree.conversion.ProcessTreeToNAryTree;
@@ -44,9 +43,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  *
  */
 
-public class Alignment {
+public class ETMAlignment {
 
-	public final static int maxStates = 1 << 24;;
+	public final static int maxStates = 1 << 24;
 	public final static double traceTimeOutInSec = -1;
 	public final static int numberOfThreads = Math.max(Runtime.getRuntime().availableProcessors() - 2, 1);
 	private static final int modelCost = 1;
@@ -54,12 +53,12 @@ public class Alignment {
 
 	private final AtomicBoolean wasReliable;
 	private final Canceller canceller;
-	private final XEventClasses eventClasses;
+	private final IvMEventClasses eventClasses;
 	private final NAryTree nTree;
 	private final int[] node2cost;
 	private final Map<XEventClass, Integer> activity2Cost;
 	private final XLog log;
-	private final AlignmentResult callback;
+	private final AlignmentCallback callback;
 
 	private final AtomicInteger tracesStarted;
 
@@ -73,7 +72,7 @@ public class Alignment {
 	 * @param callback
 	 * @param canceller
 	 */
-	public Alignment(ProcessTree tree, XLog log, XEventClasses eventClasses, AlignmentResult callback,
+	public ETMAlignment(final ProcessTree tree, XLog log, IvMEventClasses eventClasses, AlignmentCallback callback,
 			final IvMCanceller canceller) {
 		wasReliable = new AtomicBoolean(true);
 		this.canceller = new Canceller() {
@@ -210,7 +209,7 @@ public class Alignment {
 		return node2cost;
 	}
 
-	private static Map<XEventClass, Integer> createActivity2cost(XEventClasses eventClasses) {
+	private static Map<XEventClass, Integer> createActivity2cost(IvMEventClasses eventClasses) {
 		Map<XEventClass, Integer> activity2Cost = new HashMap<XEventClass, Integer>();
 		for (XEventClass activity : eventClasses.getClasses()) {
 			activity2Cost.put(activity, logCost);
@@ -218,12 +217,12 @@ public class Alignment {
 		return activity2Cost;
 	}
 
-	public static void addAllLeavesAsEventClasses(XEventClasses eventClasses, ProcessTree tree) {
+	public static void addAllLeavesAsEventClasses(IvMEventClasses eventClasses, ProcessTree tree) {
 		addAllLeavesAsEventClasses(eventClasses, tree.getRoot());
 		eventClasses.harmonizeIndices();
 	}
 
-	private static void addAllLeavesAsEventClasses(XEventClasses eventClasses, Node node) {
+	private static void addAllLeavesAsEventClasses(IvMEventClasses eventClasses, Node node) {
 		if (node instanceof Manual) {
 			eventClasses.register(node.getName());
 		} else if (node instanceof Block) {

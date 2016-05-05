@@ -1,38 +1,39 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import gnu.trove.map.hash.THashMap;
-
-import java.util.Map;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.ActivityInstanceIterator;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueMineActivityLog {
 
-	public static Map<UnfoldedNode, QueueActivityLog> mine(IvMLog tLog) {
-		Map<UnfoldedNode, QueueActivityLog> queueActivityLogs = new THashMap<>();
+	public static TIntObjectMap<QueueActivityLog> mine(IvMEfficientTree tree, IvMLog tLog) {
+		TIntObjectMap<QueueActivityLog> queueActivityLogs = new TIntObjectHashMap<QueueActivityLog>(10, 0.5f, -1);
 		for (IvMTrace tTrace : tLog) {
-			mine(tTrace, queueActivityLogs);
+			mine(tree, tTrace, queueActivityLogs);
 		}
 		return queueActivityLogs;
 	}
 
-	public static void mine(IvMTrace tTrace, Map<UnfoldedNode, QueueActivityLog> timestamps) {
-		ActivityInstanceIterator it = tTrace.activityInstanceIterator();
+	public static void mine(IvMEfficientTree tree, IvMTrace tTrace, TIntObjectMap<QueueActivityLog> timestamps) {
+		ActivityInstanceIterator it = tTrace.activityInstanceIterator(tree);
 		while (it.hasNext()) {
-			Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> activityInstance = it.next();
+			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> activityInstance = it.next();
 
 			if (activityInstance != null) {
+
+				int node = activityInstance.getA();
 
 				//we are only interested in activity instances according to the parameters
 				if (((activityInstance.getC() != null && activityInstance.getC().getLogTimestamp() != null) || (activityInstance
 						.getD() != null && activityInstance.getD().getLogTimestamp() != null))
-						&& ((activityInstance.getE() != null && activityInstance.getE().getLogTimestamp() != null)
-						|| (activityInstance.getF() != null && activityInstance.getF().getLogTimestamp() != null))) {
+						&& ((activityInstance.getE() != null && activityInstance.getE().getLogTimestamp() != null) || (activityInstance
+								.getF() != null && activityInstance.getF().getLogTimestamp() != null))) {
 
 					Long initiate = null;
 					Long enqueue = null;
@@ -53,12 +54,11 @@ public class QueueMineActivityLog {
 					}
 
 					//put this activity instance in its list
-					if (!timestamps.containsKey(activityInstance.getA())) {
-						timestamps.put(activityInstance.getA(), new QueueActivityLog());
+					if (!timestamps.containsKey(node)) {
+						timestamps.put(node, new QueueActivityLog());
 					}
 
-					timestamps.get(activityInstance.getA()).add(activityInstance.getB(), initiate, enqueue, start,
-							complete);
+					timestamps.get(node).add(activityInstance.getB(), initiate, enqueue, start, complete);
 				}
 			}
 		}

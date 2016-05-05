@@ -1,20 +1,21 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.Map;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsMeasure {
 
-	public static void measure(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs, QueueLengths method) {
+	public static void measure(TIntObjectHashMap<QueueActivityLog> queueActivityLogs, QueueLengths method) {
 
 		QueueLengthsImplUPEnqueueStartComplete qReal = new QueueLengthsImplUPEnqueueStartComplete();
 
-		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
+		for (int unode : queueActivityLogs.keySet().toArray()) {
 
 			//find min and max
 			long min = Long.MAX_VALUE;
@@ -35,13 +36,13 @@ public class QueueLengthsMeasure {
 		}
 	}
 
-	public static Pair<Double, Double> rmse(UnfoldedNode unode, QueueLengthsImplUPEnqueueStartComplete real,
-			QueueLengths method, long min, long max, Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
+	public static Pair<Double, Double> rmse(int unode, QueueLengthsImplUPEnqueueStartComplete real,
+			QueueLengths method, long min, long max, TIntObjectMap<QueueActivityLog> queueActivityLogs) {
 		long sum = 0;
 		long bias = 0;
 		long count = 0;
 
-		File f = new File("d:\\output\\graph-" + unode.getNode().getName() + "-" + method.getName() + ".csv");
+		File f = new File("d:\\output\\graph-" + unode + "-" + method.getName() + ".csv");
 		PrintWriter w;
 		try {
 			w = new PrintWriter(f);

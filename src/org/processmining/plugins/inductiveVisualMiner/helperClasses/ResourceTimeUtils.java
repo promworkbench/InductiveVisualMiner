@@ -45,6 +45,26 @@ public class ResourceTimeUtils {
 		double d = h * 24;
 		return String.format("%.2f", d) + " " + otherUnit + "\\day";
 	}
+	
+	public static final String getTimeUnitWithoutMeasure(double ms, String otherUnit) {
+		if (ms > 1) {
+			return " " + otherUnit + "\\milisecond";
+		}
+		double s = ms * 1000;
+		if (s > 1) {
+			return " " + otherUnit + "\\second";
+		}
+		double m = s * 60;
+		if (m > 1) {
+			return " " + otherUnit + "\\minute";
+		}
+		double h = m * 60;
+		if (h > 1) {
+			return " " + otherUnit + "\\hour";
+		}
+		double d = h * 24;
+		return " " + otherUnit + "\\day";
+	}
 
 	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_0 = new ThreadLocal<SoftReference<DateFormat>>();
 	private static final ThreadLocal<SoftReference<DateFormat>> DATE_FORMAT_1 = new ThreadLocal<SoftReference<DateFormat>>();

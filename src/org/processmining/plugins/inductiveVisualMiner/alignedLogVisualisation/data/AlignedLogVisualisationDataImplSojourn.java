@@ -3,12 +3,12 @@ package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.d
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
-import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisualisationData {
 
@@ -19,7 +19,7 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 
 	protected final AlignedLogVisualisationData dataForEdges;
 
-	public AlignedLogVisualisationDataImplSojourn(ProcessTree tree, PerformanceWrapper queueLengths,
+	public AlignedLogVisualisationDataImplSojourn(IvMEfficientTree tree, PerformanceWrapper queueLengths,
 			IvMLogInfo logInfo) {
 		this.queueLengths = queueLengths;
 		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(tree, logInfo);
@@ -45,7 +45,7 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 		return Pair.of(minQueueLength, maxQueueLength);
 	}
 
-	public Pair<String, Long> getNodeLabel(UnfoldedNode unode, boolean includeModelMoves) {
+	public Pair<String, Long> getNodeLabel(int unode, boolean includeModelMoves) {
 		long length = Math.round(queueLengths.getSojournTime(unode));
 		if (length >= 0) {
 			return Pair.of(Performance.timeToString(length), length);
@@ -54,11 +54,11 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 		}
 	}
 
-	public Pair<String, Long> getEdgeLabel(UnfoldedNode unode, boolean includeModelMoves) {
+	public Pair<String, Long> getEdgeLabel(int unode, boolean includeModelMoves) throws UnknownTreeNodeException {
 		return dataForEdges.getEdgeLabel(unode, includeModelMoves);
 	}
 
-	public Pair<String, Long> getModelMoveEdgeLabel(UnfoldedNode unode) {
+	public Pair<String, Long> getModelMoveEdgeLabel(int unode) {
 		return dataForEdges.getModelMoveEdgeLabel(unode);
 	}
 

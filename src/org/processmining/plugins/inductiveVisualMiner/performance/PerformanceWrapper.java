@@ -1,23 +1,20 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import gnu.trove.map.TObjectDoubleMap;
-
-import java.util.Map;
-
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import gnu.trove.map.TIntDoubleMap;
+import gnu.trove.map.TIntObjectMap;
 
 public class PerformanceWrapper {
 
-	private final Map<UnfoldedNode, QueueActivityLog> queueActivityLogs;
-	private final TObjectDoubleMap<UnfoldedNode> waitingTimes;
-	private final TObjectDoubleMap<UnfoldedNode> queueingTimes;
-	private final TObjectDoubleMap<UnfoldedNode> serviceTimes;
-	private final TObjectDoubleMap<UnfoldedNode> sojournTimes;
+	private final TIntObjectMap<QueueActivityLog> queueActivityLogs;
+	private final TIntDoubleMap waitingTimes;
+	private final TIntDoubleMap queueingTimes;
+	private final TIntDoubleMap serviceTimes;
+	private final TIntDoubleMap sojournTimes;
 	private final QueueLengths lengths;
 
-	public PerformanceWrapper(QueueLengths lengths, Map<UnfoldedNode, QueueActivityLog> queueActivityLogs,
-			TObjectDoubleMap<UnfoldedNode> waitingTimes, TObjectDoubleMap<UnfoldedNode> queueingTimes,
-			TObjectDoubleMap<UnfoldedNode> serviceTimes, TObjectDoubleMap<UnfoldedNode> sojournTimes) {
+	public PerformanceWrapper(QueueLengths lengths, TIntObjectMap<QueueActivityLog> queueActivityLogs,
+			TIntDoubleMap waitingTimes, TIntDoubleMap queueingTimes, TIntDoubleMap serviceTimes,
+			TIntDoubleMap sojournTimes) {
 		this.lengths = lengths;
 		this.waitingTimes = waitingTimes;
 		this.queueingTimes = queueingTimes;
@@ -26,27 +23,27 @@ public class PerformanceWrapper {
 		this.queueActivityLogs = queueActivityLogs;
 	}
 
-	public double getQueueLength(UnfoldedNode unode, long time) {
+	public double getQueueLength(int unode, long time) {
 		return lengths.getQueueLength(unode, time, queueActivityLogs);
 	}
 
-	public double getWaitingTime(UnfoldedNode unode) {
+	public double getWaitingTime(int unode) {
 		return waitingTimes.get(unode);
 	}
 
-	public double getQueueingTime(UnfoldedNode unode) {
+	public double getQueueingTime(int unode) {
 		return queueingTimes.get(unode);
 	}
 
-	public double getServiceTime(UnfoldedNode unode) {
+	public double getServiceTime(int unode) {
 		return serviceTimes.get(unode);
 	}
 
-	public double getSojournTime(UnfoldedNode unode) {
+	public double getSojournTime(int unode) {
 		return sojournTimes.get(unode);
 	}
 
-	public TObjectDoubleMap<UnfoldedNode> getSojournTimes() {
+	public TIntDoubleMap getSojournTimes() {
 		return sojournTimes;
 	}
 

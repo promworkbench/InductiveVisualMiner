@@ -4,43 +4,43 @@ import java.util.HashMap;
 
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotEdge;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 
 public class LocalDotEdge extends DotEdge {
 
 	public enum EdgeType {
 		model, logMove, modelMove
 	};
-	
+
 	public class Appearance {
 		public String textFill;
 		public String textStroke;
 		public String textStrokeWidth;
 		public String lineStrokeDashArray;
 	}
-	
+
 	private final EdgeType type;
-	private final UnfoldedNode unode;
-	private final UnfoldedNode lookupNode1;
-	private final UnfoldedNode lookupNode2;
+	private final int node;
+	private final int lookupNode1;
+	private final int lookupNode2;
 	private final boolean directionForward;
 	public final Appearance unselectedAppearance = new Appearance();
 
-	public LocalDotEdge(Dot dot, ProcessTreeVisualisationInfo info, LocalDotNode source, LocalDotNode target,
-			String label, UnfoldedNode unode, EdgeType type, UnfoldedNode lookupNode1,
-			UnfoldedNode lookupNode2, boolean directionForward) {
+	public LocalDotEdge(IvMEfficientTree tree, Dot dot, ProcessTreeVisualisationInfo info, LocalDotNode source,
+			LocalDotNode target, String label, int node, EdgeType type, int lookupNode1, int lookupNode2,
+			boolean directionForward) {
 		super(source, target, label, new HashMap<String, String>());
-		this.unode = unode;
+		this.node = node;
 		this.lookupNode1 = lookupNode1;
 		this.lookupNode2 = lookupNode2;
 		this.type = type;
 		this.directionForward = directionForward;
-		
+
 		dot.addEdge(this);
-		if (lookupNode1 == null && lookupNode2 == null) {
-			info.addEdge(unode, null, this);
+		if (lookupNode1 == -1 && lookupNode2 == -1) {
+			info.addEdge(tree, node, -1, this);
 		} else {
-			info.addEdge(lookupNode1, lookupNode2, this);
+			info.addEdge(tree, lookupNode1, lookupNode2, this);
 		}
 	}
 
@@ -64,19 +64,19 @@ public class LocalDotEdge extends DotEdge {
 		return type;
 	}
 
-	public UnfoldedNode getUnode() {
-		return unode;
+	public int getUnode() {
+		return node;
 	}
 
 	public boolean isDirectionForward() {
 		return directionForward;
 	}
 
-	public UnfoldedNode getLookupNode1() {
+	public int getLookupNode1() {
 		return lookupNode1;
 	}
 
-	public UnfoldedNode getLookupNode2() {
+	public int getLookupNode2() {
 		return lookupNode2;
 	}
 }

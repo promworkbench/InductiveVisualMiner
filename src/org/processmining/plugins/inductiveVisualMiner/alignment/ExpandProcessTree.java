@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.performance;
+package org.processmining.plugins.inductiveVisualMiner.alignment;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Triple;
+import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.interleaved.Interleaved;
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Block.And;
 import org.processmining.processtree.Block.Def;
 import org.processmining.processtree.Block.DefLoop;
+import org.processmining.processtree.Block.Or;
 import org.processmining.processtree.Block.Seq;
 import org.processmining.processtree.Block.Xor;
 import org.processmining.processtree.Block.XorLoop;
@@ -23,7 +25,7 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 import org.processmining.processtree.impl.AbstractBlock;
 import org.processmining.processtree.impl.ProcessTreeImpl;
 
-public class ExpandProcessTreeForQueues {
+public class ExpandProcessTree {
 	public static final String enqueue = "enqueue";
 	public static final String start = "start";
 	public static final String complete = "complete";
@@ -34,8 +36,9 @@ public class ExpandProcessTreeForQueues {
 	 * 
 	 * @param tree
 	 * @return
+	 * @throws UnknownTreeNodeException 
 	 */
-	public static Triple<ProcessTree, Map<UnfoldedNode, UnfoldedNode>, Set<UnfoldedNode>> expand(ProcessTree tree) {
+	public static Triple<ProcessTree, Map<UnfoldedNode, UnfoldedNode>, Set<UnfoldedNode>> expand(ProcessTree tree) throws UnknownTreeNodeException {
 		ProcessTree newTree = new ProcessTreeImpl();
 		Map<UnfoldedNode, UnfoldedNode> mapping = new THashMap<>();
 		Set<UnfoldedNode> enqueueTaus = new THashSet<>();
@@ -44,7 +47,7 @@ public class ExpandProcessTreeForQueues {
 	}
 
 	private static Node expand(UnfoldedNode unode, ProcessTree newTree, Map<UnfoldedNode, UnfoldedNode> mapping,
-			Set<UnfoldedNode> enqueueTaus, UnfoldedNode newParent) {
+			Set<UnfoldedNode> enqueueTaus, UnfoldedNode newParent) throws UnknownTreeNodeException {
 		if (unode.getNode() instanceof Block) {
 			//copy blocks
 			Block newNode;
@@ -95,8 +98,10 @@ public class ExpandProcessTreeForQueues {
 				newNode = new AbstractBlock.Xor(unode.getNode().getName());
 			} else if (unode.getNode() instanceof Def) {
 				newNode = new AbstractBlock.Def(unode.getNode().getName());
+			} else if (unode.getNode() instanceof Or) {
+				newNode = new AbstractBlock.Or(unode.getNode().getName());
 			} else {
-				throw new RuntimeException("construct not implemented");
+				throw new UnknownTreeNodeException();
 			}
 			newNode.setProcessTree(newTree);
 			newTree.addNode(newNode);

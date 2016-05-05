@@ -7,30 +7,32 @@ import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentPerformance;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
-import org.processmining.processtree.ProcessTree;
 
 public class Cl05Align
 		extends
-		ChainLink<Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
+		ChainLink<Sextuple<IvMEfficientTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
 
-	protected Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> generateInput(
+	protected Sextuple<IvMEfficientTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> generateInput(
 			InductiveVisualMinerState state) {
 		return Sextuple.of(state.getTree(), state.getPerformanceClassifier(), state.getXLog(), state.getLog(), state
 				.getXLogInfo().getEventClasses(), state.getXLogInfoPerformance().getEventClasses());
 	}
 
 	protected Pair<IvMLogNotFiltered, IvMLogInfo> executeLink(
-			Sextuple<ProcessTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> input,
+			Sextuple<IvMEfficientTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> input,
 			IvMCanceller canceller) throws Exception {
-		IvMLogNotFiltered log = AlignmentPerformance.align(input.getA(), input.getB(), input.getC(), input.getD(),
+		IvMEfficientTree tree = input.getA();
+
+		IvMLogNotFiltered log = AlignmentPerformance.align(tree, input.getB(), input.getC(), input.getD(),
 				input.getE(), input.getF(), canceller);
 		if (log == null) {
 			return null;
 		}
-		IvMLogInfo logInfo = new IvMLogInfo(log);
+		IvMLogInfo logInfo = new IvMLogInfo(log, tree);
 		return Pair.of(log, logInfo);
 	}
 

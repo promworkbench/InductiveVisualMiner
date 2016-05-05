@@ -1,18 +1,17 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsImplCPHComplete extends QueueLengths {
 
@@ -27,11 +26,11 @@ public class QueueLengthsImplCPHComplete extends QueueLengths {
 		}
 	}
 
-	private final Map<UnfoldedNode, Cluster[]> clusters;
+	private final TIntObjectMap<Cluster[]> clusters;
 
-	public QueueLengthsImplCPHComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs, int k) {
-		clusters = new THashMap<>();
-		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
+	public QueueLengthsImplCPHComplete(TIntObjectMap<QueueActivityLog> queueActivityLogs, int k) {
+		clusters = new TIntObjectHashMap<>(10, 0.5f, -1);
+		for (int unode : queueActivityLogs.keySet().toArray()) {
 			QueueActivityLog l = queueActivityLogs.get(unode);
 
 			//create intervals
@@ -123,7 +122,7 @@ public class QueueLengthsImplCPHComplete extends QueueLengths {
 		return cs.length - 1;
 	}
 
-	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+	public double getQueueProbability(int unode, QueueActivityLog l, long time, int traceIndex) {
 		if (l.getInitiate(traceIndex) > 0 && l.getComplete(traceIndex) > 0 && l.getInitiate(traceIndex) <= time
 				&& time <= l.getComplete(traceIndex)) {
 			Cluster[] cs = clusters.get(unode);

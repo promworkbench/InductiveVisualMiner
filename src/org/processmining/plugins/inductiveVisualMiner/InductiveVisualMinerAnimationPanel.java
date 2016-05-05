@@ -25,7 +25,6 @@ import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 /**
  * This class takes care of the node popups and render an animation
@@ -40,11 +39,12 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	//popup
 	private boolean showPopup = false;
 	private List<String> popupText = null;
-	private UnfoldedNode popupHistogramUnode = null;
+	private int popupHistogramUnode = -1;
 	public static final int popupWidth = 300;
 	public static final int popupPadding = 10;
 	public static final int popupRightMargin = 40;
-	public static final int popupHistogramHeight = 100;
+	public static final int popupHistogramHeight = 120;
+	public static final int popupHistogramYPadding = 10;
 
 	//animation
 	protected boolean animationEnabled = false;
@@ -145,8 +145,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		Color backupColour = g.getColor();
 		Font backupFont = g.getFont();
 
-		int currentPopupHistogramHeight = histogramData == null && popupHistogramUnode != null ? 0
-				: popupHistogramHeight;
+		int currentPopupHistogramHeight = histogramData == null && popupHistogramUnode != -1 ? 0 : popupHistogramHeight;
 
 		int popupHeight = (popupText.size() * 20) + currentPopupHistogramHeight;
 
@@ -159,7 +158,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 				* popupPadding + popupPadding, popupPadding, popupPadding);
 
 		//local (= unode) histogram
-		if (histogramData != null && popupHistogramUnode != null) {
+		if (histogramData != null && popupHistogramUnode != -1) {
 			paintPopupHistogram(g, x, y);
 		}
 
@@ -184,27 +183,33 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 		//border
 		g.setColor(new Color(255, 255, 255, 50));
-		g.drawRect(offsetX, offsetY, popupWidth, popupHistogramHeight);
+		g.drawRect(offsetX, offsetY + popupHistogramYPadding, popupWidth, popupHistogramHeight - 2
+				* popupHistogramYPadding);
 
 		//text
 		g.setColor(new Color(255, 255, 255, 150));
 		g.setFont(helperControlsFont);
 		double casesPerMs = histogramData.getLocalMaximum() / histogramData.getLogTimeInMsPerLocalBucket();
-		g.drawString(ResourceTimeUtils.getTimePerUnitString(casesPerMs, "executions"), offsetX + 1, offsetY + 10);
+		g.drawString(ResourceTimeUtils.getTimePerUnitString(casesPerMs, "executions"), offsetX + 1, offsetY
+				+ popupHistogramYPadding - 1);
+
+		//text bottom
+		g.drawString("0" + ResourceTimeUtils.getTimeUnitWithoutMeasure(casesPerMs, "executions"), offsetX + 1, offsetY
+				+ popupHistogramHeight);
 
 		//histogram itself
 		{
 			//create a path
 			GeneralPath path = new GeneralPath();
-			path.moveTo(offsetX, offsetY + popupHistogramHeight);
+			path.moveTo(offsetX, offsetY + (popupHistogramHeight - popupHistogramYPadding));
 			for (int pixel = 0; pixel < histogramData.getNrOfLocalBuckets(); pixel++) {
 				path.lineTo(
 						offsetX + pixel,
-						offsetY + popupHistogramHeight
-								- histogramData.getLocalBucketFraction(popupHistogramUnode, pixel)
-								* popupHistogramHeight);
+						offsetY
+								+ (popupHistogramHeight - popupHistogramYPadding)
+								- (histogramData.getLocalBucketFraction(popupHistogramUnode, pixel) * (popupHistogramHeight - 2 * popupHistogramYPadding)));
 			}
-			path.lineTo(offsetX + popupWidth, offsetY + popupHistogramHeight);
+			path.lineTo(offsetX + popupWidth, offsetY + (popupHistogramHeight - popupHistogramYPadding));
 			path.closePath();
 
 			//draw path
@@ -243,7 +248,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		g.setColor(backupColour);
 	}
 
-	public void setPopup(List<String> popup, UnfoldedNode popupHistogramUnode) {
+	public void setPopup(List<String> popup, int popupHistogramUnode) {
 		this.popupText = popup;
 		this.popupHistogramUnode = popupHistogramUnode;
 	}

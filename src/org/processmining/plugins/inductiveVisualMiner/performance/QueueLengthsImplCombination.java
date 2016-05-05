@@ -1,8 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import java.util.Map;
-
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import gnu.trove.map.TIntObjectMap;
 
 public class QueueLengthsImplCombination extends QueueLengths {
 	
@@ -11,14 +9,14 @@ public class QueueLengthsImplCombination extends QueueLengths {
 	public final QueueLengths enqueueComplete;
 	public final QueueLengths enqueueStart;
 	
-	public QueueLengthsImplCombination(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
+	public QueueLengthsImplCombination(TIntObjectMap<QueueActivityLog> queueActivityLogs) {
 		initiateComplete = new QueueLengthsImplCLIComplete(queueActivityLogs, 3);
 		initiateStart = new QueueLengthsImplCLIStartComplete(queueActivityLogs, 2);
 		enqueueComplete = new QueueLengthsImplCLIComplete(queueActivityLogs, 3);
 		enqueueStart = new QueueLengthsImplUPEnqueueStartComplete();
 	}
 
-	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+	public double getQueueProbability(int unode, QueueActivityLog l, long time, int traceIndex) {
 		if (l.getInitiate(traceIndex) > 0) {
 			//initiate timestamp
 			if (l.getComplete(traceIndex) > 0) {

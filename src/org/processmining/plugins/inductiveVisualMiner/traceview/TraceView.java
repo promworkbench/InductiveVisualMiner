@@ -9,6 +9,7 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 
@@ -20,7 +21,7 @@ public class TraceView extends SideWindow {
 	private Object showing = null;
 
 	public TraceView(Component parent) {
-		super(parent, "Inductive visual Miner - trace view");
+		super(parent, "trace view - Inductive visual Miner");
 
 		TraceBuilder<Object> traceBuilder = new TraceBuilder<Object>() {
 			public Trace<? extends Event> build(Object element) {
@@ -64,11 +65,11 @@ public class TraceView extends SideWindow {
 	 * @param selection 
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public void set(IvMLog tlog, Selection selection) {
+	public void set(IvMEfficientTree tree, IvMLog tlog, Selection selection) {
 		if (!tlog.equals(showing)) {
 			showing = tlog;
 			traceView.clear();
-			traceView.setTraceBuilder(new TraceBuilderIvMLog(selection));
+			traceView.setTraceBuilder(new TraceBuilderIvMLog(tree, selection));
 			traceView.addAll((Iterable<Object>) ((Iterable<? extends Object>) tlog));
 		}
 	}

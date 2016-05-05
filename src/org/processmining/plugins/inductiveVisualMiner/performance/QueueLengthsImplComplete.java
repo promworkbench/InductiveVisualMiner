@@ -1,10 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import java.util.Map;
+import gnu.trove.map.TIntObjectMap;
 
 import javax.swing.JOptionPane;
-
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsImplComplete extends QueueLengths {
 
@@ -16,7 +14,7 @@ public class QueueLengthsImplComplete extends QueueLengths {
 	}
 
 	@Override
-	public double getQueueLength(UnfoldedNode unode, long time, Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
+	public double getQueueLength(int unode, long time, TIntObjectMap<QueueActivityLog> queueActivityLogs) {
 		QueueActivityLog l = queueActivityLogs.get(unode);
 		if (l == null) {
 			return -1;
@@ -32,7 +30,7 @@ public class QueueLengthsImplComplete extends QueueLengths {
 		return Math.max(0, count - resources);
 	}
 
-	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+	public double getQueueProbability(int unode, QueueActivityLog l, long time, int traceIndex) {
 		throw new RuntimeException("You shouldn't arrive here.");
 	}
 

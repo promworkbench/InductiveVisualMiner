@@ -4,9 +4,8 @@ import java.awt.Color;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
-import org.processmining.processtree.Task.Automatic;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Move implements Event {
 
@@ -15,19 +14,21 @@ public class Move implements Event {
 	}
 
 	private final Type type;
-	private final UnfoldedNode unode;
+	private final int modelNode;
+	private final IvMEfficientTree tree;
 	private final XEventClass activityEventClass;
 	private final XEventClass performanceEventClass;
 	private final PerformanceTransition lifeCycleTransition;
 
-	private UnfoldedNode logMoveUnode;
-	private UnfoldedNode logMoveBeforeChild;
-	private UnfoldedNode logMoveParallelBranchMappedTo;
+	private int logMoveNode = -1;
+	private int logMoveBeforeChildNode = -1;
+	private int logMoveParallelBranchMappedToNode = -1;
 
-	public Move(Type type, UnfoldedNode unode, XEventClass activityEventClass, XEventClass performanceEventClass,
-			PerformanceTransition lifeCycle) {
+	public Move(IvMEfficientTree tree, Type type, int node, XEventClass activityEventClass,
+			XEventClass performanceEventClass, PerformanceTransition lifeCycle) {
+		this.tree = tree;
 		this.type = type;
-		this.unode = unode;
+		this.modelNode = node;
 		this.activityEventClass = activityEventClass;
 		this.performanceEventClass = performanceEventClass;
 		this.lifeCycleTransition = lifeCycle;
@@ -35,7 +36,11 @@ public class Move implements Event {
 
 	public String toString() {
 		if (isModelSync()) {
-			return getType() + " " + getUnode().toString() + " " + lifeCycleTransition;
+			if (!tree.isTau(getTreeNode())) {
+				return getType() + " " + tree.getActivityName(getTreeNode()) + " " + lifeCycleTransition;
+			} else {
+				return getType() + " tau (" + getTreeNode() + ") " + lifeCycleTransition;
+			}
 		} else {
 			return getType() + " " + getActivityEventClass().toString() + " " + lifeCycleTransition;
 		}
@@ -43,8 +48,8 @@ public class Move implements Event {
 
 	@Override
 	public int hashCode() {
-		if (getUnode() != null) {
-			return getType().hashCode() ^ getUnode().hashCode();
+		if (getTreeNode() != -1) {
+			return getType().hashCode() ^ getTreeNode();
 		} else {
 			return getType().hashCode() ^ getActivityEventClass().hashCode();
 		}
@@ -62,8 +67,8 @@ public class Move implements Event {
 		if (((Move) obj).isComplete() != isComplete()) {
 			return false;
 		}
-		if (getUnode() != null) {
-			return getUnode().equals(arg.getUnode());
+		if (getTreeNode() != -1) {
+			return getTreeNode() == arg.getTreeNode();
 		} else {
 			return getActivityEventClass().equals(arg.getActivityEventClass());
 		}
@@ -77,8 +82,8 @@ public class Move implements Event {
 		return type;
 	}
 
-	public UnfoldedNode getUnode() {
-		return unode;
+	public int getTreeNode() {
+		return modelNode;
 	}
 
 	public XEventClass getActivityEventClass() {
@@ -89,27 +94,27 @@ public class Move implements Event {
 		return performanceEventClass;
 	}
 
-	public UnfoldedNode getLogMoveBeforeChild() {
-		return logMoveBeforeChild;
+	public int getLogMoveBeforeChild() {
+		return logMoveBeforeChildNode;
 	}
 
 	public void setLogMovePosition(LogMovePosition logMovePosition) {
-		this.logMoveUnode = logMovePosition.getOn();
-		this.logMoveBeforeChild = logMovePosition.getBeforeChild();
+		this.logMoveNode = logMovePosition.getOn();
+		this.logMoveBeforeChildNode = logMovePosition.getBeforeChild();
 	}
 
-	public UnfoldedNode getLogMoveUnode() {
-		return logMoveUnode;
+	public int getLogMoveUnode() {
+		return logMoveNode;
 	}
 
-	public UnfoldedNode getPositionUnode() {
-		if (unode != null) {
-			return unode;
+	public int getPositionUnode() {
+		if (modelNode != -1) {
+			return modelNode;
 		}
-		if (logMoveUnode != null) {
-			return logMoveUnode;
+		if (logMoveNode != -1) {
+			return logMoveNode;
 		}
-		return logMoveBeforeChild;
+		return logMoveBeforeChildNode;
 	}
 
 	public boolean isLogMove() {
@@ -155,22 +160,22 @@ public class Move implements Event {
 	 * 
 	 * @return
 	 */
-	public UnfoldedNode getLogMoveParallelBranchMappedTo() {
-		return logMoveParallelBranchMappedTo;
+	public int getLogMoveParallelBranchMappedTo() {
+		return logMoveParallelBranchMappedToNode;
 	}
 
-	public void setLogMoveParallelBranchMappedTo(UnfoldedNode logMoveParallelBranch) {
-		this.logMoveParallelBranchMappedTo = logMoveParallelBranch;
+	public void setLogMoveParallelBranchMappedTo(int logMoveParallelBranch) {
+		this.logMoveParallelBranchMappedToNode = logMoveParallelBranch;
 	}
 
 	// ==== methods from the list view widget ====
 
 	public String getLabel() {
 		if (isModelMove()) {
-			return unode.toString();
+			return tree.getActivityName(modelNode);
 		}
 
-		if (isSyncMove() && unode.getNode() instanceof Automatic) {
+		if (isSyncMove() && tree.isTau(modelNode)) {
 			//tau
 			return "";
 		}
@@ -183,7 +188,7 @@ public class Move implements Event {
 	}
 
 	public String getBottomLabel() {
-		if (isSyncMove() && unode.getNode() instanceof Automatic) {
+		if (isSyncMove() && tree.isTau(modelNode)) {
 			return null;
 		} else {
 			return lifeCycleTransition.toString();

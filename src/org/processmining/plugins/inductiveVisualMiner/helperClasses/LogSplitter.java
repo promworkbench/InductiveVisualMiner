@@ -1,14 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import org.processmining.processtree.Node;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import com.google.common.collect.FluentIterable;
 
 public class LogSplitter {
 	
@@ -19,10 +20,10 @@ public class LogSplitter {
 	 * @param <X>
 	 */
 	public static class SigmaMaps <X> {
-		public List<Set<UnfoldedNode>> partition = new LinkedList<Set<UnfoldedNode>>();
+		public List<TIntSet> partition = new ArrayList<>();
 		public List<List<X>> sublogs = new ArrayList<List<X>>();
-		public HashMap<Set<UnfoldedNode>, List<X>> mapSigma2subtrace = new HashMap<Set<UnfoldedNode>, List<X>>();
-		public HashMap<UnfoldedNode, Set<UnfoldedNode>> mapUnode2sigma= new HashMap<UnfoldedNode, Set<UnfoldedNode>>();
+		public HashMap<TIntSet, List<X>> mapSigma2subtrace = new HashMap<>();
+		public TIntObjectMap<TIntSet> mapUnode2sigma= new TIntObjectHashMap<>(10, 0.5f, -1);
 	}
 
 	/**
@@ -31,21 +32,22 @@ public class LogSplitter {
 	 * @return
 	 */
 	public static <X> SigmaMaps<X> makeSigmaMaps(
-			UnfoldedNode unode) {
+			IvMEfficientTree tree, int unode) {
 		SigmaMaps<X> r = new SigmaMaps<X>();
 		
 		//make a partition
-		for (Node child : unode.getBlock().getChildren()) {
-			UnfoldedNode uchild = unode.unfoldChild(child);
-			r.partition.add(new HashSet<UnfoldedNode>(TreeUtils.unfoldAllNodes(uchild)));
+		for (int child : tree.getChildren(unode)) {
+			TIntHashSet part = new TIntHashSet(10, 0.5f, -1);
+			part.addAll(FluentIterable.from(tree.getAllNodes(child)).toList());
+			r.partition.add(part);
 		}
 
 		//map activities to sigmas
-		for (Set<UnfoldedNode> sigma : r.partition) {
+		for (TIntSet sigma : r.partition) {
 			List<X> subtrace = new ArrayList<X>();
 			r.sublogs.add(subtrace);
 			r.mapSigma2subtrace.put(sigma, subtrace);
-			for (UnfoldedNode unode2 : sigma) {
+			for (int unode2 : sigma.toArray()) {
 				r.mapUnode2sigma.put(unode2, sigma);
 			}
 		}

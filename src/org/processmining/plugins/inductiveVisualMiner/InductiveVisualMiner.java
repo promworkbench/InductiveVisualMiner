@@ -13,6 +13,7 @@ import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.InductiveMiner.Classifiers;
+import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapperPluginFinder;
 import org.processmining.processtree.ProcessTree;
 
@@ -23,7 +24,7 @@ public class InductiveVisualMiner {
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0, 1 })
-	public JComponent visualise(final PluginContext context, XLog xLog, ProMCanceller canceller) {
+	public JComponent visualise(final PluginContext context, XLog xLog, ProMCanceller canceller) throws UnknownTreeNodeException {
 
 		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog, null);
 		InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state,
@@ -40,7 +41,7 @@ public class InductiveVisualMiner {
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0, 1 })
 	public JComponent visualise(final PluginContext context, final InteractiveMinerLauncher launcher,
-			ProMCanceller canceller) {
+			ProMCanceller canceller) throws UnknownTreeNodeException {
 
 		//remove launcher
 		if (context instanceof UIPluginContext) {

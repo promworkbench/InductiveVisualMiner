@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
 import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.List;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
+import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersThesisIM;
@@ -22,6 +24,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -36,19 +39,18 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleSplitLog;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 import com.kitfox.svg.SVGDiagram;
 
 public class InductiveVisualMinerState {
 
-	public InductiveVisualMinerState(XLog xLog, ProcessTree preMinedTree) {
+	public InductiveVisualMinerState(XLog xLog, ProcessTree preMinedTree) throws UnknownTreeNodeException {
 		this.xLog = xLog;
 		//miningParameters = new NoLifeCycleMiningParametersIvM();
 		miningParameters = new MiningParametersThesisIM();
 		if (preMinedTree != null) {
-			this.tree = preMinedTree;
-			this.preMinedTree = preMinedTree;
+			this.tree = new IvMEfficientTree(preMinedTree);
+			this.preMinedTree = this.tree;
 		}
 	}
 
@@ -155,8 +157,8 @@ public class InductiveVisualMinerState {
 	private MiningParameters miningParameters;
 	private VisualMinerWrapper miner = new NoLifeCycleSplitLog();
 	private double paths = 0.8;
-	private ProcessTree tree = null;
-	private ProcessTree preMinedTree = null;
+	private IvMEfficientTree tree = null;
+	private IvMEfficientTree preMinedTree = null;
 
 	public MiningParameters getMiningParameters2() {
 		return miningParameters;
@@ -182,15 +184,15 @@ public class InductiveVisualMinerState {
 		this.paths = paths;
 	}
 
-	public ProcessTree getTree() {
+	public IvMEfficientTree getTree() {
 		return tree;
 	}
 
-	public synchronized void setTree(ProcessTree tree) {
+	public synchronized void setTree(IvMEfficientTree tree) {
 		this.tree = tree;
 	}
 
-	public ProcessTree getPreMinedTree() {
+	public IvMEfficientTree getPreMinedTree() {
 		return preMinedTree;
 	}
 
@@ -267,7 +269,7 @@ public class InductiveVisualMinerState {
 
 	public void removeModelAndLogMovesSelection() {
 		selection = new Selection(selection.getSelectedActivities(), new THashSet<LogMovePosition>(),
-				new THashSet<UnfoldedNode>(), selection.getSelectedTaus());
+				new TIntHashSet(10, 0.5f, -1), selection.getSelectedTaus());
 	}
 
 	public List<IvMFilter> getColouringFilters() {

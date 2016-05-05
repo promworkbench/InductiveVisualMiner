@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.performance;
 
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class QueueLengthsImplPHStartComplete extends QueueLengths {
 
@@ -23,7 +22,7 @@ public class QueueLengthsImplPHStartComplete extends QueueLengths {
 //		lambda2 = 0.0000007212469;
 	}
 
-	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+	public double getQueueProbability(int unode, QueueActivityLog l, long time, int traceIndex) {
 		if (l.getInitiate(traceIndex) > 0 && l.getStart(traceIndex) > 0 && l.getInitiate(traceIndex) <= time
 				&& time <= l.getStart(traceIndex)) {
 			long xI = time - l.getInitiate(traceIndex);

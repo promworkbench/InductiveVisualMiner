@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 import java.util.List;
 
 import org.deckfour.xes.model.XAttributeMap;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.ActivityInstanceIterator;
 
 public interface IvMTrace extends List<IvMMove> {
@@ -43,12 +44,12 @@ public interface IvMTrace extends List<IvMMove> {
 	public void setStartTime(double guessStartTime);
 
 	public void setEndTime(double guessEndTime);
-	
+
 	public void setRealStartTime(long startTime);
-	
+
 	public void setRealEndTime(long endTime);
 
 	public XAttributeMap getAttributes();
 
-	public ActivityInstanceIterator activityInstanceIterator();
+	public ActivityInstanceIterator activityInstanceIterator(IvMEfficientTree tree);
 }

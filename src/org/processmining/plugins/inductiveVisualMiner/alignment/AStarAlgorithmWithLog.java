@@ -8,7 +8,6 @@ import java.util.Map;
 import nl.tue.astar.Trace;
 
 import org.deckfour.xes.classification.XEventClass;
-import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.etm.model.narytree.replayer.AStarAlgorithm;
 
@@ -21,20 +20,12 @@ import org.processmining.plugins.etm.model.narytree.replayer.AStarAlgorithm;
 public class AStarAlgorithmWithLog extends AStarAlgorithm {
 
 	private Map<Trace, TIntArrayList> atrace2xtrace;
-	
-	private AStarAlgorithmWithLog() {
-		
-	}
 
-	private AStarAlgorithmWithLog(XEventClasses classes) {
-		
-	}
-
-	public AStarAlgorithmWithLog(XLog log, XEventClasses classes, Map<XEventClass, Integer> activity2Cost) {
+	public AStarAlgorithmWithLog(XLog log, IvMEventClasses classes, Map<XEventClass, Integer> activity2Cost) {
 		super(log, classes, activity2Cost);
-		
+
 		atrace2xtrace = new THashMap<>();
-		
+
 		for (int j = 0; j < log.size(); j++) {
 			Trace list = getListEventClass(log, j);
 			TIntArrayList occurrences;
@@ -47,7 +38,7 @@ public class AStarAlgorithmWithLog extends AStarAlgorithm {
 			occurrences.add(j);
 		}
 	}
-	
+
 	public TIntArrayList getXTracesOf(Trace aTrace) {
 		return atrace2xtrace.get(aTrace);
 	}

@@ -5,9 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Quadruple;
+import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -18,21 +19,23 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class Cl09FilterNodeSelection
 		extends
-		ChainLink<Quadruple<IvMLogNotFiltered, Selection, List<IvMFilter>, IvMLogInfo>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
+		ChainLink<Quintuple<IvMLogNotFiltered, Selection, List<IvMFilter>, IvMLogInfo, IvMEfficientTree>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
 
-	protected Quadruple<IvMLogNotFiltered, Selection, List<IvMFilter>, IvMLogInfo> generateInput(
+	protected Quintuple<IvMLogNotFiltered, Selection, List<IvMFilter>, IvMLogInfo, IvMEfficientTree> generateInput(
 			InductiveVisualMinerState state) {
-		return Quadruple
-				.of(state.getIvMLog(), state.getSelection(), state.getColouringFilters(), state.getIvMLogInfo());
+		return Quintuple.of(state.getIvMLog(), state.getSelection(), state.getColouringFilters(),
+				state.getIvMLogInfo(), state.getTree());
 	}
 
 	protected Pair<IvMLogFilteredImpl, IvMLogInfo> executeLink(
-			Quadruple<IvMLogNotFiltered, Selection, List<IvMFilter>, IvMLogInfo> input, IvMCanceller canceller) {
+			Quintuple<IvMLogNotFiltered, Selection, List<IvMFilter>, IvMLogInfo, IvMEfficientTree> input,
+			IvMCanceller canceller) {
 
 		IvMLogNotFiltered logBase = input.getA();
 		Selection selection = input.getB();
 		List<IvMFilter> colouringFilters = input.getC();
 		IvMLogInfo oldLogInfo = input.getD();
+		IvMEfficientTree tree = input.getE();
 
 		IvMLogFilteredImpl logFiltered = new IvMLogFilteredImpl(logBase);
 
@@ -41,13 +44,13 @@ public class Cl09FilterNodeSelection
 
 		//apply node/edge selection filters
 		if (selection.isSomethingSelected()) {
-			filterOnSelection(logFiltered, selection);
+			filterOnSelection(tree, logFiltered, selection);
 		}
 
 		//create a log info
 		IvMLogInfo resultLogInfo = oldLogInfo;
 		if (logFiltered.isSomethingFiltered()) {
-			resultLogInfo = new IvMLogInfo(logFiltered);
+			resultLogInfo = new IvMLogInfo(logFiltered, tree);
 		}
 		return Pair.of(logFiltered, resultLogInfo);
 	}
@@ -99,13 +102,13 @@ public class Cl09FilterNodeSelection
 	 * @param selectedNodes
 	 * @param selectedLogMoves
 	 */
-	private static void filterOnSelection(IvMLogFilteredImpl log, Selection selection) {
+	private static void filterOnSelection(IvMEfficientTree tree, IvMLogFilteredImpl log, Selection selection) {
 
 		for (Iterator<IvMTrace> it = log.iterator(); it.hasNext();) {
 			IvMTrace trace = it.next();
 			boolean keepTrace = false;
 			for (IvMMove move : trace) {
-				if (selection.isSelected(move)) {
+				if (selection.isSelected(tree, move)) {
 					keepTrace = true;
 					break;
 				}

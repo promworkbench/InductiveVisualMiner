@@ -156,22 +156,23 @@ public class DotToken implements Iterable<DotTokenStep> {
 		return last;
 	}
 
-	public void addStepInNode(LocalDotNode node, Double arrivalTime, String comment) {
-		steps.add(DotTokenStep.node(node, arrivalTime, comment));
+	public void addStepInNode(LocalDotNode node, Double arrivalTime) {
+		steps.add(DotTokenStep.node(node, arrivalTime));
 		subTokens.add(new THashSet<DotToken>());
 		performSanityCheck(null);
 	}
 
-	public void addStepOverEdge(LocalDotEdge edge, Double arrivalTime, String comment) {
-		steps.add(DotTokenStep.edge(edge, arrivalTime, comment));
+	public void addStepOverEdge(LocalDotEdge edge, Double arrivalTime) {
+		steps.add(DotTokenStep.edge(edge, arrivalTime));
 		subTokens.add(new THashSet<DotToken>());
 		performSanityCheck(null);
 	}
 
 	public void addSubToken(DotToken token) {
 
-		//check whether this sub token is added to a parallel/interleaved split
-		assert(getLastPosition().getType() == NodeType.parallelSplit || getLastPosition().getType() == NodeType.interleavedSplit);
+		//check whether this sub token is added to a concurrent/interleaved/or split
+		assert (getLastPosition().getType() == NodeType.concurrentSplit
+				|| getLastPosition().getType() == NodeType.interleavedSplit || getLastPosition().getType() == NodeType.orSplit);
 
 		subTokens.get(subTokens.size() - 1).add(token);
 		//		System.out.println("  add subtoken at " + (subTokens.size() - 1));
@@ -245,7 +246,7 @@ public class DotToken implements Iterable<DotTokenStep> {
 
 		StringBuilder result = new StringBuilder();
 		result.append(sIndent);
-		result.append("Token starts at " + startPosition.getId() + " @" + startTime);
+		result.append("Token starts at " + startPosition.getType() + " @" + startTime);
 		result.append("\n");
 		for (int i = 0; i < steps.size(); i++) {
 			DotTokenStep p = steps.get(i);
@@ -306,13 +307,13 @@ public class DotToken implements Iterable<DotTokenStep> {
 	 */
 	public boolean isParallelJoin(int index) {
 		//check whether this node is a parallel join
-		if (getTarget(index).getType() != NodeType.parallelJoin) {
+		if (getTarget(index).getType() != NodeType.concurrentJoin) {
 			return false;
 		}
 
 		//check whether the next node is a parallel join
 		//in that case, this join is caused by a log move
-		return index == steps.size() - 1 || getTarget(index + 1).getType() != NodeType.parallelJoin;
+		return index == steps.size() - 1 || getTarget(index + 1).getType() != NodeType.concurrentJoin;
 	}
 
 	/**

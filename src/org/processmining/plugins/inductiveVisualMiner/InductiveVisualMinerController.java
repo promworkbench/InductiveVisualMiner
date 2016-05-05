@@ -25,6 +25,7 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Function;
+import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.export.ExportDialog;
@@ -45,6 +46,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Histogram;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterPluginFinder;
@@ -62,8 +64,6 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.Task.Manual;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class InductiveVisualMinerController {
 
@@ -97,6 +97,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveModelButton().setEnabled(false);
 					panel.getSaveImageButton().setEnabled(false);
 					panel.getSaveImageButton().setText("image");
+					panel.getEditModelView().setTree(null);
 					state.resetAlignment();
 					state.resetPerformance();
 					state.resetHistogramData();
@@ -128,6 +129,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveModelButton().setEnabled(false);
 					panel.getSaveImageButton().setEnabled(false);
 					panel.getSaveImageButton().setText("image");
+					panel.getEditModelView().setTree(null);
 					state.resetAnimation();
 					state.resetAlignment();
 					state.resetPerformance();
@@ -148,10 +150,12 @@ public class InductiveVisualMinerController {
 					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveImageButton().setText("image");
 					panel.getTraceView().set(state.getLog());
+					panel.getEditModelView().setTree(null);
 					state.resetAnimation();
 					state.resetAlignment();
 					state.resetPerformance();
 					state.resetHistogramData();
+					state.setSelection(new Selection());
 					setStatus("Mining..");
 					setAnimationStatus(" ", false);
 				}
@@ -160,6 +164,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					panel.getSaveModelButton().setEnabled(true);
 					panel.getSaveImageButton().setEnabled(true);
+					panel.getEditModelView().setTree(state.getTree());
 				}
 			});
 			m.setOnException(onException);
@@ -190,11 +195,23 @@ public class InductiveVisualMinerController {
 					panel.getTraceView().setColourMap(state.getTraceViewColourMap());
 
 					makeElementsSelectable(state.getVisualisationInfo(), panel, state.getSelection());
-
 				}
 			};
 			Cl04LayoutModel chainLinkLayout = new Cl04LayoutModel();
-			chainLinkLayout.setOnStart(layoutStart);
+			chainLinkLayout.setOnStart(new Runnable() {
+				
+				public void run() {
+					layoutStart.run();
+					panel.getGraph().setAnimationEnabled(false);
+					panel.getSaveImageButton().setText("image");
+					panel.getTraceView().set(state.getLog());
+					state.resetAnimation();
+					state.resetAlignment();
+					state.resetPerformance();
+					state.resetHistogramData();
+					state.setSelection(new Selection());
+				}
+			});
 			chainLinkLayout.setOnComplete(layoutComplete);
 			chainLinkLayout.setOnException(onException);
 			chain.add(chainLinkLayout);
@@ -217,7 +234,7 @@ public class InductiveVisualMinerController {
 			});
 			a.setOnComplete(new Runnable() {
 				public void run() {
-					panel.getTraceView().set(state.getIvMLog(), state.getSelection());
+					panel.getTraceView().set(state.getTree(), state.getIvMLog(), state.getSelection());
 				}
 			});
 			a.setOnException(onException);
@@ -292,13 +309,17 @@ public class InductiveVisualMinerController {
 					state.resetPerformance();
 
 					HighlightingFiltersView.updateSelectionDescription(panel, state.getSelection(),
-							state.getColouringFilters());
+							state.getColouringFilters(), state.getTree());
 
 					//tell trace view the colour map and the selection
-					panel.getTraceView().set(state.getIvMLogFiltered(), state.getSelection());
+					panel.getTraceView().set(state.getTree(), state.getIvMLogFiltered(), state.getSelection());
 
-					updateHighlighting();
-					updatePopup();
+					try {
+						updateHighlighting();
+						updatePopup();
+					} catch (UnknownTreeNodeException e) {
+						e.printStackTrace();
+					}
 
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(state.getIvMLogFiltered());
@@ -322,8 +343,12 @@ public class InductiveVisualMinerController {
 			});
 			q.setOnComplete(new Runnable() {
 				public void run() {
-					updateHighlighting();
-					updatePopup();
+					try {
+						updateHighlighting();
+						updatePopup();
+					} catch (UnknownTreeNodeException e) {
+						e.printStackTrace();
+					}
 					panel.getGraph().repaint();
 					state.setHistogramWidth((int) panel.getGraph().getControlsProgressLine().getWidth());
 				}
@@ -414,6 +439,17 @@ public class InductiveVisualMinerController {
 				chain.execute(Cl01MakeLog.class);
 			}
 		});
+		
+		//model editor
+		panel.getEditModelView().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (e.getSource() instanceof IvMEfficientTree) {
+					IvMEfficientTree tree = (IvMEfficientTree) e.getSource();
+					state.setTree(tree);
+					chain.execute(Cl04LayoutModel.class);
+				}
+			}
+		});
 
 		//activities filter
 		panel.getActivitiesSlider().addChangeListener(new ChangeListener() {
@@ -457,7 +493,7 @@ public class InductiveVisualMinerController {
 
 				//store the resulting Process tree or Petri net
 				String name = XConceptExtension.instance().extractName(state.getXLog());
-				ProcessTree tree = state.getTree();
+				ProcessTree tree = state.getTree().getDTree();
 
 				Object[] options = { "Petri net", "Process tree" };
 				int n = JOptionPane.showOptionDialog(panel,
@@ -508,6 +544,13 @@ public class InductiveVisualMinerController {
 				panel.getPreMiningFiltersView().swapVisibility();
 			}
 		});
+		
+		//set edit model button
+		panel.getEditModelButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				panel.getEditModelView().swapVisibility();
+			}
+		});
 
 		//set trace view button
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
@@ -527,7 +570,11 @@ public class InductiveVisualMinerController {
 		panel.getGraph().addMouseInElementsChangedListener(new MouseInElementsChangedListener<DotElement>() {
 			public void mouseInElementsChanged(Set<DotElement> mouseInElements) {
 				panel.getGraph().setShowPopup(!mouseInElements.isEmpty());
-				updatePopup();
+				try {
+					updatePopup();
+				} catch (UnknownTreeNodeException e) {
+					e.printStackTrace();
+				}
 				panel.repaint();
 			}
 		});
@@ -546,7 +593,11 @@ public class InductiveVisualMinerController {
 					//draw queues
 					if (state.getMode().isUpdateWithTimeStep(state)) {
 						state.getVisualisationData().setTime(logTime);
-						updateHighlighting();
+						try {
+							updateHighlighting();
+						} catch (UnknownTreeNodeException e) {
+							e.printStackTrace();
+						}
 						panel.getTraceView().repaint();
 					}
 				}
@@ -605,7 +656,7 @@ public class InductiveVisualMinerController {
 			});
 		}
 	}
-	
+
 	private void initialisePreMiningFilters(final XLog xLog, Executor executor) {
 		final Runnable onUpdate = new Runnable() {
 			public void run() {
@@ -624,8 +675,10 @@ public class InductiveVisualMinerController {
 
 	/**
 	 * update the highlighting
+	 * 
+	 * @throws UnknownTreeNodeException
 	 */
-	public void updateHighlighting() {
+	public void updateHighlighting() throws UnknownTreeNodeException {
 		TraceViewColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(panel.getGraph()
 				.getSVG(), state.getVisualisationInfo(), state.getTree(), state.getVisualisationData(), state.getMode()
 				.getVisualisationParameters(state));
@@ -633,20 +686,21 @@ public class InductiveVisualMinerController {
 		panel.getTraceView().setColourMap(colourMap);
 	}
 
-	private void updatePopup() {
+	private void updatePopup() throws UnknownTreeNodeException {
 		if (panel.getGraph().getMouseInElements().isEmpty()) {
 			panel.getGraph().setShowPopup(false);
 		} else {
 			//output statistics about the node
 			DotElement element = panel.getGraph().getMouseInElements().iterator().next();
 			if (element instanceof LocalDotNode) {
-				UnfoldedNode unode = ((LocalDotNode) element).getUnode();
-				if (state.isAlignmentReady() && unode.getNode() instanceof Manual) {
+				int unode = ((LocalDotNode) element).getUnode();
+				if (state.isAlignmentReady() && state.getTree().isActivity(unode)) {
 					List<String> popup = new ArrayList<>();
 
 					//frequencies
 					popup.add("number of occurrences "
-							+ IvMLogMetrics.getNumberOfTracesRepresented(unode, false, state.getIvMLogInfoFiltered()));
+							+ IvMLogMetrics.getNumberOfTracesRepresented(state.getTree(), unode, false,
+									state.getIvMLogInfoFiltered()));
 
 					//waiting time
 					if (state.isPerformanceReady()) {

@@ -17,6 +17,7 @@ import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
@@ -53,6 +54,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private JComboBox<?> classifiersCombobox;
 	private final JButton preMiningFiltersButton;
 	private final PreMiningFiltersView preMiningFiltersView;
+	private final JButton editModelButton;
+	private final EditModelView editModelView;
 	private final JLabel minerLabel;
 	private JComboBox<?> minerCombobox;
 	private final JButton saveModelButton;
@@ -125,6 +128,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			add(preMiningFiltersButton, cTraceViewButton);
 		}
 
+		//miner
 		{
 			minerLabel = SlickerFactory.instance().createLabel("Mine");
 			GridBagConstraints cMinerLabel = new GridBagConstraints();
@@ -142,6 +146,18 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cMiners.fill = GridBagConstraints.HORIZONTAL;
 			add(minerCombobox, cMiners);
 			minerCombobox.setSelectedItem(state.getMiner());
+		}
+
+		//edit model view
+		{
+			editModelView = new EditModelView(this);
+			editModelButton = SlickerFactory.instance().createButton("edit model");
+			GridBagConstraints cEditModelButton = new GridBagConstraints();
+			cEditModelButton.gridx = 2;
+			cEditModelButton.gridy = gridy++;
+			cEditModelButton.gridwidth = 1;
+			cEditModelButton.fill = GridBagConstraints.HORIZONTAL;
+			add(editModelButton, cEditModelButton);
 		}
 
 		{
@@ -313,6 +329,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public void removeNotify() {
 		super.removeNotify();
+		editModelView.setVisible(false);
 		preMiningFiltersView.setVisible(false);
 		traceView.setVisible(false);
 		colouringFiltersView.setVisible(false);
@@ -374,11 +391,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public JComboBox<?> getColourSelection() {
 		return colourSelection;
 	}
-	
+
 	public JButton getPreMiningFiltersButton() {
 		return preMiningFiltersButton;
 	}
-	
+
 	public PreMiningFiltersView getPreMiningFiltersView() {
 		return preMiningFiltersView;
 	}
@@ -417,6 +434,14 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public JButton getTraceViewButton() {
 		return traceViewButton;
+	}
+
+	public EditModelView getEditModelView() {
+		return editModelView;
+	}
+
+	public JButton getEditModelButton() {
+		return editModelButton;
 	}
 
 	public HighlightingFiltersView getColouringFiltersView() {

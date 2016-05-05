@@ -7,26 +7,17 @@ import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.mining.interleaved.Interleaved;
+import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
-import org.processmining.processtree.Node;
-import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
-import org.processmining.processtree.impl.AbstractBlock.And;
-import org.processmining.processtree.impl.AbstractBlock.Or;
-import org.processmining.processtree.impl.AbstractBlock.Seq;
-import org.processmining.processtree.impl.AbstractBlock.Xor;
-import org.processmining.processtree.impl.AbstractBlock.XorLoop;
-import org.processmining.processtree.impl.AbstractTask.Automatic;
-import org.processmining.processtree.impl.AbstractTask.Manual;
 
 public class ProcessTreeVisualisation {
 
@@ -40,8 +31,9 @@ public class ProcessTreeVisualisation {
 	private ProcessTreeVisualisationInfo info;
 	private TraceViewColourMap traceViewColourMap;
 
-	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewColourMap> fancy(ProcessTree tree,
-			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters) {
+	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewColourMap> fancy(IvMEfficientTree tree,
+			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters)
+			throws UnknownTreeNodeException {
 		this.parameters = parameters;
 		this.data = data;
 
@@ -52,70 +44,74 @@ public class ProcessTreeVisualisation {
 
 		dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
-		UnfoldedNode root = new UnfoldedNode(tree.getRoot());
+		int root = tree.getRoot();
 
-		traceViewColourMap = new TraceViewColourMap();
+		traceViewColourMap = new TraceViewColourMap(tree);
 
 		//source & sink
 		info = new ProcessTreeVisualisationInfo();
-		LocalDotNode source = new LocalDotNode(dot, info, NodeType.source, "", root);
-		LocalDotNode sink = new LocalDotNode(dot, info, NodeType.sink, "", root);
+		LocalDotNode source = new LocalDotNode(dot, info, NodeType.source, "", 0);
+		LocalDotNode sink = new LocalDotNode(dot, info, NodeType.sink, "", 0);
 		info.setRoot(source, sink);
 		//convert root node
-		convertNode(root, source, sink, true);
+		convertNode(tree, root, source, sink, true);
 
 		//add log-move-arcs to source and sink
 		//a parallel root will project its own log moves 
-		if (parameters.isShowLogMoves() && !(root.getBlock() instanceof And)) {
-			visualiseLogMove(source, source, root, LogMovePosition.atSource(root), true);
-			visualiseLogMove(sink, sink, root, LogMovePosition.atSink(root), false);
+		if (parameters.isShowLogMoves() && !(tree.isConcurrent(root) || tree.isOr(root) || tree.isInterleaved(root))) {
+			visualiseLogMove(tree, source, source, root, LogMovePosition.atSource(root), true);
+			visualiseLogMove(tree, sink, sink, root, LogMovePosition.atSink(root), false);
 		}
 
 		return Triple.of(dot, info, traceViewColourMap);
 	}
 
-	private void convertNode(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
-		if (unode.getNode() instanceof Seq) {
-			convertSequence(unode, source, sink, directionForward);
-		} else if (unode.getNode() instanceof XorLoop) {
-			convertLoop(unode, source, sink, directionForward);
-		} else if (unode.getNode() instanceof Interleaved) {
-			convertInterleaved(unode, source, sink, directionForward);
-		} else if (unode.getNode() instanceof And) {
-			convertParallel(unode, source, sink, directionForward);
-		} else if (unode.getNode() instanceof Or) {
-			convertOr(unode, source, sink, directionForward);
-		} else if (unode.getNode() instanceof Xor) {
-			convertXor(unode, source, sink, directionForward);
-		} else if (unode.getNode() instanceof Manual) {
-			convertActivity(unode, source, sink, directionForward);
-		} else if (unode.getNode() instanceof Automatic) {
-			convertTau(unode, source, sink, directionForward);
+	private void convertNode(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+			boolean directionForward) throws UnknownTreeNodeException {
+		if (tree.isSequence(node)) {
+			convertSequence(tree, node, source, sink, directionForward);
+		} else if (tree.isLoop(node)) {
+			convertLoop(tree, node, source, sink, directionForward);
+		} else if (tree.isInterleaved(node)) {
+			convertInterleaved(tree, node, source, sink, directionForward);
+		} else if (tree.isConcurrent(node)) {
+			convertConcurrent(tree, node, source, sink, directionForward);
+		} else if (tree.isOr(node)) {
+			convertOr(tree, node, source, sink, directionForward);
+		} else if (tree.isXor(node)) {
+			convertXor(tree, node, source, sink, directionForward);
+		} else if (tree.isActivity(node)) {
+			convertActivity(tree, node, source, sink, directionForward);
+		} else if (tree.isTau(node)) {
+			convertTau(tree, node, source, sink, directionForward);
+		} else {
+			throw new UnknownTreeNodeException();
 		}
 	}
 
-	private void convertActivity(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
+	private void convertActivity(IvMEfficientTree tree, int unode, LocalDotNode source, LocalDotNode sink,
+			boolean directionForward) throws UnknownTreeNodeException {
 		Pair<String, Long> cardinality = data.getNodeLabel(unode, false);
-		LocalDotNode dotNode = convertActivity(unode, cardinality);
+		LocalDotNode dotNode = convertActivity(tree, unode, cardinality);
 
-		addArc(source, dotNode, unode, directionForward, false);
-		addArc(dotNode, sink, unode, directionForward, false);
+		addArc(tree, source, dotNode, unode, directionForward, false);
+		addArc(tree, dotNode, sink, unode, directionForward, false);
 
 		//draw model moves
 		if (parameters.isShowModelMoves()) {
 			Pair<String, Long> modelMoves = data.getModelMoveEdgeLabel(unode);
 			if (modelMoves.getB() != 0) {
-				addMoveArc(source, sink, unode, EdgeType.modelMove, null, null, modelMoves, directionForward);
+				addMoveArc(tree, source, sink, unode, EdgeType.modelMove, -1, -1, modelMoves, directionForward);
 			}
 		}
 
 		//draw log moves
 		if (parameters.isShowLogMoves()) {
-			visualiseLogMove(dotNode, dotNode, unode, LogMovePosition.onLeaf(unode), directionForward);
+			visualiseLogMove(tree, dotNode, dotNode, unode, LogMovePosition.onLeaf(unode), directionForward);
 		}
 	}
 
-	private LocalDotNode convertActivity(UnfoldedNode unode, Pair<String, Long> cardinality) {
+	private LocalDotNode convertActivity(IvMEfficientTree tree, int unode, Pair<String, Long> cardinality) {
 		//style the activity by the occurrences of it
 		Color fillColour = Color.white;
 		if (cardinality.getB() != 0 && parameters.getColourNodes() != null) {
@@ -130,7 +126,7 @@ public class ProcessTreeVisualisation {
 		}
 		traceViewColourMap.set(unode, fillColour, fontColour);
 
-		String label = unode.getNode().getName();
+		String label = tree.getActivityName(unode);
 		if (label.length() == 0) {
 			label = " ";
 		}
@@ -146,174 +142,178 @@ public class ProcessTreeVisualisation {
 		return dotNode;
 	}
 
-	private void convertTau(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
-		addArc(source, sink, unode, directionForward, false);
+	private void convertTau(IvMEfficientTree tree, int unode, LocalDotNode source, LocalDotNode sink,
+			boolean directionForward) throws UnknownTreeNodeException {
+		addArc(tree, source, sink, unode, directionForward, false);
 	}
 
-	private void convertSequence(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
+	private void convertSequence(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+			boolean directionForward) throws UnknownTreeNodeException {
 		LocalDotNode split;
 		LocalDotNode join = source;
 
-		Iterator<Node> it = unode.getBlock().getChildren().iterator();
+		Iterator<Integer> it = tree.getChildren(node).iterator();
 		while (it.hasNext()) {
-			Node child = it.next();
+			int child = it.next();
 
 			split = join;
 			if (it.hasNext()) {
-				join = new LocalDotNode(dot, info, NodeType.xor, "", unode);
+				join = new LocalDotNode(dot, info, NodeType.xor, "", node);
 			} else {
 				join = sink;
 			}
 
-			convertNode(unode.unfoldChild(child), split, join, directionForward);
+			convertNode(tree, child, split, join, directionForward);
 
 			//draw log-move-arc if necessary
 			if (parameters.isShowLogMoves()) {
-				visualiseLogMove(split, split, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(child)),
-						directionForward);
+				visualiseLogMove(tree, split, split, node, LogMovePosition.beforeChild(node, child), directionForward);
 			}
 		}
 	}
 
-	private void convertLoop(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
+	private void convertLoop(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", unode);
-		addArc(source, split, unode, directionForward, true);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", node);
+		addArc(tree, source, split, node, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", unode);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", node);
 
-		Node bodyChild = unode.getBlock().getChildren().get(0);
-		convertNode(unode.unfoldChild(bodyChild), split, join, directionForward);
+		int bodyChild = tree.getChild(node, 0);
+		convertNode(tree, bodyChild, split, join, directionForward);
 
-		Node redoChild = unode.getBlock().getChildren().get(1);
-		convertNode(unode.unfoldChild(redoChild), join, split, !directionForward);
+		int redoChild = tree.getChild(node, 1);
+		convertNode(tree, redoChild, join, split, !directionForward);
 
-		Node exitChild = unode.getBlock().getChildren().get(2);
-		convertNode(unode.unfoldChild(exitChild), join, sink, directionForward);
+		int exitChild = tree.getChild(node, 2);
+		convertNode(tree, exitChild, join, sink, directionForward);
 
 		//put log-moves on children
 		if (parameters.isShowLogMoves()) {
-			visualiseLogMove(split, split, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(bodyChild)),
-					directionForward);
-			visualiseLogMove(join, join, unode, LogMovePosition.beforeChild(unode, unode.unfoldChild(redoChild)),
-					directionForward);
+			visualiseLogMove(tree, split, split, node, LogMovePosition.beforeChild(node, bodyChild), directionForward);
+			visualiseLogMove(tree, join, join, node, LogMovePosition.beforeChild(node, redoChild), directionForward);
 			/*
 			 * In principle, there can be log moves before the exit node.
 			 * However, we assume them to be mapped before the redo child, as
 			 * that is the same position in the model. It's up to the log move
 			 * mapping to assure this.
 			 */
-			assert (data.getLogMoveEdgeLabel(LogMovePosition.beforeChild(unode, unode.unfoldChild(exitChild))).getB()
-					.size() == 0);
+			assert (data.getLogMoveEdgeLabel(LogMovePosition.beforeChild(node, exitChild)).getB().size() == 0);
 
 		}
 	}
 
-	private void convertParallel(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
+	private void convertConcurrent(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.parallelSplit, "+", unode);
-		addArc(source, split, unode, directionForward, true);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.concurrentSplit, "+", node);
+		addArc(tree, source, split, node, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, "+", unode);
-		addArc(join, sink, unode, directionForward, true);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.concurrentJoin, "+", node);
+		addArc(tree, join, sink, node, directionForward, true);
 
-		for (Node child : unode.getBlock().getChildren()) {
-			convertNode(unode.unfoldChild(child), split, join, directionForward);
+		for (int child : tree.getChildren(node)) {
+			convertNode(tree, child, split, join, directionForward);
 		}
 
 		//put log-moves, if necessary
 		if (parameters.isShowLogMoves()) {
 			//on split
-			visualiseLogMove(split, split, unode, LogMovePosition.atSource(unode), directionForward);
+			visualiseLogMove(tree, split, split, node, LogMovePosition.atSource(node), directionForward);
 
 			//on join
-			visualiseLogMove(join, join, unode, LogMovePosition.atSink(unode), directionForward);
+			visualiseLogMove(tree, join, join, node, LogMovePosition.atSink(node), directionForward);
 		}
 	}
 
-	private void convertInterleaved(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
+	private void convertInterleaved(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.interleavedSplit, "\u2194", unode);
-		addArc(source, split, unode, directionForward, true);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.interleavedSplit, "\u2194", node);
+		addArc(tree, source, split, node, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.interleavedJoin, "\u2194", unode);
-		addArc(join, sink, unode, directionForward, true);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.interleavedJoin, "\u2194", node);
+		addArc(tree, join, sink, node, directionForward, true);
 
-		for (Node child : unode.getBlock().getChildren()) {
-			convertNode(unode.unfoldChild(child), split, join, directionForward);
+		for (int child : tree.getChildren(node)) {
+			convertNode(tree, child, split, join, directionForward);
 		}
 
 		//put log-moves, if necessary
 		if (parameters.isShowLogMoves()) {
 			//on split
-			visualiseLogMove(split, split, unode, LogMovePosition.atSource(unode), directionForward);
+			visualiseLogMove(tree, split, split, node, LogMovePosition.atSource(node), directionForward);
 
 			//on join
-			visualiseLogMove(join, join, unode, LogMovePosition.atSink(unode), directionForward);
+			visualiseLogMove(tree, join, join, node, LogMovePosition.atSink(node), directionForward);
 		}
 	}
 
-	private void convertOr(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
+	private void convertOr(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.parallelSplit, "o", unode);
-		addArc(source, split, unode, directionForward, true);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.orSplit, "o", node);
+		addArc(tree, source, split, node, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.parallelJoin, "o", unode);
-		addArc(join, sink, unode, directionForward, true);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.orJoin, "o", node);
+		addArc(tree, join, sink, node, directionForward, true);
 
-		for (Node child : unode.getBlock().getChildren()) {
-			convertNode(unode.unfoldChild(child), split, join, directionForward);
+		for (int child : tree.getChildren(node)) {
+			convertNode(tree, child, split, join, directionForward);
 		}
 
 		//put log-moves, if necessary
 		if (parameters.isShowLogMoves()) {
 			//on split
-			visualiseLogMove(split, split, unode, LogMovePosition.atSource(unode), directionForward);
+			visualiseLogMove(tree, split, split, node, LogMovePosition.atSource(node), directionForward);
 
 			//on join
-			visualiseLogMove(join, join, unode, LogMovePosition.atSink(unode), directionForward);
+			visualiseLogMove(tree, join, join, node, LogMovePosition.atSink(node), directionForward);
 		}
 	}
 
-	private void convertXor(UnfoldedNode unode, LocalDotNode source, LocalDotNode sink, boolean directionForward) {
+	private void convertXor(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", unode);
-		addArc(source, split, unode, directionForward, true);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", node);
+		addArc(tree, source, split, node, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", unode);
-		addArc(join, sink, unode, directionForward, true);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", node);
+		addArc(tree, join, sink, node, directionForward, true);
 
-		for (Node child : unode.getBlock().getChildren()) {
-			convertNode(unode.unfoldChild(child), split, join, directionForward);
+		for (int child : tree.getChildren(node)) {
+			convertNode(tree, child, split, join, directionForward);
 		}
 
 		//log-moves
 		//are never put on xor
 	}
 
-	private LocalDotEdge addArc(final LocalDotNode from, final LocalDotNode to, final UnfoldedNode unode,
-			boolean directionForward, boolean includeModelMoves) {
-		return addModelArc(from, to, unode, directionForward, data.getEdgeLabel(unode, includeModelMoves));
+	private LocalDotEdge addArc(IvMEfficientTree tree, final LocalDotNode from, final LocalDotNode to, final int node,
+			boolean directionForward, boolean includeModelMoves) throws UnknownTreeNodeException {
+		return addModelArc(tree, from, to, node, directionForward,
+				data.getEdgeLabel(node, includeModelMoves));
 	}
 
-	private LocalDotEdge addModelArc(final LocalDotNode from, final LocalDotNode to, final UnfoldedNode unode,
-			final boolean directionForward, final Pair<String, Long> cardinality) {
+	private LocalDotEdge addModelArc(IvMEfficientTree tree, final LocalDotNode from, final LocalDotNode to,
+			final int unode, final boolean directionForward, final Pair<String, Long> cardinality) {
 
 		final LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(dot, info, from, to, "", unode, EdgeType.model, null, null, directionForward);
+			edge = new LocalDotEdge(tree, dot, info, from, to, "", unode, EdgeType.model, -1, -1, directionForward);
 		} else {
-			edge = new LocalDotEdge(dot, info, to, from, "", unode, EdgeType.model, null, null, directionForward);
+			edge = new LocalDotEdge(tree, dot, info, to, from, "", unode, EdgeType.model, -1, -1, directionForward);
 			edge.setOption("dir", "back");
 		}
 
@@ -335,7 +335,7 @@ public class ProcessTreeVisualisation {
 		return edge;
 	}
 
-	private void visualiseLogMove(LocalDotNode from, LocalDotNode to, UnfoldedNode unode,
+	private void visualiseLogMove(IvMEfficientTree tree, LocalDotNode from, LocalDotNode to, int unode,
 			LogMovePosition logMovePosition, boolean directionForward) {
 		Pair<String, MultiSet<XEventClass>> logMoves = data.getLogMoveEdgeLabel(logMovePosition);
 		Pair<String, Long> t = Pair.of(logMoves.getA(), logMoves.getB().size());
@@ -343,26 +343,28 @@ public class ProcessTreeVisualisation {
 			if (parameters.isRepairLogMoves()) {
 				for (XEventClass e : logMoves.getB()) {
 					LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.logMoveActivity, e.toString(), unode);
-					addMoveArc(from, dotNode, unode, EdgeType.logMove, logMovePosition.getOn(),
+					addMoveArc(tree, from, dotNode, unode, EdgeType.logMove, logMovePosition.getOn(),
 							logMovePosition.getBeforeChild(), t, directionForward);
-					addMoveArc(dotNode, to, unode, EdgeType.logMove, logMovePosition.getOn(),
+					addMoveArc(tree, dotNode, to, unode, EdgeType.logMove, logMovePosition.getOn(),
 							logMovePosition.getBeforeChild(), t, directionForward);
 				}
 			} else {
-				addMoveArc(from, to, unode, EdgeType.logMove, logMovePosition.getOn(),
+				addMoveArc(tree, from, to, unode, EdgeType.logMove, logMovePosition.getOn(),
 						logMovePosition.getBeforeChild(), t, directionForward);
 			}
 		}
 	}
 
-	private LocalDotEdge addMoveArc(LocalDotNode from, LocalDotNode to, UnfoldedNode unode, EdgeType type,
-			UnfoldedNode lookupNode1, UnfoldedNode lookupNode2, Pair<String, Long> cardinality, boolean directionForward) {
+	private LocalDotEdge addMoveArc(IvMEfficientTree tree, LocalDotNode from, LocalDotNode to, int node, EdgeType type,
+			int lookupNode1, int lookupNode2, Pair<String, Long> cardinality, boolean directionForward) {
 
 		LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(dot, info, from, to, "", unode, type, lookupNode1, lookupNode2, directionForward);
+			edge = new LocalDotEdge(tree, dot, info, from, to, "", node, type, lookupNode1, lookupNode2,
+					directionForward);
 		} else {
-			edge = new LocalDotEdge(dot, info, to, from, "", unode, type, lookupNode1, lookupNode2, directionForward);
+			edge = new LocalDotEdge(tree, dot, info, to, from, "", node, type, lookupNode1, lookupNode2,
+					directionForward);
 			edge.setOption("dir", "back");
 		}
 

@@ -1,19 +1,16 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
-
-import java.util.Map;
-
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import gnu.trove.map.TIntDoubleMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
 public class QueueLengthsImplPHEnqueueStartComplete extends QueueLengths {
 
-	private final TObjectDoubleMap<UnfoldedNode> lambdas;
+	private final TIntDoubleMap lambdas;
 
-	public QueueLengthsImplPHEnqueueStartComplete(Map<UnfoldedNode, QueueActivityLog> queueActivityLogs) {
-		lambdas = new TObjectDoubleHashMap<>();
-		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
+	public QueueLengthsImplPHEnqueueStartComplete(TIntObjectMap<QueueActivityLog> queueActivityLogs) {
+		lambdas = new TIntDoubleHashMap(10, 0.5f, -1, 0);
+		for (int unode : queueActivityLogs.keySet().toArray()) {
 			QueueActivityLog l = queueActivityLogs.get(unode);
 			long sum = 0;
 			long count = 0;
@@ -27,7 +24,7 @@ public class QueueLengthsImplPHEnqueueStartComplete extends QueueLengths {
 		}
 	}
 
-	public double getQueueProbability(UnfoldedNode unode, QueueActivityLog l, long time, int traceIndex) {
+	public double getQueueProbability(int unode, QueueActivityLog l, long time, int traceIndex) {
 		if (l.getEnqueue(traceIndex) > 0 && l.getStart(traceIndex) > 0 && l.getEnqueue(traceIndex) <= time
 				&& time <= l.getStart(traceIndex)) {
 			double lambda = lambdas.get(unode);

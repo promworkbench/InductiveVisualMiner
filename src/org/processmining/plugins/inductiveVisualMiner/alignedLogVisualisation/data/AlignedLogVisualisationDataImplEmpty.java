@@ -4,7 +4,6 @@ import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class AlignedLogVisualisationDataImplEmpty implements AlignedLogVisualisationData {
 
@@ -12,11 +11,11 @@ public class AlignedLogVisualisationDataImplEmpty implements AlignedLogVisualisa
 		return Pair.of(0l, 0l);
 	}
 
-	public Pair<String, Long> getNodeLabel(UnfoldedNode unode, boolean includeModelMoves) {
+	public Pair<String, Long> getNodeLabel(int unode, boolean includeModelMoves) {
 		return Pair.of("", 0l);
 	}
 
-	public Pair<String, Long> getModelMoveEdgeLabel(UnfoldedNode unode) {
+	public Pair<String, Long> getModelMoveEdgeLabel(int unode) {
 		return Pair.of("", 0l);
 	}
 
@@ -24,7 +23,7 @@ public class AlignedLogVisualisationDataImplEmpty implements AlignedLogVisualisa
 		return Pair.of("", new MultiSet<XEventClass>());
 	}
 
-	public Pair<String, Long> getEdgeLabel(UnfoldedNode unode, boolean includeModelMoves) {
+	public Pair<String, Long> getEdgeLabel(int unode, boolean includeModelMoves) {
 		return Pair.of("", 0l);
 	}
 

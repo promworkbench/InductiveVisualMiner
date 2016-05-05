@@ -3,24 +3,26 @@ package org.processmining.plugins.inductiveVisualMiner.traceview;
 import java.awt.Color;
 import java.util.Iterator;
 
-import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.TraceBuilder;
+import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
-import org.processmining.processtree.Task.Automatic;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
 class TraceBuilderIvMLog implements TraceBuilder<Object> {
-	
+
 	private final Selection selection;
-	
-	public TraceBuilderIvMLog(Selection selection) {
+	private final IvMEfficientTree tree;
+
+	public TraceBuilderIvMLog(IvMEfficientTree tree, Selection selection) {
 		this.selection = selection;
+		this.tree = tree;
 	}
 
 	public Trace<? extends Event> build(final Object trace) {
@@ -32,8 +34,8 @@ class TraceBuilderIvMLog implements TraceBuilder<Object> {
 						if (input.isTauStart()) {
 							return false;
 						}
-						if (input.isSyncMove() && input.getUnode().getNode() instanceof Automatic) {
-							return selection.isSelected(input);
+						if (input.isSyncMove() && tree.isTau(input.getTreeNode())) {
+							return selection.isSelected(tree, input);
 						}
 						return true;
 					}

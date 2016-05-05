@@ -1,107 +1,110 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Selection {
 
-	private final Set<UnfoldedNode> selectedActivities;
-	private final Set<LogMovePosition> selectedLogMoveEdges;
-	private final Set<UnfoldedNode> selectedModelMoveEdges;
-	private final Set<UnfoldedNode> selectedModelEdges;
+	private final TIntSet treeNodesOfSelectedActivities;
+	private final Set<LogMovePosition> logMovePositionsOfSelectedLogMoveEdges;
+	private final TIntSet treeNodesOfSelectedModelMoveEdges;
+	private final TIntSet treeNodesOfSelectedModelEdges;
 
 	public Selection() {
-		selectedActivities = new THashSet<>();
-		selectedLogMoveEdges = new THashSet<>();
-		selectedModelMoveEdges = new THashSet<>();
-		selectedModelEdges = new THashSet<>();
+		treeNodesOfSelectedActivities = new TIntHashSet(10, 0.5f, -1);
+		logMovePositionsOfSelectedLogMoveEdges = new THashSet<>();
+		treeNodesOfSelectedModelMoveEdges = new TIntHashSet(10, 0.5f, -1);
+		treeNodesOfSelectedModelEdges = new TIntHashSet(10, 0.5f, -1);
 	}
 
-	public Selection(Set<UnfoldedNode> selectedActivities, Set<LogMovePosition> selectedLogMoves,
-			Set<UnfoldedNode> selectedModelMoves, Set<UnfoldedNode> selectedTaus) {
-		this.selectedActivities = new THashSet<>(selectedActivities);
-		this.selectedLogMoveEdges = new THashSet<>(selectedLogMoves);
-		this.selectedModelMoveEdges = new THashSet<>(selectedModelMoves);
-		this.selectedModelEdges = new THashSet<>(selectedTaus);
+	public Selection(TIntSet selectedActivities, Set<LogMovePosition> selectedLogMoves, TIntSet selectedModelMoves,
+			TIntSet selectedTaus) {
+		this.treeNodesOfSelectedActivities = new TIntHashSet(selectedActivities);
+		this.logMovePositionsOfSelectedLogMoveEdges = new THashSet<>(selectedLogMoves);
+		this.treeNodesOfSelectedModelMoveEdges = new TIntHashSet(selectedModelMoves);
+		this.treeNodesOfSelectedModelEdges = new TIntHashSet(selectedTaus);
 	}
 
-	public boolean isSelected(Move move) {
+	public boolean isSelected(IvMEfficientTree tree, Move move) {
 		if (move.isIgnoredLogMove() || move.isIgnoredModelMove() || !move.isComplete()) {
 			return false;
 		}
-		if (move.isSyncMove() && selectedActivities.contains(move.getUnode())) {
+		if (move.isSyncMove() && treeNodesOfSelectedActivities.contains(move.getTreeNode())) {
 			return true;
 		}
-		if (move.isLogMove() && selectedLogMoveEdges.contains(LogMovePosition.of(move))) {
+		if (move.isLogMove() && logMovePositionsOfSelectedLogMoveEdges.contains(LogMovePosition.of(move))) {
 			return true;
 		}
-		if (!move.isSyncMove() && move.isModelMove() && selectedModelMoveEdges.contains(move.getUnode())) {
+		if (!move.isSyncMove() && move.isModelMove() && treeNodesOfSelectedModelMoveEdges.contains(move.getTreeNode())) {
 			return true;
 		}
-		
+
 		if (move.isSyncMove()) {
-			for (UnfoldedNode selectedEdgeUnode : selectedModelEdges) {
-				if (TreeUtils.isParent(selectedEdgeUnode, move.getUnode())) {
+			for (TIntIterator it = treeNodesOfSelectedModelEdges.iterator(); it.hasNext();) {
+				int selectedEdgeUnode = it.next();
+				if (tree.isParentOf(selectedEdgeUnode, move.getTreeNode())) {
 					return true;
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
 	public boolean isSelected(LocalDotNode dotNode) {
-		return selectedActivities.contains(dotNode.getUnode());
+		return treeNodesOfSelectedActivities.contains(dotNode.getUnode());
 	}
 
 	public boolean isSelected(LocalDotEdge dotEdge) {
 		switch (dotEdge.getType()) {
 			case model :
-				return selectedModelEdges.contains(dotEdge.getUnode());
+				return treeNodesOfSelectedModelEdges.contains(dotEdge.getUnode());
 			case logMove :
-				return selectedLogMoveEdges.contains(LogMovePosition.of(dotEdge));
+				return logMovePositionsOfSelectedLogMoveEdges.contains(LogMovePosition.of(dotEdge));
 			case modelMove :
-				return selectedModelMoveEdges.contains(dotEdge.getUnode());
+				return treeNodesOfSelectedModelMoveEdges.contains(dotEdge.getUnode());
 		}
-		throw new RuntimeException("Only model-move, log-move and tau edges can be clicked on.");
+		assert (false);
+		return false;
 	}
 
-	public Set<UnfoldedNode> getSelectedActivities() {
-		return Collections.unmodifiableSet(selectedActivities);
-	}
-	
-	public Set<UnfoldedNode> getSelectedTaus() {
-		return Collections.unmodifiableSet(selectedModelEdges);
+	public TIntSet getSelectedActivities() {
+		return treeNodesOfSelectedActivities;
 	}
 
-	public Set<UnfoldedNode> getSelectedModelMoves() {
-		return Collections.unmodifiableSet(selectedModelMoveEdges);
+	public TIntSet getSelectedTaus() {
+		return treeNodesOfSelectedModelEdges;
+	}
+
+	public TIntSet getSelectedModelMoves() {
+		return treeNodesOfSelectedModelMoveEdges;
 	}
 
 	public void select(DotElement dotElement) {
 		if (dotElement instanceof LocalDotNode) {
-			selectedActivities.add(((LocalDotNode) dotElement).getUnode());
+			treeNodesOfSelectedActivities.add(((LocalDotNode) dotElement).getUnode());
 			return;
 		} else if (dotElement instanceof LocalDotEdge) {
 			switch (((LocalDotEdge) dotElement).getType()) {
 				case logMove :
-					selectedLogMoveEdges.add(LogMovePosition.of(((LocalDotEdge) dotElement)));
+					logMovePositionsOfSelectedLogMoveEdges.add(LogMovePosition.of(((LocalDotEdge) dotElement)));
 					return;
 				case modelMove :
-					selectedModelMoveEdges.add(((LocalDotEdge) dotElement).getUnode());
+					treeNodesOfSelectedModelMoveEdges.add(((LocalDotEdge) dotElement).getUnode());
 					return;
 				case model :
-					selectedModelEdges.add(((LocalDotEdge) dotElement).getUnode());
+					treeNodesOfSelectedModelEdges.add(((LocalDotEdge) dotElement).getUnode());
 					return;
 			}
 			throw new RuntimeException("Selection not supported.");
@@ -109,19 +112,19 @@ public class Selection {
 	}
 
 	public boolean isAnActivitySelected() {
-		return !selectedActivities.isEmpty();
+		return !treeNodesOfSelectedActivities.isEmpty();
 	}
 
 	public boolean isALogMoveSelected() {
-		return !selectedLogMoveEdges.isEmpty();
+		return !logMovePositionsOfSelectedLogMoveEdges.isEmpty();
 	}
 
 	public boolean isAModelMoveSelected() {
-		return !selectedModelMoveEdges.isEmpty();
+		return !treeNodesOfSelectedModelMoveEdges.isEmpty();
 	}
 
 	public boolean isAModelEdgeSelected() {
-		return !selectedModelEdges.isEmpty();
+		return !treeNodesOfSelectedModelEdges.isEmpty();
 	}
 
 	public boolean isSomethingSelected() {

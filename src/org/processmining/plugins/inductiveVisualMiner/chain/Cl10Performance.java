@@ -1,35 +1,39 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
-import java.util.Map;
-
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCombination;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActivityLog;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
-public class Cl10Performance extends ChainLink<IvMLog, PerformanceWrapper> {
+public class Cl10Performance extends ChainLink<Pair<IvMEfficientTree, IvMLog>, PerformanceWrapper> {
 
-	protected IvMLog generateInput(InductiveVisualMinerState state) {
-		return state.getIvMLogFiltered();
+	protected Pair<IvMEfficientTree, IvMLog> generateInput(InductiveVisualMinerState state) {
+		return Pair.of(state.getTree(), (IvMLog) state.getIvMLogFiltered());
 	}
 
-	protected PerformanceWrapper executeLink(IvMLog input, IvMCanceller canceller) {
-		Map<UnfoldedNode, QueueActivityLog> queueActivityLogs = QueueMineActivityLog.mine(input);
+	protected PerformanceWrapper executeLink(Pair<IvMEfficientTree, IvMLog> input, IvMCanceller canceller) {
+		IvMEfficientTree tree = input.getA();
+		IvMLog log = input.getB();
+		TIntObjectMap<QueueActivityLog> queueActivityLogs = QueueMineActivityLog.mine(tree, log);
 
 		QueueLengths method = new QueueLengthsImplCombination(queueActivityLogs);
 
 		//compute times
-		TObjectDoubleHashMap<UnfoldedNode> waitingTimes = new TObjectDoubleHashMap<UnfoldedNode>(10, 0.5f, -1);
-		TObjectDoubleHashMap<UnfoldedNode> queueingTimes = new TObjectDoubleHashMap<UnfoldedNode>(10, 0.5f, -1);
-		TObjectDoubleHashMap<UnfoldedNode> serviceTimes = new TObjectDoubleHashMap<UnfoldedNode>(10, 0.5f, -1);
-		TObjectDoubleHashMap<UnfoldedNode> sojournTimes = new TObjectDoubleHashMap<UnfoldedNode>(10, 0.5f, -1);
-		for (UnfoldedNode unode : queueActivityLogs.keySet()) {
+		TIntDoubleHashMap waitingTimes = new TIntDoubleHashMap(10, 0.5f, -1, -1);
+		TIntDoubleHashMap queueingTimes = new TIntDoubleHashMap(10, 0.5f, -1, -1);
+		TIntDoubleHashMap serviceTimes = new TIntDoubleHashMap(10, 0.5f, -1, -1);
+		TIntDoubleHashMap sojournTimes = new TIntDoubleHashMap(10, 0.5f, -1, -1);
+		for (TIntIterator it = queueActivityLogs.keySet().iterator(); it.hasNext();) {
+			int unode = it.next();
 			QueueActivityLog activityLog = queueActivityLogs.get(unode);
 			long sumWaiting = 0;
 			int countWaiting = 0;

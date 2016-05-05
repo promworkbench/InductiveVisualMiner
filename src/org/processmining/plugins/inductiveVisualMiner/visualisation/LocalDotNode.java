@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotNode;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class LocalDotNode extends DotNode {
 
@@ -13,18 +12,18 @@ public class LocalDotNode extends DotNode {
 		public String strokeWidth;
 		public String strokeDashArray;
 	}
-	
+
 	public enum NodeType {
-		source, sink, activity, xor, parallelSplit, parallelJoin, interleavedSplit, interleavedJoin, logMoveActivity
+		source, sink, activity, xor, concurrentSplit, concurrentJoin, interleavedSplit, interleavedJoin, orSplit, orJoin, logMoveActivity
 	}
-	
+
 	private NodeType type;
-	private final UnfoldedNode node;
+	private final int node;
 	public final Appearance unselectedAppearance = new Appearance();
 
-	public LocalDotNode(Dot dot, ProcessTreeVisualisationInfo info, NodeType type, String label, final UnfoldedNode unode) {
+	public LocalDotNode(Dot dot, ProcessTreeVisualisationInfo info, NodeType type, String label, final int unode) {
 		super(label, new HashMap<String, String>());
-		
+
 		this.node = unode;
 		this.setType(type);
 
@@ -40,10 +39,12 @@ public class LocalDotNode extends DotNode {
 				setOption("fontsize", "9");
 				setOption("fillcolor", "red");
 				break;
-			case parallelSplit :
-			case parallelJoin:
+			case concurrentSplit :
+			case concurrentJoin :
+			case orSplit :
+			case orJoin :
 			case interleavedSplit :
-			case interleavedJoin:
+			case interleavedJoin :
 				setOption("shape", "diamond");
 				setOption("fixedsize", "true");
 				setOption("height", "0.25");
@@ -66,12 +67,12 @@ public class LocalDotNode extends DotNode {
 				setOption("shape", "circle");
 				break;
 		}
-		
+
 		dot.addNode(this);
 		info.addNode(unode, this);
 	}
 
-	public UnfoldedNode getUnode() {
+	public int getUnode() {
 		return node;
 	}
 

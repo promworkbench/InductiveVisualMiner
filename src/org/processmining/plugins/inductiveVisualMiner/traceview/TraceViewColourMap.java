@@ -1,24 +1,30 @@
 package org.processmining.plugins.inductiveVisualMiner.traceview;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Stroke;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.WedgeBuilder;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 
 public class TraceViewColourMap implements WedgeBuilder {
-	private final Map<UnfoldedNode, Color> mapFill = new HashMap<>();
-	private final Map<UnfoldedNode, Color> mapFont = new HashMap<>();
+	private final TIntObjectMap<Color> mapFill = new TIntObjectHashMap<Color>(10, 0.5f, -1);
+	private final TIntObjectMap<Color> mapFont = new TIntObjectHashMap<Color>(10, 0.5f, -1);
 	private Selection selection = new Selection();
+	private IvMEfficientTree tree;
+	
+	public TraceViewColourMap(IvMEfficientTree tree) {
+		this.tree = tree;
+	}
 
-	public void set(UnfoldedNode unode, Color colourFill, Color colourFont) {
+	public void set(int unode, Color colourFill, Color colourFont) {
 		mapFill.put(unode, colourFill);
 		mapFont.put(unode, colourFont);
 	}
@@ -29,7 +35,7 @@ public class TraceViewColourMap implements WedgeBuilder {
 
 	public Color buildWedgeColor(Trace<? extends Event> trace, Event event) {
 		if (event instanceof Move && !((Move) event).isModelMove()) {
-			return mapFill.get(((Move) event).getUnode());
+			return mapFill.get(((Move) event).getTreeNode());
 		}
 		return null;
 	}
@@ -43,14 +49,14 @@ public class TraceViewColourMap implements WedgeBuilder {
 			dash1, 0.0f);
 
 	public Stroke buildBorderStroke(Trace<? extends Event> trace, Event event) {
-		if (event instanceof Move && selection.isSelected((Move) event)) {
+		if (event instanceof Move && selection.isSelected(tree, (Move) event)) {
 			return selectedStroke;
 		}
 		return null;
 	}
 
 	public Color buildBorderColor(Trace<? extends Event> trace, Event event) {
-		if (event instanceof Move && selection.isSelected((Move) event)) {
+		if (event instanceof Move && selection.isSelected(tree, (Move) event)) {
 			return Color.white;
 		}
 		return null;
@@ -59,7 +65,7 @@ public class TraceViewColourMap implements WedgeBuilder {
 	public Color buildLabelColor(Trace<? extends Event> trace, Event event) {
 		if (event instanceof Move) {
 			if (((Move) event).isSyncMove()) {
-				return mapFont.get(((Move) event).getUnode());
+				return mapFont.get(((Move) event).getTreeNode());
 			} else {
 				return Color.black;
 			}

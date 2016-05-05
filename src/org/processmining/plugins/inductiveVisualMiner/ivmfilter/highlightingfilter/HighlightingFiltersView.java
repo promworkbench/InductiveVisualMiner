@@ -1,14 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter;
 
+import gnu.trove.iterator.TIntIterator;
+
 import java.awt.Component;
-import java.util.Iterator;
 import java.util.List;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersView;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class HighlightingFiltersView extends IvMFiltersView {
 
@@ -30,7 +31,7 @@ public class HighlightingFiltersView extends IvMFiltersView {
 	 * @param numberOfTraces
 	 */
 	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Selection selection,
-			List<IvMFilter> list) {
+			List<IvMFilter> list, IvMEfficientTree tree) {
 		//show the user which traces are shown
 
 		StringBuilder result = new StringBuilder();
@@ -38,11 +39,11 @@ public class HighlightingFiltersView extends IvMFiltersView {
 		//selected nodes
 		if (selection.isAnActivitySelected()) {
 			result.append("include ");
-			Iterator<UnfoldedNode> it = selection.getSelectedActivities().iterator();
-			result.append("'" + it.next().getNode() + "'");
+			TIntIterator it = selection.getSelectedActivities().iterator();
+			result.append("'" + tree.getActivityName(it.next()) + "'");
 
 			while (it.hasNext()) {
-				String p = it.next().getNode().toString();
+				String p = tree.getActivityName(it.next());
 				if (it.hasNext()) {
 					result.append(", `" + p + "'");
 				} else {

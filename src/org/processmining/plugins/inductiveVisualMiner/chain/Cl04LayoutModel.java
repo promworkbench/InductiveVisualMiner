@@ -2,34 +2,35 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Triple;
+import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplEmpty;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
-import org.processmining.processtree.ProcessTree;
 
 import com.kitfox.svg.SVGDiagram;
 
 // perform layout
 public class Cl04LayoutModel
 		extends
-		ChainLink<Triple<ProcessTree, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap>> {
+		ChainLink<Triple<IvMEfficientTree, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap>> {
 
-	protected Triple<ProcessTree, ProcessTreeVisualisationParameters, DotPanelUserSettings> generateInput(
+	protected Triple<IvMEfficientTree, ProcessTreeVisualisationParameters, DotPanelUserSettings> generateInput(
 			InductiveVisualMinerState state) {
 		return Triple.of(state.getTree(), state.getMode().getVisualisationParameters(state),
 				state.getGraphUserSettings());
 	}
 
 	protected Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap> executeLink(
-			Triple<ProcessTree, ProcessTreeVisualisationParameters, DotPanelUserSettings> input,
-			IvMCanceller canceller) {
+			Triple<IvMEfficientTree, ProcessTreeVisualisationParameters, DotPanelUserSettings> input,
+			IvMCanceller canceller) throws UnknownTreeNodeException {
 		//compute dot
 		ProcessTreeVisualisation visualiser = new ProcessTreeVisualisation();
 		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplEmpty();

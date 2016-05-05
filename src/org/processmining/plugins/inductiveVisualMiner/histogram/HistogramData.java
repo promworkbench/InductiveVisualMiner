@@ -1,20 +1,17 @@
 package org.processmining.plugins.inductiveVisualMiner.histogram;
 
-import gnu.trove.map.hash.THashMap;
-
-import java.util.Map;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.ActivityInstanceIterator;
-import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 /**
  * There are two types of histograms: a global one denoting the number of active
@@ -37,19 +34,23 @@ public class HistogramData {
 	private final int globalBuckets;
 	private double globalMax;
 
-	private final Map<UnfoldedNode, int[]> localCountFiltered;
-	private final Map<UnfoldedNode, int[]> localCountUnfiltered;
+	private final TIntObjectMap<int[]> localCountFiltered;
+	private final TIntObjectMap<int[]> localCountUnfiltered;
 	private final int localBuckets;
 	private double localMax;
 
 	/**
 	 * 
+	 * @param tree
 	 * @param log
 	 * @param scaler
 	 * @param globalBuckets
-	 *            the widht of the histogram (used for pixel-precision)
+	 * @param localBuckets
+	 *            The width of the histogram (used for pixel-precision).
+	 * @param canceller
 	 */
-	public HistogramData(ProcessTree tree, IvMLogFiltered log, Scaler scaler, int globalBuckets, int localBuckets, IvMCanceller canceller) {
+	public HistogramData(IvMEfficientTree tree, IvMLogFiltered log, Scaler scaler, int globalBuckets, int localBuckets,
+			IvMCanceller canceller) {
 		this.scaler = scaler;
 
 		globalCountFiltered = new int[globalBuckets];
@@ -59,11 +60,11 @@ public class HistogramData {
 
 		//initialise local
 		this.localBuckets = localBuckets;
-		this.localCountFiltered = new THashMap<>();
-		this.localCountUnfiltered = new THashMap<>();
-		for (UnfoldedNode unode : TreeUtils.unfoldAllActivities(tree)) {
-			localCountFiltered.put(unode, new int[localBuckets]);
-			localCountUnfiltered.put(unode, new int[localBuckets]);
+		this.localCountFiltered = new TIntObjectHashMap<int[]>(10, 0.5f, -1);
+		this.localCountUnfiltered = new TIntObjectHashMap<int[]>(10, 0.5f, -1);
+		for (int node : tree.getAllNodes()) {
+			localCountFiltered.put(node, new int[localBuckets]);
+			localCountUnfiltered.put(node, new int[localBuckets]);
 		}
 		localMax = 0;
 
@@ -75,7 +76,7 @@ public class HistogramData {
 			boolean isFilteredOut = log.isFilteredOut(it.getPosition());
 
 			addTraceGlobal(trace, isFilteredOut);
-			addTraceLocal(trace, isFilteredOut);
+			addTraceLocal(tree, trace, isFilteredOut);
 		}
 	}
 
@@ -105,12 +106,12 @@ public class HistogramData {
 	 * @param trace
 	 * @param isFilteredOut
 	 */
-	private void addTraceLocal(IvMTrace trace, boolean isFilteredOut) {
+	private void addTraceLocal(IvMEfficientTree tree, IvMTrace trace, boolean isFilteredOut) {
 		//walk over the activity instances of the trace
-		for (ActivityInstanceIterator it = trace.activityInstanceIterator(); it.hasNext();) {
-			Sextuple<UnfoldedNode, String, IvMMove, IvMMove, IvMMove, IvMMove> t = it.next();
+		for (ActivityInstanceIterator it = trace.activityInstanceIterator(tree); it.hasNext();) {
+			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> t = it.next();
 			if (t != null) {
-				UnfoldedNode unode = t.getA();
+				Integer unode = t.getA();
 				IvMMove moveStart = t.getE();
 				IvMMove moveComplete = t.getF();
 
@@ -145,7 +146,7 @@ public class HistogramData {
 			}
 		}
 	}
-	
+
 	public double getLogTimeInMsPerLocalBucket() {
 		return (scaler.getMaxInLogTime() - scaler.getMinInLogTime()) / localBuckets;
 	}
@@ -162,14 +163,14 @@ public class HistogramData {
 		return globalCountFiltered[bucketNr] / globalMax;
 	}
 
-	public double getLocalBucketFraction(UnfoldedNode unode, int pixel) {
-		return localCountFiltered.get(unode)[pixel] / localMax;
+	public double getLocalBucketFraction(int node, int pixel) {
+		return localCountFiltered.get(node)[pixel] / localMax;
 	}
-	
+
 	public int getGlobalMaximum() {
 		return (int) globalMax;
 	}
-	
+
 	public int getLocalMaximum() {
 		return (int) localMax;
 	}

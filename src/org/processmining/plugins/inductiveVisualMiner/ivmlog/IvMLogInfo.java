@@ -1,23 +1,25 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 
+import gnu.trove.map.TIntLongMap;
+import gnu.trove.map.hash.TIntLongHashMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.alignment.PositionLogMoves;
-import org.processmining.processtree.Task.Manual;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 
 @SuppressWarnings("deprecation")
 public class IvMLogInfo {
 
-	private final MultiSet<UnfoldedNode> modelMoves;
+	private final TIntLongMap modelMoves;
 	private final MultiSet<String> unlabeledLogMoves;
+	private final TIntLongMap nodeExecutions;
 
 	//for each position in the tree, the xeventclasses that were moved
 	//position:
@@ -26,66 +28,69 @@ public class IvMLogInfo {
 	// (root, null) at end of trace
 	// (null, root) at start of trace
 	private final Map<LogMovePosition, MultiSet<XEventClass>> logMoves;
-	private final MultiSet<Pair<UnfoldedNode, UnfoldedNode>> dfg;
 	private final MultiSet<Move> activities;
 
 	public IvMLogInfo() {
-		modelMoves = new MultiSet<UnfoldedNode>();
+		modelMoves = new TIntLongHashMap(10, 0.5f, -1, 0);
 		logMoves = new HashMap<LogMovePosition, MultiSet<XEventClass>>();
 		unlabeledLogMoves = new MultiSet<String>();
-		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
 		activities = new MultiSet<>();
+		nodeExecutions = new TIntLongHashMap(10, 0.5f, -1, 0);
 	}
 
-	public IvMLogInfo(IvMLog log) {
-		modelMoves = new MultiSet<UnfoldedNode>();
+	public IvMLogInfo(IvMLog log, IvMEfficientTree tree) {
+		modelMoves = new TIntLongHashMap(10, 0.5f, -1, 0);
 		unlabeledLogMoves = new MultiSet<String>();
-		dfg = new MultiSet<Pair<UnfoldedNode, UnfoldedNode>>();
 		activities = new MultiSet<>();
+		nodeExecutions = new TIntLongHashMap(10, 0.5f, -1, -1);
 		PositionLogMoves positionLogMoves = new PositionLogMoves();
-		UnfoldedNode root = null;
+		int lastModelSyncNode;
 		for (IvMTrace trace : log) {
-			UnfoldedNode lastDfgUnode = null;
-			UnfoldedNode lastUnode = null;
+			int lastDfgUnode = -1;
+			int lastUnode = -1;
+			lastModelSyncNode = -1;
 			boolean traceContainsLogMove = false;
 			for (int i = 0; i < trace.size(); i++) {
 				Move move = trace.get(i);
 				activities.add(move);
 				if (move.getType() == Type.modelMove) {
 					//add model move to list of model moves
-					modelMoves.add(move.getUnode());
+					modelMoves.adjustOrPutValue(move.getTreeNode(), 1, 1);
 				} else if (move.isLogMove()) {
 					traceContainsLogMove = true;
 					move.setLogMoveParallelBranchMappedTo(lastUnode);
 					unlabeledLogMoves.add(move.getActivityEventClass().toString());
 				}
 
-				if (root == null && move.isModelSync()) {
-					root = new UnfoldedNode(move.getUnode().getPath().get(0));
-				}
-
 				if (move.isModelSync() && !move.isIgnoredModelMove()) {
-					lastUnode = move.getUnode();
+					lastUnode = move.getTreeNode();
 				}
 
-				if (move.getUnode() != null && move.getUnode().getNode() instanceof Manual) {
-					dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastDfgUnode, move.getUnode()));
-					lastDfgUnode = move.getUnode();
+				if (move.getTreeNode() != -1 && tree.isActivity(move.getTreeNode())) {
+					lastDfgUnode = move.getTreeNode();
 				}
-			}
-			if (lastDfgUnode != null) {
-				dfg.add(new Pair<UnfoldedNode, UnfoldedNode>(lastDfgUnode, null));
+
+				/*
+				 * Keep track of entering and exiting nodes. Notice that in
+				 * process trees, it is impossible to enter a node a second time
+				 * without seeing some other node in between.
+				 */
+
+				if (move.isModelSync()) {
+					processEnteringExitingNodes(tree, lastModelSyncNode, move.getTreeNode());
+					lastModelSyncNode = move.getTreeNode();
+				}
 			}
 
 			//position the log moves
 			if (traceContainsLogMove) {
-				positionLogMoves.position(root, trace);
+				positionLogMoves.position(tree, tree.getRoot(), trace);
 			}
 		}
 		logMoves = positionLogMoves.getLogMoves();
 	}
 
-	public MultiSet<UnfoldedNode> getModelMoves() {
+	public TIntLongMap getModelMoves() {
 		return modelMoves;
 	}
 
@@ -97,12 +102,30 @@ public class IvMLogInfo {
 		return unlabeledLogMoves;
 	}
 
-	public long getDfg(UnfoldedNode unode1, UnfoldedNode unode2) {
-		return dfg.getCardinalityOf(new Pair<UnfoldedNode, UnfoldedNode>(unode1, unode2));
-	}
-
 	public MultiSet<Move> getActivities() {
 		return activities;
+	}
+
+	public long getNodeExecutions(IvMEfficientTree tree, int node) {
+		return nodeExecutions.get(node);
+	}
+
+	private void processEnteringExitingNodes(IvMEfficientTree tree, int lastNode, int newNode) {
+
+		int lowestCommonParent = tree.getRoot();
+		if (lastNode != -1) {
+			lowestCommonParent = tree.getLowestCommonParent(lastNode, newNode);
+		} else {
+			//the first move always enters the root
+			nodeExecutions.adjustOrPutValue(lowestCommonParent, 1, 1);
+		}
+
+		//we entered all nodes between the lowestCommonParent (exclusive) and newNode (inclusive)
+		int node = lowestCommonParent;
+		while (node != newNode) {
+			node = tree.getChildWith(node, newNode);
+			nodeExecutions.adjustOrPutValue(node, 1, 1);
+		}
 	}
 
 	private static void debug(Object s) {
