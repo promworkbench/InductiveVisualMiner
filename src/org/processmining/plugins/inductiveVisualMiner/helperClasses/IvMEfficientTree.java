@@ -162,6 +162,10 @@ public class IvMEfficientTree extends EfficientTree {
 					public boolean hasNext() {
 						return findNext() != -1;
 					}
+					
+					public void remove() {
+						
+					}
 				};
 			}
 		};
