@@ -120,6 +120,10 @@ public class IvMTrace2dotToken2 {
 					if (left) {
 						subTraces.get(0).add(childMove);
 					} else {
+						if (childMove.isIgnoredLogMove() || childMove.isIgnoredModelMove()) {
+							continue;
+						}
+						
 						int child = getChildNumberWith(in, enteringParallel, childMove);
 						if (child == -1) {
 							//This did not happen on a child of enteringParallel, thus we're leaving it.
@@ -130,7 +134,7 @@ public class IvMTrace2dotToken2 {
 						}
 					}
 				}
-				
+
 				//in case of or, empty subtraces may appear and need to be removed
 				if (in.tree.isOr(enteringParallel)) {
 					for (Iterator<List<IvMMove>> it1 = subTraces.iterator(); it1.hasNext();) {
@@ -184,8 +188,10 @@ public class IvMTrace2dotToken2 {
 				//activity
 				LocalDotNode destination = Animation.getDotNodeFromActivity(move, in.info);
 
-				Animation.moveDotTokenTo(in, dotToken, destination);
-				dotToken.addStepInNode(destination, move.getUserTimestamp(in.scaler));
+				if (!move.isStart()) {
+					Animation.moveDotTokenTo(in, dotToken, destination);
+					dotToken.addStepInNode(destination, move.getUserTimestamp(in.scaler));
+				}
 			}
 		}
 
@@ -211,7 +217,7 @@ public class IvMTrace2dotToken2 {
 	private static int getChildNumberWith(Input in, int parent, Move move) {
 		if (move.isLogMove()) {
 			int node = move.getLogMoveUnode();
-			if (in.tree.isConcurrent(node) || in.tree.isInterleaved(node) || in.tree.isOr(node)) {
+			if (node >= 0 && (in.tree.isConcurrent(node) || in.tree.isInterleaved(node) || in.tree.isOr(node))) {
 				return in.tree.getChildNumberWith(parent, move.getLogMoveParallelBranchMappedTo());
 			}
 		}

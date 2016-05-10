@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class ShortestPathGraph {
 		List<LocalDotEdge> path = DijkstraShortestPath.findPathBetween(graph, from, to);
 
 		if (path == null) {
-			return new ArrayList<>();
+			throw new RuntimeException("no path found in animation");
 		}
 
 		return path;

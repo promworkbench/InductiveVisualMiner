@@ -120,6 +120,22 @@ public class DotToken implements Iterable<DotTokenStep> {
 
 	private double performSanityCheck(Double last2) {
 		//perform sanity check
+		
+		//check that the token does not walk over a node twice
+		boolean lastNode = false;
+		for (DotTokenStep step : steps) {
+			if (step.isOverEdge()) {
+				lastNode = false;
+			} else if (lastNode){
+				System.out.println("===========");
+				System.out.println(this);
+				throw new RuntimeException("token takes two steps over a node");
+			} else {
+				lastNode = true;
+			}
+		}
+		
+		//check that the token does not move back in time
 		double last;
 		if (last2 != null) {
 			last = last2;
