@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Set;
@@ -64,8 +65,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JButton saveImageButton;
 	private final JButton traceViewButton;
 	private final TraceView traceView;
-	private final JButton colouringFiltersViewButton;
-	private final HighlightingFiltersView colouringFiltersView;
+	private final JButton highlightingFiltersViewButton;
+	private final HighlightingFiltersView highlightingFiltersView;
 
 	private InputFunction<Selection> onSelectionChanged = null;
 	private Runnable onGraphDirectionChanged = null;
@@ -185,6 +186,18 @@ public class InductiveVisualMinerPanel extends JPanel {
 			add(colourSelection, ccolourSelection);
 		}
 
+		//highlighting filters view
+		{
+			highlightingFiltersView = new HighlightingFiltersView(this);
+			highlightingFiltersViewButton = SlickerFactory.instance().createButton("highlighting filters");
+			GridBagConstraints cColouringFiltersViewButton = new GridBagConstraints();
+			cColouringFiltersViewButton.gridx = 2;
+			cColouringFiltersViewButton.gridy = gridy++;
+			cColouringFiltersViewButton.gridwidth = 1;
+			cColouringFiltersViewButton.fill = GridBagConstraints.HORIZONTAL;
+			add(highlightingFiltersViewButton, cColouringFiltersViewButton);
+		}
+
 		//trace view
 		{
 			traceView = new TraceView(this);
@@ -197,30 +210,18 @@ public class InductiveVisualMinerPanel extends JPanel {
 			add(traceViewButton, cTraceViewButton);
 		}
 
-		//colouring filters view
-		{
-			colouringFiltersView = new HighlightingFiltersView(this);
-			colouringFiltersViewButton = SlickerFactory.instance().createButton("highlighting filters");
-			GridBagConstraints cColouringFiltersViewButton = new GridBagConstraints();
-			cColouringFiltersViewButton.gridx = 2;
-			cColouringFiltersViewButton.gridy = gridy++;
-			cColouringFiltersViewButton.gridwidth = 1;
-			cColouringFiltersViewButton.fill = GridBagConstraints.HORIZONTAL;
-			add(colouringFiltersViewButton, cColouringFiltersViewButton);
-		}
+//		{
+//			JLabel saveLabel = SlickerFactory.instance().createLabel("Save");
+//			GridBagConstraints cExitButton = new GridBagConstraints();
+//			cExitButton.gridx = 1;
+//			cExitButton.gridy = gridy;
+//			cExitButton.gridwidth = 1;
+//			cExitButton.fill = GridBagConstraints.HORIZONTAL;
+//			add(saveLabel, cExitButton);
+//		}
 
 		{
-			JLabel saveLabel = SlickerFactory.instance().createLabel("Save");
-			GridBagConstraints cExitButton = new GridBagConstraints();
-			cExitButton.gridx = 1;
-			cExitButton.gridy = gridy;
-			cExitButton.gridwidth = 1;
-			cExitButton.fill = GridBagConstraints.HORIZONTAL;
-			add(saveLabel, cExitButton);
-		}
-
-		{
-			saveModelButton = SlickerFactory.instance().createButton("model");
+			saveModelButton = SlickerFactory.instance().createButton("export model");
 			GridBagConstraints cExitButton = new GridBagConstraints();
 			cExitButton.gridx = 2;
 			cExitButton.gridy = gridy++;
@@ -230,7 +231,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		}
 
 		{
-			saveImageButton = SlickerFactory.instance().createButton("image");
+			saveImageButton = SlickerFactory.instance().createButton("export view");
 			GridBagConstraints cExitButton = new GridBagConstraints();
 			cExitButton.gridx = 2;
 			cExitButton.gridy = gridy++;
@@ -266,6 +267,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		{
 			statusLabel = SlickerFactory.instance().createLabel(" ");
+			statusLabel.setMinimumSize(new Dimension(100, 50));
 			GridBagConstraints cStatus = new GridBagConstraints();
 			cStatus.gridx = 1;
 			cStatus.gridy = gridy++;
@@ -324,8 +326,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 		if (!enableMining) {
 			activitiesSlider.setVisible(false);
 			pathsSlider.setVisible(false);
-			classifierLabel.setVisible(false);
-			classifiersCombobox.setVisible(false);
+			//classifierLabel.setVisible(false);
+			//classifiersCombobox.setVisible(false);
 			preMiningFiltersButton.setVisible(false);
 			minerLabel.setVisible(false);
 			minerCombobox.setVisible(false);
@@ -337,7 +339,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		editModelView.setVisible(false);
 		preMiningFiltersView.setVisible(false);
 		traceView.setVisible(false);
-		colouringFiltersView.setVisible(false);
+		highlightingFiltersView.setVisible(false);
 		graphPanel.pause();
 	}
 
@@ -450,11 +452,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 	}
 
 	public HighlightingFiltersView getColouringFiltersView() {
-		return colouringFiltersView;
+		return highlightingFiltersView;
 	}
 
 	public JButton getColouringFiltersViewButton() {
-		return colouringFiltersViewButton;
+		return highlightingFiltersViewButton;
 	}
 
 	public JLabel getAnimationTimeLabel() {

@@ -56,7 +56,6 @@ public class Cl08Animate
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
 								state.setAnimation(result);
-								panel.getSaveImageButton().setText("image/animation");
 								panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
 								panel.getGraph().setAnimationExtremeTimes(
 										state.getAnimationScaler().getMinInUserTime(),

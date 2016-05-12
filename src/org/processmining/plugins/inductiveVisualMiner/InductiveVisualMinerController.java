@@ -127,7 +127,6 @@ public class InductiveVisualMinerController {
 					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveModelButton().setEnabled(false);
 					panel.getSaveImageButton().setEnabled(false);
-					panel.getSaveImageButton().setText("image");
 					panel.getEditModelView().setTree(null);
 					state.resetAlignment();
 					state.resetPerformance();
@@ -153,7 +152,6 @@ public class InductiveVisualMinerController {
 					panel.getGraph().setAnimationEnabled(false);
 					panel.getSaveModelButton().setEnabled(false);
 					panel.getSaveImageButton().setEnabled(false);
-					panel.getSaveImageButton().setText("image");
 					panel.getEditModelView().setTree(null);
 					state.resetAnimation();
 					state.resetAlignment();
@@ -173,7 +171,6 @@ public class InductiveVisualMinerController {
 			m.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
-					panel.getSaveImageButton().setText("image");
 					panel.getTraceView().set(state.getLog());
 					panel.getEditModelView().setTree(null);
 					state.resetAnimation();
@@ -206,7 +203,6 @@ public class InductiveVisualMinerController {
 					setAnimationStatus(" ", false);
 
 					panel.getGraph().setAnimationEnabled(false);
-					panel.getSaveImageButton().setText("image");
 
 					//if the view does not show deviations, do not select any log moves
 					if (!state.getMode().isShowDeviations()) {
@@ -228,7 +224,6 @@ public class InductiveVisualMinerController {
 				public void run() {
 					layoutStart.run();
 					panel.getGraph().setAnimationEnabled(false);
-					panel.getSaveImageButton().setText("image");
 					panel.getTraceView().set(state.getLog());
 					state.resetAnimation();
 					state.resetAlignment();
@@ -249,7 +244,6 @@ public class InductiveVisualMinerController {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
 					setAnimationStatus(" ", false);
-					panel.getSaveImageButton().setText("image");
 					state.resetAnimation();
 					state.resetAlignment();
 					state.resetPerformance();
@@ -281,7 +275,6 @@ public class InductiveVisualMinerController {
 			f.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
-					panel.getSaveImageButton().setText("image");
 					state.resetAnimation();
 					state.resetPerformance();
 					state.resetHistogramData();
@@ -303,7 +296,6 @@ public class InductiveVisualMinerController {
 			a.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
-					panel.getSaveImageButton().setText("image");
 					state.resetPerformance();
 					state.resetHistogramData();
 					setAnimationStatus("Creating animation.. ", false);

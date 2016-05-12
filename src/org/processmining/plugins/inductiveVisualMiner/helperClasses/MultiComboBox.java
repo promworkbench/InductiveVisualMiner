@@ -13,7 +13,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Array;
 import java.util.BitSet;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.accessibility.Accessible;
@@ -171,26 +170,6 @@ public class MultiComboBox<E> extends JComboBox<Object> {
 		}
 	}
 
-	//	@SuppressWarnings("unchecked")
-	//	@Override
-	//	public void updateUI() {
-	//		if (cbml != null) {
-	//			JList<?> list = getList();
-	//			if (Objects.nonNull(list)) {
-	//				list.removeMouseListener(cbml);
-	//				list.removeMouseMotionListener(cbml);
-	//			}
-	//		}
-	//		super.updateUI();
-	//		setRenderer((ListCellRenderer<? super Object>) new ButtonsRenderer());
-	//		JList<?> list = getList();
-	//		if (list != null) {
-	//			cbml = new CellButtonsMouseListener();
-	//			list.addMouseListener(cbml);
-	//			list.addMouseMotionListener(cbml);
-	//		}
-	//	}
-
 	@SuppressWarnings("unchecked")
 	protected JList<E> getList() {
 		Accessible a = getAccessibleContext().getAccessibleChild(0);
@@ -294,7 +273,7 @@ public class MultiComboBox<E> extends JComboBox<Object> {
 			int index = list.locationToIndex(pt);
 			if (index >= 0) {
 				JCheckBox button = getCheckBox(list, pt, index);
-				if (Objects.nonNull(button)) {
+				if (button != null) {
 					listRepaint(list, list.getCellBounds(index, index));
 				}
 				preventSelectionChange = true;
@@ -313,7 +292,7 @@ public class MultiComboBox<E> extends JComboBox<Object> {
 				preventSelectionChange = false;
 				preventPopupClosing = false;
 				JCheckBox checkBox = getCheckBox(list, pt, index);
-				if (Objects.nonNull(checkBox)) {
+				if (checkBox != null) {
 					//click on checkbox
 					checkBox.doClick();
 					Rectangle r = list.getCellBounds(index, index);
@@ -398,7 +377,7 @@ public class MultiComboBox<E> extends JComboBox<Object> {
 		@Override
 		public Component getListCellRendererComponent(JList<? extends E> list, E value, int index, boolean isSelected,
 				boolean cellHasFocus) {
-			label.setText(Objects.toString(value, ""));
+			label.setText(value != null ? value.toString() : "");
 			if (index == -1 || list.getModel().getSize() <= 0) {
 				//not in pop-up
 				System.out.println("draw not in pop-up");
