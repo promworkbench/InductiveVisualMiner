@@ -603,7 +603,7 @@ public class InductiveVisualMinerController {
 					if (state.getAnimationScaler().isCorrectTime()) {
 						setAnimationStatus(ResourceTimeUtils.timeToString(logTime), true);
 					} else {
-						setAnimationStatus("animation times are random", true);
+						setAnimationStatus("random", true);
 					}
 
 					//draw queues
@@ -644,7 +644,7 @@ public class InductiveVisualMinerController {
 	public synchronized void setAnimationStatus(String s, boolean isTime) {
 		if (isTime) {
 			panel.getAnimationTimeLabel().setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-			panel.getAnimationTimeLabel().setText(s);
+			panel.getAnimationTimeLabel().setText("time: " + s);
 		} else {
 			panel.getAnimationTimeLabel().setFont(panel.getStatusLabel().getFont());
 			panel.getAnimationTimeLabel().setText(s);

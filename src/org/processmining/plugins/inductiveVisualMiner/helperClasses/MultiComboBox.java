@@ -68,14 +68,12 @@ public class MultiComboBox<E> extends JComboBox<Object> {
 	 */
 	protected CopyOnWriteArrayList<ActionListener> listenerList = new CopyOnWriteArrayList<>();
 
-	private ListCellRenderer<Object> backlogRenderer;
-
 	@SuppressWarnings("unchecked")
 	public MultiComboBox(Class<E> clazz, E[] aModel) {
 		super(aModel);
 		this.clazz = clazz;
 		selected = new BitSet(aModel.length);
-		if (aModel.length >= 0) {
+		if (aModel.length > 0) {
 			selected.set(0);
 		}
 
@@ -87,7 +85,6 @@ public class MultiComboBox<E> extends JComboBox<Object> {
 		//getList().setSelectionBackground(textfield_bg);
 		//setOpaque(true);
 		//updateUI();
-		backlogRenderer = getRenderer();
 		setRenderer((ListCellRenderer<? super Object>) new ButtonsRenderer());
 		JList<E> list = getList();
 		if (list != null) {
@@ -126,7 +123,6 @@ public class MultiComboBox<E> extends JComboBox<Object> {
 
 	@Override
 	public void setSelectedItem(Object anObject) {
-		System.out.println("set selected item");
 		if (!preventSelectionChange) {
 			selected.clear();
 			ListModel<E> model = getList().getModel();
@@ -266,7 +262,6 @@ public class MultiComboBox<E> extends JComboBox<Object> {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			System.out.println("mouse pressed");
 			@SuppressWarnings("unchecked")
 			JList<E> list = (JList<E>) e.getComponent();
 			Point pt = e.getPoint();
@@ -283,7 +278,6 @@ public class MultiComboBox<E> extends JComboBox<Object> {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			System.out.println("mouse released");
 			@SuppressWarnings("unchecked")
 			JList<E> list = (JList<E>) e.getComponent();
 			Point pt = e.getPoint();
@@ -380,7 +374,6 @@ public class MultiComboBox<E> extends JComboBox<Object> {
 			label.setText(value != null ? value.toString() : "");
 			if (index == -1 || list.getModel().getSize() <= 0) {
 				//not in pop-up
-				System.out.println("draw not in pop-up");
 				setOpaque(false);
 				checkBox.setVisible(false);
 				label.setForeground(textfield_fg);

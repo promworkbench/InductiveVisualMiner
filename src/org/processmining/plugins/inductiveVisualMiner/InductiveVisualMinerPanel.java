@@ -1,10 +1,12 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Set;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -44,6 +46,9 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	private static final long serialVersionUID = -1078786029763735572L;
 
+	private static final int sidePanelWidth = 210;
+	private static final int lineHeight = 20;
+
 	//gui elements
 	private final InductiveVisualMinerAnimationPanel graphPanel;
 	private final JComboBox<?> colourSelection;
@@ -75,205 +80,208 @@ public class InductiveVisualMinerPanel extends JPanel {
 			ClassifierWrapper[] classifiers, VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
 		int gridy = 0;
 
-		setLayout(new GridBagLayout());
+		setLayout(new BorderLayout());
 
+		JPanel sidePanel = new JPanel();
+		sidePanel.setLayout(new BorderLayout());
+		sidePanel.setMaximumSize(new Dimension(sidePanelWidth, 10000));
+		sidePanel.setMinimumSize(new Dimension(sidePanelWidth, 100));
+		sidePanel.setPreferredSize(new Dimension(sidePanelWidth, 10000));
+		add(sidePanel, BorderLayout.LINE_END);
+
+		//sliders panel
 		{
-			activitiesSlider = SlickerFactory.instance().createNiceDoubleSlider("activities", 0, 1.0, 1.0,
-					Orientation.VERTICAL);
-			GridBagConstraints cActivitiesSlider = new GridBagConstraints();
-			cActivitiesSlider.gridx = 1;
-			cActivitiesSlider.gridy = gridy;
-			cActivitiesSlider.fill = GridBagConstraints.VERTICAL;
-			cActivitiesSlider.anchor = GridBagConstraints.EAST;
-			add(getActivitiesSlider(), cActivitiesSlider);
+			JPanel slidersPanel = new JPanel();
+			sidePanel.add(slidersPanel, BorderLayout.CENTER);
+			slidersPanel.setLayout(new BoxLayout(slidersPanel, BoxLayout.LINE_AXIS));
+
+			//activities slider
+			{
+				activitiesSlider = SlickerFactory.instance().createNiceDoubleSlider("activities", 0, 1.0, 1.0,
+						Orientation.VERTICAL);
+				slidersPanel.add(activitiesSlider);
+			}
+
+			//paths slider
+			{
+				pathsSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0, state.getPaths(),
+						Orientation.VERTICAL);
+				slidersPanel.add(pathsSlider);
+			}
 		}
 
+		//other settings
 		{
-			pathsSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0, state.getPaths(),
-					Orientation.VERTICAL);
-			GridBagConstraints cNoiseSlider = new GridBagConstraints();
-			cNoiseSlider.gridx = 2;
-			cNoiseSlider.gridy = gridy++;
-			cNoiseSlider.weighty = 1;
-			cNoiseSlider.fill = GridBagConstraints.VERTICAL;
-			cNoiseSlider.anchor = GridBagConstraints.WEST;
-			add(getPathsSlider(), cNoiseSlider);
-		}
+			JPanel otherSettingsPanel = new JPanel();
+			sidePanel.add(otherSettingsPanel, BorderLayout.PAGE_END);
+			otherSettingsPanel.setLayout(new GridBagLayout());
+			{
+				classifierLabel = SlickerFactory.instance().createLabel("Classifier");
+				GridBagConstraints cClassifierLabel = new GridBagConstraints();
+				cClassifierLabel.gridx = 0;
+				cClassifierLabel.gridy = gridy;
+				cClassifierLabel.gridwidth = 1;
+				cClassifierLabel.anchor = GridBagConstraints.WEST;
+				otherSettingsPanel.add(classifierLabel, cClassifierLabel);
 
-		{
-			classifierLabel = SlickerFactory.instance().createLabel("Classifier");
-			GridBagConstraints cClassifierLabel = new GridBagConstraints();
-			cClassifierLabel.gridx = 1;
-			cClassifierLabel.gridy = gridy;
-			cClassifierLabel.gridwidth = 1;
-			cClassifierLabel.anchor = GridBagConstraints.WEST;
-			add(classifierLabel, cClassifierLabel);
+				classifiersCombobox = new MultiComboBox<String>(String.class, new String[0]);
+				classifiersCombobox.setEnabled(false);
+				GridBagConstraints cClassifiers = new GridBagConstraints();
+				cClassifiers.gridx = 1;
+				cClassifiers.gridy = gridy++;
+				cClassifiers.gridwidth = 1;
+				cClassifiers.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(classifiersCombobox, cClassifiers);
+			}
 
-			classifiersCombobox = new MultiComboBox<String>(String.class, new String[0]);
-			classifiersCombobox.setEnabled(false);
-			GridBagConstraints cClassifiers = new GridBagConstraints();
-			cClassifiers.gridx = 2;
-			cClassifiers.gridy = gridy++;
-			cClassifiers.gridwidth = 1;
-			cClassifiers.fill = GridBagConstraints.HORIZONTAL;
-			add(classifiersCombobox, cClassifiers);
-			classifiersCombobox.setSelectedItem(state.getActivityClassifier());
-		}
+			//pre-mining filters
+			{
+				preMiningFiltersView = new PreMiningFiltersView(this);
+				preMiningFiltersButton = SlickerFactory.instance().createButton("pre-mining filters");
+				GridBagConstraints cTraceViewButton = new GridBagConstraints();
+				cTraceViewButton.gridx = 1;
+				cTraceViewButton.gridy = gridy++;
+				cTraceViewButton.gridwidth = 1;
+				cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(preMiningFiltersButton, cTraceViewButton);
+			}
 
-		//pre-mining filters
-		{
-			preMiningFiltersView = new PreMiningFiltersView(this);
-			preMiningFiltersButton = SlickerFactory.instance().createButton("pre-mining filters");
-			GridBagConstraints cTraceViewButton = new GridBagConstraints();
-			cTraceViewButton.gridx = 2;
-			cTraceViewButton.gridy = gridy++;
-			cTraceViewButton.gridwidth = 1;
-			cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
-			add(preMiningFiltersButton, cTraceViewButton);
-		}
+			//miner
+			{
+				minerLabel = SlickerFactory.instance().createLabel("Mine");
+				GridBagConstraints cMinerLabel = new GridBagConstraints();
+				cMinerLabel.gridx = 0;
+				cMinerLabel.gridy = gridy;
+				cMinerLabel.gridwidth = 1;
+				cMinerLabel.anchor = GridBagConstraints.WEST;
+				otherSettingsPanel.add(minerLabel, cMinerLabel);
 
-		//miner
-		{
-			minerLabel = SlickerFactory.instance().createLabel("Mine");
-			GridBagConstraints cMinerLabel = new GridBagConstraints();
-			cMinerLabel.gridx = 1;
-			cMinerLabel.gridy = gridy;
-			cMinerLabel.gridwidth = 1;
-			cMinerLabel.anchor = GridBagConstraints.WEST;
-			add(minerLabel, cMinerLabel);
+				minerCombobox = SlickerFactory.instance().createComboBox(miners);
+				minerCombobox.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
+				GridBagConstraints cMiners = new GridBagConstraints();
+				cMiners.gridx = 1;
+				cMiners.gridy = gridy++;
+				cMiners.gridwidth = 1;
+				cMiners.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(minerCombobox, cMiners);
+				minerCombobox.setSelectedItem(state.getMiner());
+			}
 
-			minerCombobox = SlickerFactory.instance().createComboBox(miners);
-			minerCombobox.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
-			GridBagConstraints cMiners = new GridBagConstraints();
-			cMiners.gridx = 2;
-			cMiners.gridy = gridy++;
-			cMiners.gridwidth = 1;
-			cMiners.fill = GridBagConstraints.HORIZONTAL;
-			add(minerCombobox, cMiners);
-			minerCombobox.setSelectedItem(state.getMiner());
-		}
+			//edit model view
+			{
+				editModelView = new EditModelView(this);
+				editModelButton = SlickerFactory.instance().createButton("edit model");
+				GridBagConstraints cEditModelButton = new GridBagConstraints();
+				cEditModelButton.gridx = 1;
+				cEditModelButton.gridy = gridy++;
+				cEditModelButton.gridwidth = 1;
+				cEditModelButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(editModelButton, cEditModelButton);
+			}
 
-		//edit model view
-		{
-			editModelView = new EditModelView(this);
-			editModelButton = SlickerFactory.instance().createButton("edit model");
-			GridBagConstraints cEditModelButton = new GridBagConstraints();
-			cEditModelButton.gridx = 2;
-			cEditModelButton.gridy = gridy++;
-			cEditModelButton.gridwidth = 1;
-			cEditModelButton.fill = GridBagConstraints.HORIZONTAL;
-			add(editModelButton, cEditModelButton);
-		}
+			{
+				colourLabel = SlickerFactory.instance().createLabel("Show");
+				GridBagConstraints cColourLabel = new GridBagConstraints();
+				cColourLabel.gridx = 0;
+				cColourLabel.gridy = gridy;
+				cColourLabel.gridwidth = 1;
+				cColourLabel.anchor = GridBagConstraints.WEST;
+				otherSettingsPanel.add(colourLabel, cColourLabel);
 
-		{
-			colourLabel = SlickerFactory.instance().createLabel("Show");
-			GridBagConstraints cColourLabel = new GridBagConstraints();
-			cColourLabel.gridx = 1;
-			cColourLabel.gridy = gridy;
-			cColourLabel.gridwidth = 1;
-			cColourLabel.anchor = GridBagConstraints.WEST;
-			add(colourLabel, cColourLabel);
+				colourSelection = SlickerFactory.instance().createComboBox(
+						new Mode[] { new ModePaths(), new ModePathsDeviations(), new ModePathsQueueLengths(),
+								new ModePathsSojourn(), new ModePathsService() });
+				colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
+				GridBagConstraints ccolourSelection = new GridBagConstraints();
+				ccolourSelection.gridx = 1;
+				ccolourSelection.gridy = gridy++;
+				ccolourSelection.gridwidth = 1;
+				ccolourSelection.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(colourSelection, ccolourSelection);
+			}
 
-			colourSelection = SlickerFactory.instance().createComboBox(
-					new Mode[] { new ModePaths(), new ModePathsDeviations(), new ModePathsQueueLengths(),
-							new ModePathsSojourn(), new ModePathsService() });
-			colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
-			GridBagConstraints ccolourSelection = new GridBagConstraints();
-			ccolourSelection.gridx = 2;
-			ccolourSelection.gridy = gridy++;
-			ccolourSelection.gridwidth = 1;
-			ccolourSelection.fill = GridBagConstraints.HORIZONTAL;
-			add(colourSelection, ccolourSelection);
-		}
+			//highlighting filters view
+			{
+				highlightingFiltersView = new HighlightingFiltersView(this);
+				highlightingFiltersViewButton = SlickerFactory.instance().createButton("highlighting filters");
+				GridBagConstraints cColouringFiltersViewButton = new GridBagConstraints();
+				cColouringFiltersViewButton.gridx = 1;
+				cColouringFiltersViewButton.gridy = gridy++;
+				cColouringFiltersViewButton.gridwidth = 1;
+				cColouringFiltersViewButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(highlightingFiltersViewButton, cColouringFiltersViewButton);
+			}
 
-		//highlighting filters view
-		{
-			highlightingFiltersView = new HighlightingFiltersView(this);
-			highlightingFiltersViewButton = SlickerFactory.instance().createButton("highlighting filters");
-			GridBagConstraints cColouringFiltersViewButton = new GridBagConstraints();
-			cColouringFiltersViewButton.gridx = 2;
-			cColouringFiltersViewButton.gridy = gridy++;
-			cColouringFiltersViewButton.gridwidth = 1;
-			cColouringFiltersViewButton.fill = GridBagConstraints.HORIZONTAL;
-			add(highlightingFiltersViewButton, cColouringFiltersViewButton);
-		}
+			//trace view
+			{
+				traceView = new TraceView(this);
+				traceViewButton = SlickerFactory.instance().createButton("traces");
+				GridBagConstraints cTraceViewButton = new GridBagConstraints();
+				cTraceViewButton.gridx = 1;
+				cTraceViewButton.gridy = gridy++;
+				cTraceViewButton.gridwidth = 1;
+				cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(traceViewButton, cTraceViewButton);
+			}
 
-		//trace view
-		{
-			traceView = new TraceView(this);
-			traceViewButton = SlickerFactory.instance().createButton("traces");
-			GridBagConstraints cTraceViewButton = new GridBagConstraints();
-			cTraceViewButton.gridx = 2;
-			cTraceViewButton.gridy = gridy++;
-			cTraceViewButton.gridwidth = 1;
-			cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
-			add(traceViewButton, cTraceViewButton);
-		}
+			{
+				saveModelButton = SlickerFactory.instance().createButton("export model");
+				GridBagConstraints cExitButton = new GridBagConstraints();
+				cExitButton.gridx = 1;
+				cExitButton.gridy = gridy++;
+				cExitButton.gridwidth = 1;
+				cExitButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(saveModelButton, cExitButton);
+			}
 
-//		{
-//			JLabel saveLabel = SlickerFactory.instance().createLabel("Save");
-//			GridBagConstraints cExitButton = new GridBagConstraints();
-//			cExitButton.gridx = 1;
-//			cExitButton.gridy = gridy;
-//			cExitButton.gridwidth = 1;
-//			cExitButton.fill = GridBagConstraints.HORIZONTAL;
-//			add(saveLabel, cExitButton);
-//		}
+			{
+				saveImageButton = SlickerFactory.instance().createButton("export view");
+				GridBagConstraints cExitButton = new GridBagConstraints();
+				cExitButton.gridx = 1;
+				cExitButton.gridy = gridy++;
+				cExitButton.gridwidth = 1;
+				cExitButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(saveImageButton, cExitButton);
+			}
 
-		{
-			saveModelButton = SlickerFactory.instance().createButton("export model");
-			GridBagConstraints cExitButton = new GridBagConstraints();
-			cExitButton.gridx = 2;
-			cExitButton.gridy = gridy++;
-			cExitButton.gridwidth = 1;
-			cExitButton.fill = GridBagConstraints.HORIZONTAL;
-			add(saveModelButton, cExitButton);
-		}
+			{
+				selectionLabel = new JTextArea(" \n ");
+				selectionLabel.setWrapStyleWord(true);
+				selectionLabel.setLineWrap(true);
+				selectionLabel.setEditable(false);
+				selectionLabel.setOpaque(false);
+				GridBagConstraints cSelectionLabel = new GridBagConstraints();
+				cSelectionLabel.gridx = 0;
+				cSelectionLabel.gridy = gridy++;
+				cSelectionLabel.gridwidth = 2;
+				cSelectionLabel.anchor = GridBagConstraints.NORTH;
+				cSelectionLabel.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(selectionLabel, cSelectionLabel);
+			}
 
-		{
-			saveImageButton = SlickerFactory.instance().createButton("export view");
-			GridBagConstraints cExitButton = new GridBagConstraints();
-			cExitButton.gridx = 2;
-			cExitButton.gridy = gridy++;
-			cExitButton.gridwidth = 1;
-			cExitButton.fill = GridBagConstraints.HORIZONTAL;
-			add(saveImageButton, cExitButton);
-		}
+			{
+				animationTimeLabel = SlickerFactory.instance().createLabel(" ");
+				animationTimeLabel.setMinimumSize(new Dimension(10, lineHeight));
+				animationTimeLabel.setPreferredSize(new Dimension(sidePanelWidth - 5, lineHeight));
+				GridBagConstraints cAnimationTimeLabel = new GridBagConstraints();
+				cAnimationTimeLabel.gridx = 0;
+				cAnimationTimeLabel.gridy = gridy++;
+				cAnimationTimeLabel.gridwidth = 2;
+				cAnimationTimeLabel.anchor = GridBagConstraints.SOUTH;
+				otherSettingsPanel.add(animationTimeLabel, cAnimationTimeLabel);
+			}
 
-		{
-			selectionLabel = new JTextArea(" \n ");
-			selectionLabel.setWrapStyleWord(true);
-			selectionLabel.setLineWrap(true);
-			selectionLabel.setEditable(false);
-			selectionLabel.setOpaque(false);
-			GridBagConstraints cSelectionLabel = new GridBagConstraints();
-			cSelectionLabel.gridx = 1;
-			cSelectionLabel.gridy = gridy++;
-			cSelectionLabel.gridwidth = 2;
-			cSelectionLabel.anchor = GridBagConstraints.NORTH;
-			cSelectionLabel.fill = GridBagConstraints.HORIZONTAL;
-			add(selectionLabel, cSelectionLabel);
-		}
-
-		{
-			animationTimeLabel = SlickerFactory.instance().createLabel(" ");
-			GridBagConstraints cAnimationTimeLabel = new GridBagConstraints();
-			cAnimationTimeLabel.gridx = 1;
-			cAnimationTimeLabel.gridy = gridy++;
-			cAnimationTimeLabel.gridwidth = 2;
-			cAnimationTimeLabel.anchor = GridBagConstraints.SOUTH;
-			add(animationTimeLabel, cAnimationTimeLabel);
-		}
-
-		{
-			statusLabel = SlickerFactory.instance().createLabel(" ");
-			statusLabel.setMinimumSize(new Dimension(100, 50));
-			GridBagConstraints cStatus = new GridBagConstraints();
-			cStatus.gridx = 1;
-			cStatus.gridy = gridy++;
-			cStatus.gridwidth = 2;
-			cStatus.anchor = GridBagConstraints.SOUTH;
-			add(statusLabel, cStatus);
+			{
+				statusLabel = SlickerFactory.instance().createLabel(" ");
+				statusLabel.setMinimumSize(new Dimension(10, lineHeight));
+				statusLabel.setPreferredSize(new Dimension(sidePanelWidth - 5, lineHeight));
+				GridBagConstraints cStatus = new GridBagConstraints();
+				cStatus.gridx = 0;
+				cStatus.gridy = gridy++;
+				cStatus.gridwidth = 2;
+				cStatus.anchor = GridBagConstraints.SOUTH;
+				otherSettingsPanel.add(statusLabel, cStatus);
+			}
 		}
 
 		//graph panel
@@ -311,15 +319,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 				}
 			});
 
-			GridBagConstraints cGraphPanel = new GridBagConstraints();
-			cGraphPanel.gridx = 0;
-			cGraphPanel.gridy = 0;
-			cGraphPanel.gridheight = gridy;
-			cGraphPanel.gridwidth = 1;
-			cGraphPanel.weightx = 1;
-			cGraphPanel.weighty = 1;
-			cGraphPanel.fill = GridBagConstraints.BOTH;
-			add(graphPanel, cGraphPanel);
+			add(graphPanel, BorderLayout.CENTER);
 		}
 
 		//handle pre-mined tree case
