@@ -14,7 +14,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.alignment.PositionLogMoves;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 
-@SuppressWarnings("deprecation")
 public class IvMLogInfo {
 
 	private final TIntLongMap modelMoves;
@@ -46,7 +45,6 @@ public class IvMLogInfo {
 		PositionLogMoves positionLogMoves = new PositionLogMoves();
 		int lastModelSyncNode;
 		for (IvMTrace trace : log) {
-			int lastDfgUnode = -1;
 			int lastUnode = -1;
 			lastModelSyncNode = -1;
 			boolean traceContainsLogMove = false;
@@ -64,10 +62,6 @@ public class IvMLogInfo {
 
 				if (move.isModelSync() && !move.isIgnoredModelMove()) {
 					lastUnode = move.getTreeNode();
-				}
-
-				if (move.getTreeNode() != -1 && tree.isActivity(move.getTreeNode())) {
-					lastDfgUnode = move.getTreeNode();
 				}
 
 				/*

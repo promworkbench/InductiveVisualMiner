@@ -15,6 +15,7 @@ import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
@@ -29,9 +30,8 @@ public class MultiEventAttributeFilter extends HighlightingFilter {
 		return "Event filter";
 	}
 
-	public IvMFilterGui createGui(XLog log) {
-		final Map<String, Set<XAttribute>> traceAttributes = getEventAttributeMap(log);
-		panel = new MultiAttributeFilterGui(traceAttributes, getName());
+	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+		panel = new MultiAttributeFilterGui(attributesInfo.getEventAttributesMap(), getName());
 
 		// Key selector
 		panel.getKeySelector().addActionListener(new ActionListener() {
@@ -39,7 +39,7 @@ public class MultiEventAttributeFilter extends HighlightingFilter {
 				block = true;
 				String selectedKey = panel.getSelectedKey();
 
-				panel.replaceAttributes(traceAttributes.get(selectedKey));
+				panel.replaceAttributes(attributesInfo.getEventAttributesMap().get(selectedKey));
 				block = false;
 				update();
 			}
@@ -92,7 +92,7 @@ public class MultiEventAttributeFilter extends HighlightingFilter {
 		s.append("having attribute `");
 		s.append(panel.getSelectedKey());
 		s.append("' being ");
-		List<XAttribute> attributes = panel.getSelectedAttributes();
+		List<String> attributes = panel.getSelectedAttributes();
 		if (attributes.size() > 1) {
 			s.append("either ");
 		}

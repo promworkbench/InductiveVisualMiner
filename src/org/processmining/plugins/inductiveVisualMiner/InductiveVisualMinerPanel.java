@@ -18,7 +18,9 @@ import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSele
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.BoundsPopupMenuListener;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.MultiComboBox;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -51,7 +53,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final NiceDoubleSlider activitiesSlider;
 	private final NiceDoubleSlider pathsSlider;
 	private final JLabel classifierLabel;
-	private JComboBox<?> classifiersCombobox;
+	private MultiComboBox<String> classifiersCombobox;
 	private final JButton preMiningFiltersButton;
 	private final PreMiningFiltersView preMiningFiltersView;
 	private final JButton editModelButton;
@@ -106,7 +108,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 			cClassifierLabel.anchor = GridBagConstraints.WEST;
 			add(classifierLabel, cClassifierLabel);
 
-			classifiersCombobox = SlickerFactory.instance().createComboBox(classifiers);
+			classifiersCombobox = new MultiComboBox<String>(String.class, new String[0]);
+			classifiersCombobox.setEnabled(false);
 			GridBagConstraints cClassifiers = new GridBagConstraints();
 			cClassifiers.gridx = 2;
 			cClassifiers.gridy = gridy++;
@@ -139,6 +142,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			add(minerLabel, cMinerLabel);
 
 			minerCombobox = SlickerFactory.instance().createComboBox(miners);
+			minerCombobox.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 			GridBagConstraints cMiners = new GridBagConstraints();
 			cMiners.gridx = 2;
 			cMiners.gridy = gridy++;
@@ -172,6 +176,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			colourSelection = SlickerFactory.instance().createComboBox(
 					new Mode[] { new ModePaths(), new ModePathsDeviations(), new ModePathsQueueLengths(),
 							new ModePathsSojourn(), new ModePathsService() });
+			colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 			GridBagConstraints ccolourSelection = new GridBagConstraints();
 			ccolourSelection.gridx = 2;
 			ccolourSelection.gridy = gridy++;
@@ -384,7 +389,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return statusLabel;
 	}
 
-	public JComboBox<?> getClassifiers() {
+	public MultiComboBox<String> getClassifiers() {
 		return classifiersCombobox;
 	}
 

@@ -17,7 +17,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 
-import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 
 import com.fluxicon.slickerbox.factory.SlickerFactory;
@@ -26,13 +25,13 @@ public class MultiAttributeFilterGui extends IvMFilterGui {
 
 	private static final long serialVersionUID = -5662487261061931369L;
 	private final JComboBox<String> keySelector;
-	private final JList<XAttribute> attributeSelector;
-	private final DefaultListModel<XAttribute> attributeSelectorListModel;
+	private final JList<String> attributeSelector;
+	private final DefaultListModel<String> attributeSelectorListModel;
 	private final JLabel explanation;
 	private final boolean empty;
 
 	@SuppressWarnings("unchecked")
-	public MultiAttributeFilterGui(Map<String, Set<XAttribute>> attributes, String title) {
+	public MultiAttributeFilterGui(Map<String, ? extends Set<String>> attributes, String title) {
 		super(title);
 		usesVerticalSpace = true;
 		empty = attributes.isEmpty();
@@ -70,18 +69,18 @@ public class MultiAttributeFilterGui extends IvMFilterGui {
 		}
 
 		{
-			attributeSelectorListModel = new DefaultListModel<XAttribute>();
+			attributeSelectorListModel = new DefaultListModel<String>();
 			if (!empty) {
-				for (XAttribute a : attributes.get(getSelectedKey())) {
+				for (String a : attributes.get(getSelectedKey())) {
 					attributeSelectorListModel.addElement(a);
 				}
 			}
 
-			attributeSelector = new JList<XAttribute>(attributeSelectorListModel);
-			attributeSelector.setCellRenderer(new ListCellRenderer<XAttribute>() {
+			attributeSelector = new JList<String>(attributeSelectorListModel);
+			attributeSelector.setCellRenderer(new ListCellRenderer<String>() {
 				protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
 
-				public Component getListCellRendererComponent(JList<? extends XAttribute> list, XAttribute value,
+				public Component getListCellRendererComponent(JList<? extends String> list, String value,
 						int index, boolean isSelected, boolean cellHasFocus) {
 
 					JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index,
@@ -114,7 +113,7 @@ public class MultiAttributeFilterGui extends IvMFilterGui {
 		return (String) keySelector.getSelectedItem();
 	}
 
-	public List<XAttribute> getSelectedAttributes() {
+	public List<String> getSelectedAttributes() {
 		return attributeSelector.getSelectedValuesList();
 	}
 
@@ -122,13 +121,13 @@ public class MultiAttributeFilterGui extends IvMFilterGui {
 		return keySelector;
 	}
 
-	public JList<XAttribute> getAttributeSelector() {
+	public JList<String> getAttributeSelector() {
 		return attributeSelector;
 	}
 
-	public void replaceAttributes(Iterable<XAttribute> attributes) {
+	public void replaceAttributes(Iterable<String> attributes) {
 		attributeSelectorListModel.clear();
-		for (XAttribute attribute : attributes) {
+		for (String attribute : attributes) {
 			attributeSelectorListModel.addElement(attribute);
 		}
 	}

@@ -14,6 +14,7 @@ import javax.swing.event.ListSelectionListener;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -27,9 +28,8 @@ public class MultiTraceAttributeFilter extends HighlightingFilter {
 		return "Trace filter";
 	}
 
-	public IvMFilterGui createGui(XLog log) {
-		final Map<String, Set<XAttribute>> traceAttributes = getTraceAttributeMap(log);
-		panel = new MultiAttributeFilterGui(traceAttributes, getName());
+	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+		panel = new MultiAttributeFilterGui(attributesInfo.getTraceAttributesMap(), getName());
 
 		// Key selector
 		panel.getKeySelector().addActionListener(new ActionListener() {
@@ -37,7 +37,7 @@ public class MultiTraceAttributeFilter extends HighlightingFilter {
 				block = true;
 				String selectedKey = panel.getSelectedKey();
 
-				panel.replaceAttributes(traceAttributes.get(selectedKey));
+				panel.replaceAttributes(attributesInfo.getTraceAttributesMap().get(selectedKey));
 				block = false;
 				update();
 			}
@@ -78,7 +78,7 @@ public class MultiTraceAttributeFilter extends HighlightingFilter {
 			s.append("<html>Include only traces having attribute `");
 			s.append(panel.getSelectedKey());
 			s.append("' being ");
-			List<XAttribute> attributes = panel.getSelectedAttributes();
+			List<String> attributes = panel.getSelectedAttributes();
 			if (attributes.size() > 1) {
 				s.append("either ");
 			}

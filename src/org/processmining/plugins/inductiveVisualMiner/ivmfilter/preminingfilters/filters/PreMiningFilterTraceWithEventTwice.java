@@ -3,19 +3,16 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilter
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.MultiAttributeFilterGui;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.MultiEventAttributeFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningTraceFilter;
 
 public class PreMiningFilterTraceWithEventTwice extends PreMiningTraceFilter {
@@ -27,9 +24,8 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningTraceFilter {
 		return "Trace with event happening twice filter";
 	}
 
-	public IvMFilterGui createGui(XLog log) {
-		final Map<String, Set<XAttribute>> traceAttributes = MultiEventAttributeFilter.getEventAttributeMap(log);
-		panel = new MultiAttributeFilterGui(traceAttributes, getName());
+	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+		panel = new MultiAttributeFilterGui(attributesInfo.getEventAttributesMap(), getName());
 
 		// Key selector
 		panel.getKeySelector().addActionListener(new ActionListener() {
@@ -37,7 +33,7 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningTraceFilter {
 				block = true;
 				String selectedKey = panel.getSelectedKey();
 
-				panel.replaceAttributes(traceAttributes.get(selectedKey));
+				panel.replaceAttributes(attributesInfo.getEventAttributesMap().get(selectedKey));
 				block = false;
 				update();
 			}
@@ -71,7 +67,7 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningTraceFilter {
 			s.append("<html>Include only traces that have at least two events having attribute `");
 			s.append(panel.getSelectedKey());
 			s.append("' being ");
-			List<XAttribute> attributes = panel.getSelectedAttributes();
+			List<String> attributes = panel.getSelectedAttributes();
 			if (attributes.size() > 1) {
 				s.append("either ");
 			}

@@ -18,7 +18,11 @@ public class Cl11Histogram extends
 
 	protected HistogramData executeLink(Quadruple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer> input,
 			IvMCanceller canceller) throws Exception {
-		HistogramData data = new HistogramData(input.getA(), input.getB(), input.getC(), input.getD(),
+		IvMEfficientTree tree = input.getA();
+		if (tree == null) {
+			return null;
+		}
+		HistogramData data = new HistogramData(tree, input.getB(), input.getC(), input.getD(),
 				InductiveVisualMinerAnimationPanel.popupWidth, canceller);
 		if (canceller.isCancelled()) {
 			return null;

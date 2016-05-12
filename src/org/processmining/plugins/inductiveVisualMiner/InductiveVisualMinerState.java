@@ -24,6 +24,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
@@ -52,6 +53,23 @@ public class InductiveVisualMinerState {
 			this.tree = new IvMEfficientTree(preMinedTree);
 			this.preMinedTree = this.tree;
 		}
+	}
+	
+	//==attributes==
+	private AttributesInfo attributesInfo;
+	private String[] classifiers;
+	
+	public AttributesInfo getAttributesInfo() {
+		return attributesInfo;
+	}
+	
+	public String[] getClassifiers() {
+		return classifiers;
+	}
+	
+	public void setAttributesInfo(AttributesInfo info, String[] classifiers) {
+		attributesInfo = info;
+		this.classifiers = classifiers;
 	}
 
 	//==log==

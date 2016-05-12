@@ -3,18 +3,13 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilter
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.MultiAttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningTraceFilter;
@@ -28,9 +23,8 @@ public class PreMiningMultiTraceAttributeFilter extends PreMiningTraceFilter {
 		return "Trace filter";
 	}
 
-	public IvMFilterGui createGui(XLog log) {
-		final Map<String, Set<XAttribute>> traceAttributes = getTraceAttributeMap(log);
-		panel = new MultiAttributeFilterGui(traceAttributes, getName());
+	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+		panel = new MultiAttributeFilterGui(attributesInfo.getTraceAttributesMap(), getName());
 
 		// Key selector
 		panel.getKeySelector().addActionListener(new ActionListener() {
@@ -38,7 +32,7 @@ public class PreMiningMultiTraceAttributeFilter extends PreMiningTraceFilter {
 				block = true;
 				String selectedKey = panel.getSelectedKey();
 
-				panel.replaceAttributes(traceAttributes.get(selectedKey));
+				panel.replaceAttributes(attributesInfo.getTraceAttributesMap().get(selectedKey));
 				block = false;
 				update();
 			}
@@ -79,7 +73,7 @@ public class PreMiningMultiTraceAttributeFilter extends PreMiningTraceFilter {
 			s.append("<html>Include only traces having attribute `");
 			s.append(panel.getSelectedKey());
 			s.append("' being ");
-			List<XAttribute> attributes = panel.getSelectedAttributes();
+			List<String> attributes = panel.getSelectedAttributes();
 			if (attributes.size() > 1) {
 				s.append("either ");
 			}
@@ -97,19 +91,4 @@ public class PreMiningMultiTraceAttributeFilter extends PreMiningTraceFilter {
 			panel.getExplanation().setText(s.toString());
 		}
 	}
-
-	private static Map<String, Set<XAttribute>> getTraceAttributeMap(XLog log) {
-		Map<String, Set<XAttribute>> traceAttributes = new TreeMap<String, Set<XAttribute>>();
-
-		for (XTrace trace : log) {
-			for (XAttribute traceAttribute : trace.getAttributes().values()) {
-				if (!traceAttributes.containsKey(traceAttribute.getKey())) {
-					traceAttributes.put(traceAttribute.getKey(), new TreeSet<XAttribute>());
-				}
-				traceAttributes.get(traceAttribute.getKey()).add(traceAttribute);
-			}
-		}
-		return traceAttributes;
-	}
-
 }

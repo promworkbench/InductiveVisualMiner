@@ -15,6 +15,7 @@ import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.MultiAttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningEventFilter;
@@ -37,9 +38,8 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 		return "Event filter";
 	}
 
-	public IvMFilterGui createGui(XLog log) {
-		final Map<String, Set<XAttribute>> traceAttributes = getEventAttributeMap(log);
-		panel = new MultiAttributeFilterGui(traceAttributes, getName());
+	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+		panel = new MultiAttributeFilterGui(attributesInfo.getEventAttributesMap(), getName());
 
 		// Key selector
 		panel.getKeySelector().addActionListener(new ActionListener() {
@@ -47,7 +47,7 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 				block = true;
 				String selectedKey = panel.getSelectedKey();
 
-				panel.replaceAttributes(traceAttributes.get(selectedKey));
+				panel.replaceAttributes(attributesInfo.getEventAttributesMap().get(selectedKey));
 				block = false;
 				update();
 			}
@@ -81,7 +81,7 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 			s.append("<html>Include only events having attribute `");
 			s.append(panel.getSelectedKey());
 			s.append("' being ");
-			List<XAttribute> attributes = panel.getSelectedAttributes();
+			List<String> attributes = panel.getSelectedAttributes();
 			if (attributes.size() > 1) {
 				s.append("either ");
 			}

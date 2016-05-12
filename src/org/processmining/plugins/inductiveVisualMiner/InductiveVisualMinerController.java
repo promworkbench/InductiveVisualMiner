@@ -19,11 +19,11 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.deckfour.xes.classification.XEventAttributeClassifier;
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
-import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
@@ -32,6 +32,7 @@ import org.processmining.plugins.graphviz.visualisation.export.ExportDialog;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl00GatherAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01MakeLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl02FilterLogOnActivities;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl03Mine;
@@ -45,6 +46,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl10Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Histogram;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
@@ -73,7 +75,7 @@ public class InductiveVisualMinerController {
 	private final Chain chain;
 	private final PluginContext context;
 
-	public InductiveVisualMinerController(PluginContext context, final InductiveVisualMinerPanel panel,
+	public InductiveVisualMinerController(final PluginContext context, final InductiveVisualMinerPanel panel,
 			final InductiveVisualMinerState state, ProMCanceller canceller) {
 		this.panel = panel;
 		this.state = state;
@@ -87,8 +89,37 @@ public class InductiveVisualMinerController {
 		//set up the chain
 		chain = new Chain(context.getExecutor(), state, canceller);
 
+		final Function<Exception, Object> onException = new Function<Exception, Object>() {
+			public Object call(Exception input) throws Exception {
+				setStatus("- error - aborted -");
+				return null;
+			}
+		};
+
+		//gather attributes
+		{
+			Cl00GatherAttributes m = new Cl00GatherAttributes();
+			m.setOnStart(new Runnable() {
+				public void run() {
+					state.setAttributesInfo(null, null);
+					panel.getClassifiers().setEnabled(false);
+					setStatus("Gathering attributes..");
+				}
+			});
+			m.setOnComplete(new Runnable() {
+				public void run() {
+					panel.getClassifiers().setEnabled(true);
+					panel.getClassifiers().replaceItems(state.getClassifiers());
+					panel.getClassifiers().setSelectedItem(state.getActivityClassifier().name());
+					initialisePreMiningFilters(state.getXLog(), state.getAttributesInfo(), context.getExecutor());
+					initialiseColourFilters(state.getXLog(), state.getAttributesInfo(), context.getExecutor());
+				}
+			});
+			m.setOnException(onException);
+			chain.add(m);
+		}
+
 		//make log
-		final Function<Exception, Object> onException;
 		{
 			Cl01MakeLog m = new Cl01MakeLog();
 			m.setOnStart(new Runnable() {
@@ -110,12 +141,6 @@ public class InductiveVisualMinerController {
 					panel.getTraceView().set(state.getLog());
 				}
 			});
-			onException = new Function<Exception, Object>() {
-				public Object call(Exception input) throws Exception {
-					setStatus("- error - aborted -");
-					return null;
-				}
-			};
 			m.setOnException(onException);
 			chain.add(m);
 		}
@@ -199,7 +224,7 @@ public class InductiveVisualMinerController {
 			};
 			Cl04LayoutModel chainLinkLayout = new Cl04LayoutModel();
 			chainLinkLayout.setOnStart(new Runnable() {
-				
+
 				public void run() {
 					layoutStart.run();
 					panel.getGraph().setAnimationEnabled(false);
@@ -384,7 +409,6 @@ public class InductiveVisualMinerController {
 					HighlightingFilter.class, HighlightingFilterAnnotation.class);
 			state.setColouringFilters(colouringFilters);
 			panel.getColouringFiltersView().initialise(colouringFilters);
-			initialiseColourFilters(state.getXLog(), context.getExecutor());
 		}
 
 		//set up pre-mining plug-ins
@@ -393,11 +417,10 @@ public class InductiveVisualMinerController {
 					PreMiningEventFilterAnnotation.class, PreMiningTraceFilterAnnotation.class);
 			state.setPreMiningFilters(preMiningFilters);
 			panel.getPreMiningFiltersView().initialise(preMiningFilters);
-			initialisePreMiningFilters(state.getXLog(), context.getExecutor());
 		}
 
 		//start the chain
-		chain.execute(Cl01MakeLog.class);
+		chain.execute(Cl00GatherAttributes.class);
 	}
 
 	private void initGui() {
@@ -427,7 +450,8 @@ public class InductiveVisualMinerController {
 		//classifier
 		panel.getClassifiers().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				state.setClassifier(((ClassifierWrapper) panel.getClassifiers().getSelectedItem()).classifier);
+				state.setClassifier(new XEventAttributeClassifier("custom classifier", panel.getClassifiers()
+						.getSelectedObjects()));
 				chain.execute(Cl01MakeLog.class);
 			}
 		});
@@ -439,7 +463,7 @@ public class InductiveVisualMinerController {
 				chain.execute(Cl01MakeLog.class);
 			}
 		});
-		
+
 		//model editor
 		panel.getEditModelView().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -544,7 +568,7 @@ public class InductiveVisualMinerController {
 				panel.getPreMiningFiltersView().swapVisibility();
 			}
 		});
-		
+
 		//set edit model button
 		panel.getEditModelButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -641,7 +665,7 @@ public class InductiveVisualMinerController {
 	 * @param xLog
 	 * @param executor
 	 */
-	private void initialiseColourFilters(final XLog xLog, Executor executor) {
+	private void initialiseColourFilters(final XLog xLog, final AttributesInfo attributeInfo, Executor executor) {
 		final Runnable onUpdate = new Runnable() {
 			public void run() {
 				chain.execute(Cl09FilterNodeSelection.class);
@@ -650,14 +674,14 @@ public class InductiveVisualMinerController {
 		for (final IvMFilter colouringFilter : state.getColouringFilters()) {
 			executor.execute(new Runnable() {
 				public void run() {
-					colouringFilter.initialiseFilter(xLog, onUpdate);
+					colouringFilter.initialiseFilter(xLog, attributeInfo, onUpdate);
 					panel.getColouringFiltersView().setPanel(colouringFilter, onUpdate);
 				}
 			});
 		}
 	}
 
-	private void initialisePreMiningFilters(final XLog xLog, Executor executor) {
+	private void initialisePreMiningFilters(final XLog xLog, final AttributesInfo attributeInfo, Executor executor) {
 		final Runnable onUpdate = new Runnable() {
 			public void run() {
 				chain.execute(Cl02FilterLogOnActivities.class);
@@ -666,7 +690,7 @@ public class InductiveVisualMinerController {
 		for (final IvMFilter preMiningFilter : state.getPreMiningFilters()) {
 			executor.execute(new Runnable() {
 				public void run() {
-					preMiningFilter.initialiseFilter(xLog, onUpdate);
+					preMiningFilter.initialiseFilter(xLog, attributeInfo, onUpdate);
 					panel.getPreMiningFiltersView().setPanel(preMiningFilter, onUpdate);
 				}
 			});

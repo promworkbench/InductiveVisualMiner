@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
 import org.deckfour.xes.model.XLog;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 
 public abstract class IvMFilter {
 
@@ -27,7 +28,7 @@ public abstract class IvMFilter {
 	 * @param log
 	 * @return
 	 */
-	public abstract IvMFilterGui createGui(XLog log);
+	public abstract IvMFilterGui createGui(XLog log, AttributesInfo attributeInfo);
 
 	/**
 	 * Returns whether this filter is actually filtering something. If this
@@ -53,10 +54,10 @@ public abstract class IvMFilter {
 	private Runnable onUpdate = null;
 	private boolean enabledFilter = false;
 
-	public void initialiseFilter(XLog log, Runnable onUpdate) {
+	public void initialiseFilter(XLog log, AttributesInfo attributeInfo, Runnable onUpdate) {
 		try {
 			//this might be foreign code, so be careful
-			panel = createGui(log);
+			panel = createGui(log, attributeInfo);
 		} catch (Exception e) {
 			panel = null;
 		}
