@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.visualisation;
 
-import java.util.HashMap;
+import gnu.trove.map.hash.THashMap;
 
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotNode;
@@ -22,7 +22,7 @@ public class LocalDotNode extends DotNode {
 	public final Appearance unselectedAppearance = new Appearance();
 
 	public LocalDotNode(Dot dot, ProcessTreeVisualisationInfo info, NodeType type, String label, final int unode) {
-		super(label, new HashMap<String, String>());
+		super(label, new THashMap<String, String>());
 
 		this.node = unode;
 		this.setType(type);

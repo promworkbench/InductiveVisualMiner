@@ -17,6 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 import com.kitfox.svg.SVGDiagram;
+import com.kitfox.svg.SVGException;
 
 public class ComputeAnimation {
 
@@ -26,7 +27,7 @@ public class ComputeAnimation {
 
 	public static GraphVizTokens computeAnimation(IvMEfficientTree tree, final IvMLog ivmLog, final Mode colourMode,
 			final ProcessTreeVisualisationInfo info, final Scaler scaler, final SVGDiagram svg,
-			final IvMCanceller canceller) throws NoninvertibleTransformException {
+			final IvMCanceller canceller) throws NoninvertibleTransformException, SVGException {
 
 		//make a shortest path graph
 		final ShortestPathGraph graph = new ShortestPathGraph(info.getNodes(), info.getEdges());

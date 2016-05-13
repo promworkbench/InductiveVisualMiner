@@ -16,7 +16,7 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 
-import com.kitfox.svg.Group;
+import com.kitfox.svg.Ellipse;
 import com.kitfox.svg.Path;
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGElement;
@@ -27,7 +27,7 @@ import com.kitfox.svg.TransformableElement;
 public class DotToken2GraphVizToken {
 
 	public static void convertTokens(Iterable<DotToken> tokens, GraphVizTokens result, SVGDiagram svg, int traceIndex)
-			throws NoninvertibleTransformException {
+			throws NoninvertibleTransformException, SVGException {
 		for (DotToken token : tokens) {
 			for (DotToken subToken : token.getAllTokensRecursively()) {
 				convertToken(subToken, result, svg, traceIndex);
@@ -36,12 +36,13 @@ public class DotToken2GraphVizToken {
 
 	}
 
-	public static void convertToken(DotToken token, GraphVizTokens result,
-			SVGDiagram svg, int traceIndex) throws NoninvertibleTransformException {
+	public static void convertToken(DotToken token, GraphVizTokens result, SVGDiagram svg, int traceIndex)
+			throws NoninvertibleTransformException, SVGException {
 		assert (token.isAllTimestampsSet());
 
 		for (int i = 0; i < token.size(); i++) {
-			animateDotTokenStep(token, i, token.isFade() && i == 0, token.isFade() && i == token.size() - 1, result, svg, traceIndex);
+			animateDotTokenStep(token, i, token.isFade() && i == 0, token.isFade() && i == token.size() - 1, result,
+					svg, traceIndex);
 		}
 	}
 
@@ -53,9 +54,10 @@ public class DotToken2GraphVizToken {
 	 * @param result
 	 * @param svg
 	 * @throws NoninvertibleTransformException
+	 * @throws SVGException 
 	 */
 	public static void animateDotTokenStep(DotToken dotToken, int stepIndex, boolean fadeIn, boolean fadeOut,
-			GraphVizTokens result, SVGDiagram svg, int traceIndex) throws NoninvertibleTransformException {
+			GraphVizTokens result, SVGDiagram svg, int traceIndex) throws NoninvertibleTransformException, SVGException {
 		DotTokenStep step = dotToken.get(stepIndex);
 		if (step.isOverEdge()) {
 			animateDotTokenStepEdge(dotToken, stepIndex, fadeIn, fadeOut, result, svg, traceIndex);
@@ -74,9 +76,10 @@ public class DotToken2GraphVizToken {
 	 * @param result
 	 * @param image
 	 * @throws NoninvertibleTransformException
+	 * @throws SVGException 
 	 */
 	public static void animateDotTokenStepEdge(DotToken dotToken, int stepIndex, boolean fadeIn, boolean fadeOut,
-			GraphVizTokens result, SVGDiagram image, int traceIndex) throws NoninvertibleTransformException {
+			GraphVizTokens result, SVGDiagram image, int traceIndex) throws NoninvertibleTransformException, SVGException {
 		DotTokenStep step = dotToken.get(stepIndex);
 
 		LocalDotEdge edge = step.getEdge();
@@ -124,7 +127,7 @@ public class DotToken2GraphVizToken {
 	}
 
 	public static void animateDotTokenStepNode(DotToken dotToken, int stepIndex, boolean fadeIn, boolean fadeOut,
-			GraphVizTokens result, SVGDiagram image, int traceIndex) throws NoninvertibleTransformException {
+			GraphVizTokens result, SVGDiagram image, int traceIndex) throws NoninvertibleTransformException, SVGException {
 		DotTokenStep step = dotToken.get(stepIndex);
 
 		//get the start time and compute the duration
@@ -169,7 +172,7 @@ public class DotToken2GraphVizToken {
 
 		return transform;
 	}
-	
+
 	public static String getSourceLocation(LocalDotEdge edge, SVGDiagram image) {
 		SVGElement SVGline = DotPanel.getSVGElementOf(image, edge).getChild(1);
 		String path = DotPanel.getAttributeOf(SVGline, "d");
@@ -180,7 +183,7 @@ public class DotToken2GraphVizToken {
 			return getLastLocation(path);
 		}
 	}
-	
+
 	public static String getFirstLocation(String path) {
 		Matcher matcher = pattern.matcher(path);
 		matcher.find();
@@ -197,13 +200,15 @@ public class DotToken2GraphVizToken {
 		return location;
 	}
 
-	public static String getCenter(LocalDotNode node, SVGDiagram image) {
-		Group nodeGroup = DotPanel.getSVGElementOf(image, node);
+	public static String getCenter(LocalDotNode node, SVGDiagram image) throws SVGException {
+		SVGElement element = DotPanel.getSVGElementOf(image, node).getChild(1);
 		Rectangle2D bb = null;
-		try {
-			bb = nodeGroup.getBoundingBox();
-		} catch (SVGException e) {
-			e.printStackTrace();
+		if (element instanceof Ellipse) {
+			bb = ((Ellipse) element).getBoundingBox();
+		} else if (element instanceof Path) {
+			bb = ((Path) element).getBoundingBox();
+		} else {
+			bb = DotPanel.getSVGElementOf(image, node).getBoundingBox();
 		}
 		double centerX = bb.getCenterX();
 		double centerY = bb.getCenterY();
