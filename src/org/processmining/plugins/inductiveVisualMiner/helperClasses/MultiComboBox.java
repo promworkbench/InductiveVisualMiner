@@ -34,14 +34,14 @@ import org.processmining.framework.util.ui.widgets.WidgetColors;
 import com.fluxicon.slickerbox.factory.SlickerDecorator;
 
 public class MultiComboBox<E> extends JComboBox<Object> {
-	private static final Color textfield_fg = new Color(32, 32, 32);
-	private static final Color even_colour_bg = new Color(160, 160, 160);
-	private static final Color odd_colour_bg = new Color(180, 180, 180);
-	private static final Color colour_fg = new Color(30, 30, 30);
-	private static final Color rollover_colour_bg = WidgetColors.COLOR_LIST_SELECTION_BG;
-	private static final Color rollover_colour_fg = WidgetColors.COLOR_LIST_SELECTION_FG;
-	private static final Color selection_colour_bg = new Color(50, 50, 50);
-	private static final Color selection_colour_fg = new Color(180, 180, 180);
+	public static final Color textfield_fg = new Color(32, 32, 32);
+	public static final Color even_colour_bg = new Color(160, 160, 160);
+	public static final Color odd_colour_bg = new Color(180, 180, 180);
+	public static final Color colour_fg = new Color(30, 30, 30);
+	public static final Color rollover_colour_bg = WidgetColors.COLOR_LIST_SELECTION_BG;
+	public static final Color rollover_colour_fg = WidgetColors.COLOR_LIST_SELECTION_FG;
+	public static final Color selection_colour_bg = new Color(50, 50, 50);
+	public static final Color selection_colour_fg = new Color(180, 180, 180);
 
 	private static final long serialVersionUID = -7720215210683281697L;
 	private transient CellButtonsMouseListener cbml;

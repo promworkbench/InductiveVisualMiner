@@ -1,119 +1,123 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
-import java.awt.Color;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
+import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.MultiComboBox;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 
+import com.fluxicon.slickerbox.factory.SlickerDecorator;
 import com.fluxicon.slickerbox.factory.SlickerFactory;
 
 public abstract class IvMFiltersView extends SideWindow {
 	private static final long serialVersionUID = -5500440632866414477L;
 	private final JPanel panel;
-	private final Map<IvMFilter, JComponent> filter2label;
-	private final Map<IvMFilter, Integer> filter2position;
-	private int highFilters;
-	
+	private final Map<IvMFilter, JPanel> filter2panel;
+	private final Map<IvMFilter, JLabel> filter2initialisationLabel;
+	private final TObjectIntMap<IvMFilter> filter2index;
+
 	public IvMFiltersView(Component parent, String title, String header) {
 		super(parent, title);
-		
-		panel = new JPanel(new GridBagLayout());
-		panel.setBackground(Color.gray);
+
+		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+		panel.setBackground(MultiComboBox.even_colour_bg);
 		add(panel);
-		filter2label = new HashMap<>();
-		filter2position = new HashMap<>();
-		highFilters = 0;
-		
-		JLabel explanation = new JLabel("<html>" + header + "</html>");
-		GridBagConstraints cLabel = new GridBagConstraints();
-		cLabel.gridx = 1;
-		cLabel.gridy = 1;
-		cLabel.fill = GridBagConstraints.HORIZONTAL;
-		cLabel.anchor = GridBagConstraints.WEST;
-		panel.add(explanation, cLabel);
+		filter2panel = new THashMap<>();
+		filter2initialisationLabel = new THashMap<>();
+		filter2index = new TObjectIntHashMap<>();
+
+		JTextArea explanation = new JTextArea(header);
+		explanation.setWrapStyleWord(true);
+		explanation.setLineWrap(true);
+		explanation.setOpaque(false);
+		explanation.setEnabled(false);
+		explanation.setFont(new JLabel("blaa").getFont());
+		explanation.setDisabledTextColor(MultiComboBox.colour_fg);
+		panel.add(explanation);
 	}
-	
-	public void initialise(List<? extends IvMFilter> colouringFilters) {
-		int gridy = 2;
-		Collections.sort(colouringFilters, new Comparator<IvMFilter>() {
+
+	public void initialise(List<? extends IvMFilter> filters) {
+		Collections.sort(filters, new Comparator<IvMFilter>() {
 			public int compare(IvMFilter o1, IvMFilter o2) {
 				return o1.getName().compareTo(o2.getName());
 			}
 		});
-		for (IvMFilter colouringFilter : colouringFilters) {
+		int index = 1;
+		for (IvMFilter filter : filters) {
+			//add panel
+			JPanel subPanel = new JPanel();
+			subPanel.setOpaque(true);
+			subPanel.setLayout(new BorderLayout());
+			subPanel.setBackground(index % 2 == 0 ? MultiComboBox.even_colour_bg : MultiComboBox.odd_colour_bg);
+			subPanel.setForeground(MultiComboBox.colour_fg);
+			panel.add(subPanel);
+
 			//add label
-			JLabel label = SlickerFactory.instance().createLabel(colouringFilter.getName() + " initialising ...");
-			GridBagConstraints cLabel = new GridBagConstraints();
-			cLabel.gridx = 1;
-			cLabel.gridy = gridy;
-			cLabel.fill = GridBagConstraints.VERTICAL;
-			cLabel.anchor = GridBagConstraints.EAST;
-			panel.add(label, cLabel);
+			JLabel label = SlickerFactory.instance().createLabel(filter.getName() + " initialising ...");
+			subPanel.add(label);
 
-			filter2label.put(colouringFilter, label);
-			filter2position.put(colouringFilter, new Integer(gridy));
-
-			gridy++;
+			filter2panel.put(filter, subPanel);
+			filter2initialisationLabel.put(filter, label);
+			filter2index.put(filter, index);
+			index++;
 		}
 	}
-	
+
 	public void setPanel(final IvMFilter filter, final Runnable onUpdate) {
 
 		//if the colouringfilter did not initialise, print error message
 		if (filter.getPanel() == null) {
-			((JLabel) filter2label.get(filter)).setText(filter.getName()
-					+ " did not initialise properly. It could be that the log contains inconsistent attribute types.");
+			filter2initialisationLabel
+					.get(filter)
+					.setText(
+							filter.getName()
+									+ " did not initialise properly. It could be that the log contains inconsistent attribute types.");
 			return;
 		}
 
+		final JPanel subPanel = filter2panel.get(filter);
+		final int index = filter2index.get(filter);
+
 		//remove initialising message
-		panel.remove(filter2label.get(filter));
+		subPanel.remove(filter2panel.get(filter));
 
 		//add panel
-		{
-			GridBagConstraints cPanel = new GridBagConstraints();
-			cPanel.gridx = 1;
-			cPanel.gridy = filter2position.get(filter);
-			cPanel.fill = GridBagConstraints.BOTH;
-			cPanel.anchor = GridBagConstraints.NORTH;
-			cPanel.weightx = 1;
-			if (filter.getPanel().isUsesVerticalSpace()) {
-				highFilters++;
-				cPanel.weighty = 1 / (highFilters * 1.0);
-			}
-			panel.add(filter.getPanel(), cPanel);
-		}
+		subPanel.add(filter.getPanel(), BorderLayout.CENTER);
+		filter.getPanel().setForeground(MultiComboBox.colour_fg);
 
 		//add checkbox
 		{
 			JCheckBox checkBox = new JCheckBox();
-			checkBox.setBackground(Color.gray);
-			GridBagConstraints cCheckBox = new GridBagConstraints();
-			cCheckBox.gridx = 2;
-			cCheckBox.gridy = filter2position.get(filter);
-			cCheckBox.anchor = GridBagConstraints.CENTER;
-			panel.add(checkBox, cCheckBox);
+			SlickerDecorator.instance().decorate(checkBox);
+			subPanel.add(checkBox, BorderLayout.LINE_END);
 			checkBox.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					boolean x = filter.swapEnabledFilter();
 					if (x) {
-						filter.getPanel().setBackground(Color.white);
+						subPanel.setBackground(MultiComboBox.selection_colour_bg);
+						subPanel.setForeground(MultiComboBox.selection_colour_fg);
+						filter.getPanel().setForeground(MultiComboBox.selection_colour_fg);
 					} else {
-						filter.getPanel().setBackground(Color.gray);
+						subPanel.setBackground(index % 2 == 0 ? MultiComboBox.even_colour_bg : MultiComboBox.odd_colour_bg);
+						subPanel.setForeground(MultiComboBox.colour_fg);
+						filter.getPanel().setForeground(MultiComboBox.colour_fg);
 					}
 					onUpdate.run();
 				}

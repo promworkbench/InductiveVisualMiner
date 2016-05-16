@@ -244,7 +244,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			}
 
 			{
-				selectionLabel = new JTextArea(" \n ");
+				selectionLabel = new JTextArea(" ");
 				selectionLabel.setWrapStyleWord(true);
 				selectionLabel.setLineWrap(true);
 				selectionLabel.setEditable(false);

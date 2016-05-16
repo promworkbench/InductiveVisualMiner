@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -80,8 +81,8 @@ public class MultiAttributeFilterGui extends IvMFilterGui {
 			attributeSelector.setCellRenderer(new ListCellRenderer<String>() {
 				protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
 
-				public Component getListCellRendererComponent(JList<? extends String> list, String value,
-						int index, boolean isSelected, boolean cellHasFocus) {
+				public Component getListCellRendererComponent(JList<? extends String> list, String value, int index,
+						boolean isSelected, boolean cellHasFocus) {
 
 					JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index,
 							isSelected, cellHasFocus);
@@ -134,6 +135,15 @@ public class MultiAttributeFilterGui extends IvMFilterGui {
 
 	public JLabel getExplanation() {
 		return explanation;
+	}
+
+	@Override
+	protected void setForegroundRecursively(Color colour) {
+		if (explanation != null && keySelector != null && attributeSelector != null) {
+			explanation.setForeground(colour);
+			keySelector.setForeground(colour);
+			attributeSelector.setForeground(colour);
+		}
 	}
 
 }
