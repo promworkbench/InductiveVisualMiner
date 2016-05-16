@@ -58,7 +58,7 @@ public class PreMiningMultiTraceAttributeFilter extends PreMiningTraceFilter {
 		if (!trace.getAttributes().containsKey(key)) {
 			return false;
 		}
-		return panel.getSelectedAttributes().contains(trace.getAttributes().get(key));
+		return panel.getSelectedAttributes().contains(trace.getAttributes().get(key).toString());
 	}
 
 	public boolean isEnabled() {

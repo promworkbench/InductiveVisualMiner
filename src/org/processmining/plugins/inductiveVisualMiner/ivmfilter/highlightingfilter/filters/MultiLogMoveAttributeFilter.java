@@ -15,18 +15,19 @@ public class MultiLogMoveAttributeFilter extends MultiEventAttributeFilter {
 		String key = panel.getSelectedKey();
 		for (IvMMove event : trace) {
 			if (event.isLogMove() && event.getAttributes() != null && event.getAttributes().containsKey(key)
-					&& panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
+					&& panel.getSelectedAttributes().contains(event.getAttributes().get(key).toString())) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void updateExplanation() {
 		if (panel.getSelectedAttributes().isEmpty()) {
-			panel.getExplanation().setText(
-					"<html>Include only traces that have at least one log move having an attribute as selected.</html>");
+			panel.getExplanation()
+					.setText(
+							"<html>Include only traces that have at least one log move having an attribute as selected.</html>");
 		} else {
 			StringBuilder s = new StringBuilder();
 			s.append("<html>Include only traces that have at least one log move ");

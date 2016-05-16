@@ -64,7 +64,7 @@ public class MultiEventAttributeFilter extends HighlightingFilter {
 		String key = panel.getSelectedKey();
 		for (IvMMove event : trace) {
 			if (event.getAttributes() != null && event.getAttributes().containsKey(key)
-					&& panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
+					&& panel.getSelectedAttributes().contains(event.getAttributes().get(key).toString())) {
 				return true;
 			}
 		}
@@ -87,7 +87,7 @@ public class MultiEventAttributeFilter extends HighlightingFilter {
 			panel.getExplanation().setText(s.toString());
 		}
 	}
-	
+
 	public void printKey(StringBuilder s) {
 		s.append("having attribute `");
 		s.append(panel.getSelectedKey());

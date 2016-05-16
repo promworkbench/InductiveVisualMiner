@@ -62,7 +62,7 @@ public class HighlightingFilterTraceWithEventTwice extends HighlightingFilter {
 		int count = 0;
 		for (IvMMove move : trace) {
 			if (move.getAttributes() != null && move.getAttributes().containsKey(key)
-					&& panel.getSelectedAttributes().contains(move.getAttributes().get(key))) {
+					&& panel.getSelectedAttributes().contains(move.getAttributes().get(key).toString())) {
 				count++;
 				if (count >= 2) {
 					return true;
