@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import java.lang.ref.SoftReference;
+
 import javax.swing.JComponent;
 
 import org.deckfour.xes.model.XLog;
@@ -12,7 +14,6 @@ import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.plugins.InductiveMiner.Classifiers;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapperPluginFinder;
 import org.processmining.processtree.ProcessTree;
@@ -20,23 +21,23 @@ import org.processmining.processtree.ProcessTree;
 public class InductiveVisualMiner {
 
 	@Plugin(name = "Inductive visual Miner", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = {
-			"Event log", "canceller" }, userAccessible = true)
+			"Event log", "canceller" }, userAccessible = true, level = PluginLevel.Regular)
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0, 1 })
-	public JComponent visualise(final PluginContext context, XLog xLog, ProMCanceller canceller) throws UnknownTreeNodeException {
+	public JComponent visualise(final PluginContext context, XLog xLog, ProMCanceller canceller)
+			throws UnknownTreeNodeException {
 
 		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog, null);
 		InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state,
-				Classifiers.getClassifiers(xLog), VisualMinerWrapperPluginFinder.find(context, state.getMiner()), true,
-				canceller);
+				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), true, canceller);
 		new InductiveVisualMinerController(context, panel, state, canceller);
 
 		return panel;
 	}
 
 	@Plugin(name = "Inductive visual Miner", level = PluginLevel.PeerReviewed, returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = {
-			"Interactive Miner launcher", "canceller" }, userAccessible = true)
+			"Inductive visual Miner launcher", "canceller" }, userAccessible = true)
 	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0, 1 })
@@ -49,28 +50,41 @@ public class InductiveVisualMiner {
 					.destroy();
 		}
 
-		final InductiveVisualMinerState state = new InductiveVisualMinerState(launcher.xLog, launcher.preMinedTree);
+		XLog log = launcher.xLog.get();
+		final InductiveVisualMinerState state;
+		if (log == null) {
+			throw new RuntimeException("The log has been removed by garbage collection.");
+		}
+		if (launcher.preMinedTree == null) {
+			state = new InductiveVisualMinerState(log, null);
+		} else {
+			ProcessTree preMinedTree = launcher.preMinedTree.get();
+			if (preMinedTree == null) {
+				throw new RuntimeException("The pre-mined tree has been removed by garbage collection.");
+			}
+			state = new InductiveVisualMinerState(log, preMinedTree);
+		}
 
 		final InductiveVisualMinerPanel panel = new InductiveVisualMinerPanel(context, state,
-				Classifiers.getClassifiers(launcher.xLog), VisualMinerWrapperPluginFinder.find(context,
-						state.getMiner()), launcher.preMinedTree == null, canceller);
+				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), launcher.preMinedTree == null,
+				canceller);
 		new InductiveVisualMinerController(context, panel, state, canceller);
 
 		return panel;
 	}
 
 	public class InteractiveMinerLauncher {
-		public XLog xLog;
-		public ProcessTree preMinedTree;
+		public SoftReference<XLog> xLog;
+		public SoftReference<ProcessTree> preMinedTree;
 
 		public InteractiveMinerLauncher(XLog xLog) {
-			this.xLog = xLog;
+			this.xLog = new SoftReference<>(xLog);
 			this.preMinedTree = null;
 		}
 
 		public InteractiveMinerLauncher(XLog xLog, ProcessTree preMinedTree) {
-			this.xLog = xLog;
-			this.preMinedTree = preMinedTree;
+			this.xLog = new SoftReference<>(xLog);
+			this.preMinedTree = new SoftReference<>(preMinedTree);
 		}
 	}
 

@@ -15,7 +15,6 @@ import javax.swing.JTextArea;
 
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
-import org.processmining.plugins.InductiveMiner.Classifiers.ClassifierWrapper;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
@@ -77,7 +76,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private Runnable onGraphDirectionChanged = null;
 
 	public InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			ClassifierWrapper[] classifiers, VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
+			VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
 		int gridy = 0;
 
 		setLayout(new BorderLayout());
