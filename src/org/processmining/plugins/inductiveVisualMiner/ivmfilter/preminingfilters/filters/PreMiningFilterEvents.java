@@ -24,11 +24,11 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 
 	MultiAttributeFilterGui panel = null;
 	boolean block = true;
-	
+
 	public boolean staysInLog(XEvent event) {
 		String key = panel.getSelectedKey();
 		if (event.getAttributes() != null && event.getAttributes().containsKey(key)
-				&& panel.getSelectedAttributes().contains(event.getAttributes().get(key))) {
+				&& panel.getSelectedAttributes().contains(event.getAttributes().get(key).toString())) {
 			return true;
 		}
 		return false;
@@ -74,8 +74,7 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 
 	public void updateExplanation() {
 		if (panel.getSelectedAttributes().isEmpty()) {
-			panel.getExplanation().setText(
-					"<html>Include only events having an attribute as selected.</html>");
+			panel.getExplanation().setText("<html>Include only events having an attribute as selected.</html>");
 		} else {
 			StringBuilder s = new StringBuilder();
 			s.append("<html>Include only events having attribute `");
@@ -99,7 +98,7 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 			panel.getExplanation().setText(s.toString());
 		}
 	}
-	
+
 	public static Map<String, Set<XAttribute>> getEventAttributeMap(XLog log) {
 		Map<String, Set<XAttribute>> eventAttributes = new TreeMap<String, Set<XAttribute>>();
 
