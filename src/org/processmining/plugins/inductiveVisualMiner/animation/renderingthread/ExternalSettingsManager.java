@@ -20,8 +20,8 @@ public class ExternalSettingsManager {
 
 	public class ExternalSettings {
 		//resizing variables
-		int width;
-		int height;
+		int width = 10;
+		int height = 10;
 
 		//rendering variables
 		public IvMLogFiltered filteredLog;
