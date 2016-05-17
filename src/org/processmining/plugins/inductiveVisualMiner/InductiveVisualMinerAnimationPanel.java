@@ -86,8 +86,12 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
 				//tell the animation thread
-				renderingThread.getExternalSettingsManager().setSize(getWidth(), getHeight());
-				renderingThread.renderOneFrame();
+				if (getWidth() > 0) {
+					renderingThread.getExternalSettingsManager().setSize(getWidth(), getHeight());
+					renderingThread.renderOneFrame();
+				} else {
+					renderingThread.pause();
+				}
 			}
 		});
 	}
