@@ -34,8 +34,8 @@ public class ExternalSettingsManager {
 
 	public ExternalSettingsManager() {
 		ExternalSettings newExternalSettings = new ExternalSettings();
-		newExternalSettings.width = 0;
-		newExternalSettings.height = 0;
+		newExternalSettings.width = 10;
+		newExternalSettings.height = 10;
 		newExternalSettings.tokens = null;
 		newExternalSettings.filteredLog = null;
 		newExternalSettings.transform = null;

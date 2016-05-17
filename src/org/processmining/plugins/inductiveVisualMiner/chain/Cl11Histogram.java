@@ -22,7 +22,7 @@ public class Cl11Histogram extends
 		if (tree == null) {
 			return null;
 		}
-		if (input.getD() < 0) {
+		if (input.getD() <= 0) {
 			return null;
 		}
 		HistogramData data = new HistogramData(tree, input.getB(), input.getC(), input.getD(),
