@@ -19,7 +19,6 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.deckfour.xes.classification.XEventAttributeClassifier;
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
@@ -101,7 +100,7 @@ public class InductiveVisualMinerController {
 			Cl00GatherAttributes m = new Cl00GatherAttributes();
 			m.setOnStart(new Runnable() {
 				public void run() {
-					state.setAttributesInfo(null, null);
+					state.setAttributesInfo(null, null, null);
 					panel.getClassifiers().setEnabled(false);
 					setStatus("Gathering attributes..");
 				}
@@ -109,8 +108,10 @@ public class InductiveVisualMinerController {
 			m.setOnComplete(new Runnable() {
 				public void run() {
 					panel.getClassifiers().setEnabled(true);
-					panel.getClassifiers().replaceItems(state.getClassifiers());
-					panel.getClassifiers().setSelectedItem(state.getActivityClassifier().name());
+
+					//update the classifier combobox
+					panel.getClassifiers().replaceClassifiers(state.getClassifiers(), state.getInitialClassifier());
+
 					initialisePreMiningFilters(state.getXLog(), state.getAttributesInfo(), context.getExecutor());
 					initialiseColourFilters(state.getXLog(), state.getAttributesInfo(), context.getExecutor());
 				}
@@ -442,8 +443,7 @@ public class InductiveVisualMinerController {
 		//classifier
 		panel.getClassifiers().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				state.setClassifier(new XEventAttributeClassifier("custom classifier", panel.getClassifiers()
-						.getSelectedObjects()));
+				state.setClassifier(panel.getClassifiers().getSelectedClassifier());
 				chain.execute(Cl01MakeLog.class);
 			}
 		});

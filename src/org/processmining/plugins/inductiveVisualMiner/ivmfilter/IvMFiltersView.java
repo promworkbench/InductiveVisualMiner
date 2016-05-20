@@ -19,7 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.MultiComboBox;
+import org.processmining.plugins.InductiveMiner.MultiComboBox;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 
 import com.fluxicon.slickerbox.factory.SlickerDecorator;

@@ -11,6 +11,7 @@ import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.classification.XEventNameClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
+import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
@@ -57,18 +58,24 @@ public class InductiveVisualMinerState {
 	
 	//==attributes==
 	private AttributesInfo attributesInfo;
-	private String[] classifiers;
+	private AttributeClassifier initialClassifier;
+	private AttributeClassifier[] classifiers;
 	
 	public AttributesInfo getAttributesInfo() {
 		return attributesInfo;
 	}
 	
-	public String[] getClassifiers() {
+	public AttributeClassifier getInitialClassifier() {
+		return initialClassifier;
+	}
+	
+	public AttributeClassifier[] getClassifiers() {
 		return classifiers;
 	}
 	
-	public void setAttributesInfo(AttributesInfo info, String[] classifiers) {
+	public void setAttributesInfo(AttributesInfo info, AttributeClassifier initialClassifier, AttributeClassifier[] classifiers) {
 		attributesInfo = info;
+		this.initialClassifier = initialClassifier;
 		this.classifiers = classifiers;
 	}
 

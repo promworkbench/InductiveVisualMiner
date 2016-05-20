@@ -15,14 +15,14 @@ import javax.swing.JTextArea;
 
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
+import org.processmining.plugins.InductiveMiner.BoundsPopupMenuListener;
+import org.processmining.plugins.InductiveMiner.ClassifierChooser;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.BoundsPopupMenuListener;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.MultiComboBox;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -58,7 +58,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final NiceDoubleSlider activitiesSlider;
 	private final NiceDoubleSlider pathsSlider;
 	private final JLabel classifierLabel;
-	private MultiComboBox<String> classifiersCombobox;
+	private ClassifierChooser classifiersCombobox;
 	private final JButton preMiningFiltersButton;
 	private final PreMiningFiltersView preMiningFiltersView;
 	private final JButton editModelButton;
@@ -123,7 +123,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 				cClassifierLabel.anchor = GridBagConstraints.WEST;
 				otherSettingsPanel.add(classifierLabel, cClassifierLabel);
 
-				classifiersCombobox = new MultiComboBox<String>(String.class, new String[0]);
+				classifiersCombobox = new ClassifierChooser(null, null, false);
 				classifiersCombobox.setEnabled(false);
 				GridBagConstraints cClassifiers = new GridBagConstraints();
 				cClassifiers.gridx = 1;
@@ -390,7 +390,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return statusLabel;
 	}
 
-	public MultiComboBox<String> getClassifiers() {
+	public ClassifierChooser getClassifiers() {
 		return classifiersCombobox;
 	}
 
