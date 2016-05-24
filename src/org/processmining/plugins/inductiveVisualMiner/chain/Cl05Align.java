@@ -1,5 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import java.lang.ref.SoftReference;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.Pair;
@@ -16,6 +19,8 @@ public class Cl05Align
 		extends
 		ChainLink<Sextuple<IvMEfficientTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
 
+	private static ConcurrentHashMap<Sextuple<IvMEfficientTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses>, SoftReference<IvMLogNotFiltered>> cache = new ConcurrentHashMap<>();
+
 	protected Sextuple<IvMEfficientTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> generateInput(
 			InductiveVisualMinerState state) {
 		return Sextuple.of(state.getTree(), state.getPerformanceClassifier(), state.getXLog(), state.getLog(), state
@@ -26,6 +31,16 @@ public class Cl05Align
 			Sextuple<IvMEfficientTree, XEventPerformanceClassifier, XLog, IMLog, XEventClasses, XEventClasses> input,
 			IvMCanceller canceller) throws Exception {
 		IvMEfficientTree tree = input.getA();
+		
+		//attempt to get the alignment from cache
+		SoftReference<IvMLogNotFiltered> fromCacheReference = cache.get(input);
+		if (fromCacheReference != null) {
+			IvMLogNotFiltered fromCache = fromCacheReference.get();
+			if (fromCache != null) {
+				System.out.println("hit from cache");
+				return Pair.of(fromCache, new IvMLogInfo(fromCache, tree));
+			}
+		}
 
 		IvMLogNotFiltered log = AlignmentPerformance.align(tree, input.getB(), input.getC(), input.getD(),
 				input.getE(), input.getF(), canceller);
@@ -33,6 +48,10 @@ public class Cl05Align
 			return null;
 		}
 		IvMLogInfo logInfo = new IvMLogInfo(log, tree);
+		
+		//cache the alignment
+		cache.put(input, new SoftReference<IvMLogNotFiltered>(log));
+		
 		return Pair.of(log, logInfo);
 	}
 
