@@ -48,7 +48,7 @@ public class IvMTrace2dotToken2 {
 		trace2token(input, trace, new TIntArrayList(), endPosition, dotToken);
 
 		//interpolate the missing timestamps from the token
-		DotTokenInterpolate.interpolateToken(dotToken);
+		DotTokenInterpolate.interpolateToken(info, dotToken);
 
 		return dotToken;
 	}
@@ -217,6 +217,9 @@ public class IvMTrace2dotToken2 {
 	private static int getChildNumberWith(Input in, int parent, Move move) {
 		if (move.isLogMove()) {
 			int node = move.getLogMoveUnode();
+			if (parent > node) {
+				return -1;
+			}
 			if (node >= 0 && (in.tree.isConcurrent(node) || in.tree.isInterleaved(node) || in.tree.isOr(node))) {
 				return in.tree.getChildNumberWith(parent, move.getLogMoveParallelBranchMappedTo());
 			}

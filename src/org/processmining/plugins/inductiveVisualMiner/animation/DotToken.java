@@ -120,13 +120,13 @@ public class DotToken implements Iterable<DotTokenStep> {
 
 	private double performSanityCheck(Double last2) {
 		//perform sanity check
-		
+
 		//check that the token does not walk over a node twice
 		boolean lastNode = false;
 		for (DotTokenStep step : steps) {
 			if (step.isOverEdge()) {
 				lastNode = false;
-			} else if (lastNode){
+			} else if (lastNode) {
 				System.out.println("===========");
 				System.out.println(this);
 				throw new RuntimeException("token takes two steps over a node");
@@ -134,7 +134,7 @@ public class DotToken implements Iterable<DotTokenStep> {
 				lastNode = true;
 			}
 		}
-		
+
 		//check that the token does not move back in time
 		double last;
 		if (last2 != null) {
@@ -157,7 +157,7 @@ public class DotToken implements Iterable<DotTokenStep> {
 			if (p.hasArrivalTime()) {
 				if (p.getArrivalTime() < last) {
 					System.out.println("===========");
-					System.out.println(this);
+					//System.out.println(this);
 					throw new RuntimeException("token cannot move back in time");
 				}
 				last = p.getArrivalTime();
@@ -323,13 +323,18 @@ public class DotToken implements Iterable<DotTokenStep> {
 	 */
 	public boolean isParallelJoin(int index) {
 		//check whether this node is a parallel join
-		if (getTarget(index).getType() != NodeType.concurrentJoin) {
+		if (getTarget(index).getType() != NodeType.concurrentJoin && getTarget(index).getType() != NodeType.orJoin
+				&& getTarget(index).getType() != NodeType.interleavedJoin) {
 			return false;
 		}
 
-		//check whether the next node is a parallel join
+		//check whether the next node is not the same
 		//in that case, this join is caused by a log move
-		return index == steps.size() - 1 || getTarget(index + 1).getType() != NodeType.concurrentJoin;
+		if (getTarget(index) == getTarget(index + 1)) {
+			return false;
+		}
+		return true;
+
 	}
 
 	/**

@@ -50,8 +50,8 @@ public class ProcessTreeVisualisation {
 
 		//source & sink
 		info = new ProcessTreeVisualisationInfo();
-		LocalDotNode source = new LocalDotNode(dot, info, NodeType.source, "", 0);
-		LocalDotNode sink = new LocalDotNode(dot, info, NodeType.sink, "", 0);
+		LocalDotNode source = new LocalDotNode(dot, info, NodeType.source, "", 0, null);
+		LocalDotNode sink = new LocalDotNode(dot, info, NodeType.sink, "", 0, source);
 		info.setRoot(source, sink);
 		//convert root node
 		convertNode(tree, root, source, sink, true);
@@ -134,11 +134,11 @@ public class ProcessTreeVisualisation {
 			label += "\n" + cardinality.getA();
 		}
 
-		final LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.activity, label, unode);
+		final LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.activity, label, unode, null);
 		dotNode.setOption("fillcolor", ColourMap.toHexString(fillColour));
 		dotNode.setOption("fontcolor", ColourMap.toHexString(fontColour));
 
-		info.addNode(unode, dotNode);
+		info.addNode(unode, dotNode, null);
 		return dotNode;
 	}
 
@@ -158,7 +158,7 @@ public class ProcessTreeVisualisation {
 
 			split = join;
 			if (it.hasNext()) {
-				join = new LocalDotNode(dot, info, NodeType.xor, "", node);
+				join = new LocalDotNode(dot, info, NodeType.xor, "", node, null);
 			} else {
 				join = sink;
 			}
@@ -176,11 +176,11 @@ public class ProcessTreeVisualisation {
 			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", node);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", node, null);
 		addArc(tree, source, split, node, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", node);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", node, null);
 
 		int bodyChild = tree.getChild(node, 0);
 		convertNode(tree, bodyChild, split, join, directionForward);
@@ -210,11 +210,11 @@ public class ProcessTreeVisualisation {
 			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.concurrentSplit, "+", node);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.concurrentSplit, "+", node, null);
 		addArc(tree, source, split, node, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.concurrentJoin, "+", node);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.concurrentJoin, "+", node, split);
 		addArc(tree, join, sink, node, directionForward, true);
 
 		for (int child : tree.getChildren(node)) {
@@ -235,11 +235,11 @@ public class ProcessTreeVisualisation {
 			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.interleavedSplit, "\u2194", node);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.interleavedSplit, "\u2194", node, null);
 		addArc(tree, source, split, node, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.interleavedJoin, "\u2194", node);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.interleavedJoin, "\u2194", node, split);
 		addArc(tree, join, sink, node, directionForward, true);
 
 		for (int child : tree.getChildren(node)) {
@@ -260,11 +260,11 @@ public class ProcessTreeVisualisation {
 			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.orSplit, "o", node);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.orSplit, "o", node, null);
 		addArc(tree, source, split, node, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.orJoin, "o", node);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.orJoin, "o", node, split);
 		addArc(tree, join, sink, node, directionForward, true);
 
 		for (int child : tree.getChildren(node)) {
@@ -285,11 +285,11 @@ public class ProcessTreeVisualisation {
 			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
-		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", node);
+		LocalDotNode split = new LocalDotNode(dot, info, NodeType.xor, "", node, null);
 		addArc(tree, source, split, node, directionForward, true);
 
 		//operator join
-		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", node);
+		LocalDotNode join = new LocalDotNode(dot, info, NodeType.xor, "", node, split);
 		addArc(tree, join, sink, node, directionForward, true);
 
 		for (int child : tree.getChildren(node)) {
@@ -302,8 +302,7 @@ public class ProcessTreeVisualisation {
 
 	private LocalDotEdge addArc(IvMEfficientTree tree, final LocalDotNode from, final LocalDotNode to, final int node,
 			boolean directionForward, boolean includeModelMoves) throws UnknownTreeNodeException {
-		return addModelArc(tree, from, to, node, directionForward,
-				data.getEdgeLabel(node, includeModelMoves));
+		return addModelArc(tree, from, to, node, directionForward, data.getEdgeLabel(node, includeModelMoves));
 	}
 
 	private LocalDotEdge addModelArc(IvMEfficientTree tree, final LocalDotNode from, final LocalDotNode to,
@@ -342,7 +341,8 @@ public class ProcessTreeVisualisation {
 		if (logMoves.getB().size() > 0) {
 			if (parameters.isRepairLogMoves()) {
 				for (XEventClass e : logMoves.getB()) {
-					LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.logMoveActivity, e.toString(), unode);
+					LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.logMoveActivity, e.toString(), unode,
+							null);
 					addMoveArc(tree, from, dotNode, unode, EdgeType.logMove, logMovePosition.getOn(),
 							logMovePosition.getBeforeChild(), t, directionForward);
 					addMoveArc(tree, dotNode, to, unode, EdgeType.logMove, logMovePosition.getOn(),

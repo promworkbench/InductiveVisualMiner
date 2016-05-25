@@ -59,9 +59,10 @@ public class DotTokenStep {
 	public String toString() {
 		if (isOverEdge()) {
 			return "step over edge, arrive @" + String.format("%.6f", arrivalTime) + " from "
-					+ edge.getSource().getType() + " to " + edge.getTarget().getType();
+					+ edge.getSource().getType() + " to " + edge.getTarget().getType() + " " + edge.getTarget().getId();
 		} else {
-			return "step over node, arrive @" + String.format("%.6f", arrivalTime) + " at " + node.getType();
+			return "step over node, arrive @" + String.format("%.6f", arrivalTime) + " at " + node.getType() + " "
+					+ node.getId();
 		}
 	}
 }

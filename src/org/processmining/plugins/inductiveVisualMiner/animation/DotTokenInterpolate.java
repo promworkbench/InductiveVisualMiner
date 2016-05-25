@@ -6,6 +6,7 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 public class DotTokenInterpolate {
 
@@ -13,7 +14,7 @@ public class DotTokenInterpolate {
 	 * interpolate the missing timestamps in a token and adjust the token to
 	 * them
 	 */
-	public static void interpolateToken(DotToken token) {
+	public static void interpolateToken(ProcessTreeVisualisationInfo info, DotToken token) {
 		double lastSeenTimestamp = token.getStartTime();
 
 		//walk over the edges to assign timestamps
@@ -36,7 +37,7 @@ public class DotTokenInterpolate {
 				int indexOfJoin = token.getTokenDestination(i);
 
 				//get the latest time stamp from the parallel branches
-				Pair<Integer, Double> joinBackwardsTimestamp = getTimestampBackward(token, indexOfJoin, 0);
+				Pair<Integer, Double> joinBackwardsTimestamp = getTimestampBackward(info, token, indexOfJoin, 0);
 				debug(" backward timestamp " + joinBackwardsTimestamp);
 
 				//now compute the time stamp of the join
@@ -56,7 +57,7 @@ public class DotTokenInterpolate {
 					subToken.setTimestampOfPoint(subToken.size() - 1, joinTimestamp);
 
 					//interpolate the subtoken
-					interpolateToken(subToken);
+					interpolateToken(info, subToken);
 				}
 
 			}
@@ -66,9 +67,10 @@ public class DotTokenInterpolate {
 		}
 	}
 
-	/*
-	 * returns the number of edges till the first timestamp and that timestamp,
-	 * limited to to; notice: offset means "after the #offset edge in the token"
+	/**
+	 * Returns the number of edges till the first timestamp and that timestamp,
+	 * limited to to; notice: offset means
+	 * "after the #offset edge in the token".
 	 */
 	private static Pair<Integer, Double> getTimestampForward(DotToken token, int offset, int to,
 			double previousTimestamp, int edgesFromPreviousTimestamp) {
@@ -153,9 +155,10 @@ public class DotTokenInterpolate {
 	 * @param token
 	 * @param offset
 	 * @param edgesTillNow
+	 * @param info 
 	 * @return
 	 */
-	private static Pair<Integer, Double> getTimestampBackward(DotToken token, int offset, int edgesTillNow) {
+	private static Pair<Integer, Double> getTimestampBackward(ProcessTreeVisualisationInfo info, DotToken token, int offset, int edgesTillNow) {
 
 		//if this node has a timestamp, we have found one
 		//if we hit the beginning of a trace, return the start time (known or not)
@@ -166,21 +169,21 @@ public class DotTokenInterpolate {
 		//if this is the last node of a token,
 		//then this is a subtoken. recurse directly
 		if (offset == token.size() - 1) {
-			return getTimestampBackward(token, offset - 1, edgesTillNow + 1);
+			return getTimestampBackward(info, token, offset - 1, edgesTillNow + 1);
 		}
 
 		if (token.isParallelJoin(offset)) {
 			//this is a parallel join
 
 			//recurse on the parallel sub trace that is within this token
-			Pair<Integer, Double> subTracePair = getTimestampBackward(token, offset - 1, edgesTillNow + 1);
+			Pair<Integer, Double> subTracePair = getTimestampBackward(info, token, offset - 1, edgesTillNow + 1);
 			Pair<Integer, Double> bestPair = subTracePair;
 
 			//recurse on all sub tokens that end here, keep track of maximum timestamp
-			Set<DotToken> subTokens = getSubTokensOfParallelJoin(token, offset);
+			Set<DotToken> subTokens = getSubTokensOfParallelJoin(info, token, offset);
 
 			for (DotToken subToken : subTokens) {
-				Pair<Integer, Double> subPair = getTimestampBackward(subToken, subToken.size() - 1, edgesTillNow);
+				Pair<Integer, Double> subPair = getTimestampBackward(info, subToken, subToken.size() - 1, edgesTillNow);
 				if (bestPair.getRight() == subPair.getRight() && subPair.getLeft() > bestPair.getLeft()) {
 					bestPair = subPair;
 				} else if (subPair.getRight() != null
@@ -191,7 +194,7 @@ public class DotTokenInterpolate {
 			return bestPair;
 		} else {
 			//if this node is not a parallel join, we move to the next point
-			return getTimestampBackward(token, offset - 1, edgesTillNow + 1);
+			return getTimestampBackward(info, token, offset - 1, edgesTillNow + 1);
 		}
 	}
 
@@ -217,16 +220,13 @@ public class DotTokenInterpolate {
 		return departureTime + duration * p;
 	}
 
-	private static Set<DotToken> getSubTokensOfParallelJoin(DotToken token, int offset) {
+	private static Set<DotToken> getSubTokensOfParallelJoin(ProcessTreeVisualisationInfo info, DotToken token, int offset) {
 		LocalDotNode join = token.getTarget(offset);
+		LocalDotNode split = info.getSplitCorrespondingToJoin(join);
 		for (int i = offset - 1; i >= 0; i--) {
 			//get the sub tokens that start at this point
-			Set<DotToken> subTokens = token.getSubTokensAtPoint(i);
-			if (!subTokens.isEmpty()) {
-				DotToken subToken = subTokens.iterator().next();
-				if (subToken.getLastPosition().equals(join)) {
-					return subTokens;
-				}
+			if (token.get(i).getDestinationNode() == split) {
+				return token.getSubTokensAtPoint(i);
 			}
 		}
 		return null;

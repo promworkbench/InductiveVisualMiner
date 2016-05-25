@@ -21,7 +21,8 @@ public class LocalDotNode extends DotNode {
 	private final int node;
 	public final Appearance unselectedAppearance = new Appearance();
 
-	public LocalDotNode(Dot dot, ProcessTreeVisualisationInfo info, NodeType type, String label, final int unode) {
+	public LocalDotNode(Dot dot, ProcessTreeVisualisationInfo info, NodeType type, String label, final int unode,
+			final LocalDotNode correspondingSplit) {
 		super(label, new THashMap<String, String>());
 
 		this.node = unode;
@@ -69,7 +70,7 @@ public class LocalDotNode extends DotNode {
 		}
 
 		dot.addNode(this);
-		info.addNode(unode, this);
+		info.addNode(unode, this, correspondingSplit);
 	}
 
 	public int getUnode() {

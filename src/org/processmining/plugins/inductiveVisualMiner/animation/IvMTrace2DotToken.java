@@ -42,7 +42,7 @@ public class IvMTrace2DotToken {
 				0, scaler);
 
 		//interpolate the missing timestamps from the token
-		DotTokenInterpolate.interpolateToken(token);
+		DotTokenInterpolate.interpolateToken(info, token);
 
 		//		debug(token, 0);
 

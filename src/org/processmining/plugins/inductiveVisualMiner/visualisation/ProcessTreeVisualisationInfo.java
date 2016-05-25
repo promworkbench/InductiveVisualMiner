@@ -31,6 +31,8 @@ public class ProcessTreeVisualisationInfo {
 	private final Set<LocalDotEdge> allLogMoveEdges;
 	private final Set<LocalDotEdge> allModelMoveEdges;
 	private final Set<LocalDotEdge> allTauEdges;
+	
+	private final Map<LocalDotNode, LocalDotNode> join2split;
 
 	public ProcessTreeVisualisationInfo() {
 		nodes = new THashSet<>();
@@ -45,6 +47,8 @@ public class ProcessTreeVisualisationInfo {
 		allLogMoveEdges = new THashSet<>();
 		allModelMoveEdges = new THashSet<>();
 		allTauEdges = new THashSet<>();
+		
+		join2split = new THashMap<>();
 	}
 
 	public void setRoot(LocalDotNode source, LocalDotNode sink) {
@@ -54,7 +58,7 @@ public class ProcessTreeVisualisationInfo {
 		nodes.add(sink);
 	}
 
-	public void addNode(int unode, LocalDotNode node) {
+	public void addNode(int unode, LocalDotNode node, LocalDotNode correspondingSplit) {
 		if (!unodes.containsKey(unode)) {
 			unodes.put(unode, new ArrayList<LocalDotNode>());
 		}
@@ -65,6 +69,10 @@ public class ProcessTreeVisualisationInfo {
 		}
 
 		nodes.add(node);
+		
+		if (correspondingSplit != null) {
+			join2split.put(node, correspondingSplit);
+		}
 	}
 
 	public void addEdge(IvMEfficientTree tree, int unode1, int unode2, LocalDotEdge edge) {
@@ -165,5 +173,9 @@ public class ProcessTreeVisualisationInfo {
 
 	public Set<LocalDotEdge> getAllTauEdges() {
 		return Collections.unmodifiableSet(allTauEdges);
+	}
+
+	public LocalDotNode getSplitCorrespondingToJoin(LocalDotNode join) {
+		return join2split.get(join);
 	}
 }
