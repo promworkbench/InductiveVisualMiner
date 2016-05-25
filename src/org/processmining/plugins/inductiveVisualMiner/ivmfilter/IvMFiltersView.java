@@ -5,7 +5,10 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
@@ -17,7 +20,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.Scrollable;
 
 import org.processmining.plugins.InductiveMiner.MultiComboBox;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
@@ -32,13 +37,37 @@ public abstract class IvMFiltersView extends SideWindow {
 	private final Map<IvMFilter, JLabel> filter2initialisationLabel;
 	private final TObjectIntMap<IvMFilter> filter2index;
 
+	public class IvMFiltersViewPanel extends JPanel implements Scrollable {
+		private static final long serialVersionUID = 8311080909592746520L;
+
+		public Dimension getPreferredScrollableViewportSize() {
+			return getPreferredSize();
+		}
+
+		public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+			return 10;
+		}
+
+		public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+			return 10;
+		}
+
+		public boolean getScrollableTracksViewportWidth() {
+			return true;
+		}
+
+		public boolean getScrollableTracksViewportHeight() {
+			return false;
+		}
+	}
+
 	public IvMFiltersView(Component parent, String title, String header) {
 		super(parent, title);
+		setLayout(new BorderLayout());
 
-		panel = new JPanel();
+		panel = new IvMFiltersViewPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panel.setBackground(MultiComboBox.even_colour_bg);
-		add(panel);
 		filter2panel = new THashMap<>();
 		filter2initialisationLabel = new THashMap<>();
 		filter2index = new TObjectIntHashMap<>();
@@ -51,6 +80,12 @@ public abstract class IvMFiltersView extends SideWindow {
 		explanation.setFont(new JLabel("blaa").getFont());
 		explanation.setDisabledTextColor(MultiComboBox.colour_fg);
 		panel.add(explanation);
+
+		JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		SlickerDecorator.instance().decorate(scrollPane, MultiComboBox.even_colour_bg, Color.DARK_GRAY, Color.GRAY);
+		scrollPane.setOpaque(false);
+		add(scrollPane, BorderLayout.CENTER);
 	}
 
 	public void initialise(List<? extends IvMFilter> filters) {
@@ -106,7 +141,7 @@ public abstract class IvMFiltersView extends SideWindow {
 		{
 			JCheckBox checkBox = new JCheckBox();
 			SlickerDecorator.instance().decorate(checkBox);
-			subPanel.add(checkBox, BorderLayout.LINE_END);
+			subPanel.add(checkBox, BorderLayout.LINE_START);
 			checkBox.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					boolean x = filter.swapEnabledFilter();
@@ -115,7 +150,8 @@ public abstract class IvMFiltersView extends SideWindow {
 						subPanel.setForeground(MultiComboBox.selection_colour_fg);
 						filter.getPanel().setForeground(MultiComboBox.selection_colour_fg);
 					} else {
-						subPanel.setBackground(index % 2 == 0 ? MultiComboBox.even_colour_bg : MultiComboBox.odd_colour_bg);
+						subPanel.setBackground(index % 2 == 0 ? MultiComboBox.even_colour_bg
+								: MultiComboBox.odd_colour_bg);
 						subPanel.setForeground(MultiComboBox.colour_fg);
 						filter.getPanel().setForeground(MultiComboBox.colour_fg);
 					}
