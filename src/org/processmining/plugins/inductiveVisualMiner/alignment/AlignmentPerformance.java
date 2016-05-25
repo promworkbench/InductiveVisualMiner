@@ -7,7 +7,6 @@ import java.util.Set;
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
@@ -19,7 +18,7 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 public class AlignmentPerformance {
 
 	public static IvMLogNotFiltered align(IvMEfficientTree tree, XEventPerformanceClassifier performanceClassifier,
-			XLog xLog, IMLog log, XEventClasses activityEventClasses, XEventClasses performanceEventClasses,
+			XLog xLog, XEventClasses activityEventClasses, XEventClasses performanceEventClasses,
 			IvMCanceller canceller) throws Exception {
 
 		//the event classes are not thread-safe; copy them
