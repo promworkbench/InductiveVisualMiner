@@ -20,7 +20,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import org.processmining.processtree.Node;
 
 /**
- * Rewritten animation class, that doesn't
+ * Rewritten animation class
  * 
  * @author sleemans
  *

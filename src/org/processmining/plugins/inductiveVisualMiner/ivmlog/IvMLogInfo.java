@@ -1,7 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntLongMap;
 import gnu.trove.map.hash.TIntLongHashMap;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,11 +45,13 @@ public class IvMLogInfo {
 		unlabeledLogMoves = new MultiSet<String>();
 		activities = new MultiSet<>();
 		nodeExecutions = new TIntLongHashMap(10, 0.5f, -1, -1);
+		TIntSet inParallelNodes = new TIntHashSet(10, 0.5f, -1);
 		PositionLogMoves positionLogMoves = new PositionLogMoves();
 		int lastModelSyncNode;
 		for (IvMTrace trace : log) {
 			int lastUnode = -1;
 			lastModelSyncNode = -1;
+			inParallelNodes.clear();
 			boolean traceContainsLogMove = false;
 			for (int i = 0; i < trace.size(); i++) {
 				Move move = trace.get(i);
@@ -71,7 +76,7 @@ public class IvMLogInfo {
 				 */
 
 				if (move.isModelSync()) {
-					processEnteringExitingNodes(tree, lastModelSyncNode, move.getTreeNode());
+					processEnteringExitingNodes(tree, lastModelSyncNode, move.getTreeNode(), inParallelNodes);
 					lastModelSyncNode = move.getTreeNode();
 				}
 			}
@@ -104,7 +109,7 @@ public class IvMLogInfo {
 		return nodeExecutions.get(node);
 	}
 
-	private void processEnteringExitingNodes(IvMEfficientTree tree, int lastNode, int newNode) {
+	private void processEnteringExitingNodes(IvMEfficientTree tree, int lastNode, int newNode, TIntSet inParallelNodes) {
 
 		int lowestCommonParent = tree.getRoot();
 		if (lastNode != -1) {
@@ -114,12 +119,37 @@ public class IvMLogInfo {
 			nodeExecutions.adjustOrPutValue(lowestCommonParent, 1, 1);
 		}
 
+		//process the leaving of nodes
+		for (TIntIterator it = inParallelNodes.iterator(); it.hasNext();) {
+			int parallelNode = it.next();
+
+			if (nodeLeavesParallel(tree, parallelNode, newNode)) {
+				it.remove();
+			}
+		}
+
 		//we entered all nodes between the lowestCommonParent (exclusive) and newNode (inclusive)
 		int node = lowestCommonParent;
 		while (node != newNode) {
 			node = tree.getChildWith(node, newNode);
-			nodeExecutions.adjustOrPutValue(node, 1, 1);
+			if (!inParallelNodes.contains(node)) {
+				nodeExecutions.adjustOrPutValue(node, 1, 1);
+
+				inParallelNodes.add(node);
+			}
 		}
+	}
+
+	/**
+	 * 
+	 * @param parallelNode
+	 * @param newNode
+	 * @return Whether execution of newNode is proof that parallelNode is not
+	 *         executing anymore.
+	 */
+	public static boolean nodeLeavesParallel(IvMEfficientTree tree, int parallelNode, int newNode) {
+		int lowestCommonParent = tree.getLowestCommonParent(parallelNode, newNode);
+		return !tree.isConcurrent(lowestCommonParent) && !tree.isOr(lowestCommonParent);
 	}
 
 	private static void debug(Object s) {
