@@ -4,16 +4,25 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.util.List;
+import java.util.ListIterator;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.KeyStroke;
 
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.listeners.ImageTransformationChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIterator;
@@ -50,11 +59,14 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	protected boolean animationEnabled = false;
 	RenderingThread renderingThread;
 	private AnimationTimeChangedListener animationTimeChangedListener = null;
+	private AnimationEnabledChangedListener animationEnabledChangedListener = null;
+	public static final String animationGlobalEnabledTrue = "disable animation";
+	public static final String animationGlobalEnabledFalse = "enable animation";
 
 	//histogram
 	private HistogramData histogramData = null;
 
-	public InductiveVisualMinerAnimationPanel(ProMCanceller canceller) {
+	public InductiveVisualMinerAnimationPanel(ProMCanceller canceller, boolean animationGlobalEnabled) {
 		super(getSplashScreen());
 
 		renderingThread = new RenderingThread(0, 180, new Runnable() {
@@ -70,8 +82,40 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 				repaint();
 			}
 		}, canceller);
+
+		//control the starting of the animation initially
 		renderingThread.start();
-		//renderingThread.pause();
+
+		//listen to ctrl+e for a change in enabledness of the animation
+		Action animationEnabledChanged = new AbstractAction() {
+			private static final long serialVersionUID = -8480930137301467220L;
+
+			public void actionPerformed(ActionEvent e) {
+				if (animationEnabledChangedListener != null) {
+					if (animationEnabledChangedListener.animationEnabledChanged()) {
+						for (ListIterator<String> it = helperControlsExplanations.listIterator(); it.hasNext();) {
+							if (it.next().equals(animationGlobalEnabledFalse)) {
+								it.remove();
+								it.add(animationGlobalEnabledTrue);
+							}
+						}
+					} else {
+						for (ListIterator<String> it = helperControlsExplanations.listIterator(); it.hasNext();) {
+							if (it.next().equals(animationGlobalEnabledTrue)) {
+								it.remove();
+								it.add(animationGlobalEnabledFalse);
+							}
+						}
+					}
+				}
+			}
+		};
+		helperControlsShortcuts.add("ctrl e");
+		helperControlsExplanations.add(animationGlobalEnabled ? animationGlobalEnabledTrue
+				: animationGlobalEnabledFalse);
+		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK),
+				"changeInitialAnimation");
+		getActionMap().put("changeInitialAnimation", animationEnabledChanged);
 
 		//set up listener for image transformation (zooming, panning, resizing) changes
 		setImageTransformationChangedListener(new ImageTransformationChangedListener() {
@@ -286,6 +330,16 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	}
 
 	/**
+	 * Sets a callback that is called whenever the user changes the animation
+	 * enabled-ness.
+	 * 
+	 * @param animationEnabledChangedListener
+	 */
+	public void setAnimationEnabledChangedListener(AnimationEnabledChangedListener animationEnabledChangedListener) {
+		this.animationEnabledChangedListener = animationEnabledChangedListener;
+	}
+
+	/**
 	 * Sets whether the animation is rendered and controls are displayed.
 	 * 
 	 * @return
@@ -375,5 +429,9 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	@Override
 	public void renderOneFrame() {
 		renderingThread.renderOneFrame();
+	}
+
+	public void addAnimationEnabledChangedListener(AnimationEnabledChangedListener animationEnabledChangedListener) {
+		this.animationEnabledChangedListener = animationEnabledChangedListener;
 	}
 }

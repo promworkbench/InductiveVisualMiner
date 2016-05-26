@@ -5,6 +5,7 @@ import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.List;
 import java.util.Set;
+import java.util.prefs.Preferences;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClassifier;
@@ -379,6 +380,10 @@ public class InductiveVisualMinerState {
 	//==playing animation
 	private Scaler animationScaler;
 	private GraphVizTokens animationGraphVizTokens;
+	private static final Preferences preferences = Preferences.userRoot()
+			.node("org.processmining.inductivevisualminer");
+	public static final String playAnimationOnStartupKey = "playanimationonstartup";
+	private boolean animationGlobalEnabled = preferences.getBoolean(playAnimationOnStartupKey, true);
 
 	public void setAnimation(GraphVizTokens animationGraphVizTokens) {
 		this.animationGraphVizTokens = animationGraphVizTokens;
@@ -389,8 +394,11 @@ public class InductiveVisualMinerState {
 	}
 
 	public void resetAnimation() {
-		animationScaler = null;
 		animationGraphVizTokens = null;
+	}
+	
+	public void resetScaler() {
+		animationScaler = null;
 	}
 
 	public Scaler getAnimationScaler() {
@@ -399,6 +407,15 @@ public class InductiveVisualMinerState {
 
 	public GraphVizTokens getAnimationGraphVizTokens() {
 		return animationGraphVizTokens;
+	}
+	
+	public boolean isAnimationGlobalEnabled() {
+		return animationGlobalEnabled;
+	}
+	
+	public void setAnimationGlobalEnabled(boolean animationEnabled) {
+		this.animationGlobalEnabled = animationEnabled;
+		preferences.putBoolean(playAnimationOnStartupKey, animationEnabled);
 	}
 
 	//==queue lengths

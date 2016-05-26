@@ -29,7 +29,9 @@ import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.export.ExportDialog;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl00GatherAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01MakeLog;
@@ -155,6 +157,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveImageButton().setEnabled(false);
 					panel.getEditModelView().setTree(null);
 					state.resetAnimation();
+					state.resetScaler();
 					state.resetAlignment();
 					state.resetPerformance();
 					state.resetHistogramData();
@@ -175,6 +178,7 @@ public class InductiveVisualMinerController {
 					panel.getTraceView().set(state.getLog());
 					panel.getEditModelView().setTree(null);
 					state.resetAnimation();
+					state.resetScaler();
 					state.resetAlignment();
 					state.resetPerformance();
 					state.resetHistogramData();
@@ -227,6 +231,7 @@ public class InductiveVisualMinerController {
 					panel.getGraph().setAnimationEnabled(false);
 					panel.getTraceView().set(state.getLog());
 					state.resetAnimation();
+					state.resetScaler();
 					state.resetAlignment();
 					state.resetPerformance();
 					state.resetHistogramData();
@@ -246,6 +251,7 @@ public class InductiveVisualMinerController {
 					panel.getGraph().setAnimationEnabled(false);
 					setAnimationStatus(" ", false);
 					state.resetAnimation();
+					state.resetScaler();
 					state.resetAlignment();
 					state.resetPerformance();
 					state.resetHistogramData();
@@ -277,6 +283,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
 					state.resetAnimation();
+					state.resetScaler();
 					state.resetPerformance();
 					state.resetHistogramData();
 					setStatus("Scaling animation..");
@@ -302,9 +309,28 @@ public class InductiveVisualMinerController {
 					setAnimationStatus("Creating animation.. ", false);
 				}
 			});
-			a.setOnComplete(new Runnable() {
-				public void run() {
-					//animation is performed asynchronously, so we must do the complete in the animation chain link.
+			
+			/*
+			 * Animation is performed asynchronously, so we must do the complete
+			 * in the animation chain link. Therefore, it's an inputfunction
+			 * instead of a runnable.
+			 */
+			a.setOnComplete(new InputFunction<GraphVizTokens>() {
+				public void call(GraphVizTokens result) {
+					if (result != null) {
+						//animation enabled; store the result
+						state.setAnimation(result);
+						panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
+						panel.getGraph().setAnimationExtremeTimes(state.getAnimationScaler().getMinInUserTime(),
+								state.getAnimationScaler().getMaxInUserTime());
+						panel.getGraph().setAnimationEnabled(true);
+					} else {
+						//animation disabled
+						System.out.println("animation disabled");
+						state.resetAnimation();
+						setAnimationStatus("animation disabled", true);
+						panel.getGraph().setAnimationEnabled(false);
+					}
 				}
 			});
 			a.setOnException(onException);
@@ -500,6 +526,24 @@ public class InductiveVisualMinerController {
 		panel.setOnGraphDirectionChanged(new Runnable() {
 			public void run() {
 				chain.execute(Cl06LayoutWithAlignment.class);
+			}
+		});
+
+		panel.setOnAnimationEnabledChanged(new AnimationEnabledChangedListener() {
+			public boolean animationEnabledChanged() {
+				if (state.isAnimationGlobalEnabled()) {
+					//animation gets disabled
+					state.setAnimationGlobalEnabled(false);
+					state.resetAnimation();
+					panel.getGraph().setAnimationEnabled(false);
+					setAnimationStatus("animation disabled", true);
+					return false;
+				} else {
+					//animation gets enabled
+					state.setAnimationGlobalEnabled(true);
+					chain.execute(Cl08Animate.class);
+					return true;
+				}
 			}
 		});
 

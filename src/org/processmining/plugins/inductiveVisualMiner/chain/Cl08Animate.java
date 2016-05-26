@@ -26,6 +26,7 @@ public class Cl08Animate
 		ChainLink<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree>, Double> {
 
 	private final ThreadedComputer<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree>, GraphVizTokens> pool;
+	private InputFunction<GraphVizTokens> onComplete;
 
 	public Cl08Animate(final Executor executor, final InductiveVisualMinerState state,
 			final InductiveVisualMinerPanel panel) {
@@ -38,13 +39,19 @@ public class Cl08Animate
 					public GraphVizTokens call(
 							Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree> input,
 							IvMCanceller canceller) throws Exception {
-						IvMLog log = input.getA();
-						Mode colourMode = input.getB();
-						ProcessTreeVisualisationInfo info = input.getC();
-						SVGDiagram svg = input.getD();
-						Scaler scaler = input.getE();
-						IvMEfficientTree tree = input.getF();
-						return ComputeAnimation.computeAnimation(tree, log, colourMode, info, scaler, svg, canceller);
+						if (input != null) {
+							IvMLog log = input.getA();
+							Mode colourMode = input.getB();
+							ProcessTreeVisualisationInfo info = input.getC();
+							SVGDiagram svg = input.getD();
+							Scaler scaler = input.getE();
+							IvMEfficientTree tree = input.getF();
+							return ComputeAnimation.computeAnimation(tree, log, colourMode, info, scaler, svg,
+									canceller);
+						} else {
+							//the animation is disabled
+							return null;
+						}
 					}
 
 				}, new InputFunction<GraphVizTokens>() {
@@ -55,12 +62,13 @@ public class Cl08Animate
 						//update the state and gui (in the main thread)
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
-								state.setAnimation(result);
-								panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
-								panel.getGraph().setAnimationExtremeTimes(
-										state.getAnimationScaler().getMinInUserTime(),
-										state.getAnimationScaler().getMaxInUserTime());
-								panel.getGraph().setAnimationEnabled(true);
+								if (onComplete != null) {
+									try {
+										onComplete.call(result);
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
 							}
 						});
 					}
@@ -70,8 +78,12 @@ public class Cl08Animate
 
 	protected Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree> generateInput(
 			InductiveVisualMinerState state) {
-		return Sextuple.of(state.getIvMLog(), state.getMode(), state.getVisualisationInfo(), state.getSVGDiagram(),
-				state.getAnimationScaler(), state.getTree());
+		if (state.isAnimationGlobalEnabled()) {
+			return Sextuple.of(state.getIvMLog(), state.getMode(), state.getVisualisationInfo(), state.getSVGDiagram(),
+					state.getAnimationScaler(), state.getTree());
+		} else {
+			return null;
+		}
 	}
 
 	protected Double executeLink(
@@ -88,6 +100,14 @@ public class Cl08Animate
 
 	protected void processResult(Double result, InductiveVisualMinerState state) {
 
+	}
+
+	public InputFunction<GraphVizTokens> getOnComplete() {
+		return onComplete;
+	}
+
+	public void setOnComplete(InputFunction<GraphVizTokens> onComplete) {
+		this.onComplete = onComplete;
 	}
 
 }

@@ -21,7 +21,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.
 import org.processmining.processtree.ProcessTree;
 
 public class InductiveVisualMiner {
-
+	
 	@Plugin(name = "Inductive visual Miner", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = {
 			"Event log", "canceller" }, userAccessible = true, level = PluginLevel.Regular)
 	@Visualizer

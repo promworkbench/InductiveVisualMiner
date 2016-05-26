@@ -21,6 +21,7 @@ import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
@@ -74,6 +75,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	private InputFunction<Selection> onSelectionChanged = null;
 	private Runnable onGraphDirectionChanged = null;
+	private AnimationEnabledChangedListener onAnimationEnabledChanged = null;
 
 	public static InductiveVisualMinerPanel panelPro(final PluginContext context, InductiveVisualMinerState state,
 			VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
@@ -312,7 +314,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		//graph panel
 		{
-			graphPanel = new InductiveVisualMinerAnimationPanel(canceller);
+			graphPanel = new InductiveVisualMinerAnimationPanel(canceller, state.isAnimationGlobalEnabled());
 			graphPanel.setFocusable(true);
 
 			//set the graph changed listener
@@ -342,6 +344,16 @@ public class InductiveVisualMinerPanel extends JPanel {
 					}
 
 					graphPanel.repaint();
+				}
+			});
+
+			//set the animation enabled changed listener
+			graphPanel.addAnimationEnabledChangedListener(new AnimationEnabledChangedListener() {
+				public boolean animationEnabledChanged() {
+					if (onAnimationEnabledChanged != null) {
+						return onAnimationEnabledChanged.animationEnabledChanged();
+					}
+					return true;
 				}
 			});
 
@@ -459,6 +471,10 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public void setOnGraphDirectionChanged(Runnable onGraphDirectionChanged) {
 		this.onGraphDirectionChanged = onGraphDirectionChanged;
+	}
+
+	public void setOnAnimationEnabledChanged(AnimationEnabledChangedListener onAnimationEnabledChanged) {
+		this.onAnimationEnabledChanged = onAnimationEnabledChanged;
 	}
 
 	public TraceView getTraceView() {
