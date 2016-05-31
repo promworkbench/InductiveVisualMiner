@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners
 
 import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
+import org.processmining.plugins.InductiveMiner.mining.MiningParametersIMfa;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
@@ -9,16 +10,16 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
 
-public class NoLifeCycleSplitLog extends VisualMinerWrapper {
+public class AllOperatorsMiner extends VisualMinerWrapper {
 
 	public String toString() {
-		return "pro miner";
+		return "all operators miner (IMfa)";
 	}
 
 	public ProcessTree mine(IMLog log, VisualMinerParameters parameters, final IvMCanceller canceller) {
 
 		//copy the relevant parameters
-		MiningParameters miningParameters = new NoLifeCycleMiningParametersIvM();
+		MiningParameters miningParameters = new MiningParametersIMfa();
 		miningParameters.setNoiseThreshold((float) (1 - parameters.getPaths()));
 
 		return IMProcessTree.mineProcessTree(log, miningParameters, new Canceller() {
@@ -28,4 +29,5 @@ public class NoLifeCycleSplitLog extends VisualMinerWrapper {
 			}
 		});
 	}
+
 }

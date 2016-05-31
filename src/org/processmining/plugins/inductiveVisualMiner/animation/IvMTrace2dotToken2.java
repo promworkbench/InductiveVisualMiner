@@ -27,6 +27,19 @@ import org.processmining.processtree.Node;
  */
 
 public class IvMTrace2dotToken2 {
+	
+	public static boolean areTraceTimestampsConsistent(IvMTrace trace) {
+		Long last = null;
+		for (IvMMove move : trace) {
+			if (move.getLogTimestamp() != null) {
+				if (last != null && last > move.getLogTimestamp()) {
+					return false;
+				}
+				last = move.getLogTimestamp();
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * 
@@ -45,6 +58,8 @@ public class IvMTrace2dotToken2 {
 		DotToken dotToken = new DotToken(info.getSource(), trace.getStartTime(), true);
 		Animation.Position endPosition = new Animation.Position(info.getSink(), trace.getEndTime());
 
+		//assert(IvMTrace2dotToken2.areTraceTimestampsConsistent(trace));
+		
 		trace2token(input, trace, new TIntArrayList(), endPosition, dotToken);
 
 		//interpolate the missing timestamps from the token

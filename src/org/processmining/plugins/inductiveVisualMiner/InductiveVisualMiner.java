@@ -17,7 +17,6 @@ import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapperPluginFinder;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleSplitLogBasic;
 import org.processmining.processtree.ProcessTree;
 
 public class InductiveVisualMiner {
@@ -68,9 +67,9 @@ public class InductiveVisualMiner {
 		}
 
 		final InductiveVisualMinerPanel panel;
-		if (!launcher.pro) {
-			state.setMiner(new NoLifeCycleSplitLogBasic());
-		}
+//		if (!launcher.pro) {
+//			state.setMiner(new NoLifeCycleSplitLogBasic());
+//		}
 		VisualMinerWrapper[] miners = VisualMinerWrapperPluginFinder.find(context, state.getMiner());
 		if (launcher.pro) {
 			panel = InductiveVisualMinerPanel.panelPro(context, state,
@@ -104,20 +103,20 @@ public class InductiveVisualMiner {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), new SoftReference<>(preMinedTree), true);
 		}
 
-		public static InductiveVisualMinerLauncher launcherBasic(XLog xLog) {
-			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, false);
-		}
+//		public static InductiveVisualMinerLauncher launcherBasic(XLog xLog) {
+//			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, false);
+//		}
 	}
 
-	@Plugin(name = "Mine with Inductive visual Miner basic", level = PluginLevel.PeerReviewed, returnLabels = { "Inductive visual Miner" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true, categories = {
-			PluginCategory.Discovery, PluginCategory.Analytics, PluginCategory.ConformanceChecking }, help = "Discover a process tree or a Petri net interactively using Inductive Miner.")
-	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl", pack = "InductiveVisualMiner")
-	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0 })
-	public InductiveVisualMinerLauncher mineGuiProcessTreeBasic(PluginContext context, XLog xLog) {
-		return InductiveVisualMinerLauncher.launcherBasic(xLog);
-	}
+//	@Plugin(name = "Mine with Inductive visual Miner basic", level = PluginLevel.PeerReviewed, returnLabels = { "Inductive visual Miner" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true, categories = {
+//			PluginCategory.Discovery, PluginCategory.Analytics, PluginCategory.ConformanceChecking }, help = "Discover a process tree or a Petri net interactively using Inductive Miner.")
+//	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl", pack = "InductiveVisualMiner")
+//	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0 })
+//	public InductiveVisualMinerLauncher mineGuiProcessTreeBasic(PluginContext context, XLog xLog) {
+//		return InductiveVisualMinerLauncher.launcherBasic(xLog);
+//	}
 
-	@Plugin(name = "Mine with Inductive visual Miner pro", level = PluginLevel.PeerReviewed, returnLabels = { "Inductive visual Miner" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true, categories = {
+	@Plugin(name = "Mine with Inductive visual Miner", level = PluginLevel.PeerReviewed, returnLabels = { "Inductive visual Miner" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true, categories = {
 			PluginCategory.Discovery, PluginCategory.Analytics, PluginCategory.ConformanceChecking }, help = "Discover a process tree or a Petri net interactively using Inductive Miner.")
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl", pack = "InductiveVisualMiner")
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0 })

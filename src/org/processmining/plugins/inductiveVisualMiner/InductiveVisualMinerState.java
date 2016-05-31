@@ -39,7 +39,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWra
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.NoLifeCycleSplitLog;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.Miner;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.ProcessTree;
 
@@ -181,7 +181,7 @@ public class InductiveVisualMinerState {
 
 	//==mining==
 	private MiningParameters miningParameters;
-	private VisualMinerWrapper miner = new NoLifeCycleSplitLog();
+	private VisualMinerWrapper miner = new Miner();
 	private double paths = 0.8;
 	private IvMEfficientTree tree = null;
 	private IvMEfficientTree preMinedTree = null;
