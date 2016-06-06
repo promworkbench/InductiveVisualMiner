@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import java.util.Collections;
+
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
@@ -8,7 +10,7 @@ import org.deckfour.xes.model.impl.XTraceImpl;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
-import org.processmining.plugins.inductiveVisualMiner.plugins.SortEventsPlugin;
+import org.processmining.plugins.inductiveVisualMiner.plugins.SortEventsPlugin.EventsComparator;
 
 public class Cl01SortEvents extends ChainLink<XLog, XLog> {
 
@@ -35,7 +37,7 @@ public class Cl01SortEvents extends ChainLink<XLog, XLog> {
 
 					XTrace resultTrace = new XTraceImpl(trace.getAttributes());
 					resultTrace.addAll(trace);
-					resultTrace.sort(new SortEventsPlugin.EventsComparator());
+					Collections.sort(resultTrace, new EventsComparator());
 					result.add(resultTrace);
 				}
 				return result;
