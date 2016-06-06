@@ -17,7 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class Cl09FilterNodeSelection
+public class Cl10FilterNodeSelection
 		extends
 		ChainLink<Quintuple<IvMLogNotFiltered, Selection, List<IvMFilter>, IvMLogInfo, IvMEfficientTree>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
 

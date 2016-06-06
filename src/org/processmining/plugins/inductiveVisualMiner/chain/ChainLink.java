@@ -26,7 +26,7 @@ public abstract class ChainLink<I, O> {
 
 	/**
 	 * Performs the computation, given the input. Side-effects not allowed;
-	 * should be thread-safe and static
+	 * should be thread-safe and static.
 	 * 
 	 * @param input
 	 * @param canceller

@@ -21,14 +21,14 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl08Animate
+public class Cl09Animate
 		extends
 		ChainLink<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree>, Double> {
 
 	private final ThreadedComputer<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree>, GraphVizTokens> pool;
 	private InputFunction<GraphVizTokens> onComplete;
 
-	public Cl08Animate(final Executor executor, final InductiveVisualMinerState state,
+	public Cl09Animate(final Executor executor, final InductiveVisualMinerState state,
 			final InductiveVisualMinerPanel panel) {
 
 		pool = new ThreadedComputer<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree>, GraphVizTokens>(
@@ -78,7 +78,7 @@ public class Cl08Animate
 
 	protected Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMEfficientTree> generateInput(
 			InductiveVisualMinerState state) {
-		if (state.isAnimationGlobalEnabled()) {
+		if (state.isAnimationGlobalEnabled() && !state.isIllogicalTimeStamps()) {
 			return Sextuple.of(state.getIvMLog(), state.getMode(), state.getVisualisationInfo(), state.getSVGDiagram(),
 					state.getAnimationScaler(), state.getTree());
 		} else {
@@ -99,7 +99,7 @@ public class Cl08Animate
 	}
 
 	protected void processResult(Double result, InductiveVisualMinerState state) {
-
+		
 	}
 
 	public InputFunction<GraphVizTokens> getOnComplete() {

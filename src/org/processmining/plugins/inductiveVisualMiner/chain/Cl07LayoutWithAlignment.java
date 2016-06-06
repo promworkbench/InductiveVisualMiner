@@ -19,7 +19,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import com.kitfox.svg.SVGDiagram;
 
 // perform layout
-public class Cl06LayoutWithAlignment
+public class Cl07LayoutWithAlignment
 		extends
 		ChainLink<Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap>> {
 

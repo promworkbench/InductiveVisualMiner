@@ -18,7 +18,7 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogI
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
-import org.processmining.plugins.InductiveMiner.mining.MiningParametersThesisIM;
+import org.processmining.plugins.InductiveMiner.mining.MiningParametersIMf;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
@@ -49,8 +49,7 @@ public class InductiveVisualMinerState {
 
 	public InductiveVisualMinerState(XLog xLog, ProcessTree preMinedTree) throws UnknownTreeNodeException {
 		this.xLog = xLog;
-		//miningParameters = new NoLifeCycleMiningParametersIvM();
-		miningParameters = new MiningParametersThesisIM();
+		miningParameters = new MiningParametersIMf();
 		if (preMinedTree != null) {
 			this.tree = new IvMEfficientTree(preMinedTree);
 			this.preMinedTree = this.tree;
@@ -84,12 +83,21 @@ public class InductiveVisualMinerState {
 	private XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(
 			new XEventNameClassifier());
 	private IMLog2IMLogInfo log2logInfo = new IMLog2IMLogInfoDefault();
-	private final XLog xLog;
+	private XLog xLog;
 	private XLogInfo xLogInfo;
 	private XLogInfo xLogInfoPerformance;
 	private IMLog IMLog;
 	private IMLogInfo IMLogInfo;
+	private boolean illogicalTimeStamps = false;
 
+	public boolean isIllogicalTimeStamps() {
+		return illogicalTimeStamps;
+	}
+	
+	public void setIllogicalTimeStamps(boolean illogicalTimeStamps) {
+		this.illogicalTimeStamps = illogicalTimeStamps;
+	}
+	
 	public XEventPerformanceClassifier getPerformanceClassifier() {
 		return performanceClassifier;
 	}
@@ -112,6 +120,10 @@ public class InductiveVisualMinerState {
 
 	public XLog getXLog() {
 		return xLog;
+	}
+	
+	public void setXLog(XLog xLog) {
+		this.xLog = xLog;
 	}
 
 	public XLogInfo getXLogInfo() {

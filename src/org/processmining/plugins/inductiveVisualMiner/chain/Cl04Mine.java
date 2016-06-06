@@ -10,7 +10,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
 
-public class Cl03Mine extends
+public class Cl04Mine extends
 		ChainLink<Quadruple<IvMEfficientTree, IMLog, VisualMinerWrapper, VisualMinerParameters>, IvMEfficientTree> {
 
 	protected Quadruple<IvMEfficientTree, IMLog, VisualMinerWrapper, VisualMinerParameters> generateInput(

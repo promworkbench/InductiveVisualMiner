@@ -18,7 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import com.kitfox.svg.SVGDiagram;
 
 // perform layout
-public class Cl04LayoutModel
+public class Cl05LayoutModel
 		extends
 		ChainLink<Triple<IvMEfficientTree, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap>> {
 
@@ -49,6 +49,5 @@ public class Cl04LayoutModel
 	protected void processResult(Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap> result,
 			InductiveVisualMinerState state) {
 		state.setLayout(result.getA(), result.getB(), result.getC(), result.getD());
-
 	}
 }

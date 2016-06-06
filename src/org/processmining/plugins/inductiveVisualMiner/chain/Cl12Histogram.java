@@ -8,29 +8,38 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficient
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
-public class Cl11Histogram extends
+public class Cl12Histogram extends
 		ChainLink<Quadruple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer>, HistogramData> {
 
 	protected Quadruple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer> generateInput(InductiveVisualMinerState state) {
-		return Quadruple.of(state.getTree(), (IvMLogFiltered) state.getIvMLogFiltered(), state.getAnimationScaler(),
-				state.getHistogramWidth());
+		if (!state.isIllogicalTimeStamps()) {
+			return Quadruple.of(state.getTree(), (IvMLogFiltered) state.getIvMLogFiltered(),
+					state.getAnimationScaler(), state.getHistogramWidth());
+		} else {
+			return null;
+		}
 	}
 
 	protected HistogramData executeLink(Quadruple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer> input,
 			IvMCanceller canceller) throws Exception {
-		IvMEfficientTree tree = input.getA();
-		if (tree == null) {
+		if (input != null) {
+
+			IvMEfficientTree tree = input.getA();
+			if (tree == null) {
+				return null;
+			}
+			if (input.getD() <= 0) {
+				return null;
+			}
+			HistogramData data = new HistogramData(tree, input.getB(), input.getC(), input.getD(),
+					InductiveVisualMinerAnimationPanel.popupWidth, canceller);
+			if (canceller.isCancelled()) {
+				return null;
+			}
+			return data;
+		} else {
 			return null;
 		}
-		if (input.getD() <= 0) {
-			return null;
-		}
-		HistogramData data = new HistogramData(tree, input.getB(), input.getC(), input.getD(),
-				InductiveVisualMinerAnimationPanel.popupWidth, canceller);
-		if (canceller.isCancelled()) {
-			return null;
-		}
-		return data;
 	}
 
 	protected void processResult(HistogramData result, InductiveVisualMinerState state) {

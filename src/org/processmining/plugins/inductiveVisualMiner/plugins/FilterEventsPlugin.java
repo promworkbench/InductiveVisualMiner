@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.logFiltering;
+package org.processmining.plugins.inductiveVisualMiner.plugins;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;

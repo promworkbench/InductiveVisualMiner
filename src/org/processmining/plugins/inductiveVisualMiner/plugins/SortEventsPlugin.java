@@ -1,7 +1,8 @@
-package org.processmining.plugins.inductiveVisualMiner.helperClasses;
+package org.processmining.plugins.inductiveVisualMiner.plugins;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 import org.deckfour.xes.extension.std.XTimeExtension;
 import org.deckfour.xes.model.XEvent;
@@ -28,7 +29,12 @@ public class SortEventsPlugin {
 	
 	public static class EventsComparator implements Comparator<XEvent>{
 		public int compare(XEvent o1, XEvent o2) {
-			return XTimeExtension.instance().extractTimestamp(o1).compareTo(XTimeExtension.instance().extractTimestamp(o2));
+			Date time1 = XTimeExtension.instance().extractTimestamp(o1);
+			Date time2 = XTimeExtension.instance().extractTimestamp(o2);
+			if (time1 == null || time2 == null) {
+				return 0;
+			}
+			return time1.compareTo(time2);
 		}
 	}
 }

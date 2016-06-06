@@ -20,7 +20,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningTraceFilter;
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
 
-public class Cl02FilterLogOnActivities
+public class Cl03FilterLogOnActivities
 		extends
 		ChainLink<Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, List<IvMFilter>>, Triple<IMLog, IMLogInfo, Set<XEventClass>>> {
 

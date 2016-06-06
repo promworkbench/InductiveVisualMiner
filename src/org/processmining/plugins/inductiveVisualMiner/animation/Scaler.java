@@ -21,7 +21,7 @@ public class Scaler {
 				if (move.getLogTimestamp() != null) {
 					logMin = Math.min(logMin, move.getLogTimestamp());
 					logMax = Math.max(logMax, move.getLogTimestamp());
-					
+
 					if (trace.getRealStartTime() == null) {
 						trace.setRealStartTime(move.getLogTimestamp());
 					}
@@ -88,7 +88,7 @@ public class Scaler {
 		}
 		return (userTime / (1.0 * animationDuration)) * (max - 1.0 * min) + min;
 	}
-	
+
 	public Double userTime2Fraction(Double userTime) {
 		Double logTime = userTime2LogTime(userTime);
 		if (logTime == null) {
