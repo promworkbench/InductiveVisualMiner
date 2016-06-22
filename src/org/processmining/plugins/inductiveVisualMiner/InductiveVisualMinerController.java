@@ -193,7 +193,8 @@ public class InductiveVisualMinerController {
 				public void run() {
 					panel.getTraceView().set(state.getLog());
 
-					state.getFiltersController().updateFiltersWithIMLog(panel, state.getLog(), context.getExecutor());
+					state.getFiltersController().updateFiltersWithIMLog(panel, state.getLog(), state.getXLog(),
+							context.getExecutor());
 				}
 			});
 			m.setOnException(onException);

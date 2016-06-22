@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
+import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
@@ -62,13 +63,14 @@ public abstract class IvMFilter {
 	/**
 	 * Called asynchronously: do not alter the gui directly. Return whether
 	 * something changed in the selection and an update is necessary (do not
-	 * call update() yourself).
+	 * call update() yourself). Notice that either a IMLog+XLog or a IvMLog will
+	 * be provided, never both.
 	 * 
 	 * @param log
 	 * @param ivmLog
 	 * @throws Exception
 	 */
-	protected abstract boolean fillGuiWithLog(IMLog log, IvMLog ivmLog) throws Exception;
+	protected abstract boolean fillGuiWithLog(IMLog log, XLog xLog, IvMLog ivmLog) throws Exception;
 
 	public final void createFilterGui(Runnable onUpdate, AttributesInfo attributesInfo) {
 		this.onUpdate = onUpdate;

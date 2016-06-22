@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters;
 
+import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.annotations.KeepInProMCache;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
@@ -29,10 +30,10 @@ public abstract class PreMiningTraceFilter extends IvMFilter {
 	 *         call update() yourself).
 	 * @throws Exception
 	 */
-	public abstract boolean fillGuiWithLog(IMLog log) throws Exception;
+	public abstract boolean fillGuiWithLog(IMLog log, XLog xLog) throws Exception;
 
 	@Override
-	protected final boolean fillGuiWithLog(IMLog log, IvMLog ivmLog) throws Exception {
-		return fillGuiWithLog(log);
+	protected final boolean fillGuiWithLog(IMLog log, XLog xLog, IvMLog ivmLog) throws Exception {
+		return fillGuiWithLog(log, xLog);
 	}
 }

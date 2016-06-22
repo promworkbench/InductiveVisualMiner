@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilter
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
@@ -11,12 +12,11 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters
 
 public class PreMiningFrequentTracesFilter extends PreMiningTraceFilter {
 
-	SliderGui panel = null;
+	private SliderGui panel = null;
+	private FrequencyLog fLog = null;
 	
 	public boolean staysInLog(IMTrace trace) {
-		trace.getXTraceIndex();
-		// TODO Auto-generated method stub
-		return false;
+		return fLog.isFrequentEnough(trace, panel.getSlider().getValue() / 1000.0);
 	}
 
 	public String getName() {
@@ -32,13 +32,14 @@ public class PreMiningFrequentTracesFilter extends PreMiningTraceFilter {
 				update();
 			}
 		});
+		panel.getSlider().setEnabled(false);
 		
 		updateExplanation();
 		return panel;
 	}
 
 	protected boolean isEnabled() {
-		return getThreshold() < 1.0;
+		return getThreshold() < 1.0 && panel.getSlider().isEnabled() && fLog != null;
 	}
 	
 	private double getThreshold() {
@@ -46,11 +47,19 @@ public class PreMiningFrequentTracesFilter extends PreMiningTraceFilter {
 	}
 
 	private void updateExplanation() {
-		panel.getExplanation().setText("Include " + String.format("%.2f", getThreshold() * 100) + "% of the most occurring traces.");
+		panel.getExplanation().setText("Include " + String.format("%.1f", getThreshold() * 100) + "% of the most occurring traces.");
 	}
 
-	public boolean fillGuiWithLog(IMLog log) throws Exception {
-		return false;
+	public boolean fillGuiWithLog(IMLog log, XLog xLog) throws Exception {
+		fLog = null;
+		panel.getSlider().setEnabled(false);
+		panel.getExplanation().setText("Initialising...");
+		
+		fLog = new FrequencyLog(xLog, log.getClassifier());
+		
+		updateExplanation();
+		panel.getSlider().setEnabled(true);
+		return isEnabled();
 	}
 
 }

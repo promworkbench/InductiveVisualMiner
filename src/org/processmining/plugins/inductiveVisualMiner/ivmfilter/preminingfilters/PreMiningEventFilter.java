@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters;
 
 import org.deckfour.xes.model.XEvent;
+import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.annotations.KeepInProMCache;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
@@ -32,7 +33,7 @@ public abstract class PreMiningEventFilter extends IvMFilter {
 	public abstract boolean fillGuiWithLog(IMLog log) throws Exception;
 
 	@Override
-	protected final boolean fillGuiWithLog(IMLog log, IvMLog ivmLog) throws Exception {
+	protected final boolean fillGuiWithLog(IMLog log, XLog xLog, IvMLog ivmLog) throws Exception {
 		return fillGuiWithLog(log);
 	}
 }

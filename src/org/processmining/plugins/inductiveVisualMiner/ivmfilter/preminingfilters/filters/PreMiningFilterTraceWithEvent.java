@@ -60,7 +60,7 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 		updateExplanation();
 		return panel;
 	}
-	
+
 	public boolean staysInLog(IMTrace trace) {
 		String key = panel.getSelectedKey();
 		for (XEvent event : trace) {
@@ -88,7 +88,7 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 			panel.getExplanation().setText(s.toString());
 		}
 	}
-	
+
 	public void printKey(StringBuilder s) {
 		s.append("having attribute `");
 		s.append(panel.getSelectedKey());
@@ -125,7 +125,7 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 		return eventAttributes;
 	}
 
-	public boolean fillGuiWithLog(IMLog log) throws Exception {
+	public boolean fillGuiWithLog(IMLog log, XLog xLog) throws Exception {
 		return false;
 	}
 

@@ -60,7 +60,7 @@ public class MultiTraceAttributeFilter extends HighlightingFilter {
 		return panel;
 	}
 
-	protected boolean fillGuiWithLog(IMLog log, IvMLog ivmLog) throws Exception {
+	protected boolean fillGuiWithLog(IMLog log, XLog xLog, IvMLog ivmLog) throws Exception {
 		return false;
 	}
 

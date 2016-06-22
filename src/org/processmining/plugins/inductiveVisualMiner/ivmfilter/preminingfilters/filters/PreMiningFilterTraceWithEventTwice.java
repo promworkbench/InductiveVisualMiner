@@ -8,6 +8,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.deckfour.xes.model.XEvent;
+import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
@@ -101,7 +102,7 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningTraceFilter {
 		return false;
 	}
 
-	public boolean fillGuiWithLog(IMLog log) throws Exception {
+	public boolean fillGuiWithLog(IMLog log, XLog xLog) throws Exception {
 		return false;
 	}
 

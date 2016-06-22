@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 import org.deckfour.xes.model.XEvent;
+import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
@@ -58,7 +59,7 @@ public class IvMFiltersController {
 					it.remove();
 				}
 			}
-			
+
 			panel.getColouringFiltersView().initialise(highlightingFilters);
 			for (IvMFilter filter : highlightingFilters) {
 				filter.createFilterGui(onHighlightingUpdate, state.getAttributesInfo());
@@ -75,13 +76,14 @@ public class IvMFiltersController {
 	 * @param attributesInfo
 	 * @param executor
 	 */
-	public void updateFiltersWithIMLog(InductiveVisualMinerPanel panel, final IMLog log, Executor executor) {
+	public void updateFiltersWithIMLog(InductiveVisualMinerPanel panel, final IMLog log, final XLog xLog,
+			Executor executor) {
 		for (IvMFilter filter : preMiningFilters) {
 			final IvMFilter filter2 = filter;
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
-						filter2.fillGuiWithLog(log, null);
+						filter2.fillGuiWithLog(log, xLog, null);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -94,7 +96,7 @@ public class IvMFiltersController {
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
-						filter2.fillGuiWithLog(log, null);
+						filter2.fillGuiWithLog(log, xLog, null);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -104,13 +106,14 @@ public class IvMFiltersController {
 		}
 	}
 
-	public void updateFiltersWithIvMLog(InductiveVisualMinerPanel panel, final IvMLogNotFiltered ivmLog, Executor executor) {
+	public void updateFiltersWithIvMLog(InductiveVisualMinerPanel panel, final IvMLogNotFiltered ivmLog,
+			Executor executor) {
 		for (IvMFilter filter : highlightingFilters) {
 			final IvMFilter filter2 = filter;
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
-						filter2.fillGuiWithLog(null, ivmLog);
+						filter2.fillGuiWithLog(null, null, ivmLog);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

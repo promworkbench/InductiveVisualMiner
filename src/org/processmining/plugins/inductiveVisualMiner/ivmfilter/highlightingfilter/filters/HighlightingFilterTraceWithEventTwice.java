@@ -7,6 +7,7 @@ import java.util.List;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
@@ -101,7 +102,7 @@ public class HighlightingFilterTraceWithEventTwice extends HighlightingFilter {
 		}
 	}
 
-	protected boolean fillGuiWithLog(IMLog log, IvMLog ivmLog) throws Exception {
+	protected boolean fillGuiWithLog(IMLog log, XLog xLog, IvMLog ivmLog) throws Exception {
 		return false;
 	}
 
