@@ -3,12 +3,11 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfil
 import gnu.trove.iterator.TIntIterator;
 
 import java.awt.Component;
-import java.util.List;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersView;
 
 public class HighlightingFiltersView extends IvMFiltersView {
@@ -26,12 +25,12 @@ public class HighlightingFiltersView extends IvMFiltersView {
 	 * @param panel
 	 * @param selectedNodes
 	 * @param selectedLogMoves
-	 * @param list
+	 * @param filters
 	 * @param maxAnimatedTraces
 	 * @param numberOfTraces
 	 */
 	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Selection selection,
-			List<IvMFilter> list, IvMEfficientTree tree) {
+			IvMFiltersController filters, IvMEfficientTree tree) {
 		//show the user which traces are shown
 
 		StringBuilder result = new StringBuilder();
@@ -79,22 +78,12 @@ public class HighlightingFiltersView extends IvMFiltersView {
 
 		//colouring filters
 		{
-			int enabledColouringFilters = 0;
-			for (IvMFilter colouringFilter : list) {
-				if (colouringFilter.isEnabledFilter()) {
-					enabledColouringFilters++;
-				}
-			}
-			if (enabledColouringFilters >= 1) {
+			if (filters.isAHighlightingFilterEnabled()) {
 				if (result.length() != 0) {
 					result.append("; and ");
 				}
 
-				if (enabledColouringFilters == 1) {
-					result.append("pass the highlighting filter");
-				} else {
-					result.append("pass the highlighting filters");
-				}
+				result.append("pass the highlighting filters");
 			}
 		}
 

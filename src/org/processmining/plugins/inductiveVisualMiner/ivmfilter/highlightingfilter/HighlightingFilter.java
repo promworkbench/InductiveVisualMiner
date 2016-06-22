@@ -16,4 +16,5 @@ public abstract class HighlightingFilter extends IvMFilter {
 	 * @return
 	 */
 	public abstract boolean countInColouring(IvMTrace trace);
+	
 }

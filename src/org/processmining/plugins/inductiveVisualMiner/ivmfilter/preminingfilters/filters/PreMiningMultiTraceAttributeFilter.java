@@ -7,7 +7,7 @@ import java.util.List;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.deckfour.xes.model.XLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
@@ -23,7 +23,7 @@ public class PreMiningMultiTraceAttributeFilter extends PreMiningTraceFilter {
 		return "Trace filter";
 	}
 
-	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
 		panel = new MultiAttributeFilterGui(attributesInfo.getTraceAttributesMap(), getName());
 
 		// Key selector
@@ -90,5 +90,9 @@ public class PreMiningMultiTraceAttributeFilter extends PreMiningTraceFilter {
 			s.append("</html>");
 			panel.getExplanation().setText(s.toString());
 		}
+	}
+
+	public boolean fillGuiWithLog(IMLog log) throws Exception {
+		return false;
 	}
 }

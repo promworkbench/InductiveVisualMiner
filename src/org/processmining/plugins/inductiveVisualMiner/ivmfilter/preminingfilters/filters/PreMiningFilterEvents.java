@@ -15,6 +15,7 @@ import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.MultiAttributeFilterGui;
@@ -25,6 +26,7 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 	MultiAttributeFilterGui panel = null;
 	boolean block = true;
 
+	@Override
 	public boolean staysInLog(XEvent event) {
 		String key = panel.getSelectedKey();
 		if (event.getAttributes() != null && event.getAttributes().containsKey(key)
@@ -34,11 +36,13 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 		return false;
 	}
 
+	@Override
 	public String getName() {
 		return "Event filter";
 	}
 
-	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+	@Override
+	public IvMFilterGui createGui(final AttributesInfo attributesInfo) throws Exception {
 		panel = new MultiAttributeFilterGui(attributesInfo.getEventAttributesMap(), getName());
 
 		// Key selector
@@ -68,6 +72,12 @@ public class PreMiningFilterEvents extends PreMiningEventFilter {
 		return panel;
 	}
 
+	@Override
+	public boolean fillGuiWithLog(IMLog log) throws Exception {
+		return false;
+	}
+
+	@Override
 	protected boolean isEnabled() {
 		return !panel.getSelectedAttributes().isEmpty();
 	}

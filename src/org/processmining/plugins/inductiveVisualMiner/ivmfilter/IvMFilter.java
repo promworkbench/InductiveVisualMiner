@@ -1,8 +1,16 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
-import org.deckfour.xes.model.XLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 
+/**
+ * Do not extend this class directly. Rather, use PreMiningEventFilter,
+ * PreMiningTraceFilter or HighlightingFilter.
+ * 
+ * @author sleemans
+ *
+ */
 public abstract class IvMFilter {
 
 	/**
@@ -17,18 +25,15 @@ public abstract class IvMFilter {
 	 * 
 	 * @return
 	 */
-	public abstract String getName();
+	public abstract String getName() throws Exception;
 
 	/**
 	 * Initialises the JPanel containing the filter settings. Called
-	 * asynchronously, but it is guaranteed to be the first abstract function
-	 * that will be called (after constructor). No other function will be called
-	 * until this one is finished.
+	 * asynchronously. changed.
 	 * 
-	 * @param log
 	 * @return
 	 */
-	public abstract IvMFilterGui createGui(XLog log, AttributesInfo attributeInfo);
+	public abstract IvMFilterGui createGui(AttributesInfo attributesInfo) throws Exception;
 
 	/**
 	 * Returns whether this filter is actually filtering something. If this
@@ -37,13 +42,13 @@ public abstract class IvMFilter {
 	 * 
 	 * @return
 	 */
-	protected abstract boolean isEnabled();
+	protected abstract boolean isEnabled() throws Exception;
 
 	/**
 	 * This function is called when the user updates a filter and the filtering
 	 * has to be recomputed.
 	 */
-	protected void update() {
+	protected final void update() {
 		if (onUpdate != null) {
 			onUpdate.run();
 		}
@@ -54,26 +59,51 @@ public abstract class IvMFilter {
 	private Runnable onUpdate = null;
 	private boolean enabledFilter = false;
 
-	public void initialiseFilter(XLog log, AttributesInfo attributeInfo, Runnable onUpdate) {
+	/**
+	 * Called asynchronously: do not alter the gui directly. Return whether
+	 * something changed in the selection and an update is necessary (do not
+	 * call update() yourself).
+	 * 
+	 * @param log
+	 * @param ivmLog
+	 * @throws Exception
+	 */
+	protected abstract boolean fillGuiWithLog(IMLog log, IvMLog ivmLog) throws Exception;
+
+	public final void createFilterGui(Runnable onUpdate, AttributesInfo attributesInfo) {
+		this.onUpdate = onUpdate;
 		try {
-			//this might be foreign code, so be careful
-			panel = createGui(log, attributeInfo);
+			panel = createGui(attributesInfo);
 		} catch (Exception e) {
 			panel = null;
+			e.printStackTrace();
 		}
-		this.onUpdate = onUpdate;
 	}
 
-	public boolean swapEnabledFilter() {
+	public final boolean swapEnabledFilter() {
 		enabledFilter = !enabledFilter;
 		return enabledFilter;
 	}
 
-	public boolean isEnabledFilter() {
-		return enabledFilter && (panel != null) && isEnabled();
+	public final boolean isEnabledFilter() {
+		try {
+			return enabledFilter && (panel != null) && isEnabled();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
-	public IvMFilterGui getPanel() {
+	public final String getFilterName() {
+		try {
+			return getName();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "misbehaving filter plug-in";
+		}
+	}
+
+	public final IvMFilterGui getPanel() {
 		return panel;
 	}
 }

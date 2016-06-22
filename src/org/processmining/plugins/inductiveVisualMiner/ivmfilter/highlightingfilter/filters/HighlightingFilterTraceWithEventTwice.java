@@ -7,10 +7,11 @@ import java.util.List;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.deckfour.xes.model.XLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
@@ -23,7 +24,7 @@ public class HighlightingFilterTraceWithEventTwice extends HighlightingFilter {
 		return "Event happening twice filter";
 	}
 
-	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
 		panel = new MultiAttributeFilterGui(attributesInfo.getEventAttributesMap(), getName());
 
 		// Key selector
@@ -98,6 +99,10 @@ public class HighlightingFilterTraceWithEventTwice extends HighlightingFilter {
 			s.append("</html>");
 			panel.getExplanation().setText(s.toString());
 		}
+	}
+
+	protected boolean fillGuiWithLog(IMLog log, IvMLog ivmLog) throws Exception {
+		return false;
 	}
 
 }

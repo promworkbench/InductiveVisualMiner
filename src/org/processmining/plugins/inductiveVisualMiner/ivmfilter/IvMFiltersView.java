@@ -88,10 +88,15 @@ public abstract class IvMFiltersView extends SideWindow {
 		add(scrollPane, BorderLayout.CENTER);
 	}
 
+	/**
+	 * Initialise the view. Does not initialise the filters.
+	 * 
+	 * @param filters
+	 */
 	public void initialise(List<? extends IvMFilter> filters) {
 		Collections.sort(filters, new Comparator<IvMFilter>() {
 			public int compare(IvMFilter o1, IvMFilter o2) {
-				return o1.getName().compareTo(o2.getName());
+				return o1.getFilterName().compareTo(o2.getFilterName());
 			}
 		});
 		int index = 1;
@@ -105,7 +110,7 @@ public abstract class IvMFiltersView extends SideWindow {
 			panel.add(subPanel);
 
 			//add label
-			JLabel label = SlickerFactory.instance().createLabel(filter.getName() + " initialising ...");
+			JLabel label = SlickerFactory.instance().createLabel(filter.getFilterName() + " initialising ...");
 			subPanel.add(label);
 
 			filter2panel.put(filter, subPanel);
@@ -122,7 +127,7 @@ public abstract class IvMFiltersView extends SideWindow {
 			filter2initialisationLabel
 					.get(filter)
 					.setText(
-							filter.getName()
+							filter.getFilterName()
 									+ " did not initialise properly. It could be that the log contains inconsistent attribute types.");
 			return;
 		}

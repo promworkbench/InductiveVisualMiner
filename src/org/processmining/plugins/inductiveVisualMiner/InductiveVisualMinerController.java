@@ -10,7 +10,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executor;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -20,7 +19,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.deckfour.xes.extension.std.XConceptExtension;
-import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
@@ -48,17 +46,11 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl12Histogram;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterPluginFinder;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilterAnnotation;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningEventFilterAnnotation;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningTraceFilterAnnotation;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
@@ -115,8 +107,21 @@ public class InductiveVisualMinerController {
 					//update the classifier combobox
 					panel.getClassifiers().replaceClassifiers(state.getClassifiers(), state.getInitialClassifier());
 
-					initialisePreMiningFilters(state.getXLog(), state.getAttributesInfo(), context.getExecutor());
-					initialiseColourFilters(state.getXLog(), state.getAttributesInfo(), context.getExecutor());
+					//initialise the filters
+					{
+						Runnable onUpdatePreMining = new Runnable() {
+							public void run() {
+								chain.execute(Cl03FilterLogOnActivities.class);
+							}
+						};
+						Runnable onUpdateHighlighting = new Runnable() {
+							public void run() {
+								chain.execute(Cl10FilterNodeSelection.class);
+							}
+						};
+						state.setFiltersController(new IvMFiltersController(context, panel, state, onUpdatePreMining,
+								onUpdateHighlighting));
+					}
 				}
 			});
 			m.setOnException(onException);
@@ -187,6 +192,8 @@ public class InductiveVisualMinerController {
 			m.setOnComplete(new Runnable() {
 				public void run() {
 					panel.getTraceView().set(state.getLog());
+
+					state.getFiltersController().updateFiltersWithIMLog(panel, state.getLog(), context.getExecutor());
 				}
 			});
 			m.setOnException(onException);
@@ -307,6 +314,9 @@ public class InductiveVisualMinerController {
 			a.setOnComplete(new Runnable() {
 				public void run() {
 					panel.getTraceView().set(state.getTree(), state.getIvMLog(), state.getSelection());
+
+					state.getFiltersController().updateFiltersWithIvMLog(panel, state.getIvMLog(),
+							context.getExecutor());
 				}
 			});
 			a.setOnException(onException);
@@ -399,7 +409,7 @@ public class InductiveVisualMinerController {
 					state.resetPerformance();
 
 					HighlightingFiltersView.updateSelectionDescription(panel, state.getSelection(),
-							state.getColouringFilters(), state.getTree());
+							state.getFiltersController(), state.getTree());
 
 					//tell trace view the colour map and the selection
 					panel.getTraceView().set(state.getTree(), state.getIvMLogFiltered(), state.getSelection());
@@ -466,22 +476,6 @@ public class InductiveVisualMinerController {
 			});
 			f.setOnException(onException);
 			chain.add(f);
-		}
-
-		//set up highlighting plug-ins
-		{
-			List<IvMFilter> colouringFilters = IvMFilterPluginFinder.findFilteringPlugins(context,
-					HighlightingFilter.class, HighlightingFilterAnnotation.class);
-			state.setColouringFilters(colouringFilters);
-			panel.getColouringFiltersView().initialise(colouringFilters);
-		}
-
-		//set up pre-mining plug-ins
-		{
-			List<IvMFilter> preMiningFilters = IvMFilterPluginFinder.findFilteringPlugins(context, IvMFilter.class,
-					PreMiningEventFilterAnnotation.class, PreMiningTraceFilterAnnotation.class);
-			state.setPreMiningFilters(preMiningFilters);
-			panel.getPreMiningFiltersView().initialise(preMiningFilters);
 		}
 
 		//start the chain
@@ -738,44 +732,6 @@ public class InductiveVisualMinerController {
 		} else {
 			panel.getAnimationTimeLabel().setFont(panel.getStatusLabel().getFont());
 			panel.getAnimationTimeLabel().setText(s);
-		}
-	}
-
-	/**
-	 * Call all colouring filters to initialise their guis.
-	 * 
-	 * @param xLog
-	 * @param executor
-	 */
-	private void initialiseColourFilters(final XLog xLog, final AttributesInfo attributeInfo, Executor executor) {
-		final Runnable onUpdate = new Runnable() {
-			public void run() {
-				chain.execute(Cl10FilterNodeSelection.class);
-			}
-		};
-		for (final IvMFilter colouringFilter : state.getColouringFilters()) {
-			executor.execute(new Runnable() {
-				public void run() {
-					colouringFilter.initialiseFilter(xLog, attributeInfo, onUpdate);
-					panel.getColouringFiltersView().setPanel(colouringFilter, onUpdate);
-				}
-			});
-		}
-	}
-
-	private void initialisePreMiningFilters(final XLog xLog, final AttributesInfo attributeInfo, Executor executor) {
-		final Runnable onUpdate = new Runnable() {
-			public void run() {
-				chain.execute(Cl03FilterLogOnActivities.class);
-			}
-		};
-		for (final IvMFilter preMiningFilter : state.getPreMiningFilters()) {
-			executor.execute(new Runnable() {
-				public void run() {
-					preMiningFilter.initialiseFilter(xLog, attributeInfo, onUpdate);
-					panel.getPreMiningFiltersView().setPanel(preMiningFilter, onUpdate);
-				}
-			});
 		}
 	}
 

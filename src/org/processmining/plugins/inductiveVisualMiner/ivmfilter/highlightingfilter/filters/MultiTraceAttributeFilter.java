@@ -14,9 +14,11 @@ import javax.swing.event.ListSelectionListener;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class MultiTraceAttributeFilter extends HighlightingFilter {
@@ -28,7 +30,7 @@ public class MultiTraceAttributeFilter extends HighlightingFilter {
 		return "Trace filter";
 	}
 
-	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
 		panel = new MultiAttributeFilterGui(attributesInfo.getTraceAttributesMap(), getName());
 
 		// Key selector
@@ -56,6 +58,10 @@ public class MultiTraceAttributeFilter extends HighlightingFilter {
 		block = false;
 		updateExplanation();
 		return panel;
+	}
+
+	protected boolean fillGuiWithLog(IMLog log, IvMLog ivmLog) throws Exception {
+		return false;
 	}
 
 	public boolean countInColouring(IvMTrace trace) {

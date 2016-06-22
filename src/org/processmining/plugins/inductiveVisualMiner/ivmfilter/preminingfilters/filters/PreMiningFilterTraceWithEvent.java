@@ -15,6 +15,7 @@ import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
@@ -30,7 +31,7 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 		return "Trace with event filter";
 	}
 
-	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
 		panel = new MultiAttributeFilterGui(attributesInfo.getEventAttributesMap(), getName());
 
 		// Key selector
@@ -122,6 +123,10 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 			}
 		}
 		return eventAttributes;
+	}
+
+	public boolean fillGuiWithLog(IMLog log) throws Exception {
+		return false;
 	}
 
 }

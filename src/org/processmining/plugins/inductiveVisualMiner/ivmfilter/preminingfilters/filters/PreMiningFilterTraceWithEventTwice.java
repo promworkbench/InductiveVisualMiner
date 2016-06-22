@@ -8,7 +8,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.deckfour.xes.model.XEvent;
-import org.deckfour.xes.model.XLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
@@ -24,7 +24,7 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningTraceFilter {
 		return "Trace with event happening twice filter";
 	}
 
-	public IvMFilterGui createGui(XLog log, final AttributesInfo attributesInfo) {
+	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
 		panel = new MultiAttributeFilterGui(attributesInfo.getEventAttributesMap(), getName());
 
 		// Key selector
@@ -98,6 +98,10 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningTraceFilter {
 				}
 			}
 		}
+		return false;
+	}
+
+	public boolean fillGuiWithLog(IMLog log) throws Exception {
 		return false;
 	}
 

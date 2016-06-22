@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.processmining.framework.plugin.PluginContext;
 
-public class IvMFilterPluginFinder {
+public class IvMFiltersFinder {
 
 	@SafeVarargs
 	public static List<IvMFilter> findFilteringPlugins(PluginContext context,

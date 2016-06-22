@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
-import java.util.List;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
@@ -29,7 +28,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -148,13 +147,23 @@ public class InductiveVisualMinerState {
 		this.xLogInfo = xLogInfo;
 		this.xLogInfoPerformance = xLogInfoPerformance;
 	}
+	
+	//==filters==
+	private IvMFiltersController filtersController;
+	
+	public IvMFiltersController getFiltersController() {
+		return filtersController;
+	}
+	
+	public void setFiltersController(IvMFiltersController filtersController) {
+		this.filtersController = filtersController;
+	}
 
 	//==activity-filtered log==
 	private double activitiesThreshold = 1.0;
 	private IMLog activityFilteredIMLog;
 	private IMLogInfo activityFilteredIMLogInfo;
 	private Set<XEventClass> filteredActivities;
-	private List<IvMFilter> preMiningFilters;
 
 	public double getActivitiesThreshold() {
 		return activitiesThreshold;
@@ -181,14 +190,6 @@ public class InductiveVisualMinerState {
 		this.activityFilteredIMLog = activityFilteredIMLog;
 		this.activityFilteredIMLogInfo = activityFilteredIMLogInfo;
 		this.filteredActivities = filteredActivities;
-	}
-	
-	public List<IvMFilter> getPreMiningFilters() {
-		return preMiningFilters;
-	}
-
-	public void setPreMiningFilters(List<IvMFilter> preMiningFilters) {
-		this.preMiningFilters = preMiningFilters;
 	}
 
 	//==mining==
@@ -295,7 +296,6 @@ public class InductiveVisualMinerState {
 
 	//==colour filtering ( & node selection)==
 	private Selection selection;
-	private List<IvMFilter> colouringFilters;
 
 	public Selection getSelection() {
 		return selection;
@@ -308,14 +308,6 @@ public class InductiveVisualMinerState {
 	public void removeModelAndLogMovesSelection() {
 		selection = new Selection(selection.getSelectedActivities(), new THashSet<LogMovePosition>(),
 				new TIntHashSet(10, 0.5f, -1), selection.getSelectedTaus());
-	}
-
-	public List<IvMFilter> getColouringFilters() {
-		return colouringFilters;
-	}
-
-	public void setColouringFilters(List<IvMFilter> colouringFilters2) {
-		this.colouringFilters = colouringFilters2;
 	}
 
 	//==timed log==
