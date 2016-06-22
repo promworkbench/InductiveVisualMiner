@@ -35,13 +35,13 @@ public class Cl06Align
 		//attempt to get the alignment from cache
 		Triple<IvMEfficientTree, XEventPerformanceClassifier, XLog> cacheKey = Triple.of(input.getA(), input.getB(), input.getC());
 		SoftReference<IvMLogNotFiltered> fromCacheReference = cache.get(cacheKey);
-//		if (fromCacheReference != null) {
-//			IvMLogNotFiltered fromCache = fromCacheReference.get();
-//			if (fromCache != null) {
-//				System.out.println("obtain alignment from cache");
-//				return Pair.of(fromCache, new IvMLogInfo(fromCache, tree));
-//			}
-//		}
+		if (fromCacheReference != null) {
+			IvMLogNotFiltered fromCache = fromCacheReference.get();
+			if (fromCache != null) {
+				System.out.println("obtain alignment from cache");
+				return Pair.of(fromCache, new IvMLogInfo(fromCache, tree));
+			}
+		}
 
 		IvMLogNotFiltered log = AlignmentPerformance.align(tree, input.getB(), input.getC(), input.getD(), input.getE(), canceller);
 		if (log == null) {
