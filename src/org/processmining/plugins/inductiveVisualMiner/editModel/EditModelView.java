@@ -139,7 +139,7 @@ public class EditModelView extends SideWindow {
 			setMessage("Mining a model...");
 			text.setEnabled(false);
 		} else {
-			text.setText(TreeLanguage.toString(tree));
+			text.setText(EfficientTree2HumanReadableString.toString(tree));
 			text.setEnabled(true);
 		}
 	}

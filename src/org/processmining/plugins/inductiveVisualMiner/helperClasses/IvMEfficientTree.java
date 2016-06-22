@@ -119,16 +119,6 @@ public class IvMEfficientTree extends EfficientTree {
 		return traverse(parent) > child;
 	}
 
-	public int getParent(int node) {
-		assert (node != 0);
-
-		int potentialParent = node - 1;
-		while (traverse(potentialParent) <= node) {
-			potentialParent--;
-		}
-		return potentialParent;
-	}
-
 	public ProcessTree getDTree() {
 		return dTree;
 	}

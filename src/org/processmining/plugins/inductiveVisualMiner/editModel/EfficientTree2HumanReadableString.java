@@ -7,17 +7,32 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 
 import com.google.common.collect.FluentIterable;
 
-public class TreeLanguage {
-	
-	public static String toString(IvMEfficientTree tree) {
-		return tree2string(tree, 0, tree.getRoot());
+public class EfficientTree2HumanReadableString {
+
+	/**
+	 * 
+	 * @param tree
+	 * @return A human-readable representation of the tree. Notice that it might
+	 *         not be machine-readable.
+	 */
+	public static String toString(EfficientTree tree) {
+		return tree2string(tree, 0, tree.getRoot(), false);
 	}
-	
-	public static String tree2string(EfficientTree tree, int indent, int node) {
+
+	/**
+	 * 
+	 * @param tree
+	 * @return A string representation of the tree that can be read by humans
+	 *         and machines.
+	 */
+	public static String toMachineString(EfficientTree tree) {
+		return tree2string(tree, 0, tree.getRoot(), true);
+	}
+
+	private static String tree2string(EfficientTree tree, int indent, int node, boolean machineReadable) {
 		StringBuilder result = new StringBuilder();
 		result.append(StringUtils.repeat("\t", indent));
 		if (tree.isActivity(node)) {
@@ -49,18 +64,20 @@ public class TreeLanguage {
 
 			// filter the list of children: remove superfluous taus from loops
 			List<Integer> children = new ArrayList<>(FluentIterable.from(tree.getChildren(node)).toList());
-			if (tree.isLoop(node)) {
-				if (tree.isTau(children.get(2))) {
-					children.remove(2);
-					if (tree.isTau(children.get(1))) {
-						children.remove(1);
+			if (!machineReadable) {
+				if (tree.isLoop(node)) {
+					if (tree.isTau(children.get(2))) {
+						children.remove(2);
+						if (tree.isTau(children.get(1))) {
+							children.remove(1);
+						}
 					}
 				}
 			}
 
 			int i = 0;
 			for (int child : children) {
-				result.append(tree2string(tree, indent + 1, child));
+				result.append(tree2string(tree, indent + 1, child, machineReadable));
 				i++;
 				if (i < children.size()) {
 					result.append("\n");
