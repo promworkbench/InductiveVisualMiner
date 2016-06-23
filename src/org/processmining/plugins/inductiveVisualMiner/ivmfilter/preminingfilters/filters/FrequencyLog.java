@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 import gnu.trove.strategy.HashingStrategy;
@@ -39,9 +40,13 @@ public class FrequencyLog {
 				}, 10, 0.5f, -1);
 
 		//make a frequency table
-		final TObjectIntMap<int[]> frequencyTable;
+		final TIntArrayList variantIndex2cardinality = new TIntArrayList();
+		final TObjectIntMap<int[]> variant2variantIndex;
 		{
-			frequencyTable = new TObjectIntCustomHashMap<>(new HashingStrategy<int[]>() {
+			variant2variantIndex = new TObjectIntCustomHashMap<>(new HashingStrategy<int[]>() {
+
+				private static final long serialVersionUID = 4894091764285361153L;
+
 				public int computeHashCode(int[] trace) {
 					return Arrays.hashCode(trace);
 				}
@@ -49,37 +54,75 @@ public class FrequencyLog {
 				public boolean equals(int[] o1, int[] o2) {
 					return Arrays.equals(o1, o2);
 				}
-			});
+			}, 10, 0.5f, -1);
 			for (XTrace trace : xLog) {
-				frequencyTable.adjustOrPutValue(trace2array(trace, classifier, eventClass2eventClassId), 1, 1);
+				int key = variant2variantIndex.putIfAbsent(trace2array(trace, classifier, eventClass2eventClassId),
+						variantIndex2cardinality.size());
+				if (key == variant2variantIndex.getNoEntryValue()) {
+					variantIndex2cardinality.add(1);
+				} else {
+					variantIndex2cardinality.set(key, variantIndex2cardinality.get(key) + 1);
+				}
 			}
 		}
 
-		//create a mapping sorted index -> trace index
-		int[] newIndex2traceIndex = new int[xLog.size()];
+		//sort the variants on cardinality
+		int[] variantOrder2variantIndex = new int[variant2variantIndex.size()];
 		{
-			for (int i = 0; i < xLog.size(); i++) {
-				newIndex2traceIndex[i] = i;
+			for (int i = 0; i < variant2variantIndex.size(); i++) {
+				variantOrder2variantIndex[i] = i;
 			}
-			Collections.sort(Ints.asList(newIndex2traceIndex), new Comparator<Integer>() {
+			Collections.sort(Ints.asList(variantOrder2variantIndex), new Comparator<Integer>() {
 				public int compare(Integer o1, Integer o2) {
-					int[] trace1 = trace2array(xLog.get(o1), classifier, eventClass2eventClassId);
-					int[] trace2 = trace2array(xLog.get(o2), classifier, eventClass2eventClassId);
-					return Integer.compare(frequencyTable.get(trace1), frequencyTable.get(trace2));
+					return Integer.compare(variantIndex2cardinality.get(o2), variantIndex2cardinality.get(o1));
 				}
 			});
 		}
 
 		//invert the mapping
-		traceIndex2newIndex = new int[xLog.size()];
+		int[] variantIndex2variantOrder = new int[variant2variantIndex.size()];
 		{
-			for (int i = 0; i < xLog.size(); i++) {
-				traceIndex2newIndex[newIndex2traceIndex[i]] = i;
+			for (int i = 0; i < variant2variantIndex.size(); i++) {
+				variantIndex2variantOrder[variantOrder2variantIndex[i]] = i;
 			}
 		}
 
+		//make a mapping variantOrder -> start of bucket, which is sorted by cardinality
+		int[] variantOrder2endBucket = new int[variant2variantIndex.size()];
+		{
+			//start with variantOrder -> cardinality
+			for (int variantOrder = 0; variantOrder < variant2variantIndex.size(); variantOrder++) {
+				variantOrder2endBucket[variantOrder] = variantIndex2cardinality
+						.get(variantOrder2variantIndex[variantOrder]);
+			}
+
+			System.out.println(Arrays.toString(variantOrder2endBucket));
+
+			//make it monotically increasing
+			for (int variantOrder = 1; variantOrder < variant2variantIndex.size(); variantOrder++) {
+				variantOrder2endBucket[variantOrder] = variantOrder2endBucket[variantOrder]
+						+ variantOrder2endBucket[variantOrder - 1];
+			}
+
+			System.out.println(Arrays.toString(variantOrder2endBucket));
+		}
+
+		traceIndex2newIndex = new int[xLog.size()];
+		{
+			int i = 0;
+			for (XTrace xTrace : xLog) {
+				int[] trace = trace2array(xTrace, classifier, eventClass2eventClassId);
+				int variantIndex = variant2variantIndex.get(trace);
+				int variantOrder = variantIndex2variantOrder[variantIndex];
+				traceIndex2newIndex[i] = variantOrder2endBucket[variantOrder];
+				i++;
+			}
+		}
+		
+		System.out.println(Arrays.toString(traceIndex2newIndex));
+
 		/**
-		 * output: for each trace, the start of the bucket the trace is in.
+		 * output: for each trace, the end of the bucket the trace is in.
 		 */
 	}
 
