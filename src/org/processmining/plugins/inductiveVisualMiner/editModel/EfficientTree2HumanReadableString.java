@@ -38,7 +38,8 @@ public class EfficientTree2HumanReadableString {
 		if (tree.isActivity(node)) {
 			String name = StringEscapeUtils.escapeCsv(tree.getActivityName(node));
 			if (name.startsWith("tau") || name.startsWith("sequence") || name.startsWith("parallel")
-					|| name.startsWith("xor") || name.startsWith("interleaved") || name.startsWith("loop")) {
+					|| name.startsWith("xor") || name.startsWith("interleaved") || name.startsWith("loop")
+					|| name.contains("'")) {
 				result.append("\"" + name + "\"");
 			} else {
 				result.append(name);
