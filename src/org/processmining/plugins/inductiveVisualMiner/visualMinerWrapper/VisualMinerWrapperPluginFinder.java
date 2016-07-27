@@ -1,12 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.processmining.framework.plugin.PluginContext;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.AllOperatorsMiner;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.LifeCycleMiner;
 
 public class VisualMinerWrapperPluginFinder {
 
@@ -19,8 +22,16 @@ public class VisualMinerWrapperPluginFinder {
 	 * @return
 	 */
 	public static VisualMinerWrapper[] find(PluginContext context, VisualMinerWrapper select) {
-		List<VisualMinerWrapper> miners = new LinkedList<VisualMinerWrapper>();
+		Set<VisualMinerWrapper> miners = new HashSet<VisualMinerWrapper>();
 		miners.add(select);
+
+		/**
+		 * TODO: hard-coded for now, such that they show up in the
+		 * QuickVisualiser.
+		 * 
+		 */
+		miners.add(new AllOperatorsMiner());
+		miners.add(new LifeCycleMiner());
 
 		Set<Class<?>> coverageEstimatorClasses = context.getPluginManager().getKnownClassesAnnotatedWith(
 				VisualMinerWrapperAnnotation.class);
@@ -40,9 +51,10 @@ public class VisualMinerWrapperPluginFinder {
 			}
 		}
 
-		Collections.sort(miners);
-		VisualMinerWrapper[] array = new VisualMinerWrapper[miners.size()];
-		miners.toArray(array);
+		List<VisualMinerWrapper> miners2 = new ArrayList<>(miners);
+		Collections.sort(miners2);
+		VisualMinerWrapper[] array = new VisualMinerWrapper[miners2.size()];
+		miners2.toArray(array);
 		return array;
 	}
 }
