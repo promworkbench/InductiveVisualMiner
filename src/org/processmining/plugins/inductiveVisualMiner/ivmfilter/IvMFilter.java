@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
  * @author sleemans
  *
  */
-public abstract class IvMFilter {
+public abstract class IvMFilter implements Comparable<IvMFilter> {
 
 	/**
 	 * Constructor. User is waiting when this function is called.
@@ -107,5 +107,37 @@ public abstract class IvMFilter {
 
 	public final IvMFilterGui getPanel() {
 		return panel;
+	}
+
+	public int compareTo(IvMFilter o) {
+		try {
+			return this.getName().compareTo(o.getName());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		try {
+			return getName().hashCode();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof IvMFilter) {
+			try {
+				return this.getName().equals(((IvMFilter) obj).getName());
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return false;
 	}
 }

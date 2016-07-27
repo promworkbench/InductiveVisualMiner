@@ -96,15 +96,11 @@ public class FrequencyLog {
 						.get(variantOrder2variantIndex[variantOrder]);
 			}
 
-			System.out.println(Arrays.toString(variantOrder2endBucket));
-
 			//make it monotically increasing
 			for (int variantOrder = 1; variantOrder < variant2variantIndex.size(); variantOrder++) {
 				variantOrder2endBucket[variantOrder] = variantOrder2endBucket[variantOrder]
 						+ variantOrder2endBucket[variantOrder - 1];
 			}
-
-			System.out.println(Arrays.toString(variantOrder2endBucket));
 		}
 
 		traceIndex2newIndex = new int[xLog.size()];
@@ -118,8 +114,6 @@ public class FrequencyLog {
 				i++;
 			}
 		}
-		
-		System.out.println(Arrays.toString(traceIndex2newIndex));
 
 		/**
 		 * output: for each trace, the end of the bucket the trace is in.
