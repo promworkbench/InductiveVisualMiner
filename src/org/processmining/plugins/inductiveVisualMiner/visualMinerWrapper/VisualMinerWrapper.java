@@ -35,4 +35,17 @@ public abstract class VisualMinerWrapper implements Comparable<VisualMinerWrappe
 	public int compareTo(VisualMinerWrapper o) {
 		return this.toString().compareTo(o.toString());
 	}
+	
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof VisualMinerWrapper) {
+			return this.toString().equals(obj.toString());
+		}
+		return false;
+	}
 }
