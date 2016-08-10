@@ -19,6 +19,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.lang3.StringUtils;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.processmining.framework.plugin.PluginContext;
@@ -832,18 +833,23 @@ public class InductiveVisualMinerController {
 							state.getIvMLogInfoFiltered());
 
 					popup.add(logMoves.size() + (logMoves.size() <= 1 ? " event" : " events")
-							+ " not according to the model:");
+							+ " additional to the model:");
 
 					//get digits of the maximum cardinality
 					long max = logMoves.getCardinalityOf(logMoves.getElementWithHighestCardinality());
 					int maxDigits = (int) (Math.log10(max) + 1);
+					
+					if (max == 0) {
+						panel.getGraph().setShowPopup(false);
+						return;
+					}
 
 					List<XEventClass> activities = logMoves.sortByCardinality();
 					Collections.reverse(activities);
 					for (XEventClass activity : activities) {
 						if (maxNumberOfLogMoves > 0) {
 							popup.add(String.format("%" + maxDigits + "d", logMoves.getCardinalityOf(activity)) + " "
-									+ activity.toString());
+									+ StringUtils.abbreviate(activity.toString(), 40 - maxDigits));
 						}
 						maxNumberOfLogMoves--;
 					}
