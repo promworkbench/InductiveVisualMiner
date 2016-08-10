@@ -22,6 +22,7 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.listeners.ImageTransformationChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
@@ -48,7 +49,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	//popup
 	private boolean showPopup = false;
 	private List<String> popupText = null;
-	private int popupHistogramUnode = -1;
+	private int popupHistogramNode = -1;
+	private long popupHistogramEdge = -1;
 	public static final int popupWidth = 300;
 	public static final int popupPadding = 10;
 	public static final int popupRightMargin = 40;
@@ -150,7 +152,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		}
 
 		//draw the histogram
-		if (isAnimationControlsShowing() && histogramData != null && popupHistogramUnode >= 0) {
+		if (isAnimationControlsShowing() && histogramData != null
+				&& (popupHistogramNode != -1 || popupHistogramEdge != -1)) {
 			paintGlobalHistogram((Graphics2D) g);
 		}
 	};
@@ -193,7 +196,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		Color backupColour = g.getColor();
 		Font backupFont = g.getFont();
 
-		int currentPopupHistogramHeight = histogramData == null || popupHistogramUnode < 0 ? 0 : popupHistogramHeight;
+		int currentPopupHistogramHeight = histogramData == null
+				|| (popupHistogramNode == -1 && popupHistogramEdge == -1) ? 0 : popupHistogramHeight;
 
 		int popupHeight = (popupText.size() * 20) + currentPopupHistogramHeight;
 
@@ -206,7 +210,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 				* popupPadding + popupPadding, popupPadding, popupPadding);
 
 		//local (= unode) histogram
-		if (histogramData != null && popupHistogramUnode != -1) {
+		if (histogramData != null && (popupHistogramNode != -1 || popupHistogramEdge != -1)) {
 			paintPopupHistogram(g, x, y);
 		}
 
@@ -251,11 +255,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			GeneralPath path = new GeneralPath();
 			path.moveTo(offsetX, offsetY + (popupHistogramHeight - popupHistogramYPadding));
 			for (int pixel = 0; pixel < histogramData.getNrOfLocalBuckets(); pixel++) {
-				path.lineTo(
-						offsetX + pixel,
-						offsetY
-								+ (popupHistogramHeight - popupHistogramYPadding)
-								- (histogramData.getLocalBucketFraction(popupHistogramUnode, pixel) * (popupHistogramHeight - 2 * popupHistogramYPadding)));
+				path.lineTo(offsetX + pixel, offsetY + (popupHistogramHeight - popupHistogramYPadding)
+						- (getLocalBucketFraction(pixel) * (popupHistogramHeight - 2 * popupHistogramYPadding)));
 			}
 			path.lineTo(offsetX + popupWidth, offsetY + (popupHistogramHeight - popupHistogramYPadding));
 			path.closePath();
@@ -269,6 +270,13 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 		g.setColor(backupColour);
 		g.setFont(backupFont);
+	}
+
+	private double getLocalBucketFraction(int pixel) {
+		if (popupHistogramNode != -1) {
+			return histogramData.getLocalNodeBucketFraction(popupHistogramNode, pixel);
+		}
+		return histogramData.getLocalEdgeBucketFraction(popupHistogramEdge, pixel);
 	}
 
 	public void paintGlobalHistogram(Graphics2D g) {
@@ -298,12 +306,13 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	public void setPopupActivity(List<String> popup, int popupHistogramUnode) {
 		this.popupText = popup;
-		this.popupHistogramUnode = popupHistogramUnode;
+		this.popupHistogramNode = popupHistogramUnode;
 	}
-	
-	public void setPopupLogMove(List<String> popup) {
+
+	public void setPopupLogMove(List<String> popup, LogMovePosition position) {
 		this.popupText = popup;
-		this.popupHistogramUnode = -1;
+		this.popupHistogramNode = -1;
+		this.popupHistogramEdge = HistogramData.getEdgeIndex(position);
 	}
 
 	public boolean isShowPopup() {

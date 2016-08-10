@@ -828,9 +828,8 @@ public class InductiveVisualMinerController {
 				int maxNumberOfLogMoves = 10;
 				if (state.isAlignmentReady()) {
 					List<String> popup = new ArrayList<>();
-
-					MultiSet<XEventClass> logMoves = IvMLogMetrics.getLogMoves(LogMovePosition.of(edge),
-							state.getIvMLogInfoFiltered());
+					LogMovePosition position = LogMovePosition.of(edge);
+					MultiSet<XEventClass> logMoves = IvMLogMetrics.getLogMoves(position, state.getIvMLogInfoFiltered());
 
 					popup.add(logMoves.size() + (logMoves.size() <= 1 ? " event" : " events")
 							+ " additional to the model:");
@@ -838,7 +837,7 @@ public class InductiveVisualMinerController {
 					//get digits of the maximum cardinality
 					long max = logMoves.getCardinalityOf(logMoves.getElementWithHighestCardinality());
 					int maxDigits = (int) (Math.log10(max) + 1);
-					
+
 					if (max == 0) {
 						panel.getGraph().setShowPopup(false);
 						return;
@@ -857,7 +856,7 @@ public class InductiveVisualMinerController {
 						popup.add("... and " + Math.abs(maxNumberOfLogMoves) + " activities more");
 					}
 
-					panel.getGraph().setPopupLogMove(popup);
+					panel.getGraph().setPopupLogMove(popup, position);
 					panel.getGraph().setShowPopup(true);
 				} else {
 					panel.getGraph().setShowPopup(false);

@@ -1,26 +1,30 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.plugins.InductiveMiner.Quadruple;
+import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimationPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.histogram.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
-public class Cl12Histogram extends
-		ChainLink<Quadruple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer>, HistogramData> {
+public class Cl12Histogram
+		extends
+		ChainLink<Quintuple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer, ProcessTreeVisualisationInfo>, HistogramData> {
 
-	protected Quadruple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer> generateInput(InductiveVisualMinerState state) {
+	protected Quintuple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer, ProcessTreeVisualisationInfo> generateInput(
+			InductiveVisualMinerState state) {
 		if (!state.isIllogicalTimeStamps()) {
-			return Quadruple.of(state.getTree(), (IvMLogFiltered) state.getIvMLogFiltered(),
-					state.getAnimationScaler(), state.getHistogramWidth());
+			return Quintuple.of(state.getTree(), (IvMLogFiltered) state.getIvMLogFiltered(),
+					state.getAnimationScaler(), state.getHistogramWidth(), state.getVisualisationInfo());
 		} else {
 			return null;
 		}
 	}
 
-	protected HistogramData executeLink(Quadruple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer> input,
+	protected HistogramData executeLink(
+			Quintuple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer, ProcessTreeVisualisationInfo> input,
 			IvMCanceller canceller) throws Exception {
 		if (input != null) {
 
@@ -31,7 +35,7 @@ public class Cl12Histogram extends
 			if (input.getD() <= 0) {
 				return null;
 			}
-			HistogramData data = new HistogramData(tree, input.getB(), input.getC(), input.getD(),
+			HistogramData data = new HistogramData(tree, input.getE(), input.getB(), input.getC(), input.getD(),
 					InductiveVisualMinerAnimationPanel.popupWidth, canceller);
 			if (canceller.isCancelled()) {
 				return null;
