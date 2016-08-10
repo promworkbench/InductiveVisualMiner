@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.histogram;
+package org.processmining.plugins.inductiveVisualMiner.popup;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TLongObjectMap;
