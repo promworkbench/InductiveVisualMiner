@@ -69,7 +69,7 @@ public class HistogramData {
 
 		this.localBuckets = localBuckets;
 		localMax = 0;
-		
+
 		//initialise local nodes
 		{
 			this.localNodeCountFiltered = new TIntObjectHashMap<int[]>(10, 0.5f, -1);
@@ -100,7 +100,13 @@ public class HistogramData {
 
 			addTraceGlobal(trace, isFilteredOut);
 			addTraceLocalNode(tree, trace, isFilteredOut);
-			addTraceLocalEdge(trace, isFilteredOut);
+			if (!info.getAllLogMoveEdges().isEmpty()) {
+				/*
+				 * Process the trace for log moves. If there are no log move
+				 * edges, it is not useful to do this.
+				 */
+				addTraceLocalEdge(trace, isFilteredOut);
+			}
 		}
 	}
 
@@ -212,7 +218,7 @@ public class HistogramData {
 	public double getLocalNodeBucketFraction(int node, int pixel) {
 		return localNodeCountFiltered.get(node)[pixel] / localMax;
 	}
-	
+
 	public double getLocalEdgeBucketFraction(long edge, int pixel) {
 		return localEdgeCountFiltered.get(edge)[pixel] / localMax;
 	}

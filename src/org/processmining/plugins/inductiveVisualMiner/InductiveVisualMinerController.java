@@ -56,6 +56,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficient
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
@@ -422,7 +423,7 @@ public class InductiveVisualMinerController {
 
 					try {
 						updateHighlighting();
-						updatePopup(state.getVisualisationInfo());
+						updatePopup(state.getVisualisationInfo(), state.getIvMLogInfoFiltered());
 					} catch (UnknownTreeNodeException e) {
 						e.printStackTrace();
 					}
@@ -451,7 +452,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					try {
 						updateHighlighting();
-						updatePopup(state.getVisualisationInfo());
+						updatePopup(state.getVisualisationInfo(), state.getIvMLogInfoFiltered());
 					} catch (UnknownTreeNodeException e) {
 						e.printStackTrace();
 					}
@@ -677,7 +678,7 @@ public class InductiveVisualMinerController {
 			public void mouseInElementsChanged(Set<DotElement> mouseInElements) {
 				panel.getGraph().setShowPopup(!mouseInElements.isEmpty());
 				try {
-					updatePopup(state.getVisualisationInfo());
+					updatePopup(state.getVisualisationInfo(), state.getIvMLogInfoFiltered());
 				} catch (UnknownTreeNodeException e) {
 					e.printStackTrace();
 				}
@@ -754,7 +755,8 @@ public class InductiveVisualMinerController {
 		panel.getTraceView().setColourMap(colourMap);
 	}
 
-	private void updatePopup(ProcessTreeVisualisationInfo info) throws UnknownTreeNodeException {
+	private void updatePopup(ProcessTreeVisualisationInfo visualisationInfo, IvMLogInfo logInfo)
+			throws UnknownTreeNodeException {
 		if (panel.getGraph().getMouseInElements().isEmpty()) {
 			panel.getGraph().setShowPopup(false);
 		} else {
@@ -823,7 +825,8 @@ public class InductiveVisualMinerController {
 				} else {
 					panel.getGraph().setShowPopup(false);
 				}
-			} else if (element instanceof LocalDotEdge && info.getAllLogMoveEdges().contains(element)) {
+			} else if (element instanceof LocalDotEdge && visualisationInfo.getAllLogMoveEdges().contains(element)) {
+				//log move edge
 				LocalDotEdge edge = (LocalDotEdge) element;
 				int maxNumberOfLogMoves = 10;
 				if (state.isAlignmentReady()) {
@@ -857,6 +860,19 @@ public class InductiveVisualMinerController {
 					}
 
 					panel.getGraph().setPopupLogMove(popup, position);
+					panel.getGraph().setShowPopup(true);
+				} else {
+					panel.getGraph().setShowPopup(false);
+				}
+			} else if (element instanceof LocalDotEdge && visualisationInfo.getAllModelMoveEdges().contains(element)) {
+				//model move edge
+				if (state.isAlignmentReady()) {
+					LocalDotEdge edge = (LocalDotEdge) element;
+					int node = edge.getUnode();
+					List<String> popup = new ArrayList<>();
+					popup.add(IvMLogMetrics.getModelMovesLocal(node, logInfo) + " times");
+
+					panel.getGraph().setPopupActivity(popup, -1);
 					panel.getGraph().setShowPopup(true);
 				} else {
 					panel.getGraph().setShowPopup(false);
