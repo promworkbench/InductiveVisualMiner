@@ -150,7 +150,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		}
 
 		//draw the histogram
-		if (isAnimationControlsShowing() && histogramData != null) {
+		if (isAnimationControlsShowing() && histogramData != null && popupHistogramUnode >= 0) {
 			paintGlobalHistogram((Graphics2D) g);
 		}
 	};
@@ -193,7 +193,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		Color backupColour = g.getColor();
 		Font backupFont = g.getFont();
 
-		int currentPopupHistogramHeight = histogramData == null && popupHistogramUnode != -1 ? 0 : popupHistogramHeight;
+		int currentPopupHistogramHeight = histogramData == null || popupHistogramUnode < 0 ? 0 : popupHistogramHeight;
 
 		int popupHeight = (popupText.size() * 20) + currentPopupHistogramHeight;
 
@@ -296,9 +296,14 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		g.setColor(backupColour);
 	}
 
-	public void setPopup(List<String> popup, int popupHistogramUnode) {
+	public void setPopupActivity(List<String> popup, int popupHistogramUnode) {
 		this.popupText = popup;
 		this.popupHistogramUnode = popupHistogramUnode;
+	}
+	
+	public void setPopupLogMove(List<String> popup) {
+		this.popupText = popup;
+		this.popupHistogramUnode = -1;
 	}
 
 	public boolean isShowPopup() {

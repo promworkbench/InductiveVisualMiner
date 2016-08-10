@@ -8,6 +8,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -18,15 +19,18 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
+import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.export.ExportDialog;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
@@ -417,7 +421,7 @@ public class InductiveVisualMinerController {
 
 					try {
 						updateHighlighting();
-						updatePopup();
+						updatePopup(state.getVisualisationInfo());
 					} catch (UnknownTreeNodeException e) {
 						e.printStackTrace();
 					}
@@ -446,7 +450,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					try {
 						updateHighlighting();
-						updatePopup();
+						updatePopup(state.getVisualisationInfo());
 					} catch (UnknownTreeNodeException e) {
 						e.printStackTrace();
 					}
@@ -672,7 +676,7 @@ public class InductiveVisualMinerController {
 			public void mouseInElementsChanged(Set<DotElement> mouseInElements) {
 				panel.getGraph().setShowPopup(!mouseInElements.isEmpty());
 				try {
-					updatePopup();
+					updatePopup(state.getVisualisationInfo());
 				} catch (UnknownTreeNodeException e) {
 					e.printStackTrace();
 				}
@@ -749,7 +753,7 @@ public class InductiveVisualMinerController {
 		panel.getTraceView().setColourMap(colourMap);
 	}
 
-	private void updatePopup() throws UnknownTreeNodeException {
+	private void updatePopup(ProcessTreeVisualisationInfo info) throws UnknownTreeNodeException {
 		if (panel.getGraph().getMouseInElements().isEmpty()) {
 			panel.getGraph().setShowPopup(false);
 		} else {
@@ -813,7 +817,41 @@ public class InductiveVisualMinerController {
 						popup.add(" ");
 					}
 
-					panel.getGraph().setPopup(popup, unode);
+					panel.getGraph().setPopupActivity(popup, unode);
+					panel.getGraph().setShowPopup(true);
+				} else {
+					panel.getGraph().setShowPopup(false);
+				}
+			} else if (element instanceof LocalDotEdge && info.getAllLogMoveEdges().contains(element)) {
+				LocalDotEdge edge = (LocalDotEdge) element;
+				int maxNumberOfLogMoves = 10;
+				if (state.isAlignmentReady()) {
+					List<String> popup = new ArrayList<>();
+
+					MultiSet<XEventClass> logMoves = IvMLogMetrics.getLogMoves(LogMovePosition.of(edge),
+							state.getIvMLogInfoFiltered());
+
+					popup.add(logMoves.size() + (logMoves.size() <= 1 ? " event" : " events")
+							+ " not according to the model:");
+
+					//get digits of the maximum cardinality
+					long max = logMoves.getCardinalityOf(logMoves.getElementWithHighestCardinality());
+					int maxDigits = (int) (Math.log10(max) + 1);
+
+					List<XEventClass> activities = logMoves.sortByCardinality();
+					Collections.reverse(activities);
+					for (XEventClass activity : activities) {
+						if (maxNumberOfLogMoves > 0) {
+							popup.add(String.format("%" + maxDigits + "d", logMoves.getCardinalityOf(activity)) + " "
+									+ activity.toString());
+						}
+						maxNumberOfLogMoves--;
+					}
+					if (maxNumberOfLogMoves < 0) {
+						popup.add("... and " + Math.abs(maxNumberOfLogMoves) + " activities more");
+					}
+
+					panel.getGraph().setPopupLogMove(popup);
 					panel.getGraph().setShowPopup(true);
 				} else {
 					panel.getGraph().setShowPopup(false);
