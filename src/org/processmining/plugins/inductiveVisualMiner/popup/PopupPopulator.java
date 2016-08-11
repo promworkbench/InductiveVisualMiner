@@ -136,9 +136,9 @@ public class PopupPopulator {
 					int node = edge.getUnode();
 					List<String> popup = new ArrayList<>();
 					popup.add(IvMLogMetrics.getModelMovesLocal(node, state.getIvMLogInfoFiltered())
-							+ " times activity ");
+							+ " times, activity ");
 					popup.add(StringUtils.abbreviate(state.getTree().getActivityName(edge.getUnode()), 40));
-					popup.add("was executed while not permitted by the model.");
+					popup.add("was not executed.");
 
 					panel.getGraph().setPopupActivity(popup, -1);
 					panel.getGraph().setShowPopup(true);
