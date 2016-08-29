@@ -14,6 +14,7 @@ public class ProcessTreeVisualisationParameters {
 	//nodes
 	private boolean showFrequenciesOnNodes = true;
 	private ColourMap colourNodes = new ColourMapBlue();
+	private ColourMap colourNodesGradient = null;
 	
 	//model edges
 	private ColourMap colourModelEdges = new ColourMapOpacity(new ColourMapFixed(Color.black));
@@ -101,5 +102,11 @@ public class ProcessTreeVisualisationParameters {
 	}
 	public void setAddOnClick(boolean addOnClick) {
 		this.addOnClick = addOnClick;
+	}
+	public ColourMap getColourNodesGradient() {
+		return colourNodesGradient;
+	}
+	public void setColourNodesGradient(ColourMap colourNodesGradient) {
+		this.colourNodesGradient = colourNodesGradient;
 	}
 }

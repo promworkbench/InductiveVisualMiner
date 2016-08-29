@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data;
 
-import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
@@ -14,12 +14,12 @@ public class AlignedLogVisualisationDataImplService extends AlignedLogVisualisat
 	}
 
 	@Override
-	public Pair<String, Long> getNodeLabel(int unode, boolean includeModelMoves) {
+	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves) {
 		long length = Math.round(queueLengths.getServiceTime(unode));
 		if (length >= 0) {
-			return Pair.of(Performance.timeToString(length), length);
+			return Triple.of(Performance.timeToString(length), length, length);
 		} else {
-			return Pair.of("-", -1l);
+			return Triple.of("-", -1l, -1l);
 		}
 	}
 

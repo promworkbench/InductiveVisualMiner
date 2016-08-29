@@ -91,7 +91,7 @@ public class ProcessTreeVisualisation {
 
 	private void convertActivity(IvMEfficientTree tree, int unode, LocalDotNode source, LocalDotNode sink,
 			boolean directionForward) throws UnknownTreeNodeException {
-		Pair<String, Long> cardinality = data.getNodeLabel(unode, false);
+		Triple<String, Long, Long> cardinality = data.getNodeLabel(unode, false);
 		LocalDotNode dotNode = convertActivity(tree, unode, cardinality);
 
 		addArc(tree, source, dotNode, unode, directionForward, false);
@@ -111,12 +111,18 @@ public class ProcessTreeVisualisation {
 		}
 	}
 
-	private LocalDotNode convertActivity(IvMEfficientTree tree, int unode, Pair<String, Long> cardinality) {
+	private LocalDotNode convertActivity(IvMEfficientTree tree, int unode, Triple<String, Long, Long> cardinality) {
 		//style the activity by the occurrences of it
 		Color fillColour = Color.white;
+		Color gradientColour = null;
 		if (cardinality.getB() != 0 && parameters.getColourNodes() != null) {
 			fillColour = parameters.getColourNodes().colour((long) (getOccurrenceFactor(cardinality.getB()) * 100), 0,
 					100);
+
+			if (cardinality.getC() != 0 && parameters.getColourNodesGradient() != null) {
+				gradientColour = parameters.getColourNodesGradient()
+						.colour((long) (getOccurrenceFactor(cardinality.getC()) * 100), 0, 100);
+			}
 		}
 
 		//determine label colour
@@ -135,7 +141,12 @@ public class ProcessTreeVisualisation {
 		}
 
 		final LocalDotNode dotNode = new LocalDotNode(dot, info, NodeType.activity, label, unode, null);
-		dotNode.setOption("fillcolor", ColourMap.toHexString(fillColour));
+		if (gradientColour == null) {
+			dotNode.setOption("fillcolor", ColourMap.toHexString(fillColour));
+		} else {
+			dotNode.setOption("fillcolor",
+					ColourMap.toHexString(fillColour) + ":" + ColourMap.toHexString(gradientColour));
+		}
 		dotNode.setOption("fontcolor", ColourMap.toHexString(fontColour));
 
 		info.addNode(unode, dotNode, null);

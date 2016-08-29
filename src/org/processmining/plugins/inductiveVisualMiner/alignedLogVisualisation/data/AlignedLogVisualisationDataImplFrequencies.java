@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.d
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
@@ -23,9 +24,9 @@ public class AlignedLogVisualisationDataImplFrequencies implements AlignedLogVis
 		return IvMLogMetrics.getExtremes(tree, tree.getRoot(), logInfo);
 	}
 
-	public Pair<String, Long> getNodeLabel(int unode, boolean includeModelMoves) throws UnknownTreeNodeException {
+	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves) throws UnknownTreeNodeException {
 		long cardinality = IvMLogMetrics.getNumberOfTracesRepresented(tree, unode, includeModelMoves, logInfo);
-		return Pair.of(String.valueOf(cardinality), cardinality);
+		return Triple.of(String.valueOf(cardinality), cardinality, 0l);
 	}
 	
 	public Pair<String, Long> getEdgeLabel(int unode, boolean includeModelMoves) throws UnknownTreeNodeException {

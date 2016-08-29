@@ -1,16 +1,17 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data;
 
-import gnu.trove.map.TIntDoubleMap;
-import gnu.trove.map.hash.TIntDoubleHashMap;
-
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+
+import gnu.trove.map.TIntDoubleMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
 public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualisationData {
 
@@ -56,12 +57,12 @@ public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualis
 		return Pair.of(minQueueLength, maxQueueLength);
 	}
 
-	public Pair<String, Long> getNodeLabel(int unode, boolean includeModelMoves) {
+	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves) {
 		long length = Math.round(computedLengths.get(unode));
 		if (length >= 0) {
-			return Pair.of(String.valueOf(length), length);
+			return Triple.of(String.valueOf(length), length, 0l);
 		} else {
-			return Pair.of("-", -1l);
+			return Triple.of("-", -1l, -1l);
 		}
 	}
 
