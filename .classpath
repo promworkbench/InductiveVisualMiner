@@ -4,6 +4,7 @@
 	<classpathentry kind="src" path="src-test"/>
 	<classpathentry kind="src" output="tests/bin-test" path="tests/src-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="packagelib/EfficientStorage.jar"/>
 	<classpathentry kind="lib" path="stdlib/axis.jar"/>
 	<classpathentry kind="lib" path="stdlib/bsh-2.0b4.jar"/>
 	<classpathentry kind="lib" path="stdlib/collections-generic-4.01.jar"/>
@@ -20,12 +21,11 @@
 	<classpathentry kind="lib" path="stdlib/jung-io-2.0.jar"/>
 	<classpathentry kind="lib" path="stdlib/jung-visualization-2.0.jar"/>
 	<classpathentry kind="lib" path="stdlib/simmetrics.jar"/>
-	<classpathentry kind="lib" path="stdlib/slickerbox1.0rc1.jar"/>
+	<classpathentry kind="lib" path="stdlib/slickerbox1.0rc1.jar" sourcepath="/ProM"/>
 	<classpathentry kind="lib" path="stdlib/Spex.jar"/>
 	<classpathentry kind="lib" path="stdlib/TableLayout-20050920.jar"/>
 	<classpathentry kind="lib" path="stdlib/Uitopia.jar"/>
 	<classpathentry kind="lib" path="stdlib/UITopiaResources.jar"/>
-	<classpathentry kind="lib" path="stdlib/weka.jar"/>
 	<classpathentry kind="lib" path="stdlib/xpp3-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="stdlib/ProM-Contexts.jar"/>
 	<classpathentry kind="lib" path="stdlib/ProM-Framework.jar"/>
@@ -36,7 +36,6 @@
 	<classpathentry kind="lib" path="tests/libs-external/lib-cobertura/asm-3.0.jar"/>
 	<classpathentry kind="lib" path="tests/libs-external/lib-cobertura/asm-tree-3.0.jar"/>
 	<classpathentry kind="lib" path="tests/libs-external/lib-cobertura/jakarta-oro-2.0.8.jar"/>
-	<classpathentry kind="lib" path="tests/libs-external/lib-cobertura/log4j-1.2.9.jar"/>
 	<classpathentry kind="lib" path="tests/libs-external/cobertura.jar"/>
 	<classpathentry kind="lib" path="tests/libs-external/junit-4.8.1.jar"/>
 	<classpathentry kind="lib" path="stdlib/jas-plotter-2.2.jar"/>

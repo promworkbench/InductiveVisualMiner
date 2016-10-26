@@ -22,24 +22,23 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters
 public class IvMFiltersFinder {
 
 	@SafeVarargs
-	public static List<IvMFilter> findFilteringPlugins(PluginContext context,
-			Class<? extends IvMFilter> clazz, Class<? extends Annotation>... annotations) {
+	public static List<IvMFilter> findFilteringPlugins(PluginContext context, Class<? extends IvMFilter> clazz,
+			Class<? extends Annotation>... annotations) {
 		Set<IvMFilter> colouringFilters = new HashSet<>();
-		
+
 		/**
 		 * TODO add filters manually to show them in QuickVisualiser
 		 * 
 		 */
-		colouringFilters.add(new HighlightingFilterTraceWithEventTwice());
-		colouringFilters.add(new MultiEventAttributeFilter());
-		colouringFilters.add(new MultiLogMoveAttributeFilter());
-		colouringFilters.add(new MultiTraceAttributeFilter());
-		colouringFilters.add(new PreMiningFilterEvents());
-		colouringFilters.add(new PreMiningFilterTraceWithEvent());
-		colouringFilters.add(new PreMiningFilterTraceWithEventTwice());
-		colouringFilters.add(new PreMiningFrequentTracesFilter());
-		colouringFilters.add(new PreMiningMultiTraceAttributeFilter());
-		
+		maybeAdd(colouringFilters, new HighlightingFilterTraceWithEventTwice(), annotations);
+		maybeAdd(colouringFilters, new MultiEventAttributeFilter(), annotations);
+		maybeAdd(colouringFilters, new MultiLogMoveAttributeFilter(), annotations);
+		maybeAdd(colouringFilters, new MultiTraceAttributeFilter(), annotations);
+		maybeAdd(colouringFilters, new PreMiningFilterEvents(), annotations);
+		maybeAdd(colouringFilters, new PreMiningFilterTraceWithEvent(), annotations);
+		maybeAdd(colouringFilters, new PreMiningFilterTraceWithEventTwice(), annotations);
+		maybeAdd(colouringFilters, new PreMiningFrequentTracesFilter(), annotations);
+		maybeAdd(colouringFilters, new PreMiningMultiTraceAttributeFilter(), annotations);
 
 		for (Class<? extends Annotation> annotation : annotations) {
 			Set<Class<?>> coverageEstimatorClasses = context.getPluginManager()
@@ -53,13 +52,11 @@ public class IvMFiltersFinder {
 						if (clazz.isInstance(xyz)) {
 							colouringFilters.add((IvMFilter) xyz);
 						}
-					} catch (Exception e) {
-						//Catch and ignore all exceptions to be resistant to external faults. 
-						//e.printStackTrace();
+					} catch (Exception e) { //Catch and ignore all exceptions to be resistant to external faults. 
+						//e.printStackTrace(); 
 					}
 				}
 			}
-
 		}
 
 		List<IvMFilter> filters2 = new ArrayList<>(colouringFilters);
@@ -67,4 +64,12 @@ public class IvMFiltersFinder {
 		return filters2;
 	}
 
+	private static void maybeAdd(Set<IvMFilter> colouringFilters, IvMFilter filter,
+			Class<? extends Annotation>... annotations) {
+		for (Class<? extends Annotation> annotation : annotations) {
+			if (filter.getClass().isAnnotationPresent(annotation)) {
+				colouringFilters.add(filter);
+			}
+		}
+	}
 }

@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 public abstract class PreMiningTraceFilter extends IvMFilter {
 
 	/**
-	 * Main function of the filter. Returns whether the given XEvent should
+	 * Main function of the filter. Returns whether the given IMTrace should
 	 * remain in the log.
 	 * 
 	 * @param trace
