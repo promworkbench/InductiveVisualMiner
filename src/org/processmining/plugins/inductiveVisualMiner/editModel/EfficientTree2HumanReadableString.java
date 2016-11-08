@@ -32,7 +32,7 @@ public class EfficientTree2HumanReadableString {
 		return tree2string(tree, 0, tree.getRoot(), true);
 	}
 
-	private static String tree2string(EfficientTree tree, int indent, int node, boolean machineReadable) {
+	public static String tree2string(EfficientTree tree, int indent, int node, boolean machineReadable) {
 		StringBuilder result = new StringBuilder();
 		result.append(StringUtils.repeat("\t", indent));
 		if (tree.isActivity(node)) {
