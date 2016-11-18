@@ -188,7 +188,7 @@ public class TraceColourMapView extends SideWindow {
 				if (enabled.isSelected()) {
 					String attribute = (String) keySelector.getSelectedItem();
 					int numberOfColours = attributesInfo.getTraceAttributesMap().get(attribute).size();
-					if (numberOfColours <= 4) {
+					if (numberOfColours <= 7) {
 
 						//create colours and map to values
 						Map<String, Color> colourMap = new THashMap<String, Color>(numberOfColours);
@@ -221,7 +221,7 @@ public class TraceColourMapView extends SideWindow {
 						onUpdate.call(new TraceColourMapSettings(attribute, numberOfColours, colours, colourMap));
 					} else {
 						status.setText("The current attribute would yield " + numberOfColours
-								+ " colours. Inductive visual Miner supports up till 10 colours.");
+								+ " colours. Inductive visual Miner supports up till 7 colours.");
 						example.setText("");
 						onUpdate.call(TraceColourMapSettings.empty());
 					}
