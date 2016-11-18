@@ -17,13 +17,14 @@ import java.awt.geom.Point2D;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIterator;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 public class Renderer {
 
 	//rendering constants
 	public static final int tokenRadius = 4;
-	public static final Color tokenFillColour = Color.yellow;
+	public static final Color defaultTokenFillColour = Color.yellow;
 	public static final Color tokenStrokeColour = Color.black;
 	public static final Color backgroundColor = new Color(255, 255, 255, 0);
 	public static final Stroke tokenStroke = new BasicStroke(1.5f);
@@ -60,7 +61,7 @@ public class Renderer {
 			result.graphics.setTransform(settings.transform);
 
 			//render the tokens		
-			renderTokens(result.graphics, settings.tokens, settings.filteredLog, time, result.image.getWidth(),
+			renderTokens(result.graphics, settings.tokens, settings.filteredLog, settings.trace2colour, time, result.image.getWidth(),
 					result.image.getHeight());
 
 			//transform back
@@ -75,15 +76,17 @@ public class Renderer {
 	}
 
 	public static void renderTokens(Graphics2D graphics, GraphVizTokensIterator tokens, IvMLogFiltered filteredLog,
-			double time, int imgWidth, int imgHeight) {
+			TraceColourMap trace2colour, double time, int imgWidth, int imgHeight) {
 		tokens.itInit(time);
-		
+
 		//initialise points to keep track of  
 		Point2D.Double minTokenCoordinates = new Point2D.Double(tokenRadius, tokenRadius);
 		Point2D.Double minImageCoordinates = new Point2D.Double();
 		Point2D.Double maxTokenCoordinates = new Point2D.Double(-tokenRadius, -tokenRadius);
 		Point2D.Double maxImageCoordinates = new Point2D.Double();
-		
+
+		Color tokenFillColour;
+
 		while (tokens.itHasNext()) {
 			tokens.itNext();
 
@@ -100,13 +103,18 @@ public class Renderer {
 				graphics.getTransform().transform(maxTokenCoordinates, maxImageCoordinates);
 				if (minImageCoordinates.y >= 0 && minImageCoordinates.x >= 0 && maxImageCoordinates.x <= imgWidth
 						&& maxImageCoordinates.y <= imgHeight) {
-					
+
 					//draw the fill
-					if (tokens.itGetOpacity() == 1) {
-						graphics.setPaint(tokenFillColour);
+					if (trace2colour != null) {
+						if (tokens.itGetOpacity() == 1) {
+							graphics.setPaint(trace2colour.getColour(tokens.itGetTraceIndex()));
+						} else {
+							tokenFillColour = trace2colour.getColour(tokens.itGetTraceIndex());
+							graphics.setPaint(new Color(tokenFillColour.getRed(), tokenFillColour.getGreen(),
+									tokenFillColour.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
+						}
 					} else {
-						graphics.setPaint(new Color(tokenFillColour.getRed(), tokenFillColour.getGreen(),
-								tokenFillColour.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
+						graphics.setPaint(defaultTokenFillColour);
 					}
 					graphics.fill(circle);
 

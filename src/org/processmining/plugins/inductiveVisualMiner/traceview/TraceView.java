@@ -9,6 +9,7 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
@@ -49,11 +50,11 @@ public class TraceView extends SideWindow {
 	 * @param log
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public void set(IMLog log) {
+	public void set(IMLog log, TraceColourMap traceColourMap) {
 		if (!log.equals(showing)) {
 			showing = log;
 			traceView.clear();
-			traceView.setTraceBuilder(new TraceBuilderIMLog(log));
+			traceView.setTraceBuilder(new TraceBuilderIMLog(log, traceColourMap));
 			traceView.addAll((Iterable<Object>) ((Iterable<? extends Object>) log));
 		}
 	}
@@ -62,20 +63,24 @@ public class TraceView extends SideWindow {
 	 * update the trace view with a timed log
 	 * 
 	 * @param tlog
-	 * @param selection 
+	 * @param selection
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public void set(IvMEfficientTree tree, IvMLog tlog, Selection selection) {
+	public void set(IvMEfficientTree tree, IvMLog tlog, Selection selection, TraceColourMap traceColourMap) {
 		if (!tlog.equals(showing)) {
 			showing = tlog;
 			traceView.clear();
-			traceView.setTraceBuilder(new TraceBuilderIvMLog(tree, selection));
+			traceView.setTraceBuilder(new TraceBuilderIvMLog(tree, selection, traceColourMap));
 			traceView.addAll((Iterable<Object>) ((Iterable<? extends Object>) tlog));
 		}
 	}
 
-	public void setColourMap(TraceViewColourMap colourMap) {
+	public void setEventColourMap(TraceViewEventColourMap colourMap) {
 		traceView.setWedgeBuilder(colourMap);
 	}
-	
+
+	public void setTraceColourMap(TraceColourMap traceColourMap) {
+		((TraceBuilderWrapper) traceView.getTraceBuilder()).setTraceColourMap(traceColourMap);
+	}
+
 }

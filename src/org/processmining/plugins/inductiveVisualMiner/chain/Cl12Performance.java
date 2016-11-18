@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCombination;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActivityLog;
 
-public class Cl11Performance extends ChainLink<Pair<IvMEfficientTree, IvMLog>, PerformanceWrapper> {
+public class Cl12Performance extends ChainLink<Pair<IvMEfficientTree, IvMLog>, PerformanceWrapper> {
 
 	protected Pair<IvMEfficientTree, IvMLog> generateInput(InductiveVisualMinerState state) {
 		if (!state.isIllogicalTimeStamps()) {

@@ -1,9 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.THashMap;
-
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
@@ -19,6 +15,10 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWith
 
 import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.animation.Bezier;
+
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
 
 /**
  * Keeps a collection of tokens. If performance lacks, the implementation could

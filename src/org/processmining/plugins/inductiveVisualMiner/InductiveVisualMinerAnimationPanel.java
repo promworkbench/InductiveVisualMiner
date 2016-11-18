@@ -32,6 +32,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.Renderer;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderingThread;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
@@ -59,7 +60,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	//animation
 	protected boolean animationEnabled = false;
-	RenderingThread renderingThread;
+	protected RenderingThread renderingThread;
 	private AnimationTimeChangedListener animationTimeChangedListener = null;
 	private AnimationEnabledChangedListener animationEnabledChangedListener = null;
 	public static final String animationGlobalEnabledTrue = "disable animation";
@@ -180,7 +181,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			if (settings.tokens != null) {
 				double time = renderingThread.getTimeManager().getLastRenderedTime();
 				GraphVizTokensIterator tokens = new GraphVizTokensLazyIterator(settings.tokens);
-				Renderer.renderTokens(g, tokens, settings.filteredLog, time, Integer.MAX_VALUE, Integer.MAX_VALUE);
+				Renderer.renderTokens(g, tokens, settings.filteredLog, settings.trace2colour, time, Integer.MAX_VALUE, Integer.MAX_VALUE);
 			}
 		}
 
@@ -390,6 +391,11 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	public void setFilteredLog(IvMLogFilteredImpl ivMLogFiltered) {
 		renderingThread.getExternalSettingsManager().setFilteredLog(ivMLogFiltered);
+		renderingThread.renderOneFrame();
+	}
+	
+	public void setTraceColourMap(TraceColourMap trace2colour) {
+		renderingThread.getExternalSettingsManager().setTrace2Colour(trace2colour);
 		renderingThread.renderOneFrame();
 	}
 

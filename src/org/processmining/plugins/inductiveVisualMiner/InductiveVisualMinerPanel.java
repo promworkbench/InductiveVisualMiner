@@ -22,6 +22,7 @@ import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSele
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMapView;
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
@@ -70,6 +71,8 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final JButton saveImageButton;
 	private final JButton traceViewButton;
 	private final TraceView traceView;
+	private final JButton traceColourMapViewButton;
+	private final TraceColourMapView traceColourMapView;
 	private final JButton highlightingFiltersViewButton;
 	private final HighlightingFiltersView highlightingFiltersView;
 
@@ -227,6 +230,18 @@ public class InductiveVisualMinerPanel extends JPanel {
 				ccolourSelection.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(colourSelection, ccolourSelection);
 			}
+			
+			//trace colouring view
+			{
+				traceColourMapView = new TraceColourMapView(this);
+				traceColourMapViewButton = SlickerFactory.instance().createButton("trace colouring");
+				GridBagConstraints cTraceColourMapViewButton = new GridBagConstraints();
+				cTraceColourMapViewButton.gridx = 1;
+				cTraceColourMapViewButton.gridy = gridy++;
+				cTraceColourMapViewButton.gridwidth = 1;
+				cTraceColourMapViewButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(traceColourMapViewButton, cTraceColourMapViewButton);
+			}
 
 			//highlighting filters view
 			{
@@ -378,6 +393,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		preMiningFiltersView.setVisible(false);
 		traceView.setVisible(false);
 		highlightingFiltersView.setVisible(false);
+		traceColourMapView.setVisible(false);
 		graphPanel.pause();
 	}
 
@@ -497,8 +513,16 @@ public class InductiveVisualMinerPanel extends JPanel {
 		return highlightingFiltersView;
 	}
 
-	public JButton getColouringFiltersViewButton() {
+	public JButton getHighlightingFiltersViewButton() {
 		return highlightingFiltersViewButton;
+	}
+	
+	public TraceColourMapView getTraceColourMapView() {
+		return traceColourMapView;
+	}
+	
+	public JButton getTraceColourMapViewButton() {
+		return traceColourMapViewButton;
 	}
 
 	public JLabel getAnimationTimeLabel() {

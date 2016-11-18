@@ -4,22 +4,23 @@ import java.awt.Color;
 import java.util.Iterator;
 
 import org.deckfour.xes.model.XEvent;
-import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.TraceBuilder;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 
-public class TraceBuilderIMLog implements TraceBuilder<Object> {
+public class TraceBuilderIMLog extends TraceBuilderWrapper {
 
 	private final IMLog log;
 
-	public TraceBuilderIMLog(IMLog log) {
+	public TraceBuilderIMLog(IMLog log, TraceColourMap traceColourMap) {
+		super(traceColourMap);
 		this.log = log;
 	}
 

@@ -15,7 +15,7 @@ import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
-import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewColourMap;
+import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
 
@@ -29,9 +29,9 @@ public class ProcessTreeVisualisation {
 
 	private Dot dot;
 	private ProcessTreeVisualisationInfo info;
-	private TraceViewColourMap traceViewColourMap;
+	private TraceViewEventColourMap traceViewColourMap;
 
-	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewColourMap> fancy(IvMEfficientTree tree,
+	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> fancy(IvMEfficientTree tree,
 			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters)
 			throws UnknownTreeNodeException {
 		this.parameters = parameters;
@@ -46,7 +46,7 @@ public class ProcessTreeVisualisation {
 		dot.setDirection(GraphDirection.leftRight);
 		int root = tree.getRoot();
 
-		traceViewColourMap = new TraceViewColourMap(tree);
+		traceViewColourMap = new TraceViewEventColourMap(tree);
 
 		//source & sink
 		info = new ProcessTreeVisualisationInfo();

@@ -1,8 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.Set;
 import java.util.prefs.Preferences;
 
@@ -25,6 +22,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
@@ -36,13 +35,16 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
-import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewColourMap;
+import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.Miner;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.ProcessTree;
 
 import com.kitfox.svg.SVGDiagram;
+
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class InductiveVisualMinerState {
 
@@ -241,10 +243,10 @@ public class InductiveVisualMinerState {
 	private ProcessTreeVisualisationInfo visualisationInfo;
 	private AlignedLogVisualisationData visualisationData;
 	private DotPanelUserSettings graphUserSettings;
-	private TraceViewColourMap traceViewColourMap;
+	private TraceViewEventColourMap traceViewColourMap;
 
 	public void setLayout(Dot dot, SVGDiagram svgDiagram, ProcessTreeVisualisationInfo visualisationInfo,
-			TraceViewColourMap traceViewColourMap) {
+			TraceViewEventColourMap traceViewColourMap) {
 		this.dot = dot;
 		this.svgDiagram = svgDiagram;
 		this.visualisationInfo = visualisationInfo;
@@ -271,7 +273,7 @@ public class InductiveVisualMinerState {
 		this.graphUserSettings = graphUserSettings;
 	}
 
-	public TraceViewColourMap getTraceViewColourMap() {
+	public TraceViewEventColourMap getTraceViewColourMap() {
 		return traceViewColourMap;
 	}
 
@@ -315,6 +317,8 @@ public class InductiveVisualMinerState {
 	private IvMLogInfo ivmLogInfo;
 	private IvMLogFilteredImpl ivmLogFiltered;
 	private IvMLogInfo ivmLogInfoFiltered;
+	private TraceColourMapSettings traceColourMapSettings;
+	private TraceColourMap traceColourMap;
 
 	public void setIvMLog(IvMLogNotFiltered ivMLog, IvMLogInfo ivmLogInfo) {
 		this.ivmLog = ivMLog;
@@ -347,7 +351,27 @@ public class InductiveVisualMinerState {
 	public boolean isAlignmentReady() {
 		return ivmLog != null;
 	}
+	
+	public TraceColourMapSettings getTraceColourMapSettings() {
+		return traceColourMapSettings;
+	}
+	
+	public void setTraceColourMapSettings(TraceColourMapSettings traceColourMapSettings) {
+		this.traceColourMapSettings = traceColourMapSettings;
+	}
 
+	public TraceColourMap getTraceColourMap() {
+		return traceColourMap;
+	}
+	
+	public void setTraceColourMap(TraceColourMap traceColourMap) {
+		this.traceColourMap = traceColourMap;
+	}
+	
+	public void resetTraceColourMap() {
+		this.traceColourMap = null;
+	}
+	
 	/*
 	 * Reset alignment to null
 	 */
@@ -355,6 +379,7 @@ public class InductiveVisualMinerState {
 		ivmLog = null;
 		ivmLogFiltered = null;
 		ivmLogInfoFiltered = null;
+		traceColourMap = null;
 	}
 
 	//==histogram==

@@ -9,7 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
-public class Cl12Histogram
+public class Cl13Histogram
 		extends
 		ChainLink<Quintuple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer, ProcessTreeVisualisationInfo>, HistogramData> {
 

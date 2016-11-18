@@ -15,8 +15,6 @@ import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JPanel;
 
-import nl.tue.astar.AStarThread.Canceller;
-
 import org.monte.media.Format;
 import org.monte.media.FormatKeys;
 import org.monte.media.FormatKeys.MediaType;
@@ -31,11 +29,14 @@ import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIt
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensLazyIterator;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.Renderer;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 import com.kitfox.svg.SVGDiagram;
+
+import nl.tue.astar.AStarThread.Canceller;
 
 public class ExportAnimation {
 
@@ -43,10 +44,10 @@ public class ExportAnimation {
 	public static final int framerate = 30;
 	public static final int width = 1500; //width of the movie
 
-	public static boolean saveAVItoFile(IvMLogFiltered filteredLog, GraphVizTokens tokens,
+	public static boolean saveAVItoFile(IvMLogFiltered filteredLog, TraceColourMap trace2colour, GraphVizTokens tokens,
 			final ProcessTreeVisualisationInfo info, final Mode colourMode, final SVGDiagram svg, final Dot dot,
-			final File file, final JPanel panel, final Scaler scaler) throws IOException,
-			NoninvertibleTransformException {
+			final File file, final JPanel panel, final Scaler scaler)
+			throws IOException, NoninvertibleTransformException {
 
 		final GuaranteedProgressMonitor progressMonitor = new GuaranteedProgressMonitor(panel, "",
 				"Preparing animation", 0, 100);
@@ -76,7 +77,7 @@ public class ExportAnimation {
 		Format format = new Format(VideoFormatKeys.EncodingKey, VideoFormatKeys.ENCODING_AVI_MJPG,
 				VideoFormatKeys.DepthKey, 24);
 		format = format.prepend(FormatKeys.MediaTypeKey, MediaType.VIDEO, //
-				FormatKeys.FrameRateKey, new Rational(framerate, 1),//
+				FormatKeys.FrameRateKey, new Rational(framerate, 1), //
 				VideoFormatKeys.WidthKey, width, //
 				VideoFormatKeys.HeightKey, height);
 
@@ -124,7 +125,7 @@ public class ExportAnimation {
 				//transform
 				g.transform(transform);
 
-				Renderer.renderTokens(g, tokensIterator, filteredLog, time, img.getWidth(), img.getHeight());
+				Renderer.renderTokens(g, tokensIterator, filteredLog, trace2colour, time, img.getWidth(), img.getHeight());
 
 				g.transform(transformInverse);
 

@@ -14,7 +14,6 @@ public interface IvMTrace extends List<IvMMove> {
 	 * @return
 	 */
 	public String getName();
-
 	/**
 	 * 
 	 * @return start time of the trace in user time. This includes fading-in of

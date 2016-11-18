@@ -1,8 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,10 +11,14 @@ import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+
 public class AttributesInfo {
 
 	private final String[] eventAttributes;
 	private final THashMap<String, THashSet<String>> eventAttributesMap;
+	private final String[] traceAttributes;
 	private final THashMap<String, THashSet<String>> traceAttributesMap;
 
 	public AttributesInfo(XLog log) {
@@ -33,6 +34,8 @@ public class AttributesInfo {
 		//finalise
 		this.eventAttributes = eventAttributesMap.keySet().toArray(new String[eventAttributesMap.size()]);
 		Arrays.sort(this.eventAttributes);
+		this.traceAttributes = traceAttributesMap.keySet().toArray(new String[traceAttributesMap.size()]);
+		Arrays.sort(this.traceAttributes);
 	}
 
 	public static void add(THashMap<String, THashSet<String>> attributes, XAttributeMap add) {
@@ -60,6 +63,10 @@ public class AttributesInfo {
 
 	public Map<String, ? extends Set<String>> getEventAttributesMap() {
 		return eventAttributesMap;
+	}
+	
+	public String[] getTraceAttributes() {
+		return traceAttributes;
 	}
 
 	public Map<String, ? extends Set<String>> getTraceAttributesMap() {

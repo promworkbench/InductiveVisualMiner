@@ -14,13 +14,13 @@ import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 
-public class TraceViewColourMap implements WedgeBuilder {
+public class TraceViewEventColourMap implements WedgeBuilder {
 	private final TIntObjectMap<Color> mapFill = new TIntObjectHashMap<Color>(10, 0.5f, -1);
 	private final TIntObjectMap<Color> mapFont = new TIntObjectHashMap<Color>(10, 0.5f, -1);
 	private Selection selection = new Selection();
 	private IvMEfficientTree tree;
 	
-	public TraceViewColourMap(IvMEfficientTree tree) {
+	public TraceViewEventColourMap(IvMEfficientTree tree) {
 		this.tree = tree;
 	}
 

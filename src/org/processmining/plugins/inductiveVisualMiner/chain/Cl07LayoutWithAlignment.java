@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
-import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewColourMap;
+import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
@@ -21,7 +21,7 @@ import com.kitfox.svg.SVGDiagram;
 // perform layout
 public class Cl07LayoutWithAlignment
 		extends
-		ChainLink<Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap>> {
+		ChainLink<Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap>> {
 
 	protected Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> generateInput(
 			InductiveVisualMinerState state) {
@@ -29,7 +29,7 @@ public class Cl07LayoutWithAlignment
 				state.getMode().getVisualisationParameters(state), state.getGraphUserSettings());
 	}
 
-	protected Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap> executeLink(
+	protected Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap> executeLink(
 			Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> input,
 			IvMCanceller canceller) throws UnknownTreeNodeException {
 		IvMEfficientTree tree = input.getA();
@@ -37,7 +37,7 @@ public class Cl07LayoutWithAlignment
 		//compute dot
 		ProcessTreeVisualisation visualiser = new ProcessTreeVisualisation();
 		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplFrequencies(tree, input.getB());
-		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewColourMap> p = visualiser.fancy(tree, data, input.getC());
+		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> p = visualiser.fancy(tree, data, input.getC());
 
 		//keep the user settings of the dot panel
 		input.getD().applyToDot(p.getA());
@@ -48,7 +48,7 @@ public class Cl07LayoutWithAlignment
 		return Quadruple.of(p.getA(), diagram, p.getB(), p.getC());
 	}
 
-	protected void processResult(Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewColourMap> result,
+	protected void processResult(Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap> result,
 			InductiveVisualMinerState state) {
 		state.setLayout(result.getA(), result.getB(), result.getC(), result.getD());
 	}

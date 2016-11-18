@@ -11,6 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimat
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
@@ -36,7 +37,7 @@ public class ExporterAvi extends Exporter {
 
 	public void export(NavigableSVGPanel panel, final File file) throws Exception {
 		final InductiveVisualMinerAnimationPanel panel2 = (InductiveVisualMinerAnimationPanel) panel;
-		
+
 		//save avi asynchronously
 		final SVGDiagram svg = panel2.getImage();
 		final Mode colourMode = state.getMode();
@@ -45,11 +46,12 @@ public class ExporterAvi extends Exporter {
 		final Scaler scaler = state.getAnimationScaler();
 		final ProcessTreeVisualisationInfo info = state.getVisualisationInfo();
 		final IvMLogFiltered filteredLog = state.getIvMLogFiltered();
+		final TraceColourMap trace2colour = state.getTraceColourMap();
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					if (!ExportAnimation.saveAVItoFile(filteredLog, tokens, info, colourMode, svg, dot, file, panel2,
-							scaler)) {
+					if (!ExportAnimation.saveAVItoFile(filteredLog, trace2colour, tokens, info, colourMode, svg, dot,
+							file, panel2, scaler)) {
 						System.out.println("deleted");
 						file.delete();
 					}

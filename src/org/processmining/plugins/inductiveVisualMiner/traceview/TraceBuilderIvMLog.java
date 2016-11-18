@@ -3,11 +3,11 @@ package org.processmining.plugins.inductiveVisualMiner.traceview;
 import java.awt.Color;
 import java.util.Iterator;
 
-import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.TraceBuilder;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -15,12 +15,13 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
-class TraceBuilderIvMLog implements TraceBuilder<Object> {
+class TraceBuilderIvMLog extends TraceBuilderWrapper {
 
 	private final Selection selection;
 	private final IvMEfficientTree tree;
 
-	public TraceBuilderIvMLog(IvMEfficientTree tree, Selection selection) {
+	public TraceBuilderIvMLog(IvMEfficientTree tree, Selection selection, TraceColourMap traceColourMap) {
+		super(traceColourMap);
 		this.selection = selection;
 		this.tree = tree;
 	}
@@ -46,6 +47,8 @@ class TraceBuilderIvMLog implements TraceBuilder<Object> {
 				String s = ((IvMTrace) trace).getName();
 				if (s.length() > 9) {
 					return s.substring(0, 7) + "..";
+				} else if (s.length() == 0) {
+					return " ";
 				}
 				return s;
 			}
@@ -55,11 +58,21 @@ class TraceBuilderIvMLog implements TraceBuilder<Object> {
 			}
 
 			public String getInfo() {
-				return null;
+				if (traceColourMap == null) {
+					return "";
+				}
+				String s = traceColourMap.getValue(((IvMTrace) trace));
+				if (s.length() > 9) {
+					return s.substring(0, 7) + "..";
+				}
+				return s;
 			}
 
 			public Color getInfoColor() {
-				return null;
+				if (traceColourMap == null) {
+					return null;
+				}
+				return traceColourMap.getColour(((IvMTrace) trace));
 			}
 
 		};
