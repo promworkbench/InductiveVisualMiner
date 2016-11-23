@@ -21,10 +21,29 @@ public abstract class SideWindow extends JFrame {
 	
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
+		
+		if (visible == true) {
+			toFront();
+			requestFocus();
+			repaint();
+		}
 	}
 	
 	public void swapVisibility() {
 		setVisible(!isVisible());
 	}
 	
+	public void enableAndShow() {
+		setVisible(true);
+	}
+	
+	public @Override void toFront() {
+	    int sta = super.getExtendedState() & ~JFrame.ICONIFIED & JFrame.NORMAL;
+
+	    super.setExtendedState(sta);
+	    super.setAlwaysOnTop(true);
+	    super.toFront();
+	    super.requestFocus();
+	    super.setAlwaysOnTop(false);
+	}
 }

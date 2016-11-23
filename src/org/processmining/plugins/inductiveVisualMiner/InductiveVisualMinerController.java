@@ -683,35 +683,35 @@ public class InductiveVisualMinerController {
 		//set pre-mining filters button
 		panel.getPreMiningFiltersButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panel.getPreMiningFiltersView().swapVisibility();
+				panel.getPreMiningFiltersView().enableAndShow();
 			}
 		});
 
 		//set edit model button
 		panel.getEditModelButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panel.getEditModelView().swapVisibility();
+				panel.getEditModelView().enableAndShow();
 			}
 		});
 
 		//set trace view button
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				panel.getTraceView().swapVisibility();
+				panel.getTraceView().enableAndShow();
 			}
 		});
 
 		//set trace colouring button
 		panel.getTraceColourMapViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				panel.getTraceColourMapView().swapVisibility();
+				panel.getTraceColourMapView().enableAndShow();
 			}
 		});
 
 		//set highlighting filters button
 		panel.getHighlightingFiltersViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				panel.getColouringFiltersView().swapVisibility();
+				panel.getColouringFiltersView().enableAndShow();
 			}
 		});
 

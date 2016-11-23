@@ -18,6 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIt
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
 import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
+import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 public class Renderer {
@@ -28,12 +29,14 @@ public class Renderer {
 	public static final Color tokenStrokeColour = Color.black;
 	public static final Color backgroundColor = new Color(255, 255, 255, 0);
 	public static final Stroke tokenStroke = new BasicStroke(1.5f);
+	public static final Stroke colouredTokenStroke = new BasicStroke(0.5f);
 	public static final int maxAnimationDuration = 10; //after spending xx ms in drawing circles, just quit.
 	public static final int maxAnimationPausedDuration = 1000; //after spending xx ms in drawing circles, just quit.
 
 	private static final Shape circle = new Ellipse2D.Float(-tokenRadius, -tokenRadius, tokenRadius * 2,
 			tokenRadius * 2);
 	private static final Shape outline = tokenStroke.createStrokedShape(circle);
+	private static final Shape colouredOutline = colouredTokenStroke.createStrokedShape(circle);
 
 	public static boolean render(ExternalSettings settings, RenderedFrame result, double time) {
 		if (settings.filteredLog != null && settings.tokens != null && settings.transform != null) {
@@ -61,8 +64,8 @@ public class Renderer {
 			result.graphics.setTransform(settings.transform);
 
 			//render the tokens		
-			renderTokens(result.graphics, settings.tokens, settings.filteredLog, settings.trace2colour, time, result.image.getWidth(),
-					result.image.getHeight());
+			renderTokens(result.graphics, settings.tokens, settings.filteredLog, settings.trace2colour, time,
+					result.image.getWidth(), result.image.getHeight());
 
 			//transform back
 			result.graphics.setTransform(new AffineTransform());
@@ -118,14 +121,27 @@ public class Renderer {
 					}
 					graphics.fill(circle);
 
-					//draw the oval
-					if (tokens.itGetOpacity() == 1) {
-						graphics.setColor(tokenStrokeColour);
-					} else {
-						graphics.setColor(new Color(tokenStrokeColour.getRed(), tokenStrokeColour.getGreen(),
-								tokenStrokeColour.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
+					//draw the outline/stroke
+					{
+						if (tokens.itGetOpacity() == 1) {
+							graphics.setColor(tokenStrokeColour);
+						} else {
+							graphics.setColor(new Color(tokenStrokeColour.getRed(), tokenStrokeColour.getGreen(),
+									tokenStrokeColour.getBlue(), (int) Math.round(tokens.itGetOpacity() * 255)));
+						}
+
+						/*
+						 * If the tokens have different colours, probably the
+						 * stroke is not what the programmer wants the user to
+						 * see. Therefore, draw a much smaller stroke.
+						 * 
+						 */
+						if (trace2colour instanceof TraceColourMapFixed) {
+							graphics.fill(outline);
+						} else {
+							graphics.fill(colouredOutline);
+						}
 					}
-					graphics.fill(outline);
 				}
 
 				//transform back
