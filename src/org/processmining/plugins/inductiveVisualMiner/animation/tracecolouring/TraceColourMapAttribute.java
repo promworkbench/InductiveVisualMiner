@@ -59,7 +59,7 @@ public class TraceColourMapAttribute implements TraceColourMap {
 		if (value == null) {
 			return "";
 		}
-		return "█ " + value.toString();
+		return "\u2588 " + value.toString();
 	}
 
 	public String getValue(IMTrace trace) {
@@ -67,7 +67,7 @@ public class TraceColourMapAttribute implements TraceColourMap {
 		if (value == null) {
 			return "";
 		}
-		return "█ " + value.toString();
+		return "\u2588 " + value.toString();
 	}
 
 	public static Color[] getColours(int numberOfColours) {
