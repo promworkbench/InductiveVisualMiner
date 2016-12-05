@@ -450,6 +450,16 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	public void renderOneFrame() {
 		renderingThread.renderOneFrame();
 	}
+	
+	@Override
+	public void setTimeScale(double timeScale) {
+		renderingThread.setTimeScale(timeScale);
+	}
+	
+	@Override
+	public double getTimeScale() {
+		return renderingThread.getTimeScale();
+	}
 
 	public void addAnimationEnabledChangedListener(AnimationEnabledChangedListener animationEnabledChangedListener) {
 		this.animationEnabledChangedListener = animationEnabledChangedListener;

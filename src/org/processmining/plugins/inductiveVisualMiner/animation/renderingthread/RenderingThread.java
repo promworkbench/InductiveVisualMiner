@@ -49,6 +49,24 @@ public class RenderingThread implements Runnable {
 		singleFrameRequested.set(true);
 	}
 
+	/**
+	 * Output: 0 <= time scale <= 1
+	 * 
+	 * @return
+	 */
+	public double getTimeScale() {
+		return Math.log(settingsManager.getExternalSettings().timeScale) / Math.log(10000) + 0.5;
+	}
+
+	/**
+	 * Input: 0 <= time scale <= 1
+	 * 
+	 * @param timeScale
+	 */
+	public void setTimeScale(double timeScale) {
+		settingsManager.setTimeScale(Math.pow(10000, timeScale - 0.5));
+	}
+
 	//thread handling
 	public void start() {
 		pauseRequested.set(false);
@@ -137,7 +155,8 @@ public class RenderingThread implements Runnable {
 	public boolean performRender() {
 		ExternalSettings settings = settingsManager.getExternalSettings();
 		RenderedFrame result = renderedFrameManager.getFrameForRendering();
-		double time = timeManager.getTimeToBeRendered(!pauseRequested.get() && !stopRequested.get());
+		double time = timeManager.getTimeToBeRendered(!pauseRequested.get() && !stopRequested.get(),
+				settings.timeScale);
 
 		if (!Renderer.render(settings, result, time)) {
 			renderedFrameManager.abortRendering();

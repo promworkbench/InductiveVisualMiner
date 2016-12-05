@@ -37,7 +37,7 @@ public class TimeManager {
 		maxTimeRequested = maxTime;
 	}
 
-	public double getTimeToBeRendered(boolean running) {
+	public double getTimeToBeRendered(boolean running, double timeScale) {
 		if (timeRequested != -1) {
 			lastUpdated = timeRequestedAt;
 			time = timeRequested;
@@ -53,7 +53,7 @@ public class TimeManager {
 
 		if (running) {
 			now = System.currentTimeMillis();
-			time = time + ((now - lastUpdated) / 1000.0);
+			time = time + (((now - lastUpdated) / 1000.0) * timeScale);
 		}
 		if (minTime < maxTime) {
 			while (time < minTime) {

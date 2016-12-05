@@ -29,6 +29,9 @@ public class ExternalSettingsManager {
 		public TraceColourMap trace2colour;
 		public GraphVizTokensLazyIterator tokens;
 		public AffineTransform transform;
+		
+		//time scale
+		public double timeScale = 1;
 
 		//traceability
 		int id;
@@ -42,6 +45,7 @@ public class ExternalSettingsManager {
 		newExternalSettings.filteredLog = null;
 		newExternalSettings.trace2colour = null;
 		newExternalSettings.transform = null;
+		newExternalSettings.timeScale = 1;
 		newExternalSettings.id = random.nextInt();
 
 		settings = newExternalSettings;
@@ -63,6 +67,7 @@ public class ExternalSettingsManager {
 		newExternalSettings.filteredLog = settings.filteredLog;
 		newExternalSettings.trace2colour = settings.trace2colour;
 		newExternalSettings.transform = image2user;
+		newExternalSettings.timeScale = settings.timeScale;
 		newExternalSettings.id = random.nextInt();
 
 		settings = newExternalSettings;
@@ -77,6 +82,7 @@ public class ExternalSettingsManager {
 		newExternalSettings.filteredLog = settings.filteredLog;
 		newExternalSettings.trace2colour = settings.trace2colour;
 		newExternalSettings.transform = settings.transform;
+		newExternalSettings.timeScale = settings.timeScale;
 		newExternalSettings.id = random.nextInt();
 
 		settings = newExternalSettings;
@@ -91,6 +97,7 @@ public class ExternalSettingsManager {
 		newExternalSettings.filteredLog = settings.filteredLog;
 		newExternalSettings.trace2colour = settings.trace2colour;
 		newExternalSettings.transform = settings.transform;
+		newExternalSettings.timeScale = settings.timeScale;
 		newExternalSettings.id = random.nextInt();
 
 		settings = newExternalSettings;
@@ -105,6 +112,7 @@ public class ExternalSettingsManager {
 		newExternalSettings.filteredLog = ivMLogFiltered;
 		newExternalSettings.trace2colour = settings.trace2colour;
 		newExternalSettings.transform = settings.transform;
+		newExternalSettings.timeScale = settings.timeScale;
 		newExternalSettings.id = random.nextInt();
 
 		settings = newExternalSettings;
@@ -119,6 +127,22 @@ public class ExternalSettingsManager {
 		newExternalSettings.filteredLog = settings.filteredLog;
 		newExternalSettings.trace2colour = trace2colour;
 		newExternalSettings.transform = settings.transform;
+		newExternalSettings.timeScale = settings.timeScale;
+		newExternalSettings.id = random.nextInt();
+
+		settings = newExternalSettings;
+		return newExternalSettings.id;
+	}
+	
+	public synchronized int setTimeScale(double timeScale) {
+		ExternalSettings newExternalSettings = new ExternalSettings();
+		newExternalSettings.width = settings.width;
+		newExternalSettings.height = settings.height;
+		newExternalSettings.tokens = settings.tokens;
+		newExternalSettings.filteredLog = settings.filteredLog;
+		newExternalSettings.trace2colour = settings.trace2colour;
+		newExternalSettings.transform = settings.transform;
+		newExternalSettings.timeScale = timeScale;
 		newExternalSettings.id = random.nextInt();
 
 		settings = newExternalSettings;
