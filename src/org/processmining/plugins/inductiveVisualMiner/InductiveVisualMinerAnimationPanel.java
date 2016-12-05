@@ -153,8 +153,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		}
 
 		//draw the histogram
-		if (isAnimationControlsShowing() && histogramData != null
-				&& (popupHistogramNode != -1 || popupHistogramEdge != -1)) {
+		if (isAnimationControlsShowing() && histogramData != null) {
 			paintGlobalHistogram((Graphics2D) g);
 		}
 	};
