@@ -8,7 +8,7 @@ import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.editModel.ProcessTreeNodiser.NodeType;
-
+@Deprecated
 public class ProcessTreeParser {
 	public static Triple<EfficientTree, Integer, String> parse(String string, int spacesPerTab) throws IOException {
 		ProcessTreeNodiser nodiser = new ProcessTreeNodiser(string, spacesPerTab);

@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.editModel;
 
-import gnu.trove.map.TObjectIntMap;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,6 +7,8 @@ import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 
 import com.google.common.collect.FluentIterable;
 
+import gnu.trove.map.TObjectIntMap;
+@Deprecated
 public class InlineTree {
 
 	/**

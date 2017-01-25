@@ -9,7 +9,7 @@ import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 
 import com.google.common.collect.FluentIterable;
-
+@Deprecated
 public class EfficientTree2HumanReadableString {
 
 	/**

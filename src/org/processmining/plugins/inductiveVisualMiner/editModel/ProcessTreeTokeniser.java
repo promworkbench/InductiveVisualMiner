@@ -63,7 +63,7 @@ import java.util.Arrays;
  * @see java.io.StreamTokenizer#TT_EOF
  * @since JDK1.0
  */
-
+@Deprecated
 public class ProcessTreeTokeniser {
 
 	/* Only one of these will be non-null */

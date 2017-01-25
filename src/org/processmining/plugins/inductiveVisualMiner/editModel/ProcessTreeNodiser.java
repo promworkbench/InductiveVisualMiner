@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-
+@Deprecated
 public class ProcessTreeNodiser {
 
 	private int spaces = 0;
