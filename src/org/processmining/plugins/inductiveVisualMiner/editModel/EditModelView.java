@@ -19,6 +19,8 @@ import javax.swing.text.BadLocationException;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree2HumanReadableString;
+import org.processmining.plugins.InductiveMiner.efficienttree.ProcessTreeParser;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
