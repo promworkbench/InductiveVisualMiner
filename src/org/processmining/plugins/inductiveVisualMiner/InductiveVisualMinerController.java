@@ -659,11 +659,7 @@ public class InductiveVisualMinerController {
 		//set image/animation export button
 		panel.getSaveImageButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (panel.getGraph().isAnimationEnabled()) {
-					new ExportDialog(panel.getGraph(), new ExporterAvi(state));
-				} else {
-					new ExportDialog(panel.getGraph());
-				}
+				saveView();
 			}
 		});
 
@@ -673,21 +669,11 @@ public class InductiveVisualMinerController {
 					.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_MASK), "saveAs"); // - key
 			panel.getActionMap().put("saveAs", new AbstractAction() {
 				private static final long serialVersionUID = -4780600363000017631L;
-				
+
 				public void actionPerformed(ActionEvent arg0) {
-					List<Exporter> exporters = new ArrayList<>();
-					
-					if (panel.getGraph().isAnimationEnabled()) {
-						exporters.add(new ExporterAvi(state));
-					}
-					if (state.isPerformanceReady()) {
-						exporters.add(new ExporterStatistics(state));
-					}
-					
-					Exporter[] exporters2 = new Exporter[exporters.size()];
-					exporters2 = exporters.toArray(exporters2);
-					new ExportDialog(panel.getGraph(), exporters2);
+					saveView();
 				}
+
 			});
 		}
 
@@ -806,6 +792,22 @@ public class InductiveVisualMinerController {
 				state.getMode().getVisualisationParameters(state));
 		colourMap.setSelectedNodes(state.getSelection());
 		panel.getTraceView().setEventColourMap(colourMap);
+	}
+
+	//save the view
+	private void saveView() {
+		List<Exporter> exporters = new ArrayList<>();
+
+		if (panel.getGraph().isAnimationEnabled()) {
+			exporters.add(new ExporterAvi(state));
+		}
+		if (state.isPerformanceReady()) {
+			exporters.add(new ExporterStatistics(state));
+		}
+
+		Exporter[] exporters2 = new Exporter[exporters.size()];
+		exporters2 = exporters.toArray(exporters2);
+		new ExportDialog(panel.getGraph(), exporters2);
 	}
 
 	public static void debug(Object s) {
