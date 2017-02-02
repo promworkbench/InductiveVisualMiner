@@ -463,6 +463,6 @@ public class InductiveVisualMinerState {
 	}
 
 	public boolean isPerformanceReady() {
-		return performance != null;
+		return isAlignmentReady() && performance != null;
 	}
 }

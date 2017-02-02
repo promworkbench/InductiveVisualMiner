@@ -7,6 +7,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -24,6 +26,7 @@ import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeExc
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.export.ExportDialog;
+import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
@@ -46,6 +49,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl12Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13Histogram;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
+import org.processmining.plugins.inductiveVisualMiner.export.ExporterStatistics;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
@@ -666,16 +670,23 @@ public class InductiveVisualMinerController {
 		//listen to ctrl s to save image/animation (should override keyboard shortcut of GraphViz)
 		{
 			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-					.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), "saveAs"); // - key
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_MASK), "saveAs"); // - key
 			panel.getActionMap().put("saveAs", new AbstractAction() {
 				private static final long serialVersionUID = -4780600363000017631L;
-
+				
 				public void actionPerformed(ActionEvent arg0) {
+					List<Exporter> exporters = new ArrayList<>();
+					
 					if (panel.getGraph().isAnimationEnabled()) {
-						new ExportDialog(panel.getGraph(), new ExporterAvi(state));
-					} else {
-						new ExportDialog(panel.getGraph());
+						exporters.add(new ExporterAvi(state));
 					}
+					if (state.isPerformanceReady()) {
+						exporters.add(new ExporterStatistics(state));
+					}
+					
+					Exporter[] exporters2 = new Exporter[exporters.size()];
+					exporters2 = exporters.toArray(exporters2);
+					new ExportDialog(panel.getGraph(), exporters2);
 				}
 			});
 		}
