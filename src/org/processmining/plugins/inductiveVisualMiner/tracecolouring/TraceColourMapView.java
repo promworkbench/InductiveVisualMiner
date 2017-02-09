@@ -5,6 +5,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JCheckBox;
@@ -19,6 +22,7 @@ import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.MultiComboBox;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 
 import com.fluxicon.slickerbox.factory.SlickerFactory;
@@ -28,7 +32,7 @@ import gnu.trove.map.hash.THashMap;
 public class TraceColourMapView extends SideWindow {
 
 	private static final long serialVersionUID = -4833037956665918455L;
-	private final JComboBox<String> keySelector;
+	private final JComboBox<Key> keySelector;
 	private final JCheckBox enabled;
 	private AttributesInfo attributesInfo;
 	private final JTextArea status;
@@ -51,7 +55,7 @@ public class TraceColourMapView extends SideWindow {
 		{
 			explanation = new JTextArea(
 					"Trace colouring annotates the traces with a colour in the animation and the trace view, "
-							+ "based on a trace attribute.\n");
+							+ "based on a trace attribute or property.\n");
 			explanation.setWrapStyleWord(true);
 			explanation.setLineWrap(true);
 			explanation.setOpaque(false);
@@ -112,7 +116,7 @@ public class TraceColourMapView extends SideWindow {
 		//key selector
 		{
 			keySelector = SlickerFactory.instance().createComboBox(new String[0]);
-			keySelector.addItem("(initialising)");
+			keySelector.addItem(Key.message("(initialising)"));
 			keySelector.setSelectedIndex(0);
 			keySelector.setEnabled(false);
 			GridBagConstraints c = new GridBagConstraints();
@@ -170,6 +174,68 @@ public class TraceColourMapView extends SideWindow {
 		}
 	}
 
+	public static class Key implements Comparable<Key> {
+		private final String payload;
+		private final Type type;
+
+		public enum Type {
+			attribute, message, traceDuration, numberOfEvents
+		}
+
+		public static Key attribute(String attribute) {
+			return new Key(Type.attribute, attribute);
+		}
+
+		public static Key message(String message) {
+			return new Key(Type.message, message);
+		}
+
+		public static Key traceDuration() {
+			return new Key(Type.traceDuration, null);
+		}
+
+		public static Key numberOfEvents() {
+			return new Key(Type.numberOfEvents, null);
+		}
+
+		private Key(Type type, String payload) {
+			this.payload = payload;
+			this.type = type;
+		}
+
+		public boolean isAttribute() {
+			return type == Type.attribute;
+		}
+
+		public String getAttribute() {
+			return payload;
+		}
+
+		public String toString() {
+			switch (type) {
+				case attribute :
+					return payload;
+				case message :
+					return payload;
+				case numberOfEvents :
+					return "number of events";
+				case traceDuration :
+					return "duration";
+				default :
+					return "?";
+			}
+		}
+
+		public Type getType() {
+			return type;
+		}
+
+		@Override
+		public int compareTo(Key o) {
+			return toString().compareTo(o.toString());
+		}
+	}
+
 	public void initialise(AttributesInfo attributesInfo,
 			final Function<TraceColourMapSettings, Object> onUpdateTraceColourMap) {
 		onUpdate = onUpdateTraceColourMap;
@@ -178,86 +244,150 @@ public class TraceColourMapView extends SideWindow {
 
 		//populate the combobox with the trace attributes
 		keySelector.removeAllItems();
-		String[] attributes = attributesInfo.getTraceAttributes();
-		if (attributes.length == 0) {
-			keySelector.addItem("(no attributes present)");
-		} else {
-			for (String attribute : attributes) {
-				keySelector.addItem(attribute);
-			}
-			keySelector.setEnabled(true);
+
+		List<Key> keys = new ArrayList<>();
+		for (String attribute : attributesInfo.getTraceAttributes()) {
+			keys.add(Key.attribute(attribute));
 		}
+		keys.add(Key.traceDuration());
+		keys.add(Key.numberOfEvents());
+		Collections.sort(keys);
+		for (Key key : keys) {
+			keySelector.addItem(key);
+		}
+
+		keySelector.setEnabled(true);
 	}
 
 	public void update() {
 		try {
 			if (onUpdate != null) {
 				if (enabled.isSelected()) {
-					String attribute = (String) keySelector.getSelectedItem();
-					int numberOfColours = attributesInfo.getTraceAttributesMap().get(attribute).size();
-					if (numberOfColours <= maxColours) {
-						//there are little enough colours to just use them as such 
-						Color[] colours = TraceColourMapSettings.getColours(numberOfColours);
+					Key key = (Key) keySelector.getSelectedItem();
+					switch (key.getType()) {
+						case attribute :
+							updateAttribute(key);
+							break;
+						case message :
+							updateDisable();
+							assert (false);
+							break;
+						case numberOfEvents :
+							updateNumberOfEvents();
+							break;
+						case traceDuration :
+							updateDuration();
+							break;
+						default :
+							break;
 
-						//create colours and map to values
-						Map<String, Color> colourMap = new THashMap<String, Color>(numberOfColours);
-						{
-							StringBuilder s = new StringBuilder();
-							int i = 0;
-							for (String value : attributesInfo.getTraceAttributesMap().get(attribute)) {
-								s.append(prefix + value + "\n");
-								colourMap.put(value, colours[i]);
-								i++;
-							}
-							example.setText(s.toString());
-						}
-
-						//colour the values in the example
-						colourExample(colours);
-
-						status.setText("Currently colouring traces using " + numberOfColours + " colours:\n");
-						onUpdate.call(TraceColourMapSettings.string(attribute, colours, colourMap));
-					} else if (attributesInfo.isTraceAttributeNumeric(attribute)) {
-						//this is a numeric attribute; divide it in 7 parts
-
-						numberOfColours = maxColours;
-						Color[] colours = TraceColourMapSettings.getColours(numberOfColours);
-						double min = attributesInfo.getTraceAttributeMinimum(attribute);
-						double max = attributesInfo.getTraceAttributeMaximum(attribute);
-
-						//build the example
-						{
-							StringBuilder s = new StringBuilder();
-							for (double i = 0; i < numberOfColours; i++) {
-								s.append(prefix + (min + i * (max - min) / numberOfColours) + "\n");
-								//a = (min + i * (max - min) / numberOfColours) + " - "
-								//		+ (min + (i + 1) * (max - min) / numberOfColours) + "\n";
-							}
-							s.append(prefix.substring(0, prefix.length() - 1) + "(" + max + ")");
-							example.setText(s.toString());
-						}
-
-						//colour the values in the example
-						colourExample(colours);
-
-						status.setText("Currently colouring traces using " + numberOfColours + " colours:\n");
-						onUpdate.call(TraceColourMapSettings.number(attribute, colours, min, max));
-					} else {
-						//too many colours
-						status.setText("The current attribute would yield " + numberOfColours
-								+ " colours. Inductive visual Miner supports up till " + maxColours + " colours.");
-						example.setText("");
-						onUpdate.call(TraceColourMapSettings.empty());
 					}
 				} else {
-					status.setText("Currently not colouring.");
-					example.setText("");
-					onUpdate.call(TraceColourMapSettings.empty());
+					updateDisable();
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void updateAttribute(Key key) throws Exception {
+		int numberOfColours = attributesInfo.getTraceAttributesMap().get(key.getAttribute()).size();
+		if (numberOfColours <= maxColours) {
+			//there are little enough colours to just use them as such 
+			Color[] colours = TraceColourMapSettings.getColours(numberOfColours);
+
+			//create colours and map to values
+			Map<String, Color> colourMap = new THashMap<String, Color>(numberOfColours);
+			{
+				StringBuilder s = new StringBuilder();
+				int i = 0;
+				for (String value : attributesInfo.getTraceAttributesMap().get(key.getAttribute())) {
+					s.append(prefix + value + "\n");
+					colourMap.put(value, colours[i]);
+					i++;
+				}
+				example.setText(s.toString());
+			}
+
+			//colour the values in the example
+			colourExample(colours);
+
+			status.setText("Currently colouring traces using " + numberOfColours + " colours:\n");
+			onUpdate.call(TraceColourMapSettings.string(key.getAttribute(), colours, colourMap));
+		} else if (attributesInfo.isTraceAttributeNumeric(key.getAttribute())) {
+			//this is a numeric attribute; divide it in 7 parts
+
+			numberOfColours = maxColours;
+			Color[] colours = TraceColourMapSettings.getColours(numberOfColours);
+			double min = attributesInfo.getTraceAttributeMinimum(key.getAttribute());
+			double max = attributesInfo.getTraceAttributeMaximum(key.getAttribute());
+			updateProperty(colours, min, max, false);
+
+			onUpdate.call(TraceColourMapSettings.number(key.getAttribute(), colours, min, max));
+		} else {
+			//too many colours
+			status.setText("The current attribute would yield " + numberOfColours
+					+ " colours. Inductive visual Miner supports up till " + maxColours + " colours.");
+			example.setText("");
+			onUpdate.call(TraceColourMapSettings.empty());
+		}
+	}
+
+	private void updateNumberOfEvents() throws Exception {
+		int numberOfColours = maxColours;
+
+		Color[] colours = TraceColourMapSettings.getColours(numberOfColours);
+		updateProperty(colours, attributesInfo.getTraceNumberOfEventsMin(), attributesInfo.getTraceNumberOfEventsMax(),
+				false);
+		onUpdate.call(TraceColourMapSettings.numberOfEvents(colours, attributesInfo.getTraceNumberOfEventsMin(),
+				attributesInfo.getTraceNumberOfEventsMax()));
+	}
+
+	private void updateDuration() throws Exception {
+		int numberOfColours = maxColours;
+
+		Color[] colours = TraceColourMapSettings.getColours(numberOfColours);
+		updateProperty(colours, attributesInfo.getTraceDurationMin(), attributesInfo.getTraceDurationMax(), true);
+		onUpdate.call(TraceColourMapSettings.duration(colours, attributesInfo.getTraceDurationMin(),
+				attributesInfo.getTraceDurationMax()));
+	}
+
+	private void updateProperty(Color[] colours, double min, double max, boolean time) throws BadLocationException {
+		int numberOfColours = maxColours;
+
+		//build the example
+		{
+			StringBuilder s = new StringBuilder();
+			for (double i = 0; i < numberOfColours; i++) {
+				s.append(prefix);
+				if (!time) {
+					s.append(min + i * (max - min) / numberOfColours);
+				} else {
+					s.append(ResourceTimeUtils.getDuration(min + i * (max - min) / numberOfColours));
+				}
+				s.append("\n");
+			}
+			s.append(prefix.substring(0, prefix.length() - 1) + "(");
+			if (!time) {
+				s.append(max);
+			} else {
+				s.append(ResourceTimeUtils.getDuration(max));
+			}
+			s.append(")");
+			example.setText(s.toString());
+		}
+
+		//colour the values in the example
+		colourExample(colours);
+
+		status.setText("Currently colouring traces using " + numberOfColours + " colours:\n");
+	}
+
+	private void updateDisable() throws Exception {
+		status.setText("Currently not colouring.");
+		example.setText("");
+		onUpdate.call(TraceColourMapSettings.empty());
 	}
 
 	private void colourExample(Color[] colours) throws BadLocationException {

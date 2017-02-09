@@ -9,13 +9,13 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWith
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class TraceColourMapString implements TraceColourMap {
+public class TraceColourMapAttributeString implements TraceColourMap {
 
 	private final Color[] trace2colour;
 	private final Map<String, Color> value2colour;
 	private final String attribute;
 
-	public TraceColourMapString(IvMLogNotFiltered log, String attribute, Map<String, Color> value2colour) {
+	public TraceColourMapAttributeString(IvMLogNotFiltered log, String attribute, Map<String, Color> value2colour) {
 		this.value2colour = value2colour;
 		this.attribute = attribute;
 

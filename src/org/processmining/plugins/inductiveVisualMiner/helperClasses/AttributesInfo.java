@@ -34,6 +34,11 @@ public class AttributesInfo {
 	private final TObjectDoubleMap<String> traceAttributesMin;
 	private final TObjectDoubleMap<String> traceAttributesMax;
 
+	private final long traceNumberOfEventsMin;
+	private final long traceNumberOfEventsMax;
+	private final long traceDurationMin;
+	private final long traceDurationMax;
+
 	private enum Type {
 		string, number, time;
 	}
@@ -47,12 +52,39 @@ public class AttributesInfo {
 		eventAttributesTypes = new THashMap<>();
 		eventAttributesMin = createExtremesMap(Double.MAX_VALUE);
 		eventAttributesMax = createExtremesMap(Double.MIN_VALUE);
+
+		long traceNumberOfEventsMin = Long.MAX_VALUE;
+		long traceNumberOfEventsMax = 0;
+		long traceDurationMin = Long.MAX_VALUE;
+		long traceDurationMax = Long.MIN_VALUE;
+
 		for (XTrace trace : log) {
 			add(traceAttributesMap, traceAttributesTypes, traceAttributesMin, traceAttributesMax,
 					trace.getAttributes());
+
+			long durationStart = Long.MAX_VALUE;
+			long durationEnd = Long.MIN_VALUE;
+
 			for (XEvent event : trace) {
 				add(eventAttributesMap, eventAttributesTypes, eventAttributesMin, eventAttributesMax,
 						event.getAttributes());
+				Long timestamp = ResourceTimeUtils.getTimestamp(event);
+				if (timestamp != null) {
+					durationStart = Math.min(durationStart, timestamp);
+					durationEnd = Math.max(durationEnd, timestamp);
+				}
+			}
+
+			if (durationStart != Long.MAX_VALUE) {
+				traceDurationMin = Math.min(traceDurationMin, durationEnd - durationStart);
+				traceDurationMax = Math.max(traceDurationMax, durationEnd - durationStart);
+			}
+
+			if (trace.size() < traceNumberOfEventsMin) {
+				traceNumberOfEventsMin = trace.size();
+			}
+			if (trace.size() > traceNumberOfEventsMax) {
+				traceNumberOfEventsMax = trace.size();
 			}
 		}
 
@@ -61,6 +93,10 @@ public class AttributesInfo {
 		Arrays.sort(this.eventAttributes);
 		this.traceAttributes = traceAttributesMap.keySet().toArray(new String[traceAttributesMap.size()]);
 		Arrays.sort(this.traceAttributes);
+		this.traceNumberOfEventsMin = traceNumberOfEventsMin;
+		this.traceNumberOfEventsMax = traceNumberOfEventsMax;
+		this.traceDurationMin = traceDurationMin;
+		this.traceDurationMax = traceDurationMax;
 	}
 
 	public static void add(THashMap<String, THashSet<String>> attributes, THashMap<String, Type> types,
@@ -186,5 +222,21 @@ public class AttributesInfo {
 			}
 		}
 		return true;
+	}
+
+	public long getTraceNumberOfEventsMin() {
+		return traceNumberOfEventsMin;
+	}
+
+	public long getTraceNumberOfEventsMax() {
+		return traceNumberOfEventsMax;
+	}
+
+	public long getTraceDurationMin() {
+		return traceDurationMin;
+	}
+
+	public long getTraceDurationMax() {
+		return traceDurationMax;
 	}
 }

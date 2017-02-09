@@ -25,6 +25,26 @@ public class ResourceTimeUtils {
 		}
 		return null;
 	}
+	
+	public static final String getDuration(double ms) {
+		if (ms / 1000 < 1) {
+			return String.format("%.2f", ms) + "ms";
+		}
+		double s = ms / 1000;
+		if (s / 60 < 1) {
+			return String.format("%.2f", s) + "s";
+		}
+		double m = s / 60;
+		if (m / 60 < 1) {
+			return String.format("%.0f", m) + "m";
+		}
+		double h = m / 60;
+		if (h / 24 < 1) {
+			return String.format("%.0f", h) + "h";
+		}
+		double d = h / 24;
+		return String.format("%.0f", d) + "d";
+	}
 
 	public static final String getTimePerUnitString(double ms, String otherUnit) {
 		if (ms > 1) {

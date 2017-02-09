@@ -9,7 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWith
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class TraceColourMapNumber implements TraceColourMap {
+public class TraceColourMapAttributeNumber implements TraceColourMap {
 
 	private final String attribute;
 	private final Color[] trace2colour;
@@ -17,7 +17,7 @@ public class TraceColourMapNumber implements TraceColourMap {
 	private final double max;
 	private final Color[] colours;
 
-	public TraceColourMapNumber(IvMLogNotFiltered log, String attribute, Color[] colours, double min, double max) {
+	public TraceColourMapAttributeNumber(IvMLogNotFiltered log, String attribute, Color[] colours, double min, double max) {
 		this.attribute = attribute;
 		this.min = min;
 		this.max = max;
