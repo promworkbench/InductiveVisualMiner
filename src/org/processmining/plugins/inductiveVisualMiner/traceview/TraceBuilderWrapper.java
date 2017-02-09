@@ -1,7 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.traceview;
 
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.TraceBuilder;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 
 public abstract class TraceBuilderWrapper implements TraceBuilder<Object> {
 

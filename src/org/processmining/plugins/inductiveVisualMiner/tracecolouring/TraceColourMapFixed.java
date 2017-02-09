@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring;
+package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 
 import java.awt.Color;
 

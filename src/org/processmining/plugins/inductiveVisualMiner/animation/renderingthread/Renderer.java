@@ -17,9 +17,9 @@ import java.awt.geom.Point2D;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIterator;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapFixed;
 
 public class Renderer {
 

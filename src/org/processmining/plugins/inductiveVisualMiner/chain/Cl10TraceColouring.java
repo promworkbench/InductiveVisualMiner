@@ -1,14 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import java.awt.Color;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMapAttribute;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMapFixed;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapFixed;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 
 public class Cl10TraceColouring extends ChainLink<Pair<IvMLogNotFiltered, TraceColourMapSettings>, TraceColourMap> {
 
@@ -19,10 +16,10 @@ public class Cl10TraceColouring extends ChainLink<Pair<IvMLogNotFiltered, TraceC
 	protected TraceColourMap executeLink(Pair<IvMLogNotFiltered, TraceColourMapSettings> input, IvMCanceller canceller)
 			throws Exception {
 		TraceColourMapSettings settings = input.getRight();
-		if (settings == null || settings.numberOfColours < 1 || settings.attribute == null) {
-			return new TraceColourMapFixed(Color.yellow);
+		if (settings == null) {
+			return new TraceColourMapFixed(TraceColourMapSettings.defaultColour);
 		} else {
-			return new TraceColourMapAttribute(input.getLeft(), settings);
+			return settings.getTraceColourMap(input.getLeft());
 		}
 	}
 

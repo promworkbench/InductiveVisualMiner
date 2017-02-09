@@ -32,10 +32,10 @@ import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.Renderer;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderingThread;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 
 /**
  * This class takes care of the node popups and render an animation

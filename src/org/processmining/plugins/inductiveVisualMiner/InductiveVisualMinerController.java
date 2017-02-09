@@ -31,7 +31,6 @@ import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElement
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl00GatherAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01SortEvents;
@@ -57,6 +56,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersContro
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;

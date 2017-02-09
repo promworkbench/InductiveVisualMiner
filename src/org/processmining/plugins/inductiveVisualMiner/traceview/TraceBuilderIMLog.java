@@ -9,8 +9,8 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;

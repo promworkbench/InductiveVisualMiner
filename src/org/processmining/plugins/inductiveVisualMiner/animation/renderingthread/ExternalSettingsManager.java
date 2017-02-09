@@ -5,9 +5,9 @@ import java.util.Random;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensLazyIterator;
-import org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 
 /**
  * Keeps track of the external settings of the animation. Thread-safe.

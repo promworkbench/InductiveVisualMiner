@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.animation.tracecolouring;
+package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -11,6 +11,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 
@@ -34,6 +35,9 @@ public class TraceColourMapView extends SideWindow {
 	private final JTextArea explanation;
 	private final JLabel title;
 	private final JTextArea example;
+
+	public static final int maxColours = 7;
+	public static final String prefix = "       ";
 
 	private Function<TraceColourMapSettings, Object> onUpdate;
 
@@ -120,6 +124,7 @@ public class TraceColourMapView extends SideWindow {
 			add(keySelector, c);
 
 			keySelector.addActionListener(new ActionListener() {
+
 				public void actionPerformed(ActionEvent e) {
 					update();
 				}
@@ -135,12 +140,14 @@ public class TraceColourMapView extends SideWindow {
 			status.setEnabled(false);
 			status.setFont(new JLabel("blaa").getFont());
 			status.setDisabledTextColor(MultiComboBox.colour_fg);
+
 			GridBagConstraints c = new GridBagConstraints();
 			c.gridx = 1;
 			c.gridy = 2;
 			c.gridwidth = 2;
 			c.fill = GridBagConstraints.HORIZONTAL;
 			c.anchor = GridBagConstraints.NORTH;
+
 			add(status, c);
 		}
 
@@ -188,16 +195,17 @@ public class TraceColourMapView extends SideWindow {
 				if (enabled.isSelected()) {
 					String attribute = (String) keySelector.getSelectedItem();
 					int numberOfColours = attributesInfo.getTraceAttributesMap().get(attribute).size();
-					if (numberOfColours <= 7) {
+					if (numberOfColours <= maxColours) {
+						//there are little enough colours to just use them as such 
+						Color[] colours = TraceColourMapSettings.getColours(numberOfColours);
 
 						//create colours and map to values
 						Map<String, Color> colourMap = new THashMap<String, Color>(numberOfColours);
-						Color[] colours = TraceColourMapAttribute.getColours(numberOfColours);
 						{
 							StringBuilder s = new StringBuilder();
 							int i = 0;
 							for (String value : attributesInfo.getTraceAttributesMap().get(attribute)) {
-								s.append("      " + value + "\n");
+								s.append(prefix + value + "\n");
 								colourMap.put(value, colours[i]);
 								i++;
 							}
@@ -205,23 +213,39 @@ public class TraceColourMapView extends SideWindow {
 						}
 
 						//colour the values in the example
-						{
-							int i = 0;
-							for (String value : attributesInfo.getTraceAttributesMap().get(attribute)) {
-								int startIndex = example.getLineStartOffset(i);
-								DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(
-										colours[i]);
-								example.getHighlighter().addHighlight(startIndex, startIndex + 4, painter);
-
-								i++;
-							}
-						}
+						colourExample(colours);
 
 						status.setText("Currently colouring traces using " + numberOfColours + " colours:\n");
-						onUpdate.call(new TraceColourMapSettings(attribute, numberOfColours, colours, colourMap));
+						onUpdate.call(TraceColourMapSettings.string(attribute, colours, colourMap));
+					} else if (attributesInfo.isTraceAttributeNumeric(attribute)) {
+						//this is a numeric attribute; divide it in 7 parts
+
+						numberOfColours = maxColours;
+						Color[] colours = TraceColourMapSettings.getColours(numberOfColours);
+						double min = attributesInfo.getTraceAttributeMinimum(attribute);
+						double max = attributesInfo.getTraceAttributeMaximum(attribute);
+
+						//build the example
+						{
+							StringBuilder s = new StringBuilder();
+							for (double i = 0; i < numberOfColours; i++) {
+								s.append(prefix + (min + i * (max - min) / numberOfColours) + "\n");
+								//a = (min + i * (max - min) / numberOfColours) + " - "
+								//		+ (min + (i + 1) * (max - min) / numberOfColours) + "\n";
+							}
+							s.append(prefix.substring(0, prefix.length() - 1) + "(" + max + ")");
+							example.setText(s.toString());
+						}
+
+						//colour the values in the example
+						colourExample(colours);
+
+						status.setText("Currently colouring traces using " + numberOfColours + " colours:\n");
+						onUpdate.call(TraceColourMapSettings.number(attribute, colours, min, max));
 					} else {
+						//too many colours
 						status.setText("The current attribute would yield " + numberOfColours
-								+ " colours. Inductive visual Miner supports up till 7 colours.");
+								+ " colours. Inductive visual Miner supports up till " + maxColours + " colours.");
 						example.setText("");
 						onUpdate.call(TraceColourMapSettings.empty());
 					}
@@ -233,6 +257,14 @@ public class TraceColourMapView extends SideWindow {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void colourExample(Color[] colours) throws BadLocationException {
+		for (int i = 0; i < colours.length; i++) {
+			int startIndex = example.getLineStartOffset(i);
+			DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(colours[i]);
+			example.getHighlighter().addHighlight(startIndex, startIndex + prefix.length() - 2, painter);
 		}
 	}
 }
