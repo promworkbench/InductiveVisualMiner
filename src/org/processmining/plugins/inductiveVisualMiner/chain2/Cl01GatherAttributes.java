@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.chain;
+package org.processmining.plugins.inductiveVisualMiner.chain2;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
@@ -6,13 +6,14 @@ import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeCl
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 
-public class Cl00GatherAttributes extends
-		ChainLink<XLog, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
+public class Cl01GatherAttributes
+		extends ChainLink2<XLog, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
 
 	protected XLog generateInput(InductiveVisualMinerState state) {
-		return state.getSortedXLog();
+		return state.getXLog();
 	}
 
 	protected Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]> executeLink(XLog input,
@@ -33,4 +34,10 @@ public class Cl00GatherAttributes extends
 		state.setAttributesInfo(result.getA(), result.getB(), result.getC());
 		state.setClassifier(AttributeClassifiers.constructClassifier(result.getB()));
 	}
+
+	protected void invalidateResult(InductiveVisualMinerState state) {
+		state.setAttributesInfo(null, null, null);
+		state.setClassifier(null);
+	}
+
 }

@@ -56,25 +56,26 @@ public class InductiveVisualMinerState {
 			this.preMinedTree = this.tree;
 		}
 	}
-	
+
 	//==attributes==
 	private AttributesInfo attributesInfo;
 	private AttributeClassifier initialClassifier;
 	private AttributeClassifier[] classifiers;
-	
+
 	public AttributesInfo getAttributesInfo() {
 		return attributesInfo;
 	}
-	
+
 	public AttributeClassifier getInitialClassifier() {
 		return initialClassifier;
 	}
-	
+
 	public AttributeClassifier[] getClassifiers() {
 		return classifiers;
 	}
-	
-	public void setAttributesInfo(AttributesInfo info, AttributeClassifier initialClassifier, AttributeClassifier[] classifiers) {
+
+	public void setAttributesInfo(AttributesInfo info, AttributeClassifier initialClassifier,
+			AttributeClassifier[] classifiers) {
 		attributesInfo = info;
 		this.initialClassifier = initialClassifier;
 		this.classifiers = classifiers;
@@ -85,6 +86,7 @@ public class InductiveVisualMinerState {
 			new XEventNameClassifier());
 	private IMLog2IMLogInfo log2logInfo = new IMLog2IMLogInfoDefault();
 	private XLog xLog;
+	private XLog sortedXLog;
 	private XLogInfo xLogInfo;
 	private XLogInfo xLogInfoPerformance;
 	private IMLog IMLog;
@@ -94,11 +96,11 @@ public class InductiveVisualMinerState {
 	public boolean isIllogicalTimeStamps() {
 		return illogicalTimeStamps;
 	}
-	
+
 	public void setIllogicalTimeStamps(boolean illogicalTimeStamps) {
 		this.illogicalTimeStamps = illogicalTimeStamps;
 	}
-	
+
 	public XEventPerformanceClassifier getPerformanceClassifier() {
 		return performanceClassifier;
 	}
@@ -122,9 +124,17 @@ public class InductiveVisualMinerState {
 	public XLog getXLog() {
 		return xLog;
 	}
-	
+
 	public void setXLog(XLog xLog) {
 		this.xLog = xLog;
+	}
+
+	public XLog getSortedXLog() {
+		return sortedXLog;
+	}
+
+	public void setSortedXLog(XLog xLog) {
+		this.sortedXLog = xLog;
 	}
 
 	public XLogInfo getXLogInfo() {
@@ -149,14 +159,14 @@ public class InductiveVisualMinerState {
 		this.xLogInfo = xLogInfo;
 		this.xLogInfoPerformance = xLogInfoPerformance;
 	}
-	
+
 	//==filters==
 	private IvMFiltersController filtersController;
-	
+
 	public IvMFiltersController getFiltersController() {
 		return filtersController;
 	}
-	
+
 	public void setFiltersController(IvMFiltersController filtersController) {
 		this.filtersController = filtersController;
 	}
@@ -323,7 +333,11 @@ public class InductiveVisualMinerState {
 	public void setIvMLog(IvMLogNotFiltered ivMLog, IvMLogInfo ivmLogInfo) {
 		this.ivmLog = ivMLog;
 		this.ivmLogInfo = ivmLogInfo;
-		this.ivmLogFiltered = new IvMLogFilteredImpl(ivMLog);
+		if (ivMLog != null) {
+			this.ivmLogFiltered = new IvMLogFilteredImpl(ivMLog);
+		} else {
+			this.ivmLogFiltered = null;
+		}
 		this.ivmLogInfoFiltered = ivmLogInfo;
 	}
 
@@ -351,11 +365,11 @@ public class InductiveVisualMinerState {
 	public boolean isAlignmentReady() {
 		return ivmLog != null;
 	}
-	
+
 	public TraceColourMapSettings getTraceColourMapSettings() {
 		return traceColourMapSettings;
 	}
-	
+
 	public void setTraceColourMapSettings(TraceColourMapSettings traceColourMapSettings) {
 		this.traceColourMapSettings = traceColourMapSettings;
 	}
@@ -363,32 +377,14 @@ public class InductiveVisualMinerState {
 	public TraceColourMap getTraceColourMap() {
 		return traceColourMap;
 	}
-	
+
 	public void setTraceColourMap(TraceColourMap traceColourMap) {
 		this.traceColourMap = traceColourMap;
-	}
-	
-	public void resetTraceColourMap() {
-		this.traceColourMap = null;
-	}
-	
-	/*
-	 * Reset alignment to null
-	 */
-	public synchronized void resetAlignment() {
-		ivmLog = null;
-		ivmLogFiltered = null;
-		ivmLogInfoFiltered = null;
-		traceColourMap = null;
 	}
 
 	//==histogram==
 	private HistogramData histogramData;
 	private int histogramWidth;
-
-	public void resetHistogramData() {
-		histogramData = null;
-	}
 
 	public void setHistogramData(HistogramData histogramData) {
 		this.histogramData = histogramData;
@@ -422,14 +418,6 @@ public class InductiveVisualMinerState {
 		this.animationScaler = animationScaler;
 	}
 
-	public void resetAnimation() {
-		animationGraphVizTokens = null;
-	}
-	
-	public void resetScaler() {
-		animationScaler = null;
-	}
-
 	public Scaler getAnimationScaler() {
 		return animationScaler;
 	}
@@ -437,11 +425,11 @@ public class InductiveVisualMinerState {
 	public GraphVizTokens getAnimationGraphVizTokens() {
 		return animationGraphVizTokens;
 	}
-	
+
 	public boolean isAnimationGlobalEnabled() {
 		return animationGlobalEnabled;
 	}
-	
+
 	public void setAnimationGlobalEnabled(boolean animationEnabled) {
 		this.animationGlobalEnabled = animationEnabled;
 		preferences.putBoolean(playAnimationOnStartupKey, animationEnabled);
@@ -456,10 +444,6 @@ public class InductiveVisualMinerState {
 
 	public PerformanceWrapper getPerformance() {
 		return performance;
-	}
-
-	public void resetPerformance() {
-		performance = null;
 	}
 
 	public boolean isPerformanceReady() {

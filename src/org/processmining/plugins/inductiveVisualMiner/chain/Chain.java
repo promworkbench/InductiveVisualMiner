@@ -59,33 +59,34 @@ public class Chain {
 	}
 
 	public synchronized void execute(Class<? extends ChainLink<?, ?>> c) {
-		for (int i = 0; i < chain.size(); i++) {
-			ChainLink<?, ?> cl = chain.get(i);
-			if (c.isInstance(cl)) {
-				//see if this chain execution should overwrite (= starts earlier in the chain) than the next one
-				//if we drop in ahead of an existing execution, our work will have to be redone again anyway 
-				if (i <= currentExecutionLinkNumber) {
-
-					//cancel current executions after this point
-					for (int j = i; j < currentExecutionCancellers.size(); j++) {
-						if (currentExecutionCancellers.get(j) != null) {
-							currentExecutionCancellers.get(j).cancel();
-							currentExecutionCancellers.set(j, null);
-						}
-					}
-
-					//replace execution
-					currentExecutionId = UUID.randomUUID();
-					currentExecutionLinkNumber = i;
-					currentExecutionLink = cl;
-					IvMCanceller currentExecutionCanceller = new IvMCanceller(globalCanceller);
-					currentExecutionCancellers.set(i, currentExecutionCanceller);
-
-					cl.execute(currentExecutionId, currentExecutionLinkNumber, state, currentExecutionCanceller);
-				}
-				return;
-			}
-		}
+		return;
+//		for (int i = 0; i < chain.size(); i++) {
+//			ChainLink<?, ?> cl = chain.get(i);
+//			if (c.isInstance(cl)) {
+//				//see if this chain execution should overwrite (= starts earlier in the chain) than the next one
+//				//if we drop in ahead of an existing execution, our work will have to be redone again anyway 
+//				if (i <= currentExecutionLinkNumber) {
+//
+//					//cancel current executions after this point
+//					for (int j = i; j < currentExecutionCancellers.size(); j++) {
+//						if (currentExecutionCancellers.get(j) != null) {
+//							currentExecutionCancellers.get(j).cancel();
+//							currentExecutionCancellers.set(j, null);
+//						}
+//					}
+//
+//					//replace execution
+//					currentExecutionId = UUID.randomUUID();
+//					currentExecutionLinkNumber = i;
+//					currentExecutionLink = cl;
+//					IvMCanceller currentExecutionCanceller = new IvMCanceller(globalCanceller);
+//					currentExecutionCancellers.set(i, currentExecutionCanceller);
+//
+//					cl.execute(currentExecutionId, currentExecutionLinkNumber, state, currentExecutionCanceller);
+//				}
+//				return;
+//			}
+//		}
 	}
 
 	public UUID getCurrentExecution() {

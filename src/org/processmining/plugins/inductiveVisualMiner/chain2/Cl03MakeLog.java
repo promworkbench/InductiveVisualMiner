@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.chain;
+package org.processmining.plugins.inductiveVisualMiner.chain2;
 
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
@@ -10,14 +10,14 @@ import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLogImpl;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
-// make an IMlog out of an XLog
-public class Cl02MakeLog
-		extends
-		ChainLink<Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo>, Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo>> {
+public class Cl03MakeLog extends
+		ChainLink2<Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo>, Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo>> {
 
-	protected Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> generateInput(InductiveVisualMinerState state) {
+	protected Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> generateInput(
+			InductiveVisualMinerState state) {
 		return Triple.of(state.getSortedXLog(), state.getPerformanceClassifier(), state.getLog2logInfo());
 	}
 
@@ -31,7 +31,13 @@ public class Cl02MakeLog
 		return Quadruple.of(xLogInfo, xLogInfoPerformance, imLog, imLogInfo);
 	}
 
-	protected void processResult(Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo> result, InductiveVisualMinerState state) {
+	protected void processResult(Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo> result,
+			InductiveVisualMinerState state) {
 		state.setLog(result.getA(), result.getB(), result.getC(), result.getD());
 	}
+
+	protected void invalidateResult(InductiveVisualMinerState state) {
+		state.setLog(null, null, null, null);
+	}
+
 }

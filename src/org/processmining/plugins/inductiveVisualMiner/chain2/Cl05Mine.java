@@ -1,17 +1,18 @@
-package org.processmining.plugins.inductiveVisualMiner.chain;
+package org.processmining.plugins.inductiveVisualMiner.chain2;
 
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
 
-public class Cl04Mine extends
-		ChainLink<Quadruple<IvMEfficientTree, IMLog, VisualMinerWrapper, VisualMinerParameters>, IvMEfficientTree> {
+public class Cl05Mine extends
+		ChainLink2<Quadruple<IvMEfficientTree, IMLog, VisualMinerWrapper, VisualMinerParameters>, IvMEfficientTree> {
 
 	protected Quadruple<IvMEfficientTree, IMLog, VisualMinerWrapper, VisualMinerParameters> generateInput(
 			InductiveVisualMinerState state) {
@@ -29,7 +30,7 @@ public class Cl04Mine extends
 			if (tree != null) {
 				return new IvMEfficientTree(tree);
 			} else {
-				assert(canceller.isCancelled());
+				assert (canceller.isCancelled());
 				return null;
 			}
 		} else {
@@ -42,4 +43,10 @@ public class Cl04Mine extends
 		state.setTree(result);
 		state.setSelection(new Selection());
 	}
+
+	protected void invalidateResult(InductiveVisualMinerState state) {
+		state.setTree(null);
+		state.setSelection(new Selection());
+	}
+
 }
