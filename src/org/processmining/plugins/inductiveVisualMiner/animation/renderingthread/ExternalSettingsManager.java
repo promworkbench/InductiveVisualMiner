@@ -29,11 +29,19 @@ public class ExternalSettingsManager {
 		public TraceColourMap trace2colour;
 		public GraphVizTokensLazyIterator tokens;
 		public AffineTransform transform;
-		
+
 		//time scale
 		public double timeScale = 1;
 
 		//traceability
+		/**
+		 * We use id as a pointer to denote whether the last available settings
+		 * should be invalidated. For instance: if the dimensions change, then
+		 * the id should change, and any frame rendered for the old id will be
+		 * discarded. However, if the time scale of the animation is changed,
+		 * then the rendered frame is still useable, so the id remains
+		 * unchanged. Changing id's might cause flicker of the animation.
+		 */
 		int id;
 	}
 
@@ -113,12 +121,12 @@ public class ExternalSettingsManager {
 		newExternalSettings.trace2colour = settings.trace2colour;
 		newExternalSettings.transform = settings.transform;
 		newExternalSettings.timeScale = settings.timeScale;
-		newExternalSettings.id = random.nextInt();
+		newExternalSettings.id = settings.id;
 
 		settings = newExternalSettings;
 		return newExternalSettings.id;
 	}
-	
+
 	public synchronized int setTrace2Colour(TraceColourMap trace2colour) {
 		ExternalSettings newExternalSettings = new ExternalSettings();
 		newExternalSettings.width = settings.width;
@@ -128,12 +136,12 @@ public class ExternalSettingsManager {
 		newExternalSettings.trace2colour = trace2colour;
 		newExternalSettings.transform = settings.transform;
 		newExternalSettings.timeScale = settings.timeScale;
-		newExternalSettings.id = random.nextInt();
+		newExternalSettings.id = settings.id;
 
 		settings = newExternalSettings;
 		return newExternalSettings.id;
 	}
-	
+
 	public synchronized int setTimeScale(double timeScale) {
 		ExternalSettings newExternalSettings = new ExternalSettings();
 		newExternalSettings.width = settings.width;
@@ -143,7 +151,7 @@ public class ExternalSettingsManager {
 		newExternalSettings.trace2colour = settings.trace2colour;
 		newExternalSettings.transform = settings.transform;
 		newExternalSettings.timeScale = timeScale;
-		newExternalSettings.id = random.nextInt();
+		newExternalSettings.id = settings.id;
 
 		settings = newExternalSettings;
 		return newExternalSettings.id;

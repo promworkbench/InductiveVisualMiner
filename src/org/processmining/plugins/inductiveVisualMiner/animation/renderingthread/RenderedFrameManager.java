@@ -71,6 +71,7 @@ public class RenderedFrameManager {
 	public RenderedFrame getLastRenderedFrame() {
 		int atomicDrawing = drawing;
 		if (atomicDrawing == -1) {
+			System.out.println("no frame available");
 			return null;
 		}
 		return results[atomicDrawing];

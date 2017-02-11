@@ -429,11 +429,12 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	@Override
 	public double getAnimationTime() {
-		RenderedFrame frame = renderingThread.getRenderedFrameManager().getLastRenderedFrame();
-		if (frame != null) {
-			return frame.time;
-		}
-		return -1;
+//		RenderedFrame frame = renderingThread.getRenderedFrameManager().getLastRenderedFrame();
+//		if (frame != null) {
+//			return frame.time;
+//		}
+		return renderingThread.getTimeManager().getLastRenderedTime();
+		//return -1;
 	}
 
 	@Override

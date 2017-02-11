@@ -65,7 +65,6 @@ public abstract class ChainLink<I, O> {
 	}
 
 	public void cancelAndInvalidateResult(InductiveVisualMinerState state) {
-		System.out.println("cancel " + this.getClass() + " from thread " + Thread.currentThread().getId());
 		isComplete = false;
 		if (currentExecutionCanceller != null) {
 			currentExecutionCanceller.cancel();
@@ -86,9 +85,6 @@ public abstract class ChainLink<I, O> {
 		currentExecutionCanceller = new IvMCanceller(globalCanceller);
 		currentExecutionId = UUID.randomUUID();
 		isComplete = false;
-
-		System.out.println("  execute " + this.getClass() + " from thread " + Thread.currentThread().getId() + " uuid "
-				+ currentExecutionId);
 
 		final IvMCanceller canceller = currentExecutionCanceller;
 		final UUID id = currentExecutionId;
@@ -120,7 +116,6 @@ public abstract class ChainLink<I, O> {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						if (id.equals(currentExecutionId) && !canceller.isCancelled()) {
-							System.out.println("    process result " + ChainLink.this.getClass() + " uuid" + id);
 							processResult(result, state);
 							if (onComplete != null) {
 								onComplete.run();
