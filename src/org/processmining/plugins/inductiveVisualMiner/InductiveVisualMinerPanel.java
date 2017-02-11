@@ -379,8 +379,6 @@ public class InductiveVisualMinerPanel extends JPanel {
 		if (!enableMining) {
 			activitiesSlider.setVisible(false);
 			pathsSlider.setVisible(false);
-			//classifierLabel.setVisible(false);
-			//classifiersCombobox.setVisible(false);
 			preMiningFiltersButton.setVisible(false);
 			minerLabel.setVisible(false);
 			minerCombobox.setVisible(false);

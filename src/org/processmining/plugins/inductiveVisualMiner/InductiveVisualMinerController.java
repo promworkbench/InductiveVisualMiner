@@ -368,6 +368,7 @@ public class InductiveVisualMinerController {
 		}
 		
 		chain.addConnection(animationScaler, animate);
+		chain.addConnection(layoutAlignment, animate);
 
 		//colour traces
 		Cl11TraceColouring traceColouring = new Cl11TraceColouring();
