@@ -12,12 +12,12 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.plugins.SortEventsPlugin.EventsComparator;
 
-public class Cl01SortEvents extends ChainLink<XLog, XLog> {
+public class Cl02SortEvents extends ChainLink<XLog, XLog> {
 
 	private Function<Object, Boolean> onIllogicalTimeStamps;
 
 	protected XLog generateInput(InductiveVisualMinerState state) {
-		return state.getSortedXLog();
+		return state.getXLog();
 	}
 
 	protected XLog executeLink(XLog input, IvMCanceller canceller) throws Exception {
@@ -53,8 +53,13 @@ public class Cl01SortEvents extends ChainLink<XLog, XLog> {
 			state.setSortedXLog(result);
 			state.setIllogicalTimeStamps(false);
 		} else {
+			state.setSortedXLog(state.getXLog());
 			state.setIllogicalTimeStamps(true);
 		}
+	}
+	
+	protected void invalidateResult(InductiveVisualMinerState state) {
+		state.setSortedXLog(null);
 	}
 
 	public Function<Object, Boolean> getOnIllogicalTimeStamps() {

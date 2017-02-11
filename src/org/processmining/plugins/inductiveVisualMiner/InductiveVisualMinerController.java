@@ -30,22 +30,22 @@ import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Chain2;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl01GatherAttributes;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl02SortEvents;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl03MakeLog;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl04FilterLogOnActivities;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl05Mine;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl06LayoutModel;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl07Align;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl08LayoutAlignment;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl09AnimationScaler;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl10Animate;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl11TraceColouring;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl12FilterNodeSelection;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl13Performance;
-import org.processmining.plugins.inductiveVisualMiner.chain2.Cl14Histogram;
-import org.processmining.plugins.inductiveVisualMiner.chain2.OnException;
+import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl01GatherAttributes;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl02SortEvents;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl03MakeLog;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActivities;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Mine;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutModel;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl07Align;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl08LayoutAlignment;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl09AnimationScaler;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl10Animate;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl11TraceColouring;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl12FilterNodeSelection;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl13Performance;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Histogram;
+import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterStatistics;
@@ -69,7 +69,7 @@ public class InductiveVisualMinerController {
 	final InductiveVisualMinerPanel panel;
 	final InductiveVisualMinerState state;
 
-	private final Chain2 chain;
+	private final Chain chain;
 	private final PluginContext context;
 
 	public InductiveVisualMinerController(final PluginContext context, final InductiveVisualMinerPanel panel,
@@ -91,7 +91,7 @@ public class InductiveVisualMinerController {
 		};
 
 		//set up the chain
-		chain = new Chain2(state, canceller, context.getExecutor(), onException2);
+		chain = new Chain(state, canceller, context.getExecutor(), onException2);
 
 		//gather attributes
 		Cl01GatherAttributes gatherAttributes = new Cl01GatherAttributes();

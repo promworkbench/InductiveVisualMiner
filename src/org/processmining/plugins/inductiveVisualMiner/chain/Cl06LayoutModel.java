@@ -8,9 +8,8 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplEmpty;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
@@ -18,29 +17,26 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-// perform layout
-public class Cl07LayoutWithAlignment
-		extends
-		ChainLink<Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap>> {
+public class Cl06LayoutModel extends
+		ChainLink<Triple<IvMEfficientTree, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap>> {
 
-	protected Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> generateInput(
+	protected Triple<IvMEfficientTree, ProcessTreeVisualisationParameters, DotPanelUserSettings> generateInput(
 			InductiveVisualMinerState state) {
-		return Quadruple.of(state.getTree(), state.getIvMLogInfoFiltered(),
-				state.getMode().getVisualisationParameters(state), state.getGraphUserSettings());
+		return Triple.of(state.getTree(), state.getMode().getVisualisationParameters(state),
+				state.getGraphUserSettings());
 	}
 
 	protected Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap> executeLink(
-			Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> input,
+			Triple<IvMEfficientTree, ProcessTreeVisualisationParameters, DotPanelUserSettings> input,
 			IvMCanceller canceller) throws UnknownTreeNodeException {
-		IvMEfficientTree tree = input.getA();
-
 		//compute dot
 		ProcessTreeVisualisation visualiser = new ProcessTreeVisualisation();
-		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplFrequencies(tree, input.getB());
-		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> p = visualiser.fancy(tree, data, input.getC());
+		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplEmpty();
+		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> p = visualiser.fancy(input.getA(), data,
+				input.getB());
 
-		//keep the user settings of the dot panel
-		input.getD().applyToDot(p.getA());
+		//set the graph direction
+		input.getC().applyToDot(p.getA());
 
 		//compute svg from dot
 		SVGDiagram diagram = DotPanel.dot2svg(p.getA());
@@ -48,8 +44,14 @@ public class Cl07LayoutWithAlignment
 		return Quadruple.of(p.getA(), diagram, p.getB(), p.getC());
 	}
 
-	protected void processResult(Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap> result,
+	protected void processResult(
+			Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap> result,
 			InductiveVisualMinerState state) {
 		state.setLayout(result.getA(), result.getB(), result.getC(), result.getD());
 	}
+
+	protected void invalidateResult(InductiveVisualMinerState state) {
+		state.setLayout(null, null, null, null);
+	}
+
 }

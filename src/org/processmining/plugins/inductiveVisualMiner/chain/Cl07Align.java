@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.chain2;
+package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import java.lang.ref.SoftReference;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,14 +10,13 @@ import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentPerformance;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
 public class Cl07Align extends
-		ChainLink2<Quintuple<IvMEfficientTree, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
+		ChainLink<Quintuple<IvMEfficientTree, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
 
 	private static ConcurrentHashMap<Triple<IvMEfficientTree, XEventPerformanceClassifier, XLog>, SoftReference<IvMLogNotFiltered>> cache = new ConcurrentHashMap<>();
 

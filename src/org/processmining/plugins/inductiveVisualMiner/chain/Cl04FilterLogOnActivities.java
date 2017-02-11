@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.chain2;
+package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,12 +10,11 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogI
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
 
 public class Cl04FilterLogOnActivities extends
-		ChainLink2<Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMFiltersController>, Triple<IMLog, IMLogInfo, Set<XEventClass>>> {
+		ChainLink<Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMFiltersController>, Triple<IMLog, IMLogInfo, Set<XEventClass>>> {
 
 	protected Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMFiltersController> generateInput(
 			InductiveVisualMinerState state) {

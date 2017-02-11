@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.chain2;
+package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
@@ -6,11 +6,10 @@ import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeCl
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 
 public class Cl01GatherAttributes
-		extends ChainLink2<XLog, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
+		extends ChainLink<XLog, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
 
 	protected XLog generateInput(InductiveVisualMinerState state) {
 		return state.getXLog();

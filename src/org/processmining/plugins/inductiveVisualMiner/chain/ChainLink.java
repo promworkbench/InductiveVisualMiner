@@ -5,28 +5,30 @@ import java.util.concurrent.Executor;
 
 import javax.swing.SwingUtilities;
 
-import org.processmining.plugins.InductiveMiner.Function;
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
 public abstract class ChainLink<I, O> {
-
-	private Chain chain;
-	private Executor executor;
 	private Runnable onStart;
 	private Runnable onComplete;
-	private Function<Exception, Object> onException;
+	private OnException onException;
+	private Runnable onInvalidate;
+
+	private boolean isComplete = false;
+	private IvMCanceller currentExecutionCanceller = null;
+	private UUID currentExecutionId = null;
 
 	/**
 	 * 
 	 * @return
 	 * 
-	 *         Gathers all inputs required for the computation
+	 * 		Gathers all inputs required for the computation
 	 */
 	protected abstract I generateInput(InductiveVisualMinerState state);
 
 	/**
 	 * Performs the computation, given the input. Side-effects not allowed;
-	 * should be thread-safe and static.
+	 * should be thread-safe.
 	 * 
 	 * @param input
 	 * @param canceller
@@ -38,6 +40,7 @@ public abstract class ChainLink<I, O> {
 	/**
 	 * 
 	 * @param result
+	 * @param state
 	 * 
 	 *            Processes the result of the computation. Guarantee: if
 	 *            executed, then all inputs are still relevant and have not been
@@ -45,8 +48,51 @@ public abstract class ChainLink<I, O> {
 	 */
 	protected abstract void processResult(O result, InductiveVisualMinerState state);
 
-	public void execute(final UUID execution, final int indexInChain, final InductiveVisualMinerState state,
-			final IvMCanceller canceller) {
+	/**
+	 * 
+	 * @param state
+	 * 
+	 *            Invalidate the results of this computation.
+	 */
+	protected abstract void invalidateResult(InductiveVisualMinerState state);
+
+	public boolean isComplete() {
+		return isComplete;
+	}
+
+	public boolean equals(Object other) {
+		return this.getClass() == other.getClass();
+	}
+
+	public void cancelAndInvalidateResult(InductiveVisualMinerState state) {
+		System.out.println("cancel " + this.getClass() + " from thread " + Thread.currentThread().getId());
+		isComplete = false;
+		if (currentExecutionCanceller != null) {
+			currentExecutionCanceller.cancel();
+		}
+		currentExecutionId = null;
+		currentExecutionCanceller = null;
+		if (onInvalidate != null) {
+			onInvalidate.run();
+		}
+		invalidateResult(state);
+	}
+
+	public void execute(ProMCanceller globalCanceller, Executor executor, final InductiveVisualMinerState state,
+			final Chain chain) throws InterruptedException {
+		if (currentExecutionCanceller != null) {
+			currentExecutionCanceller.cancel();
+		}
+		currentExecutionCanceller = new IvMCanceller(globalCanceller);
+		currentExecutionId = UUID.randomUUID();
+		isComplete = false;
+
+		System.out.println("  execute " + this.getClass() + " from thread " + Thread.currentThread().getId() + " uuid "
+				+ currentExecutionId);
+
+		final IvMCanceller canceller = currentExecutionCanceller;
+		final UUID id = currentExecutionId;
+
 		final I input = generateInput(state);
 
 		executor.execute(new Runnable() {
@@ -57,23 +103,32 @@ public abstract class ChainLink<I, O> {
 				final O result;
 				try {
 					result = executeLink(input, canceller);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					try {
-						onException.call(e);
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								onException.onException(e);
+							}
+						});
 						e.printStackTrace();
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 					return;
 				}
+				//process the result
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						if (chain.getCurrentExecution().equals(execution) && !canceller.isCancelled()) {
+						if (id.equals(currentExecutionId) && !canceller.isCancelled()) {
+							System.out.println("    process result " + ChainLink.this.getClass() + " uuid" + id);
 							processResult(result, state);
 							if (onComplete != null) {
 								onComplete.run();
 							}
-							chain.executeNext(execution, indexInChain);
+							isComplete = true;
+							chain.executeNext(ChainLink.this);
+						} else {
+
 						}
 					}
 				});
@@ -101,12 +156,11 @@ public abstract class ChainLink<I, O> {
 		this.onComplete = onComplete;
 	}
 
-	public void setOnException(Function<Exception, Object> onException) {
+	public void setOnException(OnException onException) {
 		this.onException = onException;
 	}
-
-	public void setExecutor(Executor executor, Chain chain) {
-		this.executor = executor;
-		this.chain = chain;
+	
+	public void setOnInvalidate(Runnable onInvalidate) {
+		this.onInvalidate = onInvalidate;
 	}
 }

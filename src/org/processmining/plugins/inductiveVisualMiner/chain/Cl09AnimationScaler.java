@@ -1,12 +1,11 @@
-package org.processmining.plugins.inductiveVisualMiner.chain2;
+package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 
-public class Cl09AnimationScaler extends ChainLink2<IvMLog, Scaler> {
+public class Cl09AnimationScaler extends ChainLink<IvMLog, Scaler> {
 
 	protected IvMLog generateInput(InductiveVisualMinerState state) {
 		return state.getIvMLog();

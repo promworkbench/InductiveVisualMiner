@@ -1,8 +1,7 @@
-package org.processmining.plugins.inductiveVisualMiner.chain2;
+package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
@@ -15,7 +14,7 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
-public class Cl13Performance extends ChainLink2<Pair<IvMEfficientTree, IvMLog>, PerformanceWrapper> {
+public class Cl13Performance extends ChainLink<Pair<IvMEfficientTree, IvMLog>, PerformanceWrapper> {
 
 	protected Pair<IvMEfficientTree, IvMLog> generateInput(InductiveVisualMinerState state) {
 		if (!state.isIllogicalTimeStamps()) {

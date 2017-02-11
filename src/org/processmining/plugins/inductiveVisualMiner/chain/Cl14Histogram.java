@@ -1,17 +1,16 @@
-package org.processmining.plugins.inductiveVisualMiner.chain2;
+package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimationPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 public class Cl14Histogram extends
-		ChainLink2<Quintuple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer, ProcessTreeVisualisationInfo>, HistogramData> {
+		ChainLink<Quintuple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer, ProcessTreeVisualisationInfo>, HistogramData> {
 
 	protected Quintuple<IvMEfficientTree, IvMLogFiltered, Scaler, Integer, ProcessTreeVisualisationInfo> generateInput(
 			InductiveVisualMinerState state) {
