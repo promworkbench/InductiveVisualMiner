@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.Map;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 
 public class TraceColourMapSettings {
@@ -11,13 +12,13 @@ public class TraceColourMapSettings {
 	public static final Color defaultColour = Color.yellow;
 
 	private enum Type {
-		empty, attributeString, attributeNumber, propertyNumberOfEvents, propertyDuration
+		empty, attributeString, attributeNumber, attributeTime, propertyNumberOfEvents, propertyTraceDuration
 	}
 
 	private final Type type;
 
 	//string
-	private final String attribute;
+	private final Attribute attribute;
 	private final Color[] colours;
 	private final Map<String, Color> value2colour;
 
@@ -29,24 +30,28 @@ public class TraceColourMapSettings {
 		return new TraceColourMapSettings(Type.empty, null, null, null, Double.MIN_VALUE, Double.MIN_VALUE);
 	}
 
-	public static TraceColourMapSettings string(String attribute, Color[] colours, Map<String, Color> value2colour) {
+	public static TraceColourMapSettings string(Attribute attribute, Color[] colours, Map<String, Color> value2colour) {
 		return new TraceColourMapSettings(Type.attributeString, attribute, colours, value2colour, Double.MIN_VALUE,
 				Double.MIN_VALUE);
 	}
 
-	public static TraceColourMapSettings number(String attribute, Color[] colours, double min, double max) {
+	public static TraceColourMapSettings number(Attribute attribute, Color[] colours, double min, double max) {
 		return new TraceColourMapSettings(Type.attributeNumber, attribute, colours, null, min, max);
+	}
+	
+	public static TraceColourMapSettings time(Attribute attribute, Color[] colours, long min, long max) {
+		return new TraceColourMapSettings(Type.attributeTime, attribute, colours, null, min, max);
+	}
+
+	public static TraceColourMapSettings duration(Color[] colours, long min, long max) {
+		return new TraceColourMapSettings(Type.propertyTraceDuration, null, colours, null, min, max);
 	}
 
 	public static TraceColourMapSettings numberOfEvents(Color[] colours, long min, long max) {
 		return new TraceColourMapSettings(Type.propertyNumberOfEvents, null, colours, null, min, max);
 	}
 
-	public static TraceColourMapSettings duration(Color[] colours, long min, long max) {
-		return new TraceColourMapSettings(Type.propertyDuration, null, colours, null, min, max);
-	}
-
-	private TraceColourMapSettings(Type type, String attribute, Color[] colours, Map<String, Color> value2colour,
+	private TraceColourMapSettings(Type type, Attribute attribute, Color[] colours, Map<String, Color> value2colour,
 			double min, double max) {
 		this.type = type;
 		this.attribute = attribute;
@@ -69,11 +74,13 @@ public class TraceColourMapSettings {
 				return new TraceColourMapAttributeNumber(log, attribute, colours, min, max);
 			case attributeString :
 				return new TraceColourMapAttributeString(log, attribute, value2colour);
+			case attributeTime :
+				return new TraceColourMapAttributeTime(log, attribute, colours, (long) min, (long) max);
 			case empty :
 				return new TraceColourMapFixed(Color.yellow);
 			case propertyNumberOfEvents :
 				return new TraceColourMapPropertyNumberOfEvents(tree, log, colours, min, max);
-			case propertyDuration :
+			case propertyTraceDuration :
 				return new TraceColourMapPropertyDuration(tree, log, colours, min, max);
 			default :
 				return new TraceColourMapFixed(Color.yellow);

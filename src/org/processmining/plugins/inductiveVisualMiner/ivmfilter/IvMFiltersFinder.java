@@ -9,15 +9,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.processmining.framework.plugin.PluginContext;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceWithEventTwice;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.MultiEventAttributeFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.MultiLogMoveAttributeFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.MultiTraceAttributeFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterEvents;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEventTwice;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterLogMove;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTrace;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFrequentTracesFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningMultiTraceAttributeFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTrace;
 
 public class IvMFiltersFinder {
 
@@ -30,15 +30,15 @@ public class IvMFiltersFinder {
 		 * TODO add filters manually to show them in QuickVisualiser
 		 * 
 		 */
-		maybeAdd(colouringFilters, new HighlightingFilterTraceWithEventTwice(), annotations);
-		maybeAdd(colouringFilters, new MultiEventAttributeFilter(), annotations);
-		maybeAdd(colouringFilters, new MultiLogMoveAttributeFilter(), annotations);
-		maybeAdd(colouringFilters, new MultiTraceAttributeFilter(), annotations);
-		maybeAdd(colouringFilters, new PreMiningFilterEvents(), annotations);
+		maybeAdd(colouringFilters, new HighlightingFilterEventTwice(), annotations);
+		maybeAdd(colouringFilters, new HighlightingFilterEvent(), annotations);
+		maybeAdd(colouringFilters, new HighlightingFilterLogMove(), annotations);
+		maybeAdd(colouringFilters, new HighlightingFilterTrace(), annotations);
+		maybeAdd(colouringFilters, new PreMiningFilterEvent(), annotations);
 		maybeAdd(colouringFilters, new PreMiningFilterTraceWithEvent(), annotations);
 		maybeAdd(colouringFilters, new PreMiningFilterTraceWithEventTwice(), annotations);
 		maybeAdd(colouringFilters, new PreMiningFrequentTracesFilter(), annotations);
-		maybeAdd(colouringFilters, new PreMiningMultiTraceAttributeFilter(), annotations);
+		maybeAdd(colouringFilters, new PreMiningFilterTrace(), annotations);
 
 		for (Class<? extends Annotation> annotation : annotations) {
 			Set<Class<?>> coverageEstimatorClasses = context.getPluginManager()

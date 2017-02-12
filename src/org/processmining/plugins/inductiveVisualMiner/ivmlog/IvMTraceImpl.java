@@ -211,4 +211,14 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 
 		}
 	}
+
+	public int getNumberOfEvents() {
+		int result = 0;
+		for (IvMMove e : this) {
+			if (!e.isModelMove() && e.getActivityEventClass() != null) {
+				result++;
+			}
+		}
+		return result;
+	}
 }

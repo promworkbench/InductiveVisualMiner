@@ -1,12 +1,16 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 
 public class Cl01GatherAttributes
 		extends ChainLink<XLog, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
@@ -18,10 +22,15 @@ public class Cl01GatherAttributes
 	protected Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]> executeLink(XLog input,
 			IvMCanceller canceller) throws Exception {
 		AttributesInfo info = new AttributesInfo(input);
-		String[] attributes = info.getEventAttributes();
+		Collection<Attribute> attributes = info.getEventAttributes();
 
-		Pair<AttributeClassifier[], AttributeClassifier> p = AttributeClassifiers.getAttributeClassifiers(input,
-				attributes, true);
+		String[] names = new String[attributes.size()];
+		Iterator<Attribute> it = attributes.iterator();
+		for (int i = 0; i < names.length; i++) {
+			names[i] = it.next().getName();
+		}
+		Pair<AttributeClassifier[], AttributeClassifier> p = AttributeClassifiers.getAttributeClassifiers(input, names,
+				true);
 		AttributeClassifier[] attributeClassifiers = p.getA();
 		AttributeClassifier firstClassifier = p.getB();
 

@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 import java.awt.Color;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
@@ -14,6 +15,7 @@ public abstract class IvMFilterGui extends JPanel {
 
 	public IvMFilterGui(String title) {
 		setBorder(BorderFactory.createTitledBorder(title));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setOpaque(false);
 	}
 

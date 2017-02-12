@@ -1,11 +1,16 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.graphs.Graph;
 import org.processmining.plugins.InductiveMiner.graphs.GraphFactory;
+import org.processmining.plugins.graphviz.dot.Dot;
+import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+
+import gnu.trove.map.hash.THashMap;
 
 /**
  * Generic class to perform any chain of computation jobs, which can be ordered
@@ -104,5 +109,20 @@ public class Chain {
 		for (long edge : graph.getOutgoingEdgesOf(chainLink)) {
 			cancelAndInvalidateResultRecursively(graph.getEdgeTarget(edge), state);
 		}
+	}
+
+	public Dot toDot() {
+		Dot result = new Dot();
+
+		Map<Class<?>, DotNode> map = new THashMap<>();
+		for (ChainLink<?, ?> vertex : graph.getVertices()) {
+			map.put(vertex.getClass(), result.addNode(vertex.getClass().getSimpleName()));
+		}
+
+		for (long edgeIndex : graph.getEdges()) {
+			result.addEdge(map.get(graph.getEdgeSource(edgeIndex).getClass()), map.get(graph.getEdgeTarget(edgeIndex).getClass()));
+		}
+		
+		return result;
 	}
 }

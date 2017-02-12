@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 
 import java.awt.Color;
+import java.text.DecimalFormat;
 
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
@@ -60,9 +61,10 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 		return trace2colour[traceIndex];
 	}
 
+	final private static DecimalFormat numberFormat = new DecimalFormat("#.##");
 	public String getValue(IvMTrace trace) {
 		if (getProperty(trace) > Double.MIN_VALUE) {
-			return "\u2588 " + getProperty(trace);
+			return "\u2588 " + numberFormat.format(getProperty(trace));
 		} else {
 			return "";
 		}
@@ -70,7 +72,7 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 
 	public String getValue(IMTrace trace) {
 		if (getProperty(trace) > Double.MIN_VALUE) {
-			return "\u2588 " + getProperty(trace);
+			return "\u2588 " + numberFormat.format(getProperty(trace));
 		} else {
 			return "";
 		}

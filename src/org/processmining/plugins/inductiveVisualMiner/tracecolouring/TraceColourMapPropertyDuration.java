@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 
 import java.awt.Color;
 
+import org.deckfour.xes.model.XEvent;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
@@ -17,12 +18,31 @@ public class TraceColourMapPropertyDuration extends TraceColourMapProperty {
 	}
 
 	protected double getProperty(IvMTrace trace) {
-		double min = Long.MAX_VALUE;
-		double max = Long.MIN_VALUE;
+		return getTraceDuration(trace);
+	}
+	
+	public static long getTraceDuration(IvMTrace trace) {
+		long min = Long.MAX_VALUE;
+		long max = Long.MIN_VALUE;
 		for (IvMMove move : trace) {
 			if (move.getLogTimestamp() != null) {
 				min = Math.min(min, move.getLogTimestamp());
 				max = Math.max(max, move.getLogTimestamp());
+			}
+		}
+		if (max == Long.MIN_VALUE) {
+			return max;
+		}
+		return max - min;
+	}
+	
+	public static long getTraceDuration(IMTrace trace) {
+		long min = Long.MAX_VALUE;
+		long max = Long.MIN_VALUE;
+		for (XEvent event : trace) {
+			if (ResourceTimeUtils.getTimestamp(event) != null) {
+				min = Math.min(min, ResourceTimeUtils.getTimestamp(event));
+				max = Math.max(max, ResourceTimeUtils.getTimestamp(event));
 			}
 		}
 		if (max == Long.MIN_VALUE) {

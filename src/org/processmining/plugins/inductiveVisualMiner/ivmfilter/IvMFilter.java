@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 
 /**

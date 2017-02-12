@@ -45,6 +45,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl11TraceColouring;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl12FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Histogram;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Done;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
@@ -208,7 +209,7 @@ public class InductiveVisualMinerController {
 			});
 			filterLogOnActivities.setOnException(onException2);
 		}
-		
+
 		chain.addConnection(makeLog, filterLogOnActivities);
 
 		//mine a model
@@ -235,7 +236,7 @@ public class InductiveVisualMinerController {
 			});
 			mine.setOnException(onException2);
 		}
-		
+
 		chain.addConnection(filterLogOnActivities, mine);
 
 		//layout
@@ -290,7 +291,7 @@ public class InductiveVisualMinerController {
 			layoutAlignment.setOnStart(new Runnable() {
 				public void run() {
 					setStatus("Layouting aligned model..");
-					
+
 					//if the view does not show deviations, do not select any log moves
 					if (!state.getMode().isShowDeviations()) {
 						state.removeModelAndLogMovesSelection();
@@ -300,9 +301,9 @@ public class InductiveVisualMinerController {
 			layoutAlignment.setOnComplete(new Runnable() {
 				public void run() {
 					panel.getGraph().changeDot(state.getDot(), state.getSVGDiagram(), true);
-					
+
 					makeElementsSelectable(state.getVisualisationInfo(), panel, state.getSelection());
-					
+
 					//tell the trace view the colours of activities
 					panel.getTraceView().setEventColourMap(state.getTraceViewColourMap());
 				}
@@ -351,22 +352,22 @@ public class InductiveVisualMinerController {
 						panel.getGraph().setAnimationEnabled(false);
 					}
 					panel.repaint();
-					
+
 					//record the width of the panel (necessary for histogram later)
 					state.setHistogramWidth((int) panel.getGraph().getControlsProgressLine().getWidth());
 				}
 			});
-			
+
 			animate.setOnInvalidate(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
 					setAnimationStatus(" ", false);
 				}
 			});
-			
+
 			animate.setOnException(onException2);
 		}
-		
+
 		chain.addConnection(animationScaler, animate);
 		chain.addConnection(layoutAlignment, animate);
 
@@ -428,7 +429,7 @@ public class InductiveVisualMinerController {
 				public void run() {
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(null);
-					
+
 					try {
 						PopupPopulator.updatePopup(panel, state);
 					} catch (UnknownTreeNodeException e) {
@@ -494,8 +495,28 @@ public class InductiveVisualMinerController {
 			});
 			histogram.setOnException(onException2);
 		}
-		
+
 		chain.addConnection(filterNodeSelection, histogram);
+
+		//done
+		Cl15Done done = new Cl15Done();
+		{
+			done.setOnStart(new Runnable() {
+				public void run() {
+					setStatus("done");
+				}
+			});
+			done.setOnComplete(new Runnable() {
+				public void run() {
+					setStatus(" ");
+				}
+			});
+		}
+
+		chain.addConnection(histogram, done);
+		chain.addConnection(performance, done);
+		chain.addConnection(traceColouring, done);
+		chain.addConnection(animate, done);
 
 		//start the chain
 		chain.execute(Cl01GatherAttributes.class);

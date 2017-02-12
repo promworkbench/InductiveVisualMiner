@@ -1,9 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -29,6 +25,10 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 
 import com.fluxicon.slickerbox.factory.SlickerDecorator;
 import com.fluxicon.slickerbox.factory.SlickerFactory;
+
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 public abstract class IvMFiltersView extends SideWindow {
 	private static final long serialVersionUID = -5500440632866414477L;
@@ -84,7 +84,8 @@ public abstract class IvMFiltersView extends SideWindow {
 		JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		SlickerDecorator.instance().decorate(scrollPane, MultiComboBox.even_colour_bg, Color.DARK_GRAY, Color.GRAY);
-		scrollPane.setOpaque(false);
+		scrollPane.setOpaque(true);
+		scrollPane.getViewport().setBackground(MultiComboBox.even_colour_bg);
 		add(scrollPane, BorderLayout.CENTER);
 	}
 

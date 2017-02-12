@@ -51,4 +51,6 @@ public interface IvMTrace extends List<IvMMove> {
 	public XAttributeMap getAttributes();
 
 	public ActivityInstanceIterator activityInstanceIterator(IvMEfficientTree tree);
+	
+	public int getNumberOfEvents();
 }

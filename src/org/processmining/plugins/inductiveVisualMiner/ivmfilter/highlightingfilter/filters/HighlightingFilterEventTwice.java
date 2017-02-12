@@ -1,22 +1,22 @@
-package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
-import org.deckfour.xes.model.XEvent;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class PreMiningFilterTraceWithEventTwice extends PreMiningFilterTraceWithEvent {
+public class HighlightingFilterEventTwice extends HighlightingFilterEvent {
 
 	@Override
 	public String getName() {
-		return "Trace with event happening twice filter";
+		return "Event happening twice filter";
 	}
-	
+
 	@Override
-	public boolean staysInLog(IMTrace trace) {
+	public boolean countInColouring(IvMTrace trace) {		
 		Attribute attribute = panel.getSelectedAttribute();
 		int count = 0;
 		if (attribute.isLiteral()) {
-			for (XEvent event : trace) {
+			for (IvMMove event : trace) {
 				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName()) && panel
 						.getSelectedLiterals().contains(event.getAttributes().get(attribute.getName()).toString())) {
 					count++;
@@ -26,7 +26,7 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningFilterTraceWith
 				}
 			}
 		} else if (attribute.isNumeric()) {
-			for (XEvent event : trace) {
+			for (IvMMove event : trace) {
 				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName())) {
 					double value = Attribute.parseDoubleFast(event.getAttributes().get(attribute.getName()));
 					if (value >= panel.getSelectedNumericMin() && value <= panel.getSelectedNumericMax()) {
@@ -38,7 +38,7 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningFilterTraceWith
 				}
 			}
 		} else if (attribute.isTime()) {
-			for (XEvent event : trace) {
+			for (IvMMove event : trace) {
 				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName())) {
 					long value = Attribute.parseTimeFast(event.getAttributes().get(attribute.getName()));
 					if (value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
@@ -52,15 +52,15 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningFilterTraceWith
 		}
 		return false;
 	}
-
+	
 	@Override
-	public void updateExplanation() {
+	public void updateExplanation() {		
 		if (!isEnabled()) {
-			panel.getExplanationLabel()
-					.setText("Include only traces that have at least two events having an attribute as selected.");
+			panel.getExplanationLabel().setText(
+					"Include only traces that have at least two events having an attribute as selected.");
 		} else {
-			panel.getExplanationLabel()
-					.setText("Include only traces that have at least two events " + panel.getExplanation() + ".");
+			panel.getExplanationLabel().setText(
+					"Include only traces that have at least two events " + panel.getExplanation() + ".");
 		}
 	}
 

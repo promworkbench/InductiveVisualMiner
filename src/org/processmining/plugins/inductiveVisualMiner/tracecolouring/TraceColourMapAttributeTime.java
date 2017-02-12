@@ -5,20 +5,21 @@ import java.awt.Color;
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class TraceColourMapAttributeNumber implements TraceColourMap {
+public class TraceColourMapAttributeTime implements TraceColourMap {
 
 	private final Attribute attribute;
 	private final Color[] trace2colour;
-	private final double min;
-	private final double max;
+	private final long min;
+	private final long max;
 	private final Color[] colours;
 
-	public TraceColourMapAttributeNumber(IvMLogNotFiltered log, Attribute attribute, Color[] colours, double min,
-			double max) {
+	public TraceColourMapAttributeTime(IvMLogNotFiltered log, Attribute attribute, Color[] colours, long min,
+			long max) {
 		this.attribute = attribute;
 		this.min = min;
 		this.max = max;
@@ -35,8 +36,8 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 		if (attribute == null) {
 			return TraceColourMapSettings.defaultColour;
 		} else {
-			double value = Attribute.parseDoubleFast(attribute);
-			if (value == Double.MIN_VALUE) {
+			long value = Attribute.parseTimeFast(attribute);
+			if (value == Long.MIN_VALUE) {
 				return TraceColourMapSettings.defaultColour;
 			}
 
@@ -61,7 +62,7 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 		if (value == null) {
 			return "";
 		}
-		return "\u2588 " + value.toString();
+		return "\u2588 " + ResourceTimeUtils.timeToString(Attribute.parseTimeFast(value));
 	}
 
 	public String getValue(IMTrace trace) {
@@ -69,6 +70,6 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 		if (value == null) {
 			return "";
 		}
-		return "\u2588 " + value.toString();
+		return "\u2588 " + ResourceTimeUtils.timeToString(Attribute.parseTimeFast(value));
 	}
 }

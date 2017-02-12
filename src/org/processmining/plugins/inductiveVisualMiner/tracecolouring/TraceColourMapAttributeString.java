@@ -6,6 +6,7 @@ import java.util.Map;
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
@@ -13,9 +14,9 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 
 	private final Color[] trace2colour;
 	private final Map<String, Color> value2colour;
-	private final String attribute;
+	private final Attribute attribute;
 
-	public TraceColourMapAttributeString(IvMLogNotFiltered log, String attribute, Map<String, Color> value2colour) {
+	public TraceColourMapAttributeString(IvMLogNotFiltered log, Attribute attribute, Map<String, Color> value2colour) {
 		this.value2colour = value2colour;
 		this.attribute = attribute;
 
@@ -36,7 +37,7 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 	}
 
 	public Color getColour(IMTrace trace) {
-		XAttribute value = trace.getAttributes().get(attribute);
+		XAttribute value = trace.getAttributes().get(attribute.getName());
 		if (value == null) {
 			return TraceColourMapSettings.defaultColour;
 		} else {
@@ -45,7 +46,7 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 	}
 
 	public Color getColour(IvMTrace trace) {
-		XAttribute value = trace.getAttributes().get(attribute);
+		XAttribute value = trace.getAttributes().get(attribute.getName());
 		if (value == null) {
 			return TraceColourMapSettings.defaultColour;
 		} else {
@@ -54,7 +55,7 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 	}
 
 	public String getValue(IvMTrace trace) {
-		XAttribute value = trace.getAttributes().get(attribute);
+		XAttribute value = trace.getAttributes().get(attribute.getName());
 		if (value == null) {
 			return "";
 		}
@@ -62,7 +63,7 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 	}
 
 	public String getValue(IMTrace trace) {
-		XAttribute value = trace.getAttributes().get(attribute);
+		XAttribute value = trace.getAttributes().get(attribute.getName());
 		if (value == null) {
 			return "";
 		}
