@@ -28,4 +28,7 @@ public class Cl09AnimationScaler extends ChainLink<IvMLog, Scaler> {
 		state.setAnimationScaler(null);
 	}
 
+	public String getName() {
+		return "scale animation";
+	}
 }

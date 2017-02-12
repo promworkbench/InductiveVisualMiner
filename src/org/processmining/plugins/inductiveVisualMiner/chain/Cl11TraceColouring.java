@@ -33,4 +33,7 @@ public class Cl11TraceColouring extends ChainLink<Triple<IvMEfficientTree, IvMLo
 		state.setTraceColourMap(new TraceColourMapFixed(TraceColourMapSettings.defaultColour));
 	}
 
+	public String getName() {
+		return "colour traces";
+	}
 }

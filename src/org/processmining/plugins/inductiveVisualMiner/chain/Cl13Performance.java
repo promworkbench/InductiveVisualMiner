@@ -98,4 +98,7 @@ public class Cl13Performance extends ChainLink<Pair<IvMEfficientTree, IvMLog>, P
 		state.setVisualisationData(null);
 	}
 
+	public String getName() {
+		return "measure performance";
+	}
 }

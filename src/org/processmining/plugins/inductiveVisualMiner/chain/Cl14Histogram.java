@@ -53,4 +53,7 @@ public class Cl14Histogram extends
 		state.setHistogramData(null);
 	}
 
+	public String getName() {
+		return "compute histograms";
+	}
 }

@@ -53,4 +53,7 @@ public class Cl04FilterLogOnActivities extends
 		state.setActivityFilteredIMLog(null, null, null);
 	}
 
+	public String getName() {
+		return "filter log";
+	}
 }

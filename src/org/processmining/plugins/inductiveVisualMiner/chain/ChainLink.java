@@ -18,6 +18,8 @@ public abstract class ChainLink<I, O> {
 	private IvMCanceller currentExecutionCanceller = null;
 	private UUID currentExecutionId = null;
 
+	public abstract String getName();
+
 	/**
 	 * 
 	 * @return
@@ -154,7 +156,7 @@ public abstract class ChainLink<I, O> {
 	public void setOnException(OnException onException) {
 		this.onException = onException;
 	}
-	
+
 	public void setOnInvalidate(Runnable onInvalidate) {
 		this.onInvalidate = onInvalidate;
 	}

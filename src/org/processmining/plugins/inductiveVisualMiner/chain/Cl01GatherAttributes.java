@@ -48,4 +48,8 @@ public class Cl01GatherAttributes
 		state.setClassifier(null);
 	}
 
+	public String getName() {
+		return "gather attributes";
+	}
+
 }

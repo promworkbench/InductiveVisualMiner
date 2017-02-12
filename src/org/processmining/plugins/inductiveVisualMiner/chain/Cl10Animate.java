@@ -55,4 +55,7 @@ public class Cl10Animate extends
 		state.setAnimation(null);
 	}
 
+	public String getName() {
+		return "animate";
+	}
 }

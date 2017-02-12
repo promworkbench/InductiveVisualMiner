@@ -23,6 +23,7 @@ import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedLi
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.ControllerView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
@@ -75,6 +76,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private final TraceColourMapView traceColourMapView;
 	private final JButton highlightingFiltersViewButton;
 	private final HighlightingFiltersView highlightingFiltersView;
+	private final ControllerView controllerView;
 
 	private InputFunction<Selection> onSelectionChanged = null;
 	private Runnable onGraphDirectionChanged = null;
@@ -266,6 +268,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 				cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(traceViewButton, cTraceViewButton);
 			}
+			
+			//controller view
+			{
+				controllerView = new ControllerView(this);
+			}
 
 			{
 				saveModelButton = SlickerFactory.instance().createButton("export model");
@@ -392,6 +399,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		traceView.setVisible(false);
 		highlightingFiltersView.setVisible(false);
 		traceColourMapView.setVisible(false);
+		controllerView.setVisible(false);
 		graphPanel.pause();
 	}
 
@@ -497,6 +505,10 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 	public JButton getTraceViewButton() {
 		return traceViewButton;
+	}
+	
+	public ControllerView getControllerView() {
+		return controllerView;
 	}
 
 	public EditModelView getEditModelView() {

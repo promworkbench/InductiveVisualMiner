@@ -39,4 +39,7 @@ public class Cl03MakeLog extends
 		state.setLog(null, null, null, null);
 	}
 
+	public String getName() {
+		return "make log";
+	}
 }

@@ -98,4 +98,8 @@ public class Cl02SortEvents extends ChainLink<XLog, XLog> {
 		}
 		return false;
 	}
+	
+	public String getName() {
+		return "sort events";
+	}
 }

@@ -1,9 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executor;
 
 import org.processmining.framework.plugin.ProMCanceller;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.graphs.Graph;
 import org.processmining.plugins.InductiveMiner.graphs.GraphFactory;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -11,6 +13,7 @@ import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
 import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 
 /**
  * Generic class to perform any chain of computation jobs, which can be ordered
@@ -25,13 +28,15 @@ public class Chain {
 	private final ProMCanceller globalCanceller;
 	private final Executor executor;
 	private final OnException onException;
+	private Runnable onChange;
 
 	public Chain(InductiveVisualMinerState state, ProMCanceller globalCanceller, Executor executor,
-			OnException onException) {
+			OnException onException, Runnable onChange) {
 		this.state = state;
 		this.globalCanceller = globalCanceller;
 		this.executor = executor;
 		this.onException = onException;
+		this.onChange = onChange;
 	}
 
 	public void addConnection(ChainLink<?, ?> from, ChainLink<?, ?> to) {
@@ -83,6 +88,7 @@ public class Chain {
 				}
 			}
 		}
+		onChange.run();
 	}
 
 	public boolean canExecute(ChainLink<?, ?> chainLink) {
@@ -111,18 +117,28 @@ public class Chain {
 		}
 	}
 
-	public Dot toDot() {
+	public Pair<Dot, Map<ChainLink<?, ?>, DotNode>> toDot() {
 		Dot result = new Dot();
 
-		Map<Class<?>, DotNode> map = new THashMap<>();
+		Map<ChainLink<?, ?>, DotNode> map = new THashMap<>();
 		for (ChainLink<?, ?> vertex : graph.getVertices()) {
-			map.put(vertex.getClass(), result.addNode(vertex.getClass().getSimpleName()));
+			map.put(vertex, result.addNode(vertex.getName()));
 		}
 
 		for (long edgeIndex : graph.getEdges()) {
-			result.addEdge(map.get(graph.getEdgeSource(edgeIndex).getClass()), map.get(graph.getEdgeTarget(edgeIndex).getClass()));
+			result.addEdge(map.get(graph.getEdgeSource(edgeIndex)), map.get(graph.getEdgeTarget(edgeIndex)));
 		}
-		
+
+		return Pair.of(result, map);
+	}
+
+	public Set<ChainLink<?, ?>> getCompletedChainLinks() {
+		Set<ChainLink<?, ?>> result = new THashSet<>();
+		for (ChainLink<?, ?> vertex : graph.getVertices()) {
+			if (vertex.isComplete()) {
+				result.add(vertex);
+			}
+		}
 		return result;
 	}
 }

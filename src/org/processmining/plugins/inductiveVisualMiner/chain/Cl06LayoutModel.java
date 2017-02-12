@@ -54,4 +54,7 @@ public class Cl06LayoutModel extends
 		state.setLayout(null, null, null, null);
 	}
 
+	public String getName() {
+		return "layout model";
+	}
 }

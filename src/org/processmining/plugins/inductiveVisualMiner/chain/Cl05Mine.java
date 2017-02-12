@@ -48,4 +48,7 @@ public class Cl05Mine extends
 		state.setSelection(new Selection());
 	}
 
+	public String getName() {
+		return "mine";
+	}
 }

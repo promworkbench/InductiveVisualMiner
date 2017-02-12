@@ -85,21 +85,29 @@ public class InductiveVisualMinerController {
 		initGui();
 
 		//set up exception handling
-		final OnException onException2 = new OnException() {
+		final OnException onException = new OnException() {
 			public void onException(Exception e) {
 				setStatus("- error - aborted -");
 			}
 		};
+		
+		//set up the controller view
+		final Runnable onChange = new Runnable() {
+			public void run() {
+				if (panel.getControllerView().isVisible()) {
+					panel.getControllerView().pushCompleteChainLinks(chain.getCompletedChainLinks());
+				}
+			}
+		};
 
 		//set up the chain
-		chain = new Chain(state, canceller, context.getExecutor(), onException2);
+		chain = new Chain(state, canceller, context.getExecutor(), onException, onChange);
 
 		//gather attributes
 		Cl01GatherAttributes gatherAttributes = new Cl01GatherAttributes();
 		{
 			gatherAttributes.setOnStart(new Runnable() {
 				public void run() {
-					panel.getClassifiers().setEnabled(false);
 					setStatus("Gathering attributes..");
 				}
 			});
@@ -135,7 +143,12 @@ public class InductiveVisualMinerController {
 					}
 				}
 			});
-			gatherAttributes.setOnException(onException2);
+			gatherAttributes.setOnInvalidate(new Runnable() {
+				public void run() {
+					panel.getClassifiers().setEnabled(false);
+				}
+			});
+			gatherAttributes.setOnException(onException);
 		}
 
 		//reorder events
@@ -173,7 +186,7 @@ public class InductiveVisualMinerController {
 					return false;
 				}
 			});
-			sortEvents.setOnException(onException2);
+			sortEvents.setOnException(onException);
 		}
 
 		chain.addConnection(gatherAttributes, sortEvents);
@@ -194,7 +207,7 @@ public class InductiveVisualMinerController {
 							context.getExecutor());
 				}
 			});
-			makeLog.setOnException(onException2);
+			makeLog.setOnException(onException);
 		}
 
 		chain.addConnection(sortEvents, makeLog);
@@ -207,7 +220,7 @@ public class InductiveVisualMinerController {
 					setStatus("Filtering activities..");
 				}
 			});
-			filterLogOnActivities.setOnException(onException2);
+			filterLogOnActivities.setOnException(onException);
 		}
 
 		chain.addConnection(makeLog, filterLogOnActivities);
@@ -234,7 +247,7 @@ public class InductiveVisualMinerController {
 					state.setSelection(new Selection());
 				}
 			});
-			mine.setOnException(onException2);
+			mine.setOnException(onException);
 		}
 
 		chain.addConnection(filterLogOnActivities, mine);
@@ -258,7 +271,7 @@ public class InductiveVisualMinerController {
 					panel.getSaveImageButton().setEnabled(false);
 				}
 			});
-			layoutModel.setOnException(onException2);
+			layoutModel.setOnException(onException);
 		}
 
 		chain.addConnection(mine, layoutModel);
@@ -280,7 +293,7 @@ public class InductiveVisualMinerController {
 							context.getExecutor());
 				}
 			});
-			align.setOnException(onException2);
+			align.setOnException(onException);
 		}
 
 		chain.addConnection(mine, align);
@@ -308,7 +321,7 @@ public class InductiveVisualMinerController {
 					panel.getTraceView().setEventColourMap(state.getTraceViewColourMap());
 				}
 			});
-			layoutAlignment.setOnException(onException2);
+			layoutAlignment.setOnException(onException);
 		}
 
 		chain.addConnection(layoutModel, layoutAlignment);
@@ -322,7 +335,7 @@ public class InductiveVisualMinerController {
 					setStatus("Scaling animation..");
 				}
 			});
-			animationScaler.setOnException(onException2);
+			animationScaler.setOnException(onException);
 		}
 
 		chain.addConnection(align, animationScaler);
@@ -365,7 +378,7 @@ public class InductiveVisualMinerController {
 				}
 			});
 
-			animate.setOnException(onException2);
+			animate.setOnException(onException);
 		}
 
 		chain.addConnection(animationScaler, animate);
@@ -389,7 +402,7 @@ public class InductiveVisualMinerController {
 					panel.repaint();
 				}
 			});
-			traceColouring.setOnException(onException2);
+			traceColouring.setOnException(onException);
 		}
 
 		chain.addConnection(align, traceColouring);
@@ -438,7 +451,7 @@ public class InductiveVisualMinerController {
 					panel.getGraph().repaint();
 				}
 			});
-			filterNodeSelection.setOnException(onException2);
+			filterNodeSelection.setOnException(onException);
 		}
 
 		chain.addConnection(layoutAlignment, filterNodeSelection);
@@ -472,7 +485,7 @@ public class InductiveVisualMinerController {
 					panel.getGraph().repaint();
 				}
 			});
-			performance.setOnException(onException2);
+			performance.setOnException(onException);
 		}
 
 		chain.addConnection(filterNodeSelection, performance);
@@ -493,7 +506,7 @@ public class InductiveVisualMinerController {
 					panel.getGraph().repaint();
 				}
 			});
-			histogram.setOnException(onException2);
+			histogram.setOnException(onException);
 		}
 
 		chain.addConnection(filterNodeSelection, histogram);
@@ -517,6 +530,8 @@ public class InductiveVisualMinerController {
 		chain.addConnection(performance, done);
 		chain.addConnection(traceColouring, done);
 		chain.addConnection(animate, done);
+
+		panel.getControllerView().setChain(chain);
 
 		//start the chain
 		chain.execute(Cl01GatherAttributes.class);
@@ -666,6 +681,20 @@ public class InductiveVisualMinerController {
 
 				public void actionPerformed(ActionEvent arg0) {
 					saveView();
+				}
+
+			});
+		}
+
+		//listen to ctrl c to show the controller view
+		{
+			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), "showControllerView"); // - key
+			panel.getActionMap().put("showControllerView", new AbstractAction() {
+				private static final long serialVersionUID = 1727407514105090094L;
+
+				public void actionPerformed(ActionEvent arg0) {
+					panel.getControllerView().setVisible(true);
 				}
 
 			});

@@ -14,11 +14,14 @@ public class Cl15Done extends ChainLink<Object, Object> {
 	}
 
 	protected void processResult(Object result, InductiveVisualMinerState state) {
-		
+
 	}
 
 	protected void invalidateResult(InductiveVisualMinerState state) {
-		
+
 	}
 
+	public String getName() {
+		return "done";
+	}
 }

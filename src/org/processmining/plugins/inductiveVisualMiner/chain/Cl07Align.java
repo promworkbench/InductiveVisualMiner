@@ -64,4 +64,7 @@ public class Cl07Align extends
 		state.setIvMLog(null, null);	
 	}
 
+	public String getName() {
+		return "align";
+	}
 }

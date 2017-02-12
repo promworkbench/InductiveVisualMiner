@@ -90,4 +90,8 @@ public class Cl12FilterNodeSelection extends
 
 		}
 	}
+	
+	public String getName() {
+		return "highlight selection";
+	}
 }
