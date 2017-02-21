@@ -79,16 +79,16 @@ public class GraphvizPetriNet {
 				}
 			}
 
-			if (initialMarking != null && initialMarking.contains(p)) {
-				place = new LocalDotPlace();
+			place = new LocalDotPlace();
+			if (initialMarking != null && initialMarking.contains(p) && finalMarkings != null && inFinalMarking) {
+				place.setOption("style", "filled");
+				place.setOption("fillcolor", "#80ff00;0.5:#E40000");
+			} else if (initialMarking != null && initialMarking.contains(p)) {
 				place.setOption("style", "filled");
 				place.setOption("fillcolor", "#80ff00");
 			} else if (finalMarkings != null && inFinalMarking) {
-				place = new LocalDotPlace();
 				place.setOption("style", "filled");
 				place.setOption("fillcolor", "#E40000");
-			} else {
-				place = new LocalDotPlace();
 			}
 			dot.addNode(place);
 			mapPetrinet2Dot.put(p, place);
