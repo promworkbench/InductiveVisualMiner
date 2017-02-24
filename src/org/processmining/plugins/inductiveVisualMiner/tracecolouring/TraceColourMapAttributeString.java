@@ -23,7 +23,7 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 		trace2colour = new Color[log.size()];
 		for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
 			IvMTrace trace = it.next();
-			XAttribute value = trace.getAttributes().get(attribute);
+			XAttribute value = trace.getAttributes().get(attribute.getName());
 			if (value == null) {
 				trace2colour[it.getPosition()] = TraceColourMapSettings.defaultColour;
 			} else {

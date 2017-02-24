@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import javax.swing.JComponent;
 
+import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.PluginContext;
@@ -22,18 +23,27 @@ import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 
-@Plugin(name = "Graphviz Petri net visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Petri net" }, userAccessible = true, level = PluginLevel.PeerReviewed)
-@Visualizer
 public class GraphvizPetriNet {
 
+	@Plugin(name = "Graphviz Petri net visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Petri net" }, userAccessible = true, level = PluginLevel.PeerReviewed)
+	@Visualizer
 	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0 })
 	public JComponent visualize(PluginContext context, Petrinet petrinet) {
-		Dot dot = convert(petrinet, null);
+		Dot dot = convert(petrinet, null, null);
+		return new DotPanel(dot);
+	}
+	
+	@Plugin(name = "Graphviz Accepting Petri net visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Petri net" }, userAccessible = true, level = PluginLevel.PeerReviewed)
+	@Visualizer
+	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
+	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0 })
+	public JComponent visualize2(PluginContext context, AcceptingPetriNet petrinet) {
+		Dot dot = convert(petrinet.getNet(), petrinet.getInitialMarking(), petrinet.getFinalMarkings());
 		return new DotPanel(dot);
 	}
 
-	public static Dot convert(PetrinetGraph petrinet, Marking initialMarking, Marking... finalMarkings) {
+	public static Dot convert(PetrinetGraph petrinet, Marking initialMarking, Iterable<Marking> finalMarkings) {
 		Dot dot = new Dot();
 		dot.setDirection(GraphDirection.leftRight);
 		convert(dot, petrinet, initialMarking, finalMarkings);
@@ -64,7 +74,7 @@ public class GraphvizPetriNet {
 		}
 	}
 
-	private static void convert(Dot dot, PetrinetGraph petrinet, Marking initialMarking, Marking... finalMarkings) {
+	private static void convert(Dot dot, PetrinetGraph petrinet, Marking initialMarking, Iterable<Marking> finalMarkings) {
 		HashMap<PetrinetNode, DotNode> mapPetrinet2Dot = new HashMap<PetrinetNode, DotNode>();
 
 		//add places
