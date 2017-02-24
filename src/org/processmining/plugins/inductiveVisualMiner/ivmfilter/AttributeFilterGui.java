@@ -175,6 +175,12 @@ public class AttributeFilterGui extends IvMFilterGui {
 				//((CardLayout) valueLayout.getLayout()).show(valueLayout, "numeric");
 				valueLiteralSelector.setVisible(false);
 				valueNumericSelector.setVisible(true);
+			} else if (getSelectedAttribute().isTraceDuration()) {
+				valueLiteralSelector.setVisible(false);
+				valueNumericSelector.setVisible(true);
+			} else if (getSelectedAttribute().isTraceNumberofEvents()) {
+				valueLiteralSelector.setVisible(false);
+				valueNumericSelector.setVisible(true);
 			}
 		}
 	}
@@ -227,10 +233,6 @@ public class AttributeFilterGui extends IvMFilterGui {
 		if (getSelectedAttribute().isLiteral()) {
 			//literal
 			return !valueLiteralSelector.isSelectionEmpty();
-		} else if (getSelectedAttribute().isNumeric()) {
-			//numeric
-			return valueNumericSelector.getValue() != valueNumericSelector.getMinimum()
-					|| valueNumericSelector.getUpperValue() != valueNumericSelector.getMaximum();
 		} else {
 			//time
 			return valueNumericSelector.getValue() != valueNumericSelector.getMinimum()

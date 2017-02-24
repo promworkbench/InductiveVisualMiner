@@ -50,10 +50,10 @@ public class HighlightingFilterTrace extends HighlightingFilterEvent {
 			}
 		} else if (attribute.isTraceNumberofEvents()) {
 			int count = trace.getNumberOfEvents();
-			return count >= panel.getSelectedNumericMin() && count <= panel.getSelectedNumericMax();
+			return count >= panel.getSelectedTimeMin() && count <= panel.getSelectedTimeMax();
 		} else if (attribute.isTraceDuration()) {
 			long duration = TraceColourMapPropertyDuration.getTraceDuration(trace);
-			return duration >= panel.getSelectedNumericMin() && duration <= panel.getSelectedNumericMax();
+			return duration >= panel.getSelectedTimeMin() && duration <= panel.getSelectedTimeMax();
 		}
 		return false;
 	}
