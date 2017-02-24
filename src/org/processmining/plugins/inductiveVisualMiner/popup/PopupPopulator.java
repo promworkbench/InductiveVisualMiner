@@ -31,9 +31,8 @@ public class PopupPopulator {
 					List<String> popup = new ArrayList<>();
 
 					//frequencies
-					popup.add("number of occurrences "
-							+ IvMLogMetrics.getNumberOfTracesRepresented(state.getTree(), unode, false,
-									state.getIvMLogInfoFiltered()));
+					popup.add("number of occurrences " + IvMLogMetrics.getNumberOfTracesRepresented(state.getTree(),
+							unode, false, state.getIvMLogInfoFiltered()));
 
 					//waiting time
 					if (state.isPerformanceReady()) {
@@ -88,7 +87,7 @@ public class PopupPopulator {
 				} else {
 					panel.getGraph().setShowPopup(false);
 				}
-			} else if (element instanceof LocalDotEdge
+			} else if (state.getVisualisationInfo() != null && element instanceof LocalDotEdge
 					&& state.getVisualisationInfo().getAllLogMoveEdges().contains(element)) {
 				//log move edge
 				LocalDotEdge edge = (LocalDotEdge) element;
@@ -128,7 +127,7 @@ public class PopupPopulator {
 				} else {
 					panel.getGraph().setShowPopup(false);
 				}
-			} else if (element instanceof LocalDotEdge
+			} else if (state.getVisualisationInfo() != null && element instanceof LocalDotEdge
 					&& state.getVisualisationInfo().getAllModelMoveEdges().contains(element)) {
 				//model move edge
 				if (state.isAlignmentReady()) {
