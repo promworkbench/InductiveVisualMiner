@@ -7,7 +7,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +24,6 @@ import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
-import org.processmining.plugins.graphviz.visualisation.export.ExportDialog;
 import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
@@ -665,26 +663,25 @@ public class InductiveVisualMinerController {
 			}
 		});
 
+		//add animation and statistics to export
+		panel.getGraph().setGetExporters(new GetExporters() {
+			public List<Exporter> getExporters(List<Exporter> exporters) {
+				if (panel.getGraph().isAnimationEnabled()) {
+					exporters.add(new ExporterAvi(state));
+				}
+				if (state.isPerformanceReady()) {
+					exporters.add(new ExporterStatistics(state));
+				}
+				return exporters;
+			}
+		});
+		
 		//set image/animation export button
 		panel.getSaveImageButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				saveView();
+				panel.getGraph().exportView();
 			}
 		});
-
-		//listen to ctrl s to save image/animation (should override keyboard shortcut of GraphViz)
-		{
-			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-					.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_MASK), "saveAs"); // - key
-			panel.getActionMap().put("saveAs", new AbstractAction() {
-				private static final long serialVersionUID = -4780600363000017631L;
-
-				public void actionPerformed(ActionEvent arg0) {
-					saveView();
-				}
-
-			});
-		}
 
 		//listen to ctrl c to show the controller view
 		{
@@ -815,22 +812,6 @@ public class InductiveVisualMinerController {
 				state.getMode().getVisualisationParameters(state));
 		colourMap.setSelectedNodes(state.getSelection());
 		panel.getTraceView().setEventColourMap(colourMap);
-	}
-
-	//save the view
-	private void saveView() {
-		List<Exporter> exporters = new ArrayList<>();
-
-		if (panel.getGraph().isAnimationEnabled()) {
-			exporters.add(new ExporterAvi(state));
-		}
-		if (state.isPerformanceReady()) {
-			exporters.add(new ExporterStatistics(state));
-		}
-
-		Exporter[] exporters2 = new Exporter[exporters.size()];
-		exporters2 = exporters.toArray(exporters2);
-		new ExportDialog(panel.getGraph(), exporters2);
 	}
 
 	public static void debug(Object s) {

@@ -21,6 +21,7 @@ import javax.swing.KeyStroke;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
+import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.graphviz.visualisation.listeners.ImageTransformationChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
@@ -69,6 +70,9 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	//histogram
 	private HistogramData histogramData = null;
 
+	//exporters
+	private GetExporters getExporters = null;
+
 	public InductiveVisualMinerAnimationPanel(ProMCanceller canceller, boolean animationGlobalEnabled) {
 		super(getSplashScreen());
 
@@ -114,8 +118,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			}
 		};
 		helperControlsShortcuts.add("ctrl e");
-		helperControlsExplanations.add(animationGlobalEnabled ? animationGlobalEnabledTrue
-				: animationGlobalEnabledFalse);
+		helperControlsExplanations
+				.add(animationGlobalEnabled ? animationGlobalEnabledTrue : animationGlobalEnabledFalse);
 		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK),
 				"changeInitialAnimation");
 		getActionMap().put("changeInitialAnimation", animationEnabledChanged);
@@ -180,7 +184,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			if (settings.tokens != null) {
 				double time = renderingThread.getTimeManager().getLastRenderedTime();
 				GraphVizTokensIterator tokens = new GraphVizTokensLazyIterator(settings.tokens);
-				Renderer.renderTokens(g, tokens, settings.filteredLog, settings.trace2colour, time, Integer.MAX_VALUE, Integer.MAX_VALUE);
+				Renderer.renderTokens(g, tokens, settings.filteredLog, settings.trace2colour, time, Integer.MAX_VALUE,
+						Integer.MAX_VALUE);
 			}
 		}
 
@@ -206,8 +211,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 		//background
 		g.setColor(new Color(0, 0, 0, 180));
-		g.fillRoundRect(x - popupPadding, y - popupPadding, popupWidth + 2 * popupPadding, popupHeight + 2
-				* popupPadding + popupPadding, popupPadding, popupPadding);
+		g.fillRoundRect(x - popupPadding, y - popupPadding, popupWidth + 2 * popupPadding,
+				popupHeight + 2 * popupPadding + popupPadding, popupPadding, popupPadding);
 
 		//local (= unode) histogram
 		if (histogramData != null && (popupHistogramNode != -1 || popupHistogramEdge != -1)) {
@@ -235,19 +240,19 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 		//border
 		g.setColor(new Color(255, 255, 255, 50));
-		g.drawRect(offsetX, offsetY + popupHistogramYPadding, popupWidth, popupHistogramHeight - 2
-				* popupHistogramYPadding);
+		g.drawRect(offsetX, offsetY + popupHistogramYPadding, popupWidth,
+				popupHistogramHeight - 2 * popupHistogramYPadding);
 
 		//text
 		g.setColor(new Color(255, 255, 255, 150));
 		g.setFont(helperControlsFont);
 		double casesPerMs = histogramData.getLocalMaximum() / histogramData.getLogTimeInMsPerLocalBucket();
-		g.drawString(ResourceTimeUtils.getTimePerUnitString(casesPerMs, "executions"), offsetX + 1, offsetY
-				+ popupHistogramYPadding - 1);
+		g.drawString(ResourceTimeUtils.getTimePerUnitString(casesPerMs, "executions"), offsetX + 1,
+				offsetY + popupHistogramYPadding - 1);
 
 		//text bottom
-		g.drawString("0" + ResourceTimeUtils.getTimeUnitWithoutMeasure(casesPerMs, "executions"), offsetX + 1, offsetY
-				+ popupHistogramHeight);
+		g.drawString("0" + ResourceTimeUtils.getTimeUnitWithoutMeasure(casesPerMs, "executions"), offsetX + 1,
+				offsetY + popupHistogramHeight);
 
 		//histogram itself
 		{
@@ -392,7 +397,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		renderingThread.getExternalSettingsManager().setFilteredLog(ivMLogFiltered);
 		renderingThread.renderOneFrame();
 	}
-	
+
 	public void setTraceColourMap(TraceColourMap trace2colour) {
 		renderingThread.getExternalSettingsManager().setTrace2Colour(trace2colour);
 		renderingThread.renderOneFrame();
@@ -429,10 +434,10 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	@Override
 	public double getAnimationTime() {
-//		RenderedFrame frame = renderingThread.getRenderedFrameManager().getLastRenderedFrame();
-//		if (frame != null) {
-//			return frame.time;
-//		}
+		//		RenderedFrame frame = renderingThread.getRenderedFrameManager().getLastRenderedFrame();
+		//		if (frame != null) {
+		//			return frame.time;
+		//		}
 		return renderingThread.getTimeManager().getLastRenderedTime();
 		//return -1;
 	}
@@ -451,18 +456,35 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	public void renderOneFrame() {
 		renderingThread.renderOneFrame();
 	}
-	
+
 	@Override
 	public void setTimeScale(double timeScale) {
 		renderingThread.setTimeScale(timeScale);
 	}
-	
+
 	@Override
 	public double getTimeScale() {
 		return renderingThread.getTimeScale();
 	}
 
+	@Override
+	public List<Exporter> getExporters() {
+		List<Exporter> exporters = super.getExporters();
+		if (getExporters != null) {
+			exporters = getExporters.getExporters(exporters);
+		}
+		return exporters;
+	}
+
 	public void addAnimationEnabledChangedListener(AnimationEnabledChangedListener animationEnabledChangedListener) {
 		this.animationEnabledChangedListener = animationEnabledChangedListener;
+	}
+
+	public GetExporters getGetExporters() {
+		return getExporters;
+	}
+
+	public void setGetExporters(GetExporters getExporters) {
+		this.getExporters = getExporters;
 	}
 }
