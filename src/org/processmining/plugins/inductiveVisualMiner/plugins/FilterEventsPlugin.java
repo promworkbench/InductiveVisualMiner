@@ -41,6 +41,7 @@ import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 
 import com.fluxicon.slickerbox.factory.SlickerFactory;
 
@@ -59,7 +60,7 @@ public class FilterEventsPlugin {
 	private JRadioButton removeUnselected;
 	private JRadioButton replaceUnselected;
 
-	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl", pack = "InductiveVisualMiner")
+	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Filter log on life cycle, default", requiredParameterLabels = { 0 })
 	public XLog filterLog(UIPluginContext context, final XLog log) throws Exception {
 

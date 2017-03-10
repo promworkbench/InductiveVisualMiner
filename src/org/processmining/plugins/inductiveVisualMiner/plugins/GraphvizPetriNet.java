@@ -18,6 +18,7 @@ import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.semantics.petrinet.Marking;
+import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotNode;
@@ -27,7 +28,7 @@ public class GraphvizPetriNet {
 
 	@Plugin(name = "Graphviz Petri net visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Petri net" }, userAccessible = true, level = PluginLevel.PeerReviewed)
 	@Visualizer
-	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
+	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0 })
 	public JComponent visualize(PluginContext context, Petrinet petrinet) {
 		Dot dot = convert(petrinet, null, null);
@@ -36,7 +37,7 @@ public class GraphvizPetriNet {
 	
 	@Plugin(name = "Graphviz Accepting Petri net visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Petri net" }, userAccessible = true, level = PluginLevel.PeerReviewed)
 	@Visualizer
-	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl")
+	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0 })
 	public JComponent visualize2(PluginContext context, AcceptingPetriNet petrinet) {
 		Dot dot = convert(petrinet);
