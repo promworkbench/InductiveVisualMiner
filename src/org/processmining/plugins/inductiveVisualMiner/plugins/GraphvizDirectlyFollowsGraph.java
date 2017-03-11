@@ -23,10 +23,10 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 
 public class GraphvizDirectlyFollowsGraph {
 
-	@Plugin(name = "Graphviz directly-follows graph visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process Tree" }, userAccessible = true)
+	@Plugin(name = "Graphviz directly follows graph visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process Tree" }, userAccessible = true)
 	@Visualizer
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
-	@PluginVariant(variantLabel = "Display directly-follows graph", requiredParameterLabels = { 0 })
+	@PluginVariant(variantLabel = "Display directly follows graph", requiredParameterLabels = { 0 })
 	public JComponent visualize(PluginContext context, Dfg dfg) {
 
 		if (dfg.getDirectlyFollowsGraph().getVertices().length > 50) {
@@ -80,7 +80,7 @@ public class GraphvizDirectlyFollowsGraph {
 			}
 		}
 
-		//add the directly-follows edges
+		//add the directly follows edges
 		for (long edge : dfg.getDirectlyFollowsGraph().getEdges()) {
 			XEventClass from = dfg.getDirectlyFollowsGraph().getEdgeSource(edge);
 			XEventClass to = dfg.getDirectlyFollowsGraph().getEdgeTarget(edge);
@@ -95,7 +95,7 @@ public class GraphvizDirectlyFollowsGraph {
 		}
 
 		if (includeParalelEdges) {
-			//add the parallel directly-follows edges
+			//add the parallel directly follows edges
 			for (long edge : dfg.getConcurrencyGraph().getEdges()) {
 				XEventClass from = dfg.getConcurrencyGraph().getEdgeSource((int) edge);
 				XEventClass to = dfg.getConcurrencyGraph().getEdgeTarget((int) edge);
