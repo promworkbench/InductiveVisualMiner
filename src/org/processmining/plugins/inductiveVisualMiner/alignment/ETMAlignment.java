@@ -8,17 +8,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import nl.tue.astar.AStarException;
-import nl.tue.astar.AStarThread.ASynchronousMoveSorting;
-import nl.tue.astar.AStarThread.Canceller;
-import nl.tue.astar.AStarThread.Type;
-import nl.tue.astar.Tail;
-import nl.tue.astar.Trace;
-import nl.tue.astar.impl.AbstractAStarThread;
-import nl.tue.astar.impl.AbstractAStarThread.QueueingModel;
-import nl.tue.astar.impl.memefficient.MemoryEfficientAStarAlgorithm;
-import nl.tue.astar.impl.memefficient.StorageAwareDelegate;
-
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.etm.model.narytree.NAryTree;
@@ -35,6 +24,17 @@ import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import nl.tue.astar.AStarException;
+import nl.tue.astar.AStarThread.ASynchronousMoveSorting;
+import nl.tue.astar.AStarThread.Canceller;
+import nl.tue.astar.AStarThread.QueueingModel;
+import nl.tue.astar.AStarThread.Type;
+import nl.tue.astar.Tail;
+import nl.tue.astar.Trace;
+import nl.tue.astar.impl.AbstractAStarThread;
+import nl.tue.astar.impl.memefficient.MemoryEfficientAStarAlgorithm;
+import nl.tue.astar.impl.memefficient.StorageAwareDelegate;
 
 /**
  * Align a log with the ETM replayer, but do not compute precision.
