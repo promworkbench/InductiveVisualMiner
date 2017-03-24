@@ -582,6 +582,7 @@ public class InductiveVisualMinerController {
 					IvMEfficientTree tree = (IvMEfficientTree) e.getSource();
 					state.setTree(tree);
 					chain.execute(Cl06LayoutModel.class);
+					chain.execute(Cl07Align.class);
 				}
 			}
 		});
