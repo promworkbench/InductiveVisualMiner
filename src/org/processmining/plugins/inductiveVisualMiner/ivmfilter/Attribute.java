@@ -1,14 +1,17 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XAttributeContinuous;
 import org.deckfour.xes.model.XAttributeDiscrete;
 import org.deckfour.xes.model.XAttributeTimestamp;
-
-import gnu.trove.set.hash.THashSet;
 
 public class Attribute implements Comparable<Attribute> {
 	public enum Type {
@@ -17,7 +20,7 @@ public class Attribute implements Comparable<Attribute> {
 
 	private String name;
 	private Type type = Type.undecided;
-	private THashSet<String> valuesLiteral;
+	private Collection<String> valuesLiteral;
 	private double valuesNumericMin;
 	private double valuesNumericMax;
 	private long valuesTimeMin;
@@ -118,6 +121,9 @@ public class Attribute implements Comparable<Attribute> {
 	public void finalise() {
 		switch (type) {
 			case literal :
+				// sort the values
+				valuesLiteral = new ArrayList<String>(valuesLiteral);
+				Collections.sort((ArrayList<String>) valuesLiteral);
 				break;
 			default :
 				valuesLiteral = null;
@@ -153,7 +159,7 @@ public class Attribute implements Comparable<Attribute> {
 		return type == Type.traceNumberOfEvents;
 	}
 
-	public THashSet<String> getStringValues() {
+	public Collection<String> getStringValues() {
 		return valuesLiteral;
 	}
 
