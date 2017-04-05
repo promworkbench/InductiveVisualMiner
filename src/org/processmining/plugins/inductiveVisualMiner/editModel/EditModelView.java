@@ -15,7 +15,7 @@ public class EditModelView extends SideWindow {
 	public EditModelView(Component parent) {
 		super(parent, "edit model - Inductive visual Miner");
 		setLayout(new BorderLayout());
-		editor = new EfficientTreeEditor(parent, null, "Mining tree...");
+		editor = new EfficientTreeEditor(null, "Mining tree...");
 		add(editor, BorderLayout.CENTER);
 	}
 	
