@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
+
 import com.google.common.collect.FluentIterable;
 
 public class LogSplitter {
@@ -38,7 +40,7 @@ public class LogSplitter {
 		//make a partition
 		for (int child : tree.getChildren(unode)) {
 			TIntHashSet part = new TIntHashSet(10, 0.5f, -1);
-			part.addAll(FluentIterable.from(tree.getAllNodes(child)).toList());
+			part.addAll(FluentIterable.from(EfficientTreeUtils.getAllNodes(tree, child)).toList());
 			r.partition.add(part);
 		}
 

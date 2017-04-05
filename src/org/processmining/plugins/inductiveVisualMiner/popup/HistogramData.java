@@ -6,6 +6,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
@@ -74,7 +75,7 @@ public class HistogramData {
 		{
 			this.localNodeCountFiltered = new TIntObjectHashMap<int[]>(10, 0.5f, -1);
 			this.localNodeCountUnfiltered = new TIntObjectHashMap<int[]>(10, 0.5f, -1);
-			for (int node : tree.getAllNodes()) {
+			for (int node : EfficientTreeUtils.getAllNodes(tree)) {
 				localNodeCountFiltered.put(node, new int[localBuckets]);
 				localNodeCountUnfiltered.put(node, new int[localBuckets]);
 			}

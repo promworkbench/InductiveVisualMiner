@@ -7,10 +7,11 @@ import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.Set;
 
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 
@@ -36,7 +37,7 @@ public class Selection {
 		this.treeNodesOfSelectedModelEdges = new TIntHashSet(selectedTaus);
 	}
 
-	public boolean isSelected(IvMEfficientTree tree, Move move) {
+	public boolean isSelected(EfficientTree tree, Move move) {
 		if (move.isIgnoredLogMove() || move.isIgnoredModelMove() || !move.isComplete()) {
 			return false;
 		}
@@ -53,7 +54,7 @@ public class Selection {
 		if (move.isSyncMove()) {
 			for (TIntIterator it = treeNodesOfSelectedModelEdges.iterator(); it.hasNext();) {
 				int selectedEdgeUnode = it.next();
-				if (tree.isParentOf(selectedEdgeUnode, move.getTreeNode())) {
+				if (EfficientTreeUtils.isParentOf(tree, selectedEdgeUnode, move.getTreeNode())) {
 					return true;
 				}
 			}

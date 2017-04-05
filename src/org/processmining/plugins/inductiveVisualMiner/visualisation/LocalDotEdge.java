@@ -2,9 +2,9 @@ package org.processmining.plugins.inductiveVisualMiner.visualisation;
 
 import java.util.HashMap;
 
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotEdge;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 
 public class LocalDotEdge extends DotEdge {
 
@@ -26,7 +26,7 @@ public class LocalDotEdge extends DotEdge {
 	private final boolean directionForward;
 	public final Appearance unselectedAppearance = new Appearance();
 
-	public LocalDotEdge(IvMEfficientTree tree, Dot dot, ProcessTreeVisualisationInfo info, LocalDotNode source,
+	public LocalDotEdge(EfficientTree tree, Dot dot, ProcessTreeVisualisationInfo info, LocalDotNode source,
 			LocalDotNode target, String label, int node, EdgeType type, int lookupNode1, int lookupNode2,
 			boolean directionForward) {
 		super(source, target, label, new HashMap<String, String>());

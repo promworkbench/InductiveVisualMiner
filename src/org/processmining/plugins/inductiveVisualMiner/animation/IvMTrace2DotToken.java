@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.LogSplitter;
@@ -327,7 +328,7 @@ public class IvMTrace2DotToken {
 					&& !inParallelUnodes.contains(now)) {
 				return now;
 			}
-			now = tree.getChildWith(now, unode);
+			now = EfficientTreeUtils.getChildWith(tree, now, unode);
 		}
 		return -1;
 	}

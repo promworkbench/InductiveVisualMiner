@@ -10,17 +10,17 @@ import java.awt.Stroke;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.WedgeBuilder;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 
 public class TraceViewEventColourMap implements WedgeBuilder {
 	private final TIntObjectMap<Color> mapFill = new TIntObjectHashMap<Color>(10, 0.5f, -1);
 	private final TIntObjectMap<Color> mapFont = new TIntObjectHashMap<Color>(10, 0.5f, -1);
 	private Selection selection = new Selection();
-	private IvMEfficientTree tree;
+	private EfficientTree tree;
 	
-	public TraceViewEventColourMap(IvMEfficientTree tree) {
+	public TraceViewEventColourMap(EfficientTree tree) {
 		this.tree = tree;
 	}
 

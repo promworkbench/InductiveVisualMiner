@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
 
 public class ProcessTreeVisualisationInfo {
@@ -75,7 +75,7 @@ public class ProcessTreeVisualisationInfo {
 		}
 	}
 
-	public void addEdge(IvMEfficientTree tree, int unode1, int unode2, LocalDotEdge edge) {
+	public void addEdge(EfficientTree tree, int unode1, int unode2, LocalDotEdge edge) {
 		switch (edge.getType()) {
 			case logMove :
 				allLogMoveEdges.add(edge);

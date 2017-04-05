@@ -1,5 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.TIntSet;
+
 import java.awt.Color;
 import java.util.Set;
 
@@ -7,6 +10,7 @@ import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
@@ -29,9 +33,6 @@ import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.SVGException;
 import com.kitfox.svg.Text;
-
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.set.TIntSet;
 
 public class InductiveVisualMinerSelectionColourer {
 
@@ -103,7 +104,7 @@ public class InductiveVisualMinerSelectionColourer {
 
 		try {
 			//style nodes
-			for (int unode : tree.getAllNodes()) {
+			for (int unode : EfficientTreeUtils.getAllNodes(tree)) {
 				Triple<String, Long, Long> cardinality = data.getNodeLabel(unode, false);
 				Pair<Color, Color> colour = styleUnfoldedNode(tree, unode, svg, info, cardinality, minCardinality,
 						maxCardinality, visualisationParameters);

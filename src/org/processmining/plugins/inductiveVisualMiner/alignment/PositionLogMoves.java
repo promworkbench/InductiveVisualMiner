@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 
@@ -97,7 +98,7 @@ public class PositionLogMoves {
 
 			//by the invariant, the trace does not start with a log move
 			//find the child that this grandchild belongs to
-			int child = tree.getChildWith(node, trace.get(0).getTreeNode());
+			int child = EfficientTreeUtils.getChildWith(tree, node, trace.get(0).getTreeNode());
 
 			positionLogMoves(tree, child, trace, cardinality);
 
@@ -124,7 +125,7 @@ public class PositionLogMoves {
 					subTraces.get(lastSeenChild).add(move);
 				} else {
 					//put this move in the subtrace of the child it belongs to
-					int child = tree.getChildWith(node, move.getTreeNode());
+					int child = EfficientTreeUtils.getChildWith(tree, node, move.getTreeNode());
 					subTraces.get(child).add(move);
 					lastSeenChild = child;
 				}
@@ -140,7 +141,7 @@ public class PositionLogMoves {
 
 	private void splitSequence(IvMEfficientTree tree, int unode, List<IvMMove> trace, long cardinality) {
 		//by the invariant, the first move is not a log move
-		int lastSeenChild = tree.getChildWith(unode, trace.get(0).getTreeNode());
+		int lastSeenChild = EfficientTreeUtils.getChildWith(tree, unode, trace.get(0).getTreeNode());
 		List<IvMMove> logMoves = new ArrayList<IvMMove>();
 		List<IvMMove> subTrace = new ArrayList<IvMMove>();
 
@@ -151,7 +152,7 @@ public class PositionLogMoves {
 			} else if (move.isLogMove()) {
 				logMoves.add(move);
 			} else {
-				int child = tree.getChildWith(unode, move.getTreeNode());
+				int child = EfficientTreeUtils.getChildWith(tree, unode, move.getTreeNode());
 				if (child == lastSeenChild) {
 					//we are not leaving the previous child with this move
 					//the log moves we have seen now are internal to the subtrace; add them
@@ -188,7 +189,7 @@ public class PositionLogMoves {
 
 	private void splitLoop(IvMEfficientTree tree, int unode, List<IvMMove> trace, long cardinality) {
 		//by the invariant, the first move is not a log move
-		int lastSeenChild = tree.getChildWith(unode, trace.get(0).getTreeNode());
+		int lastSeenChild = EfficientTreeUtils.getChildWith(tree, unode, trace.get(0).getTreeNode());
 		List<IvMMove> logMoves = new ArrayList<IvMMove>();
 		List<IvMMove> subTrace = new ArrayList<IvMMove>();
 
@@ -202,7 +203,7 @@ public class PositionLogMoves {
 			} else if (move.isLogMove()) {
 				logMoves.add(move);
 			} else {
-				int child = tree.getChildWith(unode, move.getTreeNode());
+				int child = EfficientTreeUtils.getChildWith(tree, unode, move.getTreeNode());
 				if (child == lastSeenChild) {
 					//we are not leaving the previous child with this move
 					//the log moves we have seen now are internal to the subtrace; add them

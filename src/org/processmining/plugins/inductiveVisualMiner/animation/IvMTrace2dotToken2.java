@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation.Input;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation.Position;
@@ -236,10 +237,10 @@ public class IvMTrace2dotToken2 {
 				return -1;
 			}
 			if (node >= 0 && (in.tree.isConcurrent(node) || in.tree.isInterleaved(node) || in.tree.isOr(node))) {
-				return in.tree.getChildNumberWith(parent, move.getLogMoveParallelBranchMappedTo());
+				return EfficientTreeUtils.getChildNumberWith(in.tree, parent, move.getLogMoveParallelBranchMappedTo());
 			}
 		}
-		return in.tree.getChildNumberWith(parent, move.getPositionUnode());
+		return EfficientTreeUtils.getChildNumberWith(in.tree, parent, move.getPositionUnode());
 	}
 
 	/**
@@ -257,7 +258,7 @@ public class IvMTrace2dotToken2 {
 					&& !inParallelNodes.contains(now)) {
 				return now;
 			}
-			now = in.tree.getChildWith(now, node);
+			now = EfficientTreeUtils.getChildWith(in.tree, now, node);
 		}
 		return -1;
 	}

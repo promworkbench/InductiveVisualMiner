@@ -7,6 +7,7 @@ import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
@@ -14,7 +15,6 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
@@ -31,7 +31,7 @@ public class ProcessTreeVisualisation {
 	private ProcessTreeVisualisationInfo info;
 	private TraceViewEventColourMap traceViewColourMap;
 
-	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> fancy(IvMEfficientTree tree,
+	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> fancy(EfficientTree tree,
 			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters)
 			throws UnknownTreeNodeException {
 		this.parameters = parameters;
@@ -66,7 +66,7 @@ public class ProcessTreeVisualisation {
 		return Triple.of(dot, info, traceViewColourMap);
 	}
 
-	private void convertNode(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+	private void convertNode(EfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
 			boolean directionForward) throws UnknownTreeNodeException {
 		if (tree.isSequence(node)) {
 			convertSequence(tree, node, source, sink, directionForward);
@@ -89,7 +89,7 @@ public class ProcessTreeVisualisation {
 		}
 	}
 
-	private void convertActivity(IvMEfficientTree tree, int unode, LocalDotNode source, LocalDotNode sink,
+	private void convertActivity(EfficientTree tree, int unode, LocalDotNode source, LocalDotNode sink,
 			boolean directionForward) throws UnknownTreeNodeException {
 		Triple<String, Long, Long> cardinality = data.getNodeLabel(unode, false);
 		LocalDotNode dotNode = convertActivity(tree, unode, cardinality);
@@ -111,7 +111,7 @@ public class ProcessTreeVisualisation {
 		}
 	}
 
-	private LocalDotNode convertActivity(IvMEfficientTree tree, int unode, Triple<String, Long, Long> cardinality) {
+	private LocalDotNode convertActivity(EfficientTree tree, int unode, Triple<String, Long, Long> cardinality) {
 		//style the activity by the occurrences of it
 		Color fillColour = Color.white;
 		Color gradientColour = null;
@@ -153,12 +153,12 @@ public class ProcessTreeVisualisation {
 		return dotNode;
 	}
 
-	private void convertTau(IvMEfficientTree tree, int unode, LocalDotNode source, LocalDotNode sink,
+	private void convertTau(EfficientTree tree, int unode, LocalDotNode source, LocalDotNode sink,
 			boolean directionForward) throws UnknownTreeNodeException {
 		addArc(tree, source, sink, unode, directionForward, false);
 	}
 
-	private void convertSequence(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+	private void convertSequence(EfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
 			boolean directionForward) throws UnknownTreeNodeException {
 		LocalDotNode split;
 		LocalDotNode join = source;
@@ -183,7 +183,7 @@ public class ProcessTreeVisualisation {
 		}
 	}
 
-	private void convertLoop(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+	private void convertLoop(EfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
 			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
@@ -217,7 +217,7 @@ public class ProcessTreeVisualisation {
 		}
 	}
 
-	private void convertConcurrent(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+	private void convertConcurrent(EfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
 			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
@@ -242,7 +242,7 @@ public class ProcessTreeVisualisation {
 		}
 	}
 
-	private void convertInterleaved(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+	private void convertInterleaved(EfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
 			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
@@ -267,7 +267,7 @@ public class ProcessTreeVisualisation {
 		}
 	}
 
-	private void convertOr(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+	private void convertOr(EfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
 			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
@@ -292,7 +292,7 @@ public class ProcessTreeVisualisation {
 		}
 	}
 
-	private void convertXor(IvMEfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
+	private void convertXor(EfficientTree tree, int node, LocalDotNode source, LocalDotNode sink,
 			boolean directionForward) throws UnknownTreeNodeException {
 
 		//operator split
@@ -311,12 +311,12 @@ public class ProcessTreeVisualisation {
 		//are never put on xor
 	}
 
-	private LocalDotEdge addArc(IvMEfficientTree tree, final LocalDotNode from, final LocalDotNode to, final int node,
+	private LocalDotEdge addArc(EfficientTree tree, final LocalDotNode from, final LocalDotNode to, final int node,
 			boolean directionForward, boolean includeModelMoves) throws UnknownTreeNodeException {
 		return addModelArc(tree, from, to, node, directionForward, data.getEdgeLabel(node, includeModelMoves));
 	}
 
-	private LocalDotEdge addModelArc(IvMEfficientTree tree, final LocalDotNode from, final LocalDotNode to,
+	private LocalDotEdge addModelArc(EfficientTree tree, final LocalDotNode from, final LocalDotNode to,
 			final int unode, final boolean directionForward, final Pair<String, Long> cardinality) {
 
 		final LocalDotEdge edge;
@@ -345,7 +345,7 @@ public class ProcessTreeVisualisation {
 		return edge;
 	}
 
-	private void visualiseLogMove(IvMEfficientTree tree, LocalDotNode from, LocalDotNode to, int unode,
+	private void visualiseLogMove(EfficientTree tree, LocalDotNode from, LocalDotNode to, int unode,
 			LogMovePosition logMovePosition, boolean directionForward) {
 		Pair<String, MultiSet<XEventClass>> logMoves = data.getLogMoveEdgeLabel(logMovePosition);
 		Pair<String, Long> t = Pair.of(logMoves.getA(), logMoves.getB().size());
@@ -366,7 +366,7 @@ public class ProcessTreeVisualisation {
 		}
 	}
 
-	private LocalDotEdge addMoveArc(IvMEfficientTree tree, LocalDotNode from, LocalDotNode to, int node, EdgeType type,
+	private LocalDotEdge addMoveArc(EfficientTree tree, LocalDotNode from, LocalDotNode to, int node, EdgeType type,
 			int lookupNode1, int lookupNode2, Pair<String, Long> cardinality, boolean directionForward) {
 
 		LocalDotEdge edge;

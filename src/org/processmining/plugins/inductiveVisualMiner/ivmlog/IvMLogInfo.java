@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
@@ -113,7 +114,7 @@ public class IvMLogInfo {
 
 		int lowestCommonParent = tree.getRoot();
 		if (lastNode != -1) {
-			lowestCommonParent = tree.getLowestCommonParent(lastNode, newNode);
+			lowestCommonParent = EfficientTreeUtils.getLowestCommonParent(tree, lastNode, newNode);
 		} else {
 			//the first move always enters the root
 			nodeExecutions.adjustOrPutValue(lowestCommonParent, 1, 1);
@@ -131,7 +132,7 @@ public class IvMLogInfo {
 		//we entered all nodes between the lowestCommonParent (exclusive) and newNode (inclusive)
 		int node = lowestCommonParent;
 		while (node != newNode) {
-			node = tree.getChildWith(node, newNode);
+			node = EfficientTreeUtils.getChildWith(tree, node, newNode);
 			if (!inParallelNodes.contains(node)) {
 				nodeExecutions.adjustOrPutValue(node, 1, 1);
 
@@ -148,7 +149,7 @@ public class IvMLogInfo {
 	 *         executing anymore.
 	 */
 	public static boolean nodeLeavesParallel(IvMEfficientTree tree, int parallelNode, int newNode) {
-		int lowestCommonParent = tree.getLowestCommonParent(parallelNode, newNode);
+		int lowestCommonParent = EfficientTreeUtils.getLowestCommonParent(tree, parallelNode, newNode);
 		return !tree.isConcurrent(lowestCommonParent) && !tree.isOr(lowestCommonParent);
 	}
 
