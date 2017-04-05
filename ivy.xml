@@ -14,6 +14,7 @@
     	<dependency org="prom" name="AcceptingPetriNet" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="InductiveMiner" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="GraphViz" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="Monte" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="Widgets" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="EfficientStorage" rev="latest" changing="true" transitive="true" />
         <dependency conf="lib->default" org="org.jblas" name="jblas" rev="1.2.4" />        
