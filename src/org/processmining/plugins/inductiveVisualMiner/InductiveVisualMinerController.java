@@ -21,6 +21,7 @@ import org.deckfour.xes.extension.std.XConceptExtension;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
@@ -88,7 +89,7 @@ public class InductiveVisualMinerController {
 				setStatus("- error - aborted -");
 			}
 		};
-		
+
 		//set up the controller view
 		final Runnable onChange = new Runnable() {
 			public void run() {
@@ -171,12 +172,14 @@ public class InductiveVisualMinerController {
 					setStatus("Illogical time stamps; aborted.");
 					String[] options = new String[] { "Continue with neither animation nor performance",
 							"Reorder events" };
-					int n = JOptionPane.showOptionDialog(panel,
-							"The event log contains illogical time stamps,\n i.e. some time stamps contradict the order of events.\n\nInductive visual Miner can reorder the events and discover a new model.\nWould you like to do that?", //message
-							"Illogical Time Stamps", //title
-							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, //do not use a custom Icon
-							options, //the titles of buttons
-							options[0]); //default button title
+					int n = JOptionPane
+							.showOptionDialog(
+									panel,
+									"The event log contains illogical time stamps,\n i.e. some time stamps contradict the order of events.\n\nInductive visual Miner can reorder the events and discover a new model.\nWould you like to do that?", //message
+									"Illogical Time Stamps", //title
+									JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, //do not use a custom Icon
+									options, //the titles of buttons
+									options[0]); //default button title
 					if (n == 1) {
 						//the user requested to reorder the events
 						return true;
@@ -235,13 +238,13 @@ public class InductiveVisualMinerController {
 			mine.setOnComplete(new Runnable() {
 				public void run() {
 					panel.getSaveModelButton().setEnabled(true);
-					panel.getEditModelView().setTree(state.getTree());
+					panel.getEditModelView().getEditor().setTree(state.getTree());
 				}
 			});
 			mine.setOnInvalidate(new Runnable() {
 				public void run() {
 					panel.getSaveModelButton().setEnabled(false);
-					panel.getEditModelView().setTree(null);
+					panel.getEditModelView().getEditor().setMessage("Mining tree...");
 					state.setSelection(new Selection());
 				}
 			});
@@ -576,11 +579,11 @@ public class InductiveVisualMinerController {
 		});
 
 		//model editor
-		panel.getEditModelView().addActionListener(new ActionListener() {
+		panel.getEditModelView().getEditor().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (e.getSource() instanceof IvMEfficientTree) {
-					IvMEfficientTree tree = (IvMEfficientTree) e.getSource();
-					state.setTree(tree);
+				if (e.getSource() instanceof EfficientTree) {
+					EfficientTree tree = (EfficientTree) e.getSource();
+					state.setTree(new IvMEfficientTree(tree));
 					chain.execute(Cl06LayoutModel.class);
 					chain.execute(Cl07Align.class);
 				}
@@ -676,7 +679,7 @@ public class InductiveVisualMinerController {
 				return exporters;
 			}
 		});
-		
+
 		//set image/animation export button
 		panel.getSaveImageButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -686,8 +689,8 @@ public class InductiveVisualMinerController {
 
 		//listen to ctrl c to show the controller view
 		{
-			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-					.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), "showControllerView"); // - key
+			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+					KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), "showControllerView"); // - key
 			panel.getActionMap().put("showControllerView", new AbstractAction() {
 				private static final long serialVersionUID = 1727407514105090094L;
 
@@ -808,9 +811,9 @@ public class InductiveVisualMinerController {
 	 * @throws UnknownTreeNodeException
 	 */
 	public void updateHighlighting() throws UnknownTreeNodeException {
-		TraceViewEventColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(
-				panel.getGraph().getSVG(), state.getVisualisationInfo(), state.getTree(), state.getVisualisationData(),
-				state.getMode().getVisualisationParameters(state));
+		TraceViewEventColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(panel.getGraph()
+				.getSVG(), state.getVisualisationInfo(), state.getTree(), state.getVisualisationData(), state.getMode()
+				.getVisualisationParameters(state));
 		colourMap.setSelectedNodes(state.getSelection());
 		panel.getTraceView().setEventColourMap(colourMap);
 	}

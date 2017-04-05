@@ -16,7 +16,6 @@
         <dependency org="prom" name="GraphViz" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="Widgets" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="EfficientStorage" rev="latest" changing="true" transitive="true" />
-        <dependency conf="lib->default" org="com.fifesoft" name="rsyntaxtextarea" rev="2.5.8" />
         <dependency conf="lib->default" org="org.jblas" name="jblas" rev="1.2.4" />        
      </dependencies>
 </ivy-module>
