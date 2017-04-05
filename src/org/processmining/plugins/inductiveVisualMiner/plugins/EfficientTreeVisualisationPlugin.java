@@ -21,7 +21,7 @@ public class EfficientTreeVisualisationPlugin {
 	@Visualizer
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Visualise process tree", requiredParameterLabels = { 0 })
-	public DotPanel fancy2(PluginContext context, EfficientTree tree) throws UnknownTreeNodeException {
+	public DotPanel fancy(PluginContext context, EfficientTree tree) throws UnknownTreeNodeException {
 		Dot dot = fancy(tree);
 		return new DotPanel(dot);
 	}
