@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 
 import com.kitfox.svg.SVGElement;
@@ -198,7 +197,8 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 		double[] coords = new double[6];
 		double sx = 0, sy = 0;
 
-		for (PathIterator pathIt = generalPath.getPathIterator(new AffineTransform()); !pathIt.isDone(); pathIt.next()) {
+		for (PathIterator pathIt = generalPath.getPathIterator(new AffineTransform()); !pathIt.isDone(); pathIt
+				.next()) {
 			Bezier bezier = null;
 
 			int segType = pathIt.currentSegment(coords);
@@ -241,42 +241,55 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 		return Pair.of(bezierSegs, curveLength);
 	}
 
+	public static class EvalScratch {
+		double x;
+		double y;
+		double opacity;
+
+		private double t;
+		private double startOpacity;
+		private double endOpacity;
+		private Point2D.Double point = new Point2D.Double();
+		private int bezier;
+	}
+
 	/**
 	 * 
 	 * @param tokenIndex
 	 * @param time
-	 * @return the point at which the curve is at time t and its opacity
+	 * @return the point at which the curve is at time t and its opacity (in
+	 *         EvalScratch result, which prevents us from allocating anything in
+	 *         this method. This might seem useless optimisation, but once GC
+	 *         kicks in, animation stutters.)
 	 */
-	public Triple<Double, Double, Double> eval(int tokenIndex, double time) {
-		
+	public void eval(int tokenIndex, double time, EvalScratch result) {
+
 		//normalise how far we are on the bezier to [0..1]
-		double t;
 		if (endTimes.get(tokenIndex) == startTimes.get(tokenIndex)) {
 			//single-time token point
-			t = 0;
+			result.t = 0;
 		} else {
-			t = (time - startTimes.get(tokenIndex)) / (endTimes.get(tokenIndex) - startTimes.get(tokenIndex));
+			result.t = (time - startTimes.get(tokenIndex)) / (endTimes.get(tokenIndex) - startTimes.get(tokenIndex));
 		}
-		
-		int bezier = bezierPointers.get(tokenIndex);
+
+		result.bezier = bezierPointers.get(tokenIndex);
 
 		//compute the position
-		Point2D.Double point = new Point2D.Double();
-		beziers.getBezier(bezier).eval(t, point);
+		beziers.getBezier(result.bezier).eval(result.t, result.point);
 
 		//compute opacity
-		double opacity = 1;
-		double startOpacity = beziers.getStartOpacity(bezier);
-		double endOpacity = beziers.getEndOpacity(bezier);
-		if (startOpacity == 1 && endOpacity == 1) {
-
-		} else if (startOpacity == 0 && endOpacity == 0) {
-			opacity = Math.abs(t - 0.5) * 2;
+		result.startOpacity = beziers.getStartOpacity(result.bezier);
+		result.endOpacity = beziers.getEndOpacity(result.bezier);
+		if (result.startOpacity == 1 && result.endOpacity == 1) {
+			result.opacity = 1;
+		} else if (result.startOpacity == 0 && result.endOpacity == 0) {
+			result.opacity = Math.abs(result.t - 0.5) * 2;
 		} else {
-			opacity = (1 - t) * startOpacity + t * endOpacity;
+			result.opacity = (1 - result.t) * result.startOpacity + result.t * result.endOpacity;
 		}
 
-		return Triple.of(point.x, point.y, opacity);
+		result.x = result.point.x;
+		result.y = result.point.y;
 	}
 
 	public int size() {
@@ -305,7 +318,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 		return i;
 	}
 
-	public Integer itNext() {
+	public int itNext() {
 		itNow = itNext;
 		itNext = itGetNext(itNext + 1);
 		return itNow;
@@ -339,8 +352,8 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 		} else if (beziers.getStartOpacity(itBezierPointer) == 0 && beziers.getEndOpacity(itBezierPointer) == 0) {
 			itOpacity = Math.abs(itT - 0.5) * 2;
 		} else {
-			itOpacity = (1 - itT) * beziers.getStartOpacity(itBezierPointer) + itT
-					* beziers.getEndOpacity(itBezierPointer);
+			itOpacity = (1 - itT) * beziers.getStartOpacity(itBezierPointer)
+					+ itT * beziers.getEndOpacity(itBezierPointer);
 		}
 	}
 

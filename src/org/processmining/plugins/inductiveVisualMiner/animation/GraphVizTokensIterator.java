@@ -22,7 +22,7 @@ public interface GraphVizTokensIterator {
 	 * 
 	 * @return
 	 */
-	public Integer itNext();
+	public int itNext();
 
 	/**
 	 * Default iterator.hasNext()
