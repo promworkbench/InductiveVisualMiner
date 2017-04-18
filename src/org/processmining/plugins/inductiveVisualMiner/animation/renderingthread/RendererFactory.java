@@ -29,10 +29,10 @@ public class RendererFactory {
 	public static final Shape outline = tokenStroke.createStrokedShape(circle);
 	public static final Shape colouredOutline = colouredTokenStroke.createStrokedShape(circle);
 
-	private final RendererImplOpenGL rendererOpenGL;
+	//private final RendererImplOpenGL rendererOpenGL;
 	
 	public RendererFactory() {
-		rendererOpenGL = new RendererImplOpenGL();
+		//rendererOpenGL = new RendererImplOpenGL();
 	}
 	
 	/**
