@@ -510,6 +510,7 @@ public class InductiveVisualMinerController {
 			histogram.setOnException(onException);
 		}
 
+		chain.addConnection(animationScaler, histogram);
 		chain.addConnection(filterNodeSelection, histogram);
 
 		//done
