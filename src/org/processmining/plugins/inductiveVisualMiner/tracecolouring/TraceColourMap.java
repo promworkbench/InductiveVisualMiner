@@ -20,13 +20,14 @@ public interface TraceColourMap {
 	 * METHOD!
 	 * 
 	 * Rather, prepare an array that contains a (link to) a colour for each
-	 * trace index, in the constructor.
+	 * trace index and opacity, in the constructor.
 	 * 
 	 * @param traceIndex
-	 * @param bezierIndex
+	 * @param opacity
+	 *            (0 ~ 255)
 	 * @return the colour that this bezier should have.
 	 */
-	public Color getColour(int traceIndex);
+	public Color getColour(int traceIndex, int opacity);
 
 	/**
 	 * 

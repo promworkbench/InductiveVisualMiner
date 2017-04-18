@@ -7,13 +7,15 @@ import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
 
 public class RenderingThread implements Runnable {
+	
+	private RendererFactory rendererFactory = new RendererFactory();
 
 	//thread variables
 	private Thread runThread;
 	private final AtomicBoolean stopRequested = new AtomicBoolean(false);
 	private final AtomicBoolean pauseRequested = new AtomicBoolean(false);
 	private final AtomicBoolean singleFrameRequested = new AtomicBoolean(false);
-	private static final int minRenderDuration = 30;
+	private static final int minRenderDuration = 15;
 	private final ProMCanceller canceller;
 
 	//time
@@ -115,7 +117,7 @@ public class RenderingThread implements Runnable {
 		//debug frame rate
 		long frameRateStart = 0;
 		long frameRateCount = 0;
-		int avg = 10;
+		int avg = 100;
 		while (!stopRequested.get() && !canceller.isCancelled()) {
 			//get the time before we do our game logic
 			before = System.currentTimeMillis();
@@ -142,8 +144,8 @@ public class RenderingThread implements Runnable {
 
 				//debug framerate
 				if (frameRateCount % avg == 0) {
-					//System.out.print((1 / ((System.currentTimeMillis() - frameRateStart) / (1000.0 * avg))));
-					//System.out.println(" fps");
+					System.out.print((1.0 / ((System.currentTimeMillis() - frameRateStart) / (1000.0 * avg))));
+					System.out.println(" fps");
 					frameRateStart = before;
 				}
 				frameRateCount++;
@@ -158,7 +160,7 @@ public class RenderingThread implements Runnable {
 		double time = timeManager.getTimeToBeRendered(!pauseRequested.get() && !stopRequested.get(),
 				settings.timeScale);
 
-		if (!Renderer.render(settings, result, time)) {
+		if (!rendererFactory.render(settings, result, time)) {
 			renderedFrameManager.abortRendering();
 			return false;
 		}

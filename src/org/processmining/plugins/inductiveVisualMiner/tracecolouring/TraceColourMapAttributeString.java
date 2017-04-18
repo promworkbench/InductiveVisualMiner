@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class TraceColourMapAttributeString implements TraceColourMap {
 
-	private final Color[] trace2colour;
+	private final Color[][] trace2colour;
 	private final Map<String, Color> value2colour;
 	private final Attribute attribute;
 
@@ -20,20 +20,25 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 		this.value2colour = value2colour;
 		this.attribute = attribute;
 
-		trace2colour = new Color[log.size()];
+		trace2colour = new Color[log.size()][256];
 		for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
 			IvMTrace trace = it.next();
 			XAttribute value = trace.getAttributes().get(attribute.getName());
+			Color baseColour;
 			if (value == null) {
-				trace2colour[it.getPosition()] = TraceColourMapSettings.defaultColour;
+				baseColour = TraceColourMapSettings.defaultColour;
 			} else {
-				trace2colour[it.getPosition()] = value2colour.get(value.toString());
+				baseColour = value2colour.get(value.toString());
+			}
+			for (int op = 0; op < 256; op++) {
+				trace2colour[it.getPosition()][op] = new Color(baseColour.getRed(), baseColour.getGreen(),
+						baseColour.getBlue(), op);
 			}
 		}
 	}
 
-	public Color getColour(int traceIndex) {
-		return trace2colour[traceIndex];
+	public Color getColour(int traceIndex, int opacity) {
+		return trace2colour[traceIndex][opacity];
 	}
 
 	public Color getColour(IMTrace trace) {

@@ -13,7 +13,7 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 
 	private final double min;
 	private final double max;
-	private final Color[] trace2colour;
+	private final Color[][] trace2colour;
 	private final Color[] colours;
 	protected final IvMEfficientTree tree;
 
@@ -24,10 +24,14 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 		this.colours = colours;
 		this.tree = tree;
 
-		trace2colour = new Color[log.size()];
+		trace2colour = new Color[log.size()][256];
 		for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
 			IvMTrace trace = it.next();
-			trace2colour[it.getPosition()] = attributeValue2colour(getProperty(trace));
+			Color baseColour = attributeValue2colour(getProperty(trace));
+			for (int op = 0; op < 256; op++) {
+				trace2colour[it.getPosition()][op] = new Color(baseColour.getRed(), baseColour.getGreen(),
+						baseColour.getBlue(), op);
+			}
 		}
 	}
 
@@ -57,11 +61,12 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 		return attributeValue2colour(getProperty(trace));
 	}
 
-	public Color getColour(int traceIndex) {
-		return trace2colour[traceIndex];
+	public Color getColour(int traceIndex, int opacity) {
+		return trace2colour[traceIndex][opacity];
 	}
 
 	final private static DecimalFormat numberFormat = new DecimalFormat("#.##");
+
 	public String getValue(IvMTrace trace) {
 		if (getProperty(trace) > Double.MIN_VALUE) {
 			return "\u2588 " + numberFormat.format(getProperty(trace));
