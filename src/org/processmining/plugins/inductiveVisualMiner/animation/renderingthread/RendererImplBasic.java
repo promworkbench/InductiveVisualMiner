@@ -15,19 +15,6 @@ import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColour
 public class RendererImplBasic {
 
 	//precompupte colours and transformations to save object allocations during the animation.
-	public static final Color[] defaultTokenFillColours;
-	public static final Color[] tokenStrokeColours;
-	static {
-		tokenStrokeColours = new Color[256];
-		defaultTokenFillColours = new Color[256];
-		for (int i = 0; i < 256; i++) {
-			tokenStrokeColours[i] = new Color(RendererFactory.tokenStrokeColour.getRed(),
-					RendererFactory.tokenStrokeColour.getGreen(), RendererFactory.tokenStrokeColour.getBlue(), i);
-			defaultTokenFillColours[i] = new Color(RendererFactory.defaultTokenFillColour.getRed(),
-					RendererFactory.defaultTokenFillColour.getGreen(), RendererFactory.defaultTokenFillColour.getBlue(),
-					i);
-		}
-	}
 	public static final AffineTransform identityTransform = new AffineTransform();
 
 	public static boolean render(ExternalSettings settings, RenderedFrame result, double time) {
@@ -88,12 +75,14 @@ public class RendererImplBasic {
 
 					//draw the fill
 					{
+						Color fillColour;
 						if (trace2colour != null) {
-							graphics.setPaint(trace2colour.getColour(tokens.itGetTraceIndex(),
-									(int) Math.round(tokens.itGetOpacity() * 255)));
+							fillColour = trace2colour.getColour(tokens.itGetTraceIndex());
 						} else {
-							graphics.setPaint(defaultTokenFillColours[(int) Math.round(tokens.itGetOpacity() * 255)]);
+							fillColour = RendererFactory.defaultTokenFillColour;
 						}
+						graphics.setPaint(new Color(fillColour.getRed(), fillColour.getGreen(), fillColour.getBlue(),
+								(int) Math.round(tokens.itGetOpacity() * 255)));
 						graphics.fill(RendererFactory.circle);
 					}
 
@@ -102,7 +91,10 @@ public class RendererImplBasic {
 						if (tokens.itGetOpacity() == 1) {
 							graphics.setColor(RendererFactory.tokenStrokeColour);
 						} else {
-							graphics.setColor(tokenStrokeColours[(int) Math.round(tokens.itGetOpacity() * 255)]);
+							graphics.setColor(new Color(RendererFactory.tokenStrokeColour.getRed(),
+									RendererFactory.tokenStrokeColour.getGreen(),
+									RendererFactory.tokenStrokeColour.getBlue(),
+									(int) Math.round(tokens.itGetOpacity() * 255)));
 						}
 
 						/*

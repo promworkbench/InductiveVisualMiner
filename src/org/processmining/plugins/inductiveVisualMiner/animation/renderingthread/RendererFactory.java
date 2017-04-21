@@ -29,10 +29,12 @@ public class RendererFactory {
 	public static final Shape outline = tokenStroke.createStrokedShape(circle);
 	public static final Shape colouredOutline = colouredTokenStroke.createStrokedShape(circle);
 
-	//private final RendererImplOpenGL rendererOpenGL;
+	private final RendererImplOpenGL rendererOpenGL;
+	private boolean openGLgotError;
 	
 	public RendererFactory() {
-		//rendererOpenGL = new RendererImplOpenGL();
+		rendererOpenGL = new RendererImplOpenGL();
+		openGLgotError = false;
 	}
 	
 	/**
@@ -44,6 +46,14 @@ public class RendererFactory {
 	 * @return
 	 */
 	public boolean render(ExternalSettings settings, RenderedFrame result, double time) {
+		if (!openGLgotError) {
+			try {
+				return rendererOpenGL.render(settings, result, time);
+			} catch (Exception e) {
+				openGLgotError = true;
+				e.printStackTrace();
+			}
+		}
 		return RendererImplBasic.render(settings, result, time);
 		//return RendererImplSprites.render(settings, result, time);
 		//return rendererOpenGL.render(settings, result, time);

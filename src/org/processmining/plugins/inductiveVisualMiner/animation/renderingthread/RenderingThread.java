@@ -15,7 +15,7 @@ public class RenderingThread implements Runnable {
 	private final AtomicBoolean stopRequested = new AtomicBoolean(false);
 	private final AtomicBoolean pauseRequested = new AtomicBoolean(false);
 	private final AtomicBoolean singleFrameRequested = new AtomicBoolean(false);
-	private static final int minRenderDuration = 15;
+	private static final int minRenderDuration = 1;
 	private final ProMCanceller canceller;
 
 	//time
