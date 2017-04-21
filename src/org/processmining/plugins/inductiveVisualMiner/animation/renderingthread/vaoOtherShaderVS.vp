@@ -3,13 +3,14 @@ layout(location = 1) in vec2 texCoords;
 
 uniform float x;
 uniform float y;
+uniform float scale;
 uniform vec2 imageSize;
 
 varying vec2 texture_coordinate;
 
 void main(void)
 {
-	vec4 final = position / vec4(imageSize / 10, 1, 1) + (vec4(x, y, 0, 0) / vec4(imageSize, 1, 1)) * 2 + vec4(-1, -1, 0, 0);
+	vec4 final = position / vec4(imageSize / (10 * scale), 1, 1) + (vec4(x, y, 0, 0) / vec4(imageSize, 1, 1)) * 2 + vec4(-1, -1, 0, 0);
 
 	// Transforming The Vertex
 	gl_Position = final;

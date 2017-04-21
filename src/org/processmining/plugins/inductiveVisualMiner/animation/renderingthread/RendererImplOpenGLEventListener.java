@@ -102,13 +102,9 @@ public class RendererImplOpenGLEventListener implements GLEventListener {
 			//clear the previous drawing
 			gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 			gl.glLoadIdentity();
-
-			//pass the scaling on to the shader
-			//			shader.SetUniform(pipeLine, "scaling", new JoglVectord2(((height * 1.0) / width), 1));
-			//			shader.SetUniform(pipeLine, "translating", new JoglVectord2(0, 0));
-
-			double radiusGLx = (radius / width) * 2 * settings.transform.getScaleX();
-			double radiusGLy = (radius / height) * 2 * settings.transform.getScaleY();
+			
+			//pass the scale of the tokens on to the shader
+			shader.SetUniform(pipeLine, "scale", (float) settings.transform.getScaleX());
 
 			Color previousFillColour = null;
 			double previousOpacity = -1;
