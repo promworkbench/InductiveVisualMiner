@@ -17,6 +17,51 @@
         <dependency org="prom" name="Monte" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="Widgets" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="EfficientStorage" rev="latest" changing="true" transitive="true" />
-        <dependency conf="lib->default" org="org.jblas" name="jblas" rev="1.2.4" />        
+        <dependency conf="lib->default" org="org.jblas" name="jblas" rev="1.2.4" /> 
+        <dependency org="prom" name="Visualisation3D" rev="latest" changing="true" transitive="true" /> 
+        
+        
+        
+        <dependency org="org.jogamp.gluegen" name="gluegen" rev="2.3.2" transitive="true"/>
+        <dependency org="org.jogamp.jogl" name="jogl" rev="2.3.2" transitive="true"/>      
+        <dependency org="org.jogamp.jogl" name="nativewindow" rev="2.3.2" />
+        
+        <dependency org="org.jogamp.gluegen" name="gluegen-rt" rev="2.3.2">
+        	<artifact name="gluegen-rt"/>
+        	<artifact name="gluegen-rt" classifier="sources"/>
+            <artifact name="gluegen-rt" classifier="javadoc"/>
+        	<artifact name="gluegen-rt" classifier="natives-android-armv6"/>
+            <artifact name="gluegen-rt" classifier="natives-linux-amd64"/>
+            <artifact name="gluegen-rt" classifier="natives-linux-armv6"/>
+            <artifact name="gluegen-rt" classifier="natives-linux-armv6hf"/>
+            <artifact name="gluegen-rt" classifier="natives-linux-i586"/>
+            <artifact name="gluegen-rt" classifier="natives-macosx-universal"/>
+            <artifact name="gluegen-rt" classifier="natives-solaris-amd64"/>
+            <artifact name="gluegen-rt" classifier="natives-solaris-i586"/>
+            <artifact name="gluegen-rt" classifier="natives-windows-amd64"/>
+            <artifact name="gluegen-rt" classifier="natives-windows-i586"/>
+        </dependency>
+        
+        <dependency org="org.jogamp.jogl" name="jogl-all-main" rev="2.3.2">
+            <artifact name="jogl-all-main"/>
+            <artifact name="jogl-all-main" classifier="sources"/>
+            <artifact name="jogl-all-main" classifier="javadoc"/>
+        </dependency>
+         
+        <dependency org="org.jogamp.jogl" name="jogl-all" rev="2.3.2">
+            <artifact name="jogl-all"/>
+            <artifact name="jogl-all" classifier="sources"/>
+            <artifact name="jogl-all" classifier="javadoc"/>
+            <artifact name="jogl-all" classifier="natives-android-armv6"/>
+            <artifact name="jogl-all" classifier="natives-linux-amd64"/>
+            <artifact name="jogl-all" classifier="natives-linux-armv6"/>
+            <artifact name="jogl-all" classifier="natives-linux-armv6hf"/>
+            <artifact name="jogl-all" classifier="natives-linux-i586"/>
+            <artifact name="jogl-all" classifier="natives-macosx-universal"/>
+            <artifact name="jogl-all" classifier="natives-solaris-amd64"/>
+            <artifact name="jogl-all" classifier="natives-solaris-i586"/>
+            <artifact name="jogl-all" classifier="natives-windows-amd64"/>
+            <artifact name="jogl-all" classifier="natives-windows-i586"/>
+        </dependency>
      </dependencies>
 </ivy-module>
