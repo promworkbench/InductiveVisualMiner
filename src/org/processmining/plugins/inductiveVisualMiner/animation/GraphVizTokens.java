@@ -396,4 +396,8 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	public AffineTransform itGetTransformInverse() {
 		return getTransformInverse(itNow);
 	}
+	
+	public BezierList getBeziers() {
+		return beziers;
+	}
 }

@@ -1,8 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +7,9 @@ import java.util.List;
 import org.processmining.plugins.InductiveMiner.Triple;
 
 import com.kitfox.svg.animation.Bezier;
+
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * Keep a set of elements. The index is kept.
@@ -71,6 +71,10 @@ public class BezierList {
 	
 	public double getEndOpacity(int index) {
 		return endOpacities.get(index);
+	}
+	
+	public int getNumberOfBeziers() {
+		return beziers.size();
 	}
 	
 	/**

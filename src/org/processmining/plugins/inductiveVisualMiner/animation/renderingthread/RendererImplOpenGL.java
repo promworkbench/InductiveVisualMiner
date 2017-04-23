@@ -14,6 +14,7 @@ import java.util.Vector;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokensIterator;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.opengltries.RendererImplOpenGLEventListenerInstancedArrays;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.visualisation3d.GraphicsPipeline;
@@ -41,7 +42,7 @@ public class RendererImplOpenGL {
 	private JoglShader shader = null;
 	private GraphicsPipeline pipeLine;
 
-	private RendererImplOpenGLEventListener eventListener;
+	private RendererImplOpenGLEventListenerInstancedArrays eventListener;
 
 	public final static double radius = 6;
 
@@ -58,7 +59,7 @@ public class RendererImplOpenGL {
 		factory = GLDrawableFactory.getFactory(profile);
 		
 		drawable = factory.createOffscreenAutoDrawable(factory.getDefaultDevice(), capabilities, null, 1, 1);
-		eventListener = new RendererImplOpenGLEventListener();
+		eventListener = new RendererImplOpenGLEventListenerInstancedArrays();
 		drawable.addGLEventListener(eventListener);
 	}
 

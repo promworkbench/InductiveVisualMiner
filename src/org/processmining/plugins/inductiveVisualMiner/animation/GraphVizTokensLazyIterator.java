@@ -99,4 +99,8 @@ public class GraphVizTokensLazyIterator implements GraphVizTokensIterator {
 	public AffineTransform itGetTransformInverse() {
 		return tokens.getTransformInverse(itNow);
 	}
+
+	public GraphVizTokens getTokens() {
+		return tokens;
+	}
 }

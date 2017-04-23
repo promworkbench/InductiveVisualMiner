@@ -1,6 +1,5 @@
-package org.processmining.plugins.inductiveVisualMiner.animation.renderingthread;
+package org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.opengltries;
 
-import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -15,14 +14,13 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 
-public class RendererImplOpenGLEventListenerInstances implements GLEventListener {
+public class RendererImplOpenGLEventListenerInstancedArrays implements GLEventListener {
 
 	private GraphicsPipeline pipeLine = new GraphicsPipeline();
 	private JoglShader shader = null;
 
 	private ExternalSettings settings;
 	private double time;
-	private Point2D.Double point = new Point2D.Double();
 	private int width;
 	private int height;
 
@@ -41,8 +39,9 @@ public class RendererImplOpenGLEventListenerInstances implements GLEventListener
 
 		//set up the shaders
 		{
-			shader = new JoglShader("/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread",
-					"vaoOtherShaderVSinstances", "vaoOtherShaderFSinstances");
+			shader = new JoglShader(
+					"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengltries",
+					"vaoOtherShaderVSinstancedArrays", "vaoOtherShaderFSinstancedArrays");
 			shader.Create(pipeLine);
 			shader.Bind(pipeLine);
 		}
@@ -53,11 +52,21 @@ public class RendererImplOpenGLEventListenerInstances implements GLEventListener
 			//define the quad
 			float[] quadVertices = { //
 					//position		//colour
-					-0.05f, -0.05f, 1, 1, 0,// Left  
-					0.05f, -0.05f, 	1, 0, 1,// Right 
-					0.0f, 0.05f,	0, 1, 1 // Top   
+					-0.05f, -0.05f, 1, 1, 0, // Left  
+					0.05f, -0.05f, 1, 0, 1, // Right 
+					0.0f, 0.05f, 0, 1, 1 // Top   
 			};
 			FloatBuffer quadVerticesBuffer = FloatBuffer.wrap(quadVertices);
+
+			//define the translations
+			FloatBuffer translations = FloatBuffer.allocate(200);
+			for (int y = -10; y < 10; y += 2) {
+				for (int x = -10; x < 10; x += 2) {
+					translations.put(x / 10f);
+					translations.put(y / 10f);
+				}
+			}
+			translations.rewind();
 
 			//set up a vertex array object
 			vertexArrayObject = IntBuffer.allocate(1);
@@ -67,41 +76,42 @@ public class RendererImplOpenGLEventListenerInstances implements GLEventListener
 			IntBuffer vertexBufferObject = IntBuffer.allocate(1);
 			gl.glGenBuffers(1, vertexBufferObject);
 
+			//create an instanced array
+			IntBuffer instanceVertexBufferObject = IntBuffer.allocate(1);
+			gl.glGenBuffers(1, instanceVertexBufferObject);
+
 			//bind the vertex array
 			gl.glBindVertexArray(vertexArrayObject.get(0));
 			{
-				gl.glEnableVertexAttribArray(0);
-
-				//bind the vertex buffer in the vertex array
+				//bind and send the vertex buffer in the vertex array
 				gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vertexBufferObject.get(0));
 				gl.glBufferData(GL2.GL_ARRAY_BUFFER, quadVertices.length * 4, quadVerticesBuffer, GL2.GL_STATIC_DRAW);
 
 				//tell the structure of the float buffer
+				gl.glEnableVertexAttribArray(0);
 				gl.glVertexAttribPointer(0, 2, GL2.GL_FLOAT, false, 5 * 4, 0); //position
-				
+
 				gl.glEnableVertexAttribArray(1);
 				gl.glVertexAttribPointer(1, 3, GL2.GL_FLOAT, false, 5 * 4, 2 * 4); //colour
 
+				//bind and send the instanced array
+				gl.glBindBuffer(GL.GL_ARRAY_BUFFER, instanceVertexBufferObject.get(0));
+				gl.glBufferData(GL.GL_ARRAY_BUFFER, 200 * 4, translations, GL.GL_STATIC_DRAW);
+
+				//tell the structure of the instanced array
+				gl.glEnableVertexAttribArray(2);
+				gl.glVertexAttribPointer(2, 2, GL.GL_FLOAT, false, 0, 0); //offset
+
 				//unbind the vertex buffer
 				gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+
+				gl.glVertexAttribDivisor(2, 1);
 			}
 
 			//unbind the vertex array
 			gl.glBindVertexArray(0);
 		}
 
-		//set up the locations
-		{
-			int index = 0;
-			float offset = 0.1f;
-			for (int y = -10; y < 10; y += 2) {
-				for (int x = -10; x < 10; x += 2) {
-					int location = gl.glGetUniformLocation(shader.getProgramHandle(), "offsets[" + index + "]");
-					gl.glUniform2f(location, x / 10f, y / 10f);
-					index++;
-				}
-			}
-		}
 	}
 
 	public void dispose(GLAutoDrawable drawable) {
