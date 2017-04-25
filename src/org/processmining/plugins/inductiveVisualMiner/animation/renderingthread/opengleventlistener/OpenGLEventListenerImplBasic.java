@@ -105,6 +105,7 @@ public class OpenGLEventListenerImplBasic implements OpenGLEventListener {
 
 			//pass the scale of the tokens on to the shader
 			shader.SetUniform(pipeLine, "scale", (float) settings.transform.getScaleX());
+			shader.SetUniform(pipeLine, "imageSize", new JoglVectord2(width, height));
 
 			Color previousFillColour = null;
 			double previousOpacity = -1;
@@ -122,44 +123,32 @@ public class OpenGLEventListenerImplBasic implements OpenGLEventListener {
 					point.y = settings.tokens.itGetY();
 					settings.transform.transform(point, point);
 
-					//transform to OpenGL coordinates
-					//point.x = (point.x / width);
-					//point.y = (-point.y / height);
-					//					if (true || point.getX() + radiusGLx >= -1 && point.getX() - radiusGLx <= 1
-					//							&& point.getY() - radiusGLy <= 1 && point.getY() + radiusGLy >= -1) {
-					if (true) {
-
-						//set fill colour
-						Color fillColourNew;
-						if (settings.trace2colour != null) {
-							fillColourNew = settings.trace2colour.getColour(settings.tokens.itGetTraceIndex());
-						} else {
-							fillColourNew = RendererFactory.defaultTokenFillColour;
-						}
-						if (fillColourNew != previousFillColour) {
-							previousFillColour = fillColourNew;
-							shader.SetUniform(pipeLine, "fillColourOuter",
-									new JoglVectord3(previousFillColour.getRed() / 255f,
-											previousFillColour.getGreen() / 255f, previousFillColour.getBlue() / 255f));
-						}
-
-						//set opacity
-						if (settings.tokens.itGetOpacity() != previousOpacity) {
-							shader.SetUniform(pipeLine, "opacity", (float) settings.tokens.itGetOpacity());
-							previousOpacity = settings.tokens.itGetOpacity();
-						}
-
-						//paint the token
-						//gl.glPushMatrix();
-						//System.out.println(point);
-						//gl.glTranslated(point.x, point.y, 0);
-						shader.SetUniform(pipeLine, "x", (float) point.x);
-						shader.SetUniform(pipeLine, "y", (float) point.y);
-						shader.SetUniform(pipeLine, "imageSize", new JoglVectord2(width, height));
-						gl.glDisable(GL2.GL_DEPTH_TEST);
-						gl.glDrawArrays(GL2.GL_TRIANGLES, 0, 6);
-						//gl.glPopMatrix();
+					//set fill colour
+					Color fillColourNew;
+					if (settings.trace2colour != null) {
+						fillColourNew = settings.trace2colour.getColour(settings.tokens.itGetTraceIndex());
+					} else {
+						fillColourNew = RendererFactory.defaultTokenFillColour;
 					}
+					if (fillColourNew != previousFillColour) {
+						previousFillColour = fillColourNew;
+						shader.SetUniform(pipeLine, "fillColourOuter",
+								new JoglVectord3(previousFillColour.getRed() / 255f,
+										previousFillColour.getGreen() / 255f, previousFillColour.getBlue() / 255f));
+					}
+
+					//set opacity
+					if (settings.tokens.itGetOpacity() != previousOpacity) {
+						shader.SetUniform(pipeLine, "opacity", (float) settings.tokens.itGetOpacity());
+						previousOpacity = settings.tokens.itGetOpacity();
+					}
+
+					//paint the token
+					shader.SetUniform(pipeLine, "x", (float) point.x);
+					shader.SetUniform(pipeLine, "y", (float) point.y);
+					gl.glDisable(GL2.GL_DEPTH_TEST);
+					gl.glDrawArrays(GL2.GL_TRIANGLES, 0, 6);
+
 				}
 			}
 		}
