@@ -14,7 +14,7 @@ void main( )
 	
 	//settings
 	float cutOff = 0.49;
-	float borderCutOff = 0.42;
+	float borderCutOff = 0.38;
 	float fillGradientCutOff = 0.2;
 	
 	//compute distance from the centre (we're drawing a circle)

@@ -84,10 +84,8 @@ public class RendererImplSprites {
 				tokens.itEval();
 
 				//only attempt to draw if the token is in the visible image
-				AffineTransform bezierTransform = tokens.itGetTransform();
 				point.x = tokens.itGetX();
 				point.y = tokens.itGetY();
-				bezierTransform.transform(point, point);
 				userTransform.transform(point, point);
 				if (point.getX() + radius >= 0 && point.getX() - radius < imgWidth && point.getY() + radius >= 0
 						&& point.getY() - radius < imgHeight) {

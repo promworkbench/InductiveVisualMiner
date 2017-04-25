@@ -1,11 +1,11 @@
-package org.processmining.plugins.inductiveVisualMiner.animation.renderingthread;
+package org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.opengleventlistener;
 
 import java.awt.Color;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.Vector;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.visualisation3d.GraphicsPipeline;
 import org.processmining.visualisation3d.gldatastructures.JoglShader;
 import org.processmining.visualisation3d.gldatastructures.JoglVertexArrayObject;
@@ -17,11 +17,10 @@ import org.processmining.visualisation3d.maths.JoglVectord3;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 import com.jogamp.opengl.glu.GLU;
 
-public class RendererImplOpenGLEventListener implements GLEventListener {
+public class OpenGLEventListenerImplBasic implements OpenGLEventListener {
 
 	private final GLU glu = new GLU();
 	private GraphicsPipeline pipeLine = new GraphicsPipeline();
@@ -79,8 +78,9 @@ public class RendererImplOpenGLEventListener implements GLEventListener {
 
 		//set up the shaders
 		{
-			shader = new JoglShader("/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread",
-					"vaoOtherShaderVS", "vaoOtherShaderFS");
+			shader = new JoglShader(
+					"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengleventlistener",
+					"vaoOtherShaderVSbasic", "vaoOtherShaderFSbasic");
 			shader.Create(pipeLine);
 			shader.Bind(pipeLine);
 			shader.SetUniform(pipeLine, "fillColourInner", new JoglVectord3(1, 1, 1));
@@ -102,7 +102,7 @@ public class RendererImplOpenGLEventListener implements GLEventListener {
 			//clear the previous drawing
 			gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 			gl.glLoadIdentity();
-			
+
 			//pass the scale of the tokens on to the shader
 			shader.SetUniform(pipeLine, "scale", (float) settings.transform.getScaleX());
 
@@ -118,10 +118,8 @@ public class RendererImplOpenGLEventListener implements GLEventListener {
 					settings.tokens.itEval();
 
 					//only attempt to draw if the token is in the visible image
-					AffineTransform bezierTransform = settings.tokens.itGetTransform();
 					point.x = settings.tokens.itGetX();
 					point.y = settings.tokens.itGetY();
-					bezierTransform.transform(point, point);
 					settings.transform.transform(point, point);
 
 					//transform to OpenGL coordinates

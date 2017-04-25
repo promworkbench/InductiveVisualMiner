@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import java.awt.geom.AffineTransform;
-
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens.EvalScratch;
 
 /**
@@ -90,14 +88,6 @@ public class GraphVizTokensLazyIterator implements GraphVizTokensIterator {
 	 */
 	public int itGetTraceIndex() {
 		return tokens.getTraceIndex(itNow);
-	}
-
-	public AffineTransform itGetTransform() {
-		return tokens.getTransform(itNow);
-	}
-
-	public AffineTransform itGetTransformInverse() {
-		return tokens.getTransformInverse(itNow);
 	}
 
 	public GraphVizTokens getTokens() {

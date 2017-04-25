@@ -1,5 +1,6 @@
-package org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.opengltries;
+package org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.opengleventlistener;
 
+import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -11,10 +12,9 @@ import org.processmining.visualisation3d.maths.JoglVectord2;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 
-public class RendererImplOpenGLEventListenerInstancedArrays implements GLEventListener {
+public class OpenGLEventListenerImplInstanceArrays implements OpenGLEventListener {
 
 	private GraphicsPipeline pipeLine = new GraphicsPipeline();
 	private JoglShader shader = null;
@@ -23,6 +23,8 @@ public class RendererImplOpenGLEventListenerInstancedArrays implements GLEventLi
 	private double time;
 	private int width;
 	private int height;
+
+	private boolean openGLknowsBeziers = false;
 
 	private IntBuffer vertexArrayObject;
 
@@ -40,8 +42,8 @@ public class RendererImplOpenGLEventListenerInstancedArrays implements GLEventLi
 		//set up the shaders
 		{
 			shader = new JoglShader(
-					"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengltries",
-					"vaoOtherShaderVSinstancedArrays", "vaoOtherShaderFSinstancedArrays");
+					"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengleventlistener",
+					"vaoOtherShaderVSinstancedArrays2", "vaoOtherShaderFSinstancedArrays2");
 			shader.Create(pipeLine);
 			shader.Bind(pipeLine);
 		}
@@ -49,12 +51,13 @@ public class RendererImplOpenGLEventListenerInstancedArrays implements GLEventLi
 		//set up quad to draw the circles on later
 		{
 
-			//define the quad
+			//define the basic quad
 			float[] quadVertices = { //
 					//position		//colour
-					-0.05f, -0.05f, 1, 1, 0, // Left  
-					0.05f, -0.05f, 1, 0, 1, // Right 
-					0.0f, 0.05f, 0, 1, 1 // Top   
+					-10f, -10f, 1, 1, 0, // Left  
+					10f, -10f, 1, 0, 1, // Right 
+					-10f, 10f, 0, 1, 1, // Top   
+					10f, 10f, 1, 1, 1 // Top
 			};
 			FloatBuffer quadVerticesBuffer = FloatBuffer.wrap(quadVertices);
 
@@ -62,8 +65,8 @@ public class RendererImplOpenGLEventListenerInstancedArrays implements GLEventLi
 			FloatBuffer translations = FloatBuffer.allocate(200);
 			for (int y = -10; y < 10; y += 2) {
 				for (int x = -10; x < 10; x += 2) {
-					translations.put(x / 10f);
-					translations.put(y / 10f);
+					translations.put(x * 15f);
+					translations.put(y * 15f);
 				}
 			}
 			translations.rewind();
@@ -111,7 +114,6 @@ public class RendererImplOpenGLEventListenerInstancedArrays implements GLEventLi
 			//unbind the vertex array
 			gl.glBindVertexArray(0);
 		}
-
 	}
 
 	public void dispose(GLAutoDrawable drawable) {
@@ -125,21 +127,44 @@ public class RendererImplOpenGLEventListenerInstancedArrays implements GLEventLi
 			GL2 gl = drawable.getGL().getGL2();
 
 			//clear the previous drawing
-			gl.glClearColor(1f, 1f, 0f, 0f);
+			gl.glClearColor(0f, 0f, 0f, 0f);
 			gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 			gl.glLoadIdentity();
 
-			//gl.glUseProgram(shader.getProgramHandle());
-			gl.glBindVertexArray(vertexArrayObject.get(0));
-			//gl.glDrawArrays(GL2.GL_TRIANGLES, 0, 3);
-			gl.glDrawArraysInstanced(GL2.GL_TRIANGLES, 0, 3, 100);
-			gl.glBindVertexArray(0);
+			//pass scale and translation to OpenGL
+			shader.SetUniform(pipeLine, "userScale",
+					new JoglVectord2(settings.transform.getScaleX(), settings.transform.getScaleY()));
+			shader.SetUniform(pipeLine, "userTranslate",
+					new JoglVectord2(settings.transform.getTranslateX(), settings.transform.getTranslateY()));
 
+			Point2D.Float point = new Point2D.Float(0, 0);
+
+			settings.tokens.itInit(time);
+			while (settings.tokens.itHasNext()) {
+				settings.tokens.itNext();
+
+				//only paint tokens that are not filtered out
+				if (settings.filteredLog == null
+						|| !settings.filteredLog.isFilteredOut(settings.tokens.itGetTraceIndex())) {
+					settings.tokens.itEval();
+
+					shader.SetUniform(pipeLine, "x", (float) settings.tokens.itGetX());
+					shader.SetUniform(pipeLine, "y", (float) settings.tokens.itGetY());
+					gl.glBindVertexArray(vertexArrayObject.get(0));
+					gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
+					gl.glBindVertexArray(0);
+				}
+			}
+
+			//			gl.glBindVertexArray(vertexArrayObject.get(0));
+			//			gl.glDrawArraysInstanced(GL2.GL_TRIANGLE_STRIP, 0, 4, 100);
+			//			gl.glBindVertexArray(0);
+			//
 			//			gl.glColor4f(1, 0, 0, 1);
 			//			gl.glBegin(GL2.GL_TRIANGLES);
-			//			gl.glVertex2f(-0.5f, -0.5f);
-			//			gl.glVertex2f(0.5f, -0.5f);
-			//			gl.glVertex2f(0f, 0.5f);
+			//			gl.glVertex2f(0f, 0f);
+			//			gl.glVertex2f(0f, 100f);
+			//			gl.glVertex2f(100f, 100f);
 			//			gl.glEnd();
 
 			//			gl.glBindVertexArray(quadVAO);

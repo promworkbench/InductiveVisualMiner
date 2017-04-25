@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,16 +20,12 @@ public class BezierList {
 
 	private final TObjectIntHashMap<Triple<Bezier, Double, Double>> hash;
 	private final List<Bezier> beziers;
-	private final List<AffineTransform> transforms;
-	private final List<AffineTransform> transformInverses;
 	private final TDoubleArrayList startOpacities;
 	private final TDoubleArrayList endOpacities;
 	
 	public BezierList() {
 		hash = new TObjectIntHashMap<>();
 		beziers = new ArrayList<>();
-		transforms = new ArrayList<>();
-		transformInverses = new ArrayList<>();
 		startOpacities = new TDoubleArrayList();
 		endOpacities = new TDoubleArrayList();
 	}
@@ -40,12 +35,10 @@ public class BezierList {
 	 * @param bezier
 	 * @return
 	 */
-	public int add(Bezier bezier, AffineTransform transform, AffineTransform transformInverse, double startOpacity, double endOpacity) {
+	public int add(Bezier bezier, double startOpacity, double endOpacity) {
 		int result = hash.putIfAbsent(Triple.of(bezier, startOpacity, endOpacity), beziers.size());
 		if (result == hash.getNoEntryValue()) {
 			beziers.add(bezier);
-			transforms.add(transform);
-			transformInverses.add(transformInverse);
 			startOpacities.add(startOpacity);
 			endOpacities.add(endOpacity);
 			return beziers.size() - 1;
@@ -55,14 +48,6 @@ public class BezierList {
 	
 	public Bezier getBezier(int index) {
 		return beziers.get(index);
-	}
-	
-	public AffineTransform getTransform(int index) {
-		return transforms.get(index);
-	}
-	
-	public AffineTransform getTransformInverse(int index) {
-		return transformInverses.get(index);
 	}
 	
 	public double getStartOpacity(int index) {

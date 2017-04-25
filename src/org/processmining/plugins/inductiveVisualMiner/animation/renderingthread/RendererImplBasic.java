@@ -64,7 +64,7 @@ public class RendererImplBasic {
 				tokens.itEval();
 
 				//transform the canvas
-				graphics.transform(tokens.itGetTransform());
+				//graphics.transform(tokens.itGetTransform());
 				graphics.translate(tokens.itGetX(), tokens.itGetY());
 
 				//only attempt to draw if the token is in the visible image
@@ -113,7 +113,7 @@ public class RendererImplBasic {
 
 				//transform back
 				graphics.translate(-tokens.itGetX(), -tokens.itGetY());
-				graphics.transform(tokens.itGetTransformInverse());
+				//graphics.transform(tokens.itGetTransformInverse());
 			}
 		}
 	}

@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import java.awt.geom.AffineTransform;
-
 /**
  * Keeps a collection of tokens and allows fast iteration.
  * 
@@ -65,16 +63,4 @@ public interface GraphVizTokensIterator {
 	 * @return the current trace index.
 	 */
 	public int itGetTraceIndex();
-
-	/**
-	 * 
-	 * @return the current transformation
-	 */
-	public AffineTransform itGetTransform();
-
-	/**
-	 * 
-	 * @return the inverse of the current transformation
-	 */
-	public AffineTransform itGetTransformInverse();
 }

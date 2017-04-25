@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.animation;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	}
 
 	public void add(double startTime, double endTime, String path, boolean fadeIn, boolean fadeOut,
-			AffineTransform transform, int traceIndex) throws NoninvertibleTransformException {
+			AffineTransform transform, int traceIndex) {
 
 		double startOpacity;
 		double endOpacity;
@@ -72,7 +71,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 		if (pathCache.containsKey(path)) {
 			p = pathCache.get(path);
 		} else {
-			p = processPath(path);
+			p = processPath(path, transform);
 			pathCache.put(path, p);
 		}
 
@@ -89,7 +88,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 			double newEndTime = startTime + t * (endTime - startTime);
 			double newEndOpacity = startOpacity + t * (endOpacity - startOpacity);
 
-			add(lastTime, newEndTime, bezier, lastOpacity, newEndOpacity, transform, traceIndex);
+			add(lastTime, newEndTime, bezier, lastOpacity, newEndOpacity, traceIndex);
 
 			//move for the next round
 			lastTime = newEndTime;
@@ -99,11 +98,11 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	}
 
 	private void add(double beginTime, double endTime, Bezier bezier, double startOpacity, double endOpacity,
-			AffineTransform transform, int traceIndex) throws NoninvertibleTransformException {
+			int traceIndex) {
 		startTimes.add(beginTime);
 		endTimes.add(endTime);
 		tracePointers.add(traceIndex);
-		bezierPointers.add(beziers.add(bezier, transform, transform.createInverse(), startOpacity, endOpacity));
+		bezierPointers.add(beziers.add(bezier, startOpacity, endOpacity));
 	}
 
 	public void cleanUp() {
@@ -149,14 +148,6 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 		};
 	}
 
-	public AffineTransform getTransform(int tokenIndex) {
-		return beziers.getTransform(bezierPointers.get(tokenIndex));
-	}
-
-	public AffineTransform getTransformInverse(int tokenIndex) {
-		return beziers.getTransformInverse(bezierPointers.get(tokenIndex));
-	}
-
 	public double getStart(int tokenIndex) {
 		return startTimes.get(tokenIndex);
 	}
@@ -187,15 +178,18 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	/**
 	 * 
 	 * @param path
-	 * @return a list of bezier segments and the total length of the curve
+	 * @param transform
+	 * @return a list of bezier segments and the total length of the curve. Each
+	 *         point of the bezier will be transformed using transform.
 	 */
-	public static Pair<List<Bezier>, Double> processPath(String path) {
+	public static Pair<List<Bezier>, Double> processPath(String path, AffineTransform transform) {
 		GeneralPath generalPath = SVGElement.buildPath(path, GeneralPath.WIND_NON_ZERO);
 		final List<Bezier> bezierSegs = new ArrayList<>();
 		double curveLength = 0;
 
 		double[] coords = new double[6];
-		double sx = 0, sy = 0;
+
+		Point2D.Double s = new Point2D.Double(0, 0);
 
 		for (PathIterator pathIt = generalPath.getPathIterator(new AffineTransform()); !pathIt.isDone(); pathIt
 				.next()) {
@@ -203,28 +197,40 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 
 			int segType = pathIt.currentSegment(coords);
 
+			/**
+			 * Transform the coordinates from bezier-space to image-space. Doing
+			 * it now means that is doesn't have to happen in the animation
+			 * loop.
+			 */
+			coords[0] = coords[0] * transform.getScaleX() + transform.getTranslateX();
+			coords[1] = coords[1] * transform.getScaleY() + transform.getTranslateY();
+			coords[2] = coords[2] * transform.getScaleX() + transform.getTranslateX();
+			coords[3] = coords[3] * transform.getScaleY() + transform.getTranslateY();
+			coords[4] = coords[4] * transform.getScaleX() + transform.getTranslateX();
+			coords[5] = coords[5] * transform.getScaleY() + transform.getTranslateY();
+
 			switch (segType) {
 				case PathIterator.SEG_LINETO : {
-					bezier = new Bezier(sx, sy, coords, 1);
-					sx = coords[0];
-					sy = coords[1];
+					bezier = new Bezier(s.x, s.y, coords, 1);
+					s.x = coords[0];
+					s.y = coords[1];
 					break;
 				}
 				case PathIterator.SEG_QUADTO : {
-					bezier = new Bezier(sx, sy, coords, 2);
-					sx = coords[2];
-					sy = coords[3];
+					bezier = new Bezier(s.x, s.y, coords, 2);
+					s.x = coords[2];
+					s.y = coords[3];
 					break;
 				}
 				case PathIterator.SEG_CUBICTO : {
-					bezier = new Bezier(sx, sy, coords, 3);
-					sx = coords[4];
-					sy = coords[5];
+					bezier = new Bezier(s.x, s.y, coords, 3);
+					s.x = coords[4];
+					s.y = coords[5];
 					break;
 				}
 				case PathIterator.SEG_MOVETO : {
-					sx = coords[0];
-					sy = coords[1];
+					s.x = coords[0];
+					s.y = coords[1];
 					break;
 				}
 				case PathIterator.SEG_CLOSE :
@@ -389,14 +395,6 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 		return tracePointers.get(itNow);
 	}
 
-	public AffineTransform itGetTransform() {
-		return getTransform(itNow);
-	}
-
-	public AffineTransform itGetTransformInverse() {
-		return getTransformInverse(itNow);
-	}
-	
 	public BezierList getBeziers() {
 		return beziers;
 	}
