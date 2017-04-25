@@ -35,6 +35,7 @@ public class RendererFactory {
 	private boolean openGLgotError;
 	
 	public RendererFactory() {
+		//OpenGLEventListener eventListener = new OpenGLEventListenerImplInstanceArrayOfTokens();
 		OpenGLEventListener eventListener = new OpenGLEventListenerImplBasic();
 		rendererOpenGL = new RendererImplOpenGL(eventListener);
 		openGLgotError = false;

@@ -1,14 +1,13 @@
 layout (location = 0) in vec2 position; //position in triangle
 layout (location = 1) in vec3 color;
 layout (location = 2) in vec2 offset;
+layout (location = 3) in float opacity;
 
-uniform float x;
-uniform float y;
 uniform vec2 imageSize;
 uniform vec2 userScale;
 uniform vec2 userTranslate;
 
-out vec3 fColor;
+out vec4 fColor;
 
 void toDevice(in vec2 imageCoordinates, in vec2 imageSize, out vec2 deviceCoordinates) {
 	deviceCoordinates = vec2((imageCoordinates / imageSize) * 2 - 1);
@@ -19,18 +18,14 @@ void toImage(in vec2 modelCoordinates, in vec2 userScale, in vec2 userTranslate,
 }  
 
 void main()
-{
-    //vec2 pos = position * (gl_InstanceID / 100.0f) * userScale;
-    //vec2 pos = position * userScale;
-    //gl_Position = vec4((pos * userScale) + (userTranslate), 0.0f, 1.0f);
-    
+{   
     vec2 image;
-    toImage(position + vec2(x, y), userScale, userTranslate, image);
+    toImage(position + offset, userScale, userTranslate, image);
         
     vec2 device;
    	toDevice(image, imageSize, device);
    	
     gl_Position = vec4(device, 0, 1);
     
-    fColor = color;
+    fColor = vec4(color, opacity);
 }

@@ -14,7 +14,18 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 
-public class OpenGLEventListenerImplInstanceArrays implements OpenGLEventListener {
+import gnu.trove.list.array.TFloatArrayList;
+
+/**
+ * This class computes the location of all tokens on the cpu, makes an instance
+ * array of coordinates and sends these to the gpu. Does not currently support
+ * token colouring and consists of flower-power squares instead of disks.
+ * 
+ * @author sander
+ *
+ */
+
+public class OpenGLEventListenerImplInstanceArrayOfTokens implements OpenGLEventListener {
 
 	private GraphicsPipeline pipeLine = new GraphicsPipeline();
 	private JoglShader shader = null;
@@ -27,6 +38,7 @@ public class OpenGLEventListenerImplInstanceArrays implements OpenGLEventListene
 	private boolean openGLknowsBeziers = false;
 
 	private IntBuffer vertexArrayObject;
+	private IntBuffer instanceVertexBufferObject;
 
 	public void init(GLAutoDrawable drawable) {
 		System.out.println(" GL listener init");
@@ -62,11 +74,12 @@ public class OpenGLEventListenerImplInstanceArrays implements OpenGLEventListene
 			FloatBuffer quadVerticesBuffer = FloatBuffer.wrap(quadVertices);
 
 			//define the translations
-			FloatBuffer translations = FloatBuffer.allocate(200);
+			FloatBuffer translations = FloatBuffer.allocate(300);
 			for (int y = -10; y < 10; y += 2) {
 				for (int x = -10; x < 10; x += 2) {
 					translations.put(x * 15f);
 					translations.put(y * 15f);
+					translations.put(0.5f);
 				}
 			}
 			translations.rewind();
@@ -80,7 +93,7 @@ public class OpenGLEventListenerImplInstanceArrays implements OpenGLEventListene
 			gl.glGenBuffers(1, vertexBufferObject);
 
 			//create an instanced array
-			IntBuffer instanceVertexBufferObject = IntBuffer.allocate(1);
+			instanceVertexBufferObject = IntBuffer.allocate(1);
 			gl.glGenBuffers(1, instanceVertexBufferObject);
 
 			//bind the vertex array
@@ -99,16 +112,20 @@ public class OpenGLEventListenerImplInstanceArrays implements OpenGLEventListene
 
 				//bind and send the instanced array
 				gl.glBindBuffer(GL.GL_ARRAY_BUFFER, instanceVertexBufferObject.get(0));
-				gl.glBufferData(GL.GL_ARRAY_BUFFER, 200 * 4, translations, GL.GL_STATIC_DRAW);
+				gl.glBufferData(GL.GL_ARRAY_BUFFER, 300 * 4, translations, GL.GL_STATIC_DRAW);
 
 				//tell the structure of the instanced array
 				gl.glEnableVertexAttribArray(2);
-				gl.glVertexAttribPointer(2, 2, GL.GL_FLOAT, false, 0, 0); //offset
+				gl.glVertexAttribPointer(2, 2, GL.GL_FLOAT, false, 3 * 4, 0); //offset
+
+				gl.glEnableVertexAttribArray(3);
+				gl.glVertexAttribPointer(3, 1, GL.GL_FLOAT, false, 3 * 4, 2 * 4); //opacity
 
 				//unbind the vertex buffer
 				gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
 
 				gl.glVertexAttribDivisor(2, 1);
+				gl.glVertexAttribDivisor(3, 1);
 			}
 
 			//unbind the vertex array
@@ -137,8 +154,28 @@ public class OpenGLEventListenerImplInstanceArrays implements OpenGLEventListene
 			shader.SetUniform(pipeLine, "userTranslate",
 					new JoglVectord2(settings.transform.getTranslateX(), settings.transform.getTranslateY()));
 
-			Point2D.Float point = new Point2D.Float(0, 0);
+			if (false) {
+				Point2D.Float point = new Point2D.Float(0, 0);
 
+				settings.tokens.itInit(time);
+				while (settings.tokens.itHasNext()) {
+					settings.tokens.itNext();
+
+					//only paint tokens that are not filtered out
+					if (settings.filteredLog == null
+							|| !settings.filteredLog.isFilteredOut(settings.tokens.itGetTraceIndex())) {
+						settings.tokens.itEval();
+
+						shader.SetUniform(pipeLine, "x", (float) settings.tokens.itGetX());
+						shader.SetUniform(pipeLine, "y", (float) settings.tokens.itGetY());
+						gl.glBindVertexArray(vertexArrayObject.get(0));
+						gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
+						gl.glBindVertexArray(0);
+					}
+				}
+			}
+
+			TFloatArrayList tp = new TFloatArrayList();
 			settings.tokens.itInit(time);
 			while (settings.tokens.itHasNext()) {
 				settings.tokens.itNext();
@@ -148,28 +185,21 @@ public class OpenGLEventListenerImplInstanceArrays implements OpenGLEventListene
 						|| !settings.filteredLog.isFilteredOut(settings.tokens.itGetTraceIndex())) {
 					settings.tokens.itEval();
 
-					shader.SetUniform(pipeLine, "x", (float) settings.tokens.itGetX());
-					shader.SetUniform(pipeLine, "y", (float) settings.tokens.itGetY());
-					gl.glBindVertexArray(vertexArrayObject.get(0));
-					gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
-					gl.glBindVertexArray(0);
+					tp.add((float) settings.tokens.itGetX());
+					tp.add((float) settings.tokens.itGetY());
+					tp.add((float) settings.tokens.itGetOpacity());
 				}
 			}
+			FloatBuffer tpf = FloatBuffer.wrap(tp.toArray());
 
-			//			gl.glBindVertexArray(vertexArrayObject.get(0));
-			//			gl.glDrawArraysInstanced(GL2.GL_TRIANGLE_STRIP, 0, 4, 100);
-			//			gl.glBindVertexArray(0);
-			//
-			//			gl.glColor4f(1, 0, 0, 1);
-			//			gl.glBegin(GL2.GL_TRIANGLES);
-			//			gl.glVertex2f(0f, 0f);
-			//			gl.glVertex2f(0f, 100f);
-			//			gl.glVertex2f(100f, 100f);
-			//			gl.glEnd();
+			gl.glBindBuffer(GL.GL_ARRAY_BUFFER, instanceVertexBufferObject.get(0));
+			gl.glBufferData(GL.GL_ARRAY_BUFFER, tp.size() * 4, tpf, GL.GL_STATIC_DRAW);
+			gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
 
-			//			gl.glBindVertexArray(quadVAO);
-			//			gl.glDrawArraysInstanced(GL2.GL_TRIANGLES, 0, 6, 100);  
-			//			gl.glBindVertexArray(0);
+			gl.glBindVertexArray(vertexArrayObject.get(0));
+			gl.glDrawArraysInstanced(GL2.GL_TRIANGLE_STRIP, 0, 4, tp.size() / 3);
+			gl.glBindVertexArray(0);
+
 		}
 	}
 
