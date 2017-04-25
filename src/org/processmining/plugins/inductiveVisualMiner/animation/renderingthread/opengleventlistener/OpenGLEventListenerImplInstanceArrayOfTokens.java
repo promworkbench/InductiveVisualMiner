@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.opengleventlistener;
 
-import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -32,10 +31,6 @@ public class OpenGLEventListenerImplInstanceArrayOfTokens implements OpenGLEvent
 
 	private ExternalSettings settings;
 	private double time;
-	private int width;
-	private int height;
-
-	private boolean openGLknowsBeziers = false;
 
 	private IntBuffer vertexArrayObject;
 	private IntBuffer instanceVertexBufferObject;
@@ -154,27 +149,6 @@ public class OpenGLEventListenerImplInstanceArrayOfTokens implements OpenGLEvent
 			shader.SetUniform(pipeLine, "userTranslate",
 					new JoglVectord2(settings.transform.getTranslateX(), settings.transform.getTranslateY()));
 
-			if (false) {
-				Point2D.Float point = new Point2D.Float(0, 0);
-
-				settings.tokens.itInit(time);
-				while (settings.tokens.itHasNext()) {
-					settings.tokens.itNext();
-
-					//only paint tokens that are not filtered out
-					if (settings.filteredLog == null
-							|| !settings.filteredLog.isFilteredOut(settings.tokens.itGetTraceIndex())) {
-						settings.tokens.itEval();
-
-						shader.SetUniform(pipeLine, "x", (float) settings.tokens.itGetX());
-						shader.SetUniform(pipeLine, "y", (float) settings.tokens.itGetY());
-						gl.glBindVertexArray(vertexArrayObject.get(0));
-						gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, 4);
-						gl.glBindVertexArray(0);
-					}
-				}
-			}
-
 			TFloatArrayList tp = new TFloatArrayList();
 			settings.tokens.itInit(time);
 			while (settings.tokens.itHasNext()) {
@@ -211,9 +185,6 @@ public class OpenGLEventListenerImplInstanceArrayOfTokens implements OpenGLEvent
 		if (height == 0) {
 			height = 1; // prevent divide by zero
 		}
-		double aspectRatio = (double) width / height;
-		this.width = width;
-		this.height = height;
 
 		// Set the view port (display area) to cover the entire window
 		gl.glViewport(0, 0, width, height);
