@@ -1,0 +1,170 @@
+layout (location = 0) in vec2 position; //position in triangles
+layout (location = 1) in vec3 color; //colour of the token
+layout (location = 2) in vec2 timeBounds; //start and end time of the token
+layout (location = 3) in vec2 opacityBounds; //start and end opacity of the bezier
+layout (location = 4) in vec2 bezier0; //first control point of the bezier
+layout (location = 5) in vec2 bezier1; //second control point of the bezier
+layout (location = 6) in vec2 bezier2; //third control point of the bezier
+layout (location = 7) in vec2 bezier3; //third control point of the bezier
+
+uniform float time;
+uniform vec2 imageSize;
+uniform vec2 userScale;
+uniform vec2 userTranslate;
+
+out vec4 fColor;
+
+void toDevice(in vec2 imageCoordinates, in vec2 imageSize, out vec2 deviceCoordinates) {
+	deviceCoordinates = vec2((imageCoordinates / imageSize) * 2 - 1);
+}
+
+void toImage(in vec2 modelCoordinates, in vec2 userScale, in vec2 userTranslate, out vec2 imageCoordinates) {
+	imageCoordinates = vec2(modelCoordinates * userScale + userTranslate);
+}
+
+int choose(in int num, in int denom) {
+    int denom2 = num - denom;
+    if (denom < denom2)
+    {
+        int tmp = denom;
+        denom = denom2;
+        denom2 = tmp;
+    }
+    
+    int prod = 1;
+    for (int i = num; i > denom; i--)
+    {
+        prod *= num;
+    }
+    
+    for (int i = 2; i <= denom2; i++)
+    {
+        prod /= i;
+    }
+    
+    return prod;
+}
+
+float bernstein(in int numKnots, in int knotNo, in float param) {
+    float iParam = 1 - param;
+    //Faster evaluation for easy cases:
+    switch (numKnots)
+    {
+        case 0:
+            return 1;
+        case 1:
+        {
+            switch (knotNo)
+            {
+                case 0:
+                    return iParam;
+                case 1:
+                    return param;
+            }
+            break;
+        }
+        case 2:
+        {
+            switch (knotNo)
+            {
+                case 0:
+                    return iParam * iParam;
+                case 1:
+                    return 2 * iParam * param;
+                case 2:
+                    return param * param;
+            }
+            break;
+        }
+        case 3:
+        {
+            switch (knotNo)
+            {
+                case 0:
+                    return iParam * iParam * iParam;
+                case 1:
+                    return 3 * iParam * iParam * param;
+                case 2:
+                    return 3 * iParam * param * param;
+                case 3:
+                    return param * param * param;
+            }
+            break;
+        }
+    }
+    
+    //If this bezier has more than four points, calculate bernstein the hard way
+    float retVal = 1;
+    for (int i = 0; i < knotNo; i++)
+    {
+        retVal *= param;
+    }
+    for (int i = 0; i < numKnots - knotNo; i++)
+    {
+        retVal *= iParam;
+    }
+    retVal *= choose(numKnots, knotNo);
+    
+    return retVal;
+}
+
+vec2 eval(in float param) {
+	vec2 point = vec2(0, 0);
+	
+	//check how many control points there are
+	int numKnots;
+	if (bezier3.x < -1000) {
+		if (bezier2.x < -1000) {
+			if (bezier1.x < -1000) {
+				numKnots = 1;
+			} else {
+				numKnots = 2;
+			}
+		} else {
+			numKnots = 3;
+		}
+	} else {
+		numKnots = 4;
+	}
+	
+	point += bezier0 * bernstein(numKnots - 1, 0, param);
+	if (numKnots > 1) {
+		point += bezier1 * bernstein(numKnots - 1, 1, param);
+		if (numKnots > 2) {
+			point += bezier2 * bernstein(numKnots - 1, 2, param);
+			if (numKnots > 3) {
+				point += bezier3 * bernstein(numKnots - 1, 3, param);
+			}
+		}
+	}
+    
+    return point;
+}
+
+void main()
+{   
+	vec4 posBezier;
+	float choose = step(timeBounds.x, time) - step(timeBounds.y, time); //1 = token is displayed now; 0 = token is not being displayed now
+	
+	//compute the position (t) on the bezier
+	float t;
+	if (length(timeBounds) == 0) {
+		//single-time token point
+		t = 0;
+	} else {
+		t = (time - timeBounds.x) / (timeBounds.y - timeBounds.x);
+	}
+	vec2 location = eval(t);
+	
+	vec2 image;
+    toImage(position + location, userScale, userTranslate, image);
+        
+    vec2 device;
+   	toDevice(image, imageSize, device);
+   	
+    posBezier = vec4(device, 0, 1);
+    
+    fColor = vec4(color, (1 - t) * opacityBounds.x + t * opacityBounds.y);
+    
+    gl_Position = choose * posBezier + (1 - choose) * vec4(-100, -100, -100, 0); 
+}

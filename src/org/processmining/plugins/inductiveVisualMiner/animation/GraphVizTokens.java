@@ -7,6 +7,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
@@ -27,6 +28,9 @@ import gnu.trove.map.hash.THashMap;
  */
 public class GraphVizTokens implements GraphVizTokensIterator {
 
+	private static final AtomicLong idPool = new AtomicLong(0);
+	private final long id;
+
 	private final TDoubleArrayList startTimes;
 	private final TDoubleArrayList endTimes;
 	private final TIntArrayList tracePointers;
@@ -37,6 +41,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	private final Map<String, Pair<List<Bezier>, Double>> pathCache;
 
 	public GraphVizTokens() {
+		id = idPool.incrementAndGet();
 		startTimes = new TDoubleArrayList();
 		endTimes = new TDoubleArrayList();
 		tracePointers = new TIntArrayList();
@@ -148,16 +153,20 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 		};
 	}
 
-	public double getStart(int tokenIndex) {
+	public double getStartTime(int tokenIndex) {
 		return startTimes.get(tokenIndex);
 	}
 
-	public double getEnd(int tokenIndex) {
+	public double getEndTime(int tokenIndex) {
 		return endTimes.get(tokenIndex);
 	}
 
 	public int getTraceIndex(int tokenIndex) {
 		return tracePointers.get(tokenIndex);
+	}
+
+	public int getBezierIndex(int tokenIndex) {
+		return bezierPointers.get(tokenIndex);
 	}
 
 	public String toString() {
@@ -180,7 +189,7 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 	 * @param path
 	 * @param transform
 	 * @return a list of bezier segments and the total length of the curve. Each
-	 *         point of the bezier will be transformed using transform.
+	 *         point of every bezier will be transformed using transform.
 	 */
 	public static Pair<List<Bezier>, Double> processPath(String path, AffineTransform transform) {
 		GeneralPath generalPath = SVGElement.buildPath(path, GeneralPath.WIND_NON_ZERO);
@@ -397,5 +406,25 @@ public class GraphVizTokens implements GraphVizTokensIterator {
 
 	public BezierList getBeziers() {
 		return beziers;
+	}
+
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GraphVizTokens other = (GraphVizTokens) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 }

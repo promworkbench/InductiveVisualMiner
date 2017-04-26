@@ -34,7 +34,7 @@ public class GraphVizTokensLazyIterator implements GraphVizTokensIterator {
 	}
 
 	private int itGetNext(int i) {
-		while (i < tokens.size() && (tokens.getStart(i) > itTime || itTime > tokens.getEnd(i))) {
+		while (i < tokens.size() && (tokens.getStartTime(i) > itTime || itTime > tokens.getEndTime(i))) {
 			i++;
 		}
 		return i;
