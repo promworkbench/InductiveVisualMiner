@@ -1,7 +1,7 @@
-layout (location = 0) in vec2 position; //position in triangles
-layout (location = 1) in vec3 color; //colour of the token
-layout (location = 2) in vec2 timeBounds; //start and end time of the token
-layout (location = 3) in vec2 opacityBounds; //start and end opacity of the bezier
+layout (location = 0) in vec2 position; //position in triangle
+layout (location = 1) in vec2 timeBounds; //start and end time of the token
+layout (location = 2) in vec2 opacityBounds; //start and end opacity of the bezier
+layout (location = 3) in vec3 colour; //token colour
 layout (location = 4) in vec2 bezier0; //first control point of the bezier
 layout (location = 5) in vec2 bezier1; //second control point of the bezier
 layout (location = 6) in vec2 bezier2; //third control point of the bezier
@@ -13,6 +13,8 @@ uniform vec2 userScale;
 uniform vec2 userTranslate;
 
 out vec4 fColor;
+
+varying vec2 texture_coordinate;
 
 void toDevice(in vec2 imageCoordinates, in vec2 imageSize, out vec2 deviceCoordinates) {
 	deviceCoordinates = vec2((imageCoordinates / imageSize) * 2 - 1);
@@ -143,6 +145,7 @@ vec2 eval(in float param) {
 
 void main()
 {   
+	float radius = 15;
 	vec4 posBezier;
 	float choose = step(timeBounds.x, time) - step(timeBounds.y, time); //1 = token is displayed now; 0 = token is not being displayed now
 	
@@ -157,14 +160,15 @@ void main()
 	vec2 location = eval(t);
 	
 	vec2 image;
-    toImage(position + location, userScale, userTranslate, image);
+    toImage(position * radius + location, userScale, userTranslate, image);
         
     vec2 device;
    	toDevice(image, imageSize, device);
    	
     posBezier = vec4(device, 0, 1);
     
-    fColor = vec4(color, (1 - t) * opacityBounds.x + t * opacityBounds.y);
+    fColor = vec4(colour, (1 - t) * opacityBounds.x + t * opacityBounds.y);
     
-    gl_Position = choose * posBezier + (1 - choose) * vec4(-100, -100, -100, 0); 
+    gl_Position = choose * posBezier + (1 - choose) * vec4(-100, -100, -100, 0);
+    texture_coordinate = vec2(position.xy); 
 }
