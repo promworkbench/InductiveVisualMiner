@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry excluding="org/processmining/inductivevisualminer/alignment/AlignmentArya.java|org/processmining/inductivevisualminer/alignment/AlignmentFelix.java|org/processmining/plugins/inductiveVisualMiner/alignment/AlignmentFelix.java" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/GraphViz"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=InductiveVisualMiner&amp;ivyXmlPath=ivy.xml&amp;confs=*&amp;ivySettingsPath=ivysettings.xml&amp;loadSettingsOnDemand=false&amp;ivyUserDir=&amp;propertyFiles="/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
