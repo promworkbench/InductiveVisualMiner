@@ -14,7 +14,7 @@ import java.awt.geom.Ellipse2D;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.opengleventlistener.OpenGLEventListener;
-import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.opengleventlistener.OpenGLEventListenerImplInstancedFully;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.opengleventlistener.OpenGLEventListenerImplBasic;
 
 public class RendererFactory {
 
@@ -35,8 +35,8 @@ public class RendererFactory {
 	private boolean openGLgotError;
 	
 	public RendererFactory() {
-		OpenGLEventListener eventListener = new OpenGLEventListenerImplInstancedFully();
-		//OpenGLEventListener eventListener = new OpenGLEventListenerImplBasic();
+		//OpenGLEventListener eventListener = new OpenGLEventListenerImplInstancedFully();
+		OpenGLEventListener eventListener = new OpenGLEventListenerImplBasic();
 		rendererOpenGL = new RendererImplOpenGL(eventListener);
 		openGLgotError = false;
 	}
