@@ -28,4 +28,6 @@ public interface IvMLogFiltered {
 	 *         current trace out.
 	 */
 	public IteratorWithPosition<IvMTrace> iteratorUnfiltered();
+
+	public boolean equals(IvMLogFiltered otherLog);
 }

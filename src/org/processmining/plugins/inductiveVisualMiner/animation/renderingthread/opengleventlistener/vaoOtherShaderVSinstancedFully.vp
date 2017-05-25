@@ -5,7 +5,7 @@ layout (location = 3) in vec3 colour; //token colour
 layout (location = 4) in vec2 bezier0; //first control point of the bezier
 layout (location = 5) in vec2 bezier1; //second control point of the bezier
 layout (location = 6) in vec2 bezier2; //third control point of the bezier
-layout (location = 7) in vec2 bezier3; //third control point of the bezier
+layout (location = 7) in vec2 bezier3; //fourth control point of the bezier
 
 uniform float time;
 uniform vec2 imageSize;
@@ -50,7 +50,7 @@ int choose(in int num, in int denom) {
 float bernstein(in int numKnots, in int knotNo, in float param) {
     float iParam = 1 - param;
     //Faster evaluation for easy cases:
-    switch (numKnots)
+    /*switch (numKnots)
     {
         case 0:
             return 1;
@@ -93,18 +93,12 @@ float bernstein(in int numKnots, in int knotNo, in float param) {
             }
             break;
         }
-    }
+    }*/
     
     //If this bezier has more than four points, calculate bernstein the hard way
     float retVal = 1;
-    for (int i = 0; i < knotNo; i++)
-    {
-        retVal *= param;
-    }
-    for (int i = 0; i < numKnots - knotNo; i++)
-    {
-        retVal *= iParam;
-    }
+    retVal *= pow(param, knotNo);
+    retVal *= pow(iParam, numKnots - knotNo);
     retVal *= choose(numKnots, knotNo);
     
     return retVal;
@@ -115,30 +109,12 @@ vec2 eval(in float param) {
 	
 	//check how many control points there are
 	int numKnots;
-	if (bezier3.x < -1000) {
-		if (bezier2.x < -1000) {
-			if (bezier1.x < -1000) {
-				numKnots = 1;
-			} else {
-				numKnots = 2;
-			}
-		} else {
-			numKnots = 3;
-		}
-	} else {
-		numKnots = 4;
-	}
+	numKnots = bezier3.x < -1000 ? (bezier2.x < -1000 ? (bezier1.x < -1000 ? 1 : 2) : 3) : 4;
 	
 	point += bezier0 * bernstein(numKnots - 1, 0, param);
-	if (numKnots > 1) {
-		point += bezier1 * bernstein(numKnots - 1, 1, param);
-		if (numKnots > 2) {
-			point += bezier2 * bernstein(numKnots - 1, 2, param);
-			if (numKnots > 3) {
-				point += bezier3 * bernstein(numKnots - 1, 3, param);
-			}
-		}
-	}
+	point += numKnots > 1 ? bezier1 * bernstein(numKnots - 1, 1, param) : vec2(0, 0);
+	point += numKnots > 2 ? bezier2 * bernstein(numKnots - 1, 2, param) : vec2(0, 0);
+	point += numKnots > 3 ? bezier3 * bernstein(numKnots - 1, 3, param) : vec2(0, 0);
     
     return point;
 }
@@ -151,12 +127,7 @@ void main()
 	
 	//compute the position (t) on the bezier
 	float t;
-	if (length(timeBounds) == 0) {
-		//single-time token point
-		t = 0;
-	} else {
-		t = (time - timeBounds.x) / (timeBounds.y - timeBounds.x);
-	}
+	t = length(timeBounds) == 0 ? t = 0 : (time - timeBounds.x) / (timeBounds.y - timeBounds.x); //catch singleton-time token
 	vec2 location = eval(t);
 	
 	vec2 image;

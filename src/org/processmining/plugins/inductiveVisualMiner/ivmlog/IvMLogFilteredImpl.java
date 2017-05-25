@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 
 import java.util.BitSet;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 
@@ -10,10 +11,14 @@ public class IvMLogFilteredImpl implements IvMLog, IvMLogFiltered {
 	private final IvMLogNotFiltered log;
 	private boolean somethingFiltered;
 
+	private static final AtomicLong idPool = new AtomicLong();
+	private final long id;
+
 	public IvMLogFilteredImpl(IvMLogNotFiltered log) {
 		this.log = log;
 		traceIsFilteredOut = new BitSet(log.size());
 		somethingFiltered = false;
+		id = idPool.incrementAndGet();
 	}
 
 	/**
@@ -28,8 +33,8 @@ public class IvMLogFilteredImpl implements IvMLog, IvMLogFiltered {
 
 			private int init() {
 				//start with normal traces
-				return traceIsFilteredOut.nextClearBit(0) < log.size() ? traceIsFilteredOut.nextClearBit(0) : log
-						.size();
+				return traceIsFilteredOut.nextClearBit(0) < log.size() ? traceIsFilteredOut.nextClearBit(0)
+						: log.size();
 			}
 
 			public boolean hasNext() {
@@ -67,26 +72,33 @@ public class IvMLogFilteredImpl implements IvMLog, IvMLogFiltered {
 
 	public IteratorWithPosition<IvMTrace> iteratorUnfiltered() {
 		return new IteratorWithPosition<IvMTrace>() {
-			
-			int now = - 1;
-			
+
+			int now = -1;
+
 			public IvMTrace next() {
 				now++;
 				return log.get(now);
 			}
-			
+
 			public boolean hasNext() {
 				return now + 1 < log.size();
 			}
-			
+
 			public int getPosition() {
 				return now;
 			}
-			
+
 			public void remove() {
 				traceIsFilteredOut.set(now);
 				somethingFiltered = true;
 			}
 		};
+	}
+
+	public boolean equals(IvMLogFiltered otherLog) {
+		if (!(otherLog instanceof IvMLogFilteredImpl)) {
+			return false;
+		}
+		return ((IvMLogFilteredImpl) otherLog).id == id;
 	}
 }

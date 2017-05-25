@@ -5,6 +5,7 @@ import java.nio.IntBuffer;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.visualisation3d.GraphicsPipeline;
 import org.processmining.visualisation3d.gldatastructures.JoglShader;
@@ -18,7 +19,8 @@ import com.kitfox.svg.animation.Bezier;
 
 /**
  * This class computes the location of all tokens on the gpu, but sends all
- * bezier curves again for every token. Does not currently support highlighting.
+ * bezier curves again for every token. Supports highlighting, but retransmits
+ * everyting to the gpu when changing the filtered log.
  * 
  * @author sander
  *
@@ -31,11 +33,13 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 
 	private ExternalSettings settings;
 	private GraphVizTokens tokens;
+	private int countTokens;
 	private double time;
 
 	private IntBuffer vertexArrayObject;
 	private IntBuffer instanceVertexBufferObject;
 	private TraceColourMap trace2colour;
+	private IvMLogFiltered filteredLog;
 
 	public void init(GLAutoDrawable drawable) {
 		System.out.println(" GL listener init");
@@ -163,36 +167,44 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 		if (settings != null && settings.filteredLog != null && settings.tokens != null && settings.transform != null) {
 			GL2 gl = drawable.getGL().getGL2();
 
-			if (!settings.tokens.getTokens().equals(tokens) || !settings.trace2colour.equals(trace2colour)) {
+			if (!settings.tokens.getTokens().equals(tokens) || !settings.trace2colour.equals(trace2colour)
+					|| !settings.filteredLog.equals(filteredLog)) {
 				System.out.println(" GL update tokens");
 				tokens = settings.tokens.getTokens();
 				trace2colour = settings.trace2colour;
+				filteredLog = settings.filteredLog;
 
-				//put all tokens in a buffer
+				//put the highlighted tokens in a buffer
 				FloatBuffer tokenBuffer = FloatBuffer.allocate(tokens.size() * 15);
 				{
+					countTokens = 0;
 					for (int tokenIndex = 0; tokenIndex < tokens.size(); tokenIndex++) {
-						//token-specific
-						tokenBuffer.put((float) tokens.getStartTime(tokenIndex));
-						tokenBuffer.put((float) tokens.getEndTime(tokenIndex));
 
-						//bezier-specific
-						int bezierIndex = tokens.getBezierIndex(tokenIndex);
-						int traceIndex = tokens.getTraceIndex(tokenIndex);
-						tokenBuffer.put((float) tokens.getBeziers().getStartOpacity(bezierIndex));
-						tokenBuffer.put((float) tokens.getBeziers().getEndOpacity(bezierIndex));
-						tokenBuffer.put(settings.trace2colour.getColour(traceIndex).getRed() / 256.0f);
-						tokenBuffer.put(settings.trace2colour.getColour(traceIndex).getGreen() / 256.0f);
-						tokenBuffer.put(settings.trace2colour.getColour(traceIndex).getBlue() / 256.0f);
-						Bezier bezier = tokens.getBeziers().getBezier(bezierIndex);
-						double[] coords = bezier.getCoord();
-						assert (coords.length <= 8);
-						for (int i = 0; i < 8; i++) {
-							if (i < coords.length) {
-								tokenBuffer.put((float) coords[i]);
-							} else {
-								tokenBuffer.put(-10000f);
+						//only include tokens that have survived the highlighting filters
+						if (!settings.filteredLog.isFilteredOut(tokens.getTraceIndex(tokenIndex))) {
+							//token-specific
+							tokenBuffer.put((float) tokens.getStartTime(tokenIndex));
+							tokenBuffer.put((float) tokens.getEndTime(tokenIndex));
+
+							//bezier-specific
+							int bezierIndex = tokens.getBezierIndex(tokenIndex);
+							int traceIndex = tokens.getTraceIndex(tokenIndex);
+							tokenBuffer.put((float) tokens.getBeziers().getStartOpacity(bezierIndex));
+							tokenBuffer.put((float) tokens.getBeziers().getEndOpacity(bezierIndex));
+							tokenBuffer.put(settings.trace2colour.getColour(traceIndex).getRed() / 256.0f);
+							tokenBuffer.put(settings.trace2colour.getColour(traceIndex).getGreen() / 256.0f);
+							tokenBuffer.put(settings.trace2colour.getColour(traceIndex).getBlue() / 256.0f);
+							Bezier bezier = tokens.getBeziers().getBezier(bezierIndex);
+							double[] coords = bezier.getCoord();
+							assert (coords.length <= 8);
+							for (int i = 0; i < 8; i++) {
+								if (i < coords.length) {
+									tokenBuffer.put((float) coords[i]);
+								} else {
+									tokenBuffer.put(-10000f);
+								}
 							}
+							countTokens++;
 						}
 					}
 					tokenBuffer.rewind();
@@ -200,7 +212,7 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 
 				//send the token buffer to OpenGL
 				gl.glBindBuffer(GL.GL_ARRAY_BUFFER, instanceVertexBufferObject.get(0));
-				gl.glBufferData(GL.GL_ARRAY_BUFFER, tokens.size() * 15 * 4, tokenBuffer, GL.GL_DYNAMIC_DRAW);
+				gl.glBufferData(GL.GL_ARRAY_BUFFER, countTokens * 15 * 4, tokenBuffer, GL.GL_DYNAMIC_DRAW);
 				gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
 			}
 
@@ -217,7 +229,7 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 			shader.SetUniform(pipeLine, "time", (float) time);
 
 			gl.glBindVertexArray(vertexArrayObject.get(0));
-			gl.glDrawArraysInstanced(GL2.GL_TRIANGLE_STRIP, 0, 4, tokens.size());
+			gl.glDrawArraysInstanced(GL2.GL_TRIANGLE_STRIP, 0, 4, countTokens);
 			gl.glBindVertexArray(0);
 
 		}
