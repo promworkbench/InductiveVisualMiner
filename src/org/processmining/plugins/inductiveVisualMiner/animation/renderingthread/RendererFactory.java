@@ -38,7 +38,7 @@ public class RendererFactory {
 		//OpenGLEventListener eventListener = new OpenGLEventListenerImplInstancedFully();
 		OpenGLEventListener eventListener = new OpenGLEventListenerImplBasic();
 		rendererOpenGL = new RendererImplOpenGL(eventListener);
-		openGLgotError = false;
+		openGLgotError = false; 
 	}
 	
 	/**
