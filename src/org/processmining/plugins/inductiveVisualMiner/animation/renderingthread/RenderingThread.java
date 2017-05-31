@@ -15,7 +15,7 @@ public class RenderingThread implements Runnable {
 	private final AtomicBoolean stopRequested = new AtomicBoolean(false);
 	private final AtomicBoolean pauseRequested = new AtomicBoolean(false);
 	private final AtomicBoolean singleFrameRequested = new AtomicBoolean(false);
-	private static final int minRenderDuration = 15;
+	private static final int minRenderDuration = 30;
 	private final ProMCanceller canceller;
 
 	//time
@@ -144,8 +144,8 @@ public class RenderingThread implements Runnable {
 
 				//debug framerate
 				if (frameRateCount % avg == 0) {
-					System.out.print((1.0 / ((System.currentTimeMillis() - frameRateStart) / (1000.0 * avg))));
-					System.out.println(" fps");
+					//System.out.print((1.0 / ((System.currentTimeMillis() - frameRateStart) / (1000.0 * avg))));
+					//System.out.println(" fps");
 					frameRateStart = before;
 				}
 				frameRateCount++;

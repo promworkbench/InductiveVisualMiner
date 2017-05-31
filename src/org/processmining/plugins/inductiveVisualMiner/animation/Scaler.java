@@ -74,7 +74,7 @@ public class Scaler {
 			return null;
 		}
 		if (max == min) {
-			return animationDuration * logTime;
+			return animationDuration / 2;
 		}
 		return animationDuration * (logTime - min) / (max - 1.0 * min);
 	}
@@ -95,7 +95,7 @@ public class Scaler {
 			return null;
 		}
 		if (max == min) {
-			return animationDuration * logTime;
+			return logTime / animationDuration;
 		}
 		return (logTime - min) / (max - 1.0 * min);
 	}
