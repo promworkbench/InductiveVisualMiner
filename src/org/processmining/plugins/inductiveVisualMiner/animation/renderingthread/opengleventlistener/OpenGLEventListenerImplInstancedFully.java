@@ -42,7 +42,6 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 	private IvMLogFiltered filteredLog;
 
 	public void init(GLAutoDrawable drawable) {
-		System.out.println(" GL listener init");
 		drawable.getContext().makeCurrent();
 		GL2 gl = drawable.getGL().getGL2();
 
@@ -160,7 +159,6 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 	public void dispose(GLAutoDrawable drawable) {
 		shader.Unbind(pipeLine);
 		shader.Dispose(pipeLine);
-		System.out.println(" GL listener dispose");
 	}
 
 	public void display(GLAutoDrawable drawable) {
@@ -169,7 +167,6 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 
 			if (!settings.tokens.getTokens().equals(tokens) || !settings.trace2colour.equals(trace2colour)
 					|| !settings.filteredLog.equals(filteredLog)) {
-				System.out.println(" GL update tokens");
 				tokens = settings.tokens.getTokens();
 				trace2colour = settings.trace2colour;
 				filteredLog = settings.filteredLog;
@@ -236,8 +233,6 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 	}
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-		System.out.println(" GL listener reshape");
-
 		GL2 gl = drawable.getGL().getGL2();
 
 		if (height == 0) {
