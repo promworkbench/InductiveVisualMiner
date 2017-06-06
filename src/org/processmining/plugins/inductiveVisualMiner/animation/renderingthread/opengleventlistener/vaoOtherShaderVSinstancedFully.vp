@@ -24,78 +24,21 @@ void toImage(in vec2 modelCoordinates, in vec2 userScale, in vec2 userTranslate,
 	imageCoordinates = vec2(modelCoordinates * userScale + userTranslate);
 }
 
+const ivec4 MyArray[4]=ivec4[4](
+	ivec4(1,1,1,1),
+	ivec4(1,1,1,1),
+	ivec4(1,2,1,1),
+	ivec4(1,3,3,1)
+);
+ 
 int choose(in int num, in int denom) {
-    int denom2 = num - denom;
-    if (denom < denom2)
-    {
-        int tmp = denom;
-        denom = denom2;
-        denom2 = tmp;
-    }
-    
-    int prod = 1;
-    for (int i = num; i > denom; i--)
-    {
-        prod *= num;
-    }
-    
-    for (int i = 2; i <= denom2; i++)
-    {
-        prod /= i;
-    }
-    
-    return prod;
+	//assumption: 1 <= num <= 4
+	return MyArray[num][denom];
 }
 
 float bernstein(in int numKnots, in int knotNo, in float param) {
     float iParam = 1 - param;
-    //Faster evaluation for easy cases:
-    /*switch (numKnots)
-    {
-        case 0:
-            return 1;
-        case 1:
-        {
-            switch (knotNo)
-            {
-                case 0:
-                    return iParam;
-                case 1:
-                    return param;
-            }
-            break;
-        }
-        case 2:
-        {
-            switch (knotNo)
-            {
-                case 0:
-                    return iParam * iParam;
-                case 1:
-                    return 2 * iParam * param;
-                case 2:
-                    return param * param;
-            }
-            break;
-        }
-        case 3:
-        {
-            switch (knotNo)
-            {
-                case 0:
-                    return iParam * iParam * iParam;
-                case 1:
-                    return 3 * iParam * iParam * param;
-                case 2:
-                    return 3 * iParam * param * param;
-                case 3:
-                    return param * param * param;
-            }
-            break;
-        }
-    }*/
-    
-    //If this bezier has more than four points, calculate bernstein the hard way
+   
     float retVal = 1;
     retVal *= pow(param, knotNo);
     retVal *= pow(iParam, numKnots - knotNo);
