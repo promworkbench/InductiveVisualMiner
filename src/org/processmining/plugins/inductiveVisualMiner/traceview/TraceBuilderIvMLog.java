@@ -45,9 +45,6 @@ class TraceBuilderIvMLog extends TraceBuilderWrapper {
 
 			public String getName() {
 				String s = ((IvMTrace) trace).getName();
-//				if (s.length() > 9) {
-//					return s.substring(0, 7) + "..";
-//				} else 
 				if (s.length() == 0) {
 					return " ";
 				}

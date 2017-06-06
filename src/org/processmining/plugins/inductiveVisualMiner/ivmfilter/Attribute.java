@@ -224,7 +224,7 @@ public class Attribute implements Comparable<Attribute> {
 		DecimalFormatSymbols currentLocaleSymbols = DecimalFormatSymbols.getInstance();
 		char localeMinusSign = currentLocaleSymbols.getMinusSign();
 
-		if (!Character.isDigit(str.charAt(0)) && str.charAt(0) != localeMinusSign) {
+		if (str.isEmpty() || !Character.isDigit(str.charAt(0)) && str.charAt(0) != localeMinusSign) {
 			return false;
 		}
 

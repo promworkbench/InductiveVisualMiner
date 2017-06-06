@@ -37,6 +37,7 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 	private double time;
 
 	private IntBuffer vertexArrayObject;
+	private IntBuffer vertexBufferObject;
 	private IntBuffer instanceVertexBufferObject;
 	private TraceColourMap trace2colour;
 	private IvMLogFiltered filteredLog;
@@ -95,7 +96,7 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 			gl.glGenVertexArrays(1, vertexArrayObject);
 
 			//create a vertex buffer
-			IntBuffer vertexBufferObject = IntBuffer.allocate(1);
+			vertexBufferObject = IntBuffer.allocate(1);
 			gl.glGenBuffers(1, vertexBufferObject);
 
 			//create an instanced array
@@ -157,6 +158,10 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 	}
 
 	public void dispose(GLAutoDrawable drawable) {
+		drawable.getGL().getGL2().glDeleteVertexArrays(vertexArrayObject.limit(), vertexArrayObject);
+		drawable.getGL().glDeleteBuffers(instanceVertexBufferObject.limit(), instanceVertexBufferObject);
+		drawable.getGL().glDeleteBuffers(vertexBufferObject.limit(), vertexBufferObject);
+		
 		shader.Unbind(pipeLine);
 		shader.Dispose(pipeLine);
 	}
