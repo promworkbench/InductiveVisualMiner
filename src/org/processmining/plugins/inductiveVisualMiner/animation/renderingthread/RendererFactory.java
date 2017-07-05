@@ -33,14 +33,14 @@ public class RendererFactory {
 
 	private final RendererImplOpenGL rendererOpenGL;
 	private boolean openGLgotError;
-	
+
 	public RendererFactory() {
 		OpenGLEventListener eventListener = new OpenGLEventListenerImplInstancedFully();
 		//OpenGLEventListener eventListener = new OpenGLEventListenerImplBasic();
 		rendererOpenGL = new RendererImplOpenGL(eventListener);
-		openGLgotError = true;
+		openGLgotError = false;
 	}
-	
+
 	/**
 	 * Render a single frame.
 	 * 
