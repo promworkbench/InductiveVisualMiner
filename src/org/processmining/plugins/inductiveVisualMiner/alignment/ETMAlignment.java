@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.model.XLog;
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.etm.model.narytree.NAryTree;
 import org.processmining.plugins.etm.model.narytree.conversion.ProcessTreeToNAryTree;
 import org.processmining.plugins.etm.model.narytree.replayer.AbstractNAryTreeDelegate;
@@ -17,7 +18,6 @@ import org.processmining.plugins.etm.model.narytree.replayer.NAryTreeHead;
 import org.processmining.plugins.etm.model.narytree.replayer.StubbornNAryTreeAStarThread;
 import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.etm.model.narytree.replayer.hybridilp.NAryTreeHybridILPDelegate;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.processtree.Block;
 import org.processmining.processtree.Node;
 import org.processmining.processtree.ProcessTree;
@@ -70,14 +70,14 @@ public class ETMAlignment {
 	 * @param log
 	 * @param eventClasses
 	 * @param callback
-	 * @param canceller
+	 * @param canceller2
 	 */
 	public ETMAlignment(final ProcessTree tree, XLog log, IvMEventClasses eventClasses, AlignmentCallback callback,
-			final IvMCanceller canceller) {
+			final ProMCanceller canceller2) {
 		wasReliable = new AtomicBoolean(true);
 		this.canceller = new Canceller() {
 			public boolean isCancelled() {
-				return canceller.isCancelled();
+				return canceller2.isCancelled();
 			}
 		};
 		this.log = log;

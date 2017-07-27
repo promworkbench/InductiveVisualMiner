@@ -13,7 +13,7 @@ import org.processmining.processtree.ProcessTree;
 public class Miner extends VisualMinerWrapper {
 
 	public String toString() {
-		return "miner (IMf)";
+		return "default miner (IMf)";
 	}
 
 	public ProcessTree mine(IMLog log, VisualMinerParameters parameters, final IvMCanceller canceller) {
