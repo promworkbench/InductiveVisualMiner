@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter;
 
-import gnu.trove.iterator.TIntIterator;
-
 import java.awt.Component;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
@@ -9,6 +7,8 @@ import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersView;
+
+import gnu.trove.iterator.TIntIterator;
 
 public class HighlightingFiltersView extends IvMFiltersView {
 

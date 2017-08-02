@@ -75,6 +75,9 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	public InductiveVisualMinerAnimationPanel(ProMCanceller canceller, boolean animationGlobalEnabled) {
 		super(getSplashScreen());
+		
+		setOpaque(true);
+		setBackground(Color.white);
 
 		renderingThread = new RenderingThread(0, 180, new Runnable() {
 

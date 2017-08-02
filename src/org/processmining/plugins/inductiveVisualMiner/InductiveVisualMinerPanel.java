@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,6 +13,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
@@ -98,7 +101,14 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 		setLayout(new BorderLayout());
 
+		setOpaque(true);
+		setBackground(new Color(214, 214, 214));
+		
+		//controls the margin on the left side of the settings panel
+		Border leftBorder = new EmptyBorder(0,5,0,0);
+
 		JPanel sidePanel = new JPanel();
+		sidePanel.setOpaque(false);
 		sidePanel.setLayout(new BorderLayout());
 		sidePanel.setMaximumSize(new Dimension(sidePanelWidth, 10000));
 		sidePanel.setMinimumSize(new Dimension(sidePanelWidth, 100));
@@ -109,6 +119,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 		{
 			JPanel slidersPanel = new JPanel();
 			sidePanel.add(slidersPanel, BorderLayout.CENTER);
+			slidersPanel.setOpaque(false);
 			slidersPanel.setLayout(new BoxLayout(slidersPanel, BoxLayout.LINE_AXIS));
 
 			//activities slider
@@ -130,10 +141,12 @@ public class InductiveVisualMinerPanel extends JPanel {
 		{
 			JPanel otherSettingsPanel = new JPanel();
 			sidePanel.add(otherSettingsPanel, BorderLayout.PAGE_END);
+			otherSettingsPanel.setOpaque(false);
 			otherSettingsPanel.setLayout(new GridBagLayout());
 			{
 				classifierLabel = SlickerFactory.instance().createLabel("Classifier");
 				if (pro) {
+					classifierLabel.setBorder(leftBorder);
 					GridBagConstraints cClassifierLabel = new GridBagConstraints();
 					cClassifierLabel.gridx = 0;
 					cClassifierLabel.gridy = gridy;
@@ -172,6 +185,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 			{
 				minerLabel = SlickerFactory.instance().createLabel("Miner");
 				if (pro) {
+					minerLabel.setBorder(leftBorder);
 					GridBagConstraints cMinerLabel = new GridBagConstraints();
 					cMinerLabel.gridx = 0;
 					cMinerLabel.gridy = gridy;
@@ -209,6 +223,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 
 			{
 				colourLabel = SlickerFactory.instance().createLabel("Show");
+				colourLabel.setBorder(leftBorder);
 				GridBagConstraints cColourLabel = new GridBagConstraints();
 				cColourLabel.gridx = 0;
 				cColourLabel.gridy = gridy;
@@ -217,12 +232,12 @@ public class InductiveVisualMinerPanel extends JPanel {
 				otherSettingsPanel.add(colourLabel, cColourLabel);
 
 				if (pro) {
-					colourSelection = SlickerFactory.instance().createComboBox(
-							new Mode[] { new ModePaths(), new ModePathsDeviations(), new ModePathsQueueLengths(),
-									new ModePathsSojourn(), new ModePathsService() });
+					colourSelection = SlickerFactory.instance()
+							.createComboBox(new Mode[] { new ModePaths(), new ModePathsDeviations(),
+									new ModePathsQueueLengths(), new ModePathsSojourn(), new ModePathsService() });
 				} else {
-					colourSelection = SlickerFactory.instance().createComboBox(
-							new Mode[] { new ModePaths(), new ModePathsDeviations() });
+					colourSelection = SlickerFactory.instance()
+							.createComboBox(new Mode[] { new ModePaths(), new ModePathsDeviations() });
 				}
 				colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 				GridBagConstraints ccolourSelection = new GridBagConstraints();
@@ -232,7 +247,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 				ccolourSelection.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(colourSelection, ccolourSelection);
 			}
-			
+
 			//trace colouring view
 			{
 				traceColourMapView = new TraceColourMapView(this);
@@ -268,7 +283,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 				cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(traceViewButton, cTraceViewButton);
 			}
-			
+
 			//controller view
 			{
 				controllerView = new ControllerView(this);
@@ -300,6 +315,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 				selectionLabel.setLineWrap(true);
 				selectionLabel.setEditable(false);
 				selectionLabel.setOpaque(false);
+				selectionLabel.setBorder(leftBorder);
 				GridBagConstraints cSelectionLabel = new GridBagConstraints();
 				cSelectionLabel.gridx = 0;
 				cSelectionLabel.gridy = gridy++;
@@ -313,6 +329,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 				animationTimeLabel = SlickerFactory.instance().createLabel(" ");
 				animationTimeLabel.setMinimumSize(new Dimension(10, lineHeight));
 				animationTimeLabel.setPreferredSize(new Dimension(sidePanelWidth - 5, lineHeight));
+				animationTimeLabel.setBorder(leftBorder);
 				GridBagConstraints cAnimationTimeLabel = new GridBagConstraints();
 				cAnimationTimeLabel.gridx = 0;
 				cAnimationTimeLabel.gridy = gridy++;
@@ -325,6 +342,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 				statusLabel = SlickerFactory.instance().createLabel(" ");
 				statusLabel.setMinimumSize(new Dimension(10, lineHeight));
 				statusLabel.setPreferredSize(new Dimension(sidePanelWidth - 5, lineHeight));
+				statusLabel.setBorder(leftBorder);
 				GridBagConstraints cStatus = new GridBagConstraints();
 				cStatus.gridx = 0;
 				cStatus.gridy = gridy++;
@@ -506,7 +524,7 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public JButton getTraceViewButton() {
 		return traceViewButton;
 	}
-	
+
 	public ControllerView getControllerView() {
 		return controllerView;
 	}
@@ -526,11 +544,11 @@ public class InductiveVisualMinerPanel extends JPanel {
 	public JButton getHighlightingFiltersViewButton() {
 		return highlightingFiltersViewButton;
 	}
-	
+
 	public TraceColourMapView getTraceColourMapView() {
 		return traceColourMapView;
 	}
-	
+
 	public JButton getTraceColourMapViewButton() {
 		return traceColourMapViewButton;
 	}
