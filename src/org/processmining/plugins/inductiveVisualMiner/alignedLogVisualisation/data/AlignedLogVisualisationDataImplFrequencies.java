@@ -21,7 +21,7 @@ public class AlignedLogVisualisationDataImplFrequencies implements AlignedLogVis
 	}
 
 	public Pair<Long, Long> getExtremeCardinalities() throws UnknownTreeNodeException {
-		return IvMLogMetrics.getExtremes(tree, tree.getRoot(), logInfo);
+		return IvMLogMetrics.getExtremes(tree, logInfo);
 	}
 
 	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves) throws UnknownTreeNodeException {

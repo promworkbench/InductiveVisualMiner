@@ -402,6 +402,8 @@ public class ProcessTreeVisualisation {
 	}
 
 	private double getOccurrenceFactor(long cardinality) {
+		assert (minCardinality <= cardinality);
+		assert (cardinality <= maxCardinality);
 		return ProcessTreeVisualisationHelper.getOccurrenceFactor(cardinality, minCardinality, maxCardinality);
 	}
 }

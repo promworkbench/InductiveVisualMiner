@@ -1,8 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.set.TIntSet;
-
 import java.awt.Color;
 import java.util.Set;
 
@@ -33,6 +30,9 @@ import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGElement;
 import com.kitfox.svg.SVGException;
 import com.kitfox.svg.Text;
+
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.TIntSet;
 
 public class InductiveVisualMinerSelectionColourer {
 

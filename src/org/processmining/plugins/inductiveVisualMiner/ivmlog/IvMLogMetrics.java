@@ -71,7 +71,20 @@ public class IvMLogMetrics {
 		return new MultiSet<XEventClass>();
 	}
 
-	public static Pair<Long, Long> getExtremes(IvMEfficientTree tree, int node, IvMLogInfo logInfo)
+	public static Pair<Long, Long> getExtremes(IvMEfficientTree tree, IvMLogInfo logInfo) {
+		Pair<Long, Long> p = getExtremes(tree, tree.getRoot(), logInfo);
+
+		if (tree.isActivity(tree.getRoot())) {
+			p = Pair.of(
+					Math.min(p.getA(),
+							IvMLogMetrics.getNumberOfTracesRepresented(tree, tree.getRoot(), false, logInfo)),
+					p.getB());
+		}
+
+		return p;
+	}
+
+	private static Pair<Long, Long> getExtremes(IvMEfficientTree tree, int node, IvMLogInfo logInfo)
 			throws UnknownTreeNodeException {
 
 		long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(tree, node, true, logInfo);
