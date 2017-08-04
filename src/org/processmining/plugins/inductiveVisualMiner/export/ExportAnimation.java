@@ -42,7 +42,7 @@ public class ExportAnimation {
 
 	public static final double timeMargin = 0.5; //idle time before first tokens start and after final token ends
 	public static final int framerate = 30;
-	public static final int width = 1500; //width of the movie
+	//public static final int width = 1500; //width of the movie
 
 	public static boolean saveAVItoFile(IvMLogFiltered filteredLog, TraceColourMap trace2colour, GraphVizTokens tokens,
 			final ProcessTreeVisualisationInfo info, final Mode colourMode, final SVGDiagram svg, final Dot dot,
@@ -60,6 +60,8 @@ public class ExportAnimation {
 				return progressMonitor.isCanceled();
 			}
 		};
+
+		int width = panel.getWidth();
 
 		//compute the time bounds for the movie
 		double minDuration = scaler.getMinInUserTime() - timeMargin;
