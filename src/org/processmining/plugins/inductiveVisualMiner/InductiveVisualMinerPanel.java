@@ -164,7 +164,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cClassifierLabel.anchor = GridBagConstraints.WEST;
 				otherSettingsPanel.add(classifierLabel, cClassifierLabel);
 
-				classifiersCombobox = new ClassifierChooser(null, null, false, true);
+				classifiersCombobox = new ClassifierChooser(null, null, false);
 				//IvMDecorator.decorate(classifiersCombobox.getMultiComboBox());
 				classifiersCombobox.setEnabled(false);
 				GridBagConstraints cClassifiers = new GridBagConstraints();
