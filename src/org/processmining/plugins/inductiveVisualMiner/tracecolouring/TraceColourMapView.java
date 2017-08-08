@@ -1,8 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
@@ -11,21 +12,23 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SpringLayout;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 
 import org.processmining.plugins.InductiveMiner.Function;
-import org.processmining.plugins.InductiveMiner.MultiComboBox;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.SwitchPanel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeKey;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
-
-import com.fluxicon.slickerbox.factory.SlickerFactory;
 
 import gnu.trove.map.hash.THashMap;
 
@@ -39,6 +42,7 @@ public class TraceColourMapView extends SideWindow {
 	private final JTextArea explanation;
 	private final JLabel title;
 	private final JTextArea example;
+	JPanel filterPanel;
 
 	public static final int maxColours = 7;
 	public static final String prefix = "       ";
@@ -47,106 +51,97 @@ public class TraceColourMapView extends SideWindow {
 
 	public TraceColourMapView(InductiveVisualMinerPanel parent) {
 		super(parent, "trace colouring - Inductive visual Miner");
+		setSize(300, 300);
+		setMinimumSize(new Dimension(300, 300));
+		JPanel content = new IvMPanel();
+		add(content);
 
-		setLayout(new GridBagLayout());
-		getContentPane().setBackground(MultiComboBox.even_colour_bg);
+		BorderLayout layout = new BorderLayout();
+		content.setLayout(layout);
 
 		//explanation
 		{
 			explanation = new JTextArea(
 					"Trace colouring annotates the traces with a colour in the animation and the trace view, "
-							+ "based on a trace attribute or property.\n");
+							+ "based on a trace attribute or property.");
+			IvMDecorator.decorate(explanation);
 			explanation.setWrapStyleWord(true);
 			explanation.setLineWrap(true);
-			explanation.setOpaque(false);
 			explanation.setEnabled(false);
-			explanation.setFont(new JLabel("blaa").getFont());
-			explanation.setDisabledTextColor(MultiComboBox.colour_fg);
-			GridBagConstraints c = new GridBagConstraints();
-			c.gridx = 0;
-			c.gridy = 0;
-			c.gridwidth = 3;
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.anchor = GridBagConstraints.NORTH;
-			add(explanation, c);
+			explanation.setMargin(new Insets(5, 5, 5, 5));
+			content.add(explanation, BorderLayout.PAGE_START);
 		}
 
 		//checkbox
 		{
-			enabled = SlickerFactory.instance().createCheckBox("", false);
-			GridBagConstraints c = new GridBagConstraints();
-			c.gridx = 0;
-			c.gridy = 1;
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.anchor = GridBagConstraints.CENTER;
-			add(enabled, c);
+			enabled = new JCheckBox("", false);
+			IvMDecorator.decorate(enabled);
+			content.add(enabled, BorderLayout.LINE_START);
 		}
 
-		//title
+		//filter panel
 		{
-			title = SlickerFactory.instance().createLabel("  Trace attribute");
-			GridBagConstraints c = new GridBagConstraints();
-			c.gridx = 1;
-			c.gridy = 1;
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.anchor = GridBagConstraints.CENTER;
-			add(title, c);
-		}
+			SpringLayout filterPanelLayout = new SpringLayout();
+			filterPanel = new SwitchPanel();
+			filterPanel.setLayout(filterPanelLayout);
+			filterPanel.setEnabled(false);
+			content.add(filterPanel, BorderLayout.CENTER);
 
-		//key selector
-		{
-			keySelectorModel = new DefaultComboBoxModel<>();
-			keySelectorModel.addElement(AttributeKey.message("(initialising)"));
+			//title
+			{
+				title = new JLabel("Trace attribute");
+				IvMDecorator.decorate(title);
 
-			keySelector = SlickerFactory.instance().createComboBox(new AttributeKey[0]);
-			keySelector.setModel(keySelectorModel);
-			keySelector.setSelectedIndex(0);
-			keySelector.setEnabled(false);
-			GridBagConstraints c = new GridBagConstraints();
-			c.gridx = 2;
-			c.gridy = 1;
-			c.weightx = 1;
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.anchor = GridBagConstraints.CENTER;
-			add(keySelector, c);
-		}
+				filterPanel.add(title);
+				filterPanelLayout.putConstraint(SpringLayout.NORTH, title, 10, SpringLayout.NORTH, filterPanel);
+				filterPanelLayout.putConstraint(SpringLayout.WEST, title, 5, SpringLayout.WEST, filterPanel);
+			}
 
-		//status
-		{
-			status = new JTextArea("Currently not colouring.");
-			status.setWrapStyleWord(true);
-			status.setLineWrap(true);
-			status.setOpaque(false);
-			status.setEnabled(false);
-			status.setFont(new JLabel("blaa").getFont());
-			status.setDisabledTextColor(MultiComboBox.colour_fg);
+			//key selector
+			{
+				keySelectorModel = new DefaultComboBoxModel<>();
+				keySelectorModel.addElement(AttributeKey.message("(initialising)"));
+				keySelector = new JComboBox<AttributeKey>(new AttributeKey[0]);
+				IvMDecorator.decorate(keySelector);
+				keySelector.setModel(keySelectorModel);
+				keySelector.setSelectedIndex(0);
+				keySelector.setEnabled(false);
 
-			GridBagConstraints c = new GridBagConstraints();
-			c.gridx = 1;
-			c.gridy = 2;
-			c.gridwidth = 2;
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.anchor = GridBagConstraints.NORTH;
+				filterPanel.add(keySelector);
+				filterPanelLayout.putConstraint(SpringLayout.VERTICAL_CENTER, keySelector, 0,
+						SpringLayout.VERTICAL_CENTER, title);
+				filterPanelLayout.putConstraint(SpringLayout.WEST, keySelector, 5, SpringLayout.EAST, title);
 
-			add(status, c);
-		}
+				filterPanelLayout.putConstraint(SpringLayout.EAST, keySelector, -5, SpringLayout.EAST, filterPanel);
+			}
 
-		//example colours
-		{
-			example = new JTextArea("");
-			example.setWrapStyleWord(true);
-			example.setLineWrap(true);
-			example.setOpaque(false);
-			example.setEnabled(false);
-			example.setFont(new JLabel("blaa").getFont());
-			example.setDisabledTextColor(MultiComboBox.colour_fg);
-			GridBagConstraints c = new GridBagConstraints();
-			c.gridx = 1;
-			c.gridy = 3;
-			c.gridwidth = 2;
-			c.fill = GridBagConstraints.HORIZONTAL;
-			c.anchor = GridBagConstraints.NORTH;
-			add(example, c);
+			//status
+			{
+				status = new JTextArea("Currently not colouring.");
+				IvMDecorator.decorate(status);
+				status.setWrapStyleWord(true);
+				status.setLineWrap(true);
+				status.setEnabled(false);
+
+				filterPanel.add(status);
+				filterPanelLayout.putConstraint(SpringLayout.NORTH, status, 5, SpringLayout.SOUTH, keySelector);
+				filterPanelLayout.putConstraint(SpringLayout.WEST, status, 5, SpringLayout.WEST, filterPanel);
+				filterPanelLayout.putConstraint(SpringLayout.EAST, status, -5, SpringLayout.EAST, filterPanel);
+			}
+
+			//example colours
+			{
+				example = new JTextArea(10, 10);
+				IvMDecorator.decorate(example);
+				example.setWrapStyleWord(true);
+				example.setLineWrap(true);
+				example.setEnabled(false);
+
+				filterPanel.add(example);
+				filterPanelLayout.putConstraint(SpringLayout.NORTH, example, 5, SpringLayout.SOUTH, status);
+				filterPanelLayout.putConstraint(SpringLayout.WEST, example, 5, SpringLayout.WEST, filterPanel);
+				filterPanelLayout.putConstraint(SpringLayout.EAST, example, -5, SpringLayout.EAST, filterPanel);
+			}
 		}
 	}
 
@@ -170,20 +165,8 @@ public class TraceColourMapView extends SideWindow {
 
 		enabled.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				boolean x = enabled.isSelected();
-				if (x) {
-					getContentPane().setBackground(MultiComboBox.selection_colour_bg);
-					explanation.setDisabledTextColor(MultiComboBox.selection_colour_fg);
-					title.setForeground(MultiComboBox.selection_colour_fg);
-					status.setDisabledTextColor(MultiComboBox.selection_colour_fg);
-					example.setDisabledTextColor(MultiComboBox.selection_colour_fg);
-				} else {
-					getContentPane().setBackground(MultiComboBox.even_colour_bg);
-					explanation.setDisabledTextColor(MultiComboBox.colour_fg);
-					title.setForeground(MultiComboBox.colour_fg);
-					status.setDisabledTextColor(MultiComboBox.colour_fg);
-					example.setDisabledTextColor(MultiComboBox.colour_fg);
-				}
+				filterPanel.setEnabled(enabled.isSelected());
+				filterPanel.repaint();
 				update();
 			}
 		});
@@ -210,7 +193,7 @@ public class TraceColourMapView extends SideWindow {
 
 				int numberOfColours = attribute.getStringValues().size();
 
-				//there are little enough colours to just use them as such 
+				//there are few enough colours to just use them as such 
 				Color[] colours = TraceColourMapSettings.getColours(numberOfColours);
 
 				//create colours and map to values
@@ -229,7 +212,7 @@ public class TraceColourMapView extends SideWindow {
 				//colour the values in the example
 				colourExample(colours);
 
-				status.setText("Currently colouring traces using " + numberOfColours + " colours:\n");
+				status.setText("Currently colouring traces using " + numberOfColours + " colours:");
 				onUpdate.call(TraceColourMapSettings.string(attribute, colours, colourMap));
 			} else {
 				//too many colours
@@ -288,7 +271,7 @@ public class TraceColourMapView extends SideWindow {
 			s.append(prefix.substring(0, prefix.length() - 1) + "(");
 			if (!isDuration && !isTime) {
 				s.append(max);
-			} else if (isDuration){
+			} else if (isDuration) {
 				s.append(ResourceTimeUtils.getDuration(max));
 			} else {
 				s.append(ResourceTimeUtils.timeToString((long) max));
@@ -300,7 +283,7 @@ public class TraceColourMapView extends SideWindow {
 		//colour the values in the example
 		colourExample(colours);
 
-		status.setText("Currently colouring traces using " + numberOfColours + " colours:\n");
+		status.setText("Currently colouring traces using " + numberOfColours + " colours:");
 	}
 
 	private void updateDisable() throws Exception {

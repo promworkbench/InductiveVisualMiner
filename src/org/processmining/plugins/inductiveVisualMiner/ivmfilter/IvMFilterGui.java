@@ -7,6 +7,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+
 public abstract class IvMFilterGui extends JPanel {
 
 	private static final long serialVersionUID = -7693755022689210425L;
@@ -14,7 +16,9 @@ public abstract class IvMFilterGui extends JPanel {
 	protected boolean usesVerticalSpace = false;
 
 	public IvMFilterGui(String title) {
-		setBorder(BorderFactory.createTitledBorder(title));
+		TitledBorder border = BorderFactory.createTitledBorder(title);
+		border.setTitleFont(IvMDecorator.fontLarger);
+		setBorder(border);
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setOpaque(false);
 	}

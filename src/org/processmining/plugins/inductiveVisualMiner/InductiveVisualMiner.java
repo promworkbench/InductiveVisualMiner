@@ -21,9 +21,10 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
 import org.processmining.processtree.ProcessTree;
 
 public class InductiveVisualMiner {
-	
-	@Plugin(name = "Inductive visual Miner", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = {
-			"Event log", "canceller" }, userAccessible = true, level = PluginLevel.Regular)
+
+	@Plugin(name = "Inductive visual Miner", returnLabels = { "Dot visualization" }, returnTypes = {
+			JComponent.class }, parameterLabels = { "Event log",
+					"canceller" }, userAccessible = true, level = PluginLevel.Regular)
 	@Visualizer
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0, 1 })
@@ -31,15 +32,16 @@ public class InductiveVisualMiner {
 			throws UnknownTreeNodeException {
 
 		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog, null);
-		InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panelPro(context, state,
+		InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state,
 				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), true, canceller);
 		new InductiveVisualMinerController(context, panel, state, canceller);
 
 		return panel;
 	}
 
-	@Plugin(name = "Inductive visual Miner", level = PluginLevel.PeerReviewed, returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = {
-			"Inductive visual Miner launcher", "canceller" }, userAccessible = true)
+	@Plugin(name = "Inductive visual Miner", level = PluginLevel.PeerReviewed, returnLabels = {
+			"Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = {
+					"Inductive visual Miner launcher", "canceller" }, userAccessible = true)
 	@Visualizer
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0, 1 })
@@ -67,70 +69,67 @@ public class InductiveVisualMiner {
 			state = new InductiveVisualMinerState(log, preMinedTree);
 		}
 
-		final InductiveVisualMinerPanel panel;
-//		if (!launcher.pro) {
-//			state.setMiner(new NoLifeCycleSplitLogBasic());
-//		}
 		VisualMinerWrapper[] miners = VisualMinerWrapperPluginFinder.find(context, state.getMiner());
-		if (launcher.pro) {
-			panel = InductiveVisualMinerPanel.panelPro(context, state,
-					miners, launcher.preMinedTree == null,
-					canceller);
-		} else {			
-			panel = InductiveVisualMinerPanel.panelBasic(context, state, miners, canceller);
-		}
+		final InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state, miners,
+				launcher.preMinedTree == null, canceller);
 		new InductiveVisualMinerController(context, panel, state, canceller);
 
 		return panel;
 	}
 
 	public static class InductiveVisualMinerLauncher {
-		public final boolean pro;
 		public final SoftReference<XLog> xLog;
 		public final SoftReference<ProcessTree> preMinedTree;
 
+		@Deprecated
 		private InductiveVisualMinerLauncher(SoftReference<XLog> xLog, SoftReference<ProcessTree> preMinedTree,
 				boolean pro) {
 			this.xLog = xLog;
 			this.preMinedTree = preMinedTree;
-			this.pro = pro;
 		}
 
+		private InductiveVisualMinerLauncher(SoftReference<XLog> xLog, SoftReference<ProcessTree> preMinedTree) {
+			this.xLog = xLog;
+			this.preMinedTree = preMinedTree;
+		}
+
+		public static InductiveVisualMinerLauncher launcher(XLog xLog) {
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null);
+		}
+
+		public static InductiveVisualMinerLauncher launcher(XLog xLog, ProcessTree preMinedTree) {
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), new SoftReference<>(preMinedTree));
+		}
+
+		@Deprecated
 		public static InductiveVisualMinerLauncher launcherPro(XLog xLog) {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, true);
 		}
 
+		@Deprecated
 		public static InductiveVisualMinerLauncher launcherPro(XLog xLog, ProcessTree preMinedTree) {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), new SoftReference<>(preMinedTree), true);
 		}
-
-//		public static InductiveVisualMinerLauncher launcherBasic(XLog xLog) {
-//			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, false);
-//		}
 	}
 
-//	@Plugin(name = "Mine with Inductive visual Miner basic", level = PluginLevel.PeerReviewed, returnLabels = { "Inductive visual Miner" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true, categories = {
-//			PluginCategory.Discovery, PluginCategory.Analytics, PluginCategory.ConformanceChecking }, help = "Discover a process tree or a Petri net interactively using Inductive Miner.")
-//	@UITopiaVariant(affiliation = UITopiaVariant.EHV, author = "S.J.J. Leemans", email = "s.j.j.leemans@tue.nl", pack = "InductiveVisualMiner")
-//	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0 })
-//	public InductiveVisualMinerLauncher mineGuiProcessTreeBasic(PluginContext context, XLog xLog) {
-//		return InductiveVisualMinerLauncher.launcherBasic(xLog);
-//	}
-
-	@Plugin(name = "Mine with Inductive visual Miner", level = PluginLevel.PeerReviewed, returnLabels = { "Inductive visual Miner" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = { "Event log" }, userAccessible = true, categories = {
-			PluginCategory.Discovery, PluginCategory.Analytics, PluginCategory.ConformanceChecking }, help = "Discover a process tree or a Petri net interactively using Inductive Miner.")
+	@Plugin(name = "Mine with Inductive visual Miner", level = PluginLevel.PeerReviewed, returnLabels = {
+			"Inductive visual Miner" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
+					"Event log" }, userAccessible = true, categories = { PluginCategory.Discovery,
+							PluginCategory.Analytics,
+							PluginCategory.ConformanceChecking }, help = "Discover a process tree or a Petri net interactively using Inductive Miner.")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0 })
 	public InductiveVisualMinerLauncher mineGuiProcessTree(PluginContext context, XLog xLog) {
-		return InductiveVisualMinerLauncher.launcherPro(xLog);
+		return InductiveVisualMinerLauncher.launcher(xLog);
 	}
 
-	@Plugin(name = "Visualise deviations on process tree", returnLabels = { "Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
-			"Event log", "Process tree" }, userAccessible = true, categories = { PluginCategory.Analytics,
-			PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner, including its filtering options.")
+	@Plugin(name = "Visualise deviations on process tree", returnLabels = {
+			"Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
+					"Event log", "Process tree" }, userAccessible = true, categories = { PluginCategory.Analytics,
+							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner, including its filtering options.")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
 	public InductiveVisualMinerLauncher mineGuiProcessTree(PluginContext context, XLog xLog, ProcessTree preMinedTree) {
-		return InductiveVisualMinerLauncher.launcherPro(xLog, preMinedTree);
+		return InductiveVisualMinerLauncher.launcher(xLog, preMinedTree);
 	}
 }

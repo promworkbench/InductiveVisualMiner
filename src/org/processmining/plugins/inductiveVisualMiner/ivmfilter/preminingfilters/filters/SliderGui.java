@@ -3,9 +3,10 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilter
 import java.awt.Color;
 
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 
 import com.fluxicon.slickerbox.factory.SlickerFactory;
@@ -13,7 +14,7 @@ import com.fluxicon.slickerbox.factory.SlickerFactory;
 public class SliderGui extends IvMFilterGui {
 	private static final long serialVersionUID = 436297522448887470L;
 
-	private final JLabel explanation;
+	private final JTextArea explanation;
 	private final JSlider slider;
 
 	public SliderGui(String title) {
@@ -23,7 +24,8 @@ public class SliderGui extends IvMFilterGui {
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		//explanation
 		{
-			explanation = new JLabel("title");
+			explanation = new JTextArea("title");
+			IvMDecorator.decorate(explanation);
 			add(explanation);
 		}
 
@@ -37,7 +39,7 @@ public class SliderGui extends IvMFilterGui {
 		}
 	}
 
-	public JLabel getExplanation() {
+	public JTextArea getExplanation() {
 		return explanation;
 	}
 

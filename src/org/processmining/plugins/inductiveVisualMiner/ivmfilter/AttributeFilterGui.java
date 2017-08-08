@@ -25,20 +25,16 @@ import javax.swing.event.ListSelectionListener;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.RangeSlider;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
-
-import com.fluxicon.slickerbox.factory.SlickerFactory;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 
 public class AttributeFilterGui extends IvMFilterGui {
 
 	private static final long serialVersionUID = -5662487261061931369L;
 	private final JComboBox<AttributeKey> keySelector;
-	//private final JPanel valueLayout;
 
-	//private final JPanel valueLiteralPanel;
 	private final JList<String> valueLiteralSelector;
 	private final DefaultListModel<String> valueLiteralSelectorListModel;
 
-	//private final JPanel valueNumericPanel;
 	private final RangeSlider valueNumericSelector;
 	public final int valueNumericRange = 1000;
 
@@ -47,7 +43,6 @@ public class AttributeFilterGui extends IvMFilterGui {
 	private final Runnable onUpdate;
 	private boolean block = false;
 
-	@SuppressWarnings("unchecked")
 	public AttributeFilterGui(String title, Collection<Attribute> attributes, Runnable onUpdate) {
 		super(title);
 		usesVerticalSpace = true;
@@ -57,6 +52,7 @@ public class AttributeFilterGui extends IvMFilterGui {
 		//explanation
 		{
 			explanation = new JTextArea("Only highlight traces of which the ");
+			IvMDecorator.decorate(explanation);
 			explanation.setEditable(false);
 			explanation.setLineWrap(true);
 			explanation.setWrapStyleWord(true);
@@ -69,7 +65,8 @@ public class AttributeFilterGui extends IvMFilterGui {
 
 		//key selector
 		{
-			keySelector = SlickerFactory.instance().createComboBox(new AttributeKey[0]);
+			keySelector = new JComboBox<>(new AttributeKey[0]);
+			IvMDecorator.decorate(keySelector);
 			if (empty) {
 				keySelector.addItem(AttributeKey.message("(no attributes present)"));
 				keySelector.setEnabled(false);

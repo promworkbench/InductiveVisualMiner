@@ -1,10 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.Set;
 
 import javax.swing.BoxLayout;
@@ -28,6 +28,8 @@ import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabled
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ControllerView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -47,12 +49,14 @@ import com.fluxicon.slickerbox.components.NiceSlider.Orientation;
 import com.fluxicon.slickerbox.factory.SlickerFactory;
 import com.kitfox.svg.SVGDiagram;
 
-public class InductiveVisualMinerPanel extends JPanel {
+public class InductiveVisualMinerPanel extends IvMPanel {
 
 	private static final long serialVersionUID = -1078786029763735572L;
 
-	private static final int sidePanelWidth = 210;
+	private static final int sidePanelWidth = 240;
 	private static final int lineHeight = 20;
+
+	private static final Insets margins = new Insets(2, 0, 0, 0);
 
 	//gui elements
 	private final InductiveVisualMinerAnimationPanel graphPanel;
@@ -85,27 +89,33 @@ public class InductiveVisualMinerPanel extends JPanel {
 	private Runnable onGraphDirectionChanged = null;
 	private AnimationEnabledChangedListener onAnimationEnabledChanged = null;
 
-	public static InductiveVisualMinerPanel panelPro(final PluginContext context, InductiveVisualMinerState state,
+	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
 			VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
-		return new InductiveVisualMinerPanel(context, state, miners, enableMining, true, canceller);
+		return new InductiveVisualMinerPanel(context, state, miners, enableMining, canceller);
 	}
 
+	@Deprecated
+	public static InductiveVisualMinerPanel panelPro(final PluginContext context, InductiveVisualMinerState state,
+			VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
+		return new InductiveVisualMinerPanel(context, state, miners, enableMining, canceller);
+	}
+
+	@Deprecated
 	public static InductiveVisualMinerPanel panelBasic(PluginContext context, InductiveVisualMinerState state,
 			VisualMinerWrapper[] miners, ProMCanceller canceller) {
-		return new InductiveVisualMinerPanel(context, state, miners, true, false, canceller);
+		return new InductiveVisualMinerPanel(context, state, miners, true, canceller);
 	}
 
 	private InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, boolean enableMining, boolean pro, ProMCanceller canceller) {
+			VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
 		int gridy = 0;
 
 		setLayout(new BorderLayout());
 
-		setOpaque(true);
-		setBackground(new Color(214, 214, 214));
-		
+		setOpaque(false);
+
 		//controls the margin on the left side of the settings panel
-		Border leftBorder = new EmptyBorder(0,5,0,0);
+		Border leftBorder = new EmptyBorder(0, 5, 0, 0);
 
 		JPanel sidePanel = new JPanel();
 		sidePanel.setOpaque(false);
@@ -144,85 +154,83 @@ public class InductiveVisualMinerPanel extends JPanel {
 			otherSettingsPanel.setOpaque(false);
 			otherSettingsPanel.setLayout(new GridBagLayout());
 			{
-				classifierLabel = SlickerFactory.instance().createLabel("Classifier");
-				if (pro) {
-					classifierLabel.setBorder(leftBorder);
-					GridBagConstraints cClassifierLabel = new GridBagConstraints();
-					cClassifierLabel.gridx = 0;
-					cClassifierLabel.gridy = gridy;
-					cClassifierLabel.gridwidth = 1;
-					cClassifierLabel.anchor = GridBagConstraints.WEST;
-					otherSettingsPanel.add(classifierLabel, cClassifierLabel);
-				}
+				classifierLabel = new JLabel("Classifier");
+				IvMDecorator.decorate(classifierLabel);
+				classifierLabel.setBorder(leftBorder);
+				GridBagConstraints cClassifierLabel = new GridBagConstraints();
+				cClassifierLabel.gridx = 0;
+				cClassifierLabel.gridy = gridy;
+				cClassifierLabel.gridwidth = 1;
+				cClassifierLabel.anchor = GridBagConstraints.WEST;
+				otherSettingsPanel.add(classifierLabel, cClassifierLabel);
 
-				classifiersCombobox = new ClassifierChooser(null, null, false);
-				if (pro) {
-					classifiersCombobox.setEnabled(false);
-					GridBagConstraints cClassifiers = new GridBagConstraints();
-					cClassifiers.gridx = 1;
-					cClassifiers.gridy = gridy++;
-					cClassifiers.gridwidth = 1;
-					cClassifiers.fill = GridBagConstraints.HORIZONTAL;
-					otherSettingsPanel.add(classifiersCombobox, cClassifiers);
-				}
+				classifiersCombobox = new ClassifierChooser(null, null, false, true);
+				//IvMDecorator.decorate(classifiersCombobox.getMultiComboBox());
+				classifiersCombobox.setEnabled(false);
+				GridBagConstraints cClassifiers = new GridBagConstraints();
+				cClassifiers.gridx = 1;
+				cClassifiers.gridy = gridy++;
+				cClassifiers.gridwidth = 1;
+				cClassifiers.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(classifiersCombobox, cClassifiers);
 			}
 
 			//pre-mining filters
 			{
 				preMiningFiltersView = new PreMiningFiltersView(this);
-				preMiningFiltersButton = SlickerFactory.instance().createButton("pre-mining filters");
-				if (pro) {
-					GridBagConstraints cTraceViewButton = new GridBagConstraints();
-					cTraceViewButton.gridx = 1;
-					cTraceViewButton.gridy = gridy++;
-					cTraceViewButton.gridwidth = 1;
-					cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
-					otherSettingsPanel.add(preMiningFiltersButton, cTraceViewButton);
-				}
+				preMiningFiltersButton = new JButton("pre-mining filters");
+				IvMDecorator.decorate(preMiningFiltersButton);
+				GridBagConstraints cTraceViewButton = new GridBagConstraints();
+				cTraceViewButton.gridx = 1;
+				cTraceViewButton.gridy = gridy++;
+				cTraceViewButton.gridwidth = 1;
+				cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(preMiningFiltersButton, cTraceViewButton);
 			}
 
 			//miner
 			{
-				minerLabel = SlickerFactory.instance().createLabel("Miner");
-				if (pro) {
-					minerLabel.setBorder(leftBorder);
-					GridBagConstraints cMinerLabel = new GridBagConstraints();
-					cMinerLabel.gridx = 0;
-					cMinerLabel.gridy = gridy;
-					cMinerLabel.gridwidth = 1;
-					cMinerLabel.anchor = GridBagConstraints.WEST;
-					otherSettingsPanel.add(minerLabel, cMinerLabel);
-				}
+				minerLabel = new JLabel("Miner");
+				IvMDecorator.decorate(minerLabel);
+				minerLabel.setBorder(leftBorder);
+				GridBagConstraints cMinerLabel = new GridBagConstraints();
+				cMinerLabel.gridx = 0;
+				cMinerLabel.gridy = gridy;
+				cMinerLabel.gridwidth = 1;
+				cMinerLabel.anchor = GridBagConstraints.WEST;
+				otherSettingsPanel.add(minerLabel, cMinerLabel);
 
-				minerCombobox = SlickerFactory.instance().createComboBox(miners);
-				if (pro) {
-					minerCombobox.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
-					GridBagConstraints cMiners = new GridBagConstraints();
-					cMiners.gridx = 1;
-					cMiners.gridy = gridy++;
-					cMiners.gridwidth = 1;
-					cMiners.fill = GridBagConstraints.HORIZONTAL;
-					otherSettingsPanel.add(minerCombobox, cMiners);
-					minerCombobox.setSelectedItem(state.getMiner());
-				}
+				minerCombobox = new JComboBox<>(miners);
+				IvMDecorator.decorate(minerCombobox);
+				minerCombobox.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
+				minerCombobox.setFocusable(false);
+				GridBagConstraints cMiners = new GridBagConstraints();
+				cMiners.gridx = 1;
+				cMiners.gridy = gridy++;
+				cMiners.gridwidth = 1;
+				cMiners.insets = margins;
+				cMiners.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(minerCombobox, cMiners);
+				minerCombobox.setSelectedItem(state.getMiner());
 			}
 
 			//edit model view
 			{
 				editModelView = new EditModelView(this);
-				editModelButton = SlickerFactory.instance().createButton("edit model");
-				if (pro) {
-					GridBagConstraints cEditModelButton = new GridBagConstraints();
-					cEditModelButton.gridx = 1;
-					cEditModelButton.gridy = gridy++;
-					cEditModelButton.gridwidth = 1;
-					cEditModelButton.fill = GridBagConstraints.HORIZONTAL;
-					otherSettingsPanel.add(editModelButton, cEditModelButton);
-				}
+				editModelButton = new JButton("edit model");
+				IvMDecorator.decorate(editModelButton);
+				GridBagConstraints cEditModelButton = new GridBagConstraints();
+				cEditModelButton.gridx = 1;
+				cEditModelButton.gridy = gridy++;
+				cEditModelButton.gridwidth = 1;
+				cEditModelButton.insets = margins;
+				cEditModelButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(editModelButton, cEditModelButton);
 			}
 
 			{
-				colourLabel = SlickerFactory.instance().createLabel("Show");
+				colourLabel = new JLabel("Show");
+				IvMDecorator.decorate(colourLabel);
 				colourLabel.setBorder(leftBorder);
 				GridBagConstraints cColourLabel = new GridBagConstraints();
 				cColourLabel.gridx = 0;
@@ -231,19 +239,16 @@ public class InductiveVisualMinerPanel extends JPanel {
 				cColourLabel.anchor = GridBagConstraints.WEST;
 				otherSettingsPanel.add(colourLabel, cColourLabel);
 
-				if (pro) {
-					colourSelection = SlickerFactory.instance()
-							.createComboBox(new Mode[] { new ModePaths(), new ModePathsDeviations(),
-									new ModePathsQueueLengths(), new ModePathsSojourn(), new ModePathsService() });
-				} else {
-					colourSelection = SlickerFactory.instance()
-							.createComboBox(new Mode[] { new ModePaths(), new ModePathsDeviations() });
-				}
+				colourSelection = new JComboBox<>(new Mode[] { new ModePaths(), new ModePathsDeviations(),
+						new ModePathsQueueLengths(), new ModePathsSojourn(), new ModePathsService() });
+				IvMDecorator.decorate(colourSelection);
 				colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
+				colourSelection.setFocusable(false);
 				GridBagConstraints ccolourSelection = new GridBagConstraints();
 				ccolourSelection.gridx = 1;
 				ccolourSelection.gridy = gridy++;
 				ccolourSelection.gridwidth = 1;
+				ccolourSelection.insets = margins;
 				ccolourSelection.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(colourSelection, ccolourSelection);
 			}
@@ -251,11 +256,13 @@ public class InductiveVisualMinerPanel extends JPanel {
 			//trace colouring view
 			{
 				traceColourMapView = new TraceColourMapView(this);
-				traceColourMapViewButton = SlickerFactory.instance().createButton("trace colouring");
+				traceColourMapViewButton = new JButton("trace colouring");
+				IvMDecorator.decorate(traceColourMapViewButton);
 				GridBagConstraints cTraceColourMapViewButton = new GridBagConstraints();
 				cTraceColourMapViewButton.gridx = 1;
 				cTraceColourMapViewButton.gridy = gridy++;
 				cTraceColourMapViewButton.gridwidth = 1;
+				cTraceColourMapViewButton.insets = margins;
 				cTraceColourMapViewButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(traceColourMapViewButton, cTraceColourMapViewButton);
 			}
@@ -263,11 +270,13 @@ public class InductiveVisualMinerPanel extends JPanel {
 			//highlighting filters view
 			{
 				highlightingFiltersView = new HighlightingFiltersView(this);
-				highlightingFiltersViewButton = SlickerFactory.instance().createButton("highlighting filters");
+				highlightingFiltersViewButton = new JButton("highlighting filters");
+				IvMDecorator.decorate(highlightingFiltersViewButton);
 				GridBagConstraints cColouringFiltersViewButton = new GridBagConstraints();
 				cColouringFiltersViewButton.gridx = 1;
 				cColouringFiltersViewButton.gridy = gridy++;
 				cColouringFiltersViewButton.gridwidth = 1;
+				cColouringFiltersViewButton.insets = margins;
 				cColouringFiltersViewButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(highlightingFiltersViewButton, cColouringFiltersViewButton);
 			}
@@ -275,11 +284,13 @@ public class InductiveVisualMinerPanel extends JPanel {
 			//trace view
 			{
 				traceView = new TraceView(this);
-				traceViewButton = SlickerFactory.instance().createButton("traces");
+				traceViewButton = new JButton("traces");
+				IvMDecorator.decorate(traceViewButton);
 				GridBagConstraints cTraceViewButton = new GridBagConstraints();
 				cTraceViewButton.gridx = 1;
 				cTraceViewButton.gridy = gridy++;
 				cTraceViewButton.gridwidth = 1;
+				cTraceViewButton.insets = margins;
 				cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(traceViewButton, cTraceViewButton);
 			}
@@ -290,21 +301,25 @@ public class InductiveVisualMinerPanel extends JPanel {
 			}
 
 			{
-				saveModelButton = SlickerFactory.instance().createButton("export model");
+				saveModelButton = new JButton("export model");
+				IvMDecorator.decorate(saveModelButton);
 				GridBagConstraints cExitButton = new GridBagConstraints();
 				cExitButton.gridx = 1;
 				cExitButton.gridy = gridy++;
 				cExitButton.gridwidth = 1;
+				cExitButton.insets = margins;
 				cExitButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(saveModelButton, cExitButton);
 			}
 
 			{
-				saveImageButton = SlickerFactory.instance().createButton("export view");
+				saveImageButton = new JButton("export view");
+				IvMDecorator.decorate(saveImageButton);
 				GridBagConstraints cExitButton = new GridBagConstraints();
 				cExitButton.gridx = 1;
 				cExitButton.gridy = gridy++;
 				cExitButton.gridwidth = 1;
+				cExitButton.insets = margins;
 				cExitButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(saveImageButton, cExitButton);
 			}
@@ -409,6 +424,24 @@ public class InductiveVisualMinerPanel extends JPanel {
 			minerCombobox.setVisible(false);
 		}
 	}
+
+//	@Override
+//	protected void paintComponent(Graphics grphcs) {
+//		Graphics2D g2d = (Graphics2D) grphcs;
+//		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//
+//		//GradientPaint gp = new GradientPaint(0, 0, Color.white, 0, getHeight(), new Color(171,186,171));
+//		//GradientPaint gp = new GradientPaint(0, 0, new Color(109, 213, 237), 0, getHeight(), new Color(33, 147, 176));
+//		//GradientPaint gp = new GradientPaint(0, 0, new Color(75, 108, 183), 0, getHeight(), new Color(24, 40, 72));
+//		GradientPaint gp = new GradientPaint(0, 0, new Color(161, 207, 243), 0, getHeight(), new Color(84, 141, 184));
+//
+//		//GradientPaint gp = new GradientPaint(0, 0, getBackground(), 0, getHeight(), getBackground().darker());
+//
+//		g2d.setPaint(gp);
+//		g2d.fillRect(0, 0, getWidth(), getHeight());
+//
+//		super.paintComponent(grphcs);
+//	}
 
 	public void removeNotify() {
 		super.removeNotify();
