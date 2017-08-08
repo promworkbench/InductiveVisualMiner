@@ -19,7 +19,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.Scrollable;
 
-import org.processmining.plugins.InductiveMiner.MultiComboBox;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.SwitchPanel;
@@ -140,7 +139,6 @@ public abstract class IvMFiltersView extends SideWindow {
 
 		//add panel
 		subPanel.add(filter.getPanel(), BorderLayout.CENTER);
-		filter.getPanel().setForeground(MultiComboBox.colour_fg);
 
 		//add checkbox
 		{

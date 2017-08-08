@@ -18,6 +18,7 @@ public abstract class IvMFilterGui extends JPanel {
 	public IvMFilterGui(String title) {
 		TitledBorder border = BorderFactory.createTitledBorder(title);
 		border.setTitleFont(IvMDecorator.fontLarger);
+		border.setTitleColor(IvMDecorator.textColour);
 		setBorder(border);
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setOpaque(false);
