@@ -94,7 +94,7 @@ public class IvMDecorator {
 	}
 
 	public static <X> void decorate(MultiComboBox<X> combobox) {
-		combobox.setUI(new IvMMultiComboBoxUI<X>());
+		//combobox.setUI(new IvMMultiComboBoxUI<X>());
 	}
 
 	public static void decorate(JCheckBox checkBox) {
@@ -238,17 +238,17 @@ public class IvMDecorator {
 		}
 	}
 
-	public static class IvMMultiComboBoxUI<X> extends IvMComboBoxUI<X> {
-		public void installUI(JComponent c) {
-			super.installUI(c);
-
-			@SuppressWarnings("unchecked")
-			MultiComboBox<X> comboBox = (MultiComboBox<X>) c;
-			@SuppressWarnings("unchecked")
-			MultiComboBox<X>.ButtonsRenderer renderer = (MultiComboBox<X>.ButtonsRenderer) comboBox.getRenderer();
-			decorate(renderer.label);
-		}
-	}
+//	public static class IvMMultiComboBoxUI<X> extends IvMComboBoxUI<X> {
+//		public void installUI(JComponent c) {
+//			super.installUI(c);
+//
+//			@SuppressWarnings("unchecked")
+//			MultiComboBox<X> comboBox = (MultiComboBox<X>) c;
+//			@SuppressWarnings("unchecked")
+//			MultiComboBox<X>.ButtonsRenderer renderer = (MultiComboBox<X>.ButtonsRenderer) comboBox.getRenderer();
+//			decorate(renderer.label);
+//		}
+//	}
 
 	public static class IvMCheckBoxUI extends BasicCheckBoxUI {
 		public void installUI(JComponent c) {
