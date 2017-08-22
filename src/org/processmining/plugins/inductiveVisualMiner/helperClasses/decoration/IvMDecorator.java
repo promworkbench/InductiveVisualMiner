@@ -77,8 +77,12 @@ public class IvMDecorator {
 		}
 
 		protected GradientPaint getGradient() {
-			return new GradientPaint(0, 0, backGroundColour1, 0, getHeight(), backGroundColour2);
+			return IvMDecorator.getGradient(getHeight());
 		}
+	}
+	
+	public static GradientPaint getGradient(int height) {
+		return new GradientPaint(0, 0, backGroundColour1, 0, height, backGroundColour2);
 	}
 
 	public static void decorate(JLabel label) {

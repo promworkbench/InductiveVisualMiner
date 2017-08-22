@@ -5,6 +5,7 @@ import java.awt.Color;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
 
 public class Move implements Event {
@@ -215,19 +216,19 @@ public class Move implements Event {
 	}
 
 	public Color getBorderColor() {
-		return null;
+		return IvMDecorator.backGroundColour1;
 	}
 
 	public Color getLabelColor() {
-		return null;
+		return IvMDecorator.textColour;
 	}
 
 	public Color getTopLabelColor() {
-		return Color.white;
+		return IvMDecorator.textColour;
 	}
 
 	public Color getBottomLabelColor() {
-		return null;
+		return IvMDecorator.textColour;
 	}
 
 	public Color getBottomLabel2Color() {

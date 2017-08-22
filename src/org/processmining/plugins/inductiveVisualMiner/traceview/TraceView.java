@@ -1,7 +1,12 @@
 package org.processmining.plugins.inductiveVisualMiner.traceview;
 
-import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+
+import javax.swing.JScrollPane;
 
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.TraceBuilder;
@@ -11,6 +16,7 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 
@@ -33,16 +39,31 @@ public class TraceView extends SideWindow {
 
 		traceView = new ProMTraceList<>(traceBuilder);
 		add(traceView);
+		
+		//replace the scroll pane
+		traceView.remove(traceView.getScrollPane());
+		JScrollPane scrollPane = new JScrollPane(traceView.getList());
+		traceView.add(scrollPane, BorderLayout.CENTER);
+		scrollPane.setOpaque(false);
+		
+		traceView.getList().setOpaque(true);
+		traceView.getList().setBackground(IvMDecorator.backGroundColour1);
 
-		traceView.setForeground(Color.white);
-		traceView.getList().setForeground(Color.white);
-		traceView.getScrollPane().setForeground(Color.white);
-		setForeground(Color.white);
-		traceView.getScrollPane().getViewport().setForeground(Color.white);
+		//traceView.setForeground(IvMDecorator.textColour);
+		//traceView.getList().setForeground(IvMDecorator.textColour);
+		//setForeground(IvMDecorator.textColour);
 		traceView.setMaxWedgeWidth(130);
 		traceView.setFixedInfoWidth(50);
-		traceView.setBackground(new Color(30, 30, 30));
-		traceView.setOpaque(true);
+		traceView.setOpaque(false);
+	}
+	
+	@Override
+	public void paintComponents(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setPaint(IvMDecorator.getGradient(getHeight()));
+		g2d.fillRect(0, 0, getWidth(), getHeight());
+		super.paintComponents(g);
 	}
 
 	/**
