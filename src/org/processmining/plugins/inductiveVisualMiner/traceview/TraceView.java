@@ -49,9 +49,6 @@ public class TraceView extends SideWindow {
 		traceView.getList().setOpaque(true);
 		traceView.getList().setBackground(IvMDecorator.backGroundColour1);
 
-		//traceView.setForeground(IvMDecorator.textColour);
-		//traceView.getList().setForeground(IvMDecorator.textColour);
-		//setForeground(IvMDecorator.textColour);
 		traceView.setMaxWedgeWidth(130);
 		traceView.setFixedInfoWidth(50);
 		traceView.setOpaque(false);

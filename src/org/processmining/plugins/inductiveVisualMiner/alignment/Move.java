@@ -216,7 +216,7 @@ public class Move implements Event {
 	}
 
 	public Color getBorderColor() {
-		return IvMDecorator.backGroundColour1;
+		return IvMDecorator.backGroundColour2;
 	}
 
 	public Color getLabelColor() {
