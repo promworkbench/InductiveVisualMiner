@@ -30,7 +30,7 @@ import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicPanelUI;
 import javax.swing.plaf.basic.BasicTextAreaUI;
 
-import org.processmining.plugins.InductiveMiner.MultiComboBox;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.MultiComboBox;
 
 /**
  * Class to decorate gui elements. Adapted from Fluxicon's Slicker Factory.
@@ -80,7 +80,7 @@ public class IvMDecorator {
 			return IvMDecorator.getGradient(getHeight());
 		}
 	}
-	
+
 	public static GradientPaint getGradient(int height) {
 		return new GradientPaint(0, 0, backGroundColour1, 0, height, backGroundColour2);
 	}
@@ -98,7 +98,7 @@ public class IvMDecorator {
 	}
 
 	public static <X> void decorate(MultiComboBox<X> combobox) {
-		//combobox.setUI(new IvMMultiComboBoxUI<X>());
+		combobox.setUI(new IvMMultiComboBoxUI<X>());
 	}
 
 	public static void decorate(JCheckBox checkBox) {
@@ -190,6 +190,7 @@ public class IvMDecorator {
 					comboBox.setForeground(textColour);
 					comboBox.setBackground(buttonColour);
 
+					//search for the arrow button and style it
 					for (Component component : comboBox.getComponents()) {
 						if (component instanceof BasicArrowButton) {
 							BasicArrowButton component2 = ((BasicArrowButton) component);
@@ -242,17 +243,21 @@ public class IvMDecorator {
 		}
 	}
 
-//	public static class IvMMultiComboBoxUI<X> extends IvMComboBoxUI<X> {
-//		public void installUI(JComponent c) {
-//			super.installUI(c);
-//
-//			@SuppressWarnings("unchecked")
-//			MultiComboBox<X> comboBox = (MultiComboBox<X>) c;
-//			@SuppressWarnings("unchecked")
-//			MultiComboBox<X>.ButtonsRenderer renderer = (MultiComboBox<X>.ButtonsRenderer) comboBox.getRenderer();
-//			decorate(renderer.label);
-//		}
-//	}
+	public static class IvMMultiComboBoxUI<X> extends IvMComboBoxUI<X> {
+		public void installUI(JComponent c) {
+			super.installUI(c);
+			
+			@SuppressWarnings("unchecked")
+			MultiComboBox<X> comboBox = (MultiComboBox<X>) c;
+			@SuppressWarnings("unchecked")
+			MultiComboBox<X>.ButtonsRenderer renderer = (MultiComboBox<X>.ButtonsRenderer) comboBox.getRenderer();
+			JLabel label = renderer.getLabel();
+			decorate(label);
+			label.setHorizontalAlignment(SwingConstants.CENTER);
+			
+			comboBox.addListeners();
+		}
+	}
 
 	public static class IvMCheckBoxUI extends BasicCheckBoxUI {
 		public void installUI(JComponent c) {

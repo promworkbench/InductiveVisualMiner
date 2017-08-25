@@ -19,7 +19,6 @@ import javax.swing.border.EmptyBorder;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.BoundsPopupMenuListener;
-import org.processmining.plugins.InductiveMiner.ClassifierChooser;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
@@ -28,6 +27,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabled
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ControllerView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMClassifierChooser;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
@@ -68,7 +68,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final NiceDoubleSlider activitiesSlider;
 	private final NiceDoubleSlider pathsSlider;
 	private final JLabel classifierLabel;
-	private ClassifierChooser classifiersCombobox;
+	private IvMClassifierChooser classifiersCombobox;
 	private final JButton preMiningFiltersButton;
 	private final PreMiningFiltersView preMiningFiltersView;
 	private final JButton editModelButton;
@@ -164,13 +164,14 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cClassifierLabel.anchor = GridBagConstraints.WEST;
 				otherSettingsPanel.add(classifierLabel, cClassifierLabel);
 
-				classifiersCombobox = new ClassifierChooser(null, null, false);
-				//IvMDecorator.decorate(classifiersCombobox.getMultiComboBox());
+				classifiersCombobox = new IvMClassifierChooser(null, null, false);
+				IvMDecorator.decorate(classifiersCombobox.getMultiComboBox());
 				classifiersCombobox.setEnabled(false);
 				GridBagConstraints cClassifiers = new GridBagConstraints();
 				cClassifiers.gridx = 1;
 				cClassifiers.gridy = gridy++;
 				cClassifiers.gridwidth = 1;
+				cClassifiers.insets = margins;
 				cClassifiers.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(classifiersCombobox, cClassifiers);
 			}
@@ -184,6 +185,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cTraceViewButton.gridx = 1;
 				cTraceViewButton.gridy = gridy++;
 				cTraceViewButton.gridwidth = 1;
+				cTraceViewButton.insets = margins;
 				cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(preMiningFiltersButton, cTraceViewButton);
 			}
@@ -502,7 +504,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return statusLabel;
 	}
 
-	public ClassifierChooser getClassifiers() {
+	public IvMClassifierChooser getClassifiers() {
 		return classifiersCombobox;
 	}
 
