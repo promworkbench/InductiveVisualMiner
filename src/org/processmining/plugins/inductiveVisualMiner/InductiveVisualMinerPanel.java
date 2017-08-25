@@ -427,23 +427,23 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		}
 	}
 
-//	@Override
-//	protected void paintComponent(Graphics grphcs) {
-//		Graphics2D g2d = (Graphics2D) grphcs;
-//		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//
-//		//GradientPaint gp = new GradientPaint(0, 0, Color.white, 0, getHeight(), new Color(171,186,171));
-//		//GradientPaint gp = new GradientPaint(0, 0, new Color(109, 213, 237), 0, getHeight(), new Color(33, 147, 176));
-//		//GradientPaint gp = new GradientPaint(0, 0, new Color(75, 108, 183), 0, getHeight(), new Color(24, 40, 72));
-//		GradientPaint gp = new GradientPaint(0, 0, new Color(161, 207, 243), 0, getHeight(), new Color(84, 141, 184));
-//
-//		//GradientPaint gp = new GradientPaint(0, 0, getBackground(), 0, getHeight(), getBackground().darker());
-//
-//		g2d.setPaint(gp);
-//		g2d.fillRect(0, 0, getWidth(), getHeight());
-//
-//		super.paintComponent(grphcs);
-//	}
+	//	@Override
+	//	protected void paintComponent(Graphics grphcs) {
+	//		Graphics2D g2d = (Graphics2D) grphcs;
+	//		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	//
+	//		//GradientPaint gp = new GradientPaint(0, 0, Color.white, 0, getHeight(), new Color(171,186,171));
+	//		//GradientPaint gp = new GradientPaint(0, 0, new Color(109, 213, 237), 0, getHeight(), new Color(33, 147, 176));
+	//		//GradientPaint gp = new GradientPaint(0, 0, new Color(75, 108, 183), 0, getHeight(), new Color(24, 40, 72));
+	//		GradientPaint gp = new GradientPaint(0, 0, new Color(161, 207, 243), 0, getHeight(), new Color(84, 141, 184));
+	//
+	//		//GradientPaint gp = new GradientPaint(0, 0, getBackground(), 0, getHeight(), getBackground().darker());
+	//
+	//		g2d.setPaint(gp);
+	//		g2d.fillRect(0, 0, getWidth(), getHeight());
+	//
+	//		super.paintComponent(grphcs);
+	//	}
 
 	public void removeNotify() {
 		super.removeNotify();

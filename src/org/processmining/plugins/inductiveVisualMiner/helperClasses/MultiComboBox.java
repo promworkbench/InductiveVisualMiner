@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Point;
@@ -338,15 +339,34 @@ public class MultiComboBox<E> extends JComboBox<E> {
 			}
 		});
 
+		private final JPanel checkBoxPanel = new JPanel(new CardLayout(0, 0));
+		private final JPanel showCheckBoxPanel = new JPanel(new BorderLayout(0, 0));
+		private final JPanel hideCheckBoxPanel = new JPanel(new BorderLayout(0, 0));
+		private final static String showCheckBox = "show";
+		private final static String hideCheckBox = "hide";
+
 		public ButtonsRenderer() {
 			super(new BorderLayout(0, 0));
 
 			label.setOpaque(false);
 			add(label);
 
+			add(checkBoxPanel, BorderLayout.EAST);
+			checkBoxPanel.add(showCheckBoxPanel, showCheckBox);
+			checkBoxPanel.setBorder(BorderFactory.createEmptyBorder());
+			checkBoxPanel.setOpaque(false);
+
+			showCheckBoxPanel.setBorder(BorderFactory.createEmptyBorder());
+			showCheckBoxPanel.add(checkBox, BorderLayout.CENTER);
+			showCheckBoxPanel.setOpaque(false);
 			checkBox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
 			checkBox.setContentAreaFilled(false);
-			add(checkBox, BorderLayout.EAST);
+
+			hideCheckBoxPanel.setBorder(BorderFactory.createEmptyBorder());
+			hideCheckBoxPanel.setOpaque(false);
+			checkBoxPanel.add(hideCheckBoxPanel, hideCheckBox);
+
+			((CardLayout) checkBoxPanel.getLayout()).show(checkBoxPanel, showCheckBox);
 		}
 
 		public JLabel getLabel() {
@@ -364,11 +384,12 @@ public class MultiComboBox<E> extends JComboBox<E> {
 			label.setText(value != null ? value.toString() : "");
 			if (index == -1 || list.getModel().getSize() <= 0) {
 				//not in pop-up
-				checkBox.setVisible(false);
+				checkBoxPanel.setVisible(false);
 				label.setText(getTitle());
 				label.setForeground(MultiComboBox.this.getForeground());
 			} else {
 				//in pop-up
+				checkBoxPanel.setVisible(true);
 
 				label.setForeground(null);
 				if (isSelected) {
@@ -380,7 +401,8 @@ public class MultiComboBox<E> extends JComboBox<E> {
 				}
 
 				boolean f = index == rolloverCheckBoxIndex;
-				checkBox.setVisible(!singular.get(index));
+				((CardLayout) checkBoxPanel.getLayout()).show(checkBoxPanel,
+						singular.get(index) ? hideCheckBox : showCheckBox);
 				checkBox.getModel().setRollover(f);
 				checkBox.setSelected(selected.get(index));
 			}
