@@ -21,11 +21,11 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.SwitchPanel;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.SwitchPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeKey;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
@@ -217,7 +217,7 @@ public class TraceColourMapView extends SideWindow {
 			} else {
 				//too many colours
 				status.setText("The current attribute would yield " + attribute.getStringValues().size()
-						+ " colours. Inductive visual Miner supports up till " + maxColours + " colours.");
+						+ " colours. Inductive visual Miner supports up to " + maxColours + " colours.");
 				example.setText("");
 				onUpdate.call(TraceColourMapSettings.empty());
 			}
