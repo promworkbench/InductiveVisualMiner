@@ -31,7 +31,7 @@ public class EfficientTreeAlignmentPlugin {
 					"Log" }, userAccessible = true, level = PluginLevel.Regular, categories = {
 							PluginCategory.Enhancement }, help = "Align an efficient tree and an event log using ETM-alignments.")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
-	@PluginVariant(variantLabel = "Align efficien tree, default", requiredParameterLabels = { 0, 1 })
+	@PluginVariant(variantLabel = "Align efficient tree, default", requiredParameterLabels = { 0, 1 })
 	public IvMAlignment align(final UIPluginContext context, EfficientTree tree, XLog log) throws Exception {
 
 		EfficientTreeAlignmentDialog dialog = new EfficientTreeAlignmentDialog(log);
