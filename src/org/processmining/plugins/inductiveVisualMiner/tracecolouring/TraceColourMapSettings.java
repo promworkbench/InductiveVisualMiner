@@ -3,13 +3,12 @@ package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 import java.awt.Color;
 import java.util.Map;
 
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 
 public class TraceColourMapSettings {
-
-	public static final Color defaultColour = Color.yellow;
 
 	private enum Type {
 		empty, attributeString, attributeNumber, attributeTime, propertyNumberOfEvents, propertyTraceDuration
@@ -38,7 +37,7 @@ public class TraceColourMapSettings {
 	public static TraceColourMapSettings number(Attribute attribute, Color[] colours, double min, double max) {
 		return new TraceColourMapSettings(Type.attributeNumber, attribute, colours, null, min, max);
 	}
-	
+
 	public static TraceColourMapSettings time(Attribute attribute, Color[] colours, long min, long max) {
 		return new TraceColourMapSettings(Type.attributeTime, attribute, colours, null, min, max);
 	}
@@ -77,13 +76,13 @@ public class TraceColourMapSettings {
 			case attributeTime :
 				return new TraceColourMapAttributeTime(log, attribute, colours, (long) min, (long) max);
 			case empty :
-				return new TraceColourMapFixed(Color.yellow);
+				return new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
 			case propertyNumberOfEvents :
 				return new TraceColourMapPropertyNumberOfEvents(tree, log, colours, min, max);
 			case propertyTraceDuration :
 				return new TraceColourMapPropertyDuration(tree, log, colours, min, max);
 			default :
-				return new TraceColourMapFixed(Color.yellow);
+				return new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
 		}
 	}
 
@@ -107,7 +106,7 @@ public class TraceColourMapSettings {
 						new Color(140, 150, 198), new Color(140, 107, 177), new Color(136, 65, 157),
 						new Color(110, 1, 107) };
 			default :
-				return new Color[] { Color.yellow };
+				return new Color[] { RendererFactory.defaultTokenFillColour };
 		}
 	}
 }

@@ -56,7 +56,7 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 		{
 			shader = new JoglShader(
 					"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengleventlistener",
-					"vaoOtherShaderVSinstancedFully", "vaoOtherShaderFSinstancedFully");
+					"vaoOtherShaderVSinstancedFully", "vaoOtherShaderFSinstancedFullyChristmas");
 			shader.Create(pipeLine);
 			shader.Bind(pipeLine);
 		}

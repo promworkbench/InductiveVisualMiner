@@ -10,6 +10,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Transparency;
 import java.awt.geom.Ellipse2D;
+import java.util.Calendar;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
@@ -20,7 +21,14 @@ public class RendererFactory {
 
 	//rendering constants
 	public static final int tokenRadius = 4;
-	public static final Color defaultTokenFillColour = Color.yellow;
+	public static final Color defaultTokenFillColour;
+	static {
+		if (Calendar.getInstance().get(Calendar.DAY_OF_YEAR) < 355) {
+			defaultTokenFillColour = Color.yellow;
+		} else {
+			defaultTokenFillColour = new Color(209, 58, 49);
+		}
+	}
 	public static final Color tokenStrokeColour = Color.black;
 	public static final Color backgroundColor = new Color(255, 255, 255, 0);
 	public static final Stroke tokenStroke = new BasicStroke(1.5f);

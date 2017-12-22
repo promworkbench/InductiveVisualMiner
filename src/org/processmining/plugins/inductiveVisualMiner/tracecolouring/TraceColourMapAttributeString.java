@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -26,7 +27,7 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 			XAttribute value = trace.getAttributes().get(attribute.getName());
 			Color baseColour;
 			if (value == null) {
-				baseColour = TraceColourMapSettings.defaultColour;
+				baseColour = RendererFactory.defaultTokenFillColour;
 			} else {
 				baseColour = value2colour.get(value.toString());
 			}
@@ -41,7 +42,7 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 	public Color getColour(IMTrace trace) {
 		XAttribute value = trace.getAttributes().get(attribute.getName());
 		if (value == null) {
-			return TraceColourMapSettings.defaultColour;
+			return RendererFactory.defaultTokenFillColour;
 		} else {
 			return value2colour.get(value.toString());
 		}
@@ -50,7 +51,7 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 	public Color getColour(IvMTrace trace) {
 		XAttribute value = trace.getAttributes().get(attribute.getName());
 		if (value == null) {
-			return TraceColourMapSettings.defaultColour;
+			return RendererFactory.defaultTokenFillColour;
 		} else {
 			return value2colour.get(value.toString());
 		}
