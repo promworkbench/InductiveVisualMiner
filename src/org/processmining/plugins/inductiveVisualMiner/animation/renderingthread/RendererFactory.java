@@ -19,14 +19,16 @@ import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.
 
 public class RendererFactory {
 
+	public static final boolean christmas = Calendar.getInstance().get(Calendar.DAY_OF_YEAR) >= 355;
+
 	//rendering constants
 	public static final int tokenRadius = 4;
 	public static final Color defaultTokenFillColour;
 	static {
-		if (Calendar.getInstance().get(Calendar.DAY_OF_YEAR) < 355) {
-			defaultTokenFillColour = Color.yellow;
-		} else {
+		if (christmas) {
 			defaultTokenFillColour = new Color(209, 58, 49);
+		} else {
+			defaultTokenFillColour = Color.yellow;
 		}
 	}
 	public static final Color tokenStrokeColour = Color.black;

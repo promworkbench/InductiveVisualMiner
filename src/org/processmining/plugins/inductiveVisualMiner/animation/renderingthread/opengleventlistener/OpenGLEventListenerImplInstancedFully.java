@@ -5,6 +5,7 @@ import java.nio.IntBuffer;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.visualisation3d.GraphicsPipeline;
@@ -54,9 +55,15 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 
 		//set up the shaders
 		{
-			shader = new JoglShader(
-					"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengleventlistener",
-					"vaoOtherShaderVSinstancedFully", "vaoOtherShaderFSinstancedFullyChristmas");
+			if (RendererFactory.christmas) {
+				shader = new JoglShader(
+						"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengleventlistener",
+						"vaoOtherShaderVSinstancedFully", "vaoOtherShaderFSinstancedFullyChristmas");
+			} else {
+				shader = new JoglShader(
+						"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengleventlistener",
+						"vaoOtherShaderVSinstancedFully", "vaoOtherShaderFSinstancedFully");
+			}
 			shader.Create(pipeLine);
 			shader.Bind(pipeLine);
 		}
@@ -161,7 +168,7 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 		drawable.getGL().getGL2().glDeleteVertexArrays(vertexArrayObject.limit(), vertexArrayObject);
 		drawable.getGL().glDeleteBuffers(instanceVertexBufferObject.limit(), instanceVertexBufferObject);
 		drawable.getGL().glDeleteBuffers(vertexBufferObject.limit(), vertexBufferObject);
-		
+
 		shader.Unbind(pipeLine);
 		shader.Dispose(pipeLine);
 	}
