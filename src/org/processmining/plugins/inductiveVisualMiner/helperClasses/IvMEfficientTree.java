@@ -1,15 +1,16 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree2processTree;
+import org.processmining.plugins.InductiveMiner.efficienttree.ProcessTree2EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * Class to phase out UnfoldedNodes.
@@ -23,7 +24,9 @@ public class IvMEfficientTree extends EfficientTree {
 	private final ProcessTree dTree;
 
 	public IvMEfficientTree(ProcessTree tree) throws UnknownTreeNodeException {
-		super(tree);
+		super(ProcessTree2EfficientTree.convert(tree).getTree(),
+				ProcessTree2EfficientTree.convert(tree).getActivity2int(),
+				ProcessTree2EfficientTree.convert(tree).getInt2activity());
 		this.dTree = tree;
 
 		index2unfoldedNode = TreeUtils.unfoldAllNodes(new UnfoldedNode(tree.getRoot()));
@@ -36,10 +39,6 @@ public class IvMEfficientTree extends EfficientTree {
 
 	public IvMEfficientTree(EfficientTree tree) {
 		this(EfficientTree2processTree.convert(tree));
-	}
-
-	public int getRoot() {
-		return 0;
 	}
 
 	/**
