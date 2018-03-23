@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree2processTree;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeImpl;
 import org.processmining.plugins.InductiveMiner.efficienttree.ProcessTree2EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.processtree.ProcessTree;
@@ -18,7 +19,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  * @author sleemans
  *
  */
-public class IvMEfficientTree extends EfficientTree {
+public class IvMEfficientTree extends EfficientTreeImpl {
 	private final List<UnfoldedNode> index2unfoldedNode;
 	private final TObjectIntMap<UnfoldedNode> unfoldedNode2index;
 	private final ProcessTree dTree;

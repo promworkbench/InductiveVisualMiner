@@ -8,7 +8,7 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
+import org.processmining.plugins.InductiveMiner.efficienttree.ProcessTree2EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -24,7 +24,7 @@ public class ProcessTreeVisualisationPlugin {
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Visualise process tree", requiredParameterLabels = { 0 })
 	public DotPanel fancy(PluginContext context, ProcessTree tree) throws UnknownTreeNodeException {
-		Dot dot = EfficientTreeVisualisationPlugin.fancy(new EfficientTree(tree));
+		Dot dot = EfficientTreeVisualisationPlugin.fancy(ProcessTree2EfficientTree.convert(tree));
 		return new DotPanel(dot);
 	}
 
