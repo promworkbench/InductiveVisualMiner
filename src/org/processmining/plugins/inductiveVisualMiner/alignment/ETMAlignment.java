@@ -209,7 +209,7 @@ public class ETMAlignment {
 		return node2cost;
 	}
 
-	private static Map<XEventClass, Integer> createActivity2cost(IvMEventClasses eventClasses) {
+	public static Map<XEventClass, Integer> createActivity2cost(IvMEventClasses eventClasses) {
 		Map<XEventClass, Integer> activity2Cost = new HashMap<XEventClass, Integer>();
 		for (XEventClass activity : eventClasses.getClasses()) {
 			activity2Cost.put(activity, logCost);
