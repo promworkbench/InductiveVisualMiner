@@ -27,15 +27,12 @@ public class Chain {
 	private final InductiveVisualMinerState state;
 	private final ProMCanceller globalCanceller;
 	private final Executor executor;
-	private final OnException onException;
 	private Runnable onChange;
 
-	public Chain(InductiveVisualMinerState state, ProMCanceller globalCanceller, Executor executor,
-			OnException onException, Runnable onChange) {
+	public Chain(InductiveVisualMinerState state, ProMCanceller globalCanceller, Executor executor, Runnable onChange) {
 		this.state = state;
 		this.globalCanceller = globalCanceller;
 		this.executor = executor;
-		this.onException = onException;
 		this.onChange = onChange;
 	}
 
@@ -60,12 +57,7 @@ public class Chain {
 
 		//execute the link
 		if (canExecute(chainLink)) {
-			try {
-				chainLink.execute(globalCanceller, executor, state, this);
-			} catch (InterruptedException e) {
-				onException.onException(e);
-				e.printStackTrace();
-			}
+			chainLink.execute(globalCanceller, executor, state, this);
 		}
 	}
 
@@ -80,12 +72,7 @@ public class Chain {
 
 			//execute the link
 			if (canExecute(newChainLink)) {
-				try {
-					newChainLink.execute(globalCanceller, executor, state, this);
-				} catch (InterruptedException e) {
-					onException.onException(e);
-					e.printStackTrace();
-				}
+				newChainLink.execute(globalCanceller, executor, state, this);
 			}
 		}
 		onChange.run();

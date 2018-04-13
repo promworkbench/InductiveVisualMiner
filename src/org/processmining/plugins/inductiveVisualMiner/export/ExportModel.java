@@ -1,52 +1,84 @@
 package org.processmining.plugins.inductiveVisualMiner.export;
 
+import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.contexts.uitopia.UIPluginContext;
+import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.framework.plugin.PluginContext;
+import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.models.connections.petrinets.behavioral.FinalMarkingConnection;
 import org.processmining.models.connections.petrinets.behavioral.InitialMarkingConnection;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.semantics.petrinet.Marking;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree2AcceptingPetriNet;
+import org.processmining.plugins.InductiveMiner.reduceacceptingpetrinet.ReduceAcceptingPetriNetKeepLanguage;
 import org.processmining.processtree.ProcessTree;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.InvalidProcessTreeException;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.NotYetImplementedException;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.PetrinetWithMarkings;
 
 public class ExportModel {
-	
+
 	/*
 	 * Store process tree
 	 */
 	public static void exportProcessTree(PluginContext context, ProcessTree tree, String name) {
-		context.getProvidedObjectManager().createProvidedObject("Process tree of " + name, tree,
-				ProcessTree.class, context);
+		context.getProvidedObjectManager().createProvidedObject("Process tree of " + name, tree, ProcessTree.class,
+				context);
 		if (context instanceof UIPluginContext) {
-			((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(tree).setFavorite(true);
+			((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(tree)
+					.setFavorite(true);
 		}
 	}
-	
+
+	public static void exportEfficientTree(PluginContext context, EfficientTree tree, String name) {
+		context.getProvidedObjectManager().createProvidedObject("Efficient tree of " + name, tree, EfficientTree.class,
+				context);
+		if (context instanceof UIPluginContext) {
+			((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(tree)
+					.setFavorite(true);
+		}
+	}
+
+	public static void exportAcceptingPetriNet(PluginContext context, EfficientTree tree, String name,
+			final ProMCanceller canceller) {
+		AcceptingPetriNet net = EfficientTree2AcceptingPetriNet.convert(tree);
+		ReduceAcceptingPetriNetKeepLanguage.reduce(net, new Canceller() {
+			public boolean isCancelled() {
+				return canceller.isCancelled();
+			}
+		});
+
+		context.getProvidedObjectManager().createProvidedObject("Accepting Petri net of " + name, net,
+				AcceptingPetriNet.class, context);
+		if (context instanceof UIPluginContext) {
+			((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(net)
+					.setFavorite(true);
+		}
+	}
+
 	/*
 	 * Store Petri net
 	 */
-	public static void exportPetrinet(PluginContext context, ProcessTree tree, String name) {
-		try {
-			PetrinetWithMarkings pnwm = ProcessTree2Petrinet.convert(tree, false);
-			context.getProvidedObjectManager().createProvidedObject("Petri net of " + name, pnwm.petrinet,
-					Petrinet.class, context);
-			if (context instanceof UIPluginContext) {
-				((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(pnwm.petrinet).setFavorite(true);
+	public static void exportPetrinet(PluginContext context, EfficientTree tree, String name,
+			final ProMCanceller canceller) {
+
+		AcceptingPetriNet pnwm = EfficientTree2AcceptingPetriNet.convert(tree);
+		ReduceAcceptingPetriNetKeepLanguage.reduce(pnwm, new Canceller() {
+			public boolean isCancelled() {
+				return canceller.isCancelled();
 			}
-			context.getProvidedObjectManager().createProvidedObject("Initial marking of " + name, pnwm.initialMarking,
-					Marking.class, context);
-			context.getProvidedObjectManager().createProvidedObject("Final marking of " + name, pnwm.finalMarking,
-					Marking.class, context);
-			context.addConnection(new InitialMarkingConnection(pnwm.petrinet, pnwm.initialMarking));
-			context.addConnection(new FinalMarkingConnection(pnwm.petrinet, pnwm.finalMarking));
-		} catch (NotYetImplementedException e) {
-			e.printStackTrace();
-		} catch (InvalidProcessTreeException e) {
-			e.printStackTrace();
+		});
+
+		context.getProvidedObjectManager().createProvidedObject("Petri net of " + name, pnwm.getNet(), Petrinet.class,
+				context);
+		if (context instanceof UIPluginContext) {
+			((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(pnwm.getNet())
+					.setFavorite(true);
 		}
+		context.getProvidedObjectManager().createProvidedObject("Initial marking of " + name, pnwm.getInitialMarking(),
+				Marking.class, context);
+		context.getProvidedObjectManager().createProvidedObject("Final marking of " + name,
+				pnwm.getFinalMarkings().iterator().next(), Marking.class, context);
+		context.addConnection(new InitialMarkingConnection(pnwm.getNet(), pnwm.getInitialMarking()));
+		context.addConnection(new FinalMarkingConnection(pnwm.getNet(), pnwm.getFinalMarkings().iterator().next()));
 	}
-	
+
 }

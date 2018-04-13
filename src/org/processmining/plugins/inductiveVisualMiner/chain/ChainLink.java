@@ -80,7 +80,7 @@ public abstract class ChainLink<I, O> {
 	}
 
 	public void execute(ProMCanceller globalCanceller, Executor executor, final InductiveVisualMinerState state,
-			final Chain chain) throws InterruptedException {
+			final Chain chain) {
 		if (currentExecutionCanceller != null) {
 			currentExecutionCanceller.cancel();
 		}
@@ -123,6 +123,7 @@ public abstract class ChainLink<I, O> {
 								onComplete.run();
 							}
 							isComplete = true;
+							
 							chain.executeNext(ChainLink.this);
 						} else {
 

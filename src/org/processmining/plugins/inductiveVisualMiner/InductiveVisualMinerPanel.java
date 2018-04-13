@@ -77,6 +77,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private JComboBox<?> minerCombobox;
 	private final JButton saveModelButton;
 	private final JButton saveImageButton;
+	private final JButton saveAlignmentButton;
 	private final JButton traceViewButton;
 	private final TraceView traceView;
 	private final JButton traceColourMapViewButton;
@@ -302,6 +303,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				controllerView = new ControllerView(this);
 			}
 
+			//save model button
 			{
 				saveModelButton = new JButton("export model");
 				IvMDecorator.decorate(saveModelButton);
@@ -314,6 +316,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				otherSettingsPanel.add(saveModelButton, cExitButton);
 			}
 
+			//save image button 
 			{
 				saveImageButton = new JButton("export view");
 				IvMDecorator.decorate(saveImageButton);
@@ -326,6 +329,19 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				otherSettingsPanel.add(saveImageButton, cExitButton);
 			}
 
+			//save alignment button
+			{
+				saveAlignmentButton = new JButton("export alignment");
+				IvMDecorator.decorate(saveAlignmentButton);
+				GridBagConstraints cAlignmentButton = new GridBagConstraints();
+				cAlignmentButton.gridx = 1;
+				cAlignmentButton.gridy = gridy++;
+				cAlignmentButton.gridwidth = 1;
+				cAlignmentButton.insets = margins;
+				cAlignmentButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(saveAlignmentButton, cAlignmentButton);
+			}
+			
 			{
 				selectionLabel = new JTextArea(" ");
 				selectionLabel.setWrapStyleWord(true);
@@ -538,6 +554,10 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	public JButton getSaveImageButton() {
 		return saveImageButton;
+	}
+	
+	public JButton getSaveAlignmentButton() {
+		return saveAlignmentButton;
 	}
 
 	public void setOnSelectionChanged(InputFunction<Selection> onSelectionChanged) {

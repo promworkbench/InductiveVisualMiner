@@ -46,6 +46,8 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl13Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Done;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
+import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
+import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterStatistics;
@@ -54,6 +56,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficient
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
@@ -62,7 +65,6 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
-import org.processmining.processtree.ProcessTree;
 
 public class InductiveVisualMinerController {
 
@@ -81,7 +83,7 @@ public class InductiveVisualMinerController {
 		state.getGraphUserSettings().setDirection(GraphDirection.leftRight);
 
 		//initialise gui handlers
-		initGui();
+		initGui(canceller);
 
 		//set up exception handling
 		final OnException onException = new OnException() {
@@ -100,7 +102,7 @@ public class InductiveVisualMinerController {
 		};
 
 		//set up the chain
-		chain = new Chain(state, canceller, context.getExecutor(), onException, onChange);
+		chain = new Chain(state, canceller, context.getExecutor(), onChange);
 
 		//gather attributes
 		Cl01GatherAttributes gatherAttributes = new Cl01GatherAttributes();
@@ -156,8 +158,6 @@ public class InductiveVisualMinerController {
 			sortEvents.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
-					panel.getSaveModelButton().setEnabled(false);
-					panel.getSaveImageButton().setEnabled(false);
 					setStatus("Checking time stamps..");
 					setAnimationStatus(" ", false);
 				}
@@ -172,14 +172,12 @@ public class InductiveVisualMinerController {
 					setStatus("Illogical time stamps; aborted.");
 					String[] options = new String[] { "Continue with neither animation nor performance",
 							"Reorder events" };
-					int n = JOptionPane
-							.showOptionDialog(
-									panel,
-									"The event log contains illogical time stamps,\n i.e. some time stamps contradict the order of events.\n\nInductive visual Miner can reorder the events and discover a new model.\nWould you like to do that?", //message
-									"Illogical Time Stamps", //title
-									JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, //do not use a custom Icon
-									options, //the titles of buttons
-									options[0]); //default button title
+					int n = JOptionPane.showOptionDialog(panel,
+							"The event log contains illogical time stamps,\n i.e. some time stamps contradict the order of events.\n\nInductive visual Miner can reorder the events and discover a new model.\nWould you like to do that?", //message
+							"Illogical Time Stamps", //title
+							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, //do not use a custom Icon
+							options, //the titles of buttons
+							options[0]); //default button title
 					if (n == 1) {
 						//the user requested to reorder the events
 						return true;
@@ -264,12 +262,6 @@ public class InductiveVisualMinerController {
 			layoutModel.setOnComplete(new Runnable() {
 				public void run() {
 					panel.getGraph().changeDot(state.getDot(), state.getSVGDiagram(), true);
-					panel.getSaveImageButton().setEnabled(true);
-				}
-			});
-			layoutModel.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getSaveImageButton().setEnabled(false);
 				}
 			});
 			layoutModel.setOnException(onException);
@@ -287,11 +279,17 @@ public class InductiveVisualMinerController {
 			});
 			align.setOnComplete(new Runnable() {
 				public void run() {
+					panel.getSaveAlignmentButton().setEnabled(true);
 					panel.getTraceView().set(state.getTree(), state.getIvMLog(), state.getSelection(),
 							state.getTraceColourMap());
 
 					state.getFiltersController().updateFiltersWithIvMLog(panel, state.getIvMLog(),
 							context.getExecutor());
+				}
+			});
+			align.setOnInvalidate(new Runnable() {
+				public void run() {
+					panel.getSaveAlignmentButton().setEnabled(false);
 				}
 			});
 			align.setOnException(onException);
@@ -539,7 +537,7 @@ public class InductiveVisualMinerController {
 		chain.execute(Cl01GatherAttributes.class);
 	}
 
-	private void initGui() {
+	private void initGui(final ProMCanceller canceller) {
 
 		//resize handler
 		panel.addComponentListener(new ComponentAdapter() {
@@ -651,25 +649,36 @@ public class InductiveVisualMinerController {
 
 				//store the resulting Process tree or Petri net
 				String name = XConceptExtension.instance().extractName(state.getSortedXLog());
-				ProcessTree tree = state.getTree().getDTree();
+				IvMEfficientTree tree = state.getTree();
 
-				Object[] options = { "Petri net", "Process tree" };
+				Object[] options = { "Petri net", "Accepting Petri net", "Process tree", "Efficient tree" };
+
 				int n = JOptionPane.showOptionDialog(panel,
 						"As what would you like to save the model?\nIt will become available in ProM.", "Save",
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-				if (n == 0) {
-					//store as Petri net
-					ExportModel.exportPetrinet(context, tree, name);
-				} else if (n == 1) {
-					//store as Process tree
-					ExportModel.exportProcessTree(context, tree, name);
+				switch (n) {
+					case 0 :
+						//store as Petri net
+						ExportModel.exportPetrinet(context, tree, name, canceller);
+						break;
+					case 1 :
+						ExportModel.exportAcceptingPetriNet(context, tree, name, canceller);
+						break;
+					case 2 :
+						ExportModel.exportProcessTree(context, tree.getDTree(), name);
+						break;
+					case 3 :
+						ExportModel.exportEfficientTree(context, tree, name);
+						break;
 				}
 			}
 		});
+		panel.getSaveModelButton().setEnabled(false);
 
 		//add animation and statistics to export
 		panel.getGraph().setGetExporters(new GetExporters() {
+
 			public List<Exporter> getExporters(List<Exporter> exporters) {
 				if (panel.getGraph().isAnimationEnabled()) {
 					exporters.add(new ExporterAvi(state));
@@ -688,10 +697,39 @@ public class InductiveVisualMinerController {
 			}
 		});
 
+		//set alignment export button
+		panel.getSaveAlignmentButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				String name = XConceptExtension.instance().extractName(state.getSortedXLog());
+				IvMLog log = state.getIvMLogFiltered();
+				EfficientTree tree = state.getTree();
+
+				Object[] options = { "Log view", "Model view", "Both" };
+				int n = JOptionPane.showOptionDialog(panel,
+						"What view of the alignment would you like to export?\nIt will become available as an event log in ProM.",
+						"Export Alignment", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+						options, options[0]);
+
+				switch (n) {
+					case 0 :
+						ExportAlignment.exportAlignment(context, log, tree, name, Type.logView);
+						break;
+					case 1 :
+						ExportAlignment.exportAlignment(context, log, tree, name, Type.modelView);
+						break;
+					case 2 :
+						ExportAlignment.exportAlignment(context, log, tree, name, Type.both);
+						break;
+				}
+			}
+		});
+		panel.getSaveAlignmentButton().setEnabled(false);
+
 		//listen to ctrl c to show the controller view
 		{
-			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-					KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), "showControllerView"); // - key
+			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), "showControllerView"); // - key
 			panel.getActionMap().put("showControllerView", new AbstractAction() {
 				private static final long serialVersionUID = 1727407514105090094L;
 
@@ -812,9 +850,9 @@ public class InductiveVisualMinerController {
 	 * @throws UnknownTreeNodeException
 	 */
 	public void updateHighlighting() throws UnknownTreeNodeException {
-		TraceViewEventColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(panel.getGraph()
-				.getSVG(), state.getVisualisationInfo(), state.getTree(), state.getVisualisationData(), state.getMode()
-				.getVisualisationParameters(state));
+		TraceViewEventColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(
+				panel.getGraph().getSVG(), state.getVisualisationInfo(), state.getTree(), state.getVisualisationData(),
+				state.getMode().getVisualisationParameters(state));
 		colourMap.setSelectedNodes(state.getSelection());
 		panel.getTraceView().setEventColourMap(colourMap);
 	}
