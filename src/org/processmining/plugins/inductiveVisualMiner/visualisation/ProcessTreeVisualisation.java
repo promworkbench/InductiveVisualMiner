@@ -33,6 +33,12 @@ public class ProcessTreeVisualisation {
 	private ProcessTreeVisualisationInfo info;
 	private TraceViewEventColourMap traceViewColourMap;
 
+	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> fancy(IvMEfficientTree tree,
+			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters)
+			throws UnknownTreeNodeException {
+		return fancy(new IvMModel(tree), data, parameters);
+	}
+
 	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> fancy(IvMModel model,
 			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters)
 			throws UnknownTreeNodeException {
