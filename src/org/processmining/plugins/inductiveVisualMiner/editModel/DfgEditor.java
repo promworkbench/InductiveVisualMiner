@@ -66,6 +66,8 @@ public class DfgEditor extends JPanel {
 		}
 
 		labelEdges = new JLabel("Edges") {
+			private static final long serialVersionUID = -5108825558323321667L;
+
 			@Override
 			public Dimension getMaximumSize() {
 				Dimension d = super.getMaximumSize();
@@ -86,6 +88,8 @@ public class DfgEditor extends JPanel {
 		}
 
 		labelEndActivities = new JLabel("End activities") {
+			private static final long serialVersionUID = 5730799157198750391L;
+
 			@Override
 			public Dimension getMaximumSize() {
 				Dimension d = super.getMaximumSize();
@@ -107,6 +111,8 @@ public class DfgEditor extends JPanel {
 
 		//error message
 		errorMessage = new JLabel(" ") {
+			private static final long serialVersionUID = -119544982967511643L;
+
 			@Override
 			public Dimension getMaximumSize() {
 				Dimension d = super.getMaximumSize();
@@ -228,7 +234,7 @@ public class DfgEditor extends JPanel {
 			errorMessage.setOpaque(true);
 			textEdges.addLineHighlight(line, errorColour);
 		} else {
-			errorMessage.setText("Syntax: node -> \"node with spaces\".");
+			errorMessage.setText("Edge syntax: node -> \"node with spaces\".");
 			errorMessage.setOpaque(false);
 			textEdges.removeAllLineHighlights();
 		}
