@@ -6,8 +6,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -25,7 +23,7 @@ public class EditModelView extends SideWindow {
 
 	private final JPanel panel;
 	private final EfficientTreeEditor treeEditor;
-	private final JComponent dfgEditor;
+	private final DfgEditor dfgEditor;
 
 	private final static String TREEPANEL = "tree panel";
 	private final static String DFGPANEL = "dfg panel";
@@ -42,24 +40,23 @@ public class EditModelView extends SideWindow {
 		treeEditor = new IvMEfficientTreeEditor(null, "Minnig tree...");
 		panel.add(treeEditor, TREEPANEL);
 
-		dfgEditor = new JLabel("Dfg editor coming soon...");
+		dfgEditor = new IvMDfgEditor(null, "Mining directly follows graph...");
 		panel.add(dfgEditor, DFGPANEL);
 	}
 
 	public void setModel(IvMModel model) {
 		if (model.isTree()) {
-			treeEditor.setVisible(false);
 			treeEditor.setTree(model.getTree());
 
 			//show the tree editor
 			CardLayout cl = (CardLayout) panel.getLayout();
 			cl.show(panel, TREEPANEL);
 		} else {
-			//TODO: update dfg editor
+			dfgEditor.setDfg(model.getDfg());
 
 			//show the dfg editor
 			CardLayout cl = (CardLayout) panel.getLayout();
-			cl.show(panel, TREEPANEL);
+			cl.show(panel, DFGPANEL);
 		}
 	}
 
@@ -89,9 +86,65 @@ public class EditModelView extends SideWindow {
 		}
 	}
 
+	public static class IvMDfgEditor extends DfgEditor {
+		private static final long serialVersionUID = -3553121183719500176L;
+
+		public IvMDfgEditor(Dfg dfg, String message) {
+			super(dfg, message);
+
+			IvMDecorator.decorate(labelStartActivities);
+			IvMDecorator.decorate(labelEdges);
+			IvMDecorator.decorate(labelEndActivities);
+
+			IvMDecorator.decorate(textStartActivities);
+			textStartActivities.setBackground(IvMDecorator.buttonColour);
+			textStartActivities.setAntiAliasingEnabled(true);
+			textStartActivities.setBorder(new EmptyBorder(0, 2, 2, 2));
+			textStartActivities.setForeground(IvMDecorator.textColour);
+			textStartActivities.setFont(textStartActivities.getFont().deriveFont(20));
+			textStartActivities.setSelectionColor(IvMDecorator.backGroundColour2);
+			textStartActivities.setSelectedTextColor(IvMDecorator.buttonColour);
+			textStartActivities.setUseSelectedTextColor(true);
+			textStartActivities.setCurrentLineHighlightColor(IvMDecorator.backGroundColour1);
+			textStartActivities.setFadeCurrentLineHighlight(true);
+			textStartActivities.revalidate();
+
+			IvMDecorator.decorate(textEdges);
+			textEdges.setBackground(IvMDecorator.buttonColour);
+			textEdges.setAntiAliasingEnabled(true);
+			textEdges.setBorder(new EmptyBorder(0, 2, 2, 2));
+			textEdges.setForeground(IvMDecorator.textColour);
+			textEdges.setFont(textEdges.getFont().deriveFont(20));
+			textEdges.setSelectionColor(IvMDecorator.backGroundColour2);
+			textEdges.setSelectedTextColor(IvMDecorator.buttonColour);
+			textEdges.setUseSelectedTextColor(true);
+			textEdges.setCurrentLineHighlightColor(IvMDecorator.backGroundColour1);
+			textEdges.setFadeCurrentLineHighlight(true);
+			textEdges.revalidate();
+
+			IvMDecorator.decorate(textEndActivities);
+			textEndActivities.setBackground(IvMDecorator.buttonColour);
+			textEndActivities.setAntiAliasingEnabled(true);
+			textEndActivities.setBorder(new EmptyBorder(0, 2, 2, 2));
+			textEndActivities.setForeground(IvMDecorator.textColour);
+			textEndActivities.setFont(textEndActivities.getFont().deriveFont(20));
+			textEndActivities.setSelectionColor(IvMDecorator.backGroundColour2);
+			textEndActivities.setSelectedTextColor(IvMDecorator.buttonColour);
+			textEndActivities.setUseSelectedTextColor(true);
+			textEndActivities.setCurrentLineHighlightColor(IvMDecorator.backGroundColour1);
+			textEndActivities.setFadeCurrentLineHighlight(true);
+			textEndActivities.revalidate();
+
+			IvMDecorator.decorate(errorMessage);
+
+			setBackground(IvMDecorator.backGroundColour1);
+			setOpaque(true);
+		}
+	}
+
 	public void setMessage(String message) {
 		treeEditor.setMessage(message);
-		//TODO dfgEditor.setMessage(message);
+		dfgEditor.setMessage(message);
 	}
 
 	/**
@@ -104,8 +157,14 @@ public class EditModelView extends SideWindow {
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() instanceof EfficientTree) {
 					e.setSource(new IvMModel(new IvMEfficientTree((EfficientTree) e.getSource())));
-				} else if (e.getSource() instanceof Dfg) {
-					e.setSource(new IvMModel((EfficientTree) e.getSource()));
+				}
+				actionListener.actionPerformed(e);
+			}
+		});
+		dfgEditor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (e.getSource() instanceof Dfg) {
+					e.setSource(new IvMModel((Dfg) e.getSource()));
 				}
 				actionListener.actionPerformed(e);
 			}
