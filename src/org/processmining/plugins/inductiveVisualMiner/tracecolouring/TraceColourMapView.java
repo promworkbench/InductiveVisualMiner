@@ -235,16 +235,16 @@ public class TraceColourMapView extends SideWindow {
 					TraceColourMapSettings.time(attribute, colours, attribute.getTimeMin(), attribute.getTimeMax()));
 		} else if (attribute.isTraceDuration()) {
 			//special virtual attribute: trace duration
-			Color[] colours = TraceColourMapSettings.getColours(maxColours);
 			long min = attribute.getTimeMin();
 			long max = attribute.getTimeMax();
+			Color[] colours = TraceColourMapSettings.getColours(max == min ? 1 : maxColours);
 			updateProperty(colours, min, max, true, false);
 			onUpdate.call(TraceColourMapSettings.duration(colours, min, max));
 		} else if (attribute.isTraceNumberofEvents()) {
 			//special virtual attribute: number of events
-			Color[] colours = TraceColourMapSettings.getColours(maxColours);
 			long min = attribute.getTimeMin();
 			long max = attribute.getTimeMax();
+			Color[] colours = TraceColourMapSettings.getColours((int) Math.min(maxColours, 1 + max - min));
 			updateProperty(colours, min, max, false, false);
 			onUpdate.call(TraceColourMapSettings.numberOfEvents(colours, min, max));
 		}
@@ -252,7 +252,7 @@ public class TraceColourMapView extends SideWindow {
 
 	private void updateProperty(Color[] colours, double min, double max, boolean isDuration, boolean isTime)
 			throws BadLocationException {
-		int numberOfColours = maxColours;
+		int numberOfColours = colours.length;
 
 		//build the example
 		{

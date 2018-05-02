@@ -1,27 +1,27 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import org.processmining.plugins.InductiveMiner.Sextuple;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.ActivityInstanceIterator;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+
 public class QueueMineActivityLog {
 
-	public static TIntObjectMap<QueueActivityLog> mine(IvMEfficientTree tree, IvMLog tLog) {
+	public static TIntObjectMap<QueueActivityLog> mine(IvMModel model, IvMLog tLog) {
 		TIntObjectMap<QueueActivityLog> queueActivityLogs = new TIntObjectHashMap<QueueActivityLog>(10, 0.5f, -1);
 		for (IvMTrace tTrace : tLog) {
-			mine(tree, tTrace, queueActivityLogs);
+			mine(model, tTrace, queueActivityLogs);
 		}
 		return queueActivityLogs;
 	}
 
-	public static void mine(IvMEfficientTree tree, IvMTrace tTrace, TIntObjectMap<QueueActivityLog> timestamps) {
-		ActivityInstanceIterator it = tTrace.activityInstanceIterator(tree);
+	public static void mine(IvMModel model, IvMTrace tTrace, TIntObjectMap<QueueActivityLog> timestamps) {
+		ActivityInstanceIterator it = tTrace.activityInstanceIterator(model);
 		while (it.hasNext()) {
 			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> activityInstance = it.next();
 
@@ -30,10 +30,11 @@ public class QueueMineActivityLog {
 				int node = activityInstance.getA();
 
 				//we are only interested in activity instances according to the parameters
-				if (((activityInstance.getC() != null && activityInstance.getC().getLogTimestamp() != null) || (activityInstance
-						.getD() != null && activityInstance.getD().getLogTimestamp() != null))
-						&& ((activityInstance.getE() != null && activityInstance.getE().getLogTimestamp() != null) || (activityInstance
-								.getF() != null && activityInstance.getF().getLogTimestamp() != null))) {
+				if (((activityInstance.getC() != null && activityInstance.getC().getLogTimestamp() != null)
+						|| (activityInstance.getD() != null && activityInstance.getD().getLogTimestamp() != null))
+						&& ((activityInstance.getE() != null && activityInstance.getE().getLogTimestamp() != null)
+								|| (activityInstance.getF() != null
+										&& activityInstance.getF().getLogTimestamp() != null))) {
 
 					Long initiate = null;
 					Long enqueue = null;

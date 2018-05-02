@@ -15,6 +15,7 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
 import org.processmining.plugins.inductiveVisualMiner.plugins.EfficientTreeAlignmentPlugin.IvMAlignment;
@@ -33,9 +34,10 @@ public class IvMLogVisualisation {
 	public DotPanel fancy(PluginContext context, IvMAlignment alignment) throws UnknownTreeNodeException {
 		ProcessTreeVisualisation visualisation = new ProcessTreeVisualisation();
 		ProcessTreeVisualisationParameters parameters = new ModePathsDeviations().visualisationParameters;
-		IvMLogInfo logInfo = new IvMLogInfo(alignment.log, alignment.tree);
-		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplFrequencies(alignment.tree, logInfo);
-		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> t = visualisation.fancy(alignment.tree, data,
+		IvMLogInfo logInfo = new IvMLogInfo(alignment.log, new IvMModel(alignment.tree));
+		IvMModel model = new IvMModel(alignment.tree);
+		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplFrequencies(model, logInfo);
+		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> t = visualisation.fancy(model, data,
 				parameters);
 
 		return new DotPanel(t.getA());

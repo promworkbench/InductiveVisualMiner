@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
@@ -15,14 +15,13 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 	private final double max;
 	private final Color[] trace2colour;
 	private final Color[] colours;
-	protected final IvMEfficientTree tree;
+	protected final IvMModel model;
 
-	public TraceColourMapProperty(IvMEfficientTree tree, IvMLogNotFiltered log, Color[] colours, double min,
-			double max) {
+	public TraceColourMapProperty(IvMModel model, IvMLogNotFiltered log, Color[] colours, double min, double max) {
 		this.min = min;
 		this.max = max;
 		this.colours = colours;
-		this.tree = tree;
+		this.model = model;
 
 		trace2colour = new Color[log.size()];
 		for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
@@ -32,7 +31,11 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 	}
 
 	protected Color attributeValue2colour(double value) {
-		return colours[(int) (Math.min(colours.length * (value - min) / (max - min), colours.length - 1.0))];
+		if (max != min) {
+			return colours[(int) (Math.min(colours.length * (value - min) / (max - min), colours.length - 1.0))];
+		} else {
+			return colours[0];
+		}
 	}
 
 	/**

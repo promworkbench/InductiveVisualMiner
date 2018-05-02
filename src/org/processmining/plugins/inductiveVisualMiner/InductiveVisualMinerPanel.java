@@ -95,18 +95,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return new InductiveVisualMinerPanel(context, state, miners, enableMining, canceller);
 	}
 
-	@Deprecated
-	public static InductiveVisualMinerPanel panelPro(final PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
-		return new InductiveVisualMinerPanel(context, state, miners, enableMining, canceller);
-	}
-
-	@Deprecated
-	public static InductiveVisualMinerPanel panelBasic(PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, ProMCanceller canceller) {
-		return new InductiveVisualMinerPanel(context, state, miners, true, canceller);
-	}
-
 	private InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
 			VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
 		int gridy = 0;
@@ -341,7 +329,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cAlignmentButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(saveAlignmentButton, cAlignmentButton);
 			}
-			
+
 			{
 				selectionLabel = new JTextArea(" ");
 				selectionLabel.setWrapStyleWord(true);
@@ -555,7 +543,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	public JButton getSaveImageButton() {
 		return saveImageButton;
 	}
-	
+
 	public JButton getSaveAlignmentButton() {
 		return saveAlignmentButton;
 	}

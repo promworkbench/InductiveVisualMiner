@@ -6,9 +6,11 @@ import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
+import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
@@ -17,14 +19,44 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 
 public class AlignmentPerformance {
 
-	public static IvMLogNotFiltered align(IvMEfficientTree tree, XEventPerformanceClassifier performanceClassifier,
+	public static IvMLogNotFiltered align(IvMModel model, XEventPerformanceClassifier performanceClassifier, XLog xLog,
+			XEventClasses activityEventClasses, XEventClasses performanceEventClasses, ProMCanceller canceller)
+			throws Exception {
+		if (model.isTree()) {
+			return alignTree(model, performanceClassifier, xLog, activityEventClasses, performanceEventClasses,
+					canceller);
+		} else {
+			return alignDfg(model, performanceClassifier, xLog, activityEventClasses, performanceEventClasses,
+					canceller);
+		}
+	}
+
+	public static IvMLogNotFiltered alignDfg(IvMModel model, XEventPerformanceClassifier performanceClassifier,
 			XLog xLog, XEventClasses activityEventClasses, XEventClasses performanceEventClasses,
 			ProMCanceller canceller) throws Exception {
 
 		//the event classes are not thread-safe; copy them
 		IvMEventClasses activityEventClasses2 = new IvMEventClasses(activityEventClasses);
 		IvMEventClasses performanceEventClasses2 = new IvMEventClasses(performanceEventClasses);
+
+		//make a Petri net to align
+		AcceptingPetriNet p = Dfg2AcceptingPetriNet.convertForPerformance(model.getDfg());
+
+		//TODO: finish alignments
 		
+		return null;
+	}
+
+	public static IvMLogNotFiltered alignTree(IvMModel model, XEventPerformanceClassifier performanceClassifier,
+			XLog xLog, XEventClasses activityEventClasses, XEventClasses performanceEventClasses,
+			ProMCanceller canceller) throws Exception {
+
+		IvMEfficientTree tree = model.getTree();
+
+		//the event classes are not thread-safe; copy them
+		IvMEventClasses activityEventClasses2 = new IvMEventClasses(activityEventClasses);
+		IvMEventClasses performanceEventClasses2 = new IvMEventClasses(performanceEventClasses);
+
 		//transform tree for performance measurement
 		Triple<ProcessTree, Map<UnfoldedNode, UnfoldedNode>, Set<UnfoldedNode>> t = ExpandProcessTree
 				.expand(tree.getDTree());
@@ -38,10 +70,10 @@ public class AlignmentPerformance {
 
 		ETMAlignment.addAllLeavesAsEventClasses(performanceEventClasses2, performanceTree.getDTree());
 
-		AlignmentCallbackImpl callback = new AlignmentCallbackImpl(tree, performanceTree, xLog,
-				activityEventClasses2, performanceNodeMapping, performanceEventClasses2, nodeId2performanceNode,
-				enqueueTaus);
-		ETMAlignment alignment = new ETMAlignment(performanceTree.getDTree(), xLog, performanceEventClasses2, callback, canceller);
+		AlignmentCallbackImpl callback = new AlignmentCallbackImpl(model, performanceTree, xLog, activityEventClasses2,
+				performanceNodeMapping, performanceEventClasses2, nodeId2performanceNode, enqueueTaus);
+		ETMAlignment alignment = new ETMAlignment(performanceTree.getDTree(), xLog, performanceEventClasses2, callback,
+				canceller);
 		alignment.alignLog();
 
 		if (!canceller.isCancelled()) {
@@ -50,5 +82,4 @@ public class AlignmentPerformance {
 			return null;
 		}
 	}
-
 }

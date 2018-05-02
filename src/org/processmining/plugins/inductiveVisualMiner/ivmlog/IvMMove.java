@@ -4,7 +4,7 @@ import org.deckfour.xes.model.XAttributeMap;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 
 public class IvMMove extends Move {
@@ -13,8 +13,8 @@ public class IvMMove extends Move {
 	private final String resource;
 	private final XAttributeMap attributes;
 
-	public IvMMove(IvMEfficientTree tree, Move move, Long logTimestamp, String resource, XAttributeMap xAttributeMap) {
-		super(tree, move.getType(), move.getTreeNode(), move.getActivityEventClass(), move.getPerformanceEventClass(),
+	public IvMMove(IvMModel model, Move move, Long logTimestamp, String resource, XAttributeMap xAttributeMap) {
+		super(model, move.getType(), move.getTreeNode(), move.getActivityEventClass(), move.getPerformanceEventClass(),
 				move.getLifeCycleTransition());
 		setLogMovePosition(LogMovePosition.beforeChild(move.getLogMoveUnode(), move.getLogMoveBeforeChild()));
 		setLogMoveParallelBranchMappedTo(move.getLogMoveParallelBranchMappedTo());

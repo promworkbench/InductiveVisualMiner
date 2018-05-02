@@ -95,7 +95,7 @@ public class ETMAlignment {
 	/**
 	 * Align a log.
 	 * 
-	 * @param tree
+	 * @param model
 	 * @param log
 	 * @param eventClasses
 	 * @param activity2Cost

@@ -14,7 +14,7 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
@@ -85,11 +85,11 @@ public class TraceView extends SideWindow {
 	 * @param selection
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public void set(IvMEfficientTree tree, IvMLog tlog, Selection selection, TraceColourMap traceColourMap) {
+	public void set(IvMModel model, IvMLog tlog, Selection selection, TraceColourMap traceColourMap) {
 		if (!tlog.equals(showing)) {
 			showing = tlog;
 			traceView.clear();
-			traceView.setTraceBuilder(new TraceBuilderIvMLog(tree, selection, traceColourMap));
+			traceView.setTraceBuilder(new TraceBuilderIvMLog(model, selection, traceColourMap));
 			traceView.addAll((Iterable<Object>) ((Iterable<? extends Object>) tlog));
 		}
 	}

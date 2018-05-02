@@ -9,7 +9,7 @@ import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
@@ -37,10 +37,10 @@ public class ExporterStatistics extends Exporter {
 		assert (state.isPerformanceReady() && state.isAlignmentReady());
 		PerformanceWrapper performance = state.getPerformance();
 		ProcessTreeVisualisationInfo visualisationInfo = state.getVisualisationInfo();
-		IvMEfficientTree tree = state.getTree();
+		IvMModel model = state.getModel();
 		IvMLogInfo logInfo = state.getIvMLogInfoFiltered();
 
-		AlignedLogVisualisationDataImplFrequencies frequencies = new AlignedLogVisualisationDataImplFrequencies(tree,
+		AlignedLogVisualisationDataImplFrequencies frequencies = new AlignedLogVisualisationDataImplFrequencies(model,
 				logInfo);
 
 		PrintWriter w = new PrintWriter(file, "UTF-8");
@@ -50,7 +50,7 @@ public class ExporterStatistics extends Exporter {
 			int node = activityNode.getUnode();
 			long cardinality = frequencies.getNodeLabel(node, false).getB();
 			long modelMoveCardinality = frequencies.getModelMoveEdgeLabel(node).getB();
-			w.print(state.getTree().getActivityName(node));
+			w.print(state.getModel().getActivityName(node));
 			w.print(sep + "occurrences" + sep + cardinality);
 			w.print(sep + "model moves" + sep + modelMoveCardinality);
 

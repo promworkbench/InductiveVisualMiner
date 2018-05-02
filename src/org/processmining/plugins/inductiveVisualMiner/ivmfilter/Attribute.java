@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +10,8 @@ import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XAttributeContinuous;
 import org.deckfour.xes.model.XAttributeDiscrete;
 import org.deckfour.xes.model.XAttributeTimestamp;
+
+import gnu.trove.set.hash.THashSet;
 
 public class Attribute implements Comparable<Attribute> {
 	public enum Type {
@@ -57,8 +57,8 @@ public class Attribute implements Comparable<Attribute> {
 			case undecided :
 				break;
 			case traceNumberOfEvents :
-				valuesNumericMin = Double.MAX_VALUE;
-				valuesNumericMax = Double.MIN_VALUE;
+				valuesTimeMin = Long.MAX_VALUE;
+				valuesTimeMax = Long.MIN_VALUE;
 				break;
 			default :
 				break;

@@ -57,9 +57,9 @@ public class ModePathsService extends Mode {
 
 	protected AlignedLogVisualisationData getFinalVisualisationData(InductiveVisualMinerState state) {
 		if (!state.isPerformanceReady()) {
-			return new AlignedLogVisualisationDataImplFrequencies(state.getTree(), state.getIvMLogInfoFiltered());
+			return new AlignedLogVisualisationDataImplFrequencies(state.getModel(), state.getIvMLogInfoFiltered());
 		}
-		return new AlignedLogVisualisationDataImplService(state.getTree(), state.getPerformance(),
+		return new AlignedLogVisualisationDataImplService(state.getModel(), state.getPerformance(),
 				state.getIvMLogInfoFiltered());
 	}
 }

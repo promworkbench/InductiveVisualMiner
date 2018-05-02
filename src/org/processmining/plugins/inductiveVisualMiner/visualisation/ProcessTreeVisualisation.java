@@ -15,6 +15,8 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
@@ -31,11 +33,12 @@ public class ProcessTreeVisualisation {
 	private ProcessTreeVisualisationInfo info;
 	private TraceViewEventColourMap traceViewColourMap;
 
-	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> fancy(EfficientTree tree,
+	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> fancy(IvMModel model,
 			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters)
 			throws UnknownTreeNodeException {
 		this.parameters = parameters;
 		this.data = data;
+		IvMEfficientTree tree = model.getTree();
 
 		//find maximum and mimimum occurrences
 		Pair<Long, Long> p = data.getExtremeCardinalities();
@@ -46,7 +49,7 @@ public class ProcessTreeVisualisation {
 		dot.setDirection(GraphDirection.leftRight);
 		int root = tree.getRoot();
 
-		traceViewColourMap = new TraceViewEventColourMap(tree);
+		traceViewColourMap = new TraceViewEventColourMap(model);
 
 		//source & sink
 		info = new ProcessTreeVisualisationInfo();

@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.Map;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 
@@ -67,7 +67,7 @@ public class TraceColourMapSettings {
 	 * @param log
 	 * @return
 	 */
-	public TraceColourMap getTraceColourMap(IvMEfficientTree tree, IvMLogNotFiltered log) {
+	public TraceColourMap getTraceColourMap(IvMModel model, IvMLogNotFiltered log) {
 		switch (type) {
 			case attributeNumber :
 				return new TraceColourMapAttributeNumber(log, attribute, colours, min, max);
@@ -78,9 +78,9 @@ public class TraceColourMapSettings {
 			case empty :
 				return new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
 			case propertyNumberOfEvents :
-				return new TraceColourMapPropertyNumberOfEvents(tree, log, colours, min, max);
+				return new TraceColourMapPropertyNumberOfEvents(model, log, colours, min, max);
 			case propertyTraceDuration :
-				return new TraceColourMapPropertyDuration(tree, log, colours, min, max);
+				return new TraceColourMapPropertyDuration(model, log, colours, min, max);
 			default :
 				return new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
 		}
@@ -88,6 +88,8 @@ public class TraceColourMapSettings {
 
 	public static Color[] getColours(int numberOfColours) {
 		switch (numberOfColours) {
+			case 1 :
+				return new Color[] { new Color(224, 236, 244) };
 			case 2 :
 				return new Color[] { new Color(224, 236, 244), new Color(136, 86, 167) };
 			case 3 :

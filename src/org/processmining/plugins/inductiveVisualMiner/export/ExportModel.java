@@ -12,6 +12,8 @@ import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree2AcceptingPetriNet;
 import org.processmining.plugins.InductiveMiner.reduceacceptingpetrinet.ReduceAcceptingPetriNetKeepLanguage;
+import org.processmining.plugins.inductiveVisualMiner.alignment.Dfg2AcceptingPetriNet;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.processtree.ProcessTree;
 
 public class ExportModel {
@@ -37,9 +39,14 @@ public class ExportModel {
 		}
 	}
 
-	public static void exportAcceptingPetriNet(PluginContext context, EfficientTree tree, String name,
+	public static void exportAcceptingPetriNet(PluginContext context, IvMModel model, String name,
 			final ProMCanceller canceller) {
-		AcceptingPetriNet net = EfficientTree2AcceptingPetriNet.convert(tree);
+		AcceptingPetriNet net;
+		if (model.isTree()) {
+			net = EfficientTree2AcceptingPetriNet.convert(model.getTree());
+		} else {
+			net = Dfg2AcceptingPetriNet.convert(model.getDfg());
+		}
 		ReduceAcceptingPetriNetKeepLanguage.reduce(net, new Canceller() {
 			public boolean isCancelled() {
 				return canceller.isCancelled();
@@ -57,10 +64,15 @@ public class ExportModel {
 	/*
 	 * Store Petri net
 	 */
-	public static void exportPetrinet(PluginContext context, EfficientTree tree, String name,
+	public static void exportPetrinet(PluginContext context, IvMModel model, String name,
 			final ProMCanceller canceller) {
+		AcceptingPetriNet pnwm;
+		if (model.isTree()) {
+			pnwm = EfficientTree2AcceptingPetriNet.convert(model.getTree());
+		} else {
+			pnwm = Dfg2AcceptingPetriNet.convert(model.getDfg());
+		}
 
-		AcceptingPetriNet pnwm = EfficientTree2AcceptingPetriNet.convert(tree);
 		ReduceAcceptingPetriNetKeepLanguage.reduce(pnwm, new Canceller() {
 			public boolean isCancelled() {
 				return canceller.isCancelled();

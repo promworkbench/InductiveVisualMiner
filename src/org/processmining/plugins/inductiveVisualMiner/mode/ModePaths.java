@@ -42,6 +42,6 @@ public class ModePaths extends Mode {
 	}
 
 	protected AlignedLogVisualisationData getFinalVisualisationData(InductiveVisualMinerState state) {
-		return new AlignedLogVisualisationDataImplFrequencies(state.getTree(), state.getIvMLogInfoFiltered());
+		return new AlignedLogVisualisationDataImplFrequencies(state.getModel(), state.getIvMLogInfoFiltered());
 	}
 }

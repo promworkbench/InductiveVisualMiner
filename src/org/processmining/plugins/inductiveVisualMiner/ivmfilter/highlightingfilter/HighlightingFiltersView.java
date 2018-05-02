@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersView;
 
@@ -30,7 +30,7 @@ public class HighlightingFiltersView extends IvMFiltersView {
 	 * @param numberOfTraces
 	 */
 	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Selection selection,
-			IvMFiltersController filters, IvMEfficientTree tree) {
+			IvMFiltersController filters, IvMModel model) {
 		//show the user which traces are shown
 
 		StringBuilder result = new StringBuilder();
@@ -39,10 +39,10 @@ public class HighlightingFiltersView extends IvMFiltersView {
 		if (selection.isAnActivitySelected()) {
 			result.append("include ");
 			TIntIterator it = selection.getSelectedActivities().iterator();
-			result.append("'" + tree.getActivityName(it.next()) + "'");
+			result.append("'" + model.getActivityName(it.next()) + "'");
 
 			while (it.hasNext()) {
-				String p = tree.getActivityName(it.next());
+				String p = model.getActivityName(it.next());
 				if (it.hasNext()) {
 					result.append(", `" + p + "'");
 				} else {

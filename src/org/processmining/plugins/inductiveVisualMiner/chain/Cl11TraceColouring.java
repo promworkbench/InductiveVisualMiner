@@ -3,21 +3,21 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 
 public class Cl11TraceColouring
-		extends ChainLink<Triple<IvMEfficientTree, IvMLogNotFiltered, TraceColourMapSettings>, TraceColourMap> {
+		extends ChainLink<Triple<IvMModel, IvMLogNotFiltered, TraceColourMapSettings>, TraceColourMap> {
 
-	protected Triple<IvMEfficientTree, IvMLogNotFiltered, TraceColourMapSettings> generateInput(
+	protected Triple<IvMModel, IvMLogNotFiltered, TraceColourMapSettings> generateInput(
 			InductiveVisualMinerState state) {
-		return Triple.of(state.getTree(), state.getIvMLog(), state.getTraceColourMapSettings());
+		return Triple.of(state.getModel(), state.getIvMLog(), state.getTraceColourMapSettings());
 	}
 
-	protected TraceColourMap executeLink(Triple<IvMEfficientTree, IvMLogNotFiltered, TraceColourMapSettings> input,
+	protected TraceColourMap executeLink(Triple<IvMModel, IvMLogNotFiltered, TraceColourMapSettings> input,
 			IvMCanceller canceller) throws Exception {
 		TraceColourMapSettings settings = input.getC();
 		if (settings == null) {

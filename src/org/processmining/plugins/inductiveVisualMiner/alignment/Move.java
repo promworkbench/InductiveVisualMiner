@@ -4,7 +4,7 @@ import java.awt.Color;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
 
@@ -16,7 +16,7 @@ public class Move implements Event {
 
 	private final Type type;
 	private final int modelNode;
-	private final IvMEfficientTree tree;
+	private final IvMModel model;
 	private final XEventClass activityEventClass;
 	private final XEventClass performanceEventClass;
 	private final PerformanceTransition lifeCycleTransition;
@@ -25,9 +25,9 @@ public class Move implements Event {
 	private int logMoveBeforeChildNode = -1;
 	private int logMoveParallelBranchMappedToNode = -1;
 
-	public Move(IvMEfficientTree tree, Type type, int node, XEventClass activityEventClass,
+	public Move(IvMModel model, Type type, int node, XEventClass activityEventClass,
 			XEventClass performanceEventClass, PerformanceTransition lifeCycle) {
-		this.tree = tree;
+		this.model = model;
 		this.type = type;
 		this.modelNode = node;
 		this.activityEventClass = activityEventClass;
@@ -37,8 +37,8 @@ public class Move implements Event {
 
 	public String toString() {
 		if (isModelSync()) {
-			if (!tree.isTau(getTreeNode())) {
-				return getType() + " " + tree.getActivityName(getTreeNode()) + " " + lifeCycleTransition;
+			if (!model.isTau(getTreeNode())) {
+				return getType() + " " + model.getActivityName(getTreeNode()) + " " + lifeCycleTransition;
 			} else {
 				return getType() + " tau (" + getTreeNode() + ") " + lifeCycleTransition;
 			}
@@ -173,10 +173,10 @@ public class Move implements Event {
 
 	public String getLabel() {
 		if (isModelMove()) {
-			return tree.getActivityName(modelNode);
+			return model.getActivityName(modelNode);
 		}
 
-		if (isSyncMove() && tree.isTau(modelNode)) {
+		if (isSyncMove() && model.isTau(modelNode)) {
 			//tau
 			return "";
 		}
@@ -189,7 +189,7 @@ public class Move implements Event {
 	}
 
 	public String getBottomLabel() {
-		if (isSyncMove() && tree.isTau(modelNode)) {
+		if (isSyncMove() && model.isTau(modelNode)) {
 			return null;
 		} else {
 			return lifeCycleTransition.toString();

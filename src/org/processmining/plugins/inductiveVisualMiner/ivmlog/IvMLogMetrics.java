@@ -8,54 +8,52 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
-import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class IvMLogMetrics {
 
-	public static long getNumberOfTracesRepresented(IvMEfficientTree tree, UnfoldedNode unode, IvMLogInfo logInfo)
+	public static long getNumberOfTracesRepresented(IvMModel model, int node, IvMLogInfo logInfo)
 			throws UnknownTreeNodeException {
-		return getNumberOfTracesRepresented(tree, tree.getIndex(unode), false, logInfo);
+		return getNumberOfTracesRepresented(model, node, false, logInfo);
 	}
 
-	public static long getNumberOfTracesRepresented(IvMEfficientTree tree, int node, IvMLogInfo logInfo)
-			throws UnknownTreeNodeException {
-		return getNumberOfTracesRepresented(tree, node, false, logInfo);
-	}
-
-	public static long getNumberOfTracesRepresented(IvMEfficientTree tree, int node, boolean includeModelMoves,
+	public static long getNumberOfTracesRepresented(IvMModel model, int node, boolean includeModelMoves,
 			IvMLogInfo logInfo) throws UnknownTreeNodeException {
-		if (tree.isTau(node) || tree.isActivity(node)) {
+		if (model.isTau(node) || model.isActivity(node)) {
 			long c = logInfo.getActivities().getCardinalityOf(
-					new Move(tree, Type.synchronousMove, node, null, null, PerformanceTransition.complete));
+					new Move(model, Type.synchronousMove, node, null, null, PerformanceTransition.complete));
 			if (includeModelMoves) {
 				c += getModelMovesLocal(node, logInfo);
 			}
 			return c;
-		} else if (tree.isXor(node)) {
-			//for the xor itself, there are no transitions fired
-			//so, we take the sum of all children
-			long result = 0;
-			for (int child : tree.getChildren(node)) {
-				result += getNumberOfTracesRepresented(tree, child, true, logInfo);
+		} else if (model.isTree()) {
+			IvMEfficientTree tree = model.getTree();
+			if (tree.isXor(node)) {
+				//for the xor itself, there are no transitions fired
+				//so, we take the sum of all children
+				long result = 0;
+				for (int child : tree.getChildren(node)) {
+					result += getNumberOfTracesRepresented(model, child, true, logInfo);
+				}
+				return result;
+			} else if (tree.isSequence(node) || tree.isConcurrent(node) || tree.isInterleaved(node)) {
+				//the sequence has no transitions that can fire
+				//pick the maximum of the children
+				long result = 0;
+				for (int child : tree.getChildren(node)) {
+					result = Math.max(result, getNumberOfTracesRepresented(model, child, true, logInfo));
+				}
+				return result;
+			} else if (tree.isLoop(node)) {
+				//a loop is executed precisely as often as its exit node.
+				//in alignment land, the exit node cannot be skipped
+				return getNumberOfTracesRepresented(model, tree.getChild(node, 2), true, logInfo);
+			} else if (tree.isOr(node)) {
+				//for the OR, there is no way to determine how often it fired just by its children
+				//for now, pick the maximum of the children
+				return logInfo.getNodeExecutions(tree, node);
 			}
-			return result;
-		} else if (tree.isSequence(node) || tree.isConcurrent(node) || tree.isInterleaved(node)) {
-			//the sequence has no transitions that can fire
-			//pick the maximum of the children
-			long result = 0;
-			for (int child : tree.getChildren(node)) {
-				result = Math.max(result, getNumberOfTracesRepresented(tree, child, true, logInfo));
-			}
-			return result;
-		} else if (tree.isLoop(node)) {
-			//a loop is executed precisely as often as its exit node.
-			//in alignment land, the exit node cannot be skipped
-			return getNumberOfTracesRepresented(tree, tree.getChild(node, 2), true, logInfo);
-		} else if (tree.isOr(node)) {
-			//for the OR, there is no way to determine how often it fired just by its children
-			//for now, pick the maximum of the children
-			return logInfo.getNodeExecutions(tree, node);
 		}
 		throw new UnknownTreeNodeException();
 	}
@@ -71,30 +69,37 @@ public class IvMLogMetrics {
 		return new MultiSet<XEventClass>();
 	}
 
-	public static Pair<Long, Long> getExtremes(IvMEfficientTree tree, IvMLogInfo logInfo) {
-		Pair<Long, Long> p = getExtremes(tree, tree.getRoot(), logInfo);
+	public static Pair<Long, Long> getExtremes(IvMModel model, IvMLogInfo logInfo) {
+		if (model.isTree()) {
+			return getExtremesTree(model, logInfo);
+		} else {
+			return getExtremesDfg(model, logInfo);
+		}
+	}
 
-		if (tree.isActivity(tree.getRoot())) {
-			p = Pair.of(
-					Math.min(p.getA(),
-							IvMLogMetrics.getNumberOfTracesRepresented(tree, tree.getRoot(), false, logInfo)),
+	public static Pair<Long, Long> getExtremesTree(IvMModel model, IvMLogInfo logInfo) {
+		Pair<Long, Long> p = getExtremesTree(model, model.getTree().getRoot(), logInfo);
+
+		if (model.isActivity(model.getTree().getRoot())) {
+			p = Pair.of(Math.min(p.getA(),
+					IvMLogMetrics.getNumberOfTracesRepresented(model, model.getTree().getRoot(), false, logInfo)),
 					p.getB());
 		}
 
 		return p;
 	}
 
-	private static Pair<Long, Long> getExtremes(IvMEfficientTree tree, int node, IvMLogInfo logInfo)
+	private static Pair<Long, Long> getExtremesTree(IvMModel model, int node, IvMLogInfo logInfo)
 			throws UnknownTreeNodeException {
-
-		long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(tree, node, true, logInfo);
+		IvMEfficientTree tree = model.getTree();
+		long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, node, true, logInfo);
 		long modelMoves = IvMLogMetrics.getModelMovesLocal(node, logInfo);
 		long min = Math.min(occurrences, modelMoves);
 		long max = Math.max(occurrences, modelMoves);
 
 		if (tree.isOperator(node)) {
 			for (int child : tree.getChildren(node)) {
-				Pair<Long, Long> childResult = getExtremes(tree, child, logInfo);
+				Pair<Long, Long> childResult = getExtremesTree(model, child, logInfo);
 				if (min != -1 && childResult.getLeft() != -1) {
 					min = Math.min(childResult.getLeft(), min);
 				} else if (min == -1) {
@@ -106,4 +111,16 @@ public class IvMLogMetrics {
 
 		return Pair.of(min, max);
 	}
+
+	public static Pair<Long, Long> getExtremesDfg(IvMModel model, IvMLogInfo logInfo) {
+		long min = Long.MAX_VALUE;
+		long max = Long.MIN_VALUE;
+		for (int node : model.getDfg().getActivityIndices()) {
+			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, node, true, logInfo);
+			min = Math.min(min, occurrences);
+			max = Math.max(max, occurrences);
+		}
+		return Pair.of(min, max);
+	}
+
 }

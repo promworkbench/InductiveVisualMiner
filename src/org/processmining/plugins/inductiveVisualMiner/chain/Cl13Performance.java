@@ -2,7 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
@@ -14,21 +14,21 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
-public class Cl13Performance extends ChainLink<Pair<IvMEfficientTree, IvMLog>, PerformanceWrapper> {
+public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, PerformanceWrapper> {
 
-	protected Pair<IvMEfficientTree, IvMLog> generateInput(InductiveVisualMinerState state) {
+	protected Pair<IvMModel, IvMLog> generateInput(InductiveVisualMinerState state) {
 		if (!state.isIllogicalTimeStamps()) {
-			return Pair.of(state.getTree(), (IvMLog) state.getIvMLogFiltered());
+			return Pair.of(state.getModel(), (IvMLog) state.getIvMLogFiltered());
 		} else {
 			return null;
 		}
 	}
 
-	protected PerformanceWrapper executeLink(Pair<IvMEfficientTree, IvMLog> input, IvMCanceller canceller) {
+	protected PerformanceWrapper executeLink(Pair<IvMModel, IvMLog> input, IvMCanceller canceller) {
 		if (input != null) {
-			IvMEfficientTree tree = input.getA();
+			IvMModel model = input.getA();
 			IvMLog log = input.getB();
-			TIntObjectMap<QueueActivityLog> queueActivityLogs = QueueMineActivityLog.mine(tree, log);
+			TIntObjectMap<QueueActivityLog> queueActivityLogs = QueueMineActivityLog.mine(model, log);
 
 			QueueLengths method = new QueueLengthsImplCombination(queueActivityLogs);
 

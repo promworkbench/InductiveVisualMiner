@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import nl.tue.astar.Trace;
-
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.extension.std.XLifecycleExtension;
@@ -15,6 +13,7 @@ import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.etm.model.narytree.replayer.TreeRecord;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredImpl;
@@ -27,6 +26,8 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
 
+import nl.tue.astar.Trace;
+
 /**
  * Keep track of alignment results. This class is slightly more complicated then
  * you'd expect, as it also handles the performance extension.
@@ -37,7 +38,7 @@ import org.processmining.processtree.impl.AbstractTask.Manual;
 public class AlignmentCallbackImpl implements AlignmentCallback {
 
 	//input
-	private final IvMEfficientTree tree;
+	private final IvMModel model;
 	private final IvMEfficientTree performanceTree;
 	private final XLog xLog;
 	private final XEventClasses activityEventClasses;
@@ -49,10 +50,11 @@ public class AlignmentCallbackImpl implements AlignmentCallback {
 	//output
 	private final IvMLogNotFilteredImpl alignedLog;
 
-	public AlignmentCallbackImpl(IvMEfficientTree tree, IvMEfficientTree performanceTree, XLog xLog,
+	public AlignmentCallbackImpl(IvMModel model, IvMEfficientTree performanceTree, XLog xLog,
 			XEventClasses activityEventClasses, Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping,
-			XEventClasses performanceEventClasses, UnfoldedNode[] nodeId2performanceNode, Set<UnfoldedNode> enqueueTaus) {
-		this.tree = tree;
+			XEventClasses performanceEventClasses, UnfoldedNode[] nodeId2performanceNode,
+			Set<UnfoldedNode> enqueueTaus) {
+		this.model = model;
 		this.performanceTree = performanceTree;
 		this.xLog = xLog;
 		this.activityEventClasses = activityEventClasses;
@@ -64,8 +66,7 @@ public class AlignmentCallbackImpl implements AlignmentCallback {
 		alignedLog = new IvMLogNotFilteredImpl(xLog.size());
 	}
 
-	public void traceAlignmentComplete(Trace trace, TreeRecord traceAlignment,
-			int[] xtracesRepresented) {
+	public void traceAlignmentComplete(Trace trace, TreeRecord traceAlignment, int[] xtracesRepresented) {
 
 		//for each XTrace in the log that this aligned trace represents...
 		for (int traceIndex : xtracesRepresented) {
@@ -86,9 +87,9 @@ public class AlignmentCallbackImpl implements AlignmentCallback {
 
 			//walk through the trace and translate moves
 			for (TreeRecord aMove : aTrace) {
-				Move move = getMove(tree, aMove, trace);
+				Move move = getMove(model, aMove, trace);
 				if (move != null) {
-					iTrace.add(move2ivmMove(tree, move, xTrace, aMove.getMovedEvent()));
+					iTrace.add(move2ivmMove(model, move, xTrace, aMove.getMovedEvent()));
 				}
 			}
 
@@ -96,7 +97,7 @@ public class AlignmentCallbackImpl implements AlignmentCallback {
 		}
 	}
 
-	public Move getMove(IvMEfficientTree tree, TreeRecord naryMove, Trace trace) {
+	public Move getMove(IvMModel model, TreeRecord naryMove, Trace trace) {
 		//get log part of move
 		XEventClass performanceActivity = null;
 		XEventClass activity = null;
@@ -124,8 +125,8 @@ public class AlignmentCallbackImpl implements AlignmentCallback {
 					performanceActivity = performanceEventClasses.getByIdentity(unode.getNode().getName() + "+enqueue");
 				} else {
 					lifeCycleTransition = PerformanceTransition.start;
-					performanceActivity = performanceEventClasses.getByIdentity(unode.getNode().getName() + "+"
-							+ XLifecycleExtension.StandardModel.START);
+					performanceActivity = performanceEventClasses
+							.getByIdentity(unode.getNode().getName() + "+" + XLifecycleExtension.StandardModel.START);
 				}
 				activity = activityEventClasses.getByIdentity(unode.getNode().getName());
 			} else if (performanceUnode.getNode() instanceof Automatic) {
@@ -143,33 +144,33 @@ public class AlignmentCallbackImpl implements AlignmentCallback {
 			if (performanceUnode != null && performanceUnode.getNode() instanceof Automatic
 					&& unode.getNode() instanceof Manual) {
 				//tau-start
-				return new Move(tree, Type.ignoredModelMove, tree.getIndex(unode), activity, performanceActivity,
-						lifeCycleTransition);
+				return new Move(model, Type.ignoredModelMove, model.getTree().getIndex(unode), activity,
+						performanceActivity, lifeCycleTransition);
 			} else if ((performanceUnode != null && performanceActivity != null)
 					|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)) {
 				//synchronous move
-				return new Move(tree, Type.synchronousMove, tree.getIndex(unode), activity, performanceActivity,
-						lifeCycleTransition);
+				return new Move(model, Type.synchronousMove, model.getTree().getIndex(unode), activity,
+						performanceActivity, lifeCycleTransition);
 			} else if (performanceUnode != null) {
 				//model move
-				return new Move(tree, Type.modelMove, tree.getIndex(unode), activity, performanceActivity,
+				return new Move(model, Type.modelMove, model.getTree().getIndex(unode), activity, performanceActivity,
 						lifeCycleTransition);
 			} else {
 				//log move
 				if (lifeCycleTransition == PerformanceTransition.complete) {
 					//only log moves of complete events are interesting
-					return new Move(tree, Type.logMove, tree.getIndex(unode), activity, performanceActivity,
+					return new Move(model, Type.logMove, model.getTree().getIndex(unode), activity, performanceActivity,
 							lifeCycleTransition);
 				} else {
 					//log moves of other transitions are ignored
-					return new Move(tree, Type.ignoredLogMove, -1, activity, performanceActivity, lifeCycleTransition);
+					return new Move(model, Type.ignoredLogMove, -1, activity, performanceActivity, lifeCycleTransition);
 				}
 			}
 		}
 		return null;
 	}
 
-	public static IvMMove move2ivmMove(IvMEfficientTree tree, Move move, XTrace trace, int eventIndex) {
+	public static IvMMove move2ivmMove(IvMModel tree, Move move, XTrace trace, int eventIndex) {
 		if (move.isTauStart()) {
 			//tau-start
 			return new IvMMove(tree, move, null, null, null);

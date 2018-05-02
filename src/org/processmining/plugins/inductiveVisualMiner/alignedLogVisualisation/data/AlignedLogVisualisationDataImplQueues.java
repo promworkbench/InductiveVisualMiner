@@ -1,18 +1,17 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data;
 
-import gnu.trove.map.TIntDoubleMap;
-import gnu.trove.map.hash.TIntDoubleHashMap;
-
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+
+import gnu.trove.map.TIntDoubleMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
 public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualisationData {
 
@@ -20,16 +19,15 @@ public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualis
 	private long maxQueueLength;
 	private TIntDoubleMap computedLengths;
 
-	private final IvMEfficientTree tree;
+	private final IvMModel model;
 	private final PerformanceWrapper queueLengths;
 
 	private final AlignedLogVisualisationData dataForEdges;
 
-	public AlignedLogVisualisationDataImplQueues(IvMEfficientTree tree, PerformanceWrapper queueLengths,
-			IvMLogInfo logInfo) {
-		this.tree = tree;
+	public AlignedLogVisualisationDataImplQueues(IvMModel model, PerformanceWrapper queueLengths, IvMLogInfo logInfo) {
+		this.model = model;
 		this.queueLengths = queueLengths;
-		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(tree, logInfo);
+		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(model, logInfo);
 		setTime(0);
 	}
 
@@ -39,8 +37,8 @@ public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualis
 		minQueueLength = Long.MAX_VALUE;
 		maxQueueLength = Long.MIN_VALUE;
 		{
-			for (int node : EfficientTreeUtils.getAllNodes(tree)) {
-				if (tree.isActivity(node)) {
+			for (int node : model.getAllNodes()) {
+				if (model.isActivity(node)) {
 					double l = queueLengths.getQueueLength(node, time);
 					computedLengths.put(node, l);
 					if (l > maxQueueLength) {

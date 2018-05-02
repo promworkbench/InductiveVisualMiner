@@ -1,16 +1,16 @@
 package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data;
 
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 
 public class AlignedLogVisualisationDataImplService extends AlignedLogVisualisationDataImplSojourn {
 
-	public AlignedLogVisualisationDataImplService(IvMEfficientTree tree, PerformanceWrapper queueLengths,
+	public AlignedLogVisualisationDataImplService(IvMModel model, PerformanceWrapper queueLengths,
 			IvMLogInfo logInfo) {
-		super(tree, queueLengths, logInfo);
+		super(model, queueLengths, logInfo);
 	}
 
 	@Override

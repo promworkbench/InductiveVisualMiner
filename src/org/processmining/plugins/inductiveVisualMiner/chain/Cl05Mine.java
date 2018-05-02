@@ -1,33 +1,33 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.plugins.InductiveMiner.Quadruple;
+import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
+import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
-import org.processmining.processtree.ProcessTree;
 
-public class Cl05Mine extends
-		ChainLink<Quadruple<IvMEfficientTree, IMLog, VisualMinerWrapper, VisualMinerParameters>, IvMEfficientTree> {
+public class Cl05Mine
+		extends ChainLink<Quintuple<IvMModel, IMLog, IMLogInfo, VisualMinerWrapper, VisualMinerParameters>, IvMModel> {
 
-	protected Quadruple<IvMEfficientTree, IMLog, VisualMinerWrapper, VisualMinerParameters> generateInput(
+	protected Quintuple<IvMModel, IMLog, IMLogInfo, VisualMinerWrapper, VisualMinerParameters> generateInput(
 			InductiveVisualMinerState state) {
 		VisualMinerParameters minerParameters = new VisualMinerParameters(state.getPaths());
-		return Quadruple.of(state.getPreMinedTree(), state.getActivityFilteredIMLog(), state.getMiner(),
-				minerParameters);
+		return Quintuple.of(state.getPreMinedTree(), state.getActivityFilteredIMLog(),
+				state.getActivityFilteredIMLogInfo(), state.getMiner(), minerParameters);
 	}
 
-	protected IvMEfficientTree executeLink(
-			Quadruple<IvMEfficientTree, IMLog, VisualMinerWrapper, VisualMinerParameters> input, IvMCanceller canceller)
-			throws UnknownTreeNodeException {
+	protected IvMModel executeLink(
+			Quintuple<IvMModel, IMLog, IMLogInfo, VisualMinerWrapper, VisualMinerParameters> input,
+			IvMCanceller canceller) throws UnknownTreeNodeException {
 		if (input.getA() == null) {
 			//mine a new tree
-			ProcessTree tree = input.getC().mine(input.getB(), input.getD(), canceller);
+			IvMModel tree = input.getD().mine(input.getB(), input.getC(), input.getE(), canceller);
 			if (tree != null) {
-				return new IvMEfficientTree(tree);
+				return tree;
 			} else {
 				assert (canceller.isCancelled());
 				return null;
@@ -38,13 +38,13 @@ public class Cl05Mine extends
 		}
 	}
 
-	protected void processResult(IvMEfficientTree result, InductiveVisualMinerState state) {
-		state.setTree(result);
+	protected void processResult(IvMModel result, InductiveVisualMinerState state) {
+		state.setModel(result);
 		state.setSelection(new Selection());
 	}
 
 	protected void invalidateResult(InductiveVisualMinerState state) {
-		state.setTree(null);
+		state.setModel(null);
 		state.setSelection(new Selection());
 	}
 

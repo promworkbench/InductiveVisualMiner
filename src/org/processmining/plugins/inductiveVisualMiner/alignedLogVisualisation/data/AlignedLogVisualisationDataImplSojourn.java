@@ -6,7 +6,7 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
@@ -20,10 +20,10 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 
 	protected final AlignedLogVisualisationData dataForEdges;
 
-	public AlignedLogVisualisationDataImplSojourn(IvMEfficientTree tree, PerformanceWrapper queueLengths,
+	public AlignedLogVisualisationDataImplSojourn(IvMModel model, PerformanceWrapper queueLengths,
 			IvMLogInfo logInfo) {
 		this.queueLengths = queueLengths;
-		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(tree, logInfo);
+		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(model, logInfo);
 
 		//compute extreme sojourn times
 		minQueueLength = Long.MAX_VALUE;

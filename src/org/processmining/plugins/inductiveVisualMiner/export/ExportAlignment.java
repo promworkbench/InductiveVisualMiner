@@ -11,8 +11,8 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.framework.plugin.PluginContext;
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -23,7 +23,7 @@ public class ExportAlignment {
 		modelView, logView, both
 	}
 
-	public static void exportAlignment(PluginContext context, IvMLog log, EfficientTree tree, String name, Type type) {
+	public static void exportAlignment(PluginContext context, IvMLog log, IvMModel model, String name, Type type) {
 
 		XFactory factory = new XFactoryNaiveImpl();
 
@@ -35,7 +35,7 @@ public class ExportAlignment {
 
 			for (IvMMove event : trace) {
 
-				boolean include = !event.isTauStart() && !(event.isSyncMove() && tree.isTau(event.getTreeNode()));
+				boolean include = !event.isTauStart() && !(event.isSyncMove() && model.isTau(event.getTreeNode()));
 				switch (type) {
 					case both :
 						break;
@@ -57,7 +57,7 @@ public class ExportAlignment {
 
 					if (!event.isLogMove()) {
 						xEvent.getAttributes().put("concept:name", factory.createAttributeLiteral("concept:name",
-								tree.getActivityName(event.getTreeNode()), null));
+								model.getActivityName(event.getTreeNode()), null));
 						xEvent.getAttributes().put("lifecycle:transition", factory.createAttributeLiteral(
 								"lifecycle:transition", event.getLifeCycleTransition().name(), null));
 					}

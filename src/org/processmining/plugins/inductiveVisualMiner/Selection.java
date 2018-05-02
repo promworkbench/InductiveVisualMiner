@@ -1,19 +1,18 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import java.util.Set;
+
+import org.processmining.plugins.graphviz.dot.DotElement;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
-
-import java.util.Set;
-
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
-import org.processmining.plugins.graphviz.dot.DotElement;
-import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
-import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
-import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 
 public class Selection {
 
@@ -37,7 +36,7 @@ public class Selection {
 		this.treeNodesOfSelectedModelEdges = new TIntHashSet(selectedTaus);
 	}
 
-	public boolean isSelected(EfficientTree tree, Move move) {
+	public boolean isSelected(IvMModel model, Move move) {
 		if (move.isIgnoredLogMove() || move.isIgnoredModelMove() || !move.isComplete()) {
 			return false;
 		}
@@ -47,14 +46,15 @@ public class Selection {
 		if (move.isLogMove() && logMovePositionsOfSelectedLogMoveEdges.contains(LogMovePosition.of(move))) {
 			return true;
 		}
-		if (!move.isSyncMove() && move.isModelMove() && treeNodesOfSelectedModelMoveEdges.contains(move.getTreeNode())) {
+		if (!move.isSyncMove() && move.isModelMove()
+				&& treeNodesOfSelectedModelMoveEdges.contains(move.getTreeNode())) {
 			return true;
 		}
 
 		if (move.isSyncMove()) {
 			for (TIntIterator it = treeNodesOfSelectedModelEdges.iterator(); it.hasNext();) {
 				int selectedEdgeUnode = it.next();
-				if (EfficientTreeUtils.isParentOf(tree, selectedEdgeUnode, move.getTreeNode())) {
+				if (model.isParentOf(selectedEdgeUnode, move.getTreeNode())) {
 					return true;
 				}
 			}

@@ -1,9 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper;
 
 import org.processmining.framework.plugin.annotations.KeepInProMCache;
+import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
-import org.processmining.processtree.ProcessTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
 @KeepInProMCache
 @VisualMinerWrapperAnnotation
@@ -22,25 +23,28 @@ public abstract class VisualMinerWrapper implements Comparable<VisualMinerWrappe
 	 * @return
 	 */
 	public abstract String toString();
-	
+
 	/**
-	 * Perform the mining. Will be called asynchronously, so should be thread-safe.
+	 * Perform the mining. Will be called asynchronously, so should be
+	 * thread-safe.
+	 * 
 	 * @param log
 	 * @param parameters
-	 * @param canceller 
+	 * @param canceller
 	 * @return
 	 */
-	public abstract ProcessTree mine(IMLog log, VisualMinerParameters parameters, IvMCanceller canceller);
+	public abstract IvMModel mine(IMLog log, IMLogInfo logInfo, VisualMinerParameters parameters,
+			IvMCanceller canceller);
 
 	public int compareTo(VisualMinerWrapper o) {
 		return this.toString().compareTo(o.toString());
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return toString().hashCode();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof VisualMinerWrapper) {

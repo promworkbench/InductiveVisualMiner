@@ -1,11 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.map.TIntLongMap;
-import gnu.trove.map.hash.TIntLongHashMap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +11,13 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.alignment.PositionLogMoves;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.TIntLongMap;
+import gnu.trove.map.hash.TIntLongHashMap;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class IvMLogInfo {
 
@@ -41,7 +42,7 @@ public class IvMLogInfo {
 		nodeExecutions = new TIntLongHashMap(10, 0.5f, -1, 0);
 	}
 
-	public IvMLogInfo(IvMLog log, IvMEfficientTree tree) {
+	public IvMLogInfo(IvMLog log, IvMModel model) {
 		modelMoves = new TIntLongHashMap(10, 0.5f, -1, 0);
 		unlabeledLogMoves = new MultiSet<String>();
 		activities = new MultiSet<>();
@@ -77,14 +78,17 @@ public class IvMLogInfo {
 				 */
 
 				if (move.isModelSync()) {
-					processEnteringExitingNodes(tree, lastModelSyncNode, move.getTreeNode(), inParallelNodes);
+					if (model.isTree()) {
+						processEnteringExitingNodes(model.getTree(), lastModelSyncNode, move.getTreeNode(),
+								inParallelNodes);
+					}
 					lastModelSyncNode = move.getTreeNode();
 				}
 			}
 
 			//position the log moves
 			if (traceContainsLogMove) {
-				positionLogMoves.position(tree, tree.getRoot(), trace);
+				positionLogMoves.position(model, trace);
 			}
 		}
 		logMoves = positionLogMoves.getLogMoves();
@@ -110,7 +114,8 @@ public class IvMLogInfo {
 		return nodeExecutions.get(node);
 	}
 
-	private void processEnteringExitingNodes(IvMEfficientTree tree, int lastNode, int newNode, TIntSet inParallelNodes) {
+	private void processEnteringExitingNodes(IvMEfficientTree tree, int lastNode, int newNode,
+			TIntSet inParallelNodes) {
 
 		int lowestCommonParent = tree.getRoot();
 		if (lastNode != -1) {

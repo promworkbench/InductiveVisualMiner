@@ -3,7 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.animation;
 import java.util.List;
 
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
@@ -63,7 +63,8 @@ public class Animation {
 		return null;
 	}
 
-	public static LocalDotEdge getDotEdgeFromLogMove(LogMovePosition logMovePosition, ProcessTreeVisualisationInfo info) {
+	public static LocalDotEdge getDotEdgeFromLogMove(LogMovePosition logMovePosition,
+			ProcessTreeVisualisationInfo info) {
 		for (LocalDotEdge edge : info.getAllLogMoveEdges()) {
 			if (logMovePosition.equals(LogMovePosition.of(edge))) {
 				return edge;
@@ -73,15 +74,15 @@ public class Animation {
 	}
 
 	public static class Input {
-		public final IvMEfficientTree tree;
+		public final IvMModel model;
 		public final boolean showDeviations;
 		public final ShortestPathGraph shortestPath;
 		public final ProcessTreeVisualisationInfo info;
 		public final Scaler scaler;
 
-		public Input(IvMEfficientTree tree, boolean showDeviations, ShortestPathGraph shortestPath,
+		public Input(IvMModel model, boolean showDeviations, ShortestPathGraph shortestPath,
 				ProcessTreeVisualisationInfo info, Scaler scaler) {
-			this.tree = tree;
+			this.model = model;
 			this.showDeviations = showDeviations;
 			this.shortestPath = shortestPath;
 			this.info = info;

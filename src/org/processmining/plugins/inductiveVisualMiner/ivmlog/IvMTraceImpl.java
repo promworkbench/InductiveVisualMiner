@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import org.deckfour.xes.model.XAttributeMap;
 import org.processmining.plugins.InductiveMiner.Sextuple;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
 
 public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
@@ -118,19 +118,19 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 		}
 	}
 
-	public ActivityInstanceIterator activityInstanceIterator(IvMEfficientTree tree) {
-		return new ActivityInstanceIterator(tree);
+	public ActivityInstanceIterator activityInstanceIterator(IvMModel model) {
+		return new ActivityInstanceIterator(model);
 	}
 
-	public class ActivityInstanceIterator implements
-			Iterator<Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove>> {
+	public class ActivityInstanceIterator
+			implements Iterator<Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove>> {
 
 		private EventIterator it = eventIterator();
 		private BitSet visited = new BitSet(size());
-		private IvMEfficientTree tree;
+		private IvMModel model;
 
-		public ActivityInstanceIterator(IvMEfficientTree tree) {
-			this.tree = tree;
+		public ActivityInstanceIterator(IvMModel model) {
+			this.model = model;
 		}
 
 		public boolean hasNext() {
@@ -156,7 +156,7 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 					int unode = tMove.getTreeNode();
 
 					//for initiate, find the last sequential complete
-					IvMMove initiate = getLastSequentialComplete(tree, unode);
+					IvMMove initiate = getLastSequentialComplete(model, unode);
 
 					//walk through the trace, until the corresponding complete is found
 					EventIterator it2 = it.cloneOneBack();
@@ -171,8 +171,8 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 								case complete :
 
 									//this activity instance is finished
-									Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> result = Sextuple.of(
-											unode, tMove2.getResource(), initiate, enqueue, start, tMove2);
+									Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> result = Sextuple
+											.of(unode, tMove2.getResource(), initiate, enqueue, start, tMove2);
 
 									return result;
 								case start :
@@ -195,13 +195,21 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 			return null;
 		}
 
-		public IvMMove getLastSequentialComplete(IvMEfficientTree tree, int unode) {
+		public IvMMove getLastSequentialComplete(IvMModel model, int unode) {
 			EventIterator itBack = it.cloneOneBack();
 			while (itBack.hasPrevious()) {
 				IvMMove m = itBack.previous();
-				if (m.isModelSync() && !(tree.isTau(m.getTreeNode())) && m.isComplete()
-						&& !TreeUtils.areParallel(tree.getUnfoldedNode(unode), tree.getUnfoldedNode(m.getTreeNode()))) {
-					return m;
+				if (model.isTree()) {
+					if (m.isModelSync() && !(model.isTau(m.getTreeNode())) && m.isComplete()
+							&& !TreeUtils.areParallel(model.getTree().getUnfoldedNode(unode),
+									model.getTree().getUnfoldedNode(m.getTreeNode()))) {
+						return m;
+					}
+				} else {
+					//in a dfg, every two nodes are sequential
+					if (m.isModelSync() && m.isComplete()) {
+						return m;
+					}
 				}
 			}
 			return null;

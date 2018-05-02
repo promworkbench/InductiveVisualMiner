@@ -1,22 +1,24 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
+import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
+
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 public class PositionLogMoves {
 	private THashMap<LogMovePosition, MultiSet<XEventClass>> logMoves = new THashMap<>();
 
-	public void position(IvMEfficientTree tree, int root, List<IvMMove> trace) {
+	public void position(IvMModel model, List<IvMMove> trace) {
 		/**
 		 * First, strip the ignored moves from the trace
 		 */
@@ -26,7 +28,43 @@ public class PositionLogMoves {
 				newTrace.add(move);
 			}
 		}
-		positionLogMovesRoot(tree, root, root, newTrace, 1);
+
+		if (model.isTree()) {
+			positionLogMovesRoot(model.getTree(), model.getTree().getRoot(), model.getTree().getRoot(), newTrace, 1);
+		} else {
+			positionLogMovesDfg(model.getDfg(), newTrace, 1);
+		}
+	}
+
+	private void positionLogMovesDfg(Dfg dfg, List<IvMMove> trace, long cardinality) {
+		if (trace.isEmpty()) {
+			return;
+		}
+
+		int previousActivity = -1;
+		int nextActivity = findNextActivityAfter(trace, previousActivity);
+
+		for (int i = 0; i < trace.size(); i++) {
+			Move move = trace.get(i);
+			if (move.isLogMove()) {
+				addLogMove(move, previousActivity, nextActivity, move.getActivityEventClass(), cardinality);
+			}
+
+			if (move.isComplete() && move.isModelSync()) {
+				previousActivity = nextActivity;
+				nextActivity = findNextActivityAfter(trace, nextActivity);
+			}
+		}
+	}
+
+	private int findNextActivityAfter(List<IvMMove> trace, int position) {
+		for (int i = position + 1; i < trace.size(); i++) {
+			Move move = trace.get(i);
+			if (move.isModelSync()) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	/**
@@ -69,13 +107,13 @@ public class PositionLogMoves {
 		}
 
 		//recurse on the subtrace
-		positionLogMoves(tree, continueOn, subtrace, cardinality);
+		positionLogMovesTree(tree, continueOn, subtrace, cardinality);
 	}
 
 	/*
 	 * Invariant: the first and the last move of the trace are not log moves.
 	 */
-	private void positionLogMoves(IvMEfficientTree tree, int node, List<IvMMove> trace, long cardinality) {
+	private void positionLogMovesTree(IvMEfficientTree tree, int node, List<IvMMove> trace, long cardinality) {
 		//debug(" process trace " + trace + " on " + unode);
 
 		assert (trace.get(0).isModelSync() && !trace.get(0).isIgnoredLogMove() && !trace.get(0).isIgnoredModelMove());
@@ -100,7 +138,7 @@ public class PositionLogMoves {
 			//find the child that this grandchild belongs to
 			int child = EfficientTreeUtils.getChildWith(tree, node, trace.get(0).getTreeNode());
 
-			positionLogMoves(tree, child, trace, cardinality);
+			positionLogMovesTree(tree, child, trace, cardinality);
 
 		} else if (tree.isSequence(node)) {
 			splitSequence(tree, node, trace, cardinality);
@@ -163,7 +201,7 @@ public class PositionLogMoves {
 					//we are leaving the last child with this move
 
 					//recurse on the subtrace up till now
-					positionLogMoves(tree, lastSeenChild, subTrace, cardinality);
+					positionLogMovesTree(tree, lastSeenChild, subTrace, cardinality);
 
 					//the log moves we have seen now are external to both subtraces; position them on this unode
 					for (IvMMove logMove : logMoves) {
@@ -179,7 +217,7 @@ public class PositionLogMoves {
 		}
 
 		//recurse on subtrace
-		positionLogMoves(tree, lastSeenChild, subTrace, cardinality);
+		positionLogMovesTree(tree, lastSeenChild, subTrace, cardinality);
 
 		//the log moves we have seen now are external to both subtraces; position them on this unode
 		for (Move logMove : logMoves) {
@@ -214,7 +252,7 @@ public class PositionLogMoves {
 					//we are leaving the last child with this move
 
 					//recurse on the subtrace up till now
-					positionLogMoves(tree, lastSeenChild, subTrace, cardinality);
+					positionLogMovesTree(tree, lastSeenChild, subTrace, cardinality);
 
 					//the log moves we have seen now are external to both subtraces; position them on this unode
 					for (IvMMove logMove : logMoves) {
@@ -239,7 +277,7 @@ public class PositionLogMoves {
 		}
 
 		//recurse on subtrace
-		positionLogMoves(tree, lastSeenChild, subTrace, cardinality);
+		positionLogMovesTree(tree, lastSeenChild, subTrace, cardinality);
 
 		//the log moves we have seen now are external to both subtraces; position them on the end of this unode
 		for (Move logMove : logMoves) {

@@ -1,10 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.visualisation;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +10,11 @@ import java.util.Set;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
+
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
 
 public class ProcessTreeVisualisationInfo {
 	private final Set<LocalDotNode> nodes;
@@ -31,7 +31,7 @@ public class ProcessTreeVisualisationInfo {
 	private final Set<LocalDotEdge> allLogMoveEdges;
 	private final Set<LocalDotEdge> allModelMoveEdges;
 	private final Set<LocalDotEdge> allTauEdges;
-	
+
 	private final Map<LocalDotNode, LocalDotNode> join2split;
 
 	public ProcessTreeVisualisationInfo() {
@@ -47,7 +47,7 @@ public class ProcessTreeVisualisationInfo {
 		allLogMoveEdges = new THashSet<>();
 		allModelMoveEdges = new THashSet<>();
 		allTauEdges = new THashSet<>();
-		
+
 		join2split = new THashMap<>();
 	}
 
@@ -69,7 +69,7 @@ public class ProcessTreeVisualisationInfo {
 		}
 
 		nodes.add(node);
-		
+
 		if (correspondingSplit != null) {
 			join2split.put(node, correspondingSplit);
 		}
@@ -88,7 +88,7 @@ public class ProcessTreeVisualisationInfo {
 				}
 				modelEdges.get(unode1).add(edge);
 				allModelEdges.add(edge);
-				if (tree.isTau(unode1)) {
+				if (tree != null && tree.isTau(unode1)) {
 					allTauEdges.add(edge);
 				}
 				break;

@@ -1,9 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.visualisation;
 
-import gnu.trove.map.hash.THashMap;
-
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotNode;
+
+import gnu.trove.map.hash.THashMap;
 
 public class LocalDotNode extends DotNode {
 

@@ -16,6 +16,7 @@ import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentPerformance;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
@@ -67,7 +68,7 @@ public class EfficientTreeAlignmentPlugin {
 		XEventClasses performanceEventClasses = XLogInfoFactory.createLogInfo(log, performanceClassifier)
 				.getEventClasses();
 
-		return AlignmentPerformance.align(tree, performanceClassifier, log, activityEventClasses,
+		return AlignmentPerformance.align(new IvMModel(tree), performanceClassifier, log, activityEventClasses,
 				performanceEventClasses, canceller);
 	}
 }

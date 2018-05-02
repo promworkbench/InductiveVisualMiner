@@ -3,7 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 import java.util.List;
 
 import org.deckfour.xes.model.XAttributeMap;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.ActivityInstanceIterator;
 
 public interface IvMTrace extends List<IvMMove> {
@@ -14,6 +14,7 @@ public interface IvMTrace extends List<IvMMove> {
 	 * @return
 	 */
 	public String getName();
+
 	/**
 	 * 
 	 * @return start time of the trace in user time. This includes fading-in of
@@ -50,7 +51,7 @@ public interface IvMTrace extends List<IvMMove> {
 
 	public XAttributeMap getAttributes();
 
-	public ActivityInstanceIterator activityInstanceIterator(IvMEfficientTree tree);
-	
+	public ActivityInstanceIterator activityInstanceIterator(IvMModel model);
+
 	public int getNumberOfEvents();
 }

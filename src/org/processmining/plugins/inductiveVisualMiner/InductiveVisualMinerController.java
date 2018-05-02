@@ -21,7 +21,6 @@ import org.deckfour.xes.extension.std.XConceptExtension;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
@@ -52,7 +51,7 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterStatistics;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
@@ -236,13 +235,13 @@ public class InductiveVisualMinerController {
 			mine.setOnComplete(new Runnable() {
 				public void run() {
 					panel.getSaveModelButton().setEnabled(true);
-					panel.getEditModelView().getEditor().setTree(state.getTree());
+					panel.getEditModelView().setModel(state.getModel());
 				}
 			});
 			mine.setOnInvalidate(new Runnable() {
 				public void run() {
 					panel.getSaveModelButton().setEnabled(false);
-					panel.getEditModelView().getEditor().setMessage("Mining tree...");
+					panel.getEditModelView().setMessage("Mining tree...");
 					state.setSelection(new Selection());
 				}
 			});
@@ -280,7 +279,7 @@ public class InductiveVisualMinerController {
 			align.setOnComplete(new Runnable() {
 				public void run() {
 					panel.getSaveAlignmentButton().setEnabled(true);
-					panel.getTraceView().set(state.getTree(), state.getIvMLog(), state.getSelection(),
+					panel.getTraceView().set(state.getModel(), state.getIvMLog(), state.getSelection(),
 							state.getTraceColourMap());
 
 					state.getFiltersController().updateFiltersWithIvMLog(panel, state.getIvMLog(),
@@ -418,10 +417,10 @@ public class InductiveVisualMinerController {
 				public void run() {
 
 					HighlightingFiltersView.updateSelectionDescription(panel, state.getSelection(),
-							state.getFiltersController(), state.getTree());
+							state.getFiltersController(), state.getModel());
 
 					//tell trace view the colour map and the selection
-					panel.getTraceView().set(state.getTree(), state.getIvMLogFiltered(), state.getSelection(),
+					panel.getTraceView().set(state.getModel(), state.getIvMLogFiltered(), state.getSelection(),
 							state.getTraceColourMap());
 
 					try {
@@ -578,11 +577,10 @@ public class InductiveVisualMinerController {
 		});
 
 		//model editor
-		panel.getEditModelView().getEditor().addActionListener(new ActionListener() {
+		panel.getEditModelView().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (e.getSource() instanceof EfficientTree) {
-					EfficientTree tree = (EfficientTree) e.getSource();
-					state.setTree(new IvMEfficientTree(tree));
+				if (e.getSource() instanceof IvMModel) {
+					state.setModel((IvMModel) e.getSource());
 					chain.execute(Cl06LayoutModel.class);
 					chain.execute(Cl07Align.class);
 				}
@@ -649,9 +647,20 @@ public class InductiveVisualMinerController {
 
 				//store the resulting Process tree or Petri net
 				String name = XConceptExtension.instance().extractName(state.getSortedXLog());
-				IvMEfficientTree tree = state.getTree();
+				IvMModel model = state.getModel();
 
-				Object[] options = { "Petri net", "Accepting Petri net", "Process tree", "Efficient tree" };
+				Object[] options;
+				if (model.isTree()) {
+					options = new Object[4];
+					options[0] = "Petri net";
+					options[1] = "Accepting Petri net";
+					options[2] = "Process Tree";
+					options[3] = "Efficient tree";
+				} else {
+					options = new Object[2];
+					options[0] = "Petri net";
+					options[1] = "Accepting Petri net";
+				}
 
 				int n = JOptionPane.showOptionDialog(panel,
 						"As what would you like to save the model?\nIt will become available in ProM.", "Save",
@@ -660,16 +669,16 @@ public class InductiveVisualMinerController {
 				switch (n) {
 					case 0 :
 						//store as Petri net
-						ExportModel.exportPetrinet(context, tree, name, canceller);
+						ExportModel.exportPetrinet(context, model, name, canceller);
 						break;
 					case 1 :
-						ExportModel.exportAcceptingPetriNet(context, tree, name, canceller);
+						ExportModel.exportAcceptingPetriNet(context, model, name, canceller);
 						break;
 					case 2 :
-						ExportModel.exportProcessTree(context, tree.getDTree(), name);
+						ExportModel.exportProcessTree(context, model.getTree().getDTree(), name);
 						break;
 					case 3 :
-						ExportModel.exportEfficientTree(context, tree, name);
+						ExportModel.exportEfficientTree(context, model.getTree(), name);
 						break;
 				}
 			}
@@ -703,7 +712,7 @@ public class InductiveVisualMinerController {
 
 				String name = XConceptExtension.instance().extractName(state.getSortedXLog());
 				IvMLog log = state.getIvMLogFiltered();
-				EfficientTree tree = state.getTree();
+				IvMModel model = state.getModel();
 
 				Object[] options = { "Log view", "Model view", "Both" };
 				int n = JOptionPane.showOptionDialog(panel,
@@ -713,13 +722,13 @@ public class InductiveVisualMinerController {
 
 				switch (n) {
 					case 0 :
-						ExportAlignment.exportAlignment(context, log, tree, name, Type.logView);
+						ExportAlignment.exportAlignment(context, log, model, name, Type.logView);
 						break;
 					case 1 :
-						ExportAlignment.exportAlignment(context, log, tree, name, Type.modelView);
+						ExportAlignment.exportAlignment(context, log, model, name, Type.modelView);
 						break;
 					case 2 :
-						ExportAlignment.exportAlignment(context, log, tree, name, Type.both);
+						ExportAlignment.exportAlignment(context, log, model, name, Type.both);
 						break;
 				}
 			}
@@ -851,7 +860,7 @@ public class InductiveVisualMinerController {
 	 */
 	public void updateHighlighting() throws UnknownTreeNodeException {
 		TraceViewEventColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(
-				panel.getGraph().getSVG(), state.getVisualisationInfo(), state.getTree(), state.getVisualisationData(),
+				panel.getGraph().getSVG(), state.getVisualisationInfo(), state.getModel(), state.getVisualisationData(),
 				state.getMode().getVisualisationParameters(state));
 		colourMap.setSelectedNodes(state.getSelection());
 		panel.getTraceView().setEventColourMap(colourMap);

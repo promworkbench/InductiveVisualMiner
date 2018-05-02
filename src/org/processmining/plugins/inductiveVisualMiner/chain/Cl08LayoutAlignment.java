@@ -9,7 +9,7 @@ import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisation;
@@ -19,23 +19,23 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import com.kitfox.svg.SVGDiagram;
 
 public class Cl08LayoutAlignment extends
-		ChainLink<Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap>> {
+		ChainLink<Quadruple<IvMModel, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap>> {
 
-	protected Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> generateInput(
+	protected Quadruple<IvMModel, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> generateInput(
 			InductiveVisualMinerState state) {
-		return Quadruple.of(state.getTree(), state.getIvMLogInfoFiltered(),
+		return Quadruple.of(state.getModel(), state.getIvMLogInfoFiltered(),
 				state.getMode().getVisualisationParameters(state), state.getGraphUserSettings());
 	}
 
 	protected Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap> executeLink(
-			Quadruple<IvMEfficientTree, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> input,
+			Quadruple<IvMModel, IvMLogInfo, ProcessTreeVisualisationParameters, DotPanelUserSettings> input,
 			IvMCanceller canceller) throws UnknownTreeNodeException {
-		IvMEfficientTree tree = input.getA();
+		IvMModel model = input.getA();
 
 		//compute dot
 		ProcessTreeVisualisation visualiser = new ProcessTreeVisualisation();
-		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplFrequencies(tree, input.getB());
-		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> p = visualiser.fancy(tree, data,
+		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplFrequencies(model, input.getB());
+		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> p = visualiser.fancy(model, data,
 				input.getC());
 
 		//keep the user settings of the dot panel

@@ -8,7 +8,7 @@ import java.util.Random;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
@@ -25,7 +25,7 @@ public class ComputeAnimation {
 	public static final double animationDuration = 180;
 	private static Random random = new Random(123);
 
-	public static GraphVizTokens computeAnimation(IvMEfficientTree tree, final IvMLog ivmLog, final Mode colourMode,
+	public static GraphVizTokens computeAnimation(IvMModel model, final IvMLog ivmLog, final Mode colourMode,
 			final ProcessTreeVisualisationInfo info, final Scaler scaler, final SVGDiagram svg,
 			final IvMCanceller canceller) throws NoninvertibleTransformException, SVGException {
 
@@ -44,7 +44,7 @@ public class ComputeAnimation {
 			IvMTrace ivmTrace = it.next();
 
 			//make dot tokens
-			final List<DotToken> dotTokens = computeDotTokensOfTrace(tree, ivmTrace, info, colourMode, scaler, graph,
+			final List<DotToken> dotTokens = computeDotTokensOfTrace(model, ivmTrace, info, colourMode, scaler, graph,
 					canceller);
 
 			if (canceller.isCancelled()) {
@@ -68,7 +68,7 @@ public class ComputeAnimation {
 		return graphVizTokens;
 	}
 
-	public static List<DotToken> computeDotTokensOfTrace(IvMEfficientTree tree, IvMTrace trace,
+	public static List<DotToken> computeDotTokensOfTrace(IvMModel model, IvMTrace trace,
 			final ProcessTreeVisualisationInfo info, final Mode colourMode, Scaler scaler, ShortestPathGraph graph,
 			final IvMCanceller canceller) {
 		boolean showDeviations = colourMode.isShowDeviations();
@@ -79,8 +79,8 @@ public class ComputeAnimation {
 			trace.setEndTime(guessEndTime(trace, trace.getStartTime(), graph, info, scaler));
 
 			//compute the tokens of this trace
-			tokens.add(IvMTrace2dotToken2.trace2token(tree, trace, showDeviations, graph, info, scaler));
-			IvMTrace2dotToken2.trace2token(tree, trace, showDeviations, graph, info, scaler);
+			tokens.add(IvMTrace2dotToken2.trace2token(model, trace, showDeviations, graph, info, scaler));
+			IvMTrace2dotToken2.trace2token(model, trace, showDeviations, graph, info, scaler);
 		} catch (Exception e) {
 			//for the demo, just ignore this case
 			e.printStackTrace();

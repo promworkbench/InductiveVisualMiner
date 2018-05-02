@@ -27,11 +27,11 @@ public class PopupPopulator {
 			DotElement element = panel.getGraph().getMouseInElements().iterator().next();
 			if (element instanceof LocalDotNode) {
 				int unode = ((LocalDotNode) element).getUnode();
-				if (state.isAlignmentReady() && state.getTree().isActivity(unode)) {
+				if (state.isAlignmentReady() && state.getModel().isActivity(unode)) {
 					List<String> popup = new ArrayList<>();
 
 					//frequencies
-					popup.add("number of occurrences " + IvMLogMetrics.getNumberOfTracesRepresented(state.getTree(),
+					popup.add("number of occurrences " + IvMLogMetrics.getNumberOfTracesRepresented(state.getModel(),
 							unode, false, state.getIvMLogInfoFiltered()));
 
 					//waiting time
@@ -136,7 +136,7 @@ public class PopupPopulator {
 					List<String> popup = new ArrayList<>();
 					popup.add(IvMLogMetrics.getModelMovesLocal(node, state.getIvMLogInfoFiltered())
 							+ " times, activity ");
-					popup.add(StringUtils.abbreviate(state.getTree().getActivityName(edge.getUnode()), 40));
+					popup.add(StringUtils.abbreviate(state.getModel().getActivityName(edge.getUnode()), 40));
 					popup.add("was not executed.");
 
 					panel.getGraph().setPopupActivity(popup, -1);

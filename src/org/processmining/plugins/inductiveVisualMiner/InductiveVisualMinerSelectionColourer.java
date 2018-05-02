@@ -7,7 +7,6 @@ import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
@@ -16,7 +15,7 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
@@ -92,10 +91,10 @@ public class InductiveVisualMinerSelectionColourer {
 	}
 
 	public static TraceViewEventColourMap colourHighlighting(SVGDiagram svg, ProcessTreeVisualisationInfo info,
-			IvMEfficientTree tree, AlignedLogVisualisationData data,
+			IvMModel model, AlignedLogVisualisationData data,
 			ProcessTreeVisualisationParameters visualisationParameters) throws UnknownTreeNodeException {
 
-		TraceViewEventColourMap traceViewColourMap = new TraceViewEventColourMap(tree);
+		TraceViewEventColourMap traceViewColourMap = new TraceViewEventColourMap(model);
 
 		//compute extreme cardinalities
 		Pair<Long, Long> extremes = data.getExtremeCardinalities();
@@ -104,18 +103,18 @@ public class InductiveVisualMinerSelectionColourer {
 
 		try {
 			//style nodes
-			for (int unode : EfficientTreeUtils.getAllNodes(tree)) {
+			for (int unode : model.getAllNodes()) {
 				Triple<String, Long, Long> cardinality = data.getNodeLabel(unode, false);
-				Pair<Color, Color> colour = styleUnfoldedNode(tree, unode, svg, info, cardinality, minCardinality,
+				Pair<Color, Color> colour = styleUnfoldedNode(model, unode, svg, info, cardinality, minCardinality,
 						maxCardinality, visualisationParameters);
 
-				if (tree.isActivity(unode)) {
+				if (model.isActivity(unode)) {
 					traceViewColourMap.set(unode, colour.getA(), colour.getB());
 				}
 			}
 
 			//style edges
-			styleEdges(tree, svg, info, data, visualisationParameters, traceViewColourMap, minCardinality,
+			styleEdges(model, svg, info, data, visualisationParameters, traceViewColourMap, minCardinality,
 					maxCardinality);
 
 		} catch (SVGException e) {
@@ -125,20 +124,20 @@ public class InductiveVisualMinerSelectionColourer {
 		return traceViewColourMap;
 	}
 
-	public static Pair<Color, Color> styleUnfoldedNode(IvMEfficientTree tree, int unode, SVGDiagram svg,
+	public static Pair<Color, Color> styleUnfoldedNode(IvMModel model, int unode, SVGDiagram svg,
 			ProcessTreeVisualisationInfo info, Triple<String, Long, Long> cardinality, long minCardinality,
 			long maxCardinality, ProcessTreeVisualisationParameters visualisationParameters) throws SVGException {
-		if (tree.isActivity(unode)) {
-			return styleManual(tree, unode, svg, info, cardinality, minCardinality, maxCardinality,
+		if (model.isActivity(unode)) {
+			return styleManual(model, unode, svg, info, cardinality, minCardinality, maxCardinality,
 					visualisationParameters);
 		} else {
-			styleNonManualNode(tree, unode, svg, info, cardinality);
+			styleNonManualNode(model, unode, svg, info, cardinality);
 			return null;
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Pair<Color, Color> styleManual(IvMEfficientTree tree, int unode, SVGDiagram svg,
+	private static Pair<Color, Color> styleManual(IvMModel model, int unode, SVGDiagram svg,
 			ProcessTreeVisualisationInfo info, Triple<String, Long, Long> cardinality, long minCardinality,
 			long maxCardinality, ProcessTreeVisualisationParameters visualisationParameters) throws SVGException {
 
@@ -181,8 +180,8 @@ public class InductiveVisualMinerSelectionColourer {
 		return Pair.of(fillColour, fontColour);
 	}
 
-	private static void styleNonManualNode(IvMEfficientTree tree, int node, SVGDiagram svg,
-			ProcessTreeVisualisationInfo info, Triple<String, Long, Long> cardinality) {
+	private static void styleNonManualNode(IvMModel model, int node, SVGDiagram svg, ProcessTreeVisualisationInfo info,
+			Triple<String, Long, Long> cardinality) {
 		//colour non-activity nodes
 		for (LocalDotNode dotNode : info.getNodes(node)) {
 			if (cardinality.getB() > 0) {
@@ -193,15 +192,15 @@ public class InductiveVisualMinerSelectionColourer {
 		}
 	}
 
-	private static void styleEdges(IvMEfficientTree tree, SVGDiagram svg, ProcessTreeVisualisationInfo info,
+	private static void styleEdges(IvMModel model, SVGDiagram svg, ProcessTreeVisualisationInfo info,
 			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters,
 			TraceViewEventColourMap traceViewColourMap, long minCardinality, long maxCardinality)
 			throws SVGException, UnknownTreeNodeException {
-		styleModelEdges(tree, svg, info, data, parameters, traceViewColourMap, minCardinality, maxCardinality);
+		styleModelEdges(model, svg, info, data, parameters, traceViewColourMap, minCardinality, maxCardinality);
 		styleMoveEdges(svg, info, data, parameters, minCardinality, maxCardinality);
 	}
 
-	private static void styleModelEdges(IvMEfficientTree tree, SVGDiagram svg, ProcessTreeVisualisationInfo info,
+	private static void styleModelEdges(IvMModel model, SVGDiagram svg, ProcessTreeVisualisationInfo info,
 			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters,
 			TraceViewEventColourMap traceViewColourMap, long minCardinality, long maxCardinality)
 			throws SVGException, UnknownTreeNodeException {
@@ -210,7 +209,7 @@ public class InductiveVisualMinerSelectionColourer {
 			Color edgeColour = styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality,
 					parameters.getColourModelEdges(), parameters.isShowFrequenciesOnModelEdges(),
 					parameters.getModelEdgesWidth());
-			if (tree.isTau(dotEdge.getUnode())) {
+			if (model.isTau(dotEdge.getUnode())) {
 				traceViewColourMap.set(dotEdge.getUnode(), edgeColour, edgeColour);
 			}
 		}

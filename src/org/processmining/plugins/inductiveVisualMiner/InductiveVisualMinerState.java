@@ -23,6 +23,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -52,8 +53,8 @@ public class InductiveVisualMinerState {
 		this.xLog = xLog;
 		miningParameters = new MiningParametersIMf();
 		if (preMinedTree != null) {
-			this.tree = new IvMEfficientTree(preMinedTree);
-			this.preMinedTree = this.tree;
+			this.model = new IvMModel(new IvMEfficientTree(preMinedTree));
+			this.preMinedTree = this.model;
 		}
 	}
 
@@ -208,8 +209,8 @@ public class InductiveVisualMinerState {
 	private MiningParameters miningParameters;
 	private VisualMinerWrapper miner = new Miner();
 	private double paths = 0.8;
-	private IvMEfficientTree tree = null;
-	private IvMEfficientTree preMinedTree = null;
+	private IvMModel model = null;
+	private IvMModel preMinedTree = null;
 
 	public MiningParameters getMiningParameters2() {
 		return miningParameters;
@@ -235,15 +236,15 @@ public class InductiveVisualMinerState {
 		this.paths = paths;
 	}
 
-	public IvMEfficientTree getTree() {
-		return tree;
+	public IvMModel getModel() {
+		return model;
 	}
 
-	public synchronized void setTree(IvMEfficientTree tree) {
-		this.tree = tree;
+	public synchronized void setModel(IvMModel model) {
+		this.model = model;
 	}
 
-	public IvMEfficientTree getPreMinedTree() {
+	public IvMModel getPreMinedTree() {
 		return preMinedTree;
 	}
 

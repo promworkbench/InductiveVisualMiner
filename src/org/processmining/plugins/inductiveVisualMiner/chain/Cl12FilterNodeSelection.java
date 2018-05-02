@@ -6,7 +6,7 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
@@ -15,23 +15,23 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class Cl12FilterNodeSelection extends
-		ChainLink<Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMEfficientTree>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
+		ChainLink<Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMModel>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
 
-	protected Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMEfficientTree> generateInput(
+	protected Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMModel> generateInput(
 			InductiveVisualMinerState state) {
 		return Quintuple.of(state.getIvMLog(), state.getSelection(), state.getFiltersController(),
-				state.getIvMLogInfo(), state.getTree());
+				state.getIvMLogInfo(), state.getModel());
 	}
 
 	protected Pair<IvMLogFilteredImpl, IvMLogInfo> executeLink(
-			Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMEfficientTree> input,
+			Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMModel> input,
 			IvMCanceller canceller) {
 
 		IvMLogNotFiltered logBase = input.getA();
 		Selection selection = input.getB();
 		IvMFiltersController highLightingFilters = input.getC();
 		IvMLogInfo oldLogInfo = input.getD();
-		IvMEfficientTree tree = input.getE();
+		IvMModel model = input.getE();
 
 		IvMLogFilteredImpl logFiltered = new IvMLogFilteredImpl(logBase);
 
@@ -40,13 +40,13 @@ public class Cl12FilterNodeSelection extends
 
 		//apply node/edge selection filters
 		if (selection.isSomethingSelected()) {
-			filterOnSelection(tree, logFiltered, selection);
+			filterOnSelection(model, logFiltered, selection);
 		}
 
 		//create a log info
 		IvMLogInfo resultLogInfo = oldLogInfo;
 		if (logFiltered.isSomethingFiltered()) {
-			resultLogInfo = new IvMLogInfo(logFiltered, tree);
+			resultLogInfo = new IvMLogInfo(logFiltered, model);
 		}
 		return Pair.of(logFiltered, resultLogInfo);
 	}
@@ -72,7 +72,7 @@ public class Cl12FilterNodeSelection extends
 	 * @param selectedNodes
 	 * @param selectedLogMoves
 	 */
-	private static void filterOnSelection(IvMEfficientTree tree, IvMLogFilteredImpl log, Selection selection) {
+	private static void filterOnSelection(IvMModel tree, IvMLogFilteredImpl log, Selection selection) {
 
 		for (Iterator<IvMTrace> it = log.iterator(); it.hasNext();) {
 			IvMTrace trace = it.next();
@@ -90,7 +90,7 @@ public class Cl12FilterNodeSelection extends
 
 		}
 	}
-	
+
 	public String getName() {
 		return "highlight selection";
 	}
