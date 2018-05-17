@@ -3,6 +3,8 @@ package org.processmining.plugins.inductiveVisualMiner.editModel;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
@@ -76,7 +78,27 @@ public class DfgParser {
 			XEventClass target = registerActivity(map, nodiser.getLastActivity());
 			dfg.addActivity(target);
 
-			dfg.addDirectlyFollowsEdge(source, target, 1);
+			long cardinality;
+			if (nodiser.nextNode()) {
+				if (nodiser.getLastNodeType() == NodeType.multiplicitySymbol) {
+					//multiplicity coming
+					if (!nodiser.nextNode() || nodiser.getLastNodeType() != NodeType.activity) {
+						return Pair.of(nodiser.getLastLineNumber(), "Expected a cardinality (number).");
+					}
+					String number = nodiser.getLastActivity();
+					if (!NumberUtils.isParsable(number) || StringUtils.contains(number, ".")) {
+						return Pair.of(nodiser.getLastLineNumber(), "Expected a cardinality (number).");
+					}
+					cardinality = Long.parseLong(number);
+				} else {
+					nodiser.pushBack();
+					cardinality = 1;
+				}
+			} else {
+				cardinality = 1;
+			}
+
+			dfg.addDirectlyFollowsEdge(source, target, cardinality);
 		}
 
 		return Pair.of(-1, null);

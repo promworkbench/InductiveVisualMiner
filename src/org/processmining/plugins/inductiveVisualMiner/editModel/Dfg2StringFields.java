@@ -30,6 +30,10 @@ public class Dfg2StringFields {
 			result.append(escapeNode(dfg.getDirectlyFollowsEdgeSource(edge).getId()));
 			result.append(" -> ");
 			result.append(escapeNode(dfg.getDirectlyFollowsEdgeTarget(edge).getId()));
+			if (dfg.getDirectlyFollowsEdgeCardinality(edge) > 1) {
+				result.append(" -x- ");
+				result.append(dfg.getDirectlyFollowsEdgeCardinality(edge));
+			}
 			result.append("\n");
 		}
 		return result.toString();

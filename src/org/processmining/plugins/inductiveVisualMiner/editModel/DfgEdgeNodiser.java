@@ -19,7 +19,7 @@ public class DfgEdgeNodiser {
 	private int lastLineNumber;
 
 	public enum NodeType {
-		activity, edgeSymbol;
+		activity, edgeSymbol, multiplicitySymbol;
 	}
 
 	public DfgEdgeNodiser(String string) {
@@ -83,6 +83,9 @@ public class DfgEdgeNodiser {
 			switch (activityName) {
 				case "->" :
 					lastNodeType = NodeType.edgeSymbol;
+					return true;
+				case "-x-" :
+					lastNodeType = NodeType.multiplicitySymbol;
 					return true;
 				default :
 					lastNodeType = NodeType.activity;

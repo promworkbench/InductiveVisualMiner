@@ -234,7 +234,7 @@ public class DfgEditor extends JPanel {
 			errorMessage.setOpaque(true);
 			textEdges.addLineHighlight(line, errorColour);
 		} else {
-			errorMessage.setText("Edge syntax: node -> \"node with spaces\".");
+			errorMessage.setText("Edge syntax: node -> \"node with spaces\" -x- cardinality.");
 			errorMessage.setOpaque(false);
 			textEdges.removeAllLineHighlights();
 		}
