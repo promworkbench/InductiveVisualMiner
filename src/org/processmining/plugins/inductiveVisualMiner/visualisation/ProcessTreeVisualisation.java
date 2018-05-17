@@ -46,7 +46,7 @@ public class ProcessTreeVisualisation {
 		this.data = data;
 		IvMEfficientTree tree = model.getTree();
 
-		//find maximum and mimimum occurrences
+		//find maximum and minimum occurrences
 		Pair<Long, Long> p = data.getExtremeCardinalities();
 		minCardinality = p.getLeft();
 		maxCardinality = p.getRight();

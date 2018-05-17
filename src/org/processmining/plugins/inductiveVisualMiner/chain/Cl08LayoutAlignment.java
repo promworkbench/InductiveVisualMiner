@@ -12,6 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.DfgVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
@@ -33,10 +34,15 @@ public class Cl08LayoutAlignment extends
 		IvMModel model = input.getA();
 
 		//compute dot
-		ProcessTreeVisualisation visualiser = new ProcessTreeVisualisation();
 		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplFrequencies(model, input.getB());
-		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> p = visualiser.fancy(model, data,
-				input.getC());
+		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> p;
+		if (model.isTree()) {
+			ProcessTreeVisualisation visualiser = new ProcessTreeVisualisation();
+			p = visualiser.fancy(model, data, input.getC());
+		} else {
+			DfgVisualisation visualiser = new DfgVisualisation();
+			p = visualiser.fancy(model, data, input.getC());
+		}
 
 		//keep the user settings of the dot panel
 		input.getD().applyToDot(p.getA());

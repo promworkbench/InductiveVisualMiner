@@ -45,7 +45,7 @@ public class ExportModel {
 		if (model.isTree()) {
 			net = EfficientTree2AcceptingPetriNet.convert(model.getTree());
 		} else {
-			net = Dfg2AcceptingPetriNet.convert(model.getDfg());
+			net = Dfg2AcceptingPetriNet.convertForPerformance(model.getDfg()).getA();
 		}
 		ReduceAcceptingPetriNetKeepLanguage.reduce(net, new Canceller() {
 			public boolean isCancelled() {

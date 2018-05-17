@@ -11,7 +11,7 @@ import nl.tue.astar.Trace;
  *
  */
 
-public interface AlignmentCallback {
+public interface ETMAlignmentCallback {
 
 	/**
 	 * Called each time a trace is finished. Must be thread safe, as may be

@@ -35,7 +35,7 @@ import nl.tue.astar.Trace;
  * @author sleemans
  *
  */
-public class AlignmentCallbackImpl implements AlignmentCallback {
+public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 
 	//input
 	private final IvMModel model;
@@ -50,7 +50,7 @@ public class AlignmentCallbackImpl implements AlignmentCallback {
 	//output
 	private final IvMLogNotFilteredImpl alignedLog;
 
-	public AlignmentCallbackImpl(IvMModel model, IvMEfficientTree performanceTree, XLog xLog,
+	public ETMAlignmentCallbackImpl(IvMModel model, IvMEfficientTree performanceTree, XLog xLog,
 			XEventClasses activityEventClasses, Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping,
 			XEventClasses performanceEventClasses, UnfoldedNode[] nodeId2performanceNode,
 			Set<UnfoldedNode> enqueueTaus) {

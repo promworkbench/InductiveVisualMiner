@@ -8,6 +8,8 @@ import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.framework.plugin.ProMCanceller;
+import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
+import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -16,6 +18,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
+
+import gnu.trove.map.TObjectIntMap;
 
 public class AlignmentPerformance {
 
@@ -40,11 +44,19 @@ public class AlignmentPerformance {
 		IvMEventClasses performanceEventClasses2 = new IvMEventClasses(performanceEventClasses);
 
 		//make a Petri net to align
-		AcceptingPetriNet p = Dfg2AcceptingPetriNet.convertForPerformance(model.getDfg());
+		Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p = Dfg2AcceptingPetriNet
+				.convertForPerformance(model.getDfg());
 
-		//TODO: finish alignments
-		
-		return null;
+		AcceptingPetriNetAlignment.addAllLeavesAsEventClasses(performanceEventClasses2, p.getA());
+		AcceptingPetriNetAlignmentCallback callback = new AcceptingPetriNetAlignmentCallbackImpl(xLog, model,
+				activityEventClasses2, p);
+		AcceptingPetriNetAlignment.align(model.getDfg(), p, xLog, performanceEventClasses2, callback, canceller);
+
+		if (!canceller.isCancelled()) {
+			return callback.getAlignedLog();
+		} else {
+			return null;
+		}
 	}
 
 	public static IvMLogNotFiltered alignTree(IvMModel model, XEventPerformanceClassifier performanceClassifier,
@@ -70,8 +82,9 @@ public class AlignmentPerformance {
 
 		ETMAlignment.addAllLeavesAsEventClasses(performanceEventClasses2, performanceTree.getDTree());
 
-		AlignmentCallbackImpl callback = new AlignmentCallbackImpl(model, performanceTree, xLog, activityEventClasses2,
-				performanceNodeMapping, performanceEventClasses2, nodeId2performanceNode, enqueueTaus);
+		ETMAlignmentCallbackImpl callback = new ETMAlignmentCallbackImpl(model, performanceTree, xLog,
+				activityEventClasses2, performanceNodeMapping, performanceEventClasses2, nodeId2performanceNode,
+				enqueueTaus);
 		ETMAlignment alignment = new ETMAlignment(performanceTree.getDTree(), xLog, performanceEventClasses2, callback,
 				canceller);
 		alignment.alignLog();

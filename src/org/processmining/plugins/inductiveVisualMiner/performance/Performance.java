@@ -54,6 +54,8 @@ public class Performance {
 			s = s.substring(0, s.lastIndexOf("+start"));
 		} else if (s.endsWith("+complete")) {
 			s = s.substring(0, s.lastIndexOf("+complete"));
+		} else if (s.endsWith("+enqueue")) {
+			s = s.substring(0, s.lastIndexOf("+enqueue"));
 		} else if (s.contains("+")) {
 			s = s.substring(0, s.lastIndexOf("+"));
 		}
@@ -62,7 +64,7 @@ public class Performance {
 
 	public static String timeToString(long length) {
 		return (length / 86400000) + "d" + " " + String.format("%02d", (length / 3600000) % 24) + ":"
-				+ String.format("%02d", (length / 60000) % 60) + ":" + String.format("%02d", (length / 1000) % 60)
-				+ ":" + String.format("%03d", length % 1000);
+				+ String.format("%02d", (length / 60000) % 60) + ":" + String.format("%02d", (length / 1000) % 60) + ":"
+				+ String.format("%03d", length % 1000);
 	}
 }

@@ -5,9 +5,9 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
-public class DfgMiner extends VisualMinerWrapper {
+// public class DfgMiner extends VisualMinerWrapper {
+public class DfgMiner {
 
 	public String toString() {
 		return "directly-follows miner";

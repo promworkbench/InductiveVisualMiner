@@ -58,7 +58,7 @@ public class ETMAlignment {
 	private final int[] node2cost;
 	private final Map<XEventClass, Integer> activity2Cost;
 	private final XLog log;
-	private final AlignmentCallback callback;
+	private final ETMAlignmentCallback callback;
 
 	private final AtomicInteger tracesStarted;
 
@@ -72,7 +72,7 @@ public class ETMAlignment {
 	 * @param callback
 	 * @param canceller2
 	 */
-	public ETMAlignment(final ProcessTree tree, XLog log, IvMEventClasses eventClasses, AlignmentCallback callback,
+	public ETMAlignment(final ProcessTree tree, XLog log, IvMEventClasses eventClasses, ETMAlignmentCallback callback,
 			final ProMCanceller canceller2) {
 		wasReliable = new AtomicBoolean(true);
 		this.canceller = new Canceller() {
