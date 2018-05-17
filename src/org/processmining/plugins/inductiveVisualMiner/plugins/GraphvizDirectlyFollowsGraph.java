@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.plugins;
 import java.util.HashMap;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
@@ -23,17 +22,26 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 
 public class GraphvizDirectlyFollowsGraph {
 
-	@Plugin(name = "Graphviz directly follows graph visualisation", returnLabels = { "Dot visualization" }, returnTypes = { JComponent.class }, parameterLabels = { "Process Tree" }, userAccessible = true)
+	@Plugin(name = "Graphviz directly follows graph visualisation", returnLabels = {
+			"Dot visualization" }, returnTypes = {
+					JComponent.class }, parameterLabels = { "Process Tree" }, userAccessible = true)
 	@Visualizer
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Display directly follows graph", requiredParameterLabels = { 0 })
-	public JComponent visualize(PluginContext context, Dfg dfg) {
+	public DotPanel visualise(PluginContext context, Dfg dfg) {
+		return visualise(dfg);
+	}
 
-		if (dfg.getDirectlyFollowsGraph().getVertices().length > 50) {
-			return new JPanel();
+	public static DotPanel visualise(Dfg dfg) {
+		Dot dot;
+		if (dfg.getNumberOfActivities() > 50) {
+			dot = new Dot();
+			dot.addNode("Graphs with more than 50 nodes are not visualised to prevent hanging...");
+		} else {
+			dot = dfg2Dot(dfg, true);
 		}
 
-		return new DotPanel(dfg2Dot(dfg, true));
+		return new DotPanel(dot);
 	}
 
 	public static Dot dfg2Dot(Dfg dfg, boolean includeParalelEdges) {
@@ -57,26 +65,21 @@ public class GraphvizDirectlyFollowsGraph {
 			//determine node colour using start and end activities
 			if (dfg.isStartActivity(activity) && dfg.isEndActivity(activity)) {
 				node.setOption("style", "filled");
-				node.setOption(
-						"fillcolor",
-						ColourMap.toHexString(ColourMaps.colourMapGreen(dfg.getStartActivityCardinality(activity),
-								startMax))
-								+ ":"
-								+ ColourMap.toHexString(ColourMaps.colourMapRed(
-										dfg.getEndActivityCardinality(activity), endMax)));
+				node.setOption("fillcolor",
+						ColourMap.toHexString(
+								ColourMaps.colourMapGreen(dfg.getStartActivityCardinality(activity), startMax)) + ":"
+								+ ColourMap.toHexString(
+										ColourMaps.colourMapRed(dfg.getEndActivityCardinality(activity), endMax)));
 			} else if (dfg.isStartActivity(activity)) {
 				node.setOption("style", "filled");
-				node.setOption(
-						"fillcolor",
-						ColourMap.toHexString(ColourMaps.colourMapGreen(dfg.getStartActivityCardinality(activity),
-								startMax)) + ":white");
+				node.setOption("fillcolor",
+						ColourMap.toHexString(
+								ColourMaps.colourMapGreen(dfg.getStartActivityCardinality(activity), startMax))
+								+ ":white");
 			} else if (dfg.isEndActivity(activity)) {
 				node.setOption("style", "filled");
-				node.setOption(
-						"fillcolor",
-						"white:"
-								+ ColourMap.toHexString(ColourMaps.colourMapRed(
-										dfg.getEndActivityCardinality(activity), endMax)));
+				node.setOption("fillcolor", "white:" + ColourMap
+						.toHexString(ColourMaps.colourMapRed(dfg.getEndActivityCardinality(activity), endMax)));
 			}
 		}
 
