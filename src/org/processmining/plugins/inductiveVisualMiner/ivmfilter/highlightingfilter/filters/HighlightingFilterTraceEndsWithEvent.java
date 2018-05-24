@@ -44,7 +44,7 @@ public class HighlightingFilterTraceEndsWithEvent extends HighlightingFilter {
 		if (trace.size() == 0) {
 			return false;
 		}
-		for (int i = trace.size(); i > 0; i--) {
+		for (int i = trace.size() - 1; i > 0; i--) {
 			IvMMove event = trace.get(i);
 			if (event.isComplete()) {
 				if (attribute.isLiteral()) {
