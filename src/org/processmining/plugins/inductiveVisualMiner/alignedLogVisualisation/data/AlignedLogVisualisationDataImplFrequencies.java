@@ -33,6 +33,11 @@ public class AlignedLogVisualisationDataImplFrequencies implements AlignedLogVis
 		long cardinality = IvMLogMetrics.getNumberOfTracesRepresented(model, unode, includeModelMoves, logInfo);
 		return Pair.of(String.valueOf(cardinality), cardinality);
 	}
+	
+	public Pair<String, Long> getEdgeLabel(int from, int to, boolean includeModelMoves) throws UnknownTreeNodeException {
+		long cardinality = IvMLogMetrics.getNumberOfTracesRepresented(model, from, to, includeModelMoves, logInfo);
+		return Pair.of(String.valueOf(cardinality), cardinality);
+	}
 
 	public Pair<String, Long> getModelMoveEdgeLabel(int unode) {
 		long cardinality = IvMLogMetrics.getModelMovesLocal(unode, logInfo);

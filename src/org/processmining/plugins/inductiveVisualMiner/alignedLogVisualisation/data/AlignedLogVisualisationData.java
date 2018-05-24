@@ -26,6 +26,8 @@ public interface AlignedLogVisualisationData {
 	 */
 	public Triple<String, Long, Long> getNodeLabel(int node, boolean includeModelMoves) throws UnknownTreeNodeException;
 
+	public Pair<String, Long> getEdgeLabel(int from, int to, boolean includeModelMoves) throws UnknownTreeNodeException;
+	
 	public Pair<String, Long> getEdgeLabel(int node, boolean includeModelMoves) throws UnknownTreeNodeException;
 
 	public Pair<String, Long> getModelMoveEdgeLabel(int node);

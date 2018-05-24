@@ -67,36 +67,38 @@ public class DfgVisualisation {
 
 			LocalDotNode from = info.getActivityDotNode(sourceActivity);
 			LocalDotNode to = info.getActivityDotNode(targetActivity);
-			addArc(from, to, targetActivity, true, false);
+			addArc(from, to, sourceActivity, targetActivity, true, false);
 		}
 
 		/**
 		 * Start activities
 		 */
 		for (int node : dfg.getStartActivityIndices()) {
-			addArc(source, info.getActivityDotNode(node), node, true, false);
+			addArc(source, info.getActivityDotNode(node), -1, node, true, false);
 		}
 
 		/**
 		 * End activities
 		 */
 		for (int node : dfg.getEndActivityIndices()) {
-			addArc(info.getActivityDotNode(node), sink, node, true, false);
+			addArc(info.getActivityDotNode(node), sink, node, -1, true, false);
 		}
 
 		return Triple.of(dot, info, traceViewColourMap);
 	}
 
-	private LocalDotEdge addArc(final LocalDotNode from, final LocalDotNode to, final int node,
+	private LocalDotEdge addArc(final LocalDotNode from, final LocalDotNode to, final int fromNode, int toNode,
 			boolean directionForward, boolean includeModelMoves) throws UnknownTreeNodeException {
 
-		final Pair<String, Long> cardinality = data.getEdgeLabel(node, includeModelMoves);
+		final Pair<String, Long> cardinality = data.getEdgeLabel(fromNode, toNode, includeModelMoves);
 
 		final LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(null, dot, info, from, to, "", node, EdgeType.model, -1, -1, directionForward);
+			edge = new LocalDotEdge(null, dot, info, from, to, "", -1, EdgeType.model, fromNode, toNode,
+					directionForward);
 		} else {
-			edge = new LocalDotEdge(null, dot, info, to, from, "", node, EdgeType.model, -1, -1, directionForward);
+			edge = new LocalDotEdge(null, dot, info, to, from, "", -1, EdgeType.model, fromNode, toNode,
+					directionForward);
 			edge.setOption("dir", "back");
 		}
 

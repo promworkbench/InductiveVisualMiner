@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
@@ -15,7 +16,9 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntLongMap;
+import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntLongHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 
@@ -34,12 +37,17 @@ public class IvMLogInfo {
 	private final Map<LogMovePosition, MultiSet<XEventClass>> logMoves;
 	private final MultiSet<Move> activities;
 
+	private final TObjectIntMap<Pair<Integer, Integer>> modelEdgeExecutions;
+	private final TObjectIntMap<Pair<Integer, Integer>> modelMoveEdgeExecutions;
+
 	public IvMLogInfo() {
 		modelMoves = new TIntLongHashMap(10, 0.5f, -1, 0);
 		logMoves = new HashMap<LogMovePosition, MultiSet<XEventClass>>();
 		unlabeledLogMoves = new MultiSet<String>();
 		activities = new MultiSet<>();
 		nodeExecutions = new TIntLongHashMap(10, 0.5f, -1, 0);
+		modelEdgeExecutions = new TObjectIntHashMap<>(10, 0.5f, 0);
+		modelMoveEdgeExecutions = new TObjectIntHashMap<>(10, 0.5f, 0);
 	}
 
 	public IvMLogInfo(IvMLog log, IvMModel model) {
@@ -47,6 +55,8 @@ public class IvMLogInfo {
 		unlabeledLogMoves = new MultiSet<String>();
 		activities = new MultiSet<>();
 		nodeExecutions = new TIntLongHashMap(10, 0.5f, -1, -1);
+		modelEdgeExecutions = new TObjectIntHashMap<>(10, 0.5f, 0);
+		modelMoveEdgeExecutions = new TObjectIntHashMap<>(10, 0.5f, 0);
 		TIntSet inParallelNodes = new TIntHashSet(10, 0.5f, -1);
 		PositionLogMoves positionLogMoves = new PositionLogMoves();
 		int lastModelSyncNode;
@@ -61,10 +71,13 @@ public class IvMLogInfo {
 				if (move.getType() == Type.modelMove) {
 					//add model move to list of model moves
 					modelMoves.adjustOrPutValue(move.getTreeNode(), 1, 1);
+					modelMoveEdgeExecutions.adjustOrPutValue(Pair.of(move.getSourceNode(), move.getTreeNode()), 1, 1);
 				} else if (move.isLogMove()) {
 					traceContainsLogMove = true;
 					move.setLogMoveParallelBranchMappedTo(lastUnode);
 					unlabeledLogMoves.add(move.getActivityEventClass().toString());
+				} else if (move.isComplete()) {
+					modelEdgeExecutions.adjustOrPutValue(Pair.of(move.getSourceNode(), move.getTreeNode()), 1, 1);
 				}
 
 				if (move.isModelSync() && !move.isIgnoredModelMove()) {
@@ -84,6 +97,10 @@ public class IvMLogInfo {
 					}
 					lastModelSyncNode = move.getTreeNode();
 				}
+			}
+			
+			if (lastUnode != -1) {
+				modelEdgeExecutions.adjustOrPutValue(Pair.of(lastUnode, -1), 1, 1);
 			}
 
 			//position the log moves
@@ -161,6 +178,14 @@ public class IvMLogInfo {
 	private static void debug(Object s) {
 		//System.out.println(s);
 		//InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
+	}
+
+	public long getModelEdgeExecutions(int from, int to) {
+		return modelEdgeExecutions.get(Pair.of(from, to));
+	}
+
+	public long getModelMoveEdgeExecutions(int from, int to) {
+		return modelMoveEdgeExecutions.get(Pair.of(from, to));
 	}
 
 }

@@ -144,26 +144,27 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 			if (performanceUnode != null && performanceUnode.getNode() instanceof Automatic
 					&& unode.getNode() instanceof Manual) {
 				//tau-start
-				return new Move(model, Type.ignoredModelMove, model.getTree().getIndex(unode), activity,
+				return new Move(model, Type.ignoredModelMove, -2, model.getTree().getIndex(unode), activity,
 						performanceActivity, lifeCycleTransition);
 			} else if ((performanceUnode != null && performanceActivity != null)
 					|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)) {
 				//synchronous move
-				return new Move(model, Type.synchronousMove, model.getTree().getIndex(unode), activity,
+				return new Move(model, Type.synchronousMove, -2, model.getTree().getIndex(unode), activity,
 						performanceActivity, lifeCycleTransition);
 			} else if (performanceUnode != null) {
 				//model move
-				return new Move(model, Type.modelMove, model.getTree().getIndex(unode), activity, performanceActivity,
-						lifeCycleTransition);
+				return new Move(model, Type.modelMove, -2, model.getTree().getIndex(unode), activity,
+						performanceActivity, lifeCycleTransition);
 			} else {
 				//log move
 				if (lifeCycleTransition == PerformanceTransition.complete) {
 					//only log moves of complete events are interesting
-					return new Move(model, Type.logMove, model.getTree().getIndex(unode), activity, performanceActivity,
-							lifeCycleTransition);
+					return new Move(model, Type.logMove, -2, model.getTree().getIndex(unode), activity,
+							performanceActivity, lifeCycleTransition);
 				} else {
 					//log moves of other transitions are ignored
-					return new Move(model, Type.ignoredLogMove, -1, activity, performanceActivity, lifeCycleTransition);
+					return new Move(model, Type.ignoredLogMove, -2, -1, activity, performanceActivity,
+							lifeCycleTransition);
 				}
 			}
 		}

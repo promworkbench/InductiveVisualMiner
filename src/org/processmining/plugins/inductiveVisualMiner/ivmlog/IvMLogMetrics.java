@@ -18,11 +18,20 @@ public class IvMLogMetrics {
 		return getNumberOfTracesRepresented(model, node, false, logInfo);
 	}
 
+	public static long getNumberOfTracesRepresented(IvMModel model, int from, int to, boolean includeModelMoves,
+			IvMLogInfo logInfo) {
+		long c = logInfo.getModelEdgeExecutions(from, to);
+		if (includeModelMoves) {
+			c += logInfo.getModelMoveEdgeExecutions(from, to);
+		}
+		return c;
+	}
+
 	public static long getNumberOfTracesRepresented(IvMModel model, int node, boolean includeModelMoves,
 			IvMLogInfo logInfo) throws UnknownTreeNodeException {
 		if (model.isTau(node) || model.isActivity(node)) {
 			long c = logInfo.getActivities().getCardinalityOf(
-					new Move(model, Type.synchronousMove, node, null, null, PerformanceTransition.complete));
+					new Move(model, Type.synchronousMove, -2, node, null, null, PerformanceTransition.complete));
 			if (includeModelMoves) {
 				c += getModelMovesLocal(node, logInfo);
 			}
@@ -114,13 +123,30 @@ public class IvMLogMetrics {
 
 	public static Pair<Long, Long> getExtremesDfg(IvMModel model, IvMLogInfo logInfo) {
 		long min = Long.MAX_VALUE;
-		long max = Long.MIN_VALUE;
+		long max = Long.MIN_VALUE;		
 		for (int node : model.getDfg().getActivityIndices()) {
-			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, node, true, logInfo);
+			//node itself
+			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, node, logInfo);
+			min = Math.min(min, occurrences);
+			max = Math.max(max, occurrences);
+			
+			//start
+			occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, -1, node, true, logInfo);
+			min = Math.min(min, occurrences);
+			max = Math.max(max, occurrences);
+
+			//end
+			occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, node, -1, true, logInfo);
+			min = Math.min(min, occurrences);
+			max = Math.max(max, occurrences);
+		}
+		for (long edge : model.getDfg().getDirectlyFollowsEdges()) {
+			int from = model.getDfg().getDirectlyFollowsEdgeSourceIndex(edge);
+			int to = model.getDfg().getDirectlyFollowsEdgeTargetIndex(edge);
+			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, from, to, true, logInfo);
 			min = Math.min(min, occurrences);
 			max = Math.max(max, occurrences);
 		}
 		return Pair.of(min, max);
 	}
-
 }

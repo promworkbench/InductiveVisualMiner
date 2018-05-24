@@ -69,6 +69,11 @@ public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualis
 		return dataForEdges.getEdgeLabel(unode, includeModelMoves);
 	}
 
+	public Pair<String, Long> getEdgeLabel(int from, int to, boolean includeModelMoves)
+			throws UnknownTreeNodeException {
+		return dataForEdges.getEdgeLabel(from, to, includeModelMoves);
+	}
+
 	public Pair<String, Long> getModelMoveEdgeLabel(int unode) {
 		return dataForEdges.getModelMoveEdgeLabel(unode);
 	}

@@ -205,7 +205,12 @@ public class InductiveVisualMinerSelectionColourer {
 			TraceViewEventColourMap traceViewColourMap, long minCardinality, long maxCardinality)
 			throws SVGException, UnknownTreeNodeException {
 		for (LocalDotEdge dotEdge : info.getAllModelEdges()) {
-			Pair<String, Long> cardinality = data.getEdgeLabel(dotEdge.getUnode(), false);
+			Pair<String, Long> cardinality;
+			if (model.isTree()) {
+				cardinality = data.getEdgeLabel(dotEdge.getUnode(), false);
+			} else {
+				cardinality = data.getEdgeLabel(dotEdge.getLookupNode1(), dotEdge.getLookupNode2(), false);
+			}
 			Color edgeColour = styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality,
 					parameters.getColourModelEdges(), parameters.isShowFrequenciesOnModelEdges(),
 					parameters.getModelEdgesWidth());

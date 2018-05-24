@@ -20,8 +20,7 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 
 	protected final AlignedLogVisualisationData dataForEdges;
 
-	public AlignedLogVisualisationDataImplSojourn(IvMModel model, PerformanceWrapper queueLengths,
-			IvMLogInfo logInfo) {
+	public AlignedLogVisualisationDataImplSojourn(IvMModel model, PerformanceWrapper queueLengths, IvMLogInfo logInfo) {
 		this.queueLengths = queueLengths;
 		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(model, logInfo);
 
@@ -57,6 +56,11 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 
 	public Pair<String, Long> getEdgeLabel(int unode, boolean includeModelMoves) throws UnknownTreeNodeException {
 		return dataForEdges.getEdgeLabel(unode, includeModelMoves);
+	}
+
+	public Pair<String, Long> getEdgeLabel(int from, int to, boolean includeModelMoves)
+			throws UnknownTreeNodeException {
+		return dataForEdges.getEdgeLabel(from, to, includeModelMoves);
 	}
 
 	public Pair<String, Long> getModelMoveEdgeLabel(int unode) {

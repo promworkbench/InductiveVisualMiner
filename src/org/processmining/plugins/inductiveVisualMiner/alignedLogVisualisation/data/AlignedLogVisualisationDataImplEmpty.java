@@ -28,7 +28,11 @@ public class AlignedLogVisualisationDataImplEmpty implements AlignedLogVisualisa
 		return Pair.of("", 0l);
 	}
 
+	public Pair<String, Long> getEdgeLabel(int from, int to, boolean includeModelMoves) {
+		return Pair.of("", 0l);
+	}
+
 	public void setTime(long time) {
-		
+
 	}
 }

@@ -15,7 +15,18 @@ public class Move implements Event {
 	}
 
 	private final Type type;
+
+	/**
+	 * A modelNode can denote two things, depending on whether we're in tree or
+	 * dfg mode:
+	 * 
+	 * For trees, modelNode is the node of the tree;
+	 * 
+	 * For dfgs, modelNode is the target of step in the dfg, and sourceNode is the source;
+	 */
 	private final int modelNode;
+	private final int sourceNode;
+	
 	private final IvMModel model;
 	private final XEventClass activityEventClass;
 	private final XEventClass performanceEventClass;
@@ -25,11 +36,12 @@ public class Move implements Event {
 	private int logMoveBeforeChildNode = -1;
 	private int logMoveParallelBranchMappedToNode = -1;
 
-	public Move(IvMModel model, Type type, int node, XEventClass activityEventClass,
-			XEventClass performanceEventClass, PerformanceTransition lifeCycle) {
+	public Move(IvMModel model, Type type, int sourceNode, int node, XEventClass activityEventClass, XEventClass performanceEventClass,
+			PerformanceTransition lifeCycle) {
 		this.model = model;
 		this.type = type;
 		this.modelNode = node;
+		this.sourceNode = sourceNode;
 		this.activityEventClass = activityEventClass;
 		this.performanceEventClass = performanceEventClass;
 		this.lifeCycleTransition = lifeCycle;
@@ -241,5 +253,9 @@ public class Move implements Event {
 
 	public boolean isIgnoredModelMove() {
 		return type == Type.ignoredModelMove;
+	}
+
+	public int getSourceNode() {
+		return sourceNode;
 	}
 }
