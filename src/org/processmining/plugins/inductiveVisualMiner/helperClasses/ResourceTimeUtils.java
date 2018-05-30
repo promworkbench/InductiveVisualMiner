@@ -103,7 +103,7 @@ public class ResourceTimeUtils {
 			} else if (date.getMinutes() != 0) {
 				return getThreadLocaleDateFormat("dd-MM-yyyy HH:mm", DATE_FORMAT_2).format(date);
 			} else if (date.getHours() != 0) {
-				return getThreadLocaleDateFormat("dd-MM-yyyy HHh", DATE_FORMAT_3).format(date);
+				return getThreadLocaleDateFormat("dd-MM-yyyy HH'h'", DATE_FORMAT_3).format(date);
 			} else {
 				return getThreadLocaleDateFormat("dd-MM-yyyy", DATE_FORMAT_4).format(date);
 			}
