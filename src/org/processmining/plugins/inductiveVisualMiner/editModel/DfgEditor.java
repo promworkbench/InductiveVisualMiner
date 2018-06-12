@@ -53,6 +53,7 @@ public class DfgEditor extends JPanel {
 		setOpaque(false);
 
 		labelStartActivities = new JLabel("Start activities");
+		labelStartActivities.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 		add(labelStartActivities);
 
 		//start activities text area
@@ -62,6 +63,7 @@ public class DfgEditor extends JPanel {
 			textStartActivities.setWhitespaceVisible(false);
 			textStartActivities.discardAllEdits();
 			JScrollPane textScroll = new JScrollPane(textStartActivities);
+			textScroll.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 			add(textScroll);
 		}
 
@@ -75,6 +77,7 @@ public class DfgEditor extends JPanel {
 				return d;
 			}
 		};
+		labelEdges.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 		add(labelEdges);
 
 		//edges text area
@@ -84,6 +87,7 @@ public class DfgEditor extends JPanel {
 			textEdges.setWhitespaceVisible(false);
 			textEdges.discardAllEdits();
 			JScrollPane textScroll = new JScrollPane(textEdges);
+			textScroll.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 			add(textScroll);
 		}
 
@@ -97,6 +101,7 @@ public class DfgEditor extends JPanel {
 				return d;
 			}
 		};
+		labelEndActivities.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 		add(labelEndActivities);
 
 		//end activities text area
@@ -106,6 +111,7 @@ public class DfgEditor extends JPanel {
 			textEndActivities.setWhitespaceVisible(false);
 			textEndActivities.discardAllEdits();
 			JScrollPane textScroll = new JScrollPane(textEndActivities);
+			textScroll.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 			add(textScroll);
 		}
 
@@ -122,6 +128,7 @@ public class DfgEditor extends JPanel {
 		};
 		errorMessage.setBackground(errorColour);
 		errorMessage.setOpaque(false);
+		errorMessage.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 		add(errorMessage);
 
 		if (dfg != null) {

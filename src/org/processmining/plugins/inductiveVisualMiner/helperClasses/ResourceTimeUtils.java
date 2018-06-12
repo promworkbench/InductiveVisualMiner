@@ -82,7 +82,6 @@ public class ResourceTimeUtils {
 		if (h > 1) {
 			return " " + otherUnit + "\\hour";
 		}
-		double d = h * 24;
 		return " " + otherUnit + "\\day";
 	}
 

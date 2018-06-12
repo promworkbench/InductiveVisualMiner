@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.AllOperatorsMiner;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.DfgMiner;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.LifeCycleMiner;
 
 public class VisualMinerWrapperPluginFinder {
@@ -33,7 +32,7 @@ public class VisualMinerWrapperPluginFinder {
 		 */
 		miners.add(new AllOperatorsMiner());
 		miners.add(new LifeCycleMiner());
-		miners.add(new DfgMiner());
+		//miners.add(new DfgMiner());
 
 		Set<Class<?>> coverageEstimatorClasses = context.getPluginManager().getKnownClassesAnnotatedWith(
 				VisualMinerWrapperAnnotation.class);
