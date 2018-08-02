@@ -4,27 +4,27 @@ import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.Quadruple;
-import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
-import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLogImpl;
+import org.processmining.plugins.InductiveMiner.mining.logs.XLifeCycleClassifier;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
 public class Cl03MakeLog extends
-		ChainLink<Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo>, Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo>> {
+		ChainLink<Quadruple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo, XLifeCycleClassifier>, Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo>> {
 
-	protected Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> generateInput(
+	protected Quadruple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo, XLifeCycleClassifier> generateInput(
 			InductiveVisualMinerState state) {
-		return Triple.of(state.getSortedXLog(), state.getPerformanceClassifier(), state.getLog2logInfo());
+		return Quadruple.of(state.getSortedXLog(), state.getPerformanceClassifier(), state.getLog2logInfo(),
+				state.getMiner().getLifeCycleClassifier());
 	}
 
 	protected Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo> executeLink(
-			Triple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo> input, IvMCanceller canceller) {
-		IMLog imLog = new IMLogImpl(input.getA(), input.getB().getActivityClassifier(),
-				MiningParameters.getDefaultLifeCycleClassifier());
+			Quadruple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo, XLifeCycleClassifier> input,
+			IvMCanceller canceller) {
+		IMLog imLog = new IMLogImpl(input.getA(), input.getB().getActivityClassifier(), input.getD());
 		IMLogInfo imLogInfo = input.getC().createLogInfo(imLog);
 		XLogInfo xLogInfo = XLogInfoFactory.createLogInfo(input.getA(), input.getB().getActivityClassifier());
 		XLogInfo xLogInfoPerformance = XLogInfoFactory.createLogInfo(input.getA(), input.getB());

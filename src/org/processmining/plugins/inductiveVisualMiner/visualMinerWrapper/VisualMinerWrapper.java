@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper;
 import org.processmining.framework.plugin.annotations.KeepInProMCache;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.XLifeCycleClassifier;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
@@ -39,6 +40,8 @@ public abstract class VisualMinerWrapper implements Comparable<VisualMinerWrappe
 	public int compareTo(VisualMinerWrapper o) {
 		return this.toString().compareTo(o.toString());
 	}
+	
+	public abstract XLifeCycleClassifier getLifeCycleClassifier();
 
 	@Override
 	public int hashCode() {

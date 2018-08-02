@@ -6,6 +6,7 @@ import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersIMfa;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.XLifeCycleClassifier;
 import org.processmining.plugins.InductiveMiner.plugins.IMProcessTree;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -38,4 +39,8 @@ public class AllOperatorsMiner extends VisualMinerWrapper {
 		}
 	}
 
+	public XLifeCycleClassifier getLifeCycleClassifier() {
+		return new MiningParametersIMfa().getLifeCycleClassifier();
+	}
+	
 }
