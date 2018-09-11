@@ -35,4 +35,10 @@ public class AlignedLogVisualisationDataImplEmpty implements AlignedLogVisualisa
 	public void setTime(long time) {
 
 	}
+	
+	public AlignedLogVisualisationDataImplEmpty clone() throws CloneNotSupportedException {
+		AlignedLogVisualisationDataImplEmpty c = (AlignedLogVisualisationDataImplEmpty) super.clone();
+		
+		return c;
+	}
 }

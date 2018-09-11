@@ -19,6 +19,8 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
+import org.processmining.plugins.inductiveminer2.helperclasses.graphs.IntGraph;
+import org.processmining.plugins.inductiveminer2.withoutlog.dfgmsd.DfgMsd;
 
 public class GraphvizDirectlyFollowsGraph {
 
@@ -112,6 +114,25 @@ public class GraphvizDirectlyFollowsGraph {
 				dotEdge.setOption("dir", "none");
 				dotEdge.setOption("constraint", "false");
 				dotEdge.setOption("color", ColourMap.toHexString(ColourMaps.colourMapBlue(weight, dfgParallelMax)));
+			}
+		}
+
+		if (dfg instanceof DfgMsd) {
+			IntGraph msd = ((DfgMsd) dfg).getMinimumSelfDistanceGraph();
+			for (long edge : msd.getEdges()) {
+
+				int from = msd.getEdgeSource(edge);
+				int to = msd.getEdgeTarget(edge);
+				double weight = msd.getEdgeWeight(edge);
+
+				DotNode source = activityToNode.get(from);
+				DotNode target = activityToNode.get(to);
+				String label = String.valueOf(weight);
+				DotEdge dotEdge = dot.addEdge(source, target, label);
+				dotEdge.setOption("style", "dashed");
+				dotEdge.setOption("dir", "none");
+				dotEdge.setOption("constraint", "false");
+				dotEdge.setOption("color", "black:invis:black");
 			}
 		}
 

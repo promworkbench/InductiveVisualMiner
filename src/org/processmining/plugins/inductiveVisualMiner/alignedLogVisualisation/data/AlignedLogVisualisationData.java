@@ -7,7 +7,7 @@ import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 
-public interface AlignedLogVisualisationData {
+public interface AlignedLogVisualisationData extends Cloneable {
 
 	/**
 	 * 
@@ -27,7 +27,7 @@ public interface AlignedLogVisualisationData {
 	public Triple<String, Long, Long> getNodeLabel(int node, boolean includeModelMoves) throws UnknownTreeNodeException;
 
 	public Pair<String, Long> getEdgeLabel(int from, int to, boolean includeModelMoves) throws UnknownTreeNodeException;
-	
+
 	public Pair<String, Long> getEdgeLabel(int node, boolean includeModelMoves) throws UnknownTreeNodeException;
 
 	public Pair<String, Long> getModelMoveEdgeLabel(int node);
@@ -35,4 +35,6 @@ public interface AlignedLogVisualisationData {
 	public Pair<String, MultiSet<XEventClass>> getLogMoveEdgeLabel(LogMovePosition logMovePosition);
 
 	public void setTime(long time);
+
+	public AlignedLogVisualisationData clone() throws CloneNotSupportedException;
 }

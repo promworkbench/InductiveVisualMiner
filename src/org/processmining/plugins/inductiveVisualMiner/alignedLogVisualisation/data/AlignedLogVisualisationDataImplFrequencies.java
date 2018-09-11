@@ -12,8 +12,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 
 public class AlignedLogVisualisationDataImplFrequencies implements AlignedLogVisualisationData {
 
-	private final IvMModel model;
-	private final IvMLogInfo logInfo;
+	private IvMModel model;
+	private IvMLogInfo logInfo;
 
 	public AlignedLogVisualisationDataImplFrequencies(IvMModel model, IvMLogInfo logInfo) {
 		this.model = model;
@@ -24,17 +24,19 @@ public class AlignedLogVisualisationDataImplFrequencies implements AlignedLogVis
 		return IvMLogMetrics.getExtremes(model, logInfo);
 	}
 
-	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves) throws UnknownTreeNodeException {
+	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves)
+			throws UnknownTreeNodeException {
 		long cardinality = IvMLogMetrics.getNumberOfTracesRepresented(model, unode, includeModelMoves, logInfo);
 		return Triple.of(String.valueOf(cardinality), cardinality, 0l);
 	}
-	
+
 	public Pair<String, Long> getEdgeLabel(int unode, boolean includeModelMoves) throws UnknownTreeNodeException {
 		long cardinality = IvMLogMetrics.getNumberOfTracesRepresented(model, unode, includeModelMoves, logInfo);
 		return Pair.of(String.valueOf(cardinality), cardinality);
 	}
-	
-	public Pair<String, Long> getEdgeLabel(int from, int to, boolean includeModelMoves) throws UnknownTreeNodeException {
+
+	public Pair<String, Long> getEdgeLabel(int from, int to, boolean includeModelMoves)
+			throws UnknownTreeNodeException {
 		long cardinality = IvMLogMetrics.getNumberOfTracesRepresented(model, from, to, includeModelMoves, logInfo);
 		return Pair.of(String.valueOf(cardinality), cardinality);
 	}
@@ -50,6 +52,15 @@ public class AlignedLogVisualisationDataImplFrequencies implements AlignedLogVis
 	}
 
 	public void setTime(long time) {
-		
+
+	}
+
+	public AlignedLogVisualisationDataImplFrequencies clone() throws CloneNotSupportedException {
+		AlignedLogVisualisationDataImplFrequencies c = (AlignedLogVisualisationDataImplFrequencies) super.clone();
+
+		c.logInfo = this.logInfo;
+		c.model = this.model;
+
+		return c;
 	}
 }

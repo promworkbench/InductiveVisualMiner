@@ -9,12 +9,16 @@ import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimationPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
 
 import com.kitfox.svg.SVGDiagram;
 
@@ -47,14 +51,30 @@ public class ExporterAvi extends Exporter {
 		final ProcessTreeVisualisationInfo info = state.getVisualisationInfo();
 		final IvMLogFiltered filteredLog = state.getIvMLogFiltered();
 		final TraceColourMap trace2colour = state.getTraceColourMap();
+		final boolean updateWithTimeStep = state.getMode().isUpdateWithTimeStep(state);
+		final AlignedLogVisualisationData visualisationData = state.getVisualisationData().clone();
+		final ProcessTreeVisualisationParameters visualisationParameters = state.getMode()
+				.getVisualisationParameters(state);
+		final ProcessTreeVisualisationInfo visualisationInfo = state.getVisualisationInfo();
+		final IvMModel model = state.getModel();
+		final Selection selection = state.getSelection();
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					if (!ExportAnimation.saveAVItoFile(filteredLog, trace2colour, tokens, info, colourMode, svg, dot,
-							file, panel2, scaler)) {
-						System.out.println("deleted");
+					boolean success;
+					if (updateWithTimeStep) {
+						success = ExportAnimation.saveAVItoFileUpdating(filteredLog, trace2colour, tokens, info,
+								colourMode, svg, dot, file, panel2, scaler, visualisationData, visualisationParameters,
+								visualisationInfo, model, selection);
+					} else {
+						success = ExportAnimation.saveAVItoFile(filteredLog, trace2colour, tokens, info, colourMode,
+								svg, dot, file, panel2, scaler);
+					}
+					if (!success) {
+						System.out.println("animation failed; file deleted");
 						file.delete();
 					}
+
 				} catch (IOException | NoninvertibleTransformException e) {
 					e.printStackTrace();
 				}

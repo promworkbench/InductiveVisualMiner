@@ -19,10 +19,10 @@ public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualis
 	private long maxQueueLength;
 	private TIntDoubleMap computedLengths;
 
-	private final IvMModel model;
-	private final PerformanceWrapper queueLengths;
+	private IvMModel model;
+	private PerformanceWrapper queueLengths;
 
-	private final AlignedLogVisualisationData dataForEdges;
+	private AlignedLogVisualisationData dataForEdges;
 
 	public AlignedLogVisualisationDataImplQueues(IvMModel model, PerformanceWrapper queueLengths, IvMLogInfo logInfo) {
 		this.model = model;
@@ -80,6 +80,19 @@ public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualis
 
 	public Pair<String, MultiSet<XEventClass>> getLogMoveEdgeLabel(LogMovePosition logMovePosition) {
 		return dataForEdges.getLogMoveEdgeLabel(logMovePosition);
+	}
+
+	public AlignedLogVisualisationDataImplQueues clone() throws CloneNotSupportedException {
+		AlignedLogVisualisationDataImplQueues c = (AlignedLogVisualisationDataImplQueues) super.clone();
+
+		c.computedLengths = this.computedLengths;
+		c.dataForEdges = this.dataForEdges;
+		c.maxQueueLength = this.maxQueueLength;
+		c.minQueueLength = this.minQueueLength;
+		c.model = this.model;
+		c.queueLengths = this.queueLengths;
+
+		return c;
 	}
 
 }

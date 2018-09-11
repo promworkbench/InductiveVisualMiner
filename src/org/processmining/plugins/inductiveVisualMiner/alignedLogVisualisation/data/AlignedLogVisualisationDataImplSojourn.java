@@ -16,9 +16,9 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 	protected long minQueueLength;
 	protected long maxQueueLength;
 
-	protected final PerformanceWrapper queueLengths;
+	protected PerformanceWrapper queueLengths;
 
-	protected final AlignedLogVisualisationData dataForEdges;
+	protected AlignedLogVisualisationData dataForEdges;
 
 	public AlignedLogVisualisationDataImplSojourn(IvMModel model, PerformanceWrapper queueLengths, IvMLogInfo logInfo) {
 		this.queueLengths = queueLengths;
@@ -69,6 +69,17 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 
 	public Pair<String, MultiSet<XEventClass>> getLogMoveEdgeLabel(LogMovePosition logMovePosition) {
 		return dataForEdges.getLogMoveEdgeLabel(logMovePosition);
+	}
+
+	public AlignedLogVisualisationDataImplSojourn clone() throws CloneNotSupportedException {
+		AlignedLogVisualisationDataImplSojourn c = (AlignedLogVisualisationDataImplSojourn) super.clone();
+
+		c.dataForEdges = this.dataForEdges;
+		c.maxQueueLength = this.maxQueueLength;
+		c.minQueueLength = this.minQueueLength;
+		c.queueLengths = this.queueLengths;
+
+		return c;
 	}
 
 }
