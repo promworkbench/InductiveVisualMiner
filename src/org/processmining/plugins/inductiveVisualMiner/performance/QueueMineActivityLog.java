@@ -29,38 +29,30 @@ public class QueueMineActivityLog {
 
 				int node = activityInstance.getA();
 
-				//we are only interested in activity instances according to the parameters
-				if (((activityInstance.getC() != null && activityInstance.getC().getLogTimestamp() != null)
-						|| (activityInstance.getD() != null && activityInstance.getD().getLogTimestamp() != null))
-						&& ((activityInstance.getE() != null && activityInstance.getE().getLogTimestamp() != null)
-								|| (activityInstance.getF() != null
-										&& activityInstance.getF().getLogTimestamp() != null))) {
+				Long initiate = null;
+				Long enqueue = null;
+				Long start = null;
+				Long complete = null;
 
-					Long initiate = null;
-					Long enqueue = null;
-					Long start = null;
-					Long complete = null;
-
-					if (activityInstance.getC() != null) {
-						initiate = activityInstance.getC().getLogTimestamp();
-					}
-					if (activityInstance.getD() != null) {
-						enqueue = activityInstance.getD().getLogTimestamp();
-					}
-					if (activityInstance.getE() != null) {
-						start = activityInstance.getE().getLogTimestamp();
-					}
-					if (activityInstance.getF() != null) {
-						complete = activityInstance.getF().getLogTimestamp();
-					}
-
-					//put this activity instance in its list
-					if (!timestamps.containsKey(node)) {
-						timestamps.put(node, new QueueActivityLog());
-					}
-
-					timestamps.get(node).add(activityInstance.getB(), initiate, enqueue, start, complete);
+				if (activityInstance.getC() != null) {
+					initiate = activityInstance.getC().getLogTimestamp();
 				}
+				if (activityInstance.getD() != null) {
+					enqueue = activityInstance.getD().getLogTimestamp();
+				}
+				if (activityInstance.getE() != null) {
+					start = activityInstance.getE().getLogTimestamp();
+				}
+				if (activityInstance.getF() != null) {
+					complete = activityInstance.getF().getLogTimestamp();
+				}
+
+				//put this activity instance in its list
+				if (!timestamps.containsKey(node)) {
+					timestamps.put(node, new QueueActivityLog());
+				}
+
+				timestamps.get(node).add(activityInstance.getB(), initiate, enqueue, start, complete);
 			}
 		}
 	}

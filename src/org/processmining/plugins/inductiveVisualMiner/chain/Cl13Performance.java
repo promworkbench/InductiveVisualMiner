@@ -74,10 +74,18 @@ public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, Performan
 						countSojourn++;
 					}
 				}
-				waitingTimes.put(unode, sumWaiting / (countWaiting * 1.0));
-				queueingTimes.put(unode, sumQueueing / (countQueueing * 1.0));
-				serviceTimes.put(unode, sumService / (countService * 1.0));
-				sojournTimes.put(unode, sumSojourn / (countSojourn * 1.0));
+				if (countWaiting > 0) {
+					waitingTimes.put(unode, sumWaiting / (countWaiting * 1.0));
+				}
+				if (countQueueing > 0) {
+					queueingTimes.put(unode, sumQueueing / (countQueueing * 1.0));
+				}
+				if (countService > 0) {
+					serviceTimes.put(unode, sumService / (countService * 1.0));
+				}
+				if (countSojourn > 0) {
+					sojournTimes.put(unode, sumSojourn / (countSojourn * 1.0));
+				}
 
 			}
 
