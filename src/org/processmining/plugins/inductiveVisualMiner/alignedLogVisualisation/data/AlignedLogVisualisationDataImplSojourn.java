@@ -24,6 +24,10 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 		this.queueLengths = queueLengths;
 		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(model, logInfo);
 
+		computeExtremes(queueLengths);
+	}
+
+	protected void computeExtremes(PerformanceWrapper queueLengths) {
 		//compute extreme sojourn times
 		minQueueLength = Long.MAX_VALUE;
 		maxQueueLength = Long.MIN_VALUE;

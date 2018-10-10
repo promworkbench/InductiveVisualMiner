@@ -38,6 +38,10 @@ public class PerformanceWrapper {
 	public double getServiceTime(int unode) {
 		return serviceTimes.get(unode);
 	}
+	
+	public TIntDoubleMap getServiceTimes() {
+		return serviceTimes;
+	}
 
 	public double getSojournTime(int unode) {
 		return sojournTimes.get(unode);
