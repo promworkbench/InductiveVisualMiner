@@ -16,12 +16,12 @@ out vec4 fColor;
 
 varying vec2 texture_coordinate;
 
-void toDevice(in vec2 imageCoordinates, in vec2 imageSize, out vec2 deviceCoordinates) {
-	deviceCoordinates = vec2((imageCoordinates / imageSize) * 2 - 1);
+vec2 toDevice(in vec2 imageCoordinates, in vec2 imageSize) {
+	return vec2((imageCoordinates / imageSize) * 2 - 1);
 }
 
-void toImage(in vec2 modelCoordinates, in vec2 userScale, in vec2 userTranslate, out vec2 imageCoordinates) {
-	imageCoordinates = vec2(modelCoordinates * userScale + userTranslate);
+vec2 toImage(in vec2 modelCoordinates, in vec2 userScale, in vec2 userTranslate) {
+	return vec2(modelCoordinates * userScale + userTranslate);
 }
 
 const ivec4 MyArray[4]=ivec4[4](
@@ -73,11 +73,9 @@ void main()
 	t = length(timeBounds) == 0 ? t = 0 : (time - timeBounds.x) / (timeBounds.y - timeBounds.x); //catch singleton-time token
 	vec2 location = eval(t);
 	
-	vec2 image;
-    toImage(position * radius + location, userScale, userTranslate, image);
+	vec2 image = toImage(position * radius + location, userScale, userTranslate);
         
-    vec2 device;
-   	toDevice(image, imageSize, device);
+    vec2 device = toDevice(image, imageSize);
    	
     posBezier = vec4(device, 0, 1);
     

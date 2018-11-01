@@ -21,7 +21,7 @@ import com.kitfox.svg.animation.Bezier;
 /**
  * This class computes the location of all tokens on the gpu, but sends all
  * bezier curves again for every token. Supports highlighting, but retransmits
- * everyting to the gpu when changing the filtered log.
+ * everything to the gpu when changing the filtered log.
  * 
  * @author sander
  *
@@ -51,6 +51,7 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		//gl.glEnable(GL.GL_DEPTH_TEST);
 		gl.glDisable(GL2.GL_CULL_FACE);
 
 		//set up the shaders
