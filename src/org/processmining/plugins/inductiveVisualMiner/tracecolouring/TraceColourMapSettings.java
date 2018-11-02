@@ -20,7 +20,6 @@ public class TraceColourMapSettings {
 
 	//string
 	private final Attribute attribute;
-	private final Color[] colours;
 	private final ColourMap colourMap;
 	private final Map<String, Color> value2colour;
 
@@ -29,35 +28,34 @@ public class TraceColourMapSettings {
 	private final double max;
 
 	public static TraceColourMapSettings empty() {
-		return new TraceColourMapSettings(Type.empty, null, null, null, null, Double.MIN_VALUE, Double.MIN_VALUE);
+		return new TraceColourMapSettings(Type.empty, null, null, null, Double.MIN_VALUE, Double.MIN_VALUE);
 	}
 
-	public static TraceColourMapSettings string(Attribute attribute, Color[] colours, Map<String, Color> value2colour) {
-		return new TraceColourMapSettings(Type.attributeString, attribute, colours, null, value2colour,
+	public static TraceColourMapSettings string(Attribute attribute, Map<String, Color> value2colour) {
+		return new TraceColourMapSettings(Type.attributeString, attribute, null, value2colour,
 				Double.MIN_VALUE, Double.MIN_VALUE);
 	}
 
 	public static TraceColourMapSettings number(Attribute attribute, ColourMap colourMap, double min, double max) {
-		return new TraceColourMapSettings(Type.attributeNumber, attribute, null, colourMap, null, min, max);
+		return new TraceColourMapSettings(Type.attributeNumber, attribute, colourMap, null, min, max);
 	}
 
 	public static TraceColourMapSettings time(Attribute attribute, ColourMap colourMap, long min, long max) {
-		return new TraceColourMapSettings(Type.attributeTime, attribute, null, colourMap, null, min, max);
+		return new TraceColourMapSettings(Type.attributeTime, attribute, colourMap, null, min, max);
 	}
 
 	public static TraceColourMapSettings duration(ColourMap colourMap, long min, long max) {
-		return new TraceColourMapSettings(Type.propertyTraceDuration, null, null, colourMap, null, min, max);
+		return new TraceColourMapSettings(Type.propertyTraceDuration, null, colourMap, null, min, max);
 	}
 
 	public static TraceColourMapSettings numberOfEvents(ColourMap colourMap, long min, long max) {
-		return new TraceColourMapSettings(Type.propertyNumberOfEvents, null, null, colourMap, null, min, max);
+		return new TraceColourMapSettings(Type.propertyNumberOfEvents, null, colourMap, null, min, max);
 	}
 
-	private TraceColourMapSettings(Type type, Attribute attribute, Color[] colours, ColourMap colourMap,
+	private TraceColourMapSettings(Type type, Attribute attribute, ColourMap colourMap,
 			Map<String, Color> value2colour, double min, double max) {
 		this.type = type;
 		this.attribute = attribute;
-		this.colours = colours;
 		this.colourMap = colourMap;
 		this.value2colour = value2colour;
 		this.min = min;
@@ -78,13 +76,13 @@ public class TraceColourMapSettings {
 			case attributeString :
 				return new TraceColourMapAttributeString(log, attribute, value2colour);
 			case attributeTime :
-				return new TraceColourMapAttributeTime(log, attribute, colours, (long) min, (long) max);
+				return new TraceColourMapAttributeTime(log, attribute, colourMap, (long) min, (long) max);
 			case empty :
 				return new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
 			case propertyNumberOfEvents :
-				return new TraceColourMapPropertyNumberOfEvents(model, log, colours, min, max);
+				return new TraceColourMapPropertyNumberOfEvents(model, log, colourMap, min, max);
 			case propertyTraceDuration :
-				return new TraceColourMapPropertyDuration(model, log, colours, min, max);
+				return new TraceColourMapPropertyDuration(model, log, colourMap, min, max);
 			default :
 				return new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
 		}

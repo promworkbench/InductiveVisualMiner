@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.text.DecimalFormat;
 
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.graphviz.colourMaps.ColourMap;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -14,13 +16,13 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 	private final double min;
 	private final double max;
 	private final Color[] trace2colour;
-	private final Color[] colours;
+	private final ColourMap colourMap;
 	protected final IvMModel model;
 
-	public TraceColourMapProperty(IvMModel model, IvMLogNotFiltered log, Color[] colours, double min, double max) {
+	public TraceColourMapProperty(IvMModel model, IvMLogNotFiltered log, ColourMap colourMap, double min, double max) {
 		this.min = min;
 		this.max = max;
-		this.colours = colours;
+		this.colourMap = colourMap;
 		this.model = model;
 
 		trace2colour = new Color[log.size()];
@@ -32,9 +34,9 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 
 	protected Color attributeValue2colour(double value) {
 		if (max != min) {
-			return colours[(int) (Math.min(colours.length * (value - min) / (max - min), colours.length - 1.0))];
+			return colourMap.colour(value, min, max);
 		} else {
-			return colours[0];
+			return RendererFactory.defaultTokenFillColour;
 		}
 	}
 

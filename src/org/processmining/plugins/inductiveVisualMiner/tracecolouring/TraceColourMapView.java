@@ -198,13 +198,13 @@ public class TraceColourMapView extends SideWindow {
 				Color[] colours = TraceColourMapSettings.getColours(numberOfColours);
 
 				//create colours and map to values
-				Map<String, Color> colourMap = new THashMap<String, Color>(numberOfColours);
+				Map<String, Color> value2colour = new THashMap<String, Color>(numberOfColours);
 				{
 					StringBuilder s = new StringBuilder();
 					int i = 0;
 					for (String value : attribute.getStringValues()) {
 						s.append(prefix + value + "\n");
-						colourMap.put(value, colours[i]);
+						value2colour.put(value, colours[i]);
 						i++;
 					}
 					example.setText(s.toString());
@@ -214,7 +214,7 @@ public class TraceColourMapView extends SideWindow {
 				colourExample(colours);
 
 				status.setText("Currently colouring traces using " + numberOfColours + " colours:");
-				onUpdate.call(TraceColourMapSettings.string(attribute, colours, colourMap));
+				onUpdate.call(TraceColourMapSettings.string(attribute, value2colour));
 			} else {
 				//too many colours
 				status.setText("The current attribute would yield " + attribute.getStringValues().size()
@@ -357,7 +357,6 @@ public class TraceColourMapView extends SideWindow {
 				for (int y = y0; y < y1; y++) {
 					double v = (y - y0) / (y1 - y0);
 					Color c = colourMap.colour((y - y0) / (y1 - y0 * 1.0));
-					System.out.println(v + ", " + c);
 					g.setColor(c);
 					g.drawLine(x0, y, x1, y);
 				}

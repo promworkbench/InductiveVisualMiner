@@ -1,9 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 
-import java.awt.Color;
-
 import org.deckfour.xes.model.XEvent;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -12,15 +11,15 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class TraceColourMapPropertyDuration extends TraceColourMapProperty {
 
-	public TraceColourMapPropertyDuration(IvMModel model, IvMLogNotFiltered log, Color[] colours,
-			double min, double max) {
-		super(model, log, colours, min, max);
+	public TraceColourMapPropertyDuration(IvMModel model, IvMLogNotFiltered log, ColourMap colourMap, double min,
+			double max) {
+		super(model, log, colourMap, min, max);
 	}
 
 	protected double getProperty(IvMTrace trace) {
 		return getTraceDuration(trace);
 	}
-	
+
 	public static long getTraceDuration(IvMTrace trace) {
 		long min = Long.MAX_VALUE;
 		long max = Long.MIN_VALUE;
@@ -35,7 +34,7 @@ public class TraceColourMapPropertyDuration extends TraceColourMapProperty {
 		}
 		return max - min;
 	}
-	
+
 	public static long getTraceDuration(IMTrace trace) {
 		long min = Long.MAX_VALUE;
 		long max = Long.MIN_VALUE;
@@ -54,7 +53,7 @@ public class TraceColourMapPropertyDuration extends TraceColourMapProperty {
 	protected double getProperty(IMTrace trace) {
 		return 0;
 	}
-	
+
 	@Override
 	public String getValue(IvMTrace trace) {
 		if (getProperty(trace) > Double.MIN_VALUE) {
