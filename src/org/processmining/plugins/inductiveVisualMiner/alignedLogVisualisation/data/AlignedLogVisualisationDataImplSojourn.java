@@ -34,10 +34,10 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 		minMeasure = Long.MAX_VALUE;
 		maxMeasure = Long.MIN_VALUE;
 		for (long d : performance.getMeasures(Type.sojourn, Gather.average)) {
-			if (d > maxMeasure) {
+			if (d >= 0 && d > maxMeasure) {
 				maxMeasure = d;
 			}
-			if (d < minMeasure) {
+			if (d >= 0 && d < minMeasure) {
 				minMeasure = d;
 			}
 		}

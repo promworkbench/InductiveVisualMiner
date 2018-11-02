@@ -54,7 +54,7 @@ public class IvMLogInfo {
 		modelMoves = new TIntLongHashMap(10, 0.5f, -1, 0);
 		unlabeledLogMoves = new MultiSet<String>();
 		activities = new MultiSet<>();
-		nodeExecutions = new TIntLongHashMap(10, 0.5f, -1, -1);
+		nodeExecutions = new TIntLongHashMap(10, 0.5f, -1, 0);
 		modelEdgeExecutions = new TObjectIntHashMap<>(10, 0.5f, 0);
 		modelMoveEdgeExecutions = new TObjectIntHashMap<>(10, 0.5f, 0);
 		TIntSet inParallelNodes = new TIntHashSet(10, 0.5f, -1);

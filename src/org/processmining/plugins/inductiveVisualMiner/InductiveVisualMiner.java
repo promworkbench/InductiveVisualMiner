@@ -14,6 +14,8 @@ import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
+import org.processmining.plugins.InductiveMiner.efficienttree.ProcessTree2EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
@@ -62,7 +64,7 @@ public class InductiveVisualMiner {
 		if (launcher.preMinedTree == null) {
 			state = new InductiveVisualMinerState(log, null);
 		} else {
-			ProcessTree preMinedTree = launcher.preMinedTree.get();
+			EfficientTree preMinedTree = launcher.preMinedTree.get();
 			if (preMinedTree == null) {
 				throw new RuntimeException("The pre-mined tree has been removed by garbage collection.");
 			}
@@ -79,16 +81,9 @@ public class InductiveVisualMiner {
 
 	public static class InductiveVisualMinerLauncher {
 		public final SoftReference<XLog> xLog;
-		public final SoftReference<ProcessTree> preMinedTree;
+		public final SoftReference<EfficientTree> preMinedTree;
 
-		@Deprecated
-		private InductiveVisualMinerLauncher(SoftReference<XLog> xLog, SoftReference<ProcessTree> preMinedTree,
-				boolean pro) {
-			this.xLog = xLog;
-			this.preMinedTree = preMinedTree;
-		}
-
-		private InductiveVisualMinerLauncher(SoftReference<XLog> xLog, SoftReference<ProcessTree> preMinedTree) {
+		private InductiveVisualMinerLauncher(SoftReference<XLog> xLog, SoftReference<EfficientTree> preMinedTree) {
 			this.xLog = xLog;
 			this.preMinedTree = preMinedTree;
 		}
@@ -97,18 +92,25 @@ public class InductiveVisualMiner {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null);
 		}
 
+		@Deprecated
 		public static InductiveVisualMinerLauncher launcher(XLog xLog, ProcessTree preMinedTree) {
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog),
+					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)));
+		}
+
+		public static InductiveVisualMinerLauncher launcher(XLog xLog, EfficientTree preMinedTree) {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), new SoftReference<>(preMinedTree));
 		}
 
 		@Deprecated
 		public static InductiveVisualMinerLauncher launcherPro(XLog xLog) {
-			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, true);
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null);
 		}
 
 		@Deprecated
 		public static InductiveVisualMinerLauncher launcherPro(XLog xLog, ProcessTree preMinedTree) {
-			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), new SoftReference<>(preMinedTree), true);
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog),
+					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)));
 		}
 	}
 
@@ -123,13 +125,24 @@ public class InductiveVisualMiner {
 		return InductiveVisualMinerLauncher.launcher(xLog);
 	}
 
-	@Plugin(name = "Visualise deviations on process tree", returnLabels = {
+	@Plugin(name = "Visualise deviations on Process tree", returnLabels = {
 			"Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
 					"Event log", "Process tree" }, userAccessible = true, categories = { PluginCategory.Analytics,
 							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner, including its filtering options.")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
 	public InductiveVisualMinerLauncher mineGuiProcessTree(PluginContext context, XLog xLog, ProcessTree preMinedTree) {
+		return InductiveVisualMinerLauncher.launcher(xLog, preMinedTree);
+	}
+
+	@Plugin(name = "Visualise deviations on process tree", returnLabels = {
+			"Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
+					"Event log", "Process tree" }, userAccessible = true, categories = { PluginCategory.Analytics,
+							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner, including its filtering options.")
+	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
+	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
+	public InductiveVisualMinerLauncher mineGuiEfficientTree(PluginContext context, XLog xLog,
+			EfficientTree preMinedTree) {
 		return InductiveVisualMinerLauncher.launcher(xLog, preMinedTree);
 	}
 }

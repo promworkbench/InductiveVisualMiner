@@ -11,6 +11,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
+import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
@@ -40,7 +41,6 @@ import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventCo
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.Miner;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
-import org.processmining.processtree.ProcessTree;
 
 import com.kitfox.svg.SVGDiagram;
 
@@ -49,7 +49,7 @@ import gnu.trove.set.hash.TIntHashSet;
 
 public class InductiveVisualMinerState {
 
-	public InductiveVisualMinerState(XLog xLog, ProcessTree preMinedTree) throws UnknownTreeNodeException {
+	public InductiveVisualMinerState(XLog xLog, EfficientTree preMinedTree) throws UnknownTreeNodeException {
 		this.xLog = xLog;
 		miningParameters = new MiningParametersIMf();
 		if (preMinedTree != null) {
