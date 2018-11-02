@@ -3,6 +3,8 @@ package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 import java.awt.Color;
 import java.util.Map;
 
+import org.processmining.plugins.graphviz.colourMaps.ColourMap;
+import org.processmining.plugins.graphviz.colourMaps.ColourMapViridis;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
@@ -19,6 +21,7 @@ public class TraceColourMapSettings {
 	//string
 	private final Attribute attribute;
 	private final Color[] colours;
+	private final ColourMap colourMap;
 	private final Map<String, Color> value2colour;
 
 	//number
@@ -26,35 +29,36 @@ public class TraceColourMapSettings {
 	private final double max;
 
 	public static TraceColourMapSettings empty() {
-		return new TraceColourMapSettings(Type.empty, null, null, null, Double.MIN_VALUE, Double.MIN_VALUE);
+		return new TraceColourMapSettings(Type.empty, null, null, null, null, Double.MIN_VALUE, Double.MIN_VALUE);
 	}
 
 	public static TraceColourMapSettings string(Attribute attribute, Color[] colours, Map<String, Color> value2colour) {
-		return new TraceColourMapSettings(Type.attributeString, attribute, colours, value2colour, Double.MIN_VALUE,
-				Double.MIN_VALUE);
+		return new TraceColourMapSettings(Type.attributeString, attribute, colours, null, value2colour,
+				Double.MIN_VALUE, Double.MIN_VALUE);
 	}
 
-	public static TraceColourMapSettings number(Attribute attribute, Color[] colours, double min, double max) {
-		return new TraceColourMapSettings(Type.attributeNumber, attribute, colours, null, min, max);
+	public static TraceColourMapSettings number(Attribute attribute, ColourMap colourMap, double min, double max) {
+		return new TraceColourMapSettings(Type.attributeNumber, attribute, null, colourMap, null, min, max);
 	}
 
-	public static TraceColourMapSettings time(Attribute attribute, Color[] colours, long min, long max) {
-		return new TraceColourMapSettings(Type.attributeTime, attribute, colours, null, min, max);
+	public static TraceColourMapSettings time(Attribute attribute, ColourMap colourMap, long min, long max) {
+		return new TraceColourMapSettings(Type.attributeTime, attribute, null, colourMap, null, min, max);
 	}
 
-	public static TraceColourMapSettings duration(Color[] colours, long min, long max) {
-		return new TraceColourMapSettings(Type.propertyTraceDuration, null, colours, null, min, max);
+	public static TraceColourMapSettings duration(ColourMap colourMap, long min, long max) {
+		return new TraceColourMapSettings(Type.propertyTraceDuration, null, null, colourMap, null, min, max);
 	}
 
-	public static TraceColourMapSettings numberOfEvents(Color[] colours, long min, long max) {
-		return new TraceColourMapSettings(Type.propertyNumberOfEvents, null, colours, null, min, max);
+	public static TraceColourMapSettings numberOfEvents(ColourMap colourMap, long min, long max) {
+		return new TraceColourMapSettings(Type.propertyNumberOfEvents, null, null, colourMap, null, min, max);
 	}
 
-	private TraceColourMapSettings(Type type, Attribute attribute, Color[] colours, Map<String, Color> value2colour,
-			double min, double max) {
+	private TraceColourMapSettings(Type type, Attribute attribute, Color[] colours, ColourMap colourMap,
+			Map<String, Color> value2colour, double min, double max) {
 		this.type = type;
 		this.attribute = attribute;
 		this.colours = colours;
+		this.colourMap = colourMap;
 		this.value2colour = value2colour;
 		this.min = min;
 		this.max = max;
@@ -70,7 +74,7 @@ public class TraceColourMapSettings {
 	public TraceColourMap getTraceColourMap(IvMModel model, IvMLogNotFiltered log) {
 		switch (type) {
 			case attributeNumber :
-				return new TraceColourMapAttributeNumber(log, attribute, colours, min, max);
+				return new TraceColourMapAttributeNumber(log, attribute, colourMap, min, max);
 			case attributeString :
 				return new TraceColourMapAttributeString(log, attribute, value2colour);
 			case attributeTime :
@@ -110,5 +114,9 @@ public class TraceColourMapSettings {
 			default :
 				return new Color[] { RendererFactory.defaultTokenFillColour };
 		}
+	}
+
+	public static ColourMap getColourMap() {
+		return new ColourMapViridis();
 	}
 }

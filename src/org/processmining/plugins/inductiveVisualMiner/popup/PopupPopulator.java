@@ -14,6 +14,8 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Type;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 
@@ -36,50 +38,15 @@ public class PopupPopulator {
 
 					//waiting time
 					if (state.isPerformanceReady()) {
-						if (state.getPerformance().getWaitingTime(unode) > -0.1) {
-							popup.add("average waiting time  "
-									+ Performance.timeToString((long) state.getPerformance().getWaitingTime(unode)));
-						} else {
-							popup.add("average waiting time  -");
+						for (Type type : Type.values()) {
+							for (Gather gather : Gather.values()) {
+								long m = state.getPerformance().getMeasure(type, gather, unode);
+								if (m > -1) {
+									popup.add(gather.toString() + " " + type.toString() + " time "
+											+ Performance.timeToString(m));
+								}
+							}
 						}
-					} else {
-						popup.add(" ");
-					}
-
-					//queueing time
-					if (state.isPerformanceReady()) {
-						if (state.getPerformance().getQueueingTime(unode) > -0.1) {
-							popup.add("average queueing time "
-									+ Performance.timeToString((long) state.getPerformance().getQueueingTime(unode)));
-						} else {
-							popup.add("average queueing time -");
-						}
-					} else {
-						popup.add(" ");
-					}
-
-					//service time
-					if (state.isPerformanceReady()) {
-						if (state.getPerformance().getServiceTime(unode) > -0.1) {
-							popup.add("average service time  "
-									+ Performance.timeToString((long) state.getPerformance().getServiceTime(unode)));
-						} else {
-							popup.add("average service time  -");
-						}
-					} else {
-						popup.add(" ");
-					}
-
-					//sojourn time
-					if (state.isPerformanceReady()) {
-						if (state.getPerformance().getSojournTime(unode) > -0.1) {
-							popup.add("average sojourn time  "
-									+ Performance.timeToString((long) state.getPerformance().getSojournTime(unode)));
-						} else {
-							popup.add("average sojourn time  -");
-						}
-					} else {
-						popup.add(" ");
 					}
 
 					panel.getGraph().setPopupActivity(popup, unode);

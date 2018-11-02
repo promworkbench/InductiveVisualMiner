@@ -13,6 +13,8 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Type;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
@@ -54,34 +56,18 @@ public class ExporterStatistics extends Exporter {
 			w.print(sep + "occurrences" + sep + cardinality);
 			w.print(sep + "model moves" + sep + modelMoveCardinality);
 
-			//waiting time
-			if (performance.getWaitingTime(node) > -0.1) {
-				w.print(sep + "waiting time" + sep + Performance.timeToString((long) performance.getWaitingTime(node)));
-			} else {
-				w.print(sep + "waiting time" + sep);
+			for (Type type : Type.values()) {
+				for (Gather gather : Gather.values()) {
+					long m = performance.getMeasure(type, gather, node);
+					if (m > -1) {
+						w.print(sep + gather.toString() + " " + type.toString() + " time" + sep
+								+ Performance.timeToString(m));
+					} else {
+						w.print(sep + gather.toString() + " " + type.toString() + " time" + sep);
+					}
+				}
 			}
 
-			//queueing time
-			if (performance.getQueueingTime(node) > -0.1) {
-				w.print(sep + "queueing time" + sep
-						+ Performance.timeToString((long) performance.getQueueingTime(node)));
-			} else {
-				w.print(sep + "queueing time" + sep);
-			}
-
-			//service time
-			if (state.getPerformance().getServiceTime(node) > -0.1) {
-				w.print(sep + "service time" + sep + Performance.timeToString((long) performance.getServiceTime(node)));
-			} else {
-				w.print(sep + "service time" + sep);
-			}
-
-			//sojourn time
-			if (state.getPerformance().getSojournTime(node) > -0.1) {
-				w.print(sep + "sojourn time" + sep + Performance.timeToString((long) performance.getSojournTime(node)));
-			} else {
-				w.print(sep + "sojourn time" + sep);
-			}
 			w.println();
 		}
 

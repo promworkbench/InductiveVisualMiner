@@ -20,6 +20,7 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 
 import org.processmining.plugins.InductiveMiner.Function;
+import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
@@ -41,7 +42,7 @@ public class TraceColourMapView extends SideWindow {
 	private final JTextArea status;
 	private final JTextArea explanation;
 	private final JLabel title;
-	private final JTextArea example;
+	private final TraceColourMapExample example;
 	JPanel filterPanel;
 
 	public static final int maxColours = 7;
@@ -131,7 +132,7 @@ public class TraceColourMapView extends SideWindow {
 
 			//example colours
 			{
-				example = new JTextArea(10, 10);
+				example = new TraceColourMapExample(10, 10);
 				IvMDecorator.decorate(example);
 				example.setWrapStyleWord(true);
 				example.setLineWrap(true);
@@ -222,31 +223,31 @@ public class TraceColourMapView extends SideWindow {
 				onUpdate.call(TraceColourMapSettings.empty());
 			}
 		} else if (attribute.isNumeric()) {
-			//this is a numeric attribute; divide it in 7 parts
-			Color[] colours = TraceColourMapSettings.getColours(maxColours);
-			updateProperty(colours, attribute.getNumericMin(), attribute.getNumericMax(), false, false);
-			onUpdate.call(TraceColourMapSettings.number(attribute, colours, attribute.getNumericMin(),
+			//this is a numeric attribute
+			ColourMap colourMap = TraceColourMapSettings.getColourMap();
+			updateProperty(colourMap, attribute.getNumericMin(), attribute.getNumericMax(), false, false);
+			onUpdate.call(TraceColourMapSettings.number(attribute, colourMap, attribute.getNumericMin(),
 					attribute.getNumericMax()));
 		} else if (attribute.isTime()) {
 			//this is a time attribute; divide it in 7 parts
-			Color[] colours = TraceColourMapSettings.getColours(maxColours);
-			updateProperty(colours, attribute.getTimeMin(), attribute.getTimeMax(), false, true);
+			ColourMap colourMap = TraceColourMapSettings.getColourMap();
+			updateProperty(colourMap, attribute.getTimeMin(), attribute.getTimeMax(), false, true);
 			onUpdate.call(
-					TraceColourMapSettings.time(attribute, colours, attribute.getTimeMin(), attribute.getTimeMax()));
+					TraceColourMapSettings.time(attribute, colourMap, attribute.getTimeMin(), attribute.getTimeMax()));
 		} else if (attribute.isTraceDuration()) {
 			//special virtual attribute: trace duration
 			long min = attribute.getTimeMin();
 			long max = attribute.getTimeMax();
-			Color[] colours = TraceColourMapSettings.getColours(max == min ? 1 : maxColours);
-			updateProperty(colours, min, max, true, false);
-			onUpdate.call(TraceColourMapSettings.duration(colours, min, max));
+			ColourMap colourMap = TraceColourMapSettings.getColourMap();
+			updateProperty(colourMap, min, max, true, false);
+			onUpdate.call(TraceColourMapSettings.duration(colourMap, min, max));
 		} else if (attribute.isTraceNumberofEvents()) {
 			//special virtual attribute: number of events
 			long min = attribute.getTimeMin();
 			long max = attribute.getTimeMax();
-			Color[] colours = TraceColourMapSettings.getColours((int) Math.min(maxColours, 1 + max - min));
-			updateProperty(colours, min, max, false, false);
-			onUpdate.call(TraceColourMapSettings.numberOfEvents(colours, min, max));
+			ColourMap colourMap = TraceColourMapSettings.getColourMap();
+			updateProperty(colourMap, min, max, false, false);
+			onUpdate.call(TraceColourMapSettings.numberOfEvents(colourMap, min, max));
 		}
 	}
 
@@ -255,30 +256,7 @@ public class TraceColourMapView extends SideWindow {
 		int numberOfColours = colours.length;
 
 		//build the example
-		{
-			StringBuilder s = new StringBuilder();
-			for (double i = 0; i < numberOfColours; i++) {
-				s.append(prefix);
-				if (!isDuration && !isTime) {
-					s.append(min + i * (max - min) / numberOfColours);
-				} else if (isDuration) {
-					s.append(ResourceTimeUtils.getDuration(min + i * (max - min) / numberOfColours));
-				} else {
-					s.append(ResourceTimeUtils.timeToString((long) (min + i * (max - min) / numberOfColours)));
-				}
-				s.append("\n");
-			}
-			s.append(prefix.substring(0, prefix.length() - 1) + "(");
-			if (!isDuration && !isTime) {
-				s.append(max);
-			} else if (isDuration) {
-				s.append(ResourceTimeUtils.getDuration(max));
-			} else {
-				s.append(ResourceTimeUtils.timeToString((long) max));
-			}
-			s.append(")");
-			example.setText(s.toString());
-		}
+		setExampleText(numberOfColours, min, max, isDuration, isTime, false);
 
 		//colour the values in the example
 		colourExample(colours);
@@ -286,17 +264,106 @@ public class TraceColourMapView extends SideWindow {
 		status.setText("Currently colouring traces using " + numberOfColours + " colours:");
 	}
 
+	private void updateProperty(ColourMap colourMap, double min, double max, boolean isDuration, boolean isTime)
+			throws BadLocationException {
+		//build the example
+		setExampleText(maxColours, min, max, isDuration, isTime, true);
+
+		//colour the values in the example
+		colourExample(colourMap, maxColours);
+
+		status.setText("Currently colouring traces as follows:");
+	}
+
+	private void setExampleText(int numberOfColours, double min, double max, boolean isDuration, boolean isTime,
+			boolean isMap) {
+		StringBuilder s = new StringBuilder();
+		for (double i = 0; i < numberOfColours; i++) {
+			s.append(prefix);
+			if (!isDuration && !isTime) {
+				s.append(min + i * (max - min) / numberOfColours);
+			} else if (isDuration) {
+				s.append(ResourceTimeUtils.getDuration(min + i * (max - min) / numberOfColours));
+			} else {
+				s.append(ResourceTimeUtils.timeToString((long) (min + i * (max - min) / numberOfColours)));
+			}
+			s.append("\n");
+		}
+		if (!isMap) {
+			s.append(prefix.substring(0, prefix.length() - 1) + "(");
+		} else {
+			s.append(prefix);
+		}
+		if (!isDuration && !isTime) {
+			s.append(max);
+		} else if (isDuration) {
+			s.append(ResourceTimeUtils.getDuration(max));
+		} else {
+			s.append(ResourceTimeUtils.timeToString((long) max));
+		}
+		if (!isMap) {
+			s.append(")");
+		}
+		example.setText(s.toString());
+	}
+
 	private void updateDisable() throws Exception {
 		status.setText("Currently not colouring.");
 		example.setText("");
+		example.setColourMap(null);
 		onUpdate.call(TraceColourMapSettings.empty());
 	}
 
 	private void colourExample(Color[] colours) throws BadLocationException {
+		example.setColourMap(null);
 		for (int i = 0; i < colours.length; i++) {
 			int startIndex = example.getLineStartOffset(i);
 			DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(colours[i]);
 			example.getHighlighter().addHighlight(startIndex, startIndex + prefix.length() - 2, painter);
 		}
+	}
+
+	private void colourExample(ColourMap colourMap, int numberOfRows) throws BadLocationException {
+		example.setColourMap(colourMap);
+		example.setNumberOfRows(numberOfRows);
+	}
+
+	private static class TraceColourMapExample extends JTextArea {
+		private ColourMap colourMap;
+		private int numberOfRows;
+
+		public TraceColourMapExample(int rows, int columns) {
+			super(rows, columns);
+		}
+
+		public void setColourMap(ColourMap colourMap) {
+			this.colourMap = colourMap;
+		}
+
+		public void setNumberOfRows(int numberOfRows) {
+			this.numberOfRows = numberOfRows;
+		}
+
+		@Override
+		protected void paintComponent(java.awt.Graphics g) {
+			if (colourMap != null) {
+
+				int rowHeight = 15;
+
+				int x0 = 0;
+				int x1 = 16;
+				int y0 = (int) (rowHeight * 0.5);
+				int y1 = (int) (rowHeight * (numberOfRows + 0.5));
+				for (int y = y0; y < y1; y++) {
+					double v = (y - y0) / (y1 - y0);
+					Color c = colourMap.colour((y - y0) / (y1 - y0 * 1.0));
+					System.out.println(v + ", " + c);
+					g.setColor(c);
+					g.drawLine(x0, y, x1, y);
+				}
+			}
+
+			super.paintComponent(g);
+		};
 	}
 }

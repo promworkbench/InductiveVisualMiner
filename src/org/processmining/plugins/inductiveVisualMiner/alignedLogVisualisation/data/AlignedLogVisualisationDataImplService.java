@@ -5,32 +5,34 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Type;
 
 public class AlignedLogVisualisationDataImplService extends AlignedLogVisualisationDataImplSojourn {
 
-	public AlignedLogVisualisationDataImplService(IvMModel model, PerformanceWrapper queueLengths, IvMLogInfo logInfo) {
-		super(model, queueLengths, logInfo);
+	public AlignedLogVisualisationDataImplService(IvMModel model, PerformanceWrapper performance, IvMLogInfo logInfo) {
+		super(model, performance, logInfo);
 	}
 
 	@Override
-	protected void computeExtremes(PerformanceWrapper queueLengths) {
-		//compute extreme sojourn times
-		minQueueLength = Long.MAX_VALUE;
-		maxQueueLength = Long.MIN_VALUE;
-		for (double d : queueLengths.getServiceTimes().values()) {
-			if (d > maxQueueLength) {
-				maxQueueLength = Math.round(d);
+	protected void computeExtremes(PerformanceWrapper performance) {
+		//compute extreme average times
+		minMeasure = Long.MAX_VALUE;
+		maxMeasure = Long.MIN_VALUE;
+		for (long d : performance.getMeasures(Type.service, Gather.average)) {
+			if (d > maxMeasure) {
+				maxMeasure = d;
 			}
-			if (d < minQueueLength) {
-				minQueueLength = Math.round(d);
+			if (d < minMeasure) {
+				minMeasure = d;
 			}
 		}
 	}
 
 	@Override
 	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves) {
-		long length = Math.round(queueLengths.getServiceTime(unode));
-		if (length >= 0) {
+		long length = performance.getMeasure(Type.service, Gather.average, unode);
+		if (length > -1) {
 			return Triple.of(Performance.timeToString(length), length, length);
 		} else {
 			return Triple.of("-", -1l, -1l);

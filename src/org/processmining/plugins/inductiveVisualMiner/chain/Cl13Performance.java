@@ -5,6 +5,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Type;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCombination;
@@ -12,7 +13,6 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActiv
 
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntDoubleHashMap;
 
 public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, PerformanceWrapper> {
 
@@ -32,65 +32,38 @@ public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, Performan
 
 			QueueLengths method = new QueueLengthsImplCombination(queueActivityLogs);
 
+			PerformanceWrapper result = new PerformanceWrapper(method, queueActivityLogs, model.getMaxNumberOfNodes());
+
 			//compute times
-			TIntDoubleHashMap waitingTimes = new TIntDoubleHashMap(10, 0.5f, -1, -1);
-			TIntDoubleHashMap queueingTimes = new TIntDoubleHashMap(10, 0.5f, -1, -1);
-			TIntDoubleHashMap serviceTimes = new TIntDoubleHashMap(10, 0.5f, -1, -1);
-			TIntDoubleHashMap sojournTimes = new TIntDoubleHashMap(10, 0.5f, -1, -1);
 			for (TIntIterator it = queueActivityLogs.keySet().iterator(); it.hasNext();) {
 				int unode = it.next();
 				QueueActivityLog activityLog = queueActivityLogs.get(unode);
-				long sumWaiting = 0;
-				int countWaiting = 0;
-				long sumQueueing = 0;
-				int countQueueing = 0;
-				long sumService = 0;
-				int countService = 0;
-				long sumSojourn = 0;
-				int countSojourn = 0;
 				for (int i = 0; i < activityLog.size(); i++) {
 
 					//waiting time
 					if (activityLog.hasInitiate(i) && activityLog.hasStart(i)) {
-						sumWaiting += activityLog.getStart(i) - activityLog.getInitiate(i);
-						countWaiting++;
+						result.addValue(Type.waiting, unode, activityLog.getStart(i) - activityLog.getInitiate(i));
 					}
 
 					//queueing time
 					if (activityLog.hasEnqueue(i) && activityLog.hasStart(i)) {
-						sumQueueing += activityLog.getStart(i) - activityLog.getEnqueue(i);
-						countQueueing++;
+						result.addValue(Type.queueing, unode, activityLog.getStart(i) - activityLog.getEnqueue(i));
 					}
 
 					//service time
 					if (activityLog.hasStart(i) && activityLog.hasComplete(i)) {
-						sumService += activityLog.getComplete(i) - activityLog.getStart(i);
-						countService++;
+						result.addValue(Type.service, unode, activityLog.getComplete(i) - activityLog.getStart(i));
 					}
 
 					//sojourn time
 					if (activityLog.hasInitiate(i) && activityLog.hasComplete(i)) {
-						sumSojourn += activityLog.getComplete(i) - activityLog.getInitiate(i);
-						countSojourn++;
+						result.addValue(Type.sojourn, unode, activityLog.getComplete(i) - activityLog.getInitiate(i));
 					}
 				}
-				if (countWaiting > 0) {
-					waitingTimes.put(unode, sumWaiting / (countWaiting * 1.0));
-				}
-				if (countQueueing > 0) {
-					queueingTimes.put(unode, sumQueueing / (countQueueing * 1.0));
-				}
-				if (countService > 0) {
-					serviceTimes.put(unode, sumService / (countService * 1.0));
-				}
-				if (countSojourn > 0) {
-					sojournTimes.put(unode, sumSojourn / (countSojourn * 1.0));
-				}
-
 			}
 
-			return new PerformanceWrapper(method, queueActivityLogs, waitingTimes, queueingTimes, serviceTimes,
-					sojournTimes);
+			result.finalise();
+			return result;
 		} else {
 			return null;
 		}

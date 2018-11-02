@@ -120,4 +120,11 @@ public class IvMModel {
 			return false;
 		return true;
 	}
+
+	public int getMaxNumberOfNodes() {
+		if (this.tree != null) {
+			return this.tree.getMaxNumberOfNodes();
+		}
+		return this.dfg.getNumberOfActivities();
+	}
 }

@@ -15,6 +15,7 @@ uniform vec2 userTranslate;
 out vec4 fColor;
 
 varying vec2 texture_coordinate;
+flat out int instanceID;
 
 vec2 toDevice(in vec2 imageCoordinates, in vec2 imageSize) {
 	return vec2((imageCoordinates / imageSize) * 2 - 1);
@@ -64,7 +65,7 @@ vec2 eval(in float param) {
 
 void main()
 {   
-	float radius = 15;
+	float radius = 10;
 	vec4 posBezier;
 	float choose = step(timeBounds.x, time) - step(timeBounds.y, time); //1 = token is displayed now; 0 = token is not being displayed now
 	
@@ -82,5 +83,6 @@ void main()
     fColor = vec4(colour, (1 - t) * opacityBounds.x + t * opacityBounds.y);
     
     gl_Position = choose * posBezier + (1 - choose) * vec4(-100, -100, -100, 0);
-    texture_coordinate = vec2(position.xy); 
+    texture_coordinate = vec2(position.xy);
+    instanceID = gl_InstanceID;
 }

@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
@@ -16,14 +17,14 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 	private final Color[] trace2colour;
 	private final double min;
 	private final double max;
-	private final Color[] colours;
+	private final ColourMap map;
 
-	public TraceColourMapAttributeNumber(IvMLogNotFiltered log, Attribute attribute, Color[] colours, double min,
+	public TraceColourMapAttributeNumber(IvMLogNotFiltered log, Attribute attribute, ColourMap map, double min,
 			double max) {
 		this.attribute = attribute;
 		this.min = min;
 		this.max = max;
-		this.colours = colours;
+		this.map = map;
 
 		trace2colour = new Color[log.size()];
 		for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
@@ -41,7 +42,7 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 				return RendererFactory.defaultTokenFillColour;
 			}
 
-			return colours[(int) (Math.min(colours.length * (value - min) / (max - min), colours.length - 1.0))];
+			return map.colour(value, min, max);
 		}
 	}
 

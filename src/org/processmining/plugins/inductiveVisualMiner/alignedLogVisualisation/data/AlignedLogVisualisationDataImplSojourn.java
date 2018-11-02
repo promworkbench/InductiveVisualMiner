@@ -10,33 +10,35 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Type;
 
 public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisualisationData {
 
-	protected long minQueueLength;
-	protected long maxQueueLength;
+	protected long minMeasure;
+	protected long maxMeasure;
 
-	protected PerformanceWrapper queueLengths;
+	protected PerformanceWrapper performance;
 
 	protected AlignedLogVisualisationData dataForEdges;
 
 	public AlignedLogVisualisationDataImplSojourn(IvMModel model, PerformanceWrapper queueLengths, IvMLogInfo logInfo) {
-		this.queueLengths = queueLengths;
+		this.performance = queueLengths;
 		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(model, logInfo);
 
 		computeExtremes(queueLengths);
 	}
 
-	protected void computeExtremes(PerformanceWrapper queueLengths) {
+	protected void computeExtremes(PerformanceWrapper performance) {
 		//compute extreme sojourn times
-		minQueueLength = Long.MAX_VALUE;
-		maxQueueLength = Long.MIN_VALUE;
-		for (double d : queueLengths.getSojournTimes().values()) {
-			if (d > maxQueueLength) {
-				maxQueueLength = Math.round(d);
+		minMeasure = Long.MAX_VALUE;
+		maxMeasure = Long.MIN_VALUE;
+		for (long d : performance.getMeasures(Type.sojourn, Gather.average)) {
+			if (d > maxMeasure) {
+				maxMeasure = d;
 			}
-			if (d < minQueueLength) {
-				minQueueLength = Math.round(d);
+			if (d < minMeasure) {
+				minMeasure = d;
 			}
 		}
 	}
@@ -46,11 +48,11 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 	}
 
 	public Pair<Long, Long> getExtremeCardinalities() {
-		return Pair.of(minQueueLength, maxQueueLength);
+		return Pair.of(minMeasure, maxMeasure);
 	}
 
 	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves) {
-		long length = Math.round(queueLengths.getSojournTime(unode));
+		long length = performance.getMeasure(Type.sojourn, Gather.average, unode);
 		if (length >= 0) {
 			return Triple.of(Performance.timeToString(length), length, length);
 		} else {
@@ -79,9 +81,9 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 		AlignedLogVisualisationDataImplSojourn c = (AlignedLogVisualisationDataImplSojourn) super.clone();
 
 		c.dataForEdges = this.dataForEdges;
-		c.maxQueueLength = this.maxQueueLength;
-		c.minQueueLength = this.minQueueLength;
-		c.queueLengths = this.queueLengths;
+		c.maxMeasure = this.maxMeasure;
+		c.minMeasure = this.minMeasure;
+		c.performance = this.performance;
 
 		return c;
 	}

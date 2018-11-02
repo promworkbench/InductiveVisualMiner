@@ -51,7 +51,7 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-		//gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glEnable(GL.GL_DEPTH_TEST);
 		gl.glDisable(GL2.GL_CULL_FACE);
 
 		//set up the shaders
@@ -228,7 +228,7 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 
 			//clear the previous drawing
 			gl.glClearColor(0f, 0f, 0f, 0f);
-			gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 			gl.glLoadIdentity();
 
 			//pass scale and translation to OpenGL
