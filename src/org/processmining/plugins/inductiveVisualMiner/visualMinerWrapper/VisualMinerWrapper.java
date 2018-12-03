@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper;
 
 import org.processmining.framework.plugin.annotations.KeepInProMCache;
+import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.XLifeCycleClassifier;
@@ -42,6 +43,8 @@ public abstract class VisualMinerWrapper implements Comparable<VisualMinerWrappe
 	}
 	
 	public abstract XLifeCycleClassifier getLifeCycleClassifier();
+	
+	public abstract IMLog2IMLogInfo getLog2logInfo();
 
 	@Override
 	public int hashCode() {

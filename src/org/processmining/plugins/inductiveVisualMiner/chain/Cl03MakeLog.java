@@ -17,7 +17,7 @@ public class Cl03MakeLog extends
 
 	protected Quadruple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo, XLifeCycleClassifier> generateInput(
 			InductiveVisualMinerState state) {
-		return Quadruple.of(state.getSortedXLog(), state.getPerformanceClassifier(), state.getLog2logInfo(),
+		return Quadruple.of(state.getSortedXLog(), state.getPerformanceClassifier(), state.getMiner().getLog2logInfo(),
 				state.getMiner().getLifeCycleClassifier());
 	}
 

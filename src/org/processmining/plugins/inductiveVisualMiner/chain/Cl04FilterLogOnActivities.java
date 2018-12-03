@@ -18,8 +18,8 @@ public class Cl04FilterLogOnActivities extends
 
 	protected Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMFiltersController> generateInput(
 			InductiveVisualMinerState state) {
-		return Quintuple.of(state.getLog(), state.getLogInfo(), state.getActivitiesThreshold(), state.getLog2logInfo(),
-				state.getFiltersController());
+		return Quintuple.of(state.getLog(), state.getLogInfo(), state.getActivitiesThreshold(),
+				state.getMiner().getLog2logInfo(), state.getFiltersController());
 	}
 
 	protected Triple<IMLog, IMLogInfo, Set<XEventClass>> executeLink(

@@ -10,8 +10,6 @@ import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
-import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
-import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
@@ -95,7 +93,6 @@ public class InductiveVisualMinerState {
 	//==log==
 	private XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(
 			new XEventNameClassifier());
-	private IMLog2IMLogInfo log2logInfo = new IMLog2IMLogInfoDefault();
 	private XLog xLog;
 	private XLog sortedXLog;
 	private XLogInfo xLogInfo;
@@ -122,14 +119,6 @@ public class InductiveVisualMinerState {
 
 	public synchronized void setClassifier(XEventClassifier classifier) {
 		this.performanceClassifier = new XEventPerformanceClassifier(classifier);
-	}
-
-	public IMLog2IMLogInfo getLog2logInfo() {
-		return log2logInfo;
-	}
-
-	public void setLog2logInfo(IMLog2IMLogInfo log2logInfo) {
-		this.log2logInfo = log2logInfo;
 	}
 
 	public XLog getXLog() {

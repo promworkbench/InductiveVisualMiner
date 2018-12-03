@@ -1,7 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners;
 
+import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
+import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoLifeCycle;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
-import org.processmining.plugins.InductiveMiner.mining.MiningParametersIMf;
+import org.processmining.plugins.InductiveMiner.mining.MiningParametersIMflc;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.XLifeCycleClassifier;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
@@ -21,6 +23,10 @@ public class DfgMiner extends VisualMinerWrapper {
 	}
 
 	public XLifeCycleClassifier getLifeCycleClassifier() {
-		return new MiningParametersIMf().getLifeCycleClassifier();
+		return new MiningParametersIMflc().getLifeCycleClassifier();
+	}
+	
+	public IMLog2IMLogInfo getLog2logInfo() {
+		return new IMLog2IMLogInfoLifeCycle();
 	}
 }
