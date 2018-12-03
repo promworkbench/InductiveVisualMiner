@@ -58,11 +58,13 @@ public class DotTokenStep {
 	@Override
 	public String toString() {
 		if (isOverEdge()) {
-			return "step over edge, arrive @" + String.format("%.6f", arrivalTime) + " from "
-					+ edge.getSource().getType() + " to " + edge.getTarget().getType() + " " + edge.getTarget().getId();
+			return "step over edge from " + edge.getSource().getLabel().replace("\n", " ") + " ("
+					+ edge.getSource().getType() + " " + edge.getSource().getId() + ") to "
+					+ edge.getTarget().getLabel().replace("\n", " ") + " (" + edge.getTarget().getType() + " "
+					+ edge.getTarget().getId() + "), arrive @" + String.format("%.6f", arrivalTime);
 		} else {
-			return "step over node, arrive @" + String.format("%.6f", arrivalTime) + " at " + node.getType() + " "
-					+ node.getId();
+			return "step over node " + node.getLabel().replace("\n", " ") + " (" + node.getType() + " " + node.getId()
+					+ "), arrive @" + String.format("%.6f", arrivalTime);
 		}
 	}
 }

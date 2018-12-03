@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,6 +27,15 @@ public class ShortestPathGraph {
 	}
 
 	public List<LocalDotEdge> getShortestPath(LocalDotNode from, LocalDotNode to) {
+		
+		if (from == to) {
+			if (graph.containsEdge(from, to)) {
+				List<LocalDotEdge> r = new ArrayList<>();
+				r.add(graph.getEdge(from, to));
+				return r;
+			}
+		}
+		
 		List<LocalDotEdge> path = DijkstraShortestPath.findPathBetween(graph, from, to);
 
 		if (path == null) {
