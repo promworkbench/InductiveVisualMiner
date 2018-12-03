@@ -9,6 +9,7 @@ import org.deckfour.xes.classification.XEventNameClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
+import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoDefault;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
@@ -54,7 +55,16 @@ public class InductiveVisualMinerState {
 		miningParameters = new MiningParametersIMf();
 		if (preMinedTree != null) {
 			this.model = new IvMModel(new IvMEfficientTree(preMinedTree));
-			this.preMinedTree = this.model;
+			this.preMinedModel = this.model;
+		}
+	}
+
+	public InductiveVisualMinerState(Dfg preMinedDfg, XLog xLog) throws UnknownTreeNodeException {
+		this.xLog = xLog;
+		miningParameters = new MiningParametersIMf();
+		if (preMinedDfg != null) {
+			this.model = new IvMModel(preMinedDfg);
+			this.preMinedModel = this.model;
 		}
 	}
 
@@ -210,7 +220,7 @@ public class InductiveVisualMinerState {
 	private VisualMinerWrapper miner = new Miner();
 	private double paths = 0.8;
 	private IvMModel model = null;
-	private IvMModel preMinedTree = null;
+	private IvMModel preMinedModel = null;
 
 	public MiningParameters getMiningParameters2() {
 		return miningParameters;
@@ -245,7 +255,7 @@ public class InductiveVisualMinerState {
 	}
 
 	public IvMModel getPreMinedTree() {
-		return preMinedTree;
+		return preMinedModel;
 	}
 
 	//==layout==

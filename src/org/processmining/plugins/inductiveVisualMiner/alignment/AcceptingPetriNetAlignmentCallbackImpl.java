@@ -162,6 +162,7 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 			PerformanceTransition lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode.getLabel());
 			XEventClass performanceActivity = performanceEventClasses.getByIdentity(((Transition) node).getLabel());
 			XEventClass activity = Performance.getActivity(performanceActivity, activityEventClasses);
+			assert(activity != null);
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete
 					? model.getDfg().getIndexOfActivity(activity) : previousModelNode;
 			return Pair.of(new Move(model, Type.modelMove, previousModelNode,

@@ -47,7 +47,8 @@ public class AlignmentPerformance {
 		Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p = Dfg2AcceptingPetriNet
 				.convertForPerformance(model.getDfg());
 
-		AcceptingPetriNetAlignment.addAllLeavesAsEventClasses(performanceEventClasses2, p.getA());
+		AcceptingPetriNetAlignment.addAllLeavesAsEventClasses(activityEventClasses2, model.getDfg());
+		AcceptingPetriNetAlignment.addAllLeavesAsPerformanceEventClasses(performanceEventClasses2, p.getA());
 		AcceptingPetriNetAlignmentCallback callback = new AcceptingPetriNetAlignmentCallbackImpl(xLog, model,
 				activityEventClasses2, p);
 		AcceptingPetriNetAlignment.align(model.getDfg(), p, xLog, performanceEventClasses2, callback, canceller);

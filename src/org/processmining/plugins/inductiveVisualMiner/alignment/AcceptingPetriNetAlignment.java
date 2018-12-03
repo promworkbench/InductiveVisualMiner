@@ -62,11 +62,18 @@ public class AcceptingPetriNetAlignment {
 		}
 	}
 
-	public static void addAllLeavesAsEventClasses(IvMEventClasses eventClasses, AcceptingPetriNet net) {
+	public static void addAllLeavesAsPerformanceEventClasses(IvMEventClasses eventClasses, AcceptingPetriNet net) {
 		for (Transition t : net.getNet().getTransitions()) {
 			if (!t.isInvisible()) {
 				eventClasses.register(t.getLabel());
 			}
+		}
+		eventClasses.harmonizeIndices();
+	}
+
+	public static void addAllLeavesAsEventClasses(IvMEventClasses eventClasses, Dfg dfg) {
+		for (XEventClass a : dfg.getActivities()) {
+			eventClasses.register(a.getId());
 		}
 		eventClasses.harmonizeIndices();
 	}

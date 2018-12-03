@@ -14,6 +14,7 @@ import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.ProcessTree2EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
@@ -61,19 +62,27 @@ public class InductiveVisualMiner {
 		if (log == null) {
 			throw new RuntimeException("The log has been removed by garbage collection.");
 		}
-		if (launcher.preMinedTree == null) {
+		if (launcher.preMinedTree == null && launcher.preMinedDfg == null) {
 			state = new InductiveVisualMinerState(log, null);
-		} else {
+		} else if (launcher.preMinedTree != null) {
+			//launch with pre-mined tree
 			EfficientTree preMinedTree = launcher.preMinedTree.get();
 			if (preMinedTree == null) {
 				throw new RuntimeException("The pre-mined tree has been removed by garbage collection.");
 			}
 			state = new InductiveVisualMinerState(log, preMinedTree);
+		} else {
+			//launch with pre-mined dfg
+			Dfg preMinedDfg = launcher.preMinedDfg.get();
+			if (preMinedDfg == null) {
+				throw new RuntimeException("The pre-mined tree has been removed by garbage collection.");
+			}
+			state = new InductiveVisualMinerState(preMinedDfg, log);
 		}
 
 		VisualMinerWrapper[] miners = VisualMinerWrapperPluginFinder.find(context, state.getMiner());
 		final InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state, miners,
-				launcher.preMinedTree == null, canceller);
+				launcher.preMinedTree == null && launcher.preMinedDfg == null, canceller);
 		new InductiveVisualMinerController(context, panel, state, canceller);
 
 		return panel;
@@ -82,35 +91,42 @@ public class InductiveVisualMiner {
 	public static class InductiveVisualMinerLauncher {
 		public final SoftReference<XLog> xLog;
 		public final SoftReference<EfficientTree> preMinedTree;
+		public final SoftReference<Dfg> preMinedDfg;
 
-		private InductiveVisualMinerLauncher(SoftReference<XLog> xLog, SoftReference<EfficientTree> preMinedTree) {
+		private InductiveVisualMinerLauncher(SoftReference<XLog> xLog, SoftReference<EfficientTree> preMinedTree,
+				SoftReference<Dfg> preMinedDfg) {
 			this.xLog = xLog;
 			this.preMinedTree = preMinedTree;
+			this.preMinedDfg = preMinedDfg;
 		}
 
 		public static InductiveVisualMinerLauncher launcher(XLog xLog) {
-			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null);
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, null);
 		}
 
 		@Deprecated
 		public static InductiveVisualMinerLauncher launcher(XLog xLog, ProcessTree preMinedTree) {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog),
-					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)));
+					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)), null);
 		}
 
 		public static InductiveVisualMinerLauncher launcher(XLog xLog, EfficientTree preMinedTree) {
-			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), new SoftReference<>(preMinedTree));
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), new SoftReference<>(preMinedTree), null);
+		}
+
+		public static InductiveVisualMinerLauncher launcher(XLog xLog, Dfg preMinedDfg) {
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, new SoftReference<>(preMinedDfg));
 		}
 
 		@Deprecated
 		public static InductiveVisualMinerLauncher launcherPro(XLog xLog) {
-			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null);
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, null);
 		}
 
 		@Deprecated
 		public static InductiveVisualMinerLauncher launcherPro(XLog xLog, ProcessTree preMinedTree) {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog),
-					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)));
+					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)), null);
 		}
 	}
 
@@ -125,7 +141,7 @@ public class InductiveVisualMiner {
 		return InductiveVisualMinerLauncher.launcher(xLog);
 	}
 
-	@Plugin(name = "Visualise deviations on Process tree", returnLabels = {
+	@Plugin(name = "Visualise deviations on Process tree (Inductive visual Miner)", returnLabels = {
 			"Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
 					"Event log", "Process tree" }, userAccessible = true, categories = { PluginCategory.Analytics,
 							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner, including its filtering options.")
@@ -135,7 +151,7 @@ public class InductiveVisualMiner {
 		return InductiveVisualMinerLauncher.launcher(xLog, preMinedTree);
 	}
 
-	@Plugin(name = "Visualise deviations on process tree", returnLabels = {
+	@Plugin(name = "Visualise deviations on process tree (Inductive visual Miner)", returnLabels = {
 			"Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
 					"Event log", "Process tree" }, userAccessible = true, categories = { PluginCategory.Analytics,
 							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner, including its filtering options.")
@@ -144,5 +160,16 @@ public class InductiveVisualMiner {
 	public InductiveVisualMinerLauncher mineGuiEfficientTree(PluginContext context, XLog xLog,
 			EfficientTree preMinedTree) {
 		return InductiveVisualMinerLauncher.launcher(xLog, preMinedTree);
+	}
+
+	@Plugin(name = "Visualise deviations on directly follows graph (Inductive visual Miner)", returnLabels = {
+			"Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
+					"Event log", "Directly follows graph" }, userAccessible = true, categories = {
+							PluginCategory.Analytics,
+							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a directly follows graph and visualise the results as Inductive visual Miner, including its filtering options.")
+	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
+	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
+	public InductiveVisualMinerLauncher mineGuiDfg(PluginContext context, XLog xLog, Dfg dfg) {
+		return InductiveVisualMinerLauncher.launcher(xLog, dfg);
 	}
 }
