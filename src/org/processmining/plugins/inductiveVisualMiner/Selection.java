@@ -9,31 +9,33 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 
-import gnu.trove.iterator.TIntIterator;
+import gnu.trove.iterator.TLongIterator;
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 public class Selection {
 
 	private final TIntSet treeNodesOfSelectedActivities;
 	private final Set<LogMovePosition> logMovePositionsOfSelectedLogMoveEdges;
 	private final TIntSet treeNodesOfSelectedModelMoveEdges;
-	private final TIntSet treeNodesOfSelectedModelEdges;
+	private final TLongSet treeNodesOfSelectedModelEdges;
 
 	public Selection() {
 		treeNodesOfSelectedActivities = new TIntHashSet(10, 0.5f, -1);
 		logMovePositionsOfSelectedLogMoveEdges = new THashSet<>();
 		treeNodesOfSelectedModelMoveEdges = new TIntHashSet(10, 0.5f, -1);
-		treeNodesOfSelectedModelEdges = new TIntHashSet(10, 0.5f, -1);
+		treeNodesOfSelectedModelEdges = new TLongHashSet(10, 0.5f, -1);
 	}
 
 	public Selection(TIntSet selectedActivities, Set<LogMovePosition> selectedLogMoves, TIntSet selectedModelMoves,
-			TIntSet selectedTaus) {
+			TLongSet selectedTaus) {
 		this.treeNodesOfSelectedActivities = new TIntHashSet(selectedActivities);
 		this.logMovePositionsOfSelectedLogMoveEdges = new THashSet<>(selectedLogMoves);
 		this.treeNodesOfSelectedModelMoveEdges = new TIntHashSet(selectedModelMoves);
-		this.treeNodesOfSelectedModelEdges = new TIntHashSet(selectedTaus);
+		this.treeNodesOfSelectedModelEdges = new TLongHashSet(selectedTaus);
 	}
 
 	public boolean isSelected(IvMModel model, Move move) {
@@ -52,10 +54,22 @@ public class Selection {
 		}
 
 		if (move.isSyncMove()) {
-			for (TIntIterator it = treeNodesOfSelectedModelEdges.iterator(); it.hasNext();) {
-				int selectedEdgeUnode = it.next();
-				if (model.isParentOf(selectedEdgeUnode, move.getTreeNode())) {
-					return true;
+			for (TLongIterator it = treeNodesOfSelectedModelEdges.iterator(); it.hasNext();) {
+				if (model.isTree()) {
+					int selectedEdgeUnode = (int) it.next();
+
+					if (model.isParentOf(selectedEdgeUnode, move.getTreeNode())) {
+						return true;
+					}
+				} else {
+					long selectedEdge = it.next();
+					int source = (int) (selectedEdge >> 32);
+					int target = (int) selectedEdge;
+
+					if (((move.getPrevious() == null) ? (source == -1) : (source == move.getPrevious().getTreeNode()))
+							&& target == move.getTreeNode()) {
+						return true;
+					}
 				}
 			}
 		}
@@ -84,7 +98,7 @@ public class Selection {
 		return treeNodesOfSelectedActivities;
 	}
 
-	public TIntSet getSelectedTaus() {
+	public TLongSet getSelectedTaus() {
 		return treeNodesOfSelectedModelEdges;
 	}
 
@@ -105,7 +119,19 @@ public class Selection {
 					treeNodesOfSelectedModelMoveEdges.add(((LocalDotEdge) dotElement).getUnode());
 					return;
 				case model :
-					treeNodesOfSelectedModelEdges.add(((LocalDotEdge) dotElement).getUnode());
+
+					LocalDotEdge edge = (LocalDotEdge) dotElement;
+					if (edge.getUnode() != -1) {
+						//model is a tree
+						treeNodesOfSelectedModelEdges.add(edge.getUnode());
+					} else {
+						//model is a dfg: put two endpoints of the edge in a single long
+						int x = edge.getLookupNode1();
+						int y = edge.getLookupNode2();
+						long l = (((long) x) << 32) | (y & 0xffffffffL);
+						treeNodesOfSelectedModelEdges.add(l);
+					}
+
 					return;
 			}
 			throw new RuntimeException("Selection not supported.");

@@ -31,7 +31,7 @@ public class IvMLogMetrics {
 			IvMLogInfo logInfo) throws UnknownTreeNodeException {
 		if (model.isTau(node) || model.isActivity(node)) {
 			long c = logInfo.getActivities().getCardinalityOf(
-					new Move(model, Type.synchronousMove, -2, node, null, null, PerformanceTransition.complete));
+					new Move(model, Type.synchronousMove, -2, node, null, null, PerformanceTransition.complete, null));
 			if (includeModelMoves) {
 				c += getModelMovesLocal(node, logInfo);
 			}
@@ -123,13 +123,13 @@ public class IvMLogMetrics {
 
 	public static Pair<Long, Long> getExtremesDfg(IvMModel model, IvMLogInfo logInfo) {
 		long min = Long.MAX_VALUE;
-		long max = Long.MIN_VALUE;		
+		long max = Long.MIN_VALUE;
 		for (int node : model.getDfg().getActivityIndices()) {
 			//node itself
 			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, node, logInfo);
 			min = Math.min(min, occurrences);
 			max = Math.max(max, occurrences);
-			
+
 			//start
 			occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, -1, node, true, logInfo);
 			min = Math.min(min, occurrences);

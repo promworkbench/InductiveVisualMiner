@@ -22,22 +22,37 @@ public class Move implements Event {
 	 * 
 	 * For trees, modelNode is the node of the tree;
 	 * 
-	 * For dfgs, modelNode is the target of step in the dfg, and sourceNode is the source;
+	 * For dfgs, modelNode is the target of step in the dfg, and sourceNode is
+	 * the source;
 	 */
 	private final int modelNode;
 	private final int sourceNode;
-	
+
 	private final IvMModel model;
 	private final XEventClass activityEventClass;
 	private final XEventClass performanceEventClass;
 	private final PerformanceTransition lifeCycleTransition;
+	private final Move previous;
 
 	private int logMoveNode = -1;
 	private int logMoveBeforeChildNode = -1;
 	private int logMoveParallelBranchMappedToNode = -1;
 
-	public Move(IvMModel model, Type type, int sourceNode, int node, XEventClass activityEventClass, XEventClass performanceEventClass,
-			PerformanceTransition lifeCycle) {
+	/**
+	 * 
+	 * @param model
+	 * @param type
+	 * @param sourceNode
+	 * @param node
+	 * @param activityEventClass
+	 * @param performanceEventClass
+	 * @param lifeCycle
+	 * @param previous
+	 *            previous model/sync move in the trace, or null if it does not
+	 *            exist. Only required for dfg-models.
+	 */
+	public Move(IvMModel model, Type type, int sourceNode, int node, XEventClass activityEventClass,
+			XEventClass performanceEventClass, PerformanceTransition lifeCycle, Move previous) {
 		this.model = model;
 		this.type = type;
 		this.modelNode = node;
@@ -45,6 +60,7 @@ public class Move implements Event {
 		this.activityEventClass = activityEventClass;
 		this.performanceEventClass = performanceEventClass;
 		this.lifeCycleTransition = lifeCycle;
+		this.previous = previous;
 	}
 
 	public String toString() {
@@ -257,5 +273,9 @@ public class Move implements Event {
 
 	public int getSourceNode() {
 		return sourceNode;
+	}
+
+	public Move getPrevious() {
+		return previous;
 	}
 }

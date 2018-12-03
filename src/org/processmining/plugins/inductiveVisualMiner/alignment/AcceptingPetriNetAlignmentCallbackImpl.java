@@ -9,8 +9,8 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -74,15 +74,17 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 			Iterator<Object> itNode = aTrace.getNodeInstance().iterator();
 			int eventIndex = 0;
 			int previousModelNode = -1;
+			Move previousMove = null;
 			while (itType.hasNext()) {
 				StepTypes type = itType.next();
 				Object node = itNode.next();
-				Pair<Move, Integer> p = getMove(xTrace, type, node, performanceEventClasses, eventIndex,
-						previousModelNode);
+				Triple<Move, Integer, Move> p = getMove(xTrace, type, node, performanceEventClasses, eventIndex,
+						previousModelNode, previousMove);
 
 				if (p != null) {
 					Move move = p.getA();
 					previousModelNode = p.getB();
+					previousMove = p.getC();
 
 					if (move != null) {
 						iTrace.add(ETMAlignmentCallbackImpl.move2ivmMove(model, move, xTrace, eventIndex));
@@ -108,8 +110,8 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 	 * @param previousModelNode
 	 * @return the move and the model move
 	 */
-	private Pair<Move, Integer> getMove(XTrace trace, StepTypes type, Object node,
-			IvMEventClasses performanceEventClasses, int event, int previousModelNode) {
+	private Triple<Move, Integer, Move> getMove(XTrace trace, StepTypes type, Object node,
+			IvMEventClasses performanceEventClasses, int event, int previousModelNode, Move previousMove) {
 
 		//get log part of move
 		if (type == StepTypes.L) {
@@ -121,13 +123,14 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 			//log move
 			if (lifeCycleTransition == PerformanceTransition.complete) {
 				//only log moves of complete events are interesting
-				return Pair.of(
-						new Move(model, Type.logMove, -1, -1, activity, performanceActivity, lifeCycleTransition),
-						previousModelNode);
+				Move newMove = new Move(model, Type.logMove, -1, -1, activity, performanceActivity, lifeCycleTransition,
+						previousMove);
+				return Triple.of(newMove, previousModelNode, previousMove);
 			} else {
 				//log moves of other transitions are ignored
-				return Pair.of(new Move(model, Type.ignoredLogMove, -1, -1, activity, performanceActivity,
-						lifeCycleTransition), previousModelNode);
+				Move newMove = new Move(model, Type.ignoredLogMove, -1, -1, activity, performanceActivity,
+						lifeCycleTransition, previousMove);
+				return Triple.of(newMove, previousModelNode, previousMove);
 			}
 		} else if (type == StepTypes.MINVI) {
 			//enqueue- or start-skip, or start-tau
@@ -151,9 +154,10 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 				XEventClass activity = model.getDfg().getActivityOfIndex(activityIndex);
 				XEventClass performanceActivity = performanceEventClasses
 						.getByIdentity(activity.getId() + "+" + lifeCycleTransition);
-				return Pair.of(new Move(model, Type.ignoredModelMove, previousModelNode,
-						model.getDfg().getIndexOfActivity(activity), activity, performanceActivity,
-						lifeCycleTransition), previousModelNode);
+				Move newMove = new Move(model, Type.ignoredModelMove, previousModelNode,
+						model.getDfg().getIndexOfActivity(activity), activity, performanceActivity, lifeCycleTransition,
+						previousMove);
+				return Triple.of(newMove, previousModelNode, previousMove);
 			}
 		} else if (type == StepTypes.MREAL) {
 			//model move
@@ -162,12 +166,14 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 			PerformanceTransition lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode.getLabel());
 			XEventClass performanceActivity = performanceEventClasses.getByIdentity(((Transition) node).getLabel());
 			XEventClass activity = Performance.getActivity(performanceActivity, activityEventClasses);
-			assert(activity != null);
+			assert (activity != null);
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete
 					? model.getDfg().getIndexOfActivity(activity) : previousModelNode;
-			return Pair.of(new Move(model, Type.modelMove, previousModelNode,
-					model.getDfg().getIndexOfActivity(activity), activity, performanceActivity, lifeCycleTransition),
-					newPreviousModelNode);
+			Move newMove = new Move(model, Type.modelMove, previousModelNode,
+					model.getDfg().getIndexOfActivity(activity), activity, performanceActivity, lifeCycleTransition,
+					previousMove);
+			Move newPreviousMove = lifeCycleTransition == PerformanceTransition.complete ? newMove : previousMove;
+			return Triple.of(newMove, newPreviousModelNode, newPreviousMove);
 		} else if (type == StepTypes.LMGOOD) {
 			assert (node instanceof Transition);
 			Transition performanceUnode = (Transition) node;
@@ -177,9 +183,11 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete
 					? model.getDfg().getIndexOfActivity(activity) : previousModelNode;
-			return Pair.of(new Move(model, Type.synchronousMove, previousModelNode,
-					model.getDfg().getIndexOfActivity(activity), activity, performanceActivity, lifeCycleTransition),
-					newPreviousModelNode);
+			Move newMove = new Move(model, Type.synchronousMove, previousModelNode,
+					model.getDfg().getIndexOfActivity(activity), activity, performanceActivity, lifeCycleTransition,
+					previousMove);
+			Move newPreviousMove = lifeCycleTransition == PerformanceTransition.complete ? newMove : previousMove;
+			return Triple.of(newMove, newPreviousModelNode, newPreviousMove);
 		}
 		return null;
 	}
