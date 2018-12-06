@@ -32,11 +32,12 @@ public class Move implements Event {
 	private final XEventClass activityEventClass;
 	private final XEventClass performanceEventClass;
 	private final PerformanceTransition lifeCycleTransition;
-	private final Move previous;
 
 	private int logMoveNode = -1;
 	private int logMoveBeforeChildNode = -1;
 	private int logMoveParallelBranchMappedToNode = -1;
+
+	private int indexInAlignedTrace = -1;
 
 	/**
 	 * 
@@ -47,12 +48,10 @@ public class Move implements Event {
 	 * @param activityEventClass
 	 * @param performanceEventClass
 	 * @param lifeCycle
-	 * @param previous
-	 *            previous model/sync move in the trace, or null if it does not
-	 *            exist. Only required for dfg-models.
+	 * @param indexInAlignedTrace
 	 */
 	public Move(IvMModel model, Type type, int sourceNode, int node, XEventClass activityEventClass,
-			XEventClass performanceEventClass, PerformanceTransition lifeCycle, Move previous) {
+			XEventClass performanceEventClass, PerformanceTransition lifeCycle, int indexInAlignedTrace) {
 		this.model = model;
 		this.type = type;
 		this.modelNode = node;
@@ -60,7 +59,7 @@ public class Move implements Event {
 		this.activityEventClass = activityEventClass;
 		this.performanceEventClass = performanceEventClass;
 		this.lifeCycleTransition = lifeCycle;
-		this.previous = previous;
+		this.indexInAlignedTrace = indexInAlignedTrace;
 	}
 
 	public String toString() {
@@ -275,7 +274,7 @@ public class Move implements Event {
 		return sourceNode;
 	}
 
-	public Move getPrevious() {
-		return previous;
+	public int getIndexInAlignedTrace() {
+		return indexInAlignedTrace;
 	}
 }

@@ -1,11 +1,13 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import java.util.List;
 import java.util.Set;
 
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.LogUtils;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 
@@ -38,7 +40,7 @@ public class Selection {
 		this.treeNodesOfSelectedModelEdges = new TLongHashSet(selectedTaus);
 	}
 
-	public boolean isSelected(IvMModel model, Move move) {
+	public boolean isSelected(IvMModel model, List<Move> trace, Move move) {
 		if (move.isIgnoredLogMove() || move.isIgnoredModelMove() || !move.isComplete()) {
 			return false;
 		}
@@ -56,19 +58,34 @@ public class Selection {
 		if (move.isSyncMove()) {
 			for (TLongIterator it = treeNodesOfSelectedModelEdges.iterator(); it.hasNext();) {
 				if (model.isTree()) {
+					//tree model
 					int selectedEdgeUnode = (int) it.next();
 
 					if (model.isParentOf(selectedEdgeUnode, move.getTreeNode())) {
 						return true;
 					}
 				} else {
+					//dfg model
 					long selectedEdge = it.next();
 					int source = (int) (selectedEdge >> 32);
 					int target = (int) selectedEdge;
 
-					if (((move.getPrevious() == null) ? (source == -1) : (source == move.getPrevious().getTreeNode()))
-							&& target == move.getTreeNode()) {
-						return true;
+					if (move.getTreeNode() == source || move.getTreeNode() == target) {
+						Move nextMove = LogUtils.findNextCompleteModelMove(trace, move.getIndexInAlignedTrace());
+						if (nextMove == null && target == -1 && move.getTreeNode() == source) {
+							//selected end move
+							return true;
+						}
+						if (move.getTreeNode() == source && nextMove != null && nextMove.getTreeNode() == target) {
+							//selected edge move
+							return true;
+						}
+						Move previousMove = LogUtils.findPreviousCompleteModelMove(trace,
+								move.getIndexInAlignedTrace());
+						if (previousMove == null && source == -1 && move.getTreeNode() == target) {
+							//selected start move
+							return true;
+						}
 					}
 				}
 			}

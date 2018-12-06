@@ -1,11 +1,13 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quintuple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -72,13 +74,15 @@ public class Cl12FilterNodeSelection extends
 	 * @param selectedNodes
 	 * @param selectedLogMoves
 	 */
+	@SuppressWarnings("unchecked")
 	private static void filterOnSelection(IvMModel tree, IvMLogFilteredImpl log, Selection selection) {
 
 		for (Iterator<IvMTrace> it = log.iterator(); it.hasNext();) {
 			IvMTrace trace = it.next();
 			boolean keepTrace = false;
 			for (IvMMove move : trace) {
-				if (selection.isSelected(tree, move)) {
+				List<? extends Move> trace2 = trace;
+				if (selection.isSelected(tree, (List<Move>) trace2, move)) {
 					keepTrace = true;
 					break;
 				}

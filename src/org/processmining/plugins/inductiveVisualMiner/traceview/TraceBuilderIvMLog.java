@@ -2,11 +2,13 @@ package org.processmining.plugins.inductiveVisualMiner.traceview;
 
 import java.awt.Color;
 import java.util.Iterator;
+import java.util.List;
 
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
@@ -32,12 +34,14 @@ class TraceBuilderIvMLog extends TraceBuilderWrapper {
 
 			public Iterator<IvMMove> iterator() {
 				return FluentIterable.from((IvMTrace) trace).filter(new Predicate<IvMMove>() {
+					@SuppressWarnings("unchecked")
 					public boolean apply(final IvMMove input) {
 						if (input.isTauStart()) {
 							return false;
 						}
 						if (input.isSyncMove() && model.isTau(input.getTreeNode())) {
-							return selection.isSelected(model, input);
+							List<? extends Move> trace2 = (IvMTrace) trace;
+							return selection.isSelected(model, (List<Move>) trace2, input);
 						}
 						return true;
 					}

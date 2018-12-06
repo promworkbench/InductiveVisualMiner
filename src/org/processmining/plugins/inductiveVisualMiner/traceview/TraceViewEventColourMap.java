@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.traceview;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Stroke;
+import java.util.List;
 
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.WedgeBuilder;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
@@ -19,7 +20,7 @@ public class TraceViewEventColourMap implements WedgeBuilder {
 	private final TIntObjectMap<Color> mapFont = new TIntObjectHashMap<Color>(10, 0.5f, -1);
 	private Selection selection = new Selection();
 	private IvMModel model;
-	
+
 	public TraceViewEventColourMap(IvMModel tree) {
 		this.model = tree;
 	}
@@ -48,15 +49,19 @@ public class TraceViewEventColourMap implements WedgeBuilder {
 	static final Stroke selectedStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
 			dash1, 0.0f);
 
+	@SuppressWarnings("unchecked")
 	public Stroke buildBorderStroke(Trace<? extends Event> trace, Event event) {
-		if (event instanceof Move && selection.isSelected(model, (Move) event)) {
+		if (event instanceof Move && trace instanceof List<?>
+				&& selection.isSelected(model, (List<Move>) trace, (Move) event)) {
 			return selectedStroke;
 		}
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Color buildBorderColor(Trace<? extends Event> trace, Event event) {
-		if (event instanceof Move && selection.isSelected(model, (Move) event)) {
+		if (event instanceof Move && trace instanceof List<?>
+				&& selection.isSelected(model, (List<Move>) trace, (Move) event)) {
 			return Color.white;
 		}
 		return null;

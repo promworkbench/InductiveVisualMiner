@@ -82,14 +82,16 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 
 			//reverse the alignment result
 			List<TreeRecord> aTrace = TreeRecord.getHistory(traceAlignment);
+			int moveIndex = 0;
 
 			IvMTrace iTrace = new IvMTraceImpl(traceName, xTrace.getAttributes(), aTrace.size());
 
 			//walk through the trace and translate moves
 			for (TreeRecord aMove : aTrace) {
-				Move move = getMove(model, aMove, trace);
+				Move move = getMove(model, aMove, trace, moveIndex);
 				if (move != null) {
 					iTrace.add(move2ivmMove(model, move, xTrace, aMove.getMovedEvent()));
+					moveIndex++;
 				}
 			}
 
@@ -97,7 +99,7 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 		}
 	}
 
-	public Move getMove(IvMModel model, TreeRecord naryMove, Trace trace) {
+	public Move getMove(IvMModel model, TreeRecord naryMove, Trace trace, int moveIndex) {
 		//get log part of move
 		XEventClass performanceActivity = null;
 		XEventClass activity = null;
@@ -145,26 +147,26 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 					&& unode.getNode() instanceof Manual) {
 				//tau-start
 				return new Move(model, Type.ignoredModelMove, -2, model.getTree().getIndex(unode), activity,
-						performanceActivity, lifeCycleTransition, null);
+						performanceActivity, lifeCycleTransition, moveIndex);
 			} else if ((performanceUnode != null && performanceActivity != null)
 					|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)) {
 				//synchronous move
 				return new Move(model, Type.synchronousMove, -2, model.getTree().getIndex(unode), activity,
-						performanceActivity, lifeCycleTransition, null);
+						performanceActivity, lifeCycleTransition, moveIndex);
 			} else if (performanceUnode != null) {
 				//model move
 				return new Move(model, Type.modelMove, -2, model.getTree().getIndex(unode), activity,
-						performanceActivity, lifeCycleTransition, null);
+						performanceActivity, lifeCycleTransition, moveIndex);
 			} else {
 				//log move
 				if (lifeCycleTransition == PerformanceTransition.complete) {
 					//only log moves of complete events are interesting
 					return new Move(model, Type.logMove, -2, model.getTree().getIndex(unode), activity,
-							performanceActivity, lifeCycleTransition, null);
+							performanceActivity, lifeCycleTransition, moveIndex);
 				} else {
 					//log moves of other transitions are ignored
 					return new Move(model, Type.ignoredLogMove, -2, -1, activity, performanceActivity,
-							lifeCycleTransition, null);
+							lifeCycleTransition, moveIndex);
 				}
 			}
 		}

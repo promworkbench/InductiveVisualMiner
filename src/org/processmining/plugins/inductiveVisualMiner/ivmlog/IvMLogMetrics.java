@@ -31,7 +31,7 @@ public class IvMLogMetrics {
 			IvMLogInfo logInfo) throws UnknownTreeNodeException {
 		if (model.isTau(node) || model.isActivity(node)) {
 			long c = logInfo.getActivities().getCardinalityOf(
-					new Move(model, Type.synchronousMove, -2, node, null, null, PerformanceTransition.complete, null));
+					new Move(model, Type.synchronousMove, -2, node, null, null, PerformanceTransition.complete, -100));
 			if (includeModelMoves) {
 				c += getModelMovesLocal(node, logInfo);
 			}
