@@ -4,8 +4,8 @@ import java.awt.Color;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -16,7 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventCo
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
 
-public class DfgVisualisation {
+public class DfmVisualisation {
 
 	private long maxCardinality;
 	private long minCardinality;
@@ -32,7 +32,7 @@ public class DfgVisualisation {
 			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters) {
 		this.parameters = parameters;
 		this.data = data;
-		Dfg dfg = model.getDfg();
+		DirectlyFollowsModel dfg = model.getDfg();
 
 		//find maximum and minimum occurrences
 		Pair<Long, Long> p = data.getExtremeCardinalities();
@@ -51,19 +51,26 @@ public class DfgVisualisation {
 		info.setRoot(source, sink);
 
 		/**
+		 * Empty traces
+		 */
+		if (dfg.getNumberOfEmptyTraces() > 0) {
+			addArc(source, sink, -1, -1, true, false);
+		}
+
+		/**
 		 * Nodes
 		 */
-		for (int activity : dfg.getActivityIndices()) {
+		for (int activity : dfg.getActivities()) {
 			Triple<String, Long, Long> cardinality = data.getNodeLabel(activity, false);
-			LocalDotNode dotNode = convertActivity(model.getDfg(), activity, cardinality);
+			convertActivity(model.getDfg(), activity, cardinality);
 		}
 
 		/**
 		 * Edges
 		 */
-		for (long edge : dfg.getDirectlyFollowsEdges()) {
-			int sourceActivity = dfg.getDirectlyFollowsEdgeSourceIndex(edge);
-			int targetActivity = dfg.getDirectlyFollowsEdgeTargetIndex(edge);
+		for (long edge : dfg.getDirectlyFollowsGraph().getEdges()) {
+			int sourceActivity = dfg.getDirectlyFollowsGraph().getEdgeSource(edge);
+			int targetActivity = dfg.getDirectlyFollowsGraph().getEdgeTarget(edge);
 
 			LocalDotNode from = info.getActivityDotNode(sourceActivity);
 			LocalDotNode to = info.getActivityDotNode(targetActivity);
@@ -73,14 +80,14 @@ public class DfgVisualisation {
 		/**
 		 * Start activities
 		 */
-		for (int node : dfg.getStartActivityIndices()) {
+		for (int node : dfg.getStartActivities()) {
 			addArc(source, info.getActivityDotNode(node), -1, node, true, false);
 		}
 
 		/**
 		 * End activities
 		 */
-		for (int node : dfg.getEndActivityIndices()) {
+		for (int node : dfg.getEndActivities()) {
 			addArc(info.getActivityDotNode(node), sink, node, -1, true, false);
 		}
 
@@ -120,7 +127,7 @@ public class DfgVisualisation {
 		return edge;
 	}
 
-	private LocalDotNode convertActivity(Dfg dfg, int node, Triple<String, Long, Long> cardinality) {
+	private LocalDotNode convertActivity(DirectlyFollowsModel dfg, int node, Triple<String, Long, Long> cardinality) {
 		//style the activity by the occurrences of it
 		Color fillColour = Color.white;
 		Color gradientColour = null;
@@ -141,7 +148,7 @@ public class DfgVisualisation {
 		}
 		traceViewColourMap.set(node, fillColour, fontColour);
 
-		String label = dfg.getActivityOfIndex(node).getId();
+		String label = dfg.getActivityOfIndex(node);
 		if (label.length() == 0) {
 			label = " ";
 		}

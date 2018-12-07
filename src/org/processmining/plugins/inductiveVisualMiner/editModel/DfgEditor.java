@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,8 +20,9 @@ import javax.swing.text.BadLocationException;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
 public class DfgEditor extends JPanel {
 	private static final long serialVersionUID = -75989442629887735L;
@@ -35,6 +37,7 @@ public class DfgEditor extends JPanel {
 	protected final JLabel labelEdges;
 	protected final RSyntaxTextArea textEndActivities;
 	protected final JLabel labelEndActivities;
+	protected final JCheckBox emptyTraces;
 	protected final JLabel errorMessage;
 	private ActionListener actionListener;
 	private boolean contentChangedFromController = false;
@@ -48,7 +51,7 @@ public class DfgEditor extends JPanel {
 	 *            If not null, the message will be shown to the user and editing
 	 *            the model will be disabled.
 	 */
-	public DfgEditor(Dfg dfg, String message) {
+	public DfgEditor(DirectlyFollowsModel dfg, String message) {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setOpaque(false);
 
@@ -115,6 +118,9 @@ public class DfgEditor extends JPanel {
 			add(textScroll);
 		}
 
+		emptyTraces = new JCheckBox("Allow empty traces");
+		add(emptyTraces);
+
 		//error message
 		errorMessage = new JLabel(" ") {
 			private static final long serialVersionUID = -119544982967511643L;
@@ -153,8 +159,9 @@ public class DfgEditor extends JPanel {
 				//if we're good to go, send an update to the controller
 				if (actionListener != null && !contentChangedFromController) {
 					try {
-						Triple<Dfg, Integer, String> result = DfgParser.parse(textStartActivities.getText(),
-								textEdges.getText(), textEndActivities.getText());
+						Triple<DirectlyFollowsModel, Integer, String> result = DfgParser.parse(
+								textStartActivities.getText(), textEdges.getText(), textEndActivities.getText(),
+								emptyTraces.isSelected());
 						if (result.getA() == null) {
 							//set error message
 							setErrorMessage(result.getB(), result.getC());
@@ -162,7 +169,7 @@ public class DfgEditor extends JPanel {
 							//remove error message
 							setErrorMessage(-1, null);
 
-							Dfg newTree = result.getA();
+							IvMModel newTree = new IvMModel(result.getA());
 							final ActionEvent e2 = new ActionEvent(newTree, 0, "");
 							SwingUtilities.invokeLater(new Runnable() {
 								public void run() {
@@ -219,6 +226,16 @@ public class DfgEditor extends JPanel {
 		textStartActivities.getDocument().addDocumentListener(documentListener);
 		textEdges.getDocument().addDocumentListener(documentListener);
 		textEndActivities.getDocument().addDocumentListener(documentListener);
+		emptyTraces.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					setErrorMessage(-1, null);
+				} catch (BadLocationException e1) {
+					e1.printStackTrace();
+				}
+				updateGraphOnTimer(updateTimer);
+			}
+		});
 	}
 
 	/**
@@ -241,7 +258,7 @@ public class DfgEditor extends JPanel {
 			errorMessage.setOpaque(true);
 			textEdges.addLineHighlight(line, errorColour);
 		} else {
-			errorMessage.setText("Edge syntax: node -> \"node with spaces\" -x- cardinality.");
+			errorMessage.setText("Edge syntax: node -> \"node with spaces\"");
 			errorMessage.setOpaque(false);
 			textEdges.removeAllLineHighlights();
 		}
@@ -252,7 +269,7 @@ public class DfgEditor extends JPanel {
 	 * 
 	 * @param tree
 	 */
-	public void setDfg(Dfg dfg) {
+	public void setDfg(DirectlyFollowsModel dfg) {
 		assert (dfg != null);
 		contentChangedFromController = true;
 		textStartActivities.setText(Dfg2StringFields.getStartActivities(dfg));

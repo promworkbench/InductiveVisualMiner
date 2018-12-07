@@ -1,50 +1,42 @@
 package org.processmining.plugins.inductiveVisualMiner.editModel;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
-import org.processmining.plugins.InductiveMiner.dfgOnly.DfgImpl;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.inductiveVisualMiner.editModel.DfgEdgeNodiser.NodeType;
-
-import gnu.trove.map.hash.THashMap;
+import org.processmining.plugins.inductiveminer2.withoutlog.dfgmsd.DfgMsdImpl;
 
 public class DfgParser {
 
-	public static Triple<Dfg, Integer, String> parse(String startActivities, String edges, String endActivities)
-			throws IOException {
-		Map<String, XEventClass> map = new THashMap<>();
-		Dfg dfg = new DfgImpl();
+	public static Triple<DirectlyFollowsModel, Integer, String> parse(String startActivities, String edges,
+			String endActivities, boolean emptyTraces) throws IOException {
+		DirectlyFollowsModel dfg = new DfgMsdImpl();
 
 		//start activities
 		DfgActivityNodiser startActivityNodiser = new DfgActivityNodiser(startActivities);
-		parseStartActivities(startActivityNodiser, dfg, map);
+		parseStartActivities(startActivityNodiser, dfg);
 
 		//edges
 		DfgEdgeNodiser edgeNodiser = new DfgEdgeNodiser(edges);
-		Pair<Integer, String> p = parseEdges(edgeNodiser, dfg, map);
+		Pair<Integer, String> p = parseEdges(edgeNodiser, dfg);
 		if (p.getA() >= 0) {
 			return Triple.of(null, p.getA(), p.getB());
 		}
 
 		//start activities
 		DfgActivityNodiser endActivityNodiser = new DfgActivityNodiser(endActivities);
-		parseEndActivities(endActivityNodiser, dfg, map);
+		parseEndActivities(endActivityNodiser, dfg);
+
+		//empty traces
+		if (emptyTraces) {
+			dfg.setNumberOfEmptyTraces(1);
+		}
 
 		return Triple.of(dfg, -1, null);
-	}
-
-	public static XEventClass registerActivity(Map<String, XEventClass> map, String activity) {
-		if (map.containsKey(activity)) {
-			return map.get(activity);
-		}
-		map.put(activity, new XEventClass(activity, map.size()));
-		return map.get(activity);
 	}
 
 	/**
@@ -58,15 +50,15 @@ public class DfgParser {
 	 *         an error message.
 	 * @throws IOException
 	 */
-	public static Pair<Integer, String> parseEdges(DfgEdgeNodiser nodiser, Dfg dfg, Map<String, XEventClass> map)
+	public static Pair<Integer, String> parseEdges(DfgEdgeNodiser nodiser, DirectlyFollowsModel dfg)
 			throws IOException {
 
 		while (nodiser.nextNode()) {
 			if (nodiser.getLastNodeType() != NodeType.activity) {
 				return Pair.of(nodiser.getLastLineNumber(), "Expected an activity.");
 			}
-			XEventClass source = registerActivity(map, nodiser.getLastActivity());
-			dfg.addActivity(source);
+			String source = nodiser.getLastActivity();
+			int sourceIndex = dfg.addActivity(source);
 
 			if (!nodiser.nextNode() || nodiser.getLastNodeType() != NodeType.edgeSymbol) {
 				return Pair.of(nodiser.getLastLineNumber(), "Expected ->.");
@@ -75,8 +67,8 @@ public class DfgParser {
 			if (!nodiser.nextNode() || nodiser.getLastNodeType() != NodeType.activity) {
 				return Pair.of(nodiser.getLastLineNumber(), "Expected an activity.");
 			}
-			XEventClass target = registerActivity(map, nodiser.getLastActivity());
-			dfg.addActivity(target);
+			String target = nodiser.getLastActivity();
+			int targetIndex = dfg.addActivity(target);
 
 			long cardinality;
 			if (nodiser.nextNode()) {
@@ -98,27 +90,25 @@ public class DfgParser {
 				cardinality = 1;
 			}
 
-			dfg.addDirectlyFollowsEdge(source, target, cardinality);
+			dfg.getDirectlyFollowsGraph().addEdge(sourceIndex, targetIndex, cardinality);
 		}
 
 		return Pair.of(-1, null);
 	}
 
-	public static void parseStartActivities(DfgActivityNodiser nodiser, Dfg dfg, Map<String, XEventClass> map)
-			throws IOException {
+	public static void parseStartActivities(DfgActivityNodiser nodiser, DirectlyFollowsModel dfg) throws IOException {
 		while (nodiser.nextNode()) {
-			XEventClass source = registerActivity(map, nodiser.getLastActivity());
-			dfg.addActivity(source);
-			dfg.addStartActivity(source, 1);
+			String source = nodiser.getLastActivity();
+			int index = dfg.addActivity(source);
+			dfg.getStartActivities().add(index);
 		}
 	}
 
-	public static void parseEndActivities(DfgActivityNodiser nodiser, Dfg dfg, Map<String, XEventClass> map)
-			throws IOException {
+	public static void parseEndActivities(DfgActivityNodiser nodiser, DirectlyFollowsModel dfg) throws IOException {
 		while (nodiser.nextNode()) {
-			XEventClass source = registerActivity(map, nodiser.getLastActivity());
-			dfg.addActivity(source);
-			dfg.addEndActivity(source, 1);
+			String source = nodiser.getLastActivity();
+			int index = dfg.addActivity(source);
+			dfg.getEndActivities().add(index);
 		}
 	}
 }

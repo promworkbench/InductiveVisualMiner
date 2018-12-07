@@ -173,10 +173,21 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 		return null;
 	}
 
-	public static IvMMove move2ivmMove(IvMModel tree, Move move, XTrace trace, int eventIndex) {
+	/**
+	 * Fetches information from an XTrace and stores it in a better accessible
+	 * format.
+	 * 
+	 * @param model
+	 * @param move
+	 * @param trace
+	 * @param eventIndex
+	 *            the index of the move in the trace.
+	 * @return
+	 */
+	public static IvMMove move2ivmMove(IvMModel model, Move move, XTrace trace, int eventIndex) {
 		if (move.isTauStart()) {
 			//tau-start
-			return new IvMMove(tree, move, null, null, null);
+			return new IvMMove(model, move, null, null, null);
 		} else if (move.getActivityEventClass() != null) {
 			//sync move or log move
 
@@ -185,10 +196,10 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 
 			String resource = ResourceTimeUtils.getResource(event);
 
-			return new IvMMove(tree, move, timestamp, resource, event.getAttributes());
+			return new IvMMove(model, move, timestamp, resource, event.getAttributes());
 		} else {
 			//model move or tau
-			return new IvMMove(tree, move, null, null, null);
+			return new IvMMove(model, move, null, null, null);
 		}
 	}
 

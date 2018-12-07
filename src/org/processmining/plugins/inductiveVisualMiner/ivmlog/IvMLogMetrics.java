@@ -124,7 +124,8 @@ public class IvMLogMetrics {
 	public static Pair<Long, Long> getExtremesDfg(IvMModel model, IvMLogInfo logInfo) {
 		long min = Long.MAX_VALUE;
 		long max = Long.MIN_VALUE;
-		for (int node : model.getDfg().getActivityIndices()) {
+		//nodes
+		for (int node : model.getAllNodes()) {
 			//node itself
 			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, node, logInfo);
 			min = Math.min(min, occurrences);
@@ -140,10 +141,17 @@ public class IvMLogMetrics {
 			min = Math.min(min, occurrences);
 			max = Math.max(max, occurrences);
 		}
-		for (long edge : model.getDfg().getDirectlyFollowsEdges()) {
-			int from = model.getDfg().getDirectlyFollowsEdgeSourceIndex(edge);
-			int to = model.getDfg().getDirectlyFollowsEdgeTargetIndex(edge);
+		//edges
+		for (long edge : model.getDfg().getDirectlyFollowsGraph().getEdges()) {
+			int from = model.getDfg().getDirectlyFollowsGraph().getEdgeSource(edge);
+			int to = model.getDfg().getDirectlyFollowsGraph().getEdgeTargetIndex(edge);
 			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, from, to, true, logInfo);
+			min = Math.min(min, occurrences);
+			max = Math.max(max, occurrences);
+		}
+		//empty traces
+		if (model.getDfg().getNumberOfEmptyTraces() > 0) {
+			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, -1, -1, true, logInfo);
 			min = Math.min(min, occurrences);
 			max = Math.max(max, occurrences);
 		}

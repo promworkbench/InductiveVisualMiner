@@ -9,9 +9,9 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.plugins.InductiveMiner.Sextuple;
-import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.astar.petrinet.PetrinetReplayerWithILP;
 import org.processmining.plugins.connectionfactories.logpetrinet.TransEvClassMapping;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.petrinet.replayer.PNLogReplayer;
 import org.processmining.plugins.petrinet.replayer.algorithms.IPNReplayAlgorithm;
 import org.processmining.plugins.petrinet.replayer.algorithms.costbasedcomplete.CostBasedCompleteParam;
@@ -22,7 +22,7 @@ import gnu.trove.map.TObjectIntMap;
 import nl.tue.astar.AStarException;
 
 public class AcceptingPetriNetAlignment {
-	public static void align(Dfg dfg,
+	public static void align(DirectlyFollowsModel dfg,
 			Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p,
 			XLog log, IvMEventClasses eventClasses, AcceptingPetriNetAlignmentCallback callback,
 			final ProMCanceller canceller) throws AStarException {
@@ -71,9 +71,9 @@ public class AcceptingPetriNetAlignment {
 		eventClasses.harmonizeIndices();
 	}
 
-	public static void addAllLeavesAsEventClasses(IvMEventClasses eventClasses, Dfg dfg) {
-		for (XEventClass a : dfg.getActivities()) {
-			eventClasses.register(a.getId());
+	public static void addAllLeavesAsEventClasses(IvMEventClasses eventClasses, DirectlyFollowsModel dfg) {
+		for (String a : dfg.getAllActivities()) {
+			eventClasses.register(a);
 		}
 		eventClasses.harmonizeIndices();
 	}

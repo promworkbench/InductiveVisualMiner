@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplEmpty;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
-import org.processmining.plugins.inductiveVisualMiner.visualisation.DfgVisualisation;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.DfmVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisation;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
@@ -39,7 +39,7 @@ public class Cl06LayoutModel extends
 			ProcessTreeVisualisation visualiser = new ProcessTreeVisualisation();
 			p = visualiser.fancy(model, data, input.getB());
 		} else {
-			DfgVisualisation visualiser = new DfgVisualisation();
+			DfmVisualisation visualiser = new DfmVisualisation();
 			p = visualiser.fancy(model, data, input.getB());
 		}
 

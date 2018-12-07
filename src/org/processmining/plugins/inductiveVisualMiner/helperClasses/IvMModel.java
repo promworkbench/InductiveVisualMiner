@@ -1,22 +1,20 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
-import java.util.Iterator;
-
-import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 
 public class IvMModel {
 
 	private final IvMEfficientTree tree;
-	private final Dfg dfg;
+	private final DirectlyFollowsModel dfg;
 
 	public IvMModel(EfficientTree tree) {
 		this.tree = new IvMEfficientTree(tree);
 		this.dfg = null;
 	}
 
-	public IvMModel(Dfg dfg) {
+	public IvMModel(DirectlyFollowsModel dfg) {
 		this.tree = null;
 		this.dfg = dfg;
 	}
@@ -33,7 +31,7 @@ public class IvMModel {
 		return dfg != null;
 	}
 
-	public Dfg getDfg() {
+	public DirectlyFollowsModel getDfg() {
 		return dfg;
 	}
 
@@ -41,7 +39,7 @@ public class IvMModel {
 		if (isTree()) {
 			return tree.getActivityName(node);
 		} else {
-			return dfg.getActivityOfIndex(node).getId();
+			return dfg.getActivityOfIndex(node);
 		}
 	}
 
@@ -57,22 +55,7 @@ public class IvMModel {
 		if (isTree()) {
 			return EfficientTreeUtils.getAllNodes(tree);
 		} else {
-			return new Iterable<Integer>() {
-				public Iterator<Integer> iterator() {
-					return new Iterator<Integer>() {
-						int now = -1;
-
-						public Integer next() {
-							now++;
-							return now;
-						}
-
-						public boolean hasNext() {
-							return now < dfg.getNumberOfActivities() - 1;
-						}
-					};
-				}
-			};
+			return dfg.getActivities();
 		}
 	}
 
@@ -125,6 +108,6 @@ public class IvMModel {
 		if (this.tree != null) {
 			return this.tree.getMaxNumberOfNodes();
 		}
-		return this.dfg.getNumberOfActivities();
+		return this.dfg.getAllActivities().length;
 	}
 }

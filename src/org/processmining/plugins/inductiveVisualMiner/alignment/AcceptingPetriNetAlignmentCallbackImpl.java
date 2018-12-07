@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
@@ -149,12 +150,12 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 					lifeCycleTransition = PerformanceTransition.start;
 					activityIndex = activity2skipStart.get(performanceUnode);
 				}
-				XEventClass activity = model.getDfg().getActivityOfIndex(activityIndex);
+				XEventClass activity = activityEventClasses
+						.getByIdentity(model.getDfg().getActivityOfIndex(activityIndex));
 				XEventClass performanceActivity = performanceEventClasses
 						.getByIdentity(activity.getId() + "+" + lifeCycleTransition);
-				return Pair.of(new Move(model, Type.ignoredModelMove, previousModelNode,
-						model.getDfg().getIndexOfActivity(activity), activity, performanceActivity, lifeCycleTransition,
-						moveIndex), previousModelNode);
+				return Pair.of(new Move(model, Type.ignoredModelMove, previousModelNode, activityIndex, activity,
+						performanceActivity, lifeCycleTransition, moveIndex), previousModelNode);
 			}
 		} else if (type == StepTypes.MREAL) {
 			//model move
@@ -163,24 +164,24 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 			PerformanceTransition lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode.getLabel());
 			XEventClass performanceActivity = performanceEventClasses.getByIdentity(((Transition) node).getLabel());
 			XEventClass activity = Performance.getActivity(performanceActivity, activityEventClasses);
+			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllActivities(), activity.getId());
 			assert (activity != null);
-			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete
-					? model.getDfg().getIndexOfActivity(activity) : previousModelNode;
-			return Pair
-					.of(new Move(model, Type.modelMove, previousModelNode, model.getDfg().getIndexOfActivity(activity),
-							activity, performanceActivity, lifeCycleTransition, moveIndex), newPreviousModelNode);
+			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete ? activityIndex
+					: previousModelNode;
+			return Pair.of(new Move(model, Type.modelMove, previousModelNode, activityIndex, null,
+					null, lifeCycleTransition, moveIndex), newPreviousModelNode);
 		} else if (type == StepTypes.LMGOOD) {
 			assert (node instanceof Transition);
 			Transition performanceUnode = (Transition) node;
 			XEventClass performanceActivity = performanceEventClasses.getClassOf(trace.get(event));
 			XEventClass activity = Performance.getActivity(performanceActivity, activityEventClasses);
+			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllActivities(), activity.getId());
 			PerformanceTransition lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode.getLabel());
 
-			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete
-					? model.getDfg().getIndexOfActivity(activity) : previousModelNode;
-			return Pair.of(new Move(model, Type.synchronousMove, previousModelNode,
-					model.getDfg().getIndexOfActivity(activity), activity, performanceActivity, lifeCycleTransition,
-					moveIndex), newPreviousModelNode);
+			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete ? activityIndex
+					: previousModelNode;
+			return Pair.of(new Move(model, Type.synchronousMove, previousModelNode, activityIndex, activity,
+					performanceActivity, lifeCycleTransition, moveIndex), newPreviousModelNode);
 		}
 		return null;
 	}

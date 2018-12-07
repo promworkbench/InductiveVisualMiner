@@ -14,11 +14,11 @@ import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.ProcessTree2EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapperPluginFinder;
 import org.processmining.processtree.ProcessTree;
@@ -73,7 +73,7 @@ public class InductiveVisualMiner {
 			state = new InductiveVisualMinerState(log, preMinedTree);
 		} else {
 			//launch with pre-mined dfg
-			Dfg preMinedDfg = launcher.preMinedDfg.get();
+			DirectlyFollowsModel preMinedDfg = launcher.preMinedDfg.get();
 			if (preMinedDfg == null) {
 				throw new RuntimeException("The pre-mined tree has been removed by garbage collection.");
 			}
@@ -91,10 +91,10 @@ public class InductiveVisualMiner {
 	public static class InductiveVisualMinerLauncher {
 		public final SoftReference<XLog> xLog;
 		public final SoftReference<EfficientTree> preMinedTree;
-		public final SoftReference<Dfg> preMinedDfg;
+		public final SoftReference<DirectlyFollowsModel> preMinedDfg;
 
 		private InductiveVisualMinerLauncher(SoftReference<XLog> xLog, SoftReference<EfficientTree> preMinedTree,
-				SoftReference<Dfg> preMinedDfg) {
+				SoftReference<DirectlyFollowsModel> preMinedDfg) {
 			this.xLog = xLog;
 			this.preMinedTree = preMinedTree;
 			this.preMinedDfg = preMinedDfg;
@@ -114,7 +114,7 @@ public class InductiveVisualMiner {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), new SoftReference<>(preMinedTree), null);
 		}
 
-		public static InductiveVisualMinerLauncher launcher(XLog xLog, Dfg preMinedDfg) {
+		public static InductiveVisualMinerLauncher launcher(XLog xLog, DirectlyFollowsModel preMinedDfg) {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, new SoftReference<>(preMinedDfg));
 		}
 
@@ -169,7 +169,7 @@ public class InductiveVisualMiner {
 							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a directly follows graph and visualise the results as Inductive visual Miner, including its filtering options.")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
-	public InductiveVisualMinerLauncher mineGuiDfg(PluginContext context, XLog xLog, Dfg dfg) {
+	public InductiveVisualMinerLauncher mineGuiDfg(PluginContext context, XLog xLog, DirectlyFollowsModel dfg) {
 		return InductiveVisualMinerLauncher.launcher(xLog, dfg);
 	}
 }

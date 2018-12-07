@@ -657,9 +657,10 @@ public class InductiveVisualMinerController {
 					options[2] = "Process Tree";
 					options[3] = "Efficient tree";
 				} else {
-					options = new Object[2];
+					options = new Object[3];
 					options[0] = "Petri net";
 					options[1] = "Accepting Petri net";
+					options[2] = "Directly follows model";
 				}
 
 				int n = JOptionPane.showOptionDialog(panel,
@@ -675,7 +676,11 @@ public class InductiveVisualMinerController {
 						ExportModel.exportAcceptingPetriNet(context, model, name, canceller);
 						break;
 					case 2 :
-						ExportModel.exportProcessTree(context, model.getTree().getDTree(), name);
+						if (model.isTree()) {
+							ExportModel.exportProcessTree(context, model.getTree().getDTree(), name);
+						} else {
+							ExportModel.exportDirectlyFollowsModel(context, model, name);
+						}
 						break;
 					case 3 :
 						ExportModel.exportEfficientTree(context, model.getTree(), name);

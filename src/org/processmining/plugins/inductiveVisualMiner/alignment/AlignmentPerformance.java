@@ -44,7 +44,7 @@ public class AlignmentPerformance {
 		IvMEventClasses performanceEventClasses2 = new IvMEventClasses(performanceEventClasses);
 
 		//make a Petri net to align
-		Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p = Dfg2AcceptingPetriNet
+		Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p = Dfm2AcceptingPetriNet
 				.convertForPerformance(model.getDfg());
 
 		AcceptingPetriNetAlignment.addAllLeavesAsEventClasses(activityEventClasses2, model.getDfg());

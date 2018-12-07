@@ -12,6 +12,7 @@ import javax.swing.border.EmptyBorder;
 import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeEditor;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
@@ -89,7 +90,7 @@ public class EditModelView extends SideWindow {
 	public static class IvMDfgEditor extends DfgEditor {
 		private static final long serialVersionUID = -3553121183719500176L;
 
-		public IvMDfgEditor(Dfg dfg, String message) {
+		public IvMDfgEditor(DirectlyFollowsModel dfg, String message) {
 			super(dfg, message);
 
 			IvMDecorator.decorate(labelStartActivities);
@@ -134,6 +135,8 @@ public class EditModelView extends SideWindow {
 			textEndActivities.setCurrentLineHighlightColor(IvMDecorator.backGroundColour1);
 			textEndActivities.setFadeCurrentLineHighlight(true);
 			textEndActivities.revalidate();
+			
+			IvMDecorator.decorate(emptyTraces);
 
 			IvMDecorator.decorate(errorMessage);
 
@@ -164,7 +167,7 @@ public class EditModelView extends SideWindow {
 		dfgEditor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() instanceof Dfg) {
-					e.setSource(new IvMModel((Dfg) e.getSource()));
+					e.setSource(new IvMModel((DirectlyFollowsModel) e.getSource()));
 				}
 				actionListener.actionPerformed(e);
 			}

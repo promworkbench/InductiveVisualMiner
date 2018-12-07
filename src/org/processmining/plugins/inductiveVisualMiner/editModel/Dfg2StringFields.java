@@ -1,39 +1,34 @@
 package org.processmining.plugins.inductiveVisualMiner.editModel;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.deckfour.xes.classification.XEventClass;
-import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 
 public class Dfg2StringFields {
 
-	public static String getStartActivities(Dfg dfg) {
+	public static String getStartActivities(DirectlyFollowsModel dfg) {
 		StringBuilder result = new StringBuilder();
-		for (XEventClass activity : dfg.getStartActivities()) {
-			result.append(activity);
+		for (int activity : dfg.getStartActivities()) {
+			result.append(dfg.getActivityOfIndex(activity));
 			result.append("\n");
 		}
 		return result.toString();
 	}
 
-	public static String getEndActivities(Dfg dfg) {
+	public static String getEndActivities(DirectlyFollowsModel dfg) {
 		StringBuilder result = new StringBuilder();
-		for (XEventClass activity : dfg.getEndActivities()) {
-			result.append(activity);
+		for (int activity : dfg.getEndActivities()) {
+			result.append(dfg.getActivityOfIndex(activity));
 			result.append("\n");
 		}
 		return result.toString();
 	}
 
-	public static String getEdges(Dfg dfg) {
+	public static String getEdges(DirectlyFollowsModel dfg) {
 		StringBuilder result = new StringBuilder();
-		for (long edge : dfg.getDirectlyFollowsEdges()) {
-			result.append(escapeNode(dfg.getDirectlyFollowsEdgeSource(edge).getId()));
+		for (long edge : dfg.getDirectlyFollowsGraph().getEdges()) {
+			result.append(escapeNode(dfg.getActivityOfIndex(dfg.getDirectlyFollowsGraph().getEdgeSource(edge))));
 			result.append(" -> ");
-			result.append(escapeNode(dfg.getDirectlyFollowsEdgeTarget(edge).getId()));
-			if (dfg.getDirectlyFollowsEdgeCardinality(edge) > 1) {
-				result.append(" -x- ");
-				result.append(dfg.getDirectlyFollowsEdgeCardinality(edge));
-			}
+			result.append(escapeNode(dfg.getActivityOfIndex(dfg.getDirectlyFollowsGraph().getEdgeTarget(edge))));
 			result.append("\n");
 		}
 		return result.toString();

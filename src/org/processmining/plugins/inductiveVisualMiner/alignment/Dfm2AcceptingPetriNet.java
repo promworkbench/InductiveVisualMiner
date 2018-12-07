@@ -10,7 +10,7 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Transition
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetImpl;
 import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.plugins.InductiveMiner.Sextuple;
-import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
@@ -18,9 +18,9 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
 
-public class Dfg2AcceptingPetriNet {
-	public static AcceptingPetriNet convert(Dfg dfg) {
-		Petrinet petriNet = new PetrinetImpl("converted from Dfg");
+public class Dfm2AcceptingPetriNet {
+	public static AcceptingPetriNet convert(DirectlyFollowsModel dfg) {
+		Petrinet petriNet = new PetrinetImpl("converted from Dfm");
 		Place source = petriNet.addPlace("net source");
 		Place sink = petriNet.addPlace("net sink");
 		Marking initialMarking = new Marking();
@@ -29,25 +29,34 @@ public class Dfg2AcceptingPetriNet {
 		finalMarking.add(sink);
 
 		/**
+		 * empty traces
+		 */
+		if (dfg.getNumberOfActivities() > 0) {
+			Transition epsilon = petriNet.addTransition("epsilon");
+			epsilon.setInvisible(true);
+			petriNet.addArc(source, epsilon);
+			petriNet.addArc(epsilon, sink);
+		}
+
+		/**
 		 * Activities (states)
 		 */
 		TIntObjectMap<Place> activity2place = new TIntObjectHashMap<>();
-		for (int activity : dfg.getActivityIndices()) {
-			Place place = petriNet.addPlace(dfg.getActivityOfIndex(activity).getId());
+		for (int activity : dfg.getActivities()) {
+			Place place = petriNet.addPlace(dfg.getActivityOfIndex(activity));
 			activity2place.put(activity, place);
 		}
 
 		/**
 		 * Transitions
 		 */
-		for (long edge : dfg.getDirectlyFollowsEdges()) {
-			int sourceActivity = dfg.getDirectlyFollowsEdgeSourceIndex(edge);
-			int targetActivity = dfg.getDirectlyFollowsEdgeTargetIndex(edge);
+		for (long edge : dfg.getDirectlyFollowsGraph().getEdges()) {
+			int sourceActivity = dfg.getDirectlyFollowsGraph().getEdgeSource(edge);
+			int targetActivity = dfg.getDirectlyFollowsGraph().getEdgeTarget(edge);
 			Place sourcePlace = activity2place.get(sourceActivity);
 			Place targetPlace = activity2place.get(targetActivity);
 
-			Transition transition = petriNet.addTransition(
-					dfg.getActivityOfIndex(sourceActivity).getId() + " -> " + dfg.getActivityOfIndex(targetActivity));
+			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(targetActivity));
 
 			petriNet.addArc(sourcePlace, transition);
 			petriNet.addArc(transition, targetPlace);
@@ -56,8 +65,8 @@ public class Dfg2AcceptingPetriNet {
 		/**
 		 * Starts
 		 */
-		for (int activity : dfg.getStartActivityIndices()) {
-			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(activity).getId());
+		for (int activity : dfg.getStartActivities()) {
+			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(activity));
 
 			petriNet.addArc(source, transition);
 			petriNet.addArc(transition, activity2place.get(activity));
@@ -66,8 +75,8 @@ public class Dfg2AcceptingPetriNet {
 		/**
 		 * Ends
 		 */
-		for (int activity : dfg.getEndActivityIndices()) {
-			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(activity).getId() + " -> end");
+		for (int activity : dfg.getEndActivities()) {
+			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(activity) + " -> end");
 			transition.setInvisible(true);
 
 			petriNet.addArc(activity2place.get(activity), transition);
@@ -78,7 +87,7 @@ public class Dfg2AcceptingPetriNet {
 	}
 
 	public static Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> convertForPerformance(
-			Dfg dfg) {
+			DirectlyFollowsModel dfg) {
 		TObjectIntMap<Transition> activity2skipEnqueue = new TObjectIntHashMap<>(10, 0.5f, -1);
 		TObjectIntMap<Transition> activity2skipStart = new TObjectIntHashMap<>(10, 0.5f, -1);
 		Set<Transition> startTransitions = new THashSet<>();
@@ -92,20 +101,30 @@ public class Dfg2AcceptingPetriNet {
 		initialMarking.add(source);
 		Marking finalMarking = new Marking();
 		finalMarking.add(sink);
+		
+		/**
+		 * empty traces
+		 */
+		if (dfg.getNumberOfActivities() > 0) {
+			Transition epsilon = petriNet.addTransition("epsilon");
+			epsilon.setInvisible(true);
+			petriNet.addArc(source, epsilon);
+			petriNet.addArc(epsilon, sink);
+		}
 
 		/**
 		 * Activities (states)
 		 */
 		TIntObjectMap<Place> activity2EnqueuePlace = new TIntObjectHashMap<>();
 		TIntObjectMap<Place> activity2EndPlace = new TIntObjectHashMap<>();
-		for (int activity : dfg.getActivityIndices()) {
-			Place enqueuePlace = petriNet.addPlace(dfg.getActivityOfIndex(activity).getId() + " enqueue");
+		for (int activity : dfg.getActivities()) {
+			Place enqueuePlace = petriNet.addPlace(dfg.getActivityOfIndex(activity) + " enqueue");
 			activity2EnqueuePlace.put(activity, enqueuePlace);
 
-			Place startPlace = petriNet.addPlace(dfg.getActivityOfIndex(activity).getId() + " start");
-			Place completePlace = petriNet.addPlace(dfg.getActivityOfIndex(activity).getId() + " complete");
+			Place startPlace = petriNet.addPlace(dfg.getActivityOfIndex(activity) + " start");
+			Place completePlace = petriNet.addPlace(dfg.getActivityOfIndex(activity) + " complete");
 
-			Place endPlace = petriNet.addPlace(dfg.getActivityOfIndex(activity).getId() + " end");
+			Place endPlace = petriNet.addPlace(dfg.getActivityOfIndex(activity) + " end");
 			activity2EndPlace.put(activity, endPlace);
 
 			Transition enqueue = petriNet
@@ -136,9 +155,9 @@ public class Dfg2AcceptingPetriNet {
 		/**
 		 * Transitions
 		 */
-		for (long edge : dfg.getDirectlyFollowsEdges()) {
-			int sourceActivity = dfg.getDirectlyFollowsEdgeSourceIndex(edge);
-			int targetActivity = dfg.getDirectlyFollowsEdgeTargetIndex(edge);
+		for (long edge : dfg.getDirectlyFollowsGraph().getEdges()) {
+			int sourceActivity = dfg.getDirectlyFollowsGraph().getEdgeSource(edge);
+			int targetActivity = dfg.getDirectlyFollowsGraph().getEdgeTarget(edge);
 			Place sourcePlace = activity2EndPlace.get(sourceActivity);
 			Place targetPlace = activity2EnqueuePlace.get(targetActivity);
 
@@ -153,8 +172,8 @@ public class Dfg2AcceptingPetriNet {
 		/**
 		 * Starts
 		 */
-		for (int activity : dfg.getStartActivityIndices()) {
-			Transition transition = petriNet.addTransition("start -> " + dfg.getActivityOfIndex(activity).getId());
+		for (int activity : dfg.getStartActivities()) {
+			Transition transition = petriNet.addTransition("start -> " + dfg.getActivityOfIndex(activity));
 			transition.setInvisible(true);
 			startTransitions.add(transition);
 
@@ -165,8 +184,8 @@ public class Dfg2AcceptingPetriNet {
 		/**
 		 * Ends
 		 */
-		for (int activity : dfg.getEndActivityIndices()) {
-			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(activity).getId() + " -> end");
+		for (int activity : dfg.getEndActivities()) {
+			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(activity) + " -> end");
 			transition.setInvisible(true);
 			endTransitions.add(transition);
 

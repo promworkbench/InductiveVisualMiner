@@ -65,6 +65,7 @@ public class IvMLogInfo {
 			lastModelSyncNode = -1;
 			inParallelNodes.clear();
 			boolean traceContainsLogMove = false;
+			
 			for (int i = 0; i < trace.size(); i++) {
 				Move move = trace.get(i);
 				activities.add(move);

@@ -12,7 +12,8 @@ import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree2AcceptingPetriNet;
 import org.processmining.plugins.InductiveMiner.reduceacceptingpetrinet.ReduceAcceptingPetriNetKeepLanguage;
-import org.processmining.plugins.inductiveVisualMiner.alignment.Dfg2AcceptingPetriNet;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
+import org.processmining.plugins.inductiveVisualMiner.alignment.Dfm2AcceptingPetriNet;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.processtree.ProcessTree;
 
@@ -45,7 +46,7 @@ public class ExportModel {
 		if (model.isTree()) {
 			net = EfficientTree2AcceptingPetriNet.convert(model.getTree());
 		} else {
-			net = Dfg2AcceptingPetriNet.convertForPerformance(model.getDfg()).getA();
+			net = Dfm2AcceptingPetriNet.convert(model.getDfg());
 		}
 		ReduceAcceptingPetriNetKeepLanguage.reduce(net, new Canceller() {
 			public boolean isCancelled() {
@@ -70,7 +71,7 @@ public class ExportModel {
 		if (model.isTree()) {
 			pnwm = EfficientTree2AcceptingPetriNet.convert(model.getTree());
 		} else {
-			pnwm = Dfg2AcceptingPetriNet.convert(model.getDfg());
+			pnwm = Dfm2AcceptingPetriNet.convert(model.getDfg());
 		}
 
 		ReduceAcceptingPetriNetKeepLanguage.reduce(pnwm, new Canceller() {
@@ -91,6 +92,15 @@ public class ExportModel {
 				pnwm.getFinalMarkings().iterator().next(), Marking.class, context);
 		context.addConnection(new InitialMarkingConnection(pnwm.getNet(), pnwm.getInitialMarking()));
 		context.addConnection(new FinalMarkingConnection(pnwm.getNet(), pnwm.getFinalMarkings().iterator().next()));
+	}
+
+	public static void exportDirectlyFollowsModel(PluginContext context, IvMModel model, String name) {
+		context.getProvidedObjectManager().createProvidedObject("Directly follows model of " + name, model.getDfg(),
+				DirectlyFollowsModel.class, context);
+		if (context instanceof UIPluginContext) {
+			((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(model.getDfg())
+					.setFavorite(true);
+		}
 	}
 
 }

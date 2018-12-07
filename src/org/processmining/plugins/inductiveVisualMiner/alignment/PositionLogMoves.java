@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
-import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
@@ -36,7 +36,7 @@ public class PositionLogMoves {
 		}
 	}
 
-	private void positionLogMovesDfg(Dfg dfg, List<IvMMove> trace, long cardinality) {
+	private void positionLogMovesDfg(DirectlyFollowsModel dfg, List<IvMMove> trace, long cardinality) {
 		if (trace.isEmpty()) {
 			return;
 		}

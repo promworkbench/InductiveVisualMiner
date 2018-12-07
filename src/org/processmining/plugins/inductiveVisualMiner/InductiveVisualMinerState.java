@@ -9,13 +9,13 @@ import org.deckfour.xes.classification.XEventNameClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
-import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.MiningParameters;
 import org.processmining.plugins.InductiveMiner.mining.MiningParametersIMf;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
@@ -57,7 +57,7 @@ public class InductiveVisualMinerState {
 		}
 	}
 
-	public InductiveVisualMinerState(Dfg preMinedDfg, XLog xLog) throws UnknownTreeNodeException {
+	public InductiveVisualMinerState(DirectlyFollowsModel preMinedDfg, XLog xLog) throws UnknownTreeNodeException {
 		this.xLog = xLog;
 		miningParameters = new MiningParametersIMf();
 		if (preMinedDfg != null) {
