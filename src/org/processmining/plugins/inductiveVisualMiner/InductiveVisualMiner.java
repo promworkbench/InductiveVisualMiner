@@ -64,6 +64,10 @@ public class InductiveVisualMiner {
 		}
 		if (launcher.preMinedTree == null && launcher.preMinedDfg == null) {
 			state = new InductiveVisualMinerState(log, null);
+			//pre-set the miner if necessary
+			if (launcher.getMiner() != null) {
+				state.setMiner(launcher.getMiner());
+			}
 		} else if (launcher.preMinedTree != null) {
 			//launch with pre-mined tree
 			EfficientTree preMinedTree = launcher.preMinedTree.get();
@@ -92,12 +96,17 @@ public class InductiveVisualMiner {
 		public final SoftReference<XLog> xLog;
 		public final SoftReference<EfficientTree> preMinedTree;
 		public final SoftReference<DirectlyFollowsModel> preMinedDfg;
+		private VisualMinerWrapper miner;
 
 		private InductiveVisualMinerLauncher(SoftReference<XLog> xLog, SoftReference<EfficientTree> preMinedTree,
 				SoftReference<DirectlyFollowsModel> preMinedDfg) {
 			this.xLog = xLog;
 			this.preMinedTree = preMinedTree;
 			this.preMinedDfg = preMinedDfg;
+		}
+
+		public VisualMinerWrapper getMiner() {
+			return miner;
 		}
 
 		public static InductiveVisualMinerLauncher launcher(XLog xLog) {
@@ -127,6 +136,10 @@ public class InductiveVisualMiner {
 		public static InductiveVisualMinerLauncher launcherPro(XLog xLog, ProcessTree preMinedTree) {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog),
 					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)), null);
+		}
+
+		public void setMiner(VisualMinerWrapper miner) {
+			this.miner = miner;
 		}
 	}
 
@@ -160,16 +173,5 @@ public class InductiveVisualMiner {
 	public InductiveVisualMinerLauncher mineGuiEfficientTree(PluginContext context, XLog xLog,
 			EfficientTree preMinedTree) {
 		return InductiveVisualMinerLauncher.launcher(xLog, preMinedTree);
-	}
-
-	@Plugin(name = "Visualise deviations on directly follows graph (Inductive visual Miner)", returnLabels = {
-			"Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
-					"Event log", "Directly follows graph" }, userAccessible = true, categories = {
-							PluginCategory.Analytics,
-							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a directly follows graph and visualise the results as Inductive visual Miner, including its filtering options.")
-	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
-	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
-	public InductiveVisualMinerLauncher mineGuiDfg(PluginContext context, XLog xLog, DirectlyFollowsModel dfg) {
-		return InductiveVisualMinerLauncher.launcher(xLog, dfg);
 	}
 }
