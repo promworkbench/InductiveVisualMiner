@@ -134,10 +134,10 @@ public class DfmVisualisation {
 			//log move
 			//draw an intermediate node with a self-loop on it
 			LocalDotNode intermediateNode = new LocalDotNode(dot, info, NodeType.xor, "", -1, null);
-			LocalDotEdge edge1 = new LocalDotEdge(null, dot, info, from, intermediateNode, " ", -1, EdgeType.model,
+			new LocalDotEdge(null, dot, info, from, intermediateNode, " ", -1, EdgeType.model,
 					fromNode, toNode, directionForward);
-			LocalDotEdge edge2 = new LocalDotEdge(null, dot, info, intermediateNode, to, " ", -1, EdgeType.model,
-					fromNode, toNode, directionForward);
+			new LocalDotEdge(null, dot, info, intermediateNode, to, " ", -1, EdgeType.model, fromNode, toNode,
+					directionForward);
 
 			Pair<String, Long> t = Pair.of(logMoves.getA(), logMoves.getB().size());
 			addMoveArc(intermediateNode, intermediateNode, -1, EdgeType.logMove, logMovePosition.getOn(),

@@ -59,6 +59,20 @@ public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, Performan
 					if (activityLog.hasInitiate(i) && activityLog.hasComplete(i)) {
 						result.addValue(Type.sojourn, unode, activityLog.getComplete(i) - activityLog.getInitiate(i));
 					}
+
+					//elapsed time
+					if (activityLog.hasStartTrace(i) && activityLog.hasStart(i)) {
+						result.addValue(Type.elapsed, unode, activityLog.getStart(i) - activityLog.getStartTrace(i));
+					} else if (activityLog.hasStartTrace(i) && activityLog.hasComplete(i)) {
+						result.addValue(Type.elapsed, unode, activityLog.getComplete(i) - activityLog.getStartTrace(i));
+					}
+
+					//remaining time
+					if (activityLog.hasEndTrace(i) && activityLog.hasComplete(i)) {
+						result.addValue(Type.remaining, unode, activityLog.getEndTrace(i) - activityLog.getComplete(i));
+					} else if (activityLog.hasEndTrace(i) && activityLog.hasStart(i)) {
+						result.addValue(Type.remaining, unode, activityLog.getEndTrace(i) - activityLog.getStart(i));
+					}
 				}
 			}
 

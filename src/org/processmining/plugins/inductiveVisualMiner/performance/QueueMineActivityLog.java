@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
+import java.util.Collections;
+
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
@@ -22,6 +24,27 @@ public class QueueMineActivityLog {
 
 	public static void mine(IvMModel model, IvMTrace tTrace, TIntObjectMap<QueueActivityLog> timestamps) {
 		ActivityInstanceIterator it = tTrace.activityInstanceIterator(model);
+
+		//find the start timestamp of the trace
+		Long startTrace = null;
+		for (IvMMove move : tTrace) {
+			if (move.getLogTimestamp() != null) {
+				startTrace = move.getLogTimestamp();
+				break;
+			}
+		}
+
+		//find the end timestamp of the trace
+		Long endTrace = null;
+		Collections.reverse(tTrace);
+		for (IvMMove move : tTrace) {
+			if (move.getLogTimestamp() != null) {
+				endTrace = move.getLogTimestamp();
+				break;
+			}
+		}
+		Collections.reverse(tTrace);
+
 		while (it.hasNext()) {
 			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> activityInstance = it.next();
 
@@ -52,7 +75,8 @@ public class QueueMineActivityLog {
 					timestamps.put(node, new QueueActivityLog());
 				}
 
-				timestamps.get(node).add(activityInstance.getB(), initiate, enqueue, start, complete);
+				timestamps.get(node).add(activityInstance.getB(), startTrace, initiate, enqueue, start, complete,
+						endTrace);
 			}
 		}
 	}
