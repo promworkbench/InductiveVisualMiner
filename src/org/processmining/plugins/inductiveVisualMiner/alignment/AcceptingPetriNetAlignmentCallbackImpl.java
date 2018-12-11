@@ -168,8 +168,8 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 			assert (activity != null);
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete ? activityIndex
 					: previousModelNode;
-			return Pair.of(new Move(model, Type.modelMove, previousModelNode, activityIndex, null,
-					null, lifeCycleTransition, moveIndex), newPreviousModelNode);
+			return Pair.of(new Move(model, Type.modelMove, previousModelNode, activityIndex, null, null,
+					lifeCycleTransition, moveIndex), newPreviousModelNode);
 		} else if (type == StepTypes.LMGOOD) {
 			assert (node instanceof Transition);
 			Transition performanceUnode = (Transition) node;

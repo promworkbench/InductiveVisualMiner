@@ -50,9 +50,9 @@ public class PositionLogMoves {
 				addLogMove(move, previousActivity, nextActivity, move.getActivityEventClass(), cardinality);
 			}
 
-			if (move.isComplete() && move.isModelSync()) {
+			if ((move.isComplete() || move.isStart()) && move.isModelSync()) {
 				previousActivity = nextActivity;
-				nextActivity = findNextActivityAfter(trace, nextActivity);
+				nextActivity = findNextActivityAfter(trace, i);
 			}
 		}
 	}
@@ -61,7 +61,7 @@ public class PositionLogMoves {
 		for (int i = position + 1; i < trace.size(); i++) {
 			Move move = trace.get(i);
 			if (move.isModelSync()) {
-				return i;
+				return move.getTreeNode();
 			}
 		}
 		return -1;

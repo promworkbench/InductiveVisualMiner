@@ -25,7 +25,7 @@ public class DirectlyFollowsVisualMiner {
 			"Inductive visual Miner" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
 					"Event log" }, userAccessible = true, categories = { PluginCategory.Discovery,
 							PluginCategory.Analytics,
-							PluginCategory.ConformanceChecking }, help = "Discover a directly follows model interactively.")
+							PluginCategory.ConformanceChecking }, help = "Discover a directly follows model interactively. (DFvM)")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0 })
 	public InductiveVisualMinerLauncher mineGuiProcessTree(PluginContext context, XLog xLog) {
@@ -38,7 +38,7 @@ public class DirectlyFollowsVisualMiner {
 			"Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
 					"Event log", "Directly follows model" }, userAccessible = true, categories = {
 							PluginCategory.Analytics,
-							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a directly follows graph and visualise the results as Inductive visual Miner, including its filtering options.")
+							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a directly follows graph and visualise the results as Directly Follows visual Miner (DFvM), including its filtering options.")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
 	public InductiveVisualMinerLauncher mineGuiDfg(PluginContext context, XLog xLog, DirectlyFollowsModel dfg) {

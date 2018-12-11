@@ -2,6 +2,8 @@ package org.processmining.plugins.inductiveVisualMiner.visualisation;
 
 import java.awt.Color;
 
+import org.deckfour.xes.classification.XEventClass;
+import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
@@ -11,6 +13,7 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge.EdgeType;
@@ -94,31 +97,73 @@ public class DfmVisualisation {
 		return Triple.of(dot, info, traceViewColourMap);
 	}
 
-	private LocalDotEdge addArc(final LocalDotNode from, final LocalDotNode to, final int fromNode, int toNode,
+	private void addArc(final LocalDotNode from, final LocalDotNode to, final int fromNode, int toNode,
 			boolean directionForward, boolean includeModelMoves) throws UnknownTreeNodeException {
 
-		final Pair<String, Long> cardinality = data.getEdgeLabel(fromNode, toNode, includeModelMoves);
+		LogMovePosition logMovePosition = LogMovePosition.onEdge(fromNode, toNode);
+		Pair<String, MultiSet<XEventClass>> logMoves = data.getLogMoveEdgeLabel(logMovePosition);
+		if (!parameters.isShowLogMoves() || logMoves.getB().isEmpty()) {
+			//do not show deviations
+			final Pair<String, Long> cardinality = data.getEdgeLabel(fromNode, toNode, includeModelMoves);
 
-		final LocalDotEdge edge;
-		if (directionForward) {
-			edge = new LocalDotEdge(null, dot, info, from, to, "", -1, EdgeType.model, fromNode, toNode,
-					directionForward);
+			final LocalDotEdge edge;
+			if (directionForward) {
+				edge = new LocalDotEdge(null, dot, info, from, to, "", -1, EdgeType.model, fromNode, toNode,
+						directionForward);
+			} else {
+				edge = new LocalDotEdge(null, dot, info, to, from, "", -1, EdgeType.model, fromNode, toNode,
+						directionForward);
+				edge.setOption("dir", "back");
+			}
+
+			if (parameters.getColourModelEdges() != null) {
+				String lineColour = parameters.getColourModelEdges().colourString(cardinality.getB(), minCardinality,
+						maxCardinality);
+				edge.setOption("color", lineColour);
+			}
+
+			edge.setOption("penwidth",
+					"" + parameters.getModelEdgesWidth().size(cardinality.getB(), minCardinality, maxCardinality));
+
+			if (parameters.isShowFrequenciesOnModelEdges() && !cardinality.getA().isEmpty()) {
+				edge.setLabel(cardinality.getA());
+			} else {
+				edge.setLabel(" ");
+			}
 		} else {
-			edge = new LocalDotEdge(null, dot, info, to, from, "", -1, EdgeType.model, fromNode, toNode,
-					directionForward);
-			edge.setOption("dir", "back");
-		}
+			//log move
+			//draw an intermediate node with a self-loop on it
+			LocalDotNode intermediateNode = new LocalDotNode(dot, info, NodeType.xor, "", -1, null);
+			LocalDotEdge edge1 = new LocalDotEdge(null, dot, info, from, intermediateNode, " ", -1, EdgeType.model,
+					fromNode, toNode, directionForward);
+			LocalDotEdge edge2 = new LocalDotEdge(null, dot, info, intermediateNode, to, " ", -1, EdgeType.model,
+					fromNode, toNode, directionForward);
 
-		if (parameters.getColourModelEdges() != null) {
-			String lineColour = parameters.getColourModelEdges().colourString(cardinality.getB(), minCardinality,
+			Pair<String, Long> t = Pair.of(logMoves.getA(), logMoves.getB().size());
+			addMoveArc(intermediateNode, intermediateNode, -1, EdgeType.logMove, logMovePosition.getOn(),
+					logMovePosition.getBeforeChild(), t);
+		}
+	}
+
+	private LocalDotEdge addMoveArc(LocalDotNode from, LocalDotNode to, int node, EdgeType type, int lookupNode1,
+			int lookupNode2, Pair<String, Long> cardinality) {
+
+		LocalDotEdge edge = new LocalDotEdge(null, dot, info, from, to, "", node, type, lookupNode1, lookupNode2, true);
+
+		edge.setOption("style", "dashed");
+		edge.setOption("arrowsize", ".5");
+
+		if (parameters.getColourMoves() != null) {
+			String lineColour = parameters.getColourMoves().colourString(cardinality.getB(), minCardinality,
 					maxCardinality);
 			edge.setOption("color", lineColour);
+			edge.setOption("fontcolor", lineColour);
 		}
 
 		edge.setOption("penwidth",
-				"" + parameters.getModelEdgesWidth().size(cardinality.getB(), minCardinality, maxCardinality));
+				"" + parameters.getMoveEdgesWidth().size(cardinality.getB(), minCardinality, maxCardinality));
 
-		if (parameters.isShowFrequenciesOnModelEdges() && !cardinality.getA().isEmpty()) {
+		if (parameters.isShowFrequenciesOnMoveEdges()) {
 			edge.setLabel(cardinality.getA());
 		} else {
 			edge.setLabel(" ");
@@ -166,6 +211,26 @@ public class DfmVisualisation {
 		dotNode.setOption("fontcolor", ColourMap.toHexString(fontColour));
 
 		info.addNode(node, dotNode, null);
+
+		//visualise log moves
+		if (parameters.isShowLogMoves()) {
+			LogMovePosition logMovePosition = LogMovePosition.onLeaf(node);
+			Pair<String, MultiSet<XEventClass>> logMoves = data.getLogMoveEdgeLabel(logMovePosition);
+			Pair<String, Long> t = Pair.of(logMoves.getA(), logMoves.getB().size());
+			if (t.getB() > 0) {
+				addMoveArc(dotNode, dotNode, node, EdgeType.logMove, logMovePosition.getOn(),
+						logMovePosition.getBeforeChild(), t);
+			}
+		}
+
+		//visualise model moves
+		if (parameters.isShowModelMoves()) {
+			Pair<String, Long> modelMoves = data.getModelMoveEdgeLabel(node);
+			if (modelMoves.getB() != 0) {
+				addMoveArc(dotNode, dotNode, node, EdgeType.modelMove, -1, -1, modelMoves);
+			}
+		}
+
 		return dotNode;
 	}
 

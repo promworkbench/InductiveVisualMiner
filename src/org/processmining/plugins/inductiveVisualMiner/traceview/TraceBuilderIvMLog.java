@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
-import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
-import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -29,55 +27,65 @@ class TraceBuilderIvMLog extends TraceBuilderWrapper {
 		this.model = model;
 	}
 
-	public Trace<? extends Event> build(final Object trace) {
-		return new ProMTraceView.Trace<IvMMove>() {
+	public TraceBuilderIvMLogTrace build(final Object trace) {
+		return new TraceBuilderIvMLogTrace((IvMTrace) trace);
+	}
 
-			public Iterator<IvMMove> iterator() {
-				return FluentIterable.from((IvMTrace) trace).filter(new Predicate<IvMMove>() {
-					@SuppressWarnings("unchecked")
-					public boolean apply(final IvMMove input) {
-						if (input.isTauStart()) {
-							return false;
-						}
-						if (input.isSyncMove() && model.isTau(input.getTreeNode())) {
-							List<? extends Move> trace2 = (IvMTrace) trace;
-							return selection.isSelected(model, (List<Move>) trace2, input);
-						}
-						return true;
+	public class TraceBuilderIvMLogTrace implements ProMTraceView.Trace<IvMMove> {
+		private IvMTrace trace;
+
+		public TraceBuilderIvMLogTrace(IvMTrace trace) {
+			this.trace = trace;
+		}
+
+		public IvMTrace getTrace() {
+			return trace;
+		}
+
+		public Iterator<IvMMove> iterator() {
+			return FluentIterable.from(trace).filter(new Predicate<IvMMove>() {
+				@SuppressWarnings("unchecked")
+				public boolean apply(final IvMMove input) {
+					if (input.isTauStart()) {
+						return false;
 					}
-				}).iterator();
-			}
-
-			public String getName() {
-				String s = ((IvMTrace) trace).getName();
-				if (s.length() == 0) {
-					return " ";
+					if (input.isSyncMove() && model.isTau(input.getTreeNode())) {
+						List<? extends Move> trace2 = trace;
+						return selection.isSelected(model, (List<Move>) trace2, input);
+					}
+					return true;
 				}
-				return s;
-			}
+			}).iterator();
+		}
 
-			public Color getNameColor() {
-				return IvMDecorator.textColour;
+		public String getName() {
+			String s = trace.getName();
+			if (s.length() == 0) {
+				return " ";
 			}
+			return s;
+		}
 
-			public String getInfo() {
-				if (traceColourMap == null) {
-					return "";
-				}
-				String s = traceColourMap.getValue(((IvMTrace) trace));
-				if (s.length() > 9) {
-					return s.substring(0, 7) + "..";
-				}
-				return s;
+		public Color getNameColor() {
+			return IvMDecorator.textColour;
+		}
+
+		public String getInfo() {
+			if (traceColourMap == null) {
+				return "";
 			}
-
-			public Color getInfoColor() {
-				if (traceColourMap == null) {
-					return null;
-				}
-				return traceColourMap.getColour(((IvMTrace) trace));
+			String s = traceColourMap.getValue((trace));
+			if (s.length() > 9) {
+				return s.substring(0, 7) + "..";
 			}
+			return s;
+		}
 
-		};
+		public Color getInfoColor() {
+			if (traceColourMap == null) {
+				return null;
+			}
+			return traceColourMap.getColour((trace));
+		}
 	}
 }

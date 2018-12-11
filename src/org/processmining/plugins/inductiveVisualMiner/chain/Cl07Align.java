@@ -44,8 +44,11 @@ public class Cl07Align extends
 
 		IvMLogNotFiltered log = AlignmentPerformance.align(model, input.getB(), input.getC(), input.getD(),
 				input.getE(), canceller);
-		if (log == null) {
+		if (log == null && !canceller.isCancelled()) {
 			throw new Exception("alignment failed");
+		}
+		if (canceller.isCancelled()) {
+			return null;
 		}
 		IvMLogInfo logInfo = new IvMLogInfo(log, model);
 
