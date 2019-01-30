@@ -9,7 +9,7 @@ import gnu.trove.map.TIntObjectMap;
 public class PerformanceWrapper {
 
 	public enum Type {
-		queueing, waiting, service, sojourn, elapsed, remaining;
+		elapsed, queueing, waiting, service, sojourn, remaining;
 	}
 
 	public enum Gather {
