@@ -35,8 +35,9 @@ public class PopupPopulator {
 					//frequencies
 					popup.add("number of occurrences " + IvMLogMetrics.getNumberOfTracesRepresented(state.getModel(),
 							unode, false, state.getIvMLogInfoFiltered()));
+					popup.add(null);
 
-					//waiting time
+					//times
 					if (state.isPerformanceReady()) {
 						for (Type type : Type.values()) {
 							for (Gather gather : Gather.values()) {
@@ -46,9 +47,13 @@ public class PopupPopulator {
 											+ Performance.timeToString(m));
 								}
 							}
+							if (popup.get(popup.size() - 1) != null) {
+								popup.add(null);
+							}
 						}
 					}
 
+					popup.remove(popup.size() - 1);
 					panel.getGraph().setPopupActivity(popup, unode);
 					panel.getGraph().setShowPopup(true);
 				} else {

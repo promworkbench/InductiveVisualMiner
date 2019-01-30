@@ -54,6 +54,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	private int popupHistogramNode = -1;
 	private long popupHistogramEdge = -1;
 	public static final int popupWidth = 300;
+	public static final int popupRowHeight = 20;
+	public static final int popupEmptyRowHeight = 8;
 	public static final int popupPadding = 10;
 	public static final int popupRightMargin = 40;
 	public static final int popupHistogramHeight = 120;
@@ -75,7 +77,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	public InductiveVisualMinerAnimationPanel(ProMCanceller canceller, boolean animationGlobalEnabled) {
 		super(getSplashScreen());
-		
+
 		setOpaque(true);
 		setBackground(Color.white);
 
@@ -187,9 +189,9 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			if (settings.tokens != null) {
 				double time = renderingThread.getTimeManager().getLastRenderedTime();
 				GraphVizTokensIterator tokens = new GraphVizTokensLazyIterator(settings.tokens);
-				RendererImplBasic.renderTokens(g, tokens, settings.filteredLog, settings.trace2colour, time, Integer.MAX_VALUE,
-						Integer.MAX_VALUE, new AffineTransform());
-				
+				RendererImplBasic.renderTokens(g, tokens, settings.filteredLog, settings.trace2colour, time,
+						Integer.MAX_VALUE, Integer.MAX_VALUE, new AffineTransform());
+
 			}
 		}
 
@@ -208,7 +210,15 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		int currentPopupHistogramHeight = histogramData == null
 				|| (popupHistogramNode == -1 && popupHistogramEdge == -1) ? 0 : popupHistogramHeight;
 
-		int popupHeight = (popupText.size() * 20) + currentPopupHistogramHeight;
+		//count the height of the popup
+		int popupHeight = currentPopupHistogramHeight;
+		for (String line : popupText) {
+			if (line != null) {
+				popupHeight += popupRowHeight;
+			} else {
+				popupHeight += popupEmptyRowHeight;
+			}
+		}
 
 		int x = getWidth() - (popupRightMargin + popupWidth + popupPadding);
 		int y = getHeight() - popupHeight - popupPadding;
@@ -228,9 +238,13 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		//text
 		g.setColor(new Color(255, 255, 255, 220));
 		g.setFont(helperControlsFont);
-		for (int i = 0; i < popupText.size(); i++) {
-			y += 20;
-			g.drawString(popupText.get(i), x, y);
+		for (String line : popupText) {
+			if (line != null) {
+				y += popupRowHeight;
+				g.drawString(line, x, y);
+			} else {
+				y += popupEmptyRowHeight;
+			}
 		}
 
 		//revert colour and font
