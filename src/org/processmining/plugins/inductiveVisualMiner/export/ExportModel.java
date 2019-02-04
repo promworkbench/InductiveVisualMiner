@@ -1,7 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.export;
 
+import java.util.Map;
+import java.util.Set;
+
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.contexts.uitopia.UIPluginContext;
+import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
@@ -9,13 +13,16 @@ import org.processmining.models.connections.petrinets.behavioral.FinalMarkingCon
 import org.processmining.models.connections.petrinets.behavioral.InitialMarkingConnection;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.semantics.petrinet.Marking;
+import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree2AcceptingPetriNet;
 import org.processmining.plugins.InductiveMiner.reduceacceptingpetrinet.ReduceAcceptingPetriNetKeepLanguage;
-import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Dfm2AcceptingPetriNet;
+import org.processmining.plugins.inductiveVisualMiner.alignment.ExpandProcessTree;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.processtree.ProcessTree;
+import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class ExportModel {
 
@@ -55,6 +62,31 @@ public class ExportModel {
 		});
 
 		context.getProvidedObjectManager().createProvidedObject("Accepting Petri net of " + name, net,
+				AcceptingPetriNet.class, context);
+		if (context instanceof UIPluginContext) {
+			((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(net)
+					.setFavorite(true);
+		}
+	}
+
+	public static void exportExpandedAcceptingPetriNet(PluginContext context, IvMModel model, String name,
+			final ProMCanceller canceller) {
+		AcceptingPetriNet net;
+		if (model.isTree()) {
+			Triple<ProcessTree, Map<UnfoldedNode, UnfoldedNode>, Set<UnfoldedNode>> t = ExpandProcessTree
+					.expand(model.getTree().getDTree());
+			IvMEfficientTree performanceTree = new IvMEfficientTree(t.getA());
+			net = EfficientTree2AcceptingPetriNet.convert(performanceTree);
+		} else {
+			net = Dfm2AcceptingPetriNet.convertForPerformance(model.getDfg()).getA();
+		}
+		ReduceAcceptingPetriNetKeepLanguage.reduce(net, new Canceller() {
+			public boolean isCancelled() {
+				return canceller.isCancelled();
+			}
+		});
+
+		context.getProvidedObjectManager().createProvidedObject("Expanded accepting Petri net of " + name, net,
 				AcceptingPetriNet.class, context);
 		if (context instanceof UIPluginContext) {
 			((UIPluginContext) context).getGlobalContext().getResourceManager().getResourceForInstance(net)

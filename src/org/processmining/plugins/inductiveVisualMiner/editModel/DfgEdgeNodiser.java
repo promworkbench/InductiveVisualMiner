@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.processmining.plugins.InductiveMiner.efficienttree.ProcessTreeTokeniser;
 
 public class DfgEdgeNodiser {
@@ -17,6 +18,7 @@ public class DfgEdgeNodiser {
 	private NodeType lastNodeType;
 	private int lastIndentation;
 	private int lastLineNumber;
+	private int lastActivityIndex;
 
 	public enum NodeType {
 		activity, edgeSymbol, multiplicitySymbol;
@@ -77,9 +79,23 @@ public class DfgEdgeNodiser {
 			spaces = 0;
 
 			if (isQuotedString) {
+				//process an index that might come afterwards
+				if (tokenizer.nextToken() == ProcessTreeTokeniser.TT_WORD) {
+					if (tokenizer.sval.startsWith("#") && StringUtils.isNumeric(tokenizer.sval.substring(1))) {
+						lastActivityIndex = Integer.valueOf(tokenizer.sval.substring(1));
+					} else {
+						lastActivityIndex = 0;
+						tokenizer.pushBack();
+					}
+				} else {
+					lastActivityIndex = 0;
+					tokenizer.pushBack();
+				}
+				
 				lastNodeType = NodeType.activity;
 				return true;
 			}
+			lastActivityIndex = 0;
 			switch (activityName) {
 				case "->" :
 					lastNodeType = NodeType.edgeSymbol;
@@ -114,5 +130,9 @@ public class DfgEdgeNodiser {
 
 	public void pushBack() {
 		redoToken = true;
+	}
+	
+	public int getLastActivityIndex() {
+		return lastActivityIndex;
 	}
 }

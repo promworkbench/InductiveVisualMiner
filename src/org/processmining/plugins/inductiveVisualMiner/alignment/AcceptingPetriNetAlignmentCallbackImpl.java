@@ -11,7 +11,7 @@ import org.deckfour.xes.model.XTrace;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -37,12 +37,13 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 	private final Set<Transition> startTransitions;
 	private final Set<Transition> endTransitions;
 	private final Set<Transition> interTransitions;
+	private final Transition emptyTraceTransition;
 
 	//output
 	private final IvMLogNotFilteredImpl alignedLog;
 
 	public AcceptingPetriNetAlignmentCallbackImpl(XLog xLog, IvMModel model, IvMEventClasses activityEventClasses,
-			Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p) {
+			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, Transition> p) {
 		this.xLog = xLog;
 		this.model = model;
 		this.activityEventClasses = activityEventClasses;
@@ -52,6 +53,7 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 		this.startTransitions = p.getD();
 		this.endTransitions = p.getE();
 		this.interTransitions = p.getF();
+		this.emptyTraceTransition = p.getG();
 
 		alignedLog = new IvMLogNotFilteredImpl(xLog.size());
 	}
@@ -143,7 +145,11 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 
 				PerformanceTransition lifeCycleTransition;
 				int activityIndex;
-				if (activity2skipEnqueue.containsKey(performanceUnode)) {
+				if (node.equals(emptyTraceTransition)) {
+					//empty trace
+					return Pair.of(new Move(model, Type.ignoredModelMove, previousModelNode, -100, null, null,
+							PerformanceTransition.complete, moveIndex), previousModelNode);
+				} else if (activity2skipEnqueue.containsKey(performanceUnode)) {
 					lifeCycleTransition = PerformanceTransition.enqueue;
 					activityIndex = activity2skipEnqueue.get(performanceUnode);
 				} else {

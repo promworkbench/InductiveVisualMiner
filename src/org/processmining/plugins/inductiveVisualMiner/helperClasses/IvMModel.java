@@ -1,8 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
+import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
-import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 
 public class IvMModel {
 
@@ -55,7 +55,7 @@ public class IvMModel {
 		if (isTree()) {
 			return EfficientTreeUtils.getAllNodes(tree);
 		} else {
-			return dfg.getActivities();
+			return dfg.getActivitiesIndices();
 		}
 	}
 

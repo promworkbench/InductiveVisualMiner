@@ -1,15 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners;
 
+import org.processmining.directlyfollowsmodelminer.mining.DFMMiner;
+import org.processmining.directlyfollowsmodelminer.mining.DFMMiningParametersAbstract;
+import org.processmining.directlyfollowsmodelminer.mining.variants.DFMMiningParametersDefault;
+import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.framework.packages.PackageManager.Canceller;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfo;
 import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogInfoLifeCycle;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.XLifeCycleClassifier;
-import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
-import org.processmining.plugins.directlyfollowsmodel.mining.DFMMiner;
-import org.processmining.plugins.directlyfollowsmodel.mining.DFMMiningParametersAbstract;
-import org.processmining.plugins.directlyfollowsmodel.mining.variants.DFMMiningParametersDefault;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;

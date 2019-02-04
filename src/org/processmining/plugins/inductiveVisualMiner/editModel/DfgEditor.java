@@ -19,10 +19,12 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
-import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+
+import gnu.trove.map.TIntObjectMap;
 
 public class DfgEditor extends JPanel {
 	private static final long serialVersionUID = -75989442629887735L;
@@ -257,6 +259,10 @@ public class DfgEditor extends JPanel {
 			errorMessage.setText(message);
 			errorMessage.setOpaque(true);
 			textEdges.addLineHighlight(line, errorColour);
+		} else if (message != null) {
+			errorMessage.setText(message);
+			errorMessage.setOpaque(true);
+			textEdges.removeAllLineHighlights();
 		} else {
 			errorMessage.setText("Edge syntax: node -> \"node with spaces\"");
 			errorMessage.setOpaque(false);
@@ -272,11 +278,12 @@ public class DfgEditor extends JPanel {
 	public void setDfg(DirectlyFollowsModel dfg) {
 		assert (dfg != null);
 		contentChangedFromController = true;
-		textStartActivities.setText(Dfg2StringFields.getStartActivities(dfg));
+		TIntObjectMap<String> map = Dfg2StringFields.getActivity2Node(dfg);
+		textStartActivities.setText(Dfg2StringFields.getStartActivities(dfg, map));
 		textStartActivities.setEnabled(true);
-		textEdges.setText(Dfg2StringFields.getEdges(dfg));
+		textEdges.setText(Dfg2StringFields.getEdges(dfg, map));
 		textEdges.setEnabled(true);
-		textEndActivities.setText(Dfg2StringFields.getEndActivities(dfg));
+		textEndActivities.setText(Dfg2StringFields.getEndActivities(dfg, map));
 		textEndActivities.setEnabled(true);
 	}
 

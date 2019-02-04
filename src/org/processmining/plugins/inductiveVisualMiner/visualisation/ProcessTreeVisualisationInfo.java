@@ -79,6 +79,7 @@ public class ProcessTreeVisualisationInfo {
 		switch (edge.getType()) {
 			case logMove :
 				allLogMoveEdges.add(edge);
+				System.out.println("log move edge " + edge + " [" + unode1 + ", " + unode2 + "]");
 				assert (!logMoveEdges.containsKey(Pair.of(unode1, unode2)));
 				logMoveEdges.put(Pair.of(unode1, unode2), edge);
 				break;

@@ -9,10 +9,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeEditor;
-import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
@@ -135,7 +135,7 @@ public class EditModelView extends SideWindow {
 			textEndActivities.setCurrentLineHighlightColor(IvMDecorator.backGroundColour1);
 			textEndActivities.setFadeCurrentLineHighlight(true);
 			textEndActivities.revalidate();
-			
+
 			IvMDecorator.decorate(emptyTraces);
 
 			IvMDecorator.decorate(errorMessage);

@@ -3,11 +3,11 @@ package org.processmining.plugins.inductiveVisualMiner.visualisation;
 import java.awt.Color;
 
 import org.deckfour.xes.classification.XEventClass;
+import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
-import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMaps;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -18,6 +18,8 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
+
+import gnu.trove.iterator.TIntIterator;
 
 public class DfmVisualisation {
 
@@ -56,14 +58,14 @@ public class DfmVisualisation {
 		/**
 		 * Empty traces
 		 */
-		if (dfg.getNumberOfEmptyTraces() > 0) {
+		if (dfg.isEmptyTraces()) {
 			addArc(source, sink, -1, -1, true, false);
 		}
 
 		/**
 		 * Nodes
 		 */
-		for (int activity : dfg.getActivities()) {
+		for (int activity : dfg.getActivitiesIndices()) {
 			Triple<String, Long, Long> cardinality = data.getNodeLabel(activity, false);
 			convertActivity(model.getDfg(), activity, cardinality);
 		}
@@ -71,9 +73,9 @@ public class DfmVisualisation {
 		/**
 		 * Edges
 		 */
-		for (long edge : dfg.getDirectlyFollowsGraph().getEdges()) {
-			int sourceActivity = dfg.getDirectlyFollowsGraph().getEdgeSource(edge);
-			int targetActivity = dfg.getDirectlyFollowsGraph().getEdgeTarget(edge);
+		for (long edge : dfg.getEdges()) {
+			int sourceActivity = dfg.getEdgeSource(edge);
+			int targetActivity = dfg.getEdgeTarget(edge);
 
 			LocalDotNode from = info.getActivityDotNode(sourceActivity);
 			LocalDotNode to = info.getActivityDotNode(targetActivity);
@@ -83,14 +85,16 @@ public class DfmVisualisation {
 		/**
 		 * Start activities
 		 */
-		for (int node : dfg.getStartActivities()) {
+		for (TIntIterator it = dfg.getStartActivities().iterator(); it.hasNext();) {
+			int node = it.next();
 			addArc(source, info.getActivityDotNode(node), -1, node, true, false);
 		}
 
 		/**
 		 * End activities
 		 */
-		for (int node : dfg.getEndActivities()) {
+		for (TIntIterator it = dfg.getEndActivities().iterator(); it.hasNext();) {
+			int node = it.next();
 			addArc(info.getActivityDotNode(node), sink, node, -1, true, false);
 		}
 
@@ -134,8 +138,8 @@ public class DfmVisualisation {
 			//log move
 			//draw an intermediate node with a self-loop on it
 			LocalDotNode intermediateNode = new LocalDotNode(dot, info, NodeType.xor, "", -1, null);
-			new LocalDotEdge(null, dot, info, from, intermediateNode, " ", -1, EdgeType.model,
-					fromNode, toNode, directionForward);
+			new LocalDotEdge(null, dot, info, from, intermediateNode, " ", -1, EdgeType.model, fromNode, toNode,
+					directionForward);
 			new LocalDotEdge(null, dot, info, intermediateNode, to, " ", -1, EdgeType.model, fromNode, toNode,
 					directionForward);
 

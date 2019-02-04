@@ -142,15 +142,15 @@ public class IvMLogMetrics {
 			max = Math.max(max, occurrences);
 		}
 		//edges
-		for (long edge : model.getDfg().getDirectlyFollowsGraph().getEdges()) {
-			int from = model.getDfg().getDirectlyFollowsGraph().getEdgeSource(edge);
-			int to = model.getDfg().getDirectlyFollowsGraph().getEdgeTargetIndex(edge);
+		for (long edge : model.getDfg().getEdges()) {
+			int from = model.getDfg().getEdgeSource(edge);
+			int to = model.getDfg().getEdgeTarget(edge);
 			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, from, to, true, logInfo);
 			min = Math.min(min, occurrences);
 			max = Math.max(max, occurrences);
 		}
 		//empty traces
-		if (model.getDfg().getNumberOfEmptyTraces() > 0) {
+		if (model.getDfg().isEmptyTraces()) {
 			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, -1, -1, true, logInfo);
 			min = Math.min(min, occurrences);
 			max = Math.max(max, occurrences);

@@ -2,38 +2,46 @@ package org.processmining.plugins.inductiveVisualMiner.editModel;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import org.processmining.directlyfollowsmodelminer.mining.CheckSoundness;
+import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
+import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModelImplQuadratic;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.directlyfollowsmodel.DirectlyFollowsModel;
 import org.processmining.plugins.inductiveVisualMiner.editModel.DfgEdgeNodiser.NodeType;
-import org.processmining.plugins.inductiveminer2.withoutlog.dfgmsd.DfgMsdImpl;
+
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 public class DfgParser {
 
 	public static Triple<DirectlyFollowsModel, Integer, String> parse(String startActivities, String edges,
 			String endActivities, boolean emptyTraces) throws IOException {
-		DirectlyFollowsModel dfg = new DfgMsdImpl();
+		DirectlyFollowsModel dfg = new DirectlyFollowsModelImplQuadratic();
+		TObjectIntMap<Pair<String, Integer>> userIndex2dfmIndex = new TObjectIntHashMap<>(10, 0.5f, -1);
 
 		//start activities
 		DfgActivityNodiser startActivityNodiser = new DfgActivityNodiser(startActivities);
-		parseStartActivities(startActivityNodiser, dfg);
+		parseStartActivities(startActivityNodiser, dfg, userIndex2dfmIndex);
 
 		//edges
 		DfgEdgeNodiser edgeNodiser = new DfgEdgeNodiser(edges);
-		Pair<Integer, String> p = parseEdges(edgeNodiser, dfg);
+		Pair<Integer, String> p = parseEdges(edgeNodiser, dfg, userIndex2dfmIndex);
 		if (p.getA() >= 0) {
 			return Triple.of(null, p.getA(), p.getB());
 		}
 
 		//start activities
 		DfgActivityNodiser endActivityNodiser = new DfgActivityNodiser(endActivities);
-		parseEndActivities(endActivityNodiser, dfg);
+		parseEndActivities(endActivityNodiser, dfg, userIndex2dfmIndex);
 
 		//empty traces
 		if (emptyTraces) {
-			dfg.setNumberOfEmptyTraces(1);
+			dfg.setEmptyTraces(true);
+		}
+
+		String issues = CheckSoundness.findIssues(dfg);
+		if (issues != null) {
+			return Triple.of(null, -1, issues);
 		}
 
 		return Triple.of(dfg, -1, null);
@@ -50,15 +58,24 @@ public class DfgParser {
 	 *         an error message.
 	 * @throws IOException
 	 */
-	public static Pair<Integer, String> parseEdges(DfgEdgeNodiser nodiser, DirectlyFollowsModel dfg)
-			throws IOException {
+	public static Pair<Integer, String> parseEdges(DfgEdgeNodiser nodiser, DirectlyFollowsModel dfg,
+			TObjectIntMap<Pair<String, Integer>> userIndex2dfgIndex) throws IOException {
 
 		while (nodiser.nextNode()) {
 			if (nodiser.getLastNodeType() != NodeType.activity) {
 				return Pair.of(nodiser.getLastLineNumber(), "Expected an activity.");
 			}
+
+			//get the activity and its index, and add it to the dfm 
 			String source = nodiser.getLastActivity();
-			int sourceIndex = dfg.addActivity(source);
+			Pair<String, Integer> pSource = Pair.of(source, nodiser.getLastActivityIndex());
+			int sourceIndex;
+			if (userIndex2dfgIndex.containsKey(pSource)) {
+				sourceIndex = userIndex2dfgIndex.get(pSource);
+			} else {
+				sourceIndex = dfg.addActivity(source);
+				userIndex2dfgIndex.put(pSource, sourceIndex);
+			}
 
 			if (!nodiser.nextNode() || nodiser.getLastNodeType() != NodeType.edgeSymbol) {
 				return Pair.of(nodiser.getLastLineNumber(), "Expected ->.");
@@ -67,47 +84,56 @@ public class DfgParser {
 			if (!nodiser.nextNode() || nodiser.getLastNodeType() != NodeType.activity) {
 				return Pair.of(nodiser.getLastLineNumber(), "Expected an activity.");
 			}
-			String target = nodiser.getLastActivity();
-			int targetIndex = dfg.addActivity(target);
 
-			long cardinality;
-			if (nodiser.nextNode()) {
-				if (nodiser.getLastNodeType() == NodeType.multiplicitySymbol) {
-					//multiplicity coming
-					if (!nodiser.nextNode() || nodiser.getLastNodeType() != NodeType.activity) {
-						return Pair.of(nodiser.getLastLineNumber(), "Expected a cardinality (number).");
-					}
-					String number = nodiser.getLastActivity();
-					if (!NumberUtils.isParsable(number) || StringUtils.contains(number, ".")) {
-						return Pair.of(nodiser.getLastLineNumber(), "Expected a cardinality (number).");
-					}
-					cardinality = Long.parseLong(number);
-				} else {
-					nodiser.pushBack();
-					cardinality = 1;
-				}
+			//get the activity and it's index, and add it to the dfm
+			String target = nodiser.getLastActivity();
+			Pair<String, Integer> pTarget = Pair.of(target, nodiser.getLastActivityIndex());
+			int targetIndex;
+			if (userIndex2dfgIndex.containsKey(pTarget)) {
+				targetIndex = userIndex2dfgIndex.get(pTarget);
 			} else {
-				cardinality = 1;
+				targetIndex = dfg.addActivity(target);
+				userIndex2dfgIndex.put(pTarget, targetIndex);
 			}
 
-			dfg.getDirectlyFollowsGraph().addEdge(sourceIndex, targetIndex, cardinality);
+			dfg.addEdge(sourceIndex, targetIndex);
 		}
 
 		return Pair.of(-1, null);
 	}
 
-	public static void parseStartActivities(DfgActivityNodiser nodiser, DirectlyFollowsModel dfg) throws IOException {
+	public static void parseStartActivities(DfgActivityNodiser nodiser, DirectlyFollowsModel dfg,
+			TObjectIntMap<Pair<String, Integer>> userIndex2dfgIndex) throws IOException {
 		while (nodiser.nextNode()) {
-			String source = nodiser.getLastActivity();
-			int index = dfg.addActivity(source);
+			String activity = nodiser.getLastActivity();
+			int userIndex = nodiser.getLastActivityIndex();
+			Pair<String, Integer> p = Pair.of(activity, userIndex);
+
+			int index;
+			if (userIndex2dfgIndex.containsKey(p)) {
+				index = userIndex2dfgIndex.get(p);
+			} else {
+				index = dfg.addActivity(activity);
+				userIndex2dfgIndex.put(p, index);
+			}
 			dfg.getStartActivities().add(index);
 		}
 	}
 
-	public static void parseEndActivities(DfgActivityNodiser nodiser, DirectlyFollowsModel dfg) throws IOException {
+	public static void parseEndActivities(DfgActivityNodiser nodiser, DirectlyFollowsModel dfg,
+			TObjectIntMap<Pair<String, Integer>> userIndex2dfgIndex) throws IOException {
 		while (nodiser.nextNode()) {
-			String source = nodiser.getLastActivity();
-			int index = dfg.addActivity(source);
+			String activity = nodiser.getLastActivity();
+			int userIndex = nodiser.getLastActivityIndex();
+			Pair<String, Integer> p = Pair.of(activity, userIndex);
+
+			int index;
+			if (userIndex2dfgIndex.containsKey(p)) {
+				index = userIndex2dfgIndex.get(p);
+			} else {
+				index = dfg.addActivity(activity);
+				userIndex2dfgIndex.put(p, index);
+			}
 			dfg.getEndActivities().add(index);
 		}
 	}
