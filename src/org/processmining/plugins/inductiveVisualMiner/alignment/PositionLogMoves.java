@@ -47,7 +47,24 @@ public class PositionLogMoves {
 		for (int i = 0; i < trace.size(); i++) {
 			Move move = trace.get(i);
 			if (move.isLogMove()) {
-				addLogMove(move, previousActivity, nextActivity, move.getActivityEventClass(), cardinality);
+
+				if (previousActivity == -1 && nextActivity == -1) {
+					/*
+					 * If the previous and the next activity are non-existent,
+					 * then the model must have been empty.
+					 */
+					addLogMove(move, -1, -1, move.getActivityEventClass(), cardinality);
+				} else if (previousActivity == nextActivity && trace.get(i - 1).isComplete()) {
+					/*
+					 * If the previous event is a completion event AND the next
+					 * event is of the same activity, then we are in between two
+					 * executions of the same activity. That's a special case
+					 * for DFGs.
+					 */
+					addLogMove(move, previousActivity, -2, move.getActivityEventClass(), cardinality);
+				} else {
+					addLogMove(move, previousActivity, nextActivity, move.getActivityEventClass(), cardinality);
+				}
 			}
 
 			if ((move.isComplete() || move.isStart()) && move.isModelSync()) {

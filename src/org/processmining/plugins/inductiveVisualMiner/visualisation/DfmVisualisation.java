@@ -59,7 +59,7 @@ public class DfmVisualisation {
 		 * Empty traces
 		 */
 		if (dfg.isEmptyTraces()) {
-			addArc(source, sink, -1, -1, true, false);
+			addArc(source, sink, -1, -1, true, false, false);
 		}
 
 		/**
@@ -79,7 +79,12 @@ public class DfmVisualisation {
 
 			LocalDotNode from = info.getActivityDotNode(sourceActivity);
 			LocalDotNode to = info.getActivityDotNode(targetActivity);
-			addArc(from, to, sourceActivity, targetActivity, true, false);
+			if (sourceActivity != targetActivity) {
+				addArc(from, to, sourceActivity, targetActivity, true, false, false);
+			} else {
+				//special case: log move between two instances of the same activity (on a self-loop)
+				addArc(from, to, sourceActivity, targetActivity, true, false, true);
+			}
 		}
 
 		/**
@@ -87,7 +92,7 @@ public class DfmVisualisation {
 		 */
 		for (TIntIterator it = dfg.getStartActivities().iterator(); it.hasNext();) {
 			int node = it.next();
-			addArc(source, info.getActivityDotNode(node), -1, node, true, false);
+			addArc(source, info.getActivityDotNode(node), -1, node, true, false, false);
 		}
 
 		/**
@@ -95,16 +100,21 @@ public class DfmVisualisation {
 		 */
 		for (TIntIterator it = dfg.getEndActivities().iterator(); it.hasNext();) {
 			int node = it.next();
-			addArc(info.getActivityDotNode(node), sink, node, -1, true, false);
+			addArc(info.getActivityDotNode(node), sink, node, -1, true, false, false);
 		}
 
 		return Triple.of(dot, info, traceViewColourMap);
 	}
 
 	private void addArc(final LocalDotNode from, final LocalDotNode to, final int fromNode, int toNode,
-			boolean directionForward, boolean includeModelMoves) throws UnknownTreeNodeException {
-
-		LogMovePosition logMovePosition = LogMovePosition.onEdge(fromNode, toNode);
+			boolean directionForward, boolean includeModelMoves, boolean betweenTwoInstances)
+			throws UnknownTreeNodeException {
+		LogMovePosition logMovePosition;
+		if (!betweenTwoInstances) {
+			logMovePosition = LogMovePosition.onEdge(fromNode, toNode);
+		} else {
+			logMovePosition = LogMovePosition.betweenTwoExecutionsOf(fromNode);
+		}
 		Pair<String, MultiSet<XEventClass>> logMoves = data.getLogMoveEdgeLabel(logMovePosition);
 		if (!parameters.isShowLogMoves() || logMoves.getB().isEmpty()) {
 			//do not show deviations

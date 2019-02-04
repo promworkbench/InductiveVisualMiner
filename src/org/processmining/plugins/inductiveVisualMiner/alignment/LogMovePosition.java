@@ -30,13 +30,17 @@ public class LogMovePosition {
 	public static LogMovePosition beforeChild(int unode, int child) {
 		return new LogMovePosition(unode, child);
 	}
-	
+
 	public static LogMovePosition onEdge(int from, int to) {
 		return new LogMovePosition(from, to);
 	}
 
 	public static LogMovePosition onLeaf(int unode) {
 		return new LogMovePosition(unode, unode);
+	}
+
+	public static LogMovePosition betweenTwoExecutionsOf(int unode) {
+		return new LogMovePosition(unode, -2);
 	}
 
 	/**
