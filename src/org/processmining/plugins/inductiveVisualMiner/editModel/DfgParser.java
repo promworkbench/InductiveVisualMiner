@@ -27,7 +27,7 @@ public class DfgParser {
 		DfgEdgeNodiser edgeNodiser = new DfgEdgeNodiser(edges);
 		Pair<Integer, String> p = parseEdges(edgeNodiser, dfg, userIndex2dfmIndex);
 		if (p.getA() >= 0) {
-			return Triple.of(null, p.getA(), p.getB());
+			return Triple.of(dfg, p.getA(), p.getB());
 		}
 
 		//start activities
@@ -41,7 +41,7 @@ public class DfgParser {
 
 		String issues = CheckSoundness.findIssues(dfg);
 		if (issues != null) {
-			return Triple.of(null, -1, issues);
+			return Triple.of(dfg, -1, issues);
 		}
 
 		return Triple.of(dfg, -1, null);

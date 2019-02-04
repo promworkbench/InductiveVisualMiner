@@ -70,7 +70,9 @@ public class LocalDotNode extends DotNode {
 		}
 
 		dot.addNode(this);
-		info.addNode(unode, this, correspondingSplit);
+		if (info != null) {
+			info.addNode(unode, this, correspondingSplit);
+		}
 	}
 
 	public int getUnode() {

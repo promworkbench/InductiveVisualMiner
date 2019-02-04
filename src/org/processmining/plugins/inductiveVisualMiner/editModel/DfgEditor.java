@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.editModel;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -12,6 +13,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
@@ -22,7 +24,11 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
+import org.processmining.plugins.graphviz.dot.Dot;
+import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
+import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.DfmVisualisationSimple;
 
 import gnu.trove.map.TIntObjectMap;
 
@@ -43,6 +49,7 @@ public class DfgEditor extends JPanel {
 	protected final JLabel errorMessage;
 	private ActionListener actionListener;
 	private boolean contentChangedFromController = false;
+	protected final DotPanel graphPanel;
 
 	/**
 	 * 
@@ -54,12 +61,29 @@ public class DfgEditor extends JPanel {
 	 *            the model will be disabled.
 	 */
 	public DfgEditor(DirectlyFollowsModel dfg, String message) {
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setLayout(new BorderLayout());
 		setOpaque(false);
+
+		//graph panel
+		Dot dot = new Dot();
+		dot.addNode("Example graph...");
+		graphPanel = new DotPanel(dot);
+		graphPanel.setOpaque(false);
+		graphPanel.setDirection(GraphDirection.leftRight);
+
+		//vertical (editing) panel
+		JPanel verticalPanel = new JPanel();
+		verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.Y_AXIS));
+		verticalPanel.setOpaque(false);
+
+		//top split panel
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalPanel, graphPanel);
+		splitPane.setOpaque(false);
+		add(splitPane, BorderLayout.CENTER);
 
 		labelStartActivities = new JLabel("Start activities");
 		labelStartActivities.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-		add(labelStartActivities);
+		verticalPanel.add(labelStartActivities);
 
 		//start activities text area
 		{
@@ -69,7 +93,7 @@ public class DfgEditor extends JPanel {
 			textStartActivities.discardAllEdits();
 			JScrollPane textScroll = new JScrollPane(textStartActivities);
 			textScroll.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-			add(textScroll);
+			verticalPanel.add(textScroll);
 		}
 
 		labelEdges = new JLabel("Edges") {
@@ -83,7 +107,7 @@ public class DfgEditor extends JPanel {
 			}
 		};
 		labelEdges.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-		add(labelEdges);
+		verticalPanel.add(labelEdges);
 
 		//edges text area
 		{
@@ -93,7 +117,7 @@ public class DfgEditor extends JPanel {
 			textEdges.discardAllEdits();
 			JScrollPane textScroll = new JScrollPane(textEdges);
 			textScroll.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-			add(textScroll);
+			verticalPanel.add(textScroll);
 		}
 
 		labelEndActivities = new JLabel("End activities") {
@@ -107,7 +131,7 @@ public class DfgEditor extends JPanel {
 			}
 		};
 		labelEndActivities.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-		add(labelEndActivities);
+		verticalPanel.add(labelEndActivities);
 
 		//end activities text area
 		{
@@ -117,11 +141,11 @@ public class DfgEditor extends JPanel {
 			textEndActivities.discardAllEdits();
 			JScrollPane textScroll = new JScrollPane(textEndActivities);
 			textScroll.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-			add(textScroll);
+			verticalPanel.add(textScroll);
 		}
 
 		emptyTraces = new JCheckBox("Allow empty traces");
-		add(emptyTraces);
+		verticalPanel.add(emptyTraces);
 
 		//error message
 		errorMessage = new JLabel(" ") {
@@ -137,7 +161,7 @@ public class DfgEditor extends JPanel {
 		errorMessage.setBackground(errorColour);
 		errorMessage.setOpaque(false);
 		errorMessage.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-		add(errorMessage);
+		add(errorMessage, BorderLayout.PAGE_END);
 
 		if (dfg != null) {
 			setDfg(dfg);
@@ -164,7 +188,7 @@ public class DfgEditor extends JPanel {
 						Triple<DirectlyFollowsModel, Integer, String> result = DfgParser.parse(
 								textStartActivities.getText(), textEdges.getText(), textEndActivities.getText(),
 								emptyTraces.isSelected());
-						if (result.getA() == null) {
+						if (result.getC() != null) {
 							//set error message
 							setErrorMessage(result.getB(), result.getC());
 						} else {
@@ -179,6 +203,7 @@ public class DfgEditor extends JPanel {
 								}
 							});
 						}
+						graphPanel.changeDot(DfmVisualisationSimple.fancy(result.getA()), true);
 					} catch (UnknownTreeNodeException e1) {
 						e1.printStackTrace();
 					} catch (BadLocationException e1) {
@@ -275,16 +300,18 @@ public class DfgEditor extends JPanel {
 	 * 
 	 * @param tree
 	 */
-	public void setDfg(DirectlyFollowsModel dfg) {
-		assert (dfg != null);
+	public void setDfg(DirectlyFollowsModel dfm) {
+		assert (dfm != null);
 		contentChangedFromController = true;
-		TIntObjectMap<String> map = Dfg2StringFields.getActivity2Node(dfg);
-		textStartActivities.setText(Dfg2StringFields.getStartActivities(dfg, map));
+		TIntObjectMap<String> map = Dfg2StringFields.getActivity2Node(dfm);
+		textStartActivities.setText(Dfg2StringFields.getStartActivities(dfm, map));
 		textStartActivities.setEnabled(true);
-		textEdges.setText(Dfg2StringFields.getEdges(dfg, map));
+		textEdges.setText(Dfg2StringFields.getEdges(dfm, map));
 		textEdges.setEnabled(true);
-		textEndActivities.setText(Dfg2StringFields.getEndActivities(dfg, map));
+		textEndActivities.setText(Dfg2StringFields.getEndActivities(dfm, map));
 		textEndActivities.setEnabled(true);
+
+		graphPanel.changeDot(DfmVisualisationSimple.fancy(dfm), true);
 	}
 
 	protected static void updateGraphOnTimer(Timer updateTimer) {
