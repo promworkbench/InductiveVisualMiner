@@ -49,7 +49,7 @@ public class DfgEditor extends JPanel {
 	protected final JLabel errorMessage;
 	private ActionListener actionListener;
 	private boolean contentChangedFromController = false;
-	protected final DotPanel graphPanel;
+	protected final DotPanel dotPanel;
 
 	/**
 	 * 
@@ -67,9 +67,9 @@ public class DfgEditor extends JPanel {
 		//graph panel
 		Dot dot = new Dot();
 		dot.addNode("Example graph...");
-		graphPanel = new DotPanel(dot);
-		graphPanel.setOpaque(false);
-		graphPanel.setDirection(GraphDirection.leftRight);
+		dotPanel = new DotPanel(dot);
+		dotPanel.setOpaque(false);
+		dotPanel.setDirection(GraphDirection.leftRight);
 
 		//vertical (editing) panel
 		JPanel verticalPanel = new JPanel();
@@ -77,7 +77,7 @@ public class DfgEditor extends JPanel {
 		verticalPanel.setOpaque(false);
 
 		//top split panel
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalPanel, graphPanel);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, verticalPanel, dotPanel);
 		splitPane.setOpaque(false);
 		add(splitPane, BorderLayout.CENTER);
 
@@ -203,7 +203,7 @@ public class DfgEditor extends JPanel {
 								}
 							});
 						}
-						graphPanel.changeDot(DfmVisualisationSimple.fancy(result.getA()), true);
+						dotPanel.changeDot(DfmVisualisationSimple.fancy(result.getA()), true);
 					} catch (UnknownTreeNodeException e1) {
 						e1.printStackTrace();
 					} catch (BadLocationException e1) {
@@ -311,7 +311,7 @@ public class DfgEditor extends JPanel {
 		textEndActivities.setText(Dfg2StringFields.getEndActivities(dfm, map));
 		textEndActivities.setEnabled(true);
 
-		graphPanel.changeDot(DfmVisualisationSimple.fancy(dfm), true);
+		dotPanel.changeDot(DfmVisualisationSimple.fancy(dfm), true);
 	}
 
 	protected static void updateGraphOnTimer(Timer updateTimer) {

@@ -186,7 +186,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			//draw for printing (non-optimised)
 
 			ExternalSettings settings = renderingThread.getExternalSettingsManager().getExternalSettings();
-			if (settings.tokens != null) {
+			if (settings.tokens != null && animationEnabled) {
 				double time = renderingThread.getTimeManager().getLastRenderedTime();
 				GraphVizTokensIterator tokens = new GraphVizTokensLazyIterator(settings.tokens);
 				RendererImplBasic.renderTokens(g, tokens, settings.filteredLog, settings.trace2colour, time,
