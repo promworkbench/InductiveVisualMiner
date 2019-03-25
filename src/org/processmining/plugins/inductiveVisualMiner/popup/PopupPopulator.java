@@ -106,8 +106,8 @@ public class PopupPopulator {
 					LocalDotEdge edge = (LocalDotEdge) element;
 					int node = edge.getUnode();
 					List<String> popup = new ArrayList<>();
-					popup.add(IvMLogMetrics.getModelMovesLocal(node, state.getIvMLogInfoFiltered())
-							+ " times, activity ");
+					long t = IvMLogMetrics.getModelMovesLocal(node, state.getIvMLogInfoFiltered());
+					popup.add((t > 1 ? (t + " times") : "Once") + ", activity ");
 					popup.add(StringUtils.abbreviate(state.getModel().getActivityName(edge.getUnode()), 40));
 					popup.add("was not executed.");
 
