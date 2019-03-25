@@ -310,6 +310,8 @@ public class DfgEditor extends JPanel {
 		textEdges.setEnabled(true);
 		textEndActivities.setText(Dfg2StringFields.getEndActivities(dfm, map));
 		textEndActivities.setEnabled(true);
+		emptyTraces.setSelected(dfm.isEmptyTraces());
+		emptyTraces.setEnabled(true);
 
 		dotPanel.changeDot(DfmVisualisationSimple.fancy(dfm), true);
 	}
