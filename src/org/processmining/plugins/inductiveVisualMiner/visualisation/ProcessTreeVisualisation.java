@@ -330,9 +330,9 @@ public class ProcessTreeVisualisation {
 
 		final LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(tree, dot, info, from, to, "", unode, EdgeType.model, -1, -1, directionForward);
+			edge = new LocalDotEdge(tree, dot, info, from, to, "", unode, EdgeType.model, null, -1, -1, directionForward);
 		} else {
-			edge = new LocalDotEdge(tree, dot, info, to, from, "", unode, EdgeType.model, -1, -1, directionForward);
+			edge = new LocalDotEdge(tree, dot, info, to, from, "", unode, EdgeType.model, null, -1, -1, directionForward);
 			edge.setOption("dir", "back");
 		}
 
@@ -380,10 +380,10 @@ public class ProcessTreeVisualisation {
 
 		LocalDotEdge edge;
 		if (directionForward) {
-			edge = new LocalDotEdge(tree, dot, info, from, to, "", node, type, lookupNode1, lookupNode2,
+			edge = new LocalDotEdge(tree, dot, info, from, to, "", node, type, null, lookupNode1, lookupNode2,
 					directionForward);
 		} else {
-			edge = new LocalDotEdge(tree, dot, info, to, from, "", node, type, lookupNode1, lookupNode2,
+			edge = new LocalDotEdge(tree, dot, info, to, from, "", node, type, null, lookupNode1, lookupNode2,
 					directionForward);
 			edge.setOption("dir", "back");
 		}

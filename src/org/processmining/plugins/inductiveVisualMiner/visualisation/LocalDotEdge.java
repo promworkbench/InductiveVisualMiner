@@ -20,6 +20,7 @@ public class LocalDotEdge extends DotEdge {
 	}
 
 	private final EdgeType type;
+	private final DFMEdgeType dfmType;
 	private final int node;
 	private final int lookupNode1;
 	private final int lookupNode2;
@@ -27,13 +28,14 @@ public class LocalDotEdge extends DotEdge {
 	public final Appearance unselectedAppearance = new Appearance();
 
 	public LocalDotEdge(EfficientTree tree, Dot dot, ProcessTreeVisualisationInfo info, LocalDotNode source,
-			LocalDotNode target, String label, int node, EdgeType type, int lookupNode1, int lookupNode2,
+			LocalDotNode target, String label, int node, EdgeType type, DFMEdgeType dfmType, int lookupNode1, int lookupNode2,
 			boolean directionForward) {
 		super(source, target, label, new HashMap<String, String>());
 		this.node = node;
 		this.lookupNode1 = lookupNode1;
 		this.lookupNode2 = lookupNode2;
 		this.type = type;
+		this.dfmType = dfmType;
 		this.directionForward = directionForward;
 
 		dot.addEdge(this);
@@ -62,6 +64,10 @@ public class LocalDotEdge extends DotEdge {
 
 	public EdgeType getType() {
 		return type;
+	}
+	
+	public DFMEdgeType getDfmType() {
+		return dfmType;
 	}
 
 	public int getUnode() {

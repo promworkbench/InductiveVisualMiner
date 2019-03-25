@@ -18,6 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.Animation;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMap;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.DFMEdgeType;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge.EdgeType;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
@@ -209,7 +210,12 @@ public class InductiveVisualMinerSelectionColourer {
 			if (model.isTree()) {
 				cardinality = data.getEdgeLabel(dotEdge.getUnode(), false);
 			} else {
-				cardinality = data.getEdgeLabel(dotEdge.getLookupNode1(), dotEdge.getLookupNode2(), false);
+				//DFM model
+				if (dotEdge.getDfmType() != DFMEdgeType.modelIntraActivity) {
+					cardinality = data.getEdgeLabel(dotEdge.getLookupNode1(), dotEdge.getLookupNode2(), dotEdge.getDfmType().isFrequencyIncludesModelMoves());
+				} else {
+					cardinality = data.getEdgeLabel(dotEdge.getLookupNode1(), dotEdge.getDfmType().isFrequencyIncludesModelMoves());
+				}
 			}
 			Color edgeColour = styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality,
 					parameters.getColourModelEdges(), parameters.isShowFrequenciesOnModelEdges(),

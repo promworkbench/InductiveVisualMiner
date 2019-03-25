@@ -39,98 +39,6 @@ public class DfmVisualisation {
 	private TIntObjectHashMap<LocalDotNode> node2input;
 	private TIntObjectHashMap<LocalDotNode> node2output;
 
-	public enum dfmEdgeType {
-		/**
-		 * normal DFM-edge
-		 */
-		modelBetweenActivities,
-
-		/**
-		 * DFM-edge from an activity to itself, e.g. a_start, a_complete,
-		 * a_start, a_complete
-		 */
-		modelSelfLoop,
-
-		/**
-		 * log move edge during an activity, e.g. a_start, log move, a_complete
-		 */
-		logMoveDuringActivity,
-
-		/**
-		 * log move edge in between two different activities, e.g. a_start,
-		 * a_complete, log move, b_start, b_complete
-		 */
-		logMoveInterActivity,
-
-		/**
-		 * log move edge in between two executions of the same activity, e.g.
-		 * a_start, a_complete, log move, a_start, a_complete
-		 */
-		logMoveOnSelfLoop,
-
-		/**
-		 * model move edge
-		 */
-		modelMove,
-
-		/**
-		 * edge from a point where a model move edge splits off to/from an
-		 * activity
-		 */
-		modelIntraActivity;
-
-		private boolean canHaveLogMoves = false;
-		static {
-			modelBetweenActivities.canHaveLogMoves = true;
-			modelSelfLoop.canHaveLogMoves = true;
-		}
-
-		public boolean canHaveLogMoves() {
-			return canHaveLogMoves;
-		}
-
-		private boolean isLogMove = false;
-		static {
-			logMoveDuringActivity.isLogMove = true;
-			logMoveInterActivity.isLogMove = true;
-			logMoveOnSelfLoop.isLogMove = true;
-		}
-
-		public boolean isLogMove() {
-			return isLogMove;
-		}
-
-		private boolean frequencyIncludesModelMoves = true;
-		static {
-			modelIntraActivity.frequencyIncludesModelMoves = false;
-		}
-
-		public boolean isFrequencyIncludesModelMoves() {
-			return frequencyIncludesModelMoves;
-		}
-
-		public LogMovePosition getLogMovePosition(int dfmNodeFrom, int dfmNodeTo) {
-			switch (this) {
-				case logMoveDuringActivity :
-					return null;
-				case logMoveInterActivity :
-					return null;
-				case logMoveOnSelfLoop :
-					return null;
-				case modelBetweenActivities :
-					return LogMovePosition.onEdge(dfmNodeFrom, dfmNodeTo);
-				case modelIntraActivity :
-					return null;
-				case modelMove :
-					return null;
-				case modelSelfLoop :
-					return LogMovePosition.betweenTwoExecutionsOf(dfmNodeTo);
-				default :
-					return null;
-			}
-		}
-	}
-
 	public Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> fancy(IvMModel model,
 			AlignedLogVisualisationData data, ProcessTreeVisualisationParameters parameters) {
 		this.parameters = parameters;
@@ -161,7 +69,7 @@ public class DfmVisualisation {
 		 * Empty traces
 		 */
 		if (dfg.isEmptyTraces()) {
-			addArc2(dfmEdgeType.modelBetweenActivities, -1, -1);
+			addArc2(DFMEdgeType.modelBetweenActivities, -1, -1);
 			//addArc(source, sink, -1, -1, true, false, dfmEdgeType.modelBetweenActivities);
 		}
 
@@ -181,10 +89,10 @@ public class DfmVisualisation {
 			int targetActivity = dfg.getEdgeTarget(edge);
 
 			if (sourceActivity != targetActivity) {
-				addArc2(dfmEdgeType.modelBetweenActivities, sourceActivity, targetActivity);
+				addArc2(DFMEdgeType.modelBetweenActivities, sourceActivity, targetActivity);
 			} else {
 				//special case: log move between two instances of the same activity (on a self-loop)
-				addArc2(dfmEdgeType.modelSelfLoop, sourceActivity, targetActivity);
+				addArc2(DFMEdgeType.modelSelfLoop, sourceActivity, targetActivity);
 			}
 		}
 
@@ -193,8 +101,7 @@ public class DfmVisualisation {
 		 */
 		for (TIntIterator it = dfg.getStartActivities().iterator(); it.hasNext();) {
 			int node = it.next();
-			//addArc(source, node2input.get(node), -1, node, true, false, dfmEdgeType.modelBetweenActivities);
-			addArc2(dfmEdgeType.modelBetweenActivities, -1, node);
+			addArc2(DFMEdgeType.modelBetweenActivities, -1, node);
 		}
 
 		/**
@@ -202,17 +109,17 @@ public class DfmVisualisation {
 		 */
 		for (TIntIterator it = dfg.getEndActivities().iterator(); it.hasNext();) {
 			int node = it.next();
-			//addArc(node2output.get(node), sink, node, -1, true, false, dfmEdgeType.modelBetweenActivities);
-			addArc2(dfmEdgeType.modelBetweenActivities, node, -1);
+			addArc2(DFMEdgeType.modelBetweenActivities, node, -1);
 		}
 
 		return Triple.of(dot, info, traceViewColourMap);
 	}
 
 	private LocalDotEdge addMoveArc(LocalDotNode from, LocalDotNode to, int node, EdgeType type, int lookupNode1,
-			int lookupNode2, Pair<String, Long> cardinality) {
+			int lookupNode2, Pair<String, Long> cardinality, DFMEdgeType edgeType) {
 
-		LocalDotEdge edge = new LocalDotEdge(null, dot, info, from, to, "", node, type, lookupNode1, lookupNode2, true);
+		LocalDotEdge edge = new LocalDotEdge(null, dot, info, from, to, "", node, type, edgeType, lookupNode1,
+				lookupNode2, true);
 
 		edge.setOption("style", "dashed");
 		edge.setOption("arrowsize", ".5");
@@ -291,13 +198,13 @@ public class DfmVisualisation {
 			node2output.put(msdNode, after);
 
 			//connect before -> activity -> after
-			addArc2(dfmEdgeType.modelIntraActivity, -1, msdNode);
+			addArc2(DFMEdgeType.modelIntraActivity, -1, msdNode);
 			//addArc(before, dotNode, node, node, true, false, dfmEdgeType.logMoveInterActivity);
-			addArc2(dfmEdgeType.modelIntraActivity, msdNode, -1);
+			addArc2(DFMEdgeType.modelIntraActivity, msdNode, -1);
 
 			//add the model-move edge
 			Pair<String, Long> modelMoves = data.getModelMoveEdgeLabel(msdNode);
-			addMoveArc(before, after, msdNode, EdgeType.modelMove, -1, -1, modelMoves);
+			addMoveArc(before, after, msdNode, EdgeType.modelMove, -1, -1, modelMoves, DFMEdgeType.modelMove);
 
 		} else {
 			node2input.put(msdNode, dotNode);
@@ -314,14 +221,14 @@ public class DfmVisualisation {
 
 		info.addNode(msdNode, dotNode, null);
 
-		//visualise log moves
+		//visualise log moves during activities, e.g. a_start, log move, a_complete
 		if (parameters.isShowLogMoves()) {
 			LogMovePosition logMovePosition = LogMovePosition.onLeaf(msdNode);
 			Pair<String, MultiSet<XEventClass>> logMoves = data.getLogMoveEdgeLabel(logMovePosition);
 			Pair<String, Long> t = Pair.of(logMoves.getA(), logMoves.getB().size());
 			if (t.getB() > 0) {
-				LocalDotEdge edge = addMoveArc(dotNode, dotNode, msdNode, EdgeType.logMove, logMovePosition.getOn(),
-						logMovePosition.getBeforeChild(), t);
+				addMoveArc(dotNode, dotNode, msdNode, EdgeType.logMove, logMovePosition.getOn(),
+						logMovePosition.getBeforeChild(), t, DFMEdgeType.logMoveDuringActivity);
 			}
 		}
 
@@ -334,13 +241,16 @@ public class DfmVisualisation {
 		return ProcessTreeVisualisationHelper.getOccurrenceFactor(cardinality, minCardinality, maxCardinality);
 	}
 
-	private void addArc2(dfmEdgeType edgeType, int dfmNodeFrom, int dfmNodeTo) {
-
+	private void addArc2(DFMEdgeType edgeType, int dfmNodeFrom, int dfmNodeTo) {
 		LocalDotNode dotNodeFrom;
 		LocalDotNode dotNodeTo;
-		if (edgeType != dfmEdgeType.modelIntraActivity) {
+		Pair<String, Long> cardinality;
+		if (edgeType != DFMEdgeType.modelIntraActivity) {
 			dotNodeFrom = node2output.get(dfmNodeFrom);
 			dotNodeTo = node2input.get(dfmNodeTo);
+
+			cardinality = data.getEdgeLabel(dfmNodeFrom, dfmNodeTo,
+					!parameters.isShowModelMoves() || edgeType.isFrequencyIncludesModelMoves());
 		} else {
 			//special case: model move that has been split up in two parts
 			if (dfmNodeFrom != -1) {
@@ -352,10 +262,9 @@ public class DfmVisualisation {
 				dotNodeTo = info.getActivityDotNode(dfmNodeTo);
 				dfmNodeFrom = dfmNodeTo;
 			}
+			cardinality = data.getEdgeLabel(dfmNodeTo,
+					!parameters.isShowModelMoves() || edgeType.isFrequencyIncludesModelMoves());
 		}
-
-		Pair<String, Long> cardinality = data.getEdgeLabel(dfmNodeFrom, dfmNodeTo,
-				!parameters.isShowModelMoves() || edgeType.frequencyIncludesModelMoves);
 
 		List<LocalDotEdge> edges = new ArrayList<>();
 
@@ -367,22 +276,22 @@ public class DfmVisualisation {
 				//add an intermediate note and draw a log move on int
 				LocalDotNode intermediateNode = new LocalDotNode(dot, info, NodeType.xor, "", -1, null);
 				edges.add(new LocalDotEdge(null, dot, info, dotNodeFrom, intermediateNode, "", -1, EdgeType.model,
-						dfmNodeFrom, dfmNodeTo, true));
+						edgeType, dfmNodeFrom, dfmNodeTo, true));
 				edges.add(new LocalDotEdge(null, dot, info, intermediateNode, dotNodeTo, "", -1, EdgeType.model,
-						dfmNodeFrom, dfmNodeTo, true));
+						edgeType, dfmNodeFrom, dfmNodeTo, true));
 
 				Pair<String, Long> t = Pair.of(logMoves.getA(), logMoves.getB().size());
 				addMoveArc(intermediateNode, intermediateNode, -1, EdgeType.logMove, logMovePosition.getOn(),
-						logMovePosition.getBeforeChild(), t);
+						logMovePosition.getBeforeChild(), t, edgeType.getCorrespondingLogMove());
 			} else {
 				//no log moves involved here
-				edges.add(new LocalDotEdge(null, dot, info, dotNodeFrom, dotNodeTo, "", -1, EdgeType.model, dfmNodeFrom,
-						dfmNodeTo, true));
+				edges.add(new LocalDotEdge(null, dot, info, dotNodeFrom, dotNodeTo, "", -1, EdgeType.model, edgeType,
+						dfmNodeFrom, dfmNodeTo, true));
 			}
 		} else {
 			//no log moves involved here
-			edges.add(new LocalDotEdge(null, dot, info, dotNodeFrom, dotNodeTo, "", -1, EdgeType.model, dfmNodeFrom,
-					dfmNodeTo, true));
+			edges.add(new LocalDotEdge(null, dot, info, dotNodeFrom, dotNodeTo, "", -1, EdgeType.model, edgeType,
+					dfmNodeFrom, dfmNodeTo, true));
 		}
 
 		for (LocalDotEdge edge : edges) {
