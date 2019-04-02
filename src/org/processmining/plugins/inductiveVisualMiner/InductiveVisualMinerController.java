@@ -415,7 +415,6 @@ public class InductiveVisualMinerController {
 			});
 			filterNodeSelection.setOnComplete(new Runnable() {
 				public void run() {
-
 					HighlightingFiltersView.updateSelectionDescription(panel, state.getSelection(),
 							state.getFiltersController(), state.getModel());
 

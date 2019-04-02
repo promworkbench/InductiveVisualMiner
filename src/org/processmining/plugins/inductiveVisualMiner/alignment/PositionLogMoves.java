@@ -48,7 +48,7 @@ public class PositionLogMoves {
 			Move move = trace.get(i);
 			if (move.isLogMove()) {
 
-				if (previousActivity == -1 && nextActivity == -1) {
+				if (previousActivity < 0 && nextActivity < 0) {
 					/*
 					 * If the previous and the next activity are non-existent,
 					 * then the model must have been empty.

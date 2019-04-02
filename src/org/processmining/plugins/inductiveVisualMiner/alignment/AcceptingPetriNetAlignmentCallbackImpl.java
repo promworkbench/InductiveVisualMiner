@@ -96,6 +96,8 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 					if (move != null && (type == StepTypes.L || type == StepTypes.LMGOOD)) {
 						eventIndex++;
 					}
+				} else {
+					System.out.println("bla");
 				}
 			}
 
@@ -147,7 +149,7 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 				int activityIndex;
 				if (node.equals(emptyTraceTransition)) {
 					//empty trace
-					return Pair.of(new Move(model, Type.ignoredModelMove, previousModelNode, -100, null, null,
+					return Pair.of(new Move(model, Type.synchronousMove, -2, -2, null, null,
 							PerformanceTransition.complete, moveIndex), previousModelNode);
 				} else if (activity2skipEnqueue.containsKey(performanceUnode)) {
 					lifeCycleTransition = PerformanceTransition.enqueue;

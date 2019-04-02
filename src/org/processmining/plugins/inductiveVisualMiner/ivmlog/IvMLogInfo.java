@@ -34,6 +34,7 @@ public class IvMLogInfo {
 	// (node1, node2) on node1, before node2 (only in case of node1 sequence or loop)
 	// (root, null) at end of trace
 	// (null, root) at start of trace
+	// (null, null) on an empty trace
 	private final Map<LogMovePosition, MultiSet<XEventClass>> logMoves;
 	private final MultiSet<Move> activities;
 

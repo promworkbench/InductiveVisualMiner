@@ -109,7 +109,7 @@ public class Dfm2AcceptingPetriNet {
 		 * empty traces
 		 */
 		Transition emptyTraceTransition = null;
-		if (dfg.getNumberOfActivities() > 0) {
+		if (dfg.isEmptyTraces()) {
 			emptyTraceTransition = petriNet.addTransition("epsilon");
 			emptyTraceTransition.setInvisible(true);
 			petriNet.addArc(source, emptyTraceTransition);

@@ -39,12 +39,18 @@ public enum DFMEdgeType {
 	/**
 	 * edge from a point where a model move edge splits off to/from an activity
 	 */
-	modelIntraActivity;
+	modelIntraActivity,
+
+	/**
+	 * Edge denoting the empty trace in a model
+	 */
+	modelEmptyTraces;
 
 	private boolean canHaveLogMoves = false;
 	static {
 		modelBetweenActivities.canHaveLogMoves = true;
 		modelSelfLoop.canHaveLogMoves = true;
+		modelEmptyTraces.canHaveLogMoves = true;
 	}
 
 	public boolean canHaveLogMoves() {
@@ -97,6 +103,8 @@ public enum DFMEdgeType {
 				return null;
 			case modelSelfLoop :
 				return LogMovePosition.betweenTwoExecutionsOf(dfmNodeTo);
+			case modelEmptyTraces :
+				return LogMovePosition.onEdge(-1, -1);
 			default :
 				return null;
 		}

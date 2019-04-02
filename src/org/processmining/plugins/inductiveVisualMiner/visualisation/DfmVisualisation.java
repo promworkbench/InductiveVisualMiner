@@ -69,7 +69,7 @@ public class DfmVisualisation {
 		 * Empty traces
 		 */
 		if (dfg.isEmptyTraces()) {
-			addArc2(DFMEdgeType.modelBetweenActivities, -1, -1);
+			addArc2(DFMEdgeType.modelEmptyTraces, -2, -2);
 			//addArc(source, sink, -1, -1, true, false, dfmEdgeType.modelBetweenActivities);
 		}
 
@@ -245,13 +245,8 @@ public class DfmVisualisation {
 		LocalDotNode dotNodeFrom;
 		LocalDotNode dotNodeTo;
 		Pair<String, Long> cardinality;
-		if (edgeType != DFMEdgeType.modelIntraActivity) {
-			dotNodeFrom = node2output.get(dfmNodeFrom);
-			dotNodeTo = node2input.get(dfmNodeTo);
 
-			cardinality = data.getEdgeLabel(dfmNodeFrom, dfmNodeTo,
-					!parameters.isShowModelMoves() || edgeType.isFrequencyIncludesModelMoves());
-		} else {
+		if (edgeType == DFMEdgeType.modelIntraActivity) {
 			//special case: model move that has been split up in two parts
 			if (dfmNodeFrom != -1) {
 				dotNodeFrom = info.getActivityDotNode(dfmNodeFrom);
@@ -263,6 +258,17 @@ public class DfmVisualisation {
 				dfmNodeFrom = dfmNodeTo;
 			}
 			cardinality = data.getEdgeLabel(dfmNodeTo,
+					!parameters.isShowModelMoves() || edgeType.isFrequencyIncludesModelMoves());
+		} else if (edgeType == DFMEdgeType.modelEmptyTraces) {
+			dotNodeFrom = node2output.get(-1);
+			dotNodeTo = node2input.get(-1);
+
+			cardinality = data.getEdgeLabel(dfmNodeFrom, dfmNodeTo, true);
+		} else {
+			dotNodeFrom = node2output.get(dfmNodeFrom);
+			dotNodeTo = node2input.get(dfmNodeTo);
+
+			cardinality = data.getEdgeLabel(dfmNodeFrom, dfmNodeTo,
 					!parameters.isShowModelMoves() || edgeType.isFrequencyIncludesModelMoves());
 		}
 

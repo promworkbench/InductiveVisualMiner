@@ -63,7 +63,7 @@ public class IvMModel {
 		if (isTree()) {
 			return tree.isTau(node);
 		} else {
-			return false;
+			return node < 0;
 		}
 	}
 
