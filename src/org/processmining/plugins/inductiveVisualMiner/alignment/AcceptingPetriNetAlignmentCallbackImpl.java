@@ -96,8 +96,6 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 					if (move != null && (type == StepTypes.L || type == StepTypes.LMGOOD)) {
 						eventIndex++;
 					}
-				} else {
-					System.out.println("bla");
 				}
 			}
 
