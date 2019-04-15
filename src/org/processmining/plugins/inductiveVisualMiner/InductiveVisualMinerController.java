@@ -278,7 +278,7 @@ public class InductiveVisualMinerController {
 			});
 			align.setOnComplete(new Runnable() {
 				public void run() {
-					panel.getSaveAlignmentButton().setEnabled(true);
+					panel.getSaveLogButton().setEnabled(true);
 					panel.getTraceView().set(state.getModel(), state.getIvMLog(), state.getSelection(),
 							state.getTraceColourMap());
 
@@ -288,7 +288,7 @@ public class InductiveVisualMinerController {
 			});
 			align.setOnInvalidate(new Runnable() {
 				public void run() {
-					panel.getSaveAlignmentButton().setEnabled(false);
+					panel.getSaveLogButton().setEnabled(false);
 				}
 			});
 			align.setOnException(onException);
@@ -716,33 +716,33 @@ public class InductiveVisualMinerController {
 		});
 
 		//set alignment export button
-		panel.getSaveAlignmentButton().addActionListener(new ActionListener() {
+		panel.getSaveLogButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 				String name = XConceptExtension.instance().extractName(state.getSortedXLog());
 				IvMLog log = state.getIvMLogFiltered();
 				IvMModel model = state.getModel();
 
-				Object[] options = { "Log view", "Model view", "Both" };
+				Object[] options = { "Just the log (log & sync moves)", "Aligned log (all moves)", "Model view (model & sync moves)" };
 				int n = JOptionPane.showOptionDialog(panel,
-						"What view of the alignment would you like to export?\nIt will become available as an event log in ProM.",
-						"Export Alignment", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-						options, options[0]);
+						"Which filtered view of the log would you like to export?\nIt will become available as an event log in ProM.",
+						"Export Log", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
+						options[0]);
 
 				switch (n) {
 					case 0 :
 						ExportAlignment.exportAlignment(context, log, model, name, Type.logView);
 						break;
 					case 1 :
-						ExportAlignment.exportAlignment(context, log, model, name, Type.modelView);
+						ExportAlignment.exportAlignment(context, log, model, name, Type.both);
 						break;
 					case 2 :
-						ExportAlignment.exportAlignment(context, log, model, name, Type.both);
+						ExportAlignment.exportAlignment(context, log, model, name, Type.modelView);
 						break;
 				}
 			}
 		});
-		panel.getSaveAlignmentButton().setEnabled(false);
+		panel.getSaveLogButton().setEnabled(false);
 
 		//listen to ctrl c to show the controller view
 		{

@@ -75,9 +75,9 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final EditModelView editModelView;
 	private final JLabel minerLabel;
 	private JComboBox<?> minerCombobox;
+	private final JButton saveLogButton;
 	private final JButton saveModelButton;
 	private final JButton saveImageButton;
-	private final JButton saveAlignmentButton;
 	private final JButton traceViewButton;
 	private final TraceView traceView;
 	private final JButton traceColourMapViewButton;
@@ -290,6 +290,19 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			{
 				controllerView = new ControllerView(this);
 			}
+			
+			//save log button
+			{
+				saveLogButton = new JButton("export log");
+				IvMDecorator.decorate(saveLogButton);
+				GridBagConstraints cExitButton = new GridBagConstraints();
+				cExitButton.gridx = 1;
+				cExitButton.gridy = gridy++;
+				cExitButton.gridwidth = 1;
+				cExitButton.insets = margins;
+				cExitButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(saveLogButton, cExitButton);
+			}
 
 			//save model button
 			{
@@ -315,19 +328,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cExitButton.insets = margins;
 				cExitButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(saveImageButton, cExitButton);
-			}
-
-			//save alignment button
-			{
-				saveAlignmentButton = new JButton("export alignment");
-				IvMDecorator.decorate(saveAlignmentButton);
-				GridBagConstraints cAlignmentButton = new GridBagConstraints();
-				cAlignmentButton.gridx = 1;
-				cAlignmentButton.gridy = gridy++;
-				cAlignmentButton.gridwidth = 1;
-				cAlignmentButton.insets = margins;
-				cAlignmentButton.fill = GridBagConstraints.HORIZONTAL;
-				otherSettingsPanel.add(saveAlignmentButton, cAlignmentButton);
 			}
 
 			{
@@ -544,8 +544,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return saveImageButton;
 	}
 
-	public JButton getSaveAlignmentButton() {
-		return saveAlignmentButton;
+	public JButton getSaveLogButton() {
+		return saveLogButton;
 	}
 
 	public void setOnSelectionChanged(InputFunction<Selection> onSelectionChanged) {
