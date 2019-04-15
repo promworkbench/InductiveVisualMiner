@@ -13,7 +13,7 @@ public class PerformanceWrapper {
 	}
 
 	public enum TypeGlobal {
-		cycle;
+		duration;
 	}
 
 	public enum Gather {

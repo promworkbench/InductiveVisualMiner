@@ -66,7 +66,7 @@ public class PopupPopulator {
 						List<String> popup = new ArrayList<>();
 
 						//frequencies
-						popup.add("number of traces   " + state.getIvMLogInfoFiltered().getNumberOfTraces());
+						popup.add("number of traces       " + state.getIvMLogInfoFiltered().getNumberOfTraces());
 						popup.add(null);
 
 						//times
@@ -75,7 +75,7 @@ public class PopupPopulator {
 								for (Gather gather : Gather.values()) {
 									long m = state.getPerformance().getGlobalMeasure(type, gather);
 									if (m > -1) {
-										popup.add(gather.toString() + " " + type.toString() + " time "
+										popup.add(gather.toString() + " trace " + type.toString() + " "
 												+ Performance.timeToString(m));
 									}
 								}

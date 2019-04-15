@@ -89,7 +89,7 @@ public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, Performan
 			//compute global times
 			for (IvMTrace trace : log) {
 				if (trace.getRealStartTime() != null && trace.getRealEndTime() != null) {
-					result.addGlobalValue(TypeGlobal.cycle, trace.getRealEndTime() - trace.getRealStartTime());
+					result.addGlobalValue(TypeGlobal.duration, trace.getRealEndTime() - trace.getRealStartTime());
 				}
 			}
 
