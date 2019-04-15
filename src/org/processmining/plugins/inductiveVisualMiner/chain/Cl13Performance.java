@@ -4,8 +4,10 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Type;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeGlobal;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeNode;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCombination;
@@ -34,7 +36,7 @@ public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, Performan
 
 			PerformanceWrapper result = new PerformanceWrapper(method, queueActivityLogs, model.getMaxNumberOfNodes());
 
-			//compute times
+			//compute node times
 			for (TIntIterator it = queueActivityLogs.keySet().iterator(); it.hasNext();) {
 				int unode = it.next();
 				QueueActivityLog activityLog = queueActivityLogs.get(unode);
@@ -42,37 +44,52 @@ public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, Performan
 
 					//waiting time
 					if (activityLog.hasInitiate(i) && activityLog.hasStart(i)) {
-						result.addValue(Type.waiting, unode, activityLog.getStart(i) - activityLog.getInitiate(i));
+						result.addNodeValue(TypeNode.waiting, unode,
+								activityLog.getStart(i) - activityLog.getInitiate(i));
 					}
 
 					//queueing time
 					if (activityLog.hasEnqueue(i) && activityLog.hasStart(i)) {
-						result.addValue(Type.queueing, unode, activityLog.getStart(i) - activityLog.getEnqueue(i));
+						result.addNodeValue(TypeNode.queueing, unode,
+								activityLog.getStart(i) - activityLog.getEnqueue(i));
 					}
 
 					//service time
 					if (activityLog.hasStart(i) && activityLog.hasComplete(i)) {
-						result.addValue(Type.service, unode, activityLog.getComplete(i) - activityLog.getStart(i));
+						result.addNodeValue(TypeNode.service, unode,
+								activityLog.getComplete(i) - activityLog.getStart(i));
 					}
 
 					//sojourn time
 					if (activityLog.hasInitiate(i) && activityLog.hasComplete(i)) {
-						result.addValue(Type.sojourn, unode, activityLog.getComplete(i) - activityLog.getInitiate(i));
+						result.addNodeValue(TypeNode.sojourn, unode,
+								activityLog.getComplete(i) - activityLog.getInitiate(i));
 					}
 
 					//elapsed time
 					if (activityLog.hasStartTrace(i) && activityLog.hasStart(i)) {
-						result.addValue(Type.elapsed, unode, activityLog.getStart(i) - activityLog.getStartTrace(i));
+						result.addNodeValue(TypeNode.elapsed, unode,
+								activityLog.getStart(i) - activityLog.getStartTrace(i));
 					} else if (activityLog.hasStartTrace(i) && activityLog.hasComplete(i)) {
-						result.addValue(Type.elapsed, unode, activityLog.getComplete(i) - activityLog.getStartTrace(i));
+						result.addNodeValue(TypeNode.elapsed, unode,
+								activityLog.getComplete(i) - activityLog.getStartTrace(i));
 					}
 
 					//remaining time
 					if (activityLog.hasEndTrace(i) && activityLog.hasComplete(i)) {
-						result.addValue(Type.remaining, unode, activityLog.getEndTrace(i) - activityLog.getComplete(i));
+						result.addNodeValue(TypeNode.remaining, unode,
+								activityLog.getEndTrace(i) - activityLog.getComplete(i));
 					} else if (activityLog.hasEndTrace(i) && activityLog.hasStart(i)) {
-						result.addValue(Type.remaining, unode, activityLog.getEndTrace(i) - activityLog.getStart(i));
+						result.addNodeValue(TypeNode.remaining, unode,
+								activityLog.getEndTrace(i) - activityLog.getStart(i));
 					}
+				}
+			}
+
+			//compute global times
+			for (IvMTrace trace : log) {
+				if (trace.getRealStartTime() != null && trace.getRealEndTime() != null) {
+					result.addGlobalValue(TypeGlobal.cycle, trace.getRealEndTime() - trace.getRealStartTime());
 				}
 			}
 

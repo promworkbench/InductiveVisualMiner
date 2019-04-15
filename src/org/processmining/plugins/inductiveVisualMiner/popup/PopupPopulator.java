@@ -15,9 +15,11 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Type;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeGlobal;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
 
 public class PopupPopulator {
 	public static void updatePopup(InductiveVisualMinerPanel panel, InductiveVisualMinerState state)
@@ -29,33 +31,66 @@ public class PopupPopulator {
 			DotElement element = panel.getGraph().getMouseInElements().iterator().next();
 			if (element instanceof LocalDotNode) {
 				int unode = ((LocalDotNode) element).getUnode();
-				if (state.isAlignmentReady() && state.getModel().isActivity(unode)) {
-					List<String> popup = new ArrayList<>();
+				if (state.isAlignmentReady()) {
+					//popup of an activity
+					if (state.getModel().isActivity(unode)) {
+						List<String> popup = new ArrayList<>();
 
-					//frequencies
-					popup.add("number of occurrences " + IvMLogMetrics.getNumberOfTracesRepresented(state.getModel(),
-							unode, false, state.getIvMLogInfoFiltered()));
-					popup.add(null);
+						//frequencies
+						popup.add("number of occurrences " + IvMLogMetrics.getNumberOfTracesRepresented(
+								state.getModel(), unode, false, state.getIvMLogInfoFiltered()));
+						popup.add(null);
 
-					//times
-					if (state.isPerformanceReady()) {
-						for (Type type : Type.values()) {
-							for (Gather gather : Gather.values()) {
-								long m = state.getPerformance().getMeasure(type, gather, unode);
-								if (m > -1) {
-									popup.add(gather.toString() + " " + type.toString() + " time "
-											+ Performance.timeToString(m));
+						//times
+						if (state.isPerformanceReady()) {
+							for (TypeNode type : TypeNode.values()) {
+								for (Gather gather : Gather.values()) {
+									long m = state.getPerformance().getNodeMeasure(type, gather, unode);
+									if (m > -1) {
+										popup.add(gather.toString() + " " + type.toString() + " time "
+												+ Performance.timeToString(m));
+									}
+								}
+								if (popup.get(popup.size() - 1) != null) {
+									popup.add(null);
 								}
 							}
-							if (popup.get(popup.size() - 1) != null) {
-								popup.add(null);
+						}
+
+						popup.remove(popup.size() - 1);
+						panel.getGraph().setPopupActivity(popup, unode);
+						panel.getGraph().setShowPopup(true);
+					} else if (((LocalDotNode) element).getType() == NodeType.source
+							|| ((LocalDotNode) element).getType() == NodeType.sink) {
+						//popup at the source or sink
+						List<String> popup = new ArrayList<>();
+
+						//frequencies
+						popup.add("number of traces   " + state.getIvMLogInfoFiltered().getNumberOfTraces());
+						popup.add(null);
+
+						//times
+						if (state.isPerformanceReady()) {
+							for (TypeGlobal type : TypeGlobal.values()) {
+								for (Gather gather : Gather.values()) {
+									long m = state.getPerformance().getGlobalMeasure(type, gather);
+									if (m > -1) {
+										popup.add(gather.toString() + " " + type.toString() + " time "
+												+ Performance.timeToString(m));
+									}
+								}
+								if (popup.get(popup.size() - 1) != null) {
+									popup.add(null);
+								}
 							}
 						}
-					}
 
-					popup.remove(popup.size() - 1);
-					panel.getGraph().setPopupActivity(popup, unode);
-					panel.getGraph().setShowPopup(true);
+						popup.remove(popup.size() - 1);
+						panel.getGraph().setPopupActivity(popup, -1);
+						panel.getGraph().setShowPopup(true);
+					} else {
+						panel.getGraph().setShowPopup(false);
+					}
 				} else {
 					panel.getGraph().setShowPopup(false);
 				}

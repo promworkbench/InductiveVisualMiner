@@ -8,8 +8,12 @@ import gnu.trove.map.TIntObjectMap;
 
 public class PerformanceWrapper {
 
-	public enum Type {
+	public enum TypeNode {
 		elapsed, queueing, waiting, service, sojourn, remaining;
+	}
+
+	public enum TypeGlobal {
+		cycle;
 	}
 
 	public enum Gather {
@@ -21,7 +25,7 @@ public class PerformanceWrapper {
 			public long finalise(BigInteger value, int numberOfMeasures) {
 				return value.longValue();
 			}
-			
+
 			public String toString() {
 				return "minimum";
 			}
@@ -45,7 +49,7 @@ public class PerformanceWrapper {
 			public long finalise(BigInteger value, int numberOfMeasures) {
 				return value.longValue();
 			}
-			
+
 			public String toString() {
 				return "maximum";
 			}
@@ -60,42 +64,69 @@ public class PerformanceWrapper {
 	private final QueueLengths lengths;
 
 	//finalised values
-	private long[][][] values;
+	private long[][][] valuesNode;
+	private long[][] valuesGlobal;
 
 	//intermediate values
-	private BigInteger[][][] valuesI;
-	private int[][][] countI;
+	private BigInteger[][][] valuesINode;
+	private BigInteger[][] valuesIGlobal;
+	private int[][][] countINode;
+	private int[][] countIGlobal;
 
 	public PerformanceWrapper(QueueLengths lengths, TIntObjectMap<QueueActivityLog> queueActivityLogs,
 			int numberOfNodes) {
 		this.lengths = lengths;
 		this.queueActivityLogs = queueActivityLogs;
 
-		valuesI = new BigInteger[Type.values().length][Gather.values().length][numberOfNodes];
-		countI = new int[Type.values().length][Gather.values().length][numberOfNodes];
+		valuesINode = new BigInteger[TypeNode.values().length][Gather.values().length][numberOfNodes];
+		valuesIGlobal = new BigInteger[TypeGlobal.values().length][Gather.values().length];
+		countINode = new int[TypeNode.values().length][Gather.values().length][numberOfNodes];
+		countIGlobal = new int[TypeGlobal.values().length][Gather.values().length];
 	}
 
-	public void addValue(Type type, int unode, long value) {
+	public void addNodeValue(TypeNode type, int unode, long value) {
 		int t = type.ordinal();
 		for (Gather gather : Gather.values()) {
 			int g = gather.ordinal();
-			countI[t][g][unode]++;
-			valuesI[t][g][unode] = gather.addValue(valuesI[t][g][unode], value);
+			countINode[t][g][unode]++;
+			valuesINode[t][g][unode] = gather.addValue(valuesINode[t][g][unode], value);
+		}
+	}
+
+	public void addGlobalValue(TypeGlobal type, long value) {
+		int t = type.ordinal();
+		for (Gather gather : Gather.values()) {
+			int g = gather.ordinal();
+			countIGlobal[t][g]++;
+			valuesIGlobal[t][g] = gather.addValue(valuesIGlobal[t][g], value);
 		}
 	}
 
 	public void finalise() {
-		values = new long[Type.values().length][Gather.values().length][valuesI[0][0].length];
-		for (Type type : Type.values()) {
+		valuesNode = new long[TypeNode.values().length][Gather.values().length][valuesINode[0][0].length];
+		for (TypeNode type : TypeNode.values()) {
 			for (Gather gather : Gather.values()) {
 				int t = type.ordinal();
 				int g = gather.ordinal();
-				for (int unode = 0; unode < values[0][0].length; unode++) {
-					if (countI[t][g][unode] > 0) {
-						values[t][g][unode] = gather.finalise(valuesI[t][g][unode], countI[t][g][unode]);
+				for (int unode = 0; unode < valuesNode[0][0].length; unode++) {
+					if (countINode[t][g][unode] > 0) {
+						valuesNode[t][g][unode] = gather.finalise(valuesINode[t][g][unode], countINode[t][g][unode]);
 					} else {
-						values[t][g][unode] = -1;
+						valuesNode[t][g][unode] = -1;
 					}
+				}
+			}
+		}
+
+		valuesGlobal = new long[TypeGlobal.values().length][Gather.values().length];
+		for (TypeGlobal type : TypeGlobal.values()) {
+			for (Gather gather : Gather.values()) {
+				int t = type.ordinal();
+				int g = gather.ordinal();
+				if (countIGlobal[t][g] > 0) {
+					valuesGlobal[t][g] = gather.finalise(valuesIGlobal[t][g], countIGlobal[t][g]);
+				} else {
+					valuesGlobal[t][g] = -1;
 				}
 			}
 		}
@@ -109,16 +140,20 @@ public class PerformanceWrapper {
 	 * @param unode
 	 * @return
 	 */
-	public long getMeasure(Type type, Gather gather, int unode) {
-		return values[type.ordinal()][gather.ordinal()][unode];
+	public long getNodeMeasure(TypeNode type, Gather gather, int unode) {
+		return valuesNode[type.ordinal()][gather.ordinal()][unode];
 	}
 
-	public long[] getMeasures(Type type, Gather gather) {
-		return values[type.ordinal()][gather.ordinal()];
+	public long[] getNodeMeasures(TypeNode type, Gather gather) {
+		return valuesNode[type.ordinal()][gather.ordinal()];
 	}
 
 	public double getQueueLength(int unode, long time) {
 		return lengths.getQueueLength(unode, time, queueActivityLogs);
+	}
+
+	public long getGlobalMeasure(TypeGlobal type, Gather gather) {
+		return valuesGlobal[type.ordinal()][gather.ordinal()];
 	}
 
 }

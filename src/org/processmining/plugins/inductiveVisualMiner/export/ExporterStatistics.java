@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Type;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
@@ -56,9 +56,9 @@ public class ExporterStatistics extends Exporter {
 			w.print(sep + "occurrences" + sep + cardinality);
 			w.print(sep + "model moves" + sep + modelMoveCardinality);
 
-			for (Type type : Type.values()) {
+			for (TypeNode type : TypeNode.values()) {
 				for (Gather gather : Gather.values()) {
-					long m = performance.getMeasure(type, gather, node);
+					long m = performance.getNodeMeasure(type, gather, node);
 					if (m > -1) {
 						w.print(sep + gather.toString() + " " + type.toString() + " time" + sep
 								+ Performance.timeToString(m));

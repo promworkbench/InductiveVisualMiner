@@ -485,6 +485,7 @@ public class InductiveVisualMinerController {
 			performance.setOnException(onException);
 		}
 
+		chain.addConnection(animationScaler, performance);
 		chain.addConnection(filterNodeSelection, performance);
 
 		//compute histogram
@@ -723,7 +724,8 @@ public class InductiveVisualMinerController {
 				IvMLog log = state.getIvMLogFiltered();
 				IvMModel model = state.getModel();
 
-				Object[] options = { "Just the log (log & sync moves)", "Aligned log (all moves)", "Model view (model & sync moves)" };
+				Object[] options = { "Just the log (log & sync moves)", "Aligned log (all moves)",
+						"Model view (model & sync moves)" };
 				int n = JOptionPane.showOptionDialog(panel,
 						"Which filtered view of the log would you like to export?\nIt will become available as an event log in ProM.",
 						"Export Log", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,

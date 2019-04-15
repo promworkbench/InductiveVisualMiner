@@ -59,9 +59,9 @@ public class DfmVisualisation {
 
 		//source & sink
 		info = new ProcessTreeVisualisationInfo();
-		LocalDotNode source = new LocalDotNode(dot, info, NodeType.source, "", 0, null);
+		LocalDotNode source = new LocalDotNode(dot, info, NodeType.source, "", -1, null);
 		node2output.put(-1, source);
-		LocalDotNode sink = new LocalDotNode(dot, info, NodeType.sink, "", 0, source);
+		LocalDotNode sink = new LocalDotNode(dot, info, NodeType.sink, "", -1, source);
 		node2input.put(-1, sink);
 		info.setRoot(source, sink);
 

@@ -40,6 +40,7 @@ public class IvMLogInfo {
 
 	private final TObjectIntMap<Pair<Integer, Integer>> modelEdgeExecutions;
 	private final TObjectIntMap<Pair<Integer, Integer>> modelMoveEdgeExecutions;
+	private int traces;
 
 	public IvMLogInfo() {
 		modelMoves = new TIntLongHashMap(10, 0.5f, -1, 0);
@@ -49,6 +50,7 @@ public class IvMLogInfo {
 		nodeExecutions = new TIntLongHashMap(10, 0.5f, -1, 0);
 		modelEdgeExecutions = new TObjectIntHashMap<>(10, 0.5f, 0);
 		modelMoveEdgeExecutions = new TObjectIntHashMap<>(10, 0.5f, 0);
+		traces = 0;
 	}
 
 	public IvMLogInfo(IvMLog log, IvMModel model) {
@@ -58,6 +60,7 @@ public class IvMLogInfo {
 		nodeExecutions = new TIntLongHashMap(10, 0.5f, -1, 0);
 		modelEdgeExecutions = new TObjectIntHashMap<>(10, 0.5f, 0);
 		modelMoveEdgeExecutions = new TObjectIntHashMap<>(10, 0.5f, 0);
+		traces = 0;
 		TIntSet inParallelNodes = new TIntHashSet(10, 0.5f, -1);
 		PositionLogMoves positionLogMoves = new PositionLogMoves();
 		int lastModelSyncNode;
@@ -66,7 +69,7 @@ public class IvMLogInfo {
 			lastModelSyncNode = -1;
 			inParallelNodes.clear();
 			boolean traceContainsLogMove = false;
-			
+
 			for (int i = 0; i < trace.size(); i++) {
 				Move move = trace.get(i);
 				activities.add(move);
@@ -100,7 +103,7 @@ public class IvMLogInfo {
 					lastModelSyncNode = move.getTreeNode();
 				}
 			}
-			
+
 			if (lastUnode != -1) {
 				modelEdgeExecutions.adjustOrPutValue(Pair.of(lastUnode, -1), 1, 1);
 			}
@@ -109,6 +112,8 @@ public class IvMLogInfo {
 			if (traceContainsLogMove) {
 				positionLogMoves.position(model, trace);
 			}
+
+			traces++;
 		}
 		logMoves = positionLogMoves.getLogMoves();
 	}
@@ -188,6 +193,10 @@ public class IvMLogInfo {
 
 	public long getModelMoveEdgeExecutions(int from, int to) {
 		return modelMoveEdgeExecutions.get(Pair.of(from, to));
+	}
+
+	public int getNumberOfTraces() {
+		return traces;
 	}
 
 }

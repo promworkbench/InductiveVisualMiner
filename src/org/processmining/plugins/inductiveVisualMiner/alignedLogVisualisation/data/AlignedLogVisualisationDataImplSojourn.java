@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Type;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeNode;
 
 public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisualisationData {
 
@@ -33,7 +33,7 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 		//compute extreme sojourn times
 		minMeasure = Long.MAX_VALUE;
 		maxMeasure = Long.MIN_VALUE;
-		for (long d : performance.getMeasures(Type.sojourn, Gather.average)) {
+		for (long d : performance.getNodeMeasures(TypeNode.sojourn, Gather.average)) {
 			if (d >= 0 && d > maxMeasure) {
 				maxMeasure = d;
 			}
@@ -52,7 +52,7 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 	}
 
 	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves) {
-		long length = performance.getMeasure(Type.sojourn, Gather.average, unode);
+		long length = performance.getNodeMeasure(TypeNode.sojourn, Gather.average, unode);
 		if (length >= 0) {
 			return Triple.of(Performance.timeToString(length), length, length);
 		} else {
