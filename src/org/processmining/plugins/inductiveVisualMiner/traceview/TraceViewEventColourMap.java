@@ -37,7 +37,7 @@ public class TraceViewEventColourMap implements WedgeBuilder {
 	}
 
 	public Color buildWedgeColor(Trace<? extends Event> trace, Event event) {
-		if (event instanceof Move && !((Move) event).isModelMove()) {
+		if (event instanceof Move && ((Move) event).isSyncMove()) {
 			return mapFill.get(((Move) event).getTreeNode());
 		}
 		return null;
