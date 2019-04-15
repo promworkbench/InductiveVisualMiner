@@ -147,7 +147,7 @@ public class InductiveVisualMiner {
 			"Inductive visual Miner" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
 					"Event log" }, userAccessible = true, categories = { PluginCategory.Discovery,
 							PluginCategory.Analytics,
-							PluginCategory.ConformanceChecking }, help = "Discover a process tree or a Petri net interactively using Inductive Miner.")
+							PluginCategory.ConformanceChecking }, help = "Discover a process tree or a Petri net interactively using Inductive Miner (IvM).")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0 })
 	public InductiveVisualMinerLauncher mineGuiProcessTree(PluginContext context, XLog xLog) {
@@ -157,7 +157,7 @@ public class InductiveVisualMiner {
 	@Plugin(name = "Visualise deviations on Process tree (Inductive visual Miner)", returnLabels = {
 			"Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
 					"Event log", "Process tree" }, userAccessible = true, categories = { PluginCategory.Analytics,
-							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner, including its filtering options.")
+							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner (IvM), including its filtering options.")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
 	public InductiveVisualMinerLauncher mineGuiProcessTree(PluginContext context, XLog xLog, ProcessTree preMinedTree) {
@@ -167,7 +167,7 @@ public class InductiveVisualMiner {
 	@Plugin(name = "Visualise deviations on process tree (Inductive visual Miner)", returnLabels = {
 			"Deviations visualisation" }, returnTypes = { InductiveVisualMinerLauncher.class }, parameterLabels = {
 					"Event log", "Process tree" }, userAccessible = true, categories = { PluginCategory.Analytics,
-							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner, including its filtering options.")
+							PluginCategory.ConformanceChecking }, help = "Perform an alignment on a log and a process tree and visualise the results as Inductive visual Miner (IvM), including its filtering options.")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Mine, dialog", requiredParameterLabels = { 0, 1 })
 	public InductiveVisualMinerLauncher mineGuiEfficientTree(PluginContext context, XLog xLog,
