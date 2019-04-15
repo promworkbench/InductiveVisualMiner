@@ -8,6 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.LogUtils;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.DFMEdgeType;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 
@@ -55,7 +56,7 @@ public class Selection {
 			return true;
 		}
 
-		if (move.isSyncMove()) {
+		if (move.isSyncMove() || model.isDfg()) {
 			for (TLongIterator it = treeNodesOfSelectedModelEdges.iterator(); it.hasNext();) {
 				if (model.isTree()) {
 					//tree model
@@ -71,6 +72,10 @@ public class Selection {
 					int target = (int) selectedEdge;
 
 					if (move.getTreeNode() == source || move.getTreeNode() == target) {
+						if (source == -2 && target == -2) {
+							//selected empty trace move
+							return true;
+						}
 						Move nextMove = LogUtils.findNextCompleteModelMove(trace, move.getIndexInAlignedTrace());
 						if (nextMove == null && target == -1 && move.getTreeNode() == source) {
 							//selected end move
@@ -143,10 +148,15 @@ public class Selection {
 						treeNodesOfSelectedModelEdges.add(edge.getUnode());
 					} else {
 						//model is a dfg: put two endpoints of the edge in a single long
-						int x = edge.getLookupNode1();
-						int y = edge.getLookupNode2();
-						long l = (((long) x) << 32) | (y & 0xffffffffL);
-						treeNodesOfSelectedModelEdges.add(l);
+
+						if (edge.getDfmType() == DFMEdgeType.modelIntraActivity) {
+							treeNodesOfSelectedActivities.add(((LocalDotEdge) dotElement).getLookupNode1());
+						} else {
+							int x = edge.getLookupNode1();
+							int y = edge.getLookupNode2();
+							long l = (((long) x) << 32) | (y & 0xffffffffL);
+							treeNodesOfSelectedModelEdges.add(l);
+						}
 					}
 
 					return;
