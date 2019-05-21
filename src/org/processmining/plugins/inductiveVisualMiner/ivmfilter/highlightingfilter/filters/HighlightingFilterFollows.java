@@ -36,16 +36,14 @@ public class HighlightingFilterFollows extends HighlightingFilter {
 
 	public void updateExplanation() {
 		if (!isEnabled()) {
-			panel.getPanelBefore().getExplanationLabel()
-					.setText("Include only traces that have an event followed by another event as selected.");
-			panel.getPanelFollow().getExplanationLabel().setText("");
+			panel.getPanelBefore().getExplanationLabel().setText(
+					"Include only traces that have a completion event followed by another completion event as selected.");
 		} else {
 			panel.getPanelBefore().getExplanationLabel()
-					.setText("Include only traces that have an event " + panel.getPanelBefore().getExplanation()
-							+ ", followed by an event " + panel.getPanelFollow().getExplanation() + ", with ("
-							+ panel.getMinimumEventsInBetween() + ", " + panel.getMaximumEventsInBetween()
-							+ ") completion events in between.");
-			panel.getPanelFollow().getExplanationLabel().setText("");
+					.setText("Include only traces that have a completion event "
+							+ panel.getPanelBefore().getExplanation() + ", followed by an event "
+							+ panel.getPanelFollow().getExplanation() + ", with (" + panel.getMinimumEventsInBetween()
+							+ ", " + panel.getMaximumEventsInBetween() + ") completion events in between.");
 		}
 
 	}
@@ -69,12 +67,15 @@ public class HighlightingFilterFollows extends HighlightingFilter {
 		for (int eventIndexBefore = 0; eventIndexBefore < trace.size() - 1; eventIndexBefore++) {
 			if (isEventSelected(trace, eventIndexBefore, panel.getPanelBefore())) {
 
-				int eventIndexFollow = nextComplete(trace, eventIndexBefore, min + 1);
-				int count = min;
+				int eventIndexFollow = eventIndexBefore;
 
-				//walk over all the possible following events
-				while (eventIndexFollow >= 0 && count <= max) {
+				//first, walk to the first completion event that we could consider, given min
+				for (int completions = 0; completions <= min; completions++) {
+					eventIndexFollow = nextComplete(trace, eventIndexFollow);
+				}
 
+				//then, walk up to the max while checking for candidates
+				for (int completions = min; completions <= max; completions++) {
 					if (eventIndexFollow >= 0) {
 						//make sure that this event has been considered
 						if (!eventCheckedFollow[eventIndexFollow]) {
@@ -87,32 +88,11 @@ public class HighlightingFilterFollows extends HighlightingFilter {
 							return true;
 						}
 					}
-
-					eventIndexFollow = nextComplete(trace, eventIndexBefore);
-					count++;
+					eventIndexFollow = nextComplete(trace, eventIndexFollow);
 				}
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Look for the numberOfCompletes complete event after index (may be -1), or
-	 * -2 if that does not exist.
-	 * 
-	 * @param trace
-	 * @param index
-	 * @param numberOfCompletes
-	 * @return
-	 */
-	public static int nextComplete(IvMTrace trace, int index, int numberOfCompletes) {
-		for (int i = 0; i < numberOfCompletes; i++) {
-			index = nextComplete(trace, index);
-			if (index == -2) {
-				return -2;
-			}
-		}
-		return index;
 	}
 
 	/**
