@@ -280,7 +280,7 @@ public class AttributeFilterGui extends IvMFilterGui {
 	}
 
 	@Override
-	protected void setForegroundRecursively(Color colour) {
+	public void setForegroundRecursively(Color colour) {
 		if (explanation != null && keySelector != null && valueLiteralSelector != null) {
 			explanation.setForeground(colour);
 			keySelector.setForeground(colour);
