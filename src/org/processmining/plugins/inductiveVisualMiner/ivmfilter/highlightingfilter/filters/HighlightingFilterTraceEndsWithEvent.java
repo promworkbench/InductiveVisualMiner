@@ -81,10 +81,10 @@ public class HighlightingFilterTraceEndsWithEvent extends HighlightingFilter {
 	public void updateExplanation() {
 		if (!isEnabled()) {
 			panel.getExplanationLabel()
-					.setText("Include only traces whose last complete event has an attribute as selected.");
+					.setText("Include only traces whose last completion event has an attribute as selected.");
 		} else {
 			panel.getExplanationLabel()
-					.setText("Include only traces whose last complete event " + panel.getExplanation() + ".");
+					.setText("Include only traces whose last completion event " + panel.getExplanation() + ".");
 		}
 	}
 

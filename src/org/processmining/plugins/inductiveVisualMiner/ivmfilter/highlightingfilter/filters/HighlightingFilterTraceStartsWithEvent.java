@@ -80,10 +80,10 @@ public class HighlightingFilterTraceStartsWithEvent extends HighlightingFilter {
 	public void updateExplanation() {
 		if (!isEnabled()) {
 			panel.getExplanationLabel()
-					.setText("Include only traces whose first complete event has an attribute as selected.");
+					.setText("Include only traces whose first completion event has an attribute as selected.");
 		} else {
 			panel.getExplanationLabel()
-					.setText("Include only traces whose first complete event " + panel.getExplanation() + ".");
+					.setText("Include only traces whose first completion event " + panel.getExplanation() + ".");
 		}
 	}
 

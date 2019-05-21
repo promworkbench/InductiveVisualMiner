@@ -28,7 +28,8 @@ public class HighlightingFilterCompleteEventTwice extends HighlightingFilterEven
 			}
 		} else if (attribute.isNumeric()) {
 			for (IvMMove event : trace) {
-				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName())) {
+				if (event.isComplete() && event.getAttributes() != null
+						&& event.getAttributes().containsKey(attribute.getName())) {
 					double value = Attribute.parseDoubleFast(event.getAttributes().get(attribute.getName()));
 					if (value >= panel.getSelectedNumericMin() && value <= panel.getSelectedNumericMax()) {
 						count++;
@@ -40,7 +41,8 @@ public class HighlightingFilterCompleteEventTwice extends HighlightingFilterEven
 			}
 		} else if (attribute.isTime()) {
 			for (IvMMove event : trace) {
-				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName())) {
+				if (event.isComplete() && event.getAttributes() != null
+						&& event.getAttributes().containsKey(attribute.getName())) {
 					long value = Attribute.parseTimeFast(event.getAttributes().get(attribute.getName()));
 					if (value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
 						count++;
@@ -57,11 +59,11 @@ public class HighlightingFilterCompleteEventTwice extends HighlightingFilterEven
 	@Override
 	public void updateExplanation() {
 		if (!isEnabled()) {
-			panel.getExplanationLabel()
-					.setText("Include only traces that have at least two events having an attribute as selected.");
+			panel.getExplanationLabel().setText(
+					"Include only traces that have at least two completion events having an attribute as selected.");
 		} else {
-			panel.getExplanationLabel()
-					.setText("Include only traces that have at least two events " + panel.getExplanation() + ".");
+			panel.getExplanationLabel().setText(
+					"Include only traces that have at least two completion events " + panel.getExplanation() + ".");
 		}
 	}
 
