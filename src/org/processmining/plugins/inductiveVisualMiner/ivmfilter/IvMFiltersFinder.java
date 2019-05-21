@@ -9,15 +9,19 @@ import java.util.List;
 import java.util.Set;
 
 import org.processmining.framework.plugin.PluginContext;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCompleteEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEventTwice;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterFollows;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterLogMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTrace;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceEndsWithEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceStartsWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFrequentTracesFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTrace;
 
 public class IvMFiltersFinder {
 
@@ -34,6 +38,11 @@ public class IvMFiltersFinder {
 		maybeAdd(colouringFilters, new HighlightingFilterEvent(), annotations);
 		maybeAdd(colouringFilters, new HighlightingFilterLogMove(), annotations);
 		maybeAdd(colouringFilters, new HighlightingFilterTrace(), annotations);
+		maybeAdd(colouringFilters, new HighlightingFilterCompleteEventTwice(), annotations);
+		maybeAdd(colouringFilters, new HighlightingFilterLogMove(), annotations);
+		maybeAdd(colouringFilters, new HighlightingFilterFollows(), annotations);
+		maybeAdd(colouringFilters, new HighlightingFilterTraceStartsWithEvent(), annotations);
+		maybeAdd(colouringFilters, new HighlightingFilterTraceEndsWithEvent(), annotations);
 		maybeAdd(colouringFilters, new PreMiningFilterEvent(), annotations);
 		maybeAdd(colouringFilters, new PreMiningFilterTraceWithEvent(), annotations);
 		maybeAdd(colouringFilters, new PreMiningFilterTraceWithEventTwice(), annotations);
