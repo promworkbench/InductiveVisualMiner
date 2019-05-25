@@ -227,6 +227,10 @@ public class AttributeFilterGui extends IvMFilterGui {
 	}
 
 	public boolean isFiltering() {
+		if (getSelectedAttribute() == null) {
+			//only happens in an empty log
+			return false;
+		}
 		if (getSelectedAttribute().isLiteral()) {
 			//literal
 			return !valueLiteralSelector.isSelectionEmpty();

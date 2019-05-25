@@ -17,7 +17,9 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.std.XConceptExtension;
+import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
@@ -50,6 +52,7 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Typ
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterStatistics;
+import org.processmining.plugins.inductiveVisualMiner.export.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
@@ -723,6 +726,7 @@ public class InductiveVisualMinerController {
 				String name = XConceptExtension.instance().extractName(state.getSortedXLog());
 				IvMLog log = state.getIvMLogFiltered();
 				IvMModel model = state.getModel();
+				XEventClassifier classifier = state.getActivityClassifier();
 
 				Object[] options = { "Just the log (log & sync moves)", "Aligned log (all moves)",
 						"Model view (model & sync moves)" };
@@ -736,7 +740,14 @@ public class InductiveVisualMinerController {
 						ExportAlignment.exportAlignment(context, log, model, name, Type.logView);
 						break;
 					case 1 :
-						ExportAlignment.exportAlignment(context, log, model, name, Type.both);
+						//ExportAlignment.exportAlignment(context, log, model, name, Type.both);
+						InductiveVisualMinerAlignment alignment = ExportAlignment.exportAlignment(log, model, classifier);
+						context.getProvidedObjectManager().createProvidedObject(name + " (alignment)", alignment,
+								InductiveVisualMinerAlignment.class, context);
+						if (context instanceof UIPluginContext) {
+							((UIPluginContext) context).getGlobalContext().getResourceManager()
+									.getResourceForInstance(alignment).setFavorite(true);
+						}
 						break;
 					case 2 :
 						ExportAlignment.exportAlignment(context, log, model, name, Type.modelView);

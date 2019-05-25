@@ -3,8 +3,11 @@ package org.processmining.plugins.inductiveVisualMiner.export;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.extension.std.XLifecycleExtension;
 import org.deckfour.xes.factory.XFactory;
 import org.deckfour.xes.factory.XFactoryNaiveImpl;
+import org.deckfour.xes.factory.XFactoryRegistry;
 import org.deckfour.xes.model.XAttributeMap;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
@@ -21,6 +24,56 @@ public class ExportAlignment {
 
 	public static enum Type {
 		modelView, logView, both
+	}
+
+	public static InductiveVisualMinerAlignment exportAlignment(IvMLog log, IvMModel model, XEventClassifier classifier) {
+		XFactory factory = XFactoryRegistry.instance().currentDefault();
+		XLog result = factory.createLog((XAttributeMap) log.getAttributes().clone());
+		XModelAlignmentExtension alignmentExtension = XModelAlignmentExtension.instance();
+
+		/**
+		 * Store the model and the classifier in the log
+		 */
+		if (model.isTree()) {
+			alignmentExtension.assignModel(result, XTreeExtension.KEY_TREE, XTreeExtension.fromEfficientTree(model.getTree()));
+		} else {
+			alignmentExtension.assignModel(result, XDFMExtension.KEY_DFM, XDFMExtension.fromDfg(model.getDfg()));
+		}
+
+		alignmentExtension.assignClassifier(result, classifier.getDefiningAttributeKeys());
+
+		/**
+		 * Export the log
+		 */
+		for (IvMTrace trace : log) {
+			XTrace newTrace = factory.createTrace((XAttributeMap) trace.getAttributes().clone());
+
+			for (IvMMove move : trace) {
+				XEvent event = factory.createEvent();
+
+				if (move.isSyncMove() || move.isLogMove()) {
+					//log part
+					if (!move.isIgnoredModelMove() && !(move.isSyncMove() && model.isTau(move.getTreeNode()))) {
+						event.setAttributes((XAttributeMap) move.getAttributes().clone());
+					}
+				}
+
+				if (move.isSyncMove() || move.isModelMove()) {
+					//model part
+					alignmentExtension.assignModelMoveNode(event, move.getTreeNode());
+				}
+
+				XLifecycleExtension.instance().assignTransition(event, move.getLifeCycleTransition().name());
+
+				alignmentExtension.assignMoveType(event, move.getType().name());
+
+				newTrace.add(event);
+			}
+
+			result.add(newTrace);
+		}
+
+		return new InductiveVisualMinerAlignment(result);
 	}
 
 	public static void exportAlignment(PluginContext context, IvMLog log, IvMModel model, String name, Type type) {

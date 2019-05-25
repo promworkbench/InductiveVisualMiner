@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.deckfour.xes.model.XAttributeMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 
 public class IvMLogFilteredImpl implements IvMLog, IvMLogFiltered {
@@ -100,5 +101,9 @@ public class IvMLogFilteredImpl implements IvMLog, IvMLogFiltered {
 			return false;
 		}
 		return ((IvMLogFilteredImpl) otherLog).id == id;
+	}
+
+	public XAttributeMap getAttributes() {
+		return log.getAttributes();
 	}
 }

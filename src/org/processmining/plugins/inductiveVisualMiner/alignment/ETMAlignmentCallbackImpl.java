@@ -63,7 +63,7 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 		this.nodeId2performanceNode = nodeId2performanceNode;
 		this.enqueueTaus = enqueueTaus;
 
-		alignedLog = new IvMLogNotFilteredImpl(xLog.size());
+		alignedLog = new IvMLogNotFilteredImpl(xLog.size(), xLog.getAttributes());
 	}
 
 	public void traceAlignmentComplete(Trace trace, TreeRecord traceAlignment, int[] xtracesRepresented) {

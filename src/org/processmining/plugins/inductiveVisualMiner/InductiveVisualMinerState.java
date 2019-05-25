@@ -66,6 +66,13 @@ public class InductiveVisualMinerState {
 		}
 	}
 
+	public InductiveVisualMinerState(XLog xLog, IvMModel model, XLog alignedLog) {
+		this.xLog = xLog;
+		this.miningParameters = new MiningParametersIMf();
+		this.model = model;
+		this.preMinedModel = this.model;
+	}
+
 	//==attributes==
 	private AttributesInfo attributesInfo;
 	private AttributeClassifier initialClassifier;

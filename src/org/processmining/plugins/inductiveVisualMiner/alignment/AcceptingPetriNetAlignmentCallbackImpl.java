@@ -55,7 +55,7 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 		this.interTransitions = p.getF();
 		this.emptyTraceTransition = p.getG();
 
-		alignedLog = new IvMLogNotFilteredImpl(xLog.size());
+		alignedLog = new IvMLogNotFilteredImpl(xLog.size(), xLog.getAttributes());
 	}
 
 	public void traceAlignmentComplete(SyncReplayResult aTrace, SortedSet<Integer> xTraces,

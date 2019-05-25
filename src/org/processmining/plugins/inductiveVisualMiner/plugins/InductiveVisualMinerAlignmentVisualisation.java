@@ -15,25 +15,24 @@ import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentPerformance;
+import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
+import org.processmining.plugins.inductiveVisualMiner.export.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
-public class EfficientTreeAlignmentPlugin {
+public class InductiveVisualMinerAlignmentVisualisation {
 
-	public static class IvMAlignment {
-		IvMLog log;
-		IvMEfficientTree tree;
-	}
-
-	@Plugin(name = "Compute efficient tree alignment", returnLabels = { "Aligned log" }, returnTypes = {
-			IvMAlignment.class }, parameterLabels = { "Efficient tree",
-					"Log" }, userAccessible = true, level = PluginLevel.Regular, categories = {
-							PluginCategory.Enhancement }, help = "Align an efficient tree and an event log using ETM-alignments.")
+	@Plugin(name = "Compute Inductive visual Miner alignment", returnLabels = {
+			"Inductive visual Miner alignment" }, returnTypes = {
+					InductiveVisualMinerAlignment.class }, parameterLabels = { "Efficient tree",
+							"Log" }, userAccessible = true, level = PluginLevel.Regular, categories = {
+									PluginCategory.Enhancement }, help = "Align an efficient tree and an event log using ETM-alignments.")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Align efficient tree, default", requiredParameterLabels = { 0, 1 })
-	public IvMAlignment align(final UIPluginContext context, EfficientTree tree, XLog log) throws Exception {
+	public InductiveVisualMinerAlignment align(final UIPluginContext context, EfficientTree tree, XLog log)
+			throws Exception {
 
 		EfficientTreeAlignmentDialog dialog = new EfficientTreeAlignmentDialog(log);
 		{
@@ -45,7 +44,7 @@ public class EfficientTreeAlignmentPlugin {
 			}
 		}
 
-		context.log("Mining...");
+		context.log("Aligning...");
 
 		IvMEfficientTree ivmTree = new IvMEfficientTree(tree);
 		IvMLog aLog = align(ivmTree, log, dialog.getClassifier(), new ProMCanceller() {
@@ -54,10 +53,7 @@ public class EfficientTreeAlignmentPlugin {
 			}
 		});
 
-		IvMAlignment result = new IvMAlignment();
-		result.log = aLog;
-		result.tree = ivmTree;
-		return result;
+		return ExportAlignment.exportAlignment(aLog, new IvMModel(ivmTree), dialog.getClassifier());
 	}
 
 	public static IvMLog align(IvMEfficientTree tree, XLog log, XEventClassifier classifier, ProMCanceller canceller)

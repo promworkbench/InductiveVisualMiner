@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 
+import org.deckfour.xes.model.XAttributeMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 
 /**
@@ -11,4 +12,6 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWith
 public interface IvMLog extends Iterable<IvMTrace> {
 	@Override
 	public IteratorWithPosition<IvMTrace> iterator();
+
+	public XAttributeMap getAttributes();
 }
