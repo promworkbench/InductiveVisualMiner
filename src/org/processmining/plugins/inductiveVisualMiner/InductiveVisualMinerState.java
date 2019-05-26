@@ -21,6 +21,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.export.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
@@ -338,6 +339,7 @@ public class InductiveVisualMinerState {
 
 	//==timed log==
 	private IvMLogNotFiltered ivmLog;
+	private InductiveVisualMinerAlignment preMinedAlignment = null;
 	private IvMLogInfo ivmLogInfo;
 	private IvMLogFilteredImpl ivmLogFiltered;
 	private IvMLogInfo ivmLogInfoFiltered;
@@ -357,6 +359,14 @@ public class InductiveVisualMinerState {
 
 	public IvMLogNotFiltered getIvMLog() {
 		return ivmLog;
+	}
+
+	public InductiveVisualMinerAlignment getPreMinedIvMLog() {
+		return preMinedAlignment;
+	}
+
+	public void setPreMinedAlignment(InductiveVisualMinerAlignment preMinedAlignment) {
+		this.preMinedAlignment = preMinedAlignment;
 	}
 
 	public void setIvMLogFiltered(IvMLogFilteredImpl ivmLogFiltered, IvMLogInfo ivmLogInfoFiltered) {

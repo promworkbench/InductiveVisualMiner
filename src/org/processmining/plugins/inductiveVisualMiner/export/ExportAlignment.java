@@ -26,7 +26,8 @@ public class ExportAlignment {
 		modelView, logView, both
 	}
 
-	public static InductiveVisualMinerAlignment exportAlignment(IvMLog log, IvMModel model, XEventClassifier classifier) {
+	public static InductiveVisualMinerAlignment exportAlignment(IvMLog log, IvMModel model,
+			XEventClassifier classifier) {
 		XFactory factory = XFactoryRegistry.instance().currentDefault();
 		XLog result = factory.createLog((XAttributeMap) log.getAttributes().clone());
 		XModelAlignmentExtension alignmentExtension = XModelAlignmentExtension.instance();
@@ -35,7 +36,8 @@ public class ExportAlignment {
 		 * Store the model and the classifier in the log
 		 */
 		if (model.isTree()) {
-			alignmentExtension.assignModel(result, XTreeExtension.KEY_TREE, XTreeExtension.fromEfficientTree(model.getTree()));
+			alignmentExtension.assignModel(result, XTreeExtension.KEY_TREE,
+					XTreeExtension.fromEfficientTree(model.getTree()));
 		} else {
 			alignmentExtension.assignModel(result, XDFMExtension.KEY_DFM, XDFMExtension.fromDfg(model.getDfg()));
 		}
@@ -60,7 +62,8 @@ public class ExportAlignment {
 
 				if (move.isSyncMove() || move.isModelMove()) {
 					//model part
-					alignmentExtension.assignModelMoveNode(event, move.getTreeNode());
+					alignmentExtension.assignMoveSourceNode(event, move.getSourceNode());
+					alignmentExtension.assignMoveModelNode(event, move.getTreeNode());
 				}
 
 				XLifecycleExtension.instance().assignTransition(event, move.getLifeCycleTransition().name());

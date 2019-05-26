@@ -36,7 +36,8 @@ public class XModelAlignmentExtension extends XExtension {
 	public static final String KEY_CLASSIFIER_FIELD = "treealignment:classifier:field";
 
 	public static final String KEY_MOVE_TYPE = "treealignment:movetype";
-	public static final String KEY_MODEL_MOVE_NODE = "treealignment:modelmovenode";
+	public static final String KEY_MOVE_SOURCE_NODE = "treealignment:movesourcenode";
+	public static final String KEY_MOVE_MODEL_NODE = "treealignment:movemodelnode";
 
 	public static XAttributeLiteral ATTR_MODEL_TYPE;
 	public static XAttributeList ATTR_MODEL;
@@ -44,7 +45,8 @@ public class XModelAlignmentExtension extends XExtension {
 	public static XAttributeLiteral ATTR_CLASSIFIER_FIELD;
 
 	public static XAttributeLiteral ATTR_MOVE_TYPE;
-	public static XAttributeDiscrete ATTR_MODEL_MOVE_NODE;
+	public static XAttributeDiscrete ATTR_MOVE_SOURCE_NODE;
+	public static XAttributeDiscrete ATTR_MOVE_MODEL_NODE;
 
 	/**
 	 * Singleton instance of this extension.
@@ -74,14 +76,16 @@ public class XModelAlignmentExtension extends XExtension {
 		ATTR_CLASSIFIER_FIELD = factory.createAttributeLiteral(KEY_CLASSIFIER_FIELD, "__invalid__", this);
 
 		ATTR_MOVE_TYPE = factory.createAttributeLiteral(KEY_MOVE_TYPE, "__invalid__", this);
-		ATTR_MODEL_MOVE_NODE = factory.createAttributeDiscrete(KEY_MODEL_MOVE_NODE, -1, this);
+		ATTR_MOVE_SOURCE_NODE = factory.createAttributeDiscrete(KEY_MOVE_SOURCE_NODE, -1, this);
+		ATTR_MOVE_MODEL_NODE = factory.createAttributeDiscrete(KEY_MOVE_MODEL_NODE, -1, this);
 
 		this.logAttributes.add((XAttribute) ATTR_MODEL_TYPE.clone());
 		this.logAttributes.add((XAttribute) ATTR_MODEL.clone());
 		this.logAttributes.add((XAttribute) ATTR_CLASSIFIER.clone());
 
 		this.eventAttributes.add((XAttribute) ATTR_MOVE_TYPE.clone());
-		this.eventAttributes.add((XAttribute) ATTR_MODEL_MOVE_NODE.clone());
+		this.eventAttributes.add((XAttribute) ATTR_MOVE_SOURCE_NODE.clone());
+		this.eventAttributes.add((XAttribute) ATTR_MOVE_MODEL_NODE.clone());
 	}
 
 	public void assignModel(XLog log, String modelType, List<XAttribute> model) {
@@ -166,9 +170,15 @@ public class XModelAlignmentExtension extends XExtension {
 		return null;
 	}
 
-	public void assignModelMoveNode(XEvent event, int modelMoveNode) {
-		XAttributeDiscrete attrModelMoveNode = (XAttributeDiscrete) ATTR_MODEL_MOVE_NODE.clone();
-		attrModelMoveNode.setValue(modelMoveNode);
+	public void assignMoveSourceNode(XEvent event, int moveSourceNode) {
+		XAttributeDiscrete attrModelMoveNode = (XAttributeDiscrete) ATTR_MOVE_SOURCE_NODE.clone();
+		attrModelMoveNode.setValue(moveSourceNode);
+		event.getAttributes().put(attrModelMoveNode.getKey(), attrModelMoveNode);
+	}
+
+	public void assignMoveModelNode(XEvent event, int moveModelNode) {
+		XAttributeDiscrete attrModelMoveNode = (XAttributeDiscrete) ATTR_MOVE_MODEL_NODE.clone();
+		attrModelMoveNode.setValue(moveModelNode);
 		event.getAttributes().put(attrModelMoveNode.getKey(), attrModelMoveNode);
 	}
 
@@ -178,8 +188,22 @@ public class XModelAlignmentExtension extends XExtension {
 	 * @return The model node this move is mapped to, or Integer.MIN_VALUE if
 	 *         the node is not mapped.
 	 */
-	public int extractModelMoveNode(XEvent event) {
-		XAttribute fitness = event.getAttributes().get(KEY_MODEL_MOVE_NODE);
+	public int extractMoveSourceNode(XEvent event) {
+		XAttribute fitness = event.getAttributes().get(KEY_MOVE_SOURCE_NODE);
+		if (fitness != null && fitness instanceof XAttributeDiscrete) {
+			return (int) ((XAttributeDiscrete) fitness).getValue();
+		}
+		return Integer.MIN_VALUE;
+	}
+
+	/**
+	 * 
+	 * @param event
+	 * @return The model node this move is mapped to, or Integer.MIN_VALUE if
+	 *         the node is not mapped.
+	 */
+	public int extractMoveModelNode(XEvent event) {
+		XAttribute fitness = event.getAttributes().get(KEY_MOVE_MODEL_NODE);
 		if (fitness != null && fitness instanceof XAttributeDiscrete) {
 			return (int) ((XAttributeDiscrete) fitness).getValue();
 		}
@@ -209,7 +233,7 @@ public class XModelAlignmentExtension extends XExtension {
 	}
 
 	public void removeAttributes(XEvent event) {
-		event.getAttributes().remove(KEY_MODEL_MOVE_NODE);
+		event.getAttributes().remove(KEY_MOVE_MODEL_NODE);
 		event.getAttributes().remove(KEY_MOVE_TYPE);
 	}
 }

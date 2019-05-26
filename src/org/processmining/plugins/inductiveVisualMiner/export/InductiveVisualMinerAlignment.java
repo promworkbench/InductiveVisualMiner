@@ -18,6 +18,8 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
 public class InductiveVisualMinerAlignment {
 	private XLog alignedLog;
+	private XLog xLog = null;
+	private IvMModel model = null;
 
 	public InductiveVisualMinerAlignment(XLog alignedLog) {
 		this.alignedLog = alignedLog;
@@ -37,9 +39,12 @@ public class InductiveVisualMinerAlignment {
 	 * @return
 	 */
 	public IvMModel getModel() {
+		if (model != null) {
+			return model;
+		}
 		String modelType = XModelAlignmentExtension.instance().extractModelType(alignedLog);
 		List<XAttribute> model = XModelAlignmentExtension.instance().extractModel(alignedLog);
-		if (model == null) {
+		if (modelType == null || model == null) {
 			return null;
 		}
 		if (modelType.equals(XTreeExtension.KEY_TREE)) {
@@ -48,14 +53,16 @@ public class InductiveVisualMinerAlignment {
 				return null;
 			}
 
-			return new IvMModel(tree);
+			this.model = new IvMModel(tree);
+			return this.model;
 		} else if (modelType.equals(XDFMExtension.KEY_DFM)) {
 			DirectlyFollowsModel dfm = XDFMExtension.toDFM(model);
 			if (dfm == null) {
 				return null;
 			}
 
-			return new IvMModel(dfm);
+			this.model = new IvMModel(dfm);
+			return this.model;
 		}
 		return null;
 	}
@@ -80,13 +87,15 @@ public class InductiveVisualMinerAlignment {
 	 * @return
 	 */
 	public XLog getXLog() {
+		if (xLog != null) {
+			return xLog;
+		}
 		XFactory factory = XFactoryRegistry.instance().currentDefault();
-		XLog result = factory.createLog((XAttributeMap) alignedLog.getAttributes().clone());
+		xLog = factory.createLog((XAttributeMap) alignedLog.getAttributes().clone());
 		XModelAlignmentExtension alignmentExtension = XModelAlignmentExtension.instance();
 		IvMModel model = getModel();
 
-		result.setAttributes((XAttributeMap) alignedLog.getAttributes().clone());
-		XModelAlignmentExtension.instance().removeAttributes(result);
+		alignmentExtension.instance().removeAttributes(xLog);
 		for (XTrace trace : alignedLog) {
 			XTrace newTrace = factory.createTrace((XAttributeMap) trace.getAttributes().clone());
 			alignmentExtension.removeAttributes(newTrace);
@@ -100,7 +109,7 @@ public class InductiveVisualMinerAlignment {
 						keep = true;
 						break;
 					case "synchronousMove" :
-						int node = alignmentExtension.extractModelMoveNode(event);
+						int node = alignmentExtension.extractMoveModelNode(event);
 						if (node == Integer.MIN_VALUE) {
 							return null;
 						}
@@ -123,9 +132,9 @@ public class InductiveVisualMinerAlignment {
 
 			}
 
-			result.add(newTrace);
+			xLog.add(newTrace);
 		}
 
-		return result;
+		return xLog;
 	}
 }

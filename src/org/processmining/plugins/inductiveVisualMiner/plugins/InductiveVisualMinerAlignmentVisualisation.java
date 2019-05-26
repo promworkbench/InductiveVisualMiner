@@ -1,7 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.plugins;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
+import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.model.XLog;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.PluginContext;
@@ -15,6 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerContro
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.export.InductiveVisualMinerAlignment;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapperPluginFinder;
 
 public class InductiveVisualMinerAlignmentVisualisation {
@@ -26,9 +30,20 @@ public class InductiveVisualMinerAlignmentVisualisation {
 	@PluginVariant(variantLabel = "Convert Process tree", requiredParameterLabels = { 0, 1 })
 	public JComponent visualise(final PluginContext context, InductiveVisualMinerAlignment ivmAlignment,
 			ProMCanceller canceller) throws UnknownTreeNodeException {
-		InductiveVisualMinerState state = new InductiveVisualMinerState(ivmAlignment.getXLog());
-		state.setPreMinedModel(ivmAlignment.getModel());
-		state.setPreMinedClassifier(ivmAlignment.getClassifier());
+
+		XLog xLog = ivmAlignment.getXLog();
+		IvMModel model = ivmAlignment.getModel();
+		XEventClassifier classifier = ivmAlignment.getClassifier();
+
+		if (xLog == null || model == null || classifier == null) {
+			return new JLabel(
+					" Unfortunately, this Inductive visual Miner alignment does not have the fields necessary to be visualised.");
+		}
+
+		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog);
+		state.setPreMinedModel(model);
+		state.setPreMinedClassifier(classifier);
+		state.setPreMinedAlignment(ivmAlignment);
 
 		InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state,
 				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), canceller);

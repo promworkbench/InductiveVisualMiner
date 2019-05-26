@@ -6,30 +6,44 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Quintuple;
+import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentPerformance;
+import org.processmining.plugins.inductiveVisualMiner.alignment.ImportAlignment;
+import org.processmining.plugins.inductiveVisualMiner.export.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
 public class Cl07Align extends
-		ChainLink<Quintuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
+		ChainLink<Sextuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
 
 	private static ConcurrentHashMap<Triple<IvMModel, XEventPerformanceClassifier, XLog>, SoftReference<IvMLogNotFiltered>> cache = new ConcurrentHashMap<>();
 
-	protected Quintuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses> generateInput(
+	protected Sextuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment> generateInput(
 			InductiveVisualMinerState state) {
-		return Quintuple.of(state.getModel(), state.getPerformanceClassifier(), state.getSortedXLog(),
-				state.getXLogInfo().getEventClasses(), state.getXLogInfoPerformance().getEventClasses());
+		return Sextuple.of(state.getModel(), state.getPerformanceClassifier(), state.getSortedXLog(),
+				state.getXLogInfo().getEventClasses(), state.getXLogInfoPerformance().getEventClasses(),
+				state.getPreMinedIvMLog());
 	}
 
 	protected Pair<IvMLogNotFiltered, IvMLogInfo> executeLink(
-			Quintuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses> input,
+			Sextuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment> input,
 			IvMCanceller canceller) throws Exception {
 		IvMModel model = input.getA();
+
+		//see whether the alignment was pre-mined
+		InductiveVisualMinerAlignment preMinedAlignment = input.getF();
+		if (preMinedAlignment != null) {
+			IvMLogNotFiltered ivmLog = ImportAlignment.getIvMLog(preMinedAlignment, input.getD(), input.getE());
+			if (ivmLog != null) {
+				System.out.println("Alignment imported");
+				return Pair.of(ivmLog, new IvMLogInfo(ivmLog, model));
+			}
+			System.out.println("Alignment importing failed. Recomputing...");
+		}
 
 		//attempt to get the alignment from cache
 		Triple<IvMModel, XEventPerformanceClassifier, XLog> cacheKey = Triple.of(model, input.getB(), input.getC());
