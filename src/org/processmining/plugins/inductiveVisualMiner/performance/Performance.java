@@ -21,9 +21,9 @@ public class Performance {
 	public static PerformanceTransition getLifeCycleTransition(String performanceActivity) {
 		if (performanceActivity.endsWith("+start")) {
 			return PerformanceTransition.start;
-		} else if (performanceActivity.endsWith("complete")) {
+		} else if (performanceActivity.endsWith("+complete")) {
 			return PerformanceTransition.complete;
-		} else if (performanceActivity.endsWith("enqueue")) {
+		} else if (performanceActivity.endsWith("+enqueue")) {
 			return PerformanceTransition.enqueue;
 		} else {
 			return PerformanceTransition.other;
@@ -44,6 +44,8 @@ public class Performance {
 			return s.substring(0, s.lastIndexOf("+start"));
 		} else if (s.endsWith("+complete")) {
 			return s.substring(0, s.lastIndexOf("+complete"));
+		} else if (s.endsWith("+enqueue")) {
+			return s.substring(0, s.lastIndexOf("+enqueue"));
 		}
 		return s;
 	}

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClasses;
+import org.deckfour.xes.extension.std.XLifecycleExtension;
 import org.deckfour.xes.model.XAttributeMap;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
@@ -93,26 +94,48 @@ public class ImportAlignment {
 				//depending on the type of move, we:
 				//- set the type
 				//- signal that the move is also present in the xTrace and increase the xEventIndex counter
+				//- get performance event class
+				//- get activity event class
 				Type type;
 				XEvent xEvent = null;
+				XEventClass performanceEventClass = null;
+				XEventClass activityEventClass = null;
 				switch (alignmentExtension.extractMoveType(aEvent)) {
-					case "ignoredLogMove" :
+					case "ignoredLogMove" : {
 						type = Type.ignoredLogMove;
 						xEvent = xTrace.get(xEventIndex);
+						performanceEventClass = performanceEventClasses2.getClassOf(aEvent);
+						activityEventClass = Performance.getActivity(performanceEventClass, activityEventClasses2);
 						xEventIndex++;
 						break;
-					case "ignoredModelMove" :
+					}
+					case "ignoredModelMove" : {
 						type = Type.ignoredModelMove;
+						int node = alignmentExtension.extractMoveModelNode(aEvent);
+						if (node == Integer.MIN_VALUE) {
+							return null;
+						}
+						activityEventClass = activityEventClasses2.getByIdentity(model.getActivityName(node));
 						break;
-					case "logMove" :
+					}
+					case "logMove" : {
 						type = Type.logMove;
 						xEvent = xTrace.get(xEventIndex);
+						performanceEventClass = performanceEventClasses2.getClassOf(aEvent);
+						activityEventClass = Performance.getActivity(performanceEventClass, activityEventClasses2);
 						xEventIndex++;
 						break;
-					case "modelMove" :
+					}
+					case "modelMove" : {
 						type = Type.modelMove;
+						int node = alignmentExtension.extractMoveModelNode(aEvent);
+						if (node == Integer.MIN_VALUE) {
+							return null;
+						}
+						activityEventClass = activityEventClasses2.getByIdentity(model.getActivityName(node));
 						break;
-					case "synchronousMove" :
+					}
+					case "synchronousMove" : {
 						type = Type.synchronousMove;
 						int node = alignmentExtension.extractMoveModelNode(aEvent);
 						if (node == Integer.MIN_VALUE) {
@@ -120,17 +143,21 @@ public class ImportAlignment {
 						}
 						if (!model.isTau(node)) {
 							xEvent = xTrace.get(xEventIndex);
+							performanceEventClass = performanceEventClasses2.getClassOf(aEvent);
+							activityEventClass = Performance.getActivity(performanceEventClass, activityEventClasses2);
 							xEventIndex++;
+						} else {
+							activityEventClass = activityEventClasses2.getByIdentity(model.getActivityName(node));
 						}
 						break;
+					}
 					default :
 						return null;
 				}
 
 				//gather attributes for Move
-				XEventClass performanceEventClass = performanceEventClasses2.getClassOf(aEvent);
-				XEventClass activityEventClass = Performance.getActivity(performanceEventClass, activityEventClasses2);
-				PerformanceTransition lifeCycleTransition = Performance.getLifeCycleTransition(performanceEventClass);
+				PerformanceTransition lifeCycleTransition = Performance
+						.getLifeCycleTransition("+" + XLifecycleExtension.instance().extractTransition(aEvent));
 
 				int sourceNode = alignmentExtension.extractMoveSourceNode(aEvent);
 				if (sourceNode == Integer.MIN_VALUE) {
