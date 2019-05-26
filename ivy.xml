@@ -20,5 +20,6 @@
         <dependency org="prom" name="EfficientStorage" rev="latest" changing="true" transitive="true" />
         <dependency conf="lib->default" org="org.jblas" name="jblas" rev="1.2.4" /> 
         <dependency org="prom" name="Visualisation3D" rev="latest" changing="true" transitive="true" /> 
+        <dependency org="prom" name="XESLite" rev="latest" changing="true" transitive="true" />
      </dependencies>
 </ivy-module>
