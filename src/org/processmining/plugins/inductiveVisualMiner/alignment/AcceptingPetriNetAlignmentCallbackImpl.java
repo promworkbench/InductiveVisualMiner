@@ -58,6 +58,14 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 		alignedLog = new IvMLogNotFilteredImpl(xLog.size(), xLog.getAttributes());
 	}
 
+	public static String getTraceName(XTrace xTrace) {
+		if (xTrace.getAttributes().containsKey("concept:name")) {
+			return xTrace.getAttributes().get("concept:name").toString();
+		} else {
+			return "";
+		}
+	}
+
 	public void traceAlignmentComplete(SyncReplayResult aTrace, SortedSet<Integer> xTraces,
 			IvMEventClasses performanceEventClasses) {
 
@@ -65,12 +73,7 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 			XTrace xTrace = xLog.get(traceIndex);
 
 			//get trace name
-			String traceName;
-			if (xTrace.getAttributes().containsKey("concept:name")) {
-				traceName = xTrace.getAttributes().get("concept:name").toString();
-			} else {
-				traceName = "";
-			}
+			String traceName = getTraceName(xTrace);
 
 			IvMTrace iTrace = new IvMTraceImpl(traceName, xTrace.getAttributes(), aTrace.getNodeInstance().size());
 			Iterator<StepTypes> itType = aTrace.getStepTypes().iterator();
