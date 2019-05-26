@@ -28,6 +28,7 @@ import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
@@ -52,7 +53,6 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Typ
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterStatistics;
-import org.processmining.plugins.inductiveVisualMiner.export.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;

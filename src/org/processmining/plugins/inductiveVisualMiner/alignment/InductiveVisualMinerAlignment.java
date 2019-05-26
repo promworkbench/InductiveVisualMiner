@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.export;
+package org.processmining.plugins.inductiveVisualMiner.alignment;
 
 import java.util.List;
 
@@ -14,6 +14,9 @@ import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.export.XDFMExtension;
+import org.processmining.plugins.inductiveVisualMiner.export.XModelAlignmentExtension;
+import org.processmining.plugins.inductiveVisualMiner.export.XTreeExtension;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
 public class InductiveVisualMinerAlignment {

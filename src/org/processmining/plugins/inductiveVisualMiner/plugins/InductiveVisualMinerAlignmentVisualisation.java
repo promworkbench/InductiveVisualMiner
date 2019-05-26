@@ -17,7 +17,7 @@ import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.export.InductiveVisualMinerAlignment;
+import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapperPluginFinder;
 

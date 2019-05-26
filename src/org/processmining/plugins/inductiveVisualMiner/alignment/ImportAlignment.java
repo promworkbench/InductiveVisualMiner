@@ -16,7 +16,6 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Transition
 import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
-import org.processmining.plugins.inductiveVisualMiner.export.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.XModelAlignmentExtension;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;

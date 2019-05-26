@@ -11,7 +11,7 @@ import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentPerformance;
 import org.processmining.plugins.inductiveVisualMiner.alignment.ImportAlignment;
-import org.processmining.plugins.inductiveVisualMiner.export.InductiveVisualMinerAlignment;
+import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
