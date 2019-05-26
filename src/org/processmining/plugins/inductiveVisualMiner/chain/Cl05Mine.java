@@ -16,7 +16,7 @@ public class Cl05Mine
 	protected Quintuple<IvMModel, IMLog, IMLogInfo, VisualMinerWrapper, VisualMinerParameters> generateInput(
 			InductiveVisualMinerState state) {
 		VisualMinerParameters minerParameters = new VisualMinerParameters(state.getPaths());
-		return Quintuple.of(state.getPreMinedTree(), state.getActivityFilteredIMLog(),
+		return Quintuple.of(state.getPreMinedModel(), state.getActivityFilteredIMLog(),
 				state.getActivityFilteredIMLogInfo(), state.getMiner(), minerParameters);
 	}
 

@@ -8,7 +8,6 @@ import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.classification.XEventNameClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
-import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
@@ -22,7 +21,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
@@ -48,29 +46,22 @@ import gnu.trove.set.hash.TIntHashSet;
 
 public class InductiveVisualMinerState {
 
-	public InductiveVisualMinerState(XLog xLog, EfficientTree preMinedTree) throws UnknownTreeNodeException {
+	public InductiveVisualMinerState(XLog xLog) throws UnknownTreeNodeException {
 		this.xLog = xLog;
 		miningParameters = new MiningParametersIMf();
-		if (preMinedTree != null) {
-			this.model = new IvMModel(new IvMEfficientTree(preMinedTree));
-			this.preMinedModel = this.model;
-		}
 	}
 
-	public InductiveVisualMinerState(DirectlyFollowsModel preMinedDfg, XLog xLog) throws UnknownTreeNodeException {
-		this.xLog = xLog;
-		miningParameters = new MiningParametersIMf();
-		if (preMinedDfg != null) {
-			this.model = new IvMModel(preMinedDfg);
-			this.preMinedModel = this.model;
-		}
-	}
-
-	public InductiveVisualMinerState(XLog xLog, IvMModel model, XLog alignedLog) {
-		this.xLog = xLog;
-		this.miningParameters = new MiningParametersIMf();
-		this.model = model;
-		this.preMinedModel = this.model;
+	/**
+	 * Deprecated. Use the log-only constructor instead and call
+	 * setPreMinedModel().
+	 * 
+	 * @param xLog
+	 * @param preMinedTree
+	 */
+	@Deprecated
+	public InductiveVisualMinerState(XLog xLog, EfficientTree preMinedTree) {
+		this(xLog);
+		setPreMinedModel(new IvMModel(preMinedTree));
 	}
 
 	//==attributes==
@@ -100,6 +91,7 @@ public class InductiveVisualMinerState {
 	//==log==
 	private XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(
 			new XEventNameClassifier());
+	private XEventPerformanceClassifier preMinedPerformanceClassifier;
 	private XLog xLog;
 	private XLog sortedXLog;
 	private XLogInfo xLogInfo;
@@ -117,15 +109,26 @@ public class InductiveVisualMinerState {
 	}
 
 	public XEventPerformanceClassifier getPerformanceClassifier() {
+		if (preMinedPerformanceClassifier != null) {
+			return preMinedPerformanceClassifier;
+		}
 		return performanceClassifier;
 	}
 
 	public XEventClassifier getActivityClassifier() {
-		return performanceClassifier.getActivityClassifier();
+		return getPerformanceClassifier().getActivityClassifier();
 	}
 
 	public synchronized void setClassifier(XEventClassifier classifier) {
 		this.performanceClassifier = new XEventPerformanceClassifier(classifier);
+	}
+
+	public void setPreMinedClassifier(XEventClassifier preMinedClassifier) {
+		this.preMinedPerformanceClassifier = new XEventPerformanceClassifier(preMinedClassifier);
+	}
+
+	public XEventPerformanceClassifier getPreMinedPerformanceClassifier() {
+		return preMinedPerformanceClassifier;
 	}
 
 	public XLog getXLog() {
@@ -250,8 +253,12 @@ public class InductiveVisualMinerState {
 		this.model = model;
 	}
 
-	public IvMModel getPreMinedTree() {
+	public IvMModel getPreMinedModel() {
 		return preMinedModel;
+	}
+
+	public void setPreMinedModel(IvMModel model) {
+		this.preMinedModel = model;
 	}
 
 	//==layout==

@@ -19,6 +19,7 @@ import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.ProcessTree2EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapperPluginFinder;
 import org.processmining.processtree.ProcessTree;
@@ -34,9 +35,9 @@ public class InductiveVisualMiner {
 	public JComponent visualise(final PluginContext context, XLog xLog, ProMCanceller canceller)
 			throws UnknownTreeNodeException {
 
-		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog, null);
+		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog);
 		InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state,
-				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), true, canceller);
+				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), canceller);
 		new InductiveVisualMinerController(context, panel, state, canceller);
 
 		return panel;
@@ -58,12 +59,11 @@ public class InductiveVisualMiner {
 		}
 
 		XLog log = launcher.xLog.get();
-		final InductiveVisualMinerState state;
 		if (log == null) {
 			throw new RuntimeException("The log has been removed by garbage collection.");
 		}
+		final InductiveVisualMinerState state = new InductiveVisualMinerState(log);
 		if (launcher.preMinedTree == null && launcher.preMinedDfg == null) {
-			state = new InductiveVisualMinerState(log, null);
 			//pre-set the miner if necessary
 			if (launcher.getMiner() != null) {
 				state.setMiner(launcher.getMiner());
@@ -74,19 +74,18 @@ public class InductiveVisualMiner {
 			if (preMinedTree == null) {
 				throw new RuntimeException("The pre-mined tree has been removed by garbage collection.");
 			}
-			state = new InductiveVisualMinerState(log, preMinedTree);
+			state.setPreMinedModel(new IvMModel(preMinedTree));
 		} else {
 			//launch with pre-mined dfg
-			DirectlyFollowsModel preMinedDfg = launcher.preMinedDfg.get();
-			if (preMinedDfg == null) {
+			DirectlyFollowsModel preMinedDfm = launcher.preMinedDfg.get();
+			if (preMinedDfm == null) {
 				throw new RuntimeException("The pre-mined tree has been removed by garbage collection.");
 			}
-			state = new InductiveVisualMinerState(preMinedDfg, log);
+			state.setPreMinedModel(new IvMModel(preMinedDfm));
 		}
 
 		VisualMinerWrapper[] miners = VisualMinerWrapperPluginFinder.find(context, state.getMiner());
-		final InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state, miners,
-				launcher.preMinedTree == null && launcher.preMinedDfg == null, canceller);
+		final InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state, miners, canceller);
 		new InductiveVisualMinerController(context, panel, state, canceller);
 
 		return panel;

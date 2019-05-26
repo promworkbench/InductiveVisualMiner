@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.export;
 
 import java.util.List;
 
+import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.factory.XFactory;
 import org.deckfour.xes.factory.XFactoryRegistry;
 import org.deckfour.xes.model.XAttribute;
@@ -10,6 +11,8 @@ import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
+import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
+import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
@@ -28,6 +31,11 @@ public class InductiveVisualMinerAlignment {
 		this.alignedLog = alignedLog;
 	}
 
+	/**
+	 * Extract the model from this aligned log.
+	 * 
+	 * @return
+	 */
 	public IvMModel getModel() {
 		String modelType = XModelAlignmentExtension.instance().extractModelType(alignedLog);
 		List<XAttribute> model = XModelAlignmentExtension.instance().extractModel(alignedLog);
@@ -50,6 +58,19 @@ public class InductiveVisualMinerAlignment {
 			return new IvMModel(dfm);
 		}
 		return null;
+	}
+
+	public XEventClassifier getClassifier() {
+		String[] fields = XModelAlignmentExtension.instance().extractClassifier(alignedLog);
+
+		AttributeClassifier[] x = new AttributeClassifier[fields.length];
+		int i = 0;
+		for (String field : fields) {
+			x[i] = new AttributeClassifier(field);
+			i++;
+		}
+
+		return AttributeClassifiers.constructClassifier(x);
 	}
 
 	/**
@@ -80,7 +101,10 @@ public class InductiveVisualMinerAlignment {
 						break;
 					case "synchronousMove" :
 						int node = alignmentExtension.extractModelMoveNode(event);
-						if (node != Integer.MIN_VALUE && !model.isTau(node)) {
+						if (node == Integer.MIN_VALUE) {
+							return null;
+						}
+						if (!model.isTau(node)) {
 							keep = true;
 						}
 						break;

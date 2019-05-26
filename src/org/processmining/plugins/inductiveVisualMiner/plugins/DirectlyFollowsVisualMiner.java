@@ -48,10 +48,10 @@ public class DirectlyFollowsVisualMiner {
 	public static JComponent getDirectlyFollowsVisualMiner(final PluginContext context, XLog xLog,
 			ProMCanceller canceller) throws UnknownTreeNodeException {
 
-		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog, null);
+		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog);
 		state.setMiner(new DfgMiner());
 		InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state,
-				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), true, canceller);
+				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), canceller);
 		new InductiveVisualMinerController(context, panel, state, canceller);
 
 		return panel;

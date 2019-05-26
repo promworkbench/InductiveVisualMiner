@@ -91,12 +91,29 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private AnimationEnabledChangedListener onAnimationEnabledChanged = null;
 
 	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
-		return new InductiveVisualMinerPanel(context, state, miners, enableMining, canceller);
+			VisualMinerWrapper[] miners, ProMCanceller canceller) {
+		return new InductiveVisualMinerPanel(context, state, miners, canceller);
+	}
+
+	/**
+	 * Deprecated. For disabled mining, call state.setPreMinedModel() before
+	 * calling this method.
+	 * 
+	 * @param context
+	 * @param state
+	 * @param miners
+	 * @param miningEnabled
+	 * @param canceller
+	 * @return
+	 */
+	@Deprecated
+	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
+			VisualMinerWrapper[] miners, boolean miningEnabled, ProMCanceller canceller) {
+		return new InductiveVisualMinerPanel(context, state, miners, canceller);
 	}
 
 	private InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, boolean enableMining, ProMCanceller canceller) {
+			VisualMinerWrapper[] miners, ProMCanceller canceller) {
 		int gridy = 0;
 
 		setLayout(new BorderLayout());
@@ -290,7 +307,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			{
 				controllerView = new ControllerView(this);
 			}
-			
+
 			//save log button
 			{
 				saveLogButton = new JButton("export log");
@@ -422,12 +439,19 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		}
 
 		//handle pre-mined tree case
-		if (!enableMining) {
+		if (state.getPreMinedModel() != null) {
 			activitiesSlider.setVisible(false);
 			pathsSlider.setVisible(false);
 			preMiningFiltersButton.setVisible(false);
 			minerLabel.setVisible(false);
 			minerCombobox.setVisible(false);
+			editModelButton.setVisible(false);
+		}
+
+		//handle pre-mined classifier case
+		if (state.getPreMinedPerformanceClassifier() != null) {
+			classifierLabel.setVisible(false);
+			classifiersCombobox.setVisible(false);
 		}
 	}
 

@@ -741,7 +741,8 @@ public class InductiveVisualMinerController {
 						break;
 					case 1 :
 						//ExportAlignment.exportAlignment(context, log, model, name, Type.both);
-						InductiveVisualMinerAlignment alignment = ExportAlignment.exportAlignment(log, model, classifier);
+						InductiveVisualMinerAlignment alignment = ExportAlignment.exportAlignment(log, model,
+								classifier);
 						context.getProvidedObjectManager().createProvidedObject(name + " (alignment)", alignment,
 								InductiveVisualMinerAlignment.class, context);
 						if (context instanceof UIPluginContext) {
