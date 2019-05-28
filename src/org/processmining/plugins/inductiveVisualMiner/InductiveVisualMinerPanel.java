@@ -2,9 +2,12 @@ package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.util.Set;
 
 import javax.swing.BoxLayout;
@@ -94,6 +97,9 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			VisualMinerWrapper[] miners, ProMCanceller canceller) {
 		return new InductiveVisualMinerPanel(context, state, miners, canceller);
 	}
+
+	private static final Image logo = Toolkit.getDefaultToolkit().getImage(InductiveVisualMinerPanel.class
+			.getResource("/org/processmining/plugins/inductiveVisualMiner/inductive miner logo.png"));
 
 	/**
 	 * Deprecated. For disabled mining, call state.setPreMinedModel() before
@@ -347,46 +353,56 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				otherSettingsPanel.add(saveImageButton, cExitButton);
 			}
 
+			//status area
 			{
-				selectionLabel = new JTextArea(" ");
-				selectionLabel.setWrapStyleWord(true);
-				selectionLabel.setLineWrap(true);
-				selectionLabel.setEditable(false);
-				selectionLabel.setOpaque(false);
-				selectionLabel.setBorder(leftBorder);
-				GridBagConstraints cSelectionLabel = new GridBagConstraints();
-				cSelectionLabel.gridx = 0;
-				cSelectionLabel.gridy = gridy++;
-				cSelectionLabel.gridwidth = 2;
-				cSelectionLabel.anchor = GridBagConstraints.NORTH;
-				cSelectionLabel.fill = GridBagConstraints.HORIZONTAL;
-				otherSettingsPanel.add(selectionLabel, cSelectionLabel);
-			}
+				JPanel statusArea = new JPanel() {
+					//paint a background with our icon
+					@Override
+					protected void paintComponent(Graphics g) {
+						super.paintComponent(g);
+						if (logo != null) {
+							g.drawImage(logo, getWidth() / 2 - logo.getWidth(null) / 2, 5, null);
+						}
+					}
+				};
+				//statusArea.setMinimumSize(new Dimension(sidePanelWidth, 70));
+				//statusArea.setPreferredSize(new Dimension(sidePanelWidth, 70));
+				statusArea.setMaximumSize(new Dimension(sidePanelWidth, 10000));
+				statusArea.setOpaque(false);
+				statusArea.setLayout(new BorderLayout());
+				GridBagConstraints cStatusArea = new GridBagConstraints();
+				cStatusArea.gridx = 0;
+				cStatusArea.gridy = gridy++;
+				cStatusArea.gridwidth = 2;
+				cStatusArea.anchor = GridBagConstraints.NORTH;
+				//cStatusArea.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(statusArea, cStatusArea);
 
-			{
-				animationTimeLabel = SlickerFactory.instance().createLabel(" ");
-				animationTimeLabel.setMinimumSize(new Dimension(10, lineHeight));
-				animationTimeLabel.setPreferredSize(new Dimension(sidePanelWidth - 5, lineHeight));
-				animationTimeLabel.setBorder(leftBorder);
-				GridBagConstraints cAnimationTimeLabel = new GridBagConstraints();
-				cAnimationTimeLabel.gridx = 0;
-				cAnimationTimeLabel.gridy = gridy++;
-				cAnimationTimeLabel.gridwidth = 2;
-				cAnimationTimeLabel.anchor = GridBagConstraints.SOUTH;
-				otherSettingsPanel.add(animationTimeLabel, cAnimationTimeLabel);
-			}
+				{
+					selectionLabel = new JTextArea(" ");
+					selectionLabel.setWrapStyleWord(true);
+					selectionLabel.setLineWrap(true);
+					selectionLabel.setEditable(false);
+					selectionLabel.setOpaque(false);
+					selectionLabel.setBorder(leftBorder);
+					statusArea.add(selectionLabel, BorderLayout.CENTER);
+				}
 
-			{
-				statusLabel = SlickerFactory.instance().createLabel(" ");
-				statusLabel.setMinimumSize(new Dimension(10, lineHeight));
-				statusLabel.setPreferredSize(new Dimension(sidePanelWidth - 5, lineHeight));
-				statusLabel.setBorder(leftBorder);
-				GridBagConstraints cStatus = new GridBagConstraints();
-				cStatus.gridx = 0;
-				cStatus.gridy = gridy++;
-				cStatus.gridwidth = 2;
-				cStatus.anchor = GridBagConstraints.SOUTH;
-				otherSettingsPanel.add(statusLabel, cStatus);
+				{
+					animationTimeLabel = SlickerFactory.instance().createLabel(" ");
+					animationTimeLabel.setMinimumSize(new Dimension(sidePanelWidth - 5, lineHeight));
+					animationTimeLabel.setPreferredSize(new Dimension(sidePanelWidth - 5, lineHeight));
+					animationTimeLabel.setBorder(leftBorder);
+					statusArea.add(animationTimeLabel, BorderLayout.PAGE_START);
+				}
+
+				{
+					statusLabel = SlickerFactory.instance().createLabel(" ");
+					statusLabel.setMinimumSize(new Dimension(10, lineHeight));
+					statusLabel.setPreferredSize(new Dimension(sidePanelWidth - 5, lineHeight));
+					statusLabel.setBorder(leftBorder);
+					statusArea.add(statusLabel, BorderLayout.PAGE_END);
+				}
 			}
 		}
 
@@ -398,6 +414,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			//set the graph changed listener
 			//if we are initialised, the dotPanel should not update the layout, as we have to recompute the animation
 			graphPanel.addGraphChangedListener(new GraphChangedListener() {
+
 				public void graphChanged(GraphChangedReason reason, Object newState) {
 					onGraphDirectionChanged.run();
 				}
@@ -439,7 +456,9 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		}
 
 		//handle pre-mined tree case
-		if (state.getPreMinedModel() != null) {
+		if (state.getPreMinedModel() != null)
+
+		{
 			activitiesSlider.setVisible(false);
 			pathsSlider.setVisible(false);
 			preMiningFiltersButton.setVisible(false);
