@@ -456,19 +456,17 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		}
 
 		//handle pre-mined tree case
-		if (state.getPreMinedModel() != null)
-
-		{
+		if (state.getPreMinedModel() != null) {
 			activitiesSlider.setVisible(false);
 			pathsSlider.setVisible(false);
 			preMiningFiltersButton.setVisible(false);
 			minerLabel.setVisible(false);
 			minerCombobox.setVisible(false);
-			editModelButton.setVisible(false);
 		}
 
 		//handle pre-mined classifier case
 		if (state.getPreMinedPerformanceClassifier() != null) {
+			editModelButton.setVisible(false);
 			classifierLabel.setVisible(false);
 			classifiersCombobox.setVisible(false);
 		}
