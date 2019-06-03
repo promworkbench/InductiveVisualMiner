@@ -61,11 +61,9 @@ public class ExportAlignment {
 					}
 				}
 
-				if (move.isSyncMove() || move.isModelMove()) {
-					//model part
-					alignmentExtension.assignMoveSourceNode(event, move.getSourceNode());
-					alignmentExtension.assignMoveModelNode(event, move.getTreeNode());
-				}
+				//always export the model part, just to be sure
+				alignmentExtension.assignMoveSourceNode(event, move.getSourceNode());
+				alignmentExtension.assignMoveModelNode(event, move.getTreeNode());
 
 				XLifecycleExtension.instance().assignTransition(event, move.getLifeCycleTransition().name());
 
