@@ -8,6 +8,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeGlobal;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeNode;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapperTraces;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapperTraces.Type;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.performance.QueueLengthsImplCombination;
@@ -35,6 +37,7 @@ public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, Performan
 			QueueLengths method = new QueueLengthsImplCombination(queueActivityLogs);
 
 			PerformanceWrapper result = new PerformanceWrapper(method, queueActivityLogs, model.getMaxNumberOfNodes());
+			PerformanceWrapperTraces resultTraces = new PerformanceWrapperTraces();
 
 			//compute node times
 			for (TIntIterator it = queueActivityLogs.keySet().iterator(); it.hasNext();) {
@@ -44,26 +47,35 @@ public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, Performan
 
 					//waiting time
 					if (activityLog.hasInitiate(i) && activityLog.hasStart(i)) {
-						result.addNodeValue(TypeNode.waiting, unode,
-								activityLog.getStart(i) - activityLog.getInitiate(i));
+						long waiting = activityLog.getStart(i) - activityLog.getInitiate(i);
+						result.addNodeValue(TypeNode.waiting, unode, waiting);
+						resultTraces.addValue(Type.waiting, activityLog.getTraceIndex(i), waiting);
 					}
 
 					//queueing time
 					if (activityLog.hasEnqueue(i) && activityLog.hasStart(i)) {
-						result.addNodeValue(TypeNode.queueing, unode,
-								activityLog.getStart(i) - activityLog.getEnqueue(i));
+						long queueing = activityLog.getStart(i) - activityLog.getEnqueue(i);
+						result.addNodeValue(TypeNode.queueing, unode, queueing);
+						resultTraces.addValue(Type.queueing, activityLog.getTraceIndex(i), queueing);
 					}
 
 					//service time
 					if (activityLog.hasStart(i) && activityLog.hasComplete(i)) {
-						result.addNodeValue(TypeNode.service, unode,
-								activityLog.getComplete(i) - activityLog.getStart(i));
+						long service = activityLog.getComplete(i) - activityLog.getStart(i);
+						result.addNodeValue(TypeNode.service, unode, service);
+						resultTraces.addValue(Type.service, activityLog.getTraceIndex(i), service);
 					}
 
 					//sojourn time
 					if (activityLog.hasInitiate(i) && activityLog.hasComplete(i)) {
-						result.addNodeValue(TypeNode.sojourn, unode,
-								activityLog.getComplete(i) - activityLog.getInitiate(i));
+						long sojourn = activityLog.getComplete(i) - activityLog.getInitiate(i);
+						result.addNodeValue(TypeNode.sojourn, unode, sojourn);
+
+						/**
+						 * We could technically show trace sojourn time, but
+						 * this would cause confusion with the trace duration.
+						 */
+						//resultTraces.addValue(Type.sojourn, activityLog.getTraceIndex(i), sojourn);
 					}
 
 					//elapsed time
@@ -85,6 +97,8 @@ public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, Performan
 					}
 				}
 			}
+
+			resultTraces.finalise(result);
 
 			//compute global times
 			for (IvMTrace trace : log) {

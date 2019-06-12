@@ -50,10 +50,11 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	//popup
 	private boolean showPopup = false;
+	private int popupWidth = 10;
 	private List<String> popupText = null;
 	private int popupHistogramNode = -1;
 	private long popupHistogramEdge = -1;
-	public static final int popupWidth = 300;
+	private boolean popupHistogramLog = false;
 	public static final int popupRowHeight = 20;
 	public static final int popupEmptyRowHeight = 8;
 	public static final int popupPadding = 10;
@@ -208,7 +209,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		Font backupFont = g.getFont();
 
 		int currentPopupHistogramHeight = histogramData == null
-				|| (popupHistogramNode == -1 && popupHistogramEdge == -1) ? 0 : popupHistogramHeight;
+				|| (popupHistogramNode == -1 && popupHistogramEdge == -1 && !popupHistogramLog) ? 0
+						: popupHistogramHeight;
 
 		//count the height of the popup
 		int popupHeight = currentPopupHistogramHeight;
@@ -229,7 +231,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 				popupHeight + 2 * popupPadding + popupPadding, popupPadding, popupPadding);
 
 		//local (= unode) histogram
-		if (histogramData != null && (popupHistogramNode != -1 || popupHistogramEdge != -1)) {
+		if (histogramData != null && (popupHistogramNode != -1 || popupHistogramEdge != -1 || popupHistogramLog)) {
 			paintPopupHistogram(g, x, y);
 		}
 
@@ -277,7 +279,8 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			//create a path
 			GeneralPath path = new GeneralPath();
 			path.moveTo(offsetX, offsetY + (popupHistogramHeight - popupHistogramYPadding));
-			for (int pixel = 0; pixel < histogramData.getNrOfLocalBuckets(); pixel++) {
+			int buckets = popupHistogramLog ? histogramData.getNrOfLogBuckets() : histogramData.getNrOfLocalBuckets();
+			for (int pixel = 0; pixel < buckets; pixel++) {
 				path.lineTo(offsetX + pixel, offsetY + (popupHistogramHeight - popupHistogramYPadding)
 						- (getLocalBucketFraction(pixel) * (popupHistogramHeight - 2 * popupHistogramYPadding)));
 			}
@@ -296,10 +299,13 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	}
 
 	private double getLocalBucketFraction(int pixel) {
-		if (popupHistogramNode != -1) {
+		if (popupHistogramNode >= 0) {
 			return histogramData.getLocalNodeBucketFraction(popupHistogramNode, pixel);
+		} else if (popupHistogramEdge >= 0) {
+			return histogramData.getLocalEdgeBucketFraction(popupHistogramEdge, pixel);
+		} else {
+			return histogramData.getLogBucketFraction(pixel);
 		}
-		return histogramData.getLocalEdgeBucketFraction(popupHistogramEdge, pixel);
 	}
 
 	public void paintGlobalHistogram(Graphics2D g) {
@@ -331,20 +337,30 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		this.popupText = popup;
 		this.popupHistogramNode = popupHistogramUnode;
 		this.popupHistogramEdge = -1;
+		this.popupHistogramLog = false;
 	}
 
 	public void setPopupLogMove(List<String> popup, LogMovePosition position) {
 		this.popupText = popup;
 		this.popupHistogramNode = -1;
 		this.popupHistogramEdge = HistogramData.getEdgeIndex(position);
+		this.popupHistogramLog = false;
+	}
+
+	public void setPopupLog(List<String> popup) {
+		this.popupText = popup;
+		this.popupHistogramNode = -1;
+		this.popupHistogramEdge = -1;
+		this.popupHistogramLog = true;
 	}
 
 	public boolean isShowPopup() {
 		return showPopup;
 	}
 
-	public void setShowPopup(boolean showPopup) {
+	public void setShowPopup(boolean showPopup, int width) {
 		this.showPopup = showPopup;
+		this.popupWidth = width;
 	}
 
 	public static Dot getSplashScreen() {

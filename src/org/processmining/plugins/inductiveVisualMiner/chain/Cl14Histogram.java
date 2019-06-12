@@ -1,12 +1,12 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.InductiveMiner.Quintuple;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimationPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 public class Cl14Histogram extends
@@ -35,7 +35,7 @@ public class Cl14Histogram extends
 				return null;
 			}
 			HistogramData data = new HistogramData(model, input.getE(), input.getB(), input.getC(), input.getD(),
-					InductiveVisualMinerAnimationPanel.popupWidth, canceller);
+					PopupPopulator.popupWidthNodes, PopupPopulator.popupWidthSourceSink, canceller);
 			if (canceller.isCancelled()) {
 				return null;
 			}

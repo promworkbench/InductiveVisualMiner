@@ -22,10 +22,14 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
 
 public class PopupPopulator {
+
+	public static final int popupWidthNodes = 300;
+	public static final int popupWidthSourceSink = 350;
+
 	public static void updatePopup(InductiveVisualMinerPanel panel, InductiveVisualMinerState state)
 			throws UnknownTreeNodeException {
 		if (panel.getGraph().getMouseInElements().isEmpty()) {
-			panel.getGraph().setShowPopup(false);
+			panel.getGraph().setShowPopup(false, 10);
 		} else {
 			//output statistics about the node
 			DotElement element = panel.getGraph().getMouseInElements().iterator().next();
@@ -36,8 +40,11 @@ public class PopupPopulator {
 					if (state.getModel().isActivity(unode)) {
 						List<String> popup = new ArrayList<>();
 
+						//name
+						popup.add("activity " + state.getModel().getActivityName(unode));
+
 						//frequencies
-						popup.add("number of occurrences " + IvMLogMetrics.getNumberOfTracesRepresented(
+						popup.add("number of occurrences  " + IvMLogMetrics.getNumberOfTracesRepresented(
 								state.getModel(), unode, false, state.getIvMLogInfoFiltered()));
 						popup.add(null);
 
@@ -47,7 +54,7 @@ public class PopupPopulator {
 								for (Gather gather : Gather.values()) {
 									long m = state.getPerformance().getNodeMeasure(type, gather, unode);
 									if (m > -1) {
-										popup.add(gather.toString() + " " + type.toString() + " time "
+										popup.add(gather.toString() + " " + type.toString() + " "
 												+ Performance.timeToString(m));
 									}
 								}
@@ -59,14 +66,18 @@ public class PopupPopulator {
 
 						popup.remove(popup.size() - 1);
 						panel.getGraph().setPopupActivity(popup, unode);
-						panel.getGraph().setShowPopup(true);
+						panel.getGraph().setShowPopup(true, popupWidthNodes);
 					} else if (((LocalDotNode) element).getType() == NodeType.source
 							|| ((LocalDotNode) element).getType() == NodeType.sink) {
 						//popup at the source or sink
 						List<String> popup = new ArrayList<>();
 
+						//name
+						popup.add("all highlighted traces");
+
 						//frequencies
-						popup.add("number of traces       " + state.getIvMLogInfoFiltered().getNumberOfTraces());
+						popup.add(
+								"number of traces                " + state.getIvMLogInfoFiltered().getNumberOfTraces());
 						popup.add(null);
 
 						//times
@@ -75,7 +86,7 @@ public class PopupPopulator {
 								for (Gather gather : Gather.values()) {
 									long m = state.getPerformance().getGlobalMeasure(type, gather);
 									if (m > -1) {
-										popup.add(gather.toString() + " trace " + type.toString() + " "
+										popup.add(gather.toString() + " " + type.toString() + " "
 												+ Performance.timeToString(m));
 									}
 								}
@@ -86,13 +97,13 @@ public class PopupPopulator {
 						}
 
 						popup.remove(popup.size() - 1);
-						panel.getGraph().setPopupActivity(popup, -1);
-						panel.getGraph().setShowPopup(true);
+						panel.getGraph().setPopupLog(popup);
+						panel.getGraph().setShowPopup(true, popupWidthSourceSink);
 					} else {
-						panel.getGraph().setShowPopup(false);
+						panel.getGraph().setShowPopup(false, 10);
 					}
 				} else {
-					panel.getGraph().setShowPopup(false);
+					panel.getGraph().setShowPopup(false, 10);
 				}
 			} else if (state.getVisualisationInfo() != null && element instanceof LocalDotEdge
 					&& state.getVisualisationInfo().getAllLogMoveEdges().contains(element)) {
@@ -112,8 +123,7 @@ public class PopupPopulator {
 					int maxDigits = (int) (Math.log10(max) + 1);
 
 					if (max == 0) {
-						panel.getGraph().setShowPopup(false);
-						return;
+						panel.getGraph().setShowPopup(false, 10);
 					}
 
 					List<XEventClass> activities = logMoves.sortByCardinality();
@@ -126,13 +136,14 @@ public class PopupPopulator {
 						maxNumberOfLogMoves--;
 					}
 					if (maxNumberOfLogMoves < 0) {
-						popup.add("... and " + Math.abs(maxNumberOfLogMoves) + " activities more");
+						popup.add("... and " + Math.abs(maxNumberOfLogMoves) + " more "
+								+ (Math.abs(maxNumberOfLogMoves) > 1 ? "activities" : "activity") + " ");
 					}
 
 					panel.getGraph().setPopupLogMove(popup, position);
-					panel.getGraph().setShowPopup(true);
+					panel.getGraph().setShowPopup(true, popupWidthNodes);
 				} else {
-					panel.getGraph().setShowPopup(false);
+					panel.getGraph().setShowPopup(false, 10);
 				}
 			} else if (state.getVisualisationInfo() != null && element instanceof LocalDotEdge
 					&& state.getVisualisationInfo().getAllModelMoveEdges().contains(element)) {
@@ -147,12 +158,12 @@ public class PopupPopulator {
 					popup.add("was not executed.");
 
 					panel.getGraph().setPopupActivity(popup, -1);
-					panel.getGraph().setShowPopup(true);
+					panel.getGraph().setShowPopup(true, popupWidthNodes);
 				} else {
-					panel.getGraph().setShowPopup(false);
+					panel.getGraph().setShowPopup(false, 10);
 				}
 			} else {
-				panel.getGraph().setShowPopup(false);
+				panel.getGraph().setShowPopup(false, 10);
 			}
 		}
 	}

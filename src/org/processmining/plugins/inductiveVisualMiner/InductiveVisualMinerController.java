@@ -810,11 +810,11 @@ public class InductiveVisualMinerController {
 		//set mouse-in-out node updater
 		panel.getGraph().addMouseInElementsChangedListener(new MouseInElementsChangedListener<DotElement>() {
 			public void mouseInElementsChanged(Set<DotElement> mouseInElements) {
-				panel.getGraph().setShowPopup(!mouseInElements.isEmpty());
 				try {
 					PopupPopulator.updatePopup(panel, state);
 				} catch (UnknownTreeNodeException e) {
 					e.printStackTrace();
+					panel.getGraph().setShowPopup(false, 10);
 				}
 				panel.repaint();
 			}

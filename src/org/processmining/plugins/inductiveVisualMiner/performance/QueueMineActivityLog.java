@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.performance;
 import java.util.Collections;
 
 import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
@@ -16,13 +17,16 @@ public class QueueMineActivityLog {
 
 	public static TIntObjectMap<QueueActivityLog> mine(IvMModel model, IvMLog tLog) {
 		TIntObjectMap<QueueActivityLog> queueActivityLogs = new TIntObjectHashMap<QueueActivityLog>(10, 0.5f, -1);
-		for (IvMTrace tTrace : tLog) {
-			mine(model, tTrace, queueActivityLogs);
+		for (IteratorWithPosition<IvMTrace> it = tLog.iterator(); it.hasNext();) {
+			IvMTrace tTrace = it.next();
+			int traceIndex = it.getPosition();
+			mine(model, tTrace, traceIndex, queueActivityLogs);
 		}
 		return queueActivityLogs;
 	}
 
-	public static void mine(IvMModel model, IvMTrace tTrace, TIntObjectMap<QueueActivityLog> timestamps) {
+	public static void mine(IvMModel model, IvMTrace tTrace, int traceIndex,
+			TIntObjectMap<QueueActivityLog> timestamps) {
 		ActivityInstanceIterator it = tTrace.activityInstanceIterator(model);
 
 		//find the start timestamp of the trace
@@ -76,7 +80,7 @@ public class QueueMineActivityLog {
 				}
 
 				timestamps.get(node).add(activityInstance.getB(), startTrace, initiate, enqueue, start, complete,
-						endTrace);
+						endTrace, traceIndex);
 			}
 		}
 	}

@@ -9,11 +9,63 @@ import gnu.trove.map.TIntObjectMap;
 public class PerformanceWrapper {
 
 	public enum TypeNode {
-		elapsed, queueing, waiting, service, sojourn, remaining;
+		elapsed {
+			public String toString() {
+				return "elapsed time  ";
+			}
+		}, queueing {
+			public String toString() {
+				return "queueing time ";
+			}
+		}, waiting {
+			public String toString() {
+				return "waiting time  ";
+			}
+		}, service {
+			public String toString() {
+				return "service time  ";
+			}
+		}, sojourn {
+			public String toString() {
+				return "sojourn time  ";
+			}
+		}, remaining {
+			public String toString() {
+				return "remaining time";
+			}
+		};
+		
+		public abstract String toString();
 	}
 
 	public enum TypeGlobal {
-		duration;
+		queueing {
+			public String toString() {
+				return "queueing time per trace";
+			}
+		},
+		waiting {
+			public String toString() {
+				return "waiting time per trace ";
+			}
+		},
+		service {
+			public String toString() {
+				return "service time per trace ";
+			}
+		},
+		sojourn {
+			public String toString() {
+				return "sojourn time per trace ";
+			}
+		},
+		duration {
+			public String toString() {
+				return "trace duration         ";
+			}
+		};
+
+		public abstract String toString();
 	}
 
 	public enum Gather {

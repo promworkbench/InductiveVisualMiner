@@ -48,6 +48,11 @@ public class HistogramData {
 	private final TLongObjectMap<int[]> localEdgeCountFiltered;
 	private final TLongObjectMap<int[]> localEdgeCountUnfiltered;
 
+	private final int[] logCountFiltered;
+	private final int[] logCountUnfiltered;
+	private final int logBuckets;
+	private double logMax;
+
 	/**
 	 * 
 	 * @param model
@@ -56,16 +61,22 @@ public class HistogramData {
 	 * @param globalBuckets
 	 * @param localBuckets
 	 *            The width of the histogram (used for pixel-precision).
+	 * @param logBuckets
 	 * @param canceller
 	 */
 	public HistogramData(IvMModel model, ProcessTreeVisualisationInfo info, IvMLogFiltered log, Scaler scaler,
-			int globalBuckets, int localBuckets, IvMCanceller canceller) {
+			int globalBuckets, int localBuckets, int logBuckets, IvMCanceller canceller) {
 		this.scaler = scaler;
 
 		globalCountFiltered = new int[globalBuckets];
 		globalCountUnfiltered = new int[globalBuckets];
 		this.globalBuckets = globalBuckets;
 		globalMax = 0;
+
+		logCountFiltered = new int[logBuckets];
+		logCountUnfiltered = new int[logBuckets];
+		this.logBuckets = logBuckets;
+		logMax = 0;
 
 		this.localBuckets = localBuckets;
 		localMax = 0;
@@ -115,6 +126,7 @@ public class HistogramData {
 		Long realStartTime = trace.getRealStartTime();
 		Long realEndTime = trace.getRealEndTime();
 
+		//add to animation bar histogram
 		if (realStartTime != null) {
 			int startBucket = (int) (scaler.userTime2Fraction(scaler.logTime2UserTime(realStartTime))
 					* (globalBuckets - 1));
@@ -127,6 +139,22 @@ public class HistogramData {
 
 				if (!isFilteredOut) {
 					globalCountFiltered[i]++;
+				}
+			}
+		}
+
+		//add to log popup histogram
+		if (realStartTime != null) {
+			int startBucket = (int) (scaler.userTime2Fraction(scaler.logTime2UserTime(realStartTime))
+					* (logBuckets - 1));
+			int endBucket = (int) (scaler.userTime2Fraction(scaler.logTime2UserTime(realEndTime)) * (logBuckets - 1));
+
+			for (int i = startBucket; i <= endBucket; i++) {
+				logCountUnfiltered[i]++;
+				logMax = Math.max(logMax, logCountUnfiltered[i]);
+
+				if (!isFilteredOut) {
+					logCountFiltered[i]++;
 				}
 			}
 		}
@@ -215,6 +243,10 @@ public class HistogramData {
 		return localBuckets;
 	}
 
+	public int getNrOfLogBuckets() {
+		return logBuckets;
+	}
+
 	public double getGlobalBucketFraction(int bucketNr) {
 		return globalCountFiltered[bucketNr] / globalMax;
 	}
@@ -227,12 +259,20 @@ public class HistogramData {
 		return localEdgeCountFiltered.get(edge)[pixel] / localMax;
 	}
 
+	public double getLogBucketFraction(int pixel) {
+		return logCountFiltered[pixel] / logMax;
+	}
+
 	public int getGlobalMaximum() {
 		return (int) globalMax;
 	}
 
 	public int getLocalMaximum() {
 		return (int) localMax;
+	}
+
+	public int getLogMaximum() {
+		return (int) logMax;
 	}
 
 	public static long getEdgeIndex(LogMovePosition position) {
