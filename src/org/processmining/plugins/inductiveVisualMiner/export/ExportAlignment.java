@@ -108,9 +108,6 @@ public class ExportAlignment {
 						xEvent = factory.createEvent((XAttributeMap) event.getAttributes().clone());
 					} else {
 						xEvent = factory.createEvent();
-					}
-
-					if (!event.isLogMove()) {
 						xEvent.getAttributes().put("concept:name", factory.createAttributeLiteral("concept:name",
 								model.getActivityName(event.getTreeNode()), null));
 						xEvent.getAttributes().put("lifecycle:transition", factory.createAttributeLiteral(
