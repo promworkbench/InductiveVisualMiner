@@ -634,6 +634,7 @@ public class InductiveVisualMinerController {
 					state.setAnimation(null);
 					panel.getGraph().setAnimationEnabled(false);
 					setAnimationStatus("animation disabled", true);
+					panel.repaint();
 					return false;
 				} else {
 					//animation gets enabled
