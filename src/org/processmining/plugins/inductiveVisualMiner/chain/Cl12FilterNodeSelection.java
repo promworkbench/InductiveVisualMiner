@@ -84,7 +84,6 @@ public class Cl12FilterNodeSelection extends
 				List<? extends Move> trace2 = trace;
 				if (selection.isSelected(tree, (List<Move>) trace2, move)) {
 					keepTrace = true;
-					selection.isSelected(tree, (List<Move>) trace2, move);
 					break;
 				}
 			}

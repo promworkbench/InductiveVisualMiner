@@ -43,6 +43,7 @@ public class PositionLogMoves {
 
 		int previousActivity = -1;
 		int nextActivity = findNextActivityAfter(trace, previousActivity);
+		boolean previousActivityComplete = false;
 
 		for (int i = 0; i < trace.size(); i++) {
 			Move move = trace.get(i);
@@ -54,7 +55,7 @@ public class PositionLogMoves {
 					 * then the model must have been empty.
 					 */
 					addLogMove(move, -1, -1, move.getActivityEventClass(), cardinality);
-				} else if (previousActivity == nextActivity && trace.get(i - 1).isComplete()) {
+				} else if (previousActivity == nextActivity && previousActivityComplete) {
 					/*
 					 * If the previous event is a completion event AND the next
 					 * event is of the same activity, then we are in between two
@@ -70,6 +71,7 @@ public class PositionLogMoves {
 			if ((move.isComplete() || move.isStart()) && move.isModelSync()) {
 				previousActivity = nextActivity;
 				nextActivity = findNextActivityAfter(trace, i);
+				previousActivityComplete = move.isComplete();
 			}
 		}
 	}
