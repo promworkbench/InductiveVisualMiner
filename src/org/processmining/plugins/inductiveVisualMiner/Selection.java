@@ -81,7 +81,8 @@ public class Selection {
 							//selected end move
 							return true;
 						}
-						if (move.getTreeNode() == source && nextMove != null && nextMove.getTreeNode() == target) {
+						if (source != -1 && target != -1 && move.getTreeNode() == source && nextMove != null
+								&& nextMove.getTreeNode() == target) {
 							//selected edge move
 							return true;
 						}
