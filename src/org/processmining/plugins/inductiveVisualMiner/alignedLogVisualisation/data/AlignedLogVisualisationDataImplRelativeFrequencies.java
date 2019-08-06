@@ -34,7 +34,9 @@ public class AlignedLogVisualisationDataImplRelativeFrequencies implements Align
 
 	public Pair<String, Long> getEdgeLabel(int unode, boolean includeModelMoves) throws UnknownTreeNodeException {
 		long cardinality = IvMLogMetrics.getNumberOfTracesRepresented(model, unode, includeModelMoves, logInfo);
-		return Pair.of(String.valueOf(cardinality), cardinality);
+
+		double ratio = cardinality / (logInfo.getNumberOfTraces() * 1.0);
+		return Pair.of(format(ratio), cardinality);
 	}
 
 	public Pair<String, Long> getEdgeLabel(int from, int to, boolean includeModelMoves)

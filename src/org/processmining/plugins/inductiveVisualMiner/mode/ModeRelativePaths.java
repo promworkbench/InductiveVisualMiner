@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.mode;
 
-import org.processmining.plugins.graphviz.colourMaps.ColourMapGreen;
+import org.processmining.plugins.graphviz.colourMaps.ColourMapLightGreen;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplRelativeFrequencies;
@@ -13,13 +13,13 @@ public class ModeRelativePaths extends Mode {
 
 	public ModeRelativePaths() {
 		visualisationParameters.setShowFrequenciesOnModelEdges(true);
-		visualisationParameters.setColourModelEdges(new ColourMapGreen());
+		visualisationParameters.setColourModelEdges(new ColourMapLightGreen());
 		visualisationParameters.setModelEdgesWidth(new SizeMapLinear(1, 3));
 		visualisationParameters.setShowFrequenciesOnMoveEdges(false);
 		visualisationParameters.setShowLogMoves(false);
 		visualisationParameters.setShowModelMoves(false);
 
-		visualisationParameters.setColourNodes(new ColourMapGreen());
+		visualisationParameters.setColourNodes(new ColourMapLightGreen());
 	}
 
 	public ProcessTreeVisualisationParameters getFinalVisualisationParameters(InductiveVisualMinerState state) {
