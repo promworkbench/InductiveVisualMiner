@@ -46,6 +46,11 @@ public class PopupPopulator {
 						//frequencies
 						popup.add("number of occurrences  " + IvMLogMetrics.getNumberOfTracesRepresented(
 								state.getModel(), unode, false, state.getIvMLogInfoFiltered()));
+						//frequencies
+						popup.add("occurrences per trace  "
+								+ (IvMLogMetrics.getNumberOfTracesRepresented(state.getModel(), unode, false,
+										state.getIvMLogInfoFiltered())
+										/ (state.getIvMLogInfoFiltered().getNumberOfTraces() * 1.0)));
 						popup.add(null);
 
 						//times
