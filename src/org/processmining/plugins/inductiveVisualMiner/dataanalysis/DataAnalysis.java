@@ -87,7 +87,7 @@ public class DataAnalysis {
 				imageMap.put(attribute, image);
 			}
 		}
-		return Pair.of(correlationMap, imageMap);
+		return Pair.of((TObjectDoubleMap<Attribute>) correlationMap, (Map<Attribute, BufferedImage>) imageMap);
 	}
 
 	public static double getDoubleValue(Attribute attribute, IvMTrace trace) {
