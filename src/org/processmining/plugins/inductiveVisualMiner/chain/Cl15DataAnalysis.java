@@ -13,7 +13,7 @@ public class Cl15DataAnalysis extends ChainLink<Pair<IvMLogFiltered, AttributesI
 	}
 
 	protected Pair<IvMLogFiltered, AttributesInfo> generateInput(InductiveVisualMinerState state) {
-		return Pair.of(state.getIvMLogFiltered(), state.getAttributesInfo());
+		return Pair.of((IvMLogFiltered) state.getIvMLogFiltered(), state.getAttributesInfo());
 	}
 
 	protected DataAnalysis executeLink(Pair<IvMLogFiltered, AttributesInfo> input, IvMCanceller canceller)
