@@ -27,6 +27,7 @@ import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSele
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisView;
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ControllerView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
@@ -86,6 +87,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final JButton saveImageButton;
 	private final JButton traceViewButton;
 	private final TraceView traceView;
+	private final JButton dataAnalysisViewButton;
+	private final DataAnalysisView dataAnalysisView;
 	private final JButton traceColourMapViewButton;
 	private final TraceColourMapView traceColourMapView;
 	private final JButton highlightingFiltersViewButton;
@@ -103,6 +106,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	private static final Image logo = Toolkit.getDefaultToolkit().getImage(InductiveVisualMinerPanel.class
 			.getResource("/org/processmining/plugins/inductiveVisualMiner/inductive miner logo.png"));
+
+	public static final String title = "visual Miner";
 
 	/**
 	 * Deprecated. For disabled mining, call state.setPreMinedModel() before
@@ -336,6 +341,20 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(traceViewButton, cTraceViewButton);
 			}
+			
+			//data analysis view
+			{
+				dataAnalysisView = new DataAnalysisView(this);
+				dataAnalysisViewButton = new JButton("data analysis");
+				IvMDecorator.decorate(dataAnalysisViewButton);
+				GridBagConstraints cDataAnalysisViewButton = new GridBagConstraints();
+				cDataAnalysisViewButton.gridx = 1;
+				cDataAnalysisViewButton.gridy = gridy++;
+				cDataAnalysisViewButton.gridwidth = 1;
+				cDataAnalysisViewButton.insets = margins;
+				cDataAnalysisViewButton.fill = GridBagConstraints.HORIZONTAL;
+				otherSettingsPanel.add(dataAnalysisViewButton, cDataAnalysisViewButton);
+			}
 
 			//controller view
 			{
@@ -524,6 +543,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		editModelView.setVisible(false);
 		preMiningFiltersView.setVisible(false);
 		traceView.setVisible(false);
+		dataAnalysisView.setVisible(false);
 		highlightingFiltersView.setVisible(false);
 		traceColourMapView.setVisible(false);
 		controllerView.setVisible(false);
@@ -640,6 +660,14 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	public JButton getTraceViewButton() {
 		return traceViewButton;
+	}
+	
+	public DataAnalysisView getDataAnalysisView() {
+		return dataAnalysisView;
+	}
+	
+	public JButton getDataAnalysisViewButton() {
+		return dataAnalysisViewButton;
 	}
 
 	public ControllerView getControllerView() {

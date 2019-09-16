@@ -46,7 +46,8 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl11TraceColouring;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl12FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Histogram;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Done;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl15DataAnalysis;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl16Done;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
@@ -143,6 +144,11 @@ public class InductiveVisualMinerController {
 						state.setFiltersController(new IvMFiltersController(context, panel, state, onUpdatePreMining,
 								onUpdateHighlighting));
 						panel.getTraceColourMapView().initialise(state.getAttributesInfo(), onUpdateTraceColourMap);
+					}
+					
+					//initialise the data analysis view
+					{
+						panel.getDataAnalysisView().initialiseAttributes(state.getAttributesInfo());
 					}
 				}
 			});
@@ -513,8 +519,31 @@ public class InductiveVisualMinerController {
 		chain.addConnection(animationScaler, histogram);
 		chain.addConnection(filterNodeSelection, histogram);
 
+		//15 data analysis
+		Cl15DataAnalysis dataAnalysis = new Cl15DataAnalysis();
+		{
+			dataAnalysis.setOnStart(new Runnable() {
+				public void run() {
+					setStatus("Performing data analysis..");
+				}
+			});
+			dataAnalysis.setOnComplete(new Runnable() {
+				public void run() {
+					setStatus(" ");
+					panel.getDataAnalysisView().setDataAnalysis(state.getDataAnalysis());
+				}
+			});
+			dataAnalysis.setOnInvalidate(new Runnable() {
+				public void run() {
+					panel.getDataAnalysisView().invalidateContent();
+				}
+			});
+			dataAnalysis.setOnException(onException);
+		}
+		chain.addConnection(filterNodeSelection, dataAnalysis);
+
 		//done
-		Cl15Done done = new Cl15Done();
+		Cl16Done done = new Cl16Done();
 		{
 			done.setOnStart(new Runnable() {
 				public void run() {
@@ -532,6 +561,7 @@ public class InductiveVisualMinerController {
 		chain.addConnection(performance, done);
 		chain.addConnection(traceColouring, done);
 		chain.addConnection(animate, done);
+		chain.addConnection(dataAnalysis, done);
 
 		panel.getControllerView().setChain(chain);
 
@@ -791,6 +821,12 @@ public class InductiveVisualMinerController {
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				panel.getTraceView().enableAndShow();
+			}
+		});
+
+		panel.getDataAnalysisViewButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				panel.getDataAnalysisView().enableAndShow();
 			}
 		});
 

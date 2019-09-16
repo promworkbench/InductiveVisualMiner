@@ -13,6 +13,7 @@ import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.dfgOnly.Dfg;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeEditor;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
@@ -30,7 +31,7 @@ public class EditModelView extends SideWindow {
 	private final static String DFGPANEL = "dfg panel";
 
 	public EditModelView(Component parent) {
-		super(parent, "edit model - Inductive visual Miner");
+		super(parent, "edit model - " + InductiveVisualMinerPanel.title);
 
 		getContentPane().setBackground(IvMDecorator.backGroundColour1);
 

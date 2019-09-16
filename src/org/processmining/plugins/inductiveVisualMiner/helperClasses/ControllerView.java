@@ -9,6 +9,7 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.ChainLink;
 
@@ -19,7 +20,7 @@ public class ControllerView extends SideWindow {
 	private Map<ChainLink<?, ?>, DotNode> map;
 
 	public ControllerView(Component parent) {
-		super(parent, "Inductive visual Miner - controller view");
+		super(parent, "Controller view - " + InductiveVisualMinerPanel.title);
 
 		Dot dot = new Dot();
 		dot.addNode("waiting for controller view");

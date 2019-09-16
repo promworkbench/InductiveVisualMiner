@@ -14,6 +14,7 @@ import org.deckfour.xes.model.XAttributeTimestamp;
 import gnu.trove.set.hash.THashSet;
 
 public class Attribute implements Comparable<Attribute> {
+
 	public enum Type {
 		undecided, literal, numeric, time, traceDuration, traceNumberOfEvents;
 	}
@@ -133,6 +134,29 @@ public class Attribute implements Comparable<Attribute> {
 
 	public int compareTo(Attribute arg0) {
 		return name.toLowerCase().compareTo(arg0.getName().toLowerCase());
+	}
+
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.toLowerCase().hashCode());
+		return result;
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Attribute other = (Attribute) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.toLowerCase().equals(other.name.toLowerCase()))
+			return false;
+		return true;
 	}
 
 	public String toString() {

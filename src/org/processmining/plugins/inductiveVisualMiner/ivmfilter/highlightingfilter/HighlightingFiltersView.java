@@ -15,7 +15,7 @@ public class HighlightingFiltersView extends IvMFiltersView {
 	private static final long serialVersionUID = -3014513707228444822L;
 
 	public HighlightingFiltersView(Component parent) {
-		super(parent, "highlighting filters - Inductive visual Miner",
+		super(parent, "highlighting filters - " + InductiveVisualMinerPanel.title,
 				"These filters alter the occurrence counts, performance measurements and animation.");
 	}
 

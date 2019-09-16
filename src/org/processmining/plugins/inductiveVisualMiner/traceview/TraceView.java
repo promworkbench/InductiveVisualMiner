@@ -13,6 +13,7 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.Trace
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
@@ -29,7 +30,7 @@ public class TraceView extends SideWindow {
 	private Object showing = null;
 
 	public TraceView(Component parent) {
-		super(parent, "trace view - Inductive visual Miner");
+		super(parent, "trace view - " + InductiveVisualMinerPanel.title);
 
 		TraceBuilder<Object> traceBuilder = new TraceBuilder<Object>() {
 			public Trace<? extends Event> build(Object element) {

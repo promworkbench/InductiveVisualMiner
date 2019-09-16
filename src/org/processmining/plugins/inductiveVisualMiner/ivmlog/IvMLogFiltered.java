@@ -8,10 +8,17 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWith
  * @author sleemans
  *
  */
-public interface IvMLogFiltered {
+public interface IvMLogFiltered extends Cloneable {
 	public boolean isSomethingFiltered();
 
 	public boolean isFilteredOut(int traceIndex);
+
+	/**
+	 * Inverts the log. Cheap operation.
+	 * 
+	 * @return
+	 */
+	public void invert();
 
 	/**
 	 * 
@@ -30,4 +37,6 @@ public interface IvMLogFiltered {
 	public IteratorWithPosition<IvMTrace> iteratorUnfiltered();
 
 	public boolean equals(IvMLogFiltered otherLog);
+	
+	public IvMLogFilteredImpl clone() throws CloneNotSupportedException;
 }

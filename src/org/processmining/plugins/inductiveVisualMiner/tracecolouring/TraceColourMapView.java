@@ -51,7 +51,7 @@ public class TraceColourMapView extends SideWindow {
 	private Function<TraceColourMapSettings, Object> onUpdate;
 
 	public TraceColourMapView(InductiveVisualMinerPanel parent) {
-		super(parent, "trace colouring - Inductive visual Miner");
+		super(parent, "trace colouring - " + InductiveVisualMinerPanel.title);
 		setSize(300, 300);
 		setMinimumSize(new Dimension(300, 300));
 		JPanel content = new IvMPanel();

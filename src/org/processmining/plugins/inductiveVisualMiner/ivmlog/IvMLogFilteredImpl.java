@@ -8,8 +8,8 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWith
 
 public class IvMLogFilteredImpl implements IvMLog, IvMLogFiltered {
 
-	private final BitSet traceIsFilteredOut;
-	private final IvMLogNotFiltered log;
+	private BitSet traceIsFilteredOut; //should be final, but should be cloneable as well
+	private IvMLogNotFiltered log; //should be final, but should be cloneable as well
 	private boolean somethingFiltered;
 
 	private static final AtomicLong idPool = new AtomicLong();
@@ -105,5 +105,21 @@ public class IvMLogFilteredImpl implements IvMLog, IvMLogFiltered {
 
 	public XAttributeMap getAttributes() {
 		return log.getAttributes();
+	}
+
+	public void invert() {
+		traceIsFilteredOut.flip(0, log.size());
+		somethingFiltered = traceIsFilteredOut.nextSetBit(0) != -1;
+	}
+
+	@Override
+	public IvMLogFilteredImpl clone() throws CloneNotSupportedException {
+		IvMLogFilteredImpl result = (IvMLogFilteredImpl) super.clone();
+
+		result.traceIsFilteredOut = (BitSet) traceIsFilteredOut.clone();
+		result.log = log;
+		result.somethingFiltered = somethingFiltered;
+
+		return result;
 	}
 }
