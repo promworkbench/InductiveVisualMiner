@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.awt.BorderLayout;
+import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -58,8 +59,6 @@ public class DataAnalysisAttributeView extends JPanel {
 			} else {
 				text.append("Correlation with fitness: n/a (highlighted traces)\n");
 			}
-			ImageIcon icon = new ImageIcon(dataAnalysis.getCorrelationDensityPlot(attribute));
-			image.setIcon(icon);
 
 			//negative (non-highlighted traces)
 			double correlationNegative = dataAnalysis.getCorrelationNegative(attribute);
@@ -76,8 +75,14 @@ public class DataAnalysisAttributeView extends JPanel {
 			} else {
 				text.append("Correlation with fitness: n/a");
 			}
+		}
+
+		BufferedImage im = dataAnalysis.getCorrelationDensityPlot(attribute);
+		if (im != null) {
 			ImageIcon icon = new ImageIcon(dataAnalysis.getCorrelationDensityPlot(attribute));
 			image.setIcon(icon);
+		} else {
+			image.setIcon(null);
 		}
 
 		label.setText(text.toString());
