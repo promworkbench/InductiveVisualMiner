@@ -56,7 +56,7 @@ public class TraceColourMapPropertyDuration extends TraceColourMapProperty {
 
 	@Override
 	public String getValue(IvMTrace trace) {
-		if (getProperty(trace) > Double.MIN_VALUE) {
+		if (getProperty(trace) > -Double.MAX_VALUE) {
 			return "\u2588 " + ResourceTimeUtils.getDuration(getProperty(trace));
 		} else {
 			return "";

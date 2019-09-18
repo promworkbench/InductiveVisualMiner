@@ -38,7 +38,7 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 			return RendererFactory.defaultTokenFillColour;
 		} else {
 			double value = Attribute.parseDoubleFast(attribute);
-			if (value == Double.MIN_VALUE) {
+			if (value == -Double.MAX_VALUE) {
 				return RendererFactory.defaultTokenFillColour;
 			}
 

@@ -43,14 +43,14 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 	/**
 	 * 
 	 * @param trace
-	 * @return Double.MIN_VALUE if not present
+	 * @return -Double.MAX_VALUE if not present
 	 */
 	protected abstract double getProperty(IvMTrace trace);
 
 	/**
 	 * 
 	 * @param trace
-	 * @return Double.MIN_VALUE if not present
+	 * @return -Double.MAX_VALUE if not present
 	 */
 	protected abstract double getProperty(IMTrace trace);
 
@@ -69,7 +69,7 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 	final private static DecimalFormat numberFormat = new DecimalFormat("#.##");
 
 	public String getValue(IvMTrace trace) {
-		if (getProperty(trace) > Double.MIN_VALUE) {
+		if (getProperty(trace) > -Double.MAX_VALUE) {
 			return "\u2588 " + numberFormat.format(getProperty(trace));
 		} else {
 			return "";
@@ -77,7 +77,7 @@ public abstract class TraceColourMapProperty implements TraceColourMap {
 	}
 
 	public String getValue(IMTrace trace) {
-		if (getProperty(trace) > Double.MIN_VALUE) {
+		if (getProperty(trace) > -Double.MAX_VALUE) {
 			return "\u2588 " + numberFormat.format(getProperty(trace));
 		} else {
 			return "";

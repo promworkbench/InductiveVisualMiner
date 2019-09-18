@@ -61,8 +61,10 @@ public class DataAnalysisView extends SideWindow {
 		attributesPanel.removeAll();
 
 		for (Attribute attribute : attributesInfo.getTraceAttributes()) {
-			DataAnalysisAttributeView attributePanel = new DataAnalysisAttributeView(attribute);
-			attributesPanel.add(attributePanel);
+			if (DataAnalysis.isSupported(attribute)) {
+				DataAnalysisAttributeView attributePanel = new DataAnalysisAttributeView(attribute);
+				attributesPanel.add(attributePanel);
+			}
 		}
 
 		revalidate();

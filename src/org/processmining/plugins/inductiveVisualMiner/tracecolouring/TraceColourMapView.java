@@ -251,21 +251,7 @@ public class TraceColourMapView extends SideWindow {
 		}
 	}
 
-	private void updateProperty(Color[] colours, double min, double max, boolean isDuration, boolean isTime)
-			throws BadLocationException {
-		int numberOfColours = colours.length;
-
-		//build the example
-		setExampleText(numberOfColours, min, max, isDuration, isTime, false);
-
-		//colour the values in the example
-		colourExample(colours);
-
-		status.setText("Currently colouring traces using " + numberOfColours + " colours:");
-	}
-
-	private void updateProperty(ColourMap colourMap, double min, double max, boolean isDuration, boolean isTime)
-			throws BadLocationException {
+	private void updateProperty(ColourMap colourMap, double min, double max, boolean isDuration, boolean isTime) {
 		//build the example
 		setExampleText(maxColours, min, max, isDuration, isTime, true);
 
@@ -323,12 +309,13 @@ public class TraceColourMapView extends SideWindow {
 		}
 	}
 
-	private void colourExample(ColourMap colourMap, int numberOfRows) throws BadLocationException {
+	private void colourExample(ColourMap colourMap, int numberOfRows) {
 		example.setColourMap(colourMap);
 		example.setNumberOfRows(numberOfRows);
 	}
 
 	private static class TraceColourMapExample extends JTextArea {
+		private static final long serialVersionUID = 2130711974156441942L;
 		private ColourMap colourMap;
 		private int numberOfRows;
 

@@ -28,12 +28,12 @@ public class TraceColourMapSettings {
 	private final double max;
 
 	public static TraceColourMapSettings empty() {
-		return new TraceColourMapSettings(Type.empty, null, null, null, Double.MIN_VALUE, Double.MIN_VALUE);
+		return new TraceColourMapSettings(Type.empty, null, null, null, -Double.MAX_VALUE, -Double.MAX_VALUE);
 	}
 
 	public static TraceColourMapSettings string(Attribute attribute, Map<String, Color> value2colour) {
 		return new TraceColourMapSettings(Type.attributeString, attribute, null, value2colour,
-				Double.MIN_VALUE, Double.MIN_VALUE);
+				-Double.MAX_VALUE, -Double.MAX_VALUE);
 	}
 
 	public static TraceColourMapSettings number(Attribute attribute, ColourMap colourMap, double min, double max) {

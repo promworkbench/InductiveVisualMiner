@@ -31,7 +31,7 @@ public class Attribute implements Comparable<Attribute> {
 		this.name = name;
 		this.valuesLiteral = new THashSet<>();
 		this.valuesNumericMin = Double.MAX_VALUE;
-		this.valuesNumericMax = Double.MIN_VALUE;
+		this.valuesNumericMax = -Double.MAX_VALUE;
 		this.valuesTimeMin = Long.MAX_VALUE;
 		this.valuesTimeMax = Long.MIN_VALUE;
 	}
@@ -42,14 +42,14 @@ public class Attribute implements Comparable<Attribute> {
 		switch (type) {
 			case traceDuration :
 				valuesNumericMin = Double.MAX_VALUE;
-				valuesNumericMax = Double.MIN_VALUE;
+				valuesNumericMax = -Double.MAX_VALUE;
 				break;
 			case literal :
 				valuesLiteral = new THashSet<>();
 				break;
 			case numeric :
 				valuesNumericMin = Double.MAX_VALUE;
-				valuesNumericMax = Double.MIN_VALUE;
+				valuesNumericMax = -Double.MAX_VALUE;
 				break;
 			case time :
 				valuesTimeMin = Long.MAX_VALUE;
@@ -70,7 +70,7 @@ public class Attribute implements Comparable<Attribute> {
 		valuesLiteral.add(attribute.toString());
 		if (type == type.undecided) {
 			double numeric = parseDoubleFast(attribute);
-			if (numeric != Double.MIN_VALUE) {
+			if (numeric != -Double.MAX_VALUE) {
 				type = type.numeric;
 			} else {
 				long time = parseTimeFast(attribute);
@@ -84,7 +84,7 @@ public class Attribute implements Comparable<Attribute> {
 		//process numeric
 		if (type == type.numeric) {
 			double numeric = parseDoubleFast(attribute);
-			if (numeric != Double.MIN_VALUE) {
+			if (numeric != -Double.MAX_VALUE) {
 				//this is a number
 				valuesNumericMin = Math.min(valuesNumericMin, numeric);
 				valuesNumericMax = Math.max(valuesNumericMax, numeric);
@@ -223,7 +223,7 @@ public class Attribute implements Comparable<Attribute> {
 	}
 
 	/**
-	 * See if the given attribute has a numeric value. Returns Double.MIN_VALUE
+	 * See if the given attribute has a numeric value. Returns -Double.MAX_VALUE
 	 * if not.
 	 * 
 	 * @param attribute
@@ -239,9 +239,9 @@ public class Attribute implements Comparable<Attribute> {
 			}
 		} else if (isStringNumeric(attribute.toString())) {
 			//the attribute was declared to be a string, check if it is not a number anyway
-			return NumberUtils.toDouble(attribute.toString(), Double.MIN_VALUE);
+			return NumberUtils.toDouble(attribute.toString(), -Double.MAX_VALUE);
 		}
-		return Double.MIN_VALUE;
+		return -Double.MAX_VALUE;
 	}
 
 	public static boolean isStringNumeric(String str) {

@@ -3,11 +3,30 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class Correlation {
-	public static BigDecimal correlation(double[] valuesX, double[] valuesY) {
+import org.processmining.plugins.InductiveMiner.Pair;
 
-		if (valuesX.length == 0) {
-			return BigDecimal.valueOf(Double.MIN_VALUE);
+import gnu.trove.list.array.TDoubleArrayList;
+
+public class Correlation {
+
+	public static Pair<double[], double[]> filterMissingValues(double[] valuesX, double[] valuesY) {
+		TDoubleArrayList newValuesX = new TDoubleArrayList();
+		TDoubleArrayList newValuesY = new TDoubleArrayList();
+
+		for (int i = 0; i < valuesX.length; i++) {
+			if (valuesX[i] > -Double.MAX_VALUE && valuesY[i] > -Double.MAX_VALUE) {
+				newValuesX.add(valuesX[i]);
+				newValuesY.add(valuesY[i]);
+			}
+		}
+
+		return Pair.of(newValuesX.toArray(), newValuesY.toArray());
+	}
+
+	public static double correlation(double[] valuesX, double[] valuesY) {
+
+		if (valuesX.length <= 1) {
+			return -Double.MAX_VALUE;
 		}
 
 		BigDecimal meanX = mean(valuesX);
@@ -16,7 +35,7 @@ public class Correlation {
 		BigDecimal standardDeviationY = new BigDecimal(standardDeviation(valuesY, meanY));
 
 		if (standardDeviationX.equals(BigDecimal.ZERO) || standardDeviationY.equals(BigDecimal.ZERO)) {
-			return BigDecimal.valueOf(Double.MIN_VALUE);
+			return -Double.MAX_VALUE;
 		}
 
 		BigDecimal sum = BigDecimal.ZERO;
@@ -27,7 +46,7 @@ public class Correlation {
 					RoundingMode.HALF_UP);
 			sum = sum.add(x.multiply(y));
 		}
-		return sum.divide(BigDecimal.valueOf(valuesX.length - 1), 10, RoundingMode.HALF_UP);
+		return sum.divide(BigDecimal.valueOf(valuesX.length - 1), 10, RoundingMode.HALF_UP).doubleValue();
 	}
 
 	public static BigDecimal mean(double[] values) {
