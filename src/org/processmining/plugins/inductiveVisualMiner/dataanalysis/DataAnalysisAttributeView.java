@@ -89,19 +89,27 @@ public class DataAnalysisAttributeView extends JPanel {
 				for (Field field : Field.values()) {
 					left.add(createLabel(field + " (highlighted traces)"));
 					if (data.get(field) > -Double.MAX_VALUE) {
-						right.add(createLabel(DataAnalysis.getString(attribute, data.get(field))));
+						if (field.forcedNumeric()) {
+							right.add(createLabel(DataAnalysis.numberFormat.format(data.get(field))));
+						} else {
+							right.add(createLabel(DataAnalysis.getString(attribute, data.get(field))));
+						}
 					} else {
 						right.add(createLabel("n/a"));
 					}
 				}
 
-				//other fields: 
+				//other fields: negative log
 				AttributeData dataNegative = dataAnalysis.getAttributeDataNegative(attribute);
 				if (dataNegative != null) {
 					for (Field field : Field.values()) {
 						left.add(createLabel(field + " (non-highlighted traces)"));
 						if (data.get(field) > -Double.MAX_VALUE) {
-							right.add(createLabel(DataAnalysis.getString(attribute, dataNegative.get(field))));
+							if (field.forcedNumeric()) {
+								right.add(createLabel(DataAnalysis.numberFormat.format(dataNegative.get(field))));
+							} else {
+								right.add(createLabel(DataAnalysis.getString(attribute, dataNegative.get(field))));
+							}
 						} else {
 							right.add(createLabel("n/a"));
 						}
@@ -112,7 +120,11 @@ public class DataAnalysisAttributeView extends JPanel {
 				for (Field field : Field.values()) {
 					left.add(createLabel(field));
 					if (data.get(field) > -Double.MAX_VALUE) {
-						right.add(createLabel(DataAnalysis.getString(attribute, data.get(field))));
+						if (field.forcedNumeric()) {
+							right.add(createLabel(DataAnalysis.numberFormat.format(data.get(field))));
+						} else {
+							right.add(createLabel(DataAnalysis.getString(attribute, data.get(field))));
+						}
 					} else {
 						right.add(createLabel("n/a"));
 					}
@@ -179,7 +191,7 @@ public class DataAnalysisAttributeView extends JPanel {
 		//		}
 	}
 
-	private static JLabel createLabel(Object string) {
+	private static JLabel createLabel(final Object string) {
 		JLabel label = new JLabel(string.toString()) {
 			public String toString() {
 				return string.toString();

@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -35,22 +36,58 @@ public class DataAnalysis {
 				public String toString() {
 					return "minimum";
 				}
+
+				public boolean forcedNumeric() {
+					return false;
+				}
+			},
+			average {
+				public String toString() {
+					return "average";
+				}
+
+				public boolean forcedNumeric() {
+					return false;
+				}
 			},
 			max {
 				public String toString() {
 					return "maximum";
+				}
+
+				public boolean forcedNumeric() {
+					return false;
+				}
+			},
+			median {
+				public String toString() {
+					return "median";
+				}
+
+				public boolean forcedNumeric() {
+					return false;
 				}
 			},
 			correlation {
 				public String toString() {
 					return "correlation with fitness";
 				}
-			},
+
+				public boolean forcedNumeric() {
+					return true;
+				}
+			};
+
+			public abstract boolean forcedNumeric();
 		}
 
 		private double values[] = new double[Field.values().length];
 
 		private BufferedImage correlationDensityPlot;
+
+		public AttributeData() {
+			Arrays.fill(values, -Double.MAX_VALUE);
+		}
 
 		public double get(Field field) {
 			return values[field.ordinal()];
@@ -168,6 +205,8 @@ public class DataAnalysis {
 		}
 
 		result.set(Field.min, min);
+		result.set(Field.average, Correlation.mean(values).doubleValue());
+		result.set(Field.median, Correlation.median(values));
 		result.set(Field.max, max);
 
 		//filter missing values
