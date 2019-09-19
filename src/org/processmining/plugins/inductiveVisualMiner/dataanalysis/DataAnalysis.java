@@ -345,7 +345,8 @@ public class DataAnalysis {
 			return null;
 		}
 
-		result.set(Field.average, Correlation.mean(valuesFiltered).doubleValue());
+		BigDecimal valuesAverage = Correlation.mean(valuesFiltered);
+		result.set(Field.average, valuesAverage.doubleValue());
 
 		if (canceller.isCancelled()) {
 			return null;
@@ -363,14 +364,15 @@ public class DataAnalysis {
 			return null;
 		}
 
-		result.set(Field.standardDeviation,
-				Correlation.standardDeviation(valuesFiltered, BigDecimal.valueOf(result.getNumber(Field.average))));
+		double valuesStandardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
+		result.set(Field.standardDeviation, valuesStandardDeviation);
 
 		if (canceller.isCancelled()) {
 			return null;
 		}
 
-		result.set(Field.correlation, Correlation.correlation(fitnessFiltered, valuesFiltered));
+		result.set(Field.correlation, Correlation
+				.correlation(fitnessFiltered, valuesFiltered, valuesAverage, valuesStandardDeviation).doubleValue());
 
 		if (canceller.isCancelled()) {
 			return null;

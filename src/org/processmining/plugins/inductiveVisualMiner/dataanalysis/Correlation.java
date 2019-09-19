@@ -79,18 +79,18 @@ public class Correlation {
 		return partitionIterative(arr, left, right);
 	}
 
-	public static double correlation(double[] valuesX, double[] valuesY) {
+	public static BigDecimal correlation(double[] valuesX, double[] valuesY, BigDecimal meanY,
+			double standardDeviationYd) {
 		if (valuesX.length <= 1) {
-			return -Double.MAX_VALUE;
+			return BigDecimal.valueOf(-Double.MAX_VALUE);
 		}
 
 		BigDecimal meanX = mean(valuesX);
 		BigDecimal standardDeviationX = new BigDecimal(standardDeviation(valuesX, meanX));
-		BigDecimal meanY = mean(valuesY);
-		BigDecimal standardDeviationY = new BigDecimal(standardDeviation(valuesY, meanY));
+		BigDecimal standardDeviationY = BigDecimal.valueOf(standardDeviationYd);
 
-		if (standardDeviationX.equals(BigDecimal.ZERO) || standardDeviationY.equals(BigDecimal.ZERO)) {
-			return -Double.MAX_VALUE;
+		if (standardDeviationX.compareTo(BigDecimal.ZERO) == 0 || standardDeviationY.compareTo(BigDecimal.ZERO) == 0) {
+			return BigDecimal.valueOf(-Double.MAX_VALUE);
 		}
 
 		BigDecimal sum = BigDecimal.ZERO;
@@ -101,7 +101,7 @@ public class Correlation {
 					RoundingMode.HALF_UP);
 			sum = sum.add(x.multiply(y));
 		}
-		return sum.divide(BigDecimal.valueOf(valuesX.length - 1), 10, RoundingMode.HALF_UP).doubleValue();
+		return sum.divide(BigDecimal.valueOf(valuesX.length - 1), 10, RoundingMode.HALF_UP);
 	}
 
 	public static BigDecimal mean(double[] values) {
@@ -117,13 +117,19 @@ public class Correlation {
 	}
 
 	public static double standardDeviation(double[] values, BigDecimal mean) {
-		BigDecimal sum = BigDecimal.ZERO;
-		for (double value : values) {
-			BigDecimal p = BigDecimal.valueOf(value).subtract(mean).pow(2);
-			sum = sum.add(p);
-		}
-		BigDecimal d = sum.divide(BigDecimal.valueOf(values.length - 1), 10, RoundingMode.HALF_UP);
+		if (values.length > 1) {
+			BigDecimal sum = BigDecimal.ZERO;
+			for (double value : values) {
+				BigDecimal p = BigDecimal.valueOf(value).subtract(mean).pow(2);
+				sum = sum.add(p);
+			}
+			BigDecimal d = sum.divide(BigDecimal.valueOf(values.length - 1), 10, RoundingMode.HALF_UP);
 
-		return Math.sqrt(d.doubleValue());
+			return Math.sqrt(d.doubleValue());
+		} else if (values.length == 1) {
+			return 0;
+		} else {
+			return -Double.MAX_VALUE;
+		}
 	}
 }
