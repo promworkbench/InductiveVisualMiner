@@ -24,6 +24,7 @@ public class Correlation {
 	}
 
 	public static double median(double[] values) {
+		values = values.clone();
 		if (values.length % 2 == 1) {
 			return quickSelect(values, 0, values.length - 1, values.length / 2);
 		} else {
