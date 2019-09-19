@@ -105,11 +105,15 @@ public class Correlation {
 	}
 
 	public static BigDecimal mean(double[] values) {
-		BigDecimal sum = BigDecimal.ZERO;
-		for (double value : values) {
-			sum = sum.add(BigDecimal.valueOf(value));
+		if (values.length > 0) {
+			BigDecimal sum = BigDecimal.ZERO;
+			for (double value : values) {
+				sum = sum.add(BigDecimal.valueOf(value));
+			}
+			return sum.divide(BigDecimal.valueOf(values.length), 10, RoundingMode.HALF_UP);
+		} else {
+			return BigDecimal.ZERO;
 		}
-		return sum.divide(BigDecimal.valueOf(values.length), 10, RoundingMode.HALF_UP);
 	}
 
 	public static double standardDeviation(double[] values, BigDecimal mean) {

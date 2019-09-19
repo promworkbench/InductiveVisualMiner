@@ -20,7 +20,7 @@ public class Cl15DataAnalysis
 
 	protected DataAnalysis executeLink(Triple<IvMLogNotFiltered, IvMLogFiltered, AttributesInfo> input,
 			IvMCanceller canceller) throws Exception {
-		return new DataAnalysis(input.getA(), input.getB(), input.getC());
+		return new DataAnalysis(input.getA(), input.getB(), input.getC(), canceller);
 	}
 
 	protected void processResult(DataAnalysis result, InductiveVisualMinerState state) {

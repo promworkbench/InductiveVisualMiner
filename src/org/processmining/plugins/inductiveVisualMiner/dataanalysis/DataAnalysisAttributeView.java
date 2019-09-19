@@ -13,6 +13,7 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.LayoutStyle;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.TitledBorder;
 
@@ -34,7 +35,6 @@ public class DataAnalysisAttributeView extends JPanel {
 
 	private final JPanel label;
 	private final GroupLayout labelLayout;
-	private final JLabel image;
 
 	public DataAnalysisAttributeView(Attribute attribute) {
 		this.attribute = attribute;
@@ -54,151 +54,179 @@ public class DataAnalysisAttributeView extends JPanel {
 		label.setLayout(labelLayout);
 		label.setOpaque(false);
 		add(label, BorderLayout.CENTER);
-
-		image = new JLabel();
-		add(image, BorderLayout.LINE_END);
 	}
 
 	public void set(DataAnalysis dataAnalysis) {
 		AttributeData data = dataAnalysis.getAttributeData(attribute);
 
-		//set image
-		BufferedImage im = data.getCorrelationDensityPlot();
-		if (im != null) {
-			ImageIcon icon = new ImageIcon(im);
-			image.setIcon(icon);
+		label.removeAll();
+		if (!dataAnalysis.isSomethingFiltered()) {
+			//full log without filters
+			List<JLabel> columnA = new ArrayList<>();
+			List<JLabel> columnB = new ArrayList<>();
+
+			columnA.add(createLabel("Full log:"));
+			columnB.add(createLabel(""));
+
+			processLog(data, columnA, columnB, "");
+
+			putInPanel(columnA, columnB);
 		} else {
-			image.setIcon(null);
-		}
+			//filtered log
 
-		//set text
-		{
-			label.removeAll();
-			List<JLabel> left = new ArrayList<>();
-			List<JLabel> right = new ArrayList<>();
-			if (dataAnalysis.isSomethingFiltered()) {
-				//minimum and maximum
-				{
-					left.add(createLabel("minimum (full log)"));
-					right.add(createLabel(DataAnalysis.getStringMin(attribute)));
-					left.add(createLabel("maximum (full log)"));
-					right.add(createLabel(DataAnalysis.getStringMax(attribute)));
-				}
+			List<JLabel> columnA = new ArrayList<>();
+			List<JLabel> columnB = new ArrayList<>();
+			List<JLabel> columnC = new ArrayList<>();
+			List<JLabel> columnD = new ArrayList<>();
 
-				//other fields: filtered log
-				for (Field field : Field.values()) {
-					left.add(createLabel(field + " (highlighted traces)"));
-					if (data.get(field) > -Double.MAX_VALUE) {
-						if (field.forcedNumeric()) {
-							right.add(createLabel(DataAnalysis.numberFormat.format(data.get(field))));
-						} else {
-							right.add(createLabel(DataAnalysis.getString(attribute, data.get(field))));
-						}
-					} else {
-						right.add(createLabel("n/a"));
-					}
-				}
+			//minimum and maximum
+			if (false) {
+				columnA.add(createLabel("minimum (full log)"));
+				columnB.add(createLabel(DataAnalysis.getStringMin(attribute)));
+				columnA.add(createLabel("maximum (full log)"));
+				columnB.add(createLabel(DataAnalysis.getStringMax(attribute)));
+			}
 
-				//other fields: negative log
-				AttributeData dataNegative = dataAnalysis.getAttributeDataNegative(attribute);
-				if (dataNegative != null) {
-					for (Field field : Field.values()) {
-						left.add(createLabel(field + " (non-highlighted traces)"));
-						if (data.get(field) > -Double.MAX_VALUE) {
-							if (field.forcedNumeric()) {
-								right.add(createLabel(DataAnalysis.numberFormat.format(dataNegative.get(field))));
-							} else {
-								right.add(createLabel(DataAnalysis.getString(attribute, dataNegative.get(field))));
-							}
-						} else {
-							right.add(createLabel("n/a"));
-						}
-					}
-				}
+			//other fields: filtered log
+			columnA.add(createLabel("Highlighted traces:"));
+			columnB.add(createLabel(""));
+			processLog(data, columnA, columnB, "");
+
+			//other fields: negative log
+			AttributeData dataNegative = dataAnalysis.getAttributeDataNegative(attribute);
+			if (dataNegative != null) {
+				columnC.add(createLabel("Non-highlighted traces:"));
+				columnD.add(createLabel(""));
+				processLog(dataNegative, columnC, columnD, "");
+				putInPanel(columnA, columnB, columnC, columnD);
 			} else {
-				//other fields
-				for (Field field : Field.values()) {
-					left.add(createLabel(field));
-					if (data.get(field) > -Double.MAX_VALUE) {
-						if (field.forcedNumeric()) {
-							right.add(createLabel(DataAnalysis.numberFormat.format(data.get(field))));
-						} else {
-							right.add(createLabel(DataAnalysis.getString(attribute, data.get(field))));
-						}
-					} else {
-						right.add(createLabel("n/a"));
-					}
-				}
-			}
-
-			//put into the panel
-			{
-				//vertical groups
-				{
-					Iterator<JLabel> itLeft = left.iterator();
-					Iterator<JLabel> itRight = right.iterator();
-					SequentialGroup sequentialGroup = labelLayout.createSequentialGroup();
-					while (itLeft.hasNext()) {
-						JLabel labelLeft = itLeft.next();
-						JLabel labelRight = itRight.next();
-
-						sequentialGroup = sequentialGroup.addGroup(
-								labelLayout.createParallelGroup().addComponent(labelLeft).addComponent(labelRight));
-					}
-					labelLayout.setVerticalGroup(sequentialGroup);
-				}
-
-				//horizontal group
-				{
-					ParallelGroup parallelGroup1 = labelLayout.createParallelGroup();
-					for (JLabel label : left) {
-						parallelGroup1.addComponent(label);
-					}
-					ParallelGroup parallelGroup2 = labelLayout.createParallelGroup();
-					for (JLabel label : right) {
-						parallelGroup2.addComponent(label);
-					}
-					labelLayout.setHorizontalGroup(
-							labelLayout.createSequentialGroup().addGroup(parallelGroup1).addGroup(parallelGroup2));
-				}
+				putInPanel(columnA, columnB);
 			}
 		}
-
-		//		if (false) {
-		//
-		//			StringBuilder text = new StringBuilder();
-		//			if (dataAnalysis.isSomethingFiltered()) {
-		//				//filtered log
-		//				double correlation = dataAnalysis.getCorrelation(attribute);
-		//				if (correlation != -Double.MAX_VALUE) {
-		//					text.append("Correlation with fitness " + correlation + " (highlighted traces)");
-		//				} else {
-		//					text.append("Correlation with fitness n/a (highlighted traces)\n");
-		//				}
-		//
-		//				//negative (non-highlighted traces)
-		//				double correlationNegative = dataAnalysis.getCorrelationNegative(attribute);
-		//				if (correlationNegative != -Double.MAX_VALUE) {
-		//					text.append("Correlation with fitness " + correlationNegative + " (non-highlighted traces)");
-		//				} else {
-		//					text.append("Correlation with fitness n/a (non-highlighted traces)");
-		//				}
-		//			} else {
-		//				//normal log
-		//			}
-		//
-		//			//label.setText(text.toString());
-		//		}
 	}
 
-	private static JLabel createLabel(final Object string) {
+	private void putInPanel(List<JLabel> columnA, List<JLabel> columnB, List<JLabel> columnC, List<JLabel> columnD) {
+		//vertical groups
+		{
+			Iterator<JLabel> itA = columnA.iterator();
+			Iterator<JLabel> itB = columnB.iterator();
+			Iterator<JLabel> itC = columnC.iterator();
+			Iterator<JLabel> itD = columnD.iterator();
+			SequentialGroup sequentialGroup = labelLayout.createSequentialGroup();
+			while (itA.hasNext()) {
+				JLabel labelA = itA.next();
+				JLabel labelB = itB.next();
+				JLabel labelC = itC.next();
+				JLabel labelD = itD.next();
+
+				sequentialGroup = sequentialGroup.addGroup(labelLayout.createParallelGroup().addComponent(labelA)
+						.addComponent(labelB).addComponent(labelC).addComponent(labelD));
+			}
+			labelLayout.setVerticalGroup(sequentialGroup);
+		}
+
+		//horizontal group
+		{
+			ParallelGroup parallelGroupA = labelLayout.createParallelGroup();
+			for (JLabel label : columnA) {
+				parallelGroupA.addComponent(label);
+			}
+			ParallelGroup parallelGroupB = labelLayout.createParallelGroup();
+			for (JLabel label : columnB) {
+				parallelGroupB.addComponent(label);
+			}
+			ParallelGroup parallelGroupC = labelLayout.createParallelGroup();
+			for (JLabel label : columnC) {
+				parallelGroupC.addComponent(label);
+			}
+			ParallelGroup parallelGroupD = labelLayout.createParallelGroup();
+			for (JLabel label : columnD) {
+				parallelGroupD.addComponent(label);
+			}
+			labelLayout.setHorizontalGroup(labelLayout.createSequentialGroup().addGroup(parallelGroupA)
+					.addGroup(parallelGroupB)
+					.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(parallelGroupC).addGroup(parallelGroupD));
+		}
+	}
+
+	public void putInPanel(List<JLabel> left, List<JLabel> right) {
+		//vertical groups
+		{
+			Iterator<JLabel> itLeft = left.iterator();
+			Iterator<JLabel> itRight = right.iterator();
+			SequentialGroup sequentialGroup = labelLayout.createSequentialGroup();
+			while (itLeft.hasNext()) {
+				JLabel labelLeft = itLeft.next();
+				JLabel labelRight = itRight.next();
+
+				sequentialGroup = sequentialGroup
+						.addGroup(labelLayout.createParallelGroup().addComponent(labelLeft).addComponent(labelRight));
+			}
+			labelLayout.setVerticalGroup(sequentialGroup);
+		}
+
+		//horizontal group
+		{
+			ParallelGroup parallelGroup1 = labelLayout.createParallelGroup();
+			for (JLabel label : left) {
+				parallelGroup1.addComponent(label);
+			}
+			ParallelGroup parallelGroup2 = labelLayout.createParallelGroup();
+			for (JLabel label : right) {
+				parallelGroup2.addComponent(label);
+			}
+			labelLayout.setHorizontalGroup(
+					labelLayout.createSequentialGroup().addGroup(parallelGroup1).addGroup(parallelGroup2));
+		}
+	}
+
+	public void processLog(AttributeData data, List<JLabel> left, List<JLabel> right, String postfix) {
+		for (Field field : Field.values()) {
+			left.add(createLabel(field + postfix));
+			switch (field.type()) {
+				case image :
+					BufferedImage im = data.getImage(field);
+					if (im != null) {
+						ImageIcon icon = new ImageIcon(im);
+						right.add(createLabel(icon));
+					} else {
+						right.add(createLabel("n/a"));
+					}
+					break;
+				case number :
+					if (data.getNumber(field) > -Double.MAX_VALUE) {
+						if (field.forcedNumeric()) {
+							right.add(createLabel(DataAnalysis.numberFormat.format(data.getNumber(field))));
+						} else {
+							right.add(createLabel(DataAnalysis.getString(attribute, data.getNumber(field))));
+						}
+					} else {
+						right.add(createLabel("n/a"));
+					}
+					break;
+				default :
+					break;
+			}
+		}
+	}
+
+	private static JLabel createLabel(final String string) {
 		JLabel label = new JLabel(string.toString()) {
+			private static final long serialVersionUID = -3542530385464222088L;
+
 			public String toString() {
 				return string.toString();
 			}
 		};
 		IvMDecorator.decorate(label);
 		label.setFont(IvMDecorator.fontLarger);
+		return label;
+	}
+
+	private static JLabel createLabel(final ImageIcon icon) {
+		JLabel label = new JLabel();
+		label.setIcon(icon);
 		return label;
 	}
 }

@@ -82,6 +82,7 @@ public class InductiveVisualMinerController {
 		this.panel = panel;
 		this.state = state;
 		this.context = context;
+
 		state.setGraphUserSettings(panel.getGraph().getUserSettings());
 		state.getGraphUserSettings().setDirection(GraphDirection.leftRight);
 
@@ -145,7 +146,7 @@ public class InductiveVisualMinerController {
 								onUpdateHighlighting));
 						panel.getTraceColourMapView().initialise(state.getAttributesInfo(), onUpdateTraceColourMap);
 					}
-					
+
 					//initialise the data analysis view
 					{
 						panel.getDataAnalysisView().initialiseAttributes(state.getAttributesInfo());

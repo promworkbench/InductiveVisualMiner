@@ -34,7 +34,7 @@ public class DataAnalysisView extends SideWindow {
 
 		attributesPanel = new DataAnalysisAttributesPanel();
 		scrollPane = new JScrollPane(attributesPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.getViewport().setBackground(IvMDecorator.backGroundColour1);
 		topPanel.add(scrollPane, BorderLayout.CENTER);
 

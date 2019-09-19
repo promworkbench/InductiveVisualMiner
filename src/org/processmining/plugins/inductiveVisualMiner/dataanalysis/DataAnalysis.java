@@ -1,14 +1,23 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.awt.image.BufferedImage;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.deckfour.xes.model.XAttribute;
+import org.math.plot.utils.Array;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysis.AttributeData.Field;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
@@ -18,6 +27,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapPropertyDuration;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import gnu.trove.map.hash.THashMap;
 
@@ -32,6 +43,19 @@ public class DataAnalysis {
 
 	public static class AttributeData {
 		public static enum Field {
+			set {
+				public String toString() {
+					return "traces with attribute";
+				}
+
+				public boolean forcedNumeric() {
+					return true;
+				}
+
+				public FieldType type() {
+					return FieldType.number;
+				}
+			},
 			min {
 				public String toString() {
 					return "minimum";
@@ -39,6 +63,10 @@ public class DataAnalysis {
 
 				public boolean forcedNumeric() {
 					return false;
+				}
+
+				public FieldType type() {
+					return FieldType.number;
 				}
 			},
 			average {
@@ -49,6 +77,10 @@ public class DataAnalysis {
 				public boolean forcedNumeric() {
 					return false;
 				}
+
+				public FieldType type() {
+					return FieldType.number;
+				}
 			},
 			max {
 				public String toString() {
@@ -57,6 +89,10 @@ public class DataAnalysis {
 
 				public boolean forcedNumeric() {
 					return false;
+				}
+
+				public FieldType type() {
+					return FieldType.number;
 				}
 			},
 			median {
@@ -67,6 +103,23 @@ public class DataAnalysis {
 				public boolean forcedNumeric() {
 					return false;
 				}
+
+				public FieldType type() {
+					return FieldType.number;
+				}
+			},
+			standardDeviation {
+				public String toString() {
+					return "standard deviation";
+				}
+
+				public boolean forcedNumeric() {
+					return false;
+				}
+
+				public FieldType type() {
+					return FieldType.number;
+				}
 			},
 			correlation {
 				public String toString() {
@@ -76,29 +129,55 @@ public class DataAnalysis {
 				public boolean forcedNumeric() {
 					return true;
 				}
+
+				public FieldType type() {
+					return FieldType.number;
+				}
+			},
+			correlationPlot {
+				public String toString() {
+					return "correlation plot";
+				}
+
+				public boolean forcedNumeric() {
+					return false;
+				}
+
+				public FieldType type() {
+					return FieldType.image;
+				}
 			};
 
 			public abstract boolean forcedNumeric();
+
+			public abstract FieldType type();
 		}
 
-		private double values[] = new double[Field.values().length];
+		public enum FieldType {
+			number, image
+		}
 
-		private BufferedImage correlationDensityPlot;
+		private double[] values = new double[Field.values().length];
+		private BufferedImage[] images = new BufferedImage[Field.values().length];
 
 		public AttributeData() {
 			Arrays.fill(values, -Double.MAX_VALUE);
 		}
 
-		public double get(Field field) {
+		public double getNumber(Field field) {
 			return values[field.ordinal()];
+		}
+
+		public BufferedImage getImage(Field field) {
+			return images[field.ordinal()];
 		}
 
 		private void set(Field field, double value) {
 			values[field.ordinal()] = value;
 		}
 
-		public BufferedImage getCorrelationDensityPlot() {
-			return correlationDensityPlot;
+		public void set(Field field, BufferedImage image) {
+			images[field.ordinal()] = image;
 		}
 	}
 
@@ -110,12 +189,12 @@ public class DataAnalysis {
 	Map<Attribute, AttributeData> attribute2data = new THashMap<>();
 	Map<Attribute, AttributeData> attribute2dataNegative = new THashMap<>();
 
-	private final double globalMinFitness;
-	private final double globalMaxFitness;
-	private final boolean isSomethingFiltered;
+	private double globalMinFitness;
+	private double globalMaxFitness;
+	private boolean isSomethingFiltered;
 
-	public DataAnalysis(IvMLogNotFiltered fullLog, IvMLogFiltered logFiltered, AttributesInfo attributes)
-			throws CloneNotSupportedException {
+	public DataAnalysis(IvMLogNotFiltered fullLog, final IvMLogFiltered logFiltered, AttributesInfo attributes,
+			final IvMCanceller canceller) throws CloneNotSupportedException, InterruptedException {
 		//compute global min and max fitness
 		{
 			double min = 1;
@@ -131,25 +210,68 @@ public class DataAnalysis {
 			globalMaxFitness = max;
 		}
 
+		if (canceller.isCancelled()) {
+			return;
+		}
+
 		isSomethingFiltered = logFiltered.isSomethingFiltered();
 
-		LogData logFilteredData = createLogData(logFiltered);
+		final LogData logFilteredData = createLogData(logFiltered);
 
-		IvMLogFilteredImpl logFilteredNegative = logFiltered.clone();
+		final IvMLogFilteredImpl logFilteredNegative = logFiltered.clone();
 		logFilteredNegative.invert();
-		LogData logFilteredDataNegative = createLogData(logFilteredNegative);
+		final LogData logFilteredDataNegative = createLogData(logFilteredNegative);
 
-		for (Attribute attribute : attributes.getTraceAttributes()) {
-			if (isSupported(attribute)) {
-				AttributeData data = createAttributeData(logFiltered, logFilteredData, attribute);
-				attribute2data.put(attribute, data);
+		final ConcurrentMap<Attribute, AttributeData> attribute2dataC = new ConcurrentHashMap<>();
+		final ConcurrentMap<Attribute, AttributeData> attribute2dataNegativeC = new ConcurrentHashMap<>();
+		ExecutorService executor = Executors.newFixedThreadPool(
+				Math.max(Runtime.getRuntime().availableProcessors() - 1, 1),
+				new ThreadFactoryBuilder().setNameFormat("ivm-thread-dataanalysis-%d").build());
+		try {
 
-				if (isSomethingFiltered) {
-					AttributeData dataNegative = createAttributeData(logFilteredNegative, logFilteredDataNegative,
-							attribute);
-					attribute2dataNegative.put(attribute, dataNegative);
+			for (Attribute attribute : attributes.getTraceAttributes()) {
+				if (isSupported(attribute)) {
+					final Attribute attribute2 = attribute;
+					executor.execute(new Runnable() {
+						public void run() {
+
+							if (canceller.isCancelled()) {
+								return;
+							}
+
+							AttributeData data = createAttributeData(logFiltered, logFilteredData, attribute2,
+									canceller);
+							attribute2dataC.put(attribute2, data);
+						}
+					});
+
+					if (isSomethingFiltered) {
+						executor.execute(new Runnable() {
+							public void run() {
+
+								if (canceller.isCancelled()) {
+									return;
+								}
+
+								AttributeData dataNegative = createAttributeData(logFilteredNegative,
+										logFilteredDataNegative, attribute2, canceller);
+								attribute2dataNegativeC.put(attribute2, dataNegative);
+							}
+						});
+					}
 				}
 			}
+			executor.shutdown();
+			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+		} finally {
+			executor.shutdownNow();
+		}
+
+		for (Entry<Attribute, AttributeData> e : attribute2dataC.entrySet()) {
+			attribute2data.put(e.getKey(), e.getValue());
+		}
+		for (Entry<Attribute, AttributeData> e : attribute2dataNegativeC.entrySet()) {
+			attribute2dataNegative.put(e.getKey(), e.getValue());
 		}
 	}
 
@@ -180,45 +302,83 @@ public class DataAnalysis {
 		return result;
 	}
 
-	public AttributeData createAttributeData(IvMLogFiltered logFiltered, LogData logData, Attribute attribute) {
+	public AttributeData createAttributeData(IvMLogFiltered logFiltered, LogData logData, Attribute attribute,
+			IvMCanceller canceller) {
 		AttributeData result = new AttributeData();
 
 		//compute correlation and plots
-		double[] values = new double[logData.numberOfTraces];
-		int i = 0;
-		double min = Double.MAX_VALUE;
-		double max = -Double.MAX_VALUE;
-		for (Iterator<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
-			IvMTrace trace = it.next();
-			double value = getDoubleValue(attribute, trace);
+		double[] fitnessFiltered;
+		double[] valuesFiltered;
+		{
+			double[] values = new double[logData.numberOfTraces];
+			int i = 0;
+			for (Iterator<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
+				IvMTrace trace = it.next();
+				double value = getDoubleValue(attribute, trace);
 
-			//keep track of min and max
-			if (value > -Double.MAX_VALUE) {
-				min = Math.min(min, value);
-				max = Math.max(max, value);
+				//store the value
+				values[i] = value;
+
+				i++;
 			}
 
-			//store the value
-			values[i] = value;
+			if (canceller.isCancelled()) {
+				return null;
+			}
 
-			i++;
+			//filter missing values
+			Pair<double[], double[]> p = Correlation.filterMissingValues(logData.fitness, values);
+			fitnessFiltered = p.getA();
+			valuesFiltered = p.getB();
 		}
 
-		result.set(Field.min, min);
-		result.set(Field.average, Correlation.mean(values).doubleValue());
-		result.set(Field.median, Correlation.median(values));
-		result.set(Field.max, max);
+		//we assume we always have a fitness value, so we can use the filtered lists
 
-		//filter missing values
-		Pair<double[], double[]> p = Correlation.filterMissingValues(logData.fitness, values);
-		double[] fitnessFiltered = p.getA();
-		double[] valuesFiltered = p.getB();
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
+		result.set(Field.set, valuesFiltered.length);
+		result.set(Field.min, Array.min(valuesFiltered));
+
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
+		result.set(Field.average, Correlation.mean(valuesFiltered).doubleValue());
+
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
+		result.set(Field.median, Correlation.median(valuesFiltered));
+
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
+		result.set(Field.max, Array.max(valuesFiltered));
+
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
+		result.set(Field.standardDeviation,
+				Correlation.standardDeviation(valuesFiltered, BigDecimal.valueOf(result.getNumber(Field.average))));
+
+		if (canceller.isCancelled()) {
+			return null;
+		}
 
 		result.set(Field.correlation, Correlation.correlation(fitnessFiltered, valuesFiltered));
 
-		result.correlationDensityPlot = CorrelationDensityPlot.create(attribute.getName(), valuesFiltered,
-				getDoubleMin(attribute), getDoubleMax(attribute), "fitness", fitnessFiltered, globalMinFitness,
-				globalMaxFitness);
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
+		result.set(Field.correlationPlot,
+				CorrelationDensityPlot.create(attribute.getName(), valuesFiltered, getDoubleMin(attribute),
+						getDoubleMax(attribute), "fitness", fitnessFiltered, globalMinFitness, globalMaxFitness));
 
 		return result;
 	}
