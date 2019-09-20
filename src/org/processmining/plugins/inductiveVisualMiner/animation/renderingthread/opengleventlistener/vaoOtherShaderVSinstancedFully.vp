@@ -1,11 +1,12 @@
-layout (location = 0) in vec2 position; //position in triangle
-layout (location = 1) in vec2 timeBounds; //start and end time of the token
-layout (location = 2) in vec2 opacityBounds; //start and end opacity of the bezier
-layout (location = 3) in vec3 colour; //token colour
-layout (location = 4) in vec2 bezier0; //first control point of the bezier
-layout (location = 5) in vec2 bezier1; //second control point of the bezier
-layout (location = 6) in vec2 bezier2; //third control point of the bezier
-layout (location = 7) in vec2 bezier3; //fourth control point of the bezier
+#version 130
+attribute vec2 position;
+attribute vec2 timeBounds;
+attribute vec2 opacityBounds;
+attribute vec3 colour;
+attribute vec2 bezier0;
+attribute vec2 bezier1;
+attribute vec2 bezier2;
+attribute vec2 bezier3;
 
 uniform float time;
 uniform vec2 imageSize;
@@ -15,7 +16,6 @@ uniform vec2 userTranslate;
 out vec4 fColor;
 
 varying vec2 texture_coordinate;
-flat out int instanceID;
 
 vec2 toDevice(in vec2 imageCoordinates, in vec2 imageSize) {
 	return vec2((imageCoordinates / imageSize) * 2 - 1);
@@ -84,5 +84,4 @@ void main()
     
     gl_Position = choose * posBezier + (1 - choose) * vec4(-100, -100, -100, 0);
     texture_coordinate = vec2(position.xy);
-    instanceID = gl_InstanceID;
 }

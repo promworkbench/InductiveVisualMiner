@@ -1,5 +1,5 @@
+#version 130
 varying vec2 texture_coordinate;
-flat in int instanceID;
 
 in vec4 fColor;
 

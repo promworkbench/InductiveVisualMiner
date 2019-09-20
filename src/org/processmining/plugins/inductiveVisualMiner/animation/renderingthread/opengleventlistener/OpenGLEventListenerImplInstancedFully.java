@@ -16,6 +16,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
+import com.jogamp.opengl.util.glsl.ShaderProgram;
 import com.kitfox.svg.animation.Bezier;
 
 /**
@@ -55,19 +56,37 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 		gl.glDisable(GL2.GL_CULL_FACE);
 
 		//set up the shaders
-		{
-			if (RendererFactory.christmas) {
-				shader = new JoglShader(
-						"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengleventlistener",
-						"vaoOtherShaderVSinstancedFully", "vaoOtherShaderFSinstancedFullyChristmas");
-			} else {
-				shader = new JoglShader(
-						"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengleventlistener",
-						"vaoOtherShaderVSinstancedFully", "vaoOtherShaderFSinstancedFully");
-			}
-			shader.Create(pipeLine);
-			shader.Bind(pipeLine);
+
+		String vertexShader;
+		String fragmentShader;
+		if (RendererFactory.christmas) {
+			vertexShader = "vaoOtherShaderVSinstancedFully";
+			fragmentShader = "vaoOtherShaderFSinstancedFullyChristmas";
+		} else {
+			vertexShader = "vaoOtherShaderVSinstancedFully";
+			fragmentShader = "vaoOtherShaderFSinstancedFully";
 		}
+
+		shader = new JoglShader(
+				"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengleventlistener",
+				vertexShader, fragmentShader, false) {
+			@Override
+			public void linkShader(GL2 gl, ShaderProgram sp0) {
+				getShaderState().attachShaderProgram(gl, sp0, false);
+				getShaderState().bindAttribLocation(gl, 0, "position");
+				getShaderState().bindAttribLocation(gl, 1, "timeBounds");
+				getShaderState().bindAttribLocation(gl, 2, "opacityBounds");
+				getShaderState().bindAttribLocation(gl, 3, "colour");
+				getShaderState().bindAttribLocation(gl, 4, "bezier0");
+				getShaderState().bindAttribLocation(gl, 5, "bezier1");
+				getShaderState().bindAttribLocation(gl, 6, "bezier2");
+				getShaderState().bindAttribLocation(gl, 7, "bezier3");
+				getShaderState().shaderProgram().link(gl, System.err);
+			}
+		};
+
+		shader.Create(pipeLine);
+		shader.Bind(pipeLine);
 
 		//set up quad to draw the circles on later
 		{
