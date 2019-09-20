@@ -130,6 +130,20 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 				"changeInitialAnimation");
 		getActionMap().put("changeInitialAnimation", animationEnabledChanged);
 
+		//set up listener for about message (ctrl a)
+		Action aboutChanged = new AbstractAction() {
+			private static final long serialVersionUID = -8518809641877095503L;
+
+			public void actionPerformed(ActionEvent e) {
+				InductiveVisualMinerAboutMessage.show(InductiveVisualMinerAnimationPanel.this);
+			}
+		};
+		helperControlsShortcuts.add("ctrl a");
+		helperControlsExplanations.add("about");
+		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK),
+				"showAbout");
+		getActionMap().put("showAbout", aboutChanged);
+
 		//set up listener for image transformation (zooming, panning, resizing) changes
 		setImageTransformationChangedListener(new ImageTransformationChangedListener() {
 			public void imageTransformationChanged(AffineTransform image2user, AffineTransform user2image) {
