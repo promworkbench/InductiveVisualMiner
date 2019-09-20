@@ -60,47 +60,41 @@ public class DataAnalysisAttributeView extends JPanel {
 		AttributeData data = dataAnalysis.getAttributeData(attribute);
 
 		label.removeAll();
-		if (!dataAnalysis.isSomethingFiltered()) {
-			//full log without filters
-			List<JLabel> columnA = new ArrayList<>();
-			List<JLabel> columnB = new ArrayList<>();
+		if (data != null) {
+			if (!dataAnalysis.isSomethingFiltered()) {
+				//full log without filters
+				List<JLabel> columnA = new ArrayList<>();
+				List<JLabel> columnB = new ArrayList<>();
 
-			columnA.add(createLabel("Full log:"));
-			columnB.add(createLabel(""));
+				columnA.add(createLabel("Full log:"));
+				columnB.add(createLabel(""));
 
-			processLog(data, columnA, columnB, "");
+				processLog(data, columnA, columnB, "");
 
-			putInPanel(columnA, columnB);
-		} else {
-			//filtered log
-
-			List<JLabel> columnA = new ArrayList<>();
-			List<JLabel> columnB = new ArrayList<>();
-			List<JLabel> columnC = new ArrayList<>();
-			List<JLabel> columnD = new ArrayList<>();
-
-			//minimum and maximum
-			if (false) {
-				columnA.add(createLabel("minimum (full log)"));
-				columnB.add(createLabel(DataAnalysis.getStringMin(attribute)));
-				columnA.add(createLabel("maximum (full log)"));
-				columnB.add(createLabel(DataAnalysis.getStringMax(attribute)));
-			}
-
-			//other fields: filtered log
-			columnA.add(createLabel("Highlighted traces:"));
-			columnB.add(createLabel(""));
-			processLog(data, columnA, columnB, "");
-
-			//other fields: negative log
-			AttributeData dataNegative = dataAnalysis.getAttributeDataNegative(attribute);
-			if (dataNegative != null) {
-				columnC.add(createLabel("Non-highlighted traces:"));
-				columnD.add(createLabel(""));
-				processLog(dataNegative, columnC, columnD, "");
-				putInPanel(columnA, columnB, columnC, columnD);
-			} else {
 				putInPanel(columnA, columnB);
+			} else {
+				//filtered log
+
+				List<JLabel> columnA = new ArrayList<>();
+				List<JLabel> columnB = new ArrayList<>();
+				List<JLabel> columnC = new ArrayList<>();
+				List<JLabel> columnD = new ArrayList<>();
+
+				//other fields: filtered log
+				columnA.add(createLabel("Highlighted traces:"));
+				columnB.add(createLabel(""));
+				processLog(data, columnA, columnB, "");
+
+				//other fields: negative log
+				AttributeData dataNegative = dataAnalysis.getAttributeDataNegative(attribute);
+				if (dataNegative != null) {
+					columnC.add(createLabel("Non-highlighted traces:"));
+					columnD.add(createLabel(""));
+					processLog(dataNegative, columnC, columnD, "");
+					putInPanel(columnA, columnB, columnC, columnD);
+				} else {
+					putInPanel(columnA, columnB);
+				}
 			}
 		}
 	}

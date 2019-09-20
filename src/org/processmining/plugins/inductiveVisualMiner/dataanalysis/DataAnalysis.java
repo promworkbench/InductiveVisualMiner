@@ -241,7 +241,9 @@ public class DataAnalysis {
 
 							AttributeData data = createAttributeData(logFiltered, logFilteredData, attribute2,
 									canceller);
-							attribute2dataC.put(attribute2, data);
+							if (data != null) {
+								attribute2dataC.put(attribute2, data);
+							}
 						}
 					});
 
@@ -255,7 +257,9 @@ public class DataAnalysis {
 
 								AttributeData dataNegative = createAttributeData(logFilteredNegative,
 										logFilteredDataNegative, attribute2, canceller);
-								attribute2dataNegativeC.put(attribute2, dataNegative);
+								if (dataNegative != null) {
+									attribute2dataNegativeC.put(attribute2, dataNegative);
+								}
 							}
 						});
 					}
@@ -339,6 +343,12 @@ public class DataAnalysis {
 		}
 
 		result.set(Field.set, valuesFiltered.length);
+
+		//if the list is empty, better fail now and do not attempt the rest
+		if (valuesFiltered.length == 0) {
+			return result;
+		}
+
 		result.set(Field.min, Array.min(valuesFiltered));
 
 		if (canceller.isCancelled()) {

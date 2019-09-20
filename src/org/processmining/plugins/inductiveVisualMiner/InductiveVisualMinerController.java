@@ -57,6 +57,7 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExporterStatistics;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.UserStatus;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
@@ -76,11 +77,13 @@ public class InductiveVisualMinerController {
 
 	private final Chain chain;
 	private final PluginContext context;
+	private final UserStatus userStatus;
 
 	public InductiveVisualMinerController(final PluginContext context, final InductiveVisualMinerPanel panel,
 			final InductiveVisualMinerState state, ProMCanceller canceller) {
 		this.panel = panel;
 		this.state = state;
+		this.userStatus = new UserStatus();
 		this.context = context;
 
 		state.setGraphUserSettings(panel.getGraph().getUserSettings());
@@ -92,7 +95,7 @@ public class InductiveVisualMinerController {
 		//set up exception handling
 		final OnException onException = new OnException() {
 			public void onException(Exception e) {
-				setStatus("- error - aborted -");
+				setStatus("- error - aborted -", 0);
 			}
 		};
 
@@ -113,11 +116,12 @@ public class InductiveVisualMinerController {
 		{
 			gatherAttributes.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Gathering attributes..");
+					setStatus("Gathering attributes..", 1);
 				}
 			});
 			gatherAttributes.setOnComplete(new Runnable() {
 				public void run() {
+					setStatus(null, 1);
 					panel.getClassifiers().setEnabled(true);
 
 					//update the classifier combobox
@@ -167,18 +171,18 @@ public class InductiveVisualMinerController {
 			sortEvents.setOnStart(new Runnable() {
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
-					setStatus("Checking time stamps..");
+					setStatus("Checking time stamps..", 2);
 					setAnimationStatus(" ", false);
 				}
 			});
 			sortEvents.setOnComplete(new Runnable() {
 				public void run() {
-
+					setStatus(null, 2);
 				}
 			});
 			sortEvents.setOnIllogicalTimeStamps(new Function<Object, Boolean>() {
 				public Boolean call(Object input) throws Exception {
-					setStatus("Illogical time stamps; aborted.");
+					setStatus("Illogical time stamps; aborted.", 2);
 					String[] options = new String[] { "Continue with neither animation nor performance",
 							"Reorder events" };
 					int n = JOptionPane.showOptionDialog(panel,
@@ -204,11 +208,12 @@ public class InductiveVisualMinerController {
 		{
 			makeLog.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Making log..");
+					setStatus("Making log..", 3);
 				}
 			});
 			makeLog.setOnComplete(new Runnable() {
 				public void run() {
+					setStatus(null, 3);
 					panel.getTraceView().set(state.getLog(), state.getTraceColourMap());
 
 					state.getFiltersController().updateFiltersWithIMLog(panel, state.getLog(), state.getSortedXLog(),
@@ -225,7 +230,12 @@ public class InductiveVisualMinerController {
 		{
 			filterLogOnActivities.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Filtering activities..");
+					setStatus("Filtering activities..", 4);
+				}
+			});
+			filterLogOnActivities.setOnComplete(new Runnable() {
+				public void run() {
+					setStatus(null, 4);
 				}
 			});
 			filterLogOnActivities.setOnException(onException);
@@ -238,12 +248,13 @@ public class InductiveVisualMinerController {
 		{
 			mine.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Mining..");
+					setStatus("Mining..", 5);
 					setAnimationStatus(" ", false);
 				}
 			});
 			mine.setOnComplete(new Runnable() {
 				public void run() {
+					setStatus(null, 5);
 					panel.getSaveModelButton().setEnabled(true);
 					panel.getEditModelView().setModel(state.getModel());
 				}
@@ -265,11 +276,12 @@ public class InductiveVisualMinerController {
 		{
 			layoutModel.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Layouting model..");
+					setStatus("Layouting model..", 6);
 				}
 			});
 			layoutModel.setOnComplete(new Runnable() {
 				public void run() {
+					setStatus(null, 6);
 					panel.getGraph().changeDot(state.getDot(), state.getSVGDiagram(), true);
 				}
 			});
@@ -283,11 +295,12 @@ public class InductiveVisualMinerController {
 		{
 			align.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Aligning log and model..");
+					setStatus("Aligning log and model..", 7);
 				}
 			});
 			align.setOnComplete(new Runnable() {
 				public void run() {
+					setStatus(null, 7);
 					panel.getSaveLogButton().setEnabled(true);
 					panel.getTraceView().set(state.getModel(), state.getIvMLog(), state.getSelection(),
 							state.getTraceColourMap());
@@ -311,7 +324,7 @@ public class InductiveVisualMinerController {
 		{
 			layoutAlignment.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Layouting aligned model..");
+					setStatus("Layouting aligned model..", 8);
 
 					//if the view does not show deviations, do not select any log moves
 					if (!state.getMode().isShowDeviations()) {
@@ -321,6 +334,7 @@ public class InductiveVisualMinerController {
 			});
 			layoutAlignment.setOnComplete(new Runnable() {
 				public void run() {
+					setStatus(null, 8);
 					panel.getGraph().changeDot(state.getDot(), state.getSVGDiagram(), true);
 
 					makeElementsSelectable(state.getVisualisationInfo(), panel, state.getSelection());
@@ -340,7 +354,12 @@ public class InductiveVisualMinerController {
 		{
 			animationScaler.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Scaling animation..");
+					setStatus("Scaling animation..", 9);
+				}
+			});
+			animationScaler.setOnComplete(new Runnable() {
+				public void run() {
+					setStatus(null, 9);
 				}
 			});
 			animationScaler.setOnException(onException);
@@ -353,12 +372,14 @@ public class InductiveVisualMinerController {
 		{
 			animate.setOnStart(new Runnable() {
 				public void run() {
-					setAnimationStatus("Creating animation.. ", false);
+					setStatus("Creating animation.. ", 10);
+					setAnimationStatus(" ", false);
 				}
 			});
 
 			animate.setOnComplete(new Runnable() {
 				public void run() {
+					setStatus(null, 10);
 					if (state.getAnimationGraphVizTokens() != null) {
 						//animation enabled; store the result
 						panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
@@ -397,11 +418,13 @@ public class InductiveVisualMinerController {
 		{
 			traceColouring.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Colouring traces..");
+					setStatus("Colouring traces..", 11);
 				}
 			});
 			traceColouring.setOnComplete(new Runnable() {
 				public void run() {
+					setStatus(null, 11);
+
 					//tell the animation and the trace view the trace colour map
 					panel.getGraph().setTraceColourMap(state.getTraceColourMap());
 					panel.getTraceView().setTraceColourMap(state.getTraceColourMap());
@@ -420,11 +443,12 @@ public class InductiveVisualMinerController {
 		{
 			filterNodeSelection.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Highlighting selection..");
+					setStatus("Highlighting selection..", 12);
 				}
 			});
 			filterNodeSelection.setOnComplete(new Runnable() {
 				public void run() {
+					setStatus(null, 12);
 					HighlightingFiltersView.updateSelectionDescription(panel, state.getSelection(),
 							state.getFiltersController(), state.getModel());
 
@@ -468,11 +492,12 @@ public class InductiveVisualMinerController {
 		{
 			performance.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Measuring performance..");
+					setStatus("Measuring performance..", 13);
 				}
 			});
 			performance.setOnComplete(new Runnable() {
 				public void run() {
+					setStatus(null, 13);
 					try {
 						updateHighlighting();
 						PopupPopulator.updatePopup(panel, state);
@@ -503,12 +528,12 @@ public class InductiveVisualMinerController {
 		{
 			histogram.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Computing histogram..");
+					setStatus("Computing histogram..", 14);
 				}
 			});
 			histogram.setOnComplete(new Runnable() {
 				public void run() {
-					setStatus(" ");
+					setStatus(null, 14);
 					//pass the histogram data to the panel
 					panel.getGraph().setHistogramData(state.getHistogramData());
 					panel.getGraph().repaint();
@@ -525,12 +550,12 @@ public class InductiveVisualMinerController {
 		{
 			dataAnalysis.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("Performing data analysis..");
+					setStatus("Performing data analysis..", 15);
 				}
 			});
 			dataAnalysis.setOnComplete(new Runnable() {
 				public void run() {
-					setStatus(" ");
+					setStatus(null, 15);
 					panel.getDataAnalysisView().setDataAnalysis(state.getDataAnalysis());
 				}
 			});
@@ -548,12 +573,17 @@ public class InductiveVisualMinerController {
 		{
 			done.setOnStart(new Runnable() {
 				public void run() {
-					setStatus("done");
+					setStatus("done", 16);
 				}
 			});
 			done.setOnComplete(new Runnable() {
 				public void run() {
-					setStatus(" ");
+					setStatus(null, 16);
+				}
+			});
+			done.setOnInvalidate(new Runnable() {
+				public void run() {
+					setStatus(null, 16);
 				}
 			});
 		}
@@ -900,8 +930,10 @@ public class InductiveVisualMinerController {
 		}
 	}
 
-	public synchronized void setStatus(String s) {
-		panel.getStatusLabel().setText(s);
+	public synchronized void setStatus(String message, int number) {
+		userStatus.setStatus(message, number);
+		panel.getStatusLabel().setText(userStatus.getText());
+		panel.getStatusLabel().repaint();
 	}
 
 	public synchronized void setAnimationStatus(String s, boolean isTime) {

@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner;
+package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -11,12 +11,13 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 
-public class InductiveVisualMinerAboutMessage {
+public class AboutMessage {
 
 	public static void show(JComponent parent) {
 
@@ -80,7 +81,7 @@ public class InductiveVisualMinerAboutMessage {
 		Component[] m = c.getComponents();
 		for (int i = 0; i < m.length; i++) {
 
-			if (m[i].getClass().getName() == "javax.swing.JPanel") {
+			if (m[i] instanceof JPanel) {
 				m[i].setBackground(IvMDecorator.backGroundColour1);
 			}
 

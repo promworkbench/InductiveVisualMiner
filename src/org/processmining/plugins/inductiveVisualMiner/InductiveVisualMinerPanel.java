@@ -197,28 +197,27 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			}
 
 			//secondary classifiers
-			/*{
-				classifierSecondLabel = new JLabel("2nd Classifier");
-				IvMDecorator.decorate(classifierSecondLabel);
-				classifierSecondLabel.setBorder(leftBorder);
-				GridBagConstraints cClassifierLabel = new GridBagConstraints();
-				cClassifierLabel.gridx = 0;
-				cClassifierLabel.gridy = gridy;
-				cClassifierLabel.gridwidth = 1;
-				cClassifierLabel.anchor = GridBagConstraints.WEST;
-				otherSettingsPanel.add(classifierSecondLabel, cClassifierLabel);
-
-				classifiersSecondCombobox = new IvMClassifierChooser(null, null, false);
-				IvMDecorator.decorate(classifiersSecondCombobox.getMultiComboBox());
-				classifiersSecondCombobox.setEnabled(false);
-				GridBagConstraints cClassifiers = new GridBagConstraints();
-				cClassifiers.gridx = 1;
-				cClassifiers.gridy = gridy++;
-				cClassifiers.gridwidth = 1;
-				cClassifiers.insets = margins;
-				cClassifiers.fill = GridBagConstraints.HORIZONTAL;
-				otherSettingsPanel.add(classifiersSecondCombobox, cClassifiers);
-			}*/
+			/*
+			 * { classifierSecondLabel = new JLabel("2nd Classifier");
+			 * IvMDecorator.decorate(classifierSecondLabel);
+			 * classifierSecondLabel.setBorder(leftBorder); GridBagConstraints
+			 * cClassifierLabel = new GridBagConstraints();
+			 * cClassifierLabel.gridx = 0; cClassifierLabel.gridy = gridy;
+			 * cClassifierLabel.gridwidth = 1; cClassifierLabel.anchor =
+			 * GridBagConstraints.WEST;
+			 * otherSettingsPanel.add(classifierSecondLabel, cClassifierLabel);
+			 * 
+			 * classifiersSecondCombobox = new IvMClassifierChooser(null, null,
+			 * false);
+			 * IvMDecorator.decorate(classifiersSecondCombobox.getMultiComboBox(
+			 * )); classifiersSecondCombobox.setEnabled(false);
+			 * GridBagConstraints cClassifiers = new GridBagConstraints();
+			 * cClassifiers.gridx = 1; cClassifiers.gridy = gridy++;
+			 * cClassifiers.gridwidth = 1; cClassifiers.insets = margins;
+			 * cClassifiers.fill = GridBagConstraints.HORIZONTAL;
+			 * otherSettingsPanel.add(classifiersSecondCombobox, cClassifiers);
+			 * }
+			 */
 
 			//pre-mining filters
 			{
@@ -341,7 +340,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cTraceViewButton.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(traceViewButton, cTraceViewButton);
 			}
-			
+
 			//data analysis view
 			{
 				dataAnalysisView = new DataAnalysisView(this);
@@ -446,7 +445,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				{
 					statusLabel = SlickerFactory.instance().createLabel(" ");
 					statusLabel.setMinimumSize(new Dimension(10, lineHeight));
-					statusLabel.setPreferredSize(new Dimension(sidePanelWidth - 5, lineHeight));
+					statusLabel.setPreferredSize(new Dimension(sidePanelWidth - 5, (int) (lineHeight * 1.5)));
+					statusLabel.setVerticalAlignment(JLabel.BOTTOM);
 					statusLabel.setBorder(leftBorder);
 					statusArea.add(statusLabel, BorderLayout.PAGE_END);
 				}
@@ -602,9 +602,9 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return classifiersCombobox;
 	}
 
-//	public IvMClassifierChooser getSecondClassifiers() {
-//		return classifiersSecondCombobox;
-//	}
+	//	public IvMClassifierChooser getSecondClassifiers() {
+	//		return classifiersSecondCombobox;
+	//	}
 
 	public JComboBox<?> getColourSelection() {
 		return colourSelection;
@@ -661,11 +661,11 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	public JButton getTraceViewButton() {
 		return traceViewButton;
 	}
-	
+
 	public DataAnalysisView getDataAnalysisView() {
 		return dataAnalysisView;
 	}
-	
+
 	public JButton getDataAnalysisViewButton() {
 		return dataAnalysisViewButton;
 	}
