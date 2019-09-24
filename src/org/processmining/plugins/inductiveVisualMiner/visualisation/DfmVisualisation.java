@@ -76,7 +76,7 @@ public class DfmVisualisation {
 		/**
 		 * Activities
 		 */
-		for (int activity : dfg.getActivitiesIndices()) {
+		for (int activity : dfg.getNodeIndices()) {
 			Triple<String, Long, Long> cardinality = data.getNodeLabel(activity, false);
 			convertActivity(model.getDfg(), activity, cardinality);
 		}
@@ -99,7 +99,7 @@ public class DfmVisualisation {
 		/**
 		 * Start activities
 		 */
-		for (TIntIterator it = dfg.getStartActivities().iterator(); it.hasNext();) {
+		for (TIntIterator it = dfg.getStartNodes().iterator(); it.hasNext();) {
 			int node = it.next();
 			addArc2(DFMEdgeType.modelBetweenActivities, -1, node);
 		}
@@ -107,7 +107,7 @@ public class DfmVisualisation {
 		/**
 		 * End activities
 		 */
-		for (TIntIterator it = dfg.getEndActivities().iterator(); it.hasNext();) {
+		for (TIntIterator it = dfg.getEndNodes().iterator(); it.hasNext();) {
 			int node = it.next();
 			addArc2(DFMEdgeType.modelBetweenActivities, node, -1);
 		}
@@ -168,7 +168,7 @@ public class DfmVisualisation {
 		}
 		traceViewColourMap.set(msdNode, fillColour, fontColour);
 
-		String label = dfg.getActivityOfIndex(msdNode);
+		String label = dfg.getNodeOfIndex(msdNode);
 		if (label.length() == 0) {
 			label = " ";
 		}

@@ -32,7 +32,7 @@ public class Dfm2AcceptingPetriNet {
 		/**
 		 * empty traces
 		 */
-		if (dfg.getNumberOfActivities() > 0) {
+		if (dfg.getNumberOfNodes() > 0) {
 			Transition epsilon = petriNet.addTransition("epsilon");
 			epsilon.setInvisible(true);
 			petriNet.addArc(source, epsilon);
@@ -43,8 +43,8 @@ public class Dfm2AcceptingPetriNet {
 		 * Activities (states)
 		 */
 		TIntObjectMap<Place> activity2place = new TIntObjectHashMap<>();
-		for (int activity : dfg.getActivitiesIndices()) {
-			Place place = petriNet.addPlace(dfg.getActivityOfIndex(activity));
+		for (int activity : dfg.getNodeIndices()) {
+			Place place = petriNet.addPlace(dfg.getNodeOfIndex(activity));
 			activity2place.put(activity, place);
 		}
 
@@ -57,7 +57,7 @@ public class Dfm2AcceptingPetriNet {
 			Place sourcePlace = activity2place.get(sourceActivity);
 			Place targetPlace = activity2place.get(targetActivity);
 
-			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(targetActivity));
+			Transition transition = petriNet.addTransition(dfg.getNodeOfIndex(targetActivity));
 
 			petriNet.addArc(sourcePlace, transition);
 			petriNet.addArc(transition, targetPlace);
@@ -66,9 +66,9 @@ public class Dfm2AcceptingPetriNet {
 		/**
 		 * Starts
 		 */
-		for (TIntIterator it = dfg.getStartActivities().iterator(); it.hasNext();) {
+		for (TIntIterator it = dfg.getStartNodes().iterator(); it.hasNext();) {
 			int activity = it.next();
-			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(activity));
+			Transition transition = petriNet.addTransition(dfg.getNodeOfIndex(activity));
 
 			petriNet.addArc(source, transition);
 			petriNet.addArc(transition, activity2place.get(activity));
@@ -77,9 +77,9 @@ public class Dfm2AcceptingPetriNet {
 		/**
 		 * Ends
 		 */
-		for (TIntIterator it = dfg.getEndActivities().iterator(); it.hasNext();) {
+		for (TIntIterator it = dfg.getEndNodes().iterator(); it.hasNext();) {
 			int activity = it.next();
-			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(activity) + " -> end");
+			Transition transition = petriNet.addTransition(dfg.getNodeOfIndex(activity) + " -> end");
 			transition.setInvisible(true);
 
 			petriNet.addArc(activity2place.get(activity), transition);
@@ -121,18 +121,17 @@ public class Dfm2AcceptingPetriNet {
 		 */
 		TIntObjectMap<Place> activity2EnqueuePlace = new TIntObjectHashMap<>();
 		TIntObjectMap<Place> activity2EndPlace = new TIntObjectHashMap<>();
-		for (int activity : dfg.getActivitiesIndices()) {
-			Place enqueuePlace = petriNet.addPlace(dfg.getActivityOfIndex(activity) + " enqueue");
+		for (int activity : dfg.getNodeIndices()) {
+			Place enqueuePlace = petriNet.addPlace(dfg.getNodeOfIndex(activity) + " enqueue");
 			activity2EnqueuePlace.put(activity, enqueuePlace);
 
-			Place startPlace = petriNet.addPlace(dfg.getActivityOfIndex(activity) + " start");
-			Place completePlace = petriNet.addPlace(dfg.getActivityOfIndex(activity) + " complete");
+			Place startPlace = petriNet.addPlace(dfg.getNodeOfIndex(activity) + " start");
+			Place completePlace = petriNet.addPlace(dfg.getNodeOfIndex(activity) + " complete");
 
-			Place endPlace = petriNet.addPlace(dfg.getActivityOfIndex(activity) + " end");
+			Place endPlace = petriNet.addPlace(dfg.getNodeOfIndex(activity) + " end");
 			activity2EndPlace.put(activity, endPlace);
 
-			Transition enqueue = petriNet
-					.addTransition(dfg.getActivityOfIndex(activity) + "+" + ExpandProcessTree.enqueue);
+			Transition enqueue = petriNet.addTransition(dfg.getNodeOfIndex(activity) + "+" + ExpandProcessTree.enqueue);
 			Transition skipEnqueue = petriNet.addTransition("tau");
 			activity2skipEnqueue.put(skipEnqueue, activity);
 			skipEnqueue.setInvisible(true);
@@ -141,7 +140,7 @@ public class Dfm2AcceptingPetriNet {
 			petriNet.addArc(enqueuePlace, skipEnqueue);
 			petriNet.addArc(skipEnqueue, startPlace);
 
-			Transition start = petriNet.addTransition(dfg.getActivityOfIndex(activity) + "+" + ExpandProcessTree.start);
+			Transition start = petriNet.addTransition(dfg.getNodeOfIndex(activity) + "+" + ExpandProcessTree.start);
 			Transition skipStart = petriNet.addTransition("tau");
 			activity2skipStart.put(skipStart, activity);
 			skipStart.setInvisible(true);
@@ -151,7 +150,7 @@ public class Dfm2AcceptingPetriNet {
 			petriNet.addArc(skipStart, completePlace);
 
 			Transition complete = petriNet
-					.addTransition(dfg.getActivityOfIndex(activity) + "+" + ExpandProcessTree.complete);
+					.addTransition(dfg.getNodeOfIndex(activity) + "+" + ExpandProcessTree.complete);
 			petriNet.addArc(completePlace, complete);
 			petriNet.addArc(complete, endPlace);
 		}
@@ -176,9 +175,9 @@ public class Dfm2AcceptingPetriNet {
 		/**
 		 * Starts
 		 */
-		for (TIntIterator it = dfg.getStartActivities().iterator(); it.hasNext();) {
+		for (TIntIterator it = dfg.getStartNodes().iterator(); it.hasNext();) {
 			int activity = it.next();
-			Transition transition = petriNet.addTransition("start -> " + dfg.getActivityOfIndex(activity));
+			Transition transition = petriNet.addTransition("start -> " + dfg.getNodeOfIndex(activity));
 			transition.setInvisible(true);
 			startTransitions.add(transition);
 
@@ -189,9 +188,9 @@ public class Dfm2AcceptingPetriNet {
 		/**
 		 * Ends
 		 */
-		for (TIntIterator it = dfg.getEndActivities().iterator(); it.hasNext();) {
+		for (TIntIterator it = dfg.getEndNodes().iterator(); it.hasNext();) {
 			int activity = it.next();
-			Transition transition = petriNet.addTransition(dfg.getActivityOfIndex(activity) + " -> end");
+			Transition transition = petriNet.addTransition(dfg.getNodeOfIndex(activity) + " -> end");
 			transition.setInvisible(true);
 			endTransitions.add(transition);
 

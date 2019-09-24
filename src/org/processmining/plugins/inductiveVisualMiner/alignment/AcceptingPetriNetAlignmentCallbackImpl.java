@@ -160,7 +160,7 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 					activityIndex = activity2skipStart.get(performanceUnode);
 				}
 				XEventClass activity = activityEventClasses
-						.getByIdentity(model.getDfg().getActivityOfIndex(activityIndex));
+						.getByIdentity(model.getDfg().getNodeOfIndex(activityIndex));
 				XEventClass performanceActivity = performanceEventClasses
 						.getByIdentity(activity.getId() + "+" + lifeCycleTransition);
 				return Pair.of(new Move(model, Type.ignoredModelMove, previousModelNode, activityIndex, activity,
@@ -173,7 +173,7 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 			PerformanceTransition lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode.getLabel());
 			XEventClass performanceActivity = performanceEventClasses.getByIdentity(((Transition) node).getLabel());
 			XEventClass activity = Performance.getActivity(performanceActivity, activityEventClasses);
-			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllActivities(), activity.getId());
+			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllNodeNames(), activity.getId());
 			assert (activity != null);
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete ? activityIndex
 					: previousModelNode;
@@ -184,7 +184,7 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 			Transition performanceUnode = (Transition) node;
 			XEventClass performanceActivity = performanceEventClasses.getClassOf(trace.get(event));
 			XEventClass activity = Performance.getActivity(performanceActivity, activityEventClasses);
-			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllActivities(), activity.getId());
+			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllNodeNames(), activity.getId());
 			PerformanceTransition lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode.getLabel());
 
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete ? activityIndex

@@ -36,8 +36,8 @@ public class DfmVisualisationSimple {
 		/**
 		 * Nodes
 		 */
-		for (int activity : dfg.getActivitiesIndices()) {
-			LocalDotNode dotNode = new LocalDotNode(dot, null, NodeType.activity, dfg.getActivityOfIndex(activity),
+		for (int activity : dfg.getNodeIndices()) {
+			LocalDotNode dotNode = new LocalDotNode(dot, null, NodeType.activity, dfg.getNodeOfIndex(activity),
 					activity, null);
 			activity2dotNode.put(activity, dotNode);
 		}
@@ -57,7 +57,7 @@ public class DfmVisualisationSimple {
 		/**
 		 * Start activities
 		 */
-		for (TIntIterator it = dfg.getStartActivities().iterator(); it.hasNext();) {
+		for (TIntIterator it = dfg.getStartNodes().iterator(); it.hasNext();) {
 			int node = it.next();
 			dot.addEdge(source, activity2dotNode.get(node));
 		}
@@ -65,7 +65,7 @@ public class DfmVisualisationSimple {
 		/**
 		 * End activities
 		 */
-		for (TIntIterator it = dfg.getEndActivities().iterator(); it.hasNext();) {
+		for (TIntIterator it = dfg.getEndNodes().iterator(); it.hasNext();) {
 			int node = it.next();
 			dot.addEdge(activity2dotNode.get(node), sink);
 		}

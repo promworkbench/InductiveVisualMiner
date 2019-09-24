@@ -72,7 +72,7 @@ public class AcceptingPetriNetAlignment {
 	}
 
 	public static void addAllLeavesAsEventClasses(IvMEventClasses eventClasses, DirectlyFollowsModel dfg) {
-		for (String a : dfg.getAllActivities()) {
+		for (String a : dfg.getAllNodeNames()) {
 			eventClasses.register(a);
 		}
 		eventClasses.harmonizeIndices();

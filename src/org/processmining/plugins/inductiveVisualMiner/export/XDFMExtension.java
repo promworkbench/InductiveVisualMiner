@@ -40,7 +40,7 @@ public class XDFMExtension {
 					XModelAlignmentExtension.instance());
 			XAttributeLiteral string = factory.createAttributeLiteral(KEY_DFM_ACTIVITY, "__invalid__",
 					XModelAlignmentExtension.instance());
-			for (String activity : dfm.getAllActivities()) {
+			for (String activity : dfm.getAllNodeNames()) {
 				XAttributeLiteral att = (XAttributeLiteral) string.clone();
 				att.setValue(activity);
 				activitiesList.addToCollection(att);
@@ -73,7 +73,7 @@ public class XDFMExtension {
 					XModelAlignmentExtension.instance());
 			XAttributeDiscrete number = factory.createAttributeDiscrete(KEY_DFM_START_ACTIVITY, -1,
 					XModelAlignmentExtension.instance());
-			for (TIntIterator it = dfm.getStartActivities().iterator(); it.hasNext();) {
+			for (TIntIterator it = dfm.getStartNodes().iterator(); it.hasNext();) {
 				XAttributeDiscrete att = (XAttributeDiscrete) number.clone();
 				att.setValue(it.next());
 				startActivitiesList.addToCollection(att);
@@ -89,7 +89,7 @@ public class XDFMExtension {
 					XModelAlignmentExtension.instance());
 			XAttributeDiscrete number = factory.createAttributeDiscrete(KEY_DFM_END_ACTIVITY, -1,
 					XModelAlignmentExtension.instance());
-			for (TIntIterator it = dfm.getEndActivities().iterator(); it.hasNext();) {
+			for (TIntIterator it = dfm.getEndNodes().iterator(); it.hasNext();) {
 				XAttributeDiscrete att = (XAttributeDiscrete) number.clone();
 				att.setValue(it.next());
 				endActivitiesList.addToCollection(att);
@@ -137,7 +137,7 @@ public class XDFMExtension {
 				i++;
 			}
 
-			result.addActivities(activities);
+			result.addNodes(activities);
 		}
 
 		/**
@@ -177,7 +177,7 @@ public class XDFMExtension {
 				}
 				XAttributeDiscrete attNodeD = (XAttributeDiscrete) attNode;
 				int startActivity = (int) attNodeD.getValue();
-				result.addStartActivity(startActivity);
+				result.addStartNode(startActivity);
 			}
 		}
 
@@ -196,7 +196,7 @@ public class XDFMExtension {
 				}
 				XAttributeDiscrete attNodeD = (XAttributeDiscrete) attNode;
 				int startActivity = (int) attNodeD.getValue();
-				result.addEndActivity(startActivity);
+				result.addEndNode(startActivity);
 			}
 		}
 

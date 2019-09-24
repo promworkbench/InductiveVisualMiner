@@ -13,8 +13,8 @@ public class Dfg2StringFields {
 	public static TIntObjectMap<String> getActivity2Node(DirectlyFollowsModel dfg) {
 		TIntObjectHashMap<String> result = new TIntObjectHashMap<>(10, 0.5f, -1);
 
-		for (String activity : dfg.getAllActivities()) {
-			TIntSet a = dfg.getIndexOfActivity(activity);
+		for (String activity : dfg.getAllNodeNames()) {
+			TIntSet a = dfg.getIndicesOfNodeName(activity);
 
 			if (a.size() == 1) {
 				result.put(a.iterator().next(), escapeNode(activity));
@@ -32,9 +32,9 @@ public class Dfg2StringFields {
 
 	public static String getStartActivities(DirectlyFollowsModel dfg, TIntObjectMap<String> activity2node) {
 		StringBuilder result = new StringBuilder();
-		for (TIntIterator it = dfg.getStartActivities().iterator(); it.hasNext();) {
+		for (TIntIterator it = dfg.getStartNodes().iterator(); it.hasNext();) {
 			int activity = it.next();
-			result.append(escapeNode(dfg.getActivityOfIndex(activity)));
+			result.append(escapeNode(dfg.getNodeOfIndex(activity)));
 			result.append("\n");
 		}
 		return result.toString();
@@ -42,7 +42,7 @@ public class Dfg2StringFields {
 
 	public static String getEndActivities(DirectlyFollowsModel dfg, TIntObjectMap<String> activity2node) {
 		StringBuilder result = new StringBuilder();
-		for (TIntIterator it = dfg.getEndActivities().iterator(); it.hasNext();) {
+		for (TIntIterator it = dfg.getEndNodes().iterator(); it.hasNext();) {
 			int activity = it.next();
 			result.append(activity2node.get(activity));
 			result.append("\n");

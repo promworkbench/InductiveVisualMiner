@@ -39,7 +39,7 @@ public class IvMModel {
 		if (isTree()) {
 			return tree.getActivityName(node);
 		} else {
-			return dfg.getActivityOfIndex(node);
+			return dfg.getNodeOfIndex(node);
 		}
 	}
 
@@ -55,7 +55,7 @@ public class IvMModel {
 		if (isTree()) {
 			return EfficientTreeUtils.getAllNodes(tree);
 		} else {
-			return dfg.getActivitiesIndices();
+			return dfg.getNodeIndices();
 		}
 	}
 
@@ -108,6 +108,6 @@ public class IvMModel {
 		if (this.tree != null) {
 			return this.tree.getMaxNumberOfNodes();
 		}
-		return this.dfg.getAllActivities().length;
+		return this.dfg.getAllNodeNames().length;
 	}
 }

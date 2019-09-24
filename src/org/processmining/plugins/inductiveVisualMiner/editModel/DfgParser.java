@@ -73,7 +73,7 @@ public class DfgParser {
 			if (userIndex2dfgIndex.containsKey(pSource)) {
 				sourceIndex = userIndex2dfgIndex.get(pSource);
 			} else {
-				sourceIndex = dfg.addActivity(source);
+				sourceIndex = dfg.addNode(source);
 				userIndex2dfgIndex.put(pSource, sourceIndex);
 			}
 
@@ -92,7 +92,7 @@ public class DfgParser {
 			if (userIndex2dfgIndex.containsKey(pTarget)) {
 				targetIndex = userIndex2dfgIndex.get(pTarget);
 			} else {
-				targetIndex = dfg.addActivity(target);
+				targetIndex = dfg.addNode(target);
 				userIndex2dfgIndex.put(pTarget, targetIndex);
 			}
 
@@ -113,10 +113,10 @@ public class DfgParser {
 			if (userIndex2dfgIndex.containsKey(p)) {
 				index = userIndex2dfgIndex.get(p);
 			} else {
-				index = dfg.addActivity(activity);
+				index = dfg.addNode(activity);
 				userIndex2dfgIndex.put(p, index);
 			}
-			dfg.getStartActivities().add(index);
+			dfg.getStartNodes().add(index);
 		}
 	}
 
@@ -131,10 +131,10 @@ public class DfgParser {
 			if (userIndex2dfgIndex.containsKey(p)) {
 				index = userIndex2dfgIndex.get(p);
 			} else {
-				index = dfg.addActivity(activity);
+				index = dfg.addNode(activity);
 				userIndex2dfgIndex.put(p, index);
 			}
-			dfg.getEndActivities().add(index);
+			dfg.getEndNodes().add(index);
 		}
 	}
 }
