@@ -28,7 +28,7 @@ public class ExporterStatistics extends Exporter {
 
 	@Override
 	public String getDescription() {
-		return "csv (statistics)";
+		return "csv (model statistics)";
 	}
 
 	protected String getExtension() {

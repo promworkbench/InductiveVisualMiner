@@ -388,7 +388,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//save image button 
 			{
-				saveImageButton = new JButton("export view");
+				saveImageButton = new JButton("export ..");
 				IvMDecorator.decorate(saveImageButton);
 				GridBagConstraints cExitButton = new GridBagConstraints();
 				cExitButton.gridx = 1;

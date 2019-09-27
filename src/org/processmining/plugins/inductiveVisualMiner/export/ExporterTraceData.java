@@ -3,10 +3,13 @@ package org.processmining.plugins.inductiveVisualMiner.export;
 import java.io.File;
 import java.io.PrintWriter;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -30,7 +33,7 @@ public class ExporterTraceData extends Exporter {
 	}
 
 	public void export(NavigableSVGPanel panel, File file) throws Exception {
-		assert (state.getIvMLogFiltered() != null);
+		assert (state.getIvMLogFiltered() != null && state.isAlignmentReady());
 		final IvMLogFilteredImpl log = state.getIvMLogFiltered();
 		final AttributesInfo attributes = state.getAttributesInfo();
 
@@ -42,6 +45,7 @@ public class ExporterTraceData extends Exporter {
 			w.print(escape(attribute.getName()));
 			w.print(fieldSeparator);
 		}
+		w.print("fitness");
 		w.println("");
 
 		//body
@@ -50,9 +54,15 @@ public class ExporterTraceData extends Exporter {
 				XAttribute value = trace.getAttributes().get(attribute.getName());
 				if (value != null) {
 					w.print(escape(value.toString()));
+				} else {
+					String v = DataAnalysis.getString(attribute, trace);
+					if (v != null) {
+						w.print(escape(v));
+					}
 				}
 				w.print(fieldSeparator);
 			}
+			w.print(Fitness.compute(trace));
 			w.println("");
 		}
 
@@ -60,7 +70,7 @@ public class ExporterTraceData extends Exporter {
 	}
 
 	public static String escape(String s) {
-		return s;
+		return StringEscapeUtils.escapeCsv(s);
 	}
 
 }

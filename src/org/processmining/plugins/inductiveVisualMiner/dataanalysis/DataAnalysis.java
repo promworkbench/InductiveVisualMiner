@@ -542,4 +542,13 @@ public class DataAnalysis {
 		return isSomethingFiltered;
 	}
 
+	public static String getString(Attribute attribute, IvMTrace trace) {
+		if (attribute.isTraceDuration()) {
+			return TraceColourMapPropertyDuration.getTraceDuration(trace) + "";
+		} else if (attribute.isTraceNumberofEvents()) {
+			return trace.getNumberOfEvents() + "";
+		}
+		return null;
+	}
+
 }
