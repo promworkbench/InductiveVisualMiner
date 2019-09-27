@@ -402,6 +402,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			//status area
 			{
 				JPanel statusArea = new JPanel() {
+					private static final long serialVersionUID = -3004738781055843682L;
+
 					//paint a background with our icon
 					@Override
 					protected void paintComponent(Graphics g) {
