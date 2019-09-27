@@ -54,6 +54,7 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Typ
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterStatistics;
+import org.processmining.plugins.inductiveVisualMiner.export.ExporterTraceData;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
@@ -762,13 +763,15 @@ public class InductiveVisualMinerController {
 
 		//add animation and statistics to export
 		panel.getGraph().setGetExporters(new GetExporters() {
-
 			public List<Exporter> getExporters(List<Exporter> exporters) {
-				if (panel.getGraph().isAnimationEnabled()) {
-					exporters.add(new ExporterAvi(state));
+				if (state.getIvMLogFiltered() != null) {
+					exporters.add(new ExporterTraceData(state));
 				}
 				if (state.isPerformanceReady()) {
 					exporters.add(new ExporterStatistics(state));
+				}
+				if (panel.getGraph().isAnimationEnabled()) {
+					exporters.add(new ExporterAvi(state));
 				}
 				return exporters;
 			}

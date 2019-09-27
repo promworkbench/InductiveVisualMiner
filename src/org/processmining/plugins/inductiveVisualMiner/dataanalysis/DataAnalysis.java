@@ -82,9 +82,9 @@ public class DataAnalysis {
 					return FieldType.number;
 				}
 			},
-			max {
+			median {
 				public String toString() {
-					return "maximum";
+					return "median";
 				}
 
 				public boolean forcedNumeric() {
@@ -95,9 +95,9 @@ public class DataAnalysis {
 					return FieldType.number;
 				}
 			},
-			median {
+			max {
 				public String toString() {
-					return "median";
+					return "maximum";
 				}
 
 				public boolean forcedNumeric() {
@@ -115,6 +115,45 @@ public class DataAnalysis {
 
 				public boolean forcedNumeric() {
 					return false;
+				}
+
+				public FieldType type() {
+					return FieldType.number;
+				}
+			},
+			minFitness {
+				public String toString() {
+					return "minimum fitness";
+				}
+
+				public boolean forcedNumeric() {
+					return true;
+				}
+
+				public FieldType type() {
+					return FieldType.number;
+				}
+			},
+			averageFitness {
+				public String toString() {
+					return "average fitness";
+				}
+
+				public boolean forcedNumeric() {
+					return true;
+				}
+
+				public FieldType type() {
+					return FieldType.number;
+				}
+			},
+			maxFitness {
+				public String toString() {
+					return "maximum fitness";
+				}
+
+				public boolean forcedNumeric() {
+					return true;
 				}
 
 				public FieldType type() {
@@ -374,6 +413,24 @@ public class DataAnalysis {
 			return null;
 		}
 
+		result.set(Field.minFitness, Array.min(fitnessFiltered));
+
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
+		result.set(Field.averageFitness, Correlation.mean(fitnessFiltered).doubleValue());
+
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
+		result.set(Field.maxFitness, Array.max(fitnessFiltered));
+
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
 		double valuesStandardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
 		result.set(Field.standardDeviation, valuesStandardDeviation);
 
@@ -390,7 +447,8 @@ public class DataAnalysis {
 
 		result.set(Field.correlationPlot,
 				CorrelationDensityPlot.create(attribute.getName(), valuesFiltered, getDoubleMin(attribute),
-						getDoubleMax(attribute), "fitness", fitnessFiltered, globalMinFitness, globalMaxFitness));
+						getDoubleMax(attribute), "fitness", fitnessFiltered, result.getNumber(Field.minFitness),
+						result.getNumber(Field.maxFitness)));
 
 		return result;
 	}
