@@ -42,6 +42,7 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsQueueLengths;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsService;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsWaiting;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModeRelativePaths;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapView;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceView;
@@ -284,9 +285,9 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cColourLabel.anchor = GridBagConstraints.WEST;
 				otherSettingsPanel.add(colourLabel, cColourLabel);
 
-				colourSelection = new JComboBox<>(
-						new Mode[] { new ModePaths(), new ModePathsDeviations(), new ModePathsQueueLengths(),
-								new ModePathsSojourn(), new ModePathsService(), new ModeRelativePaths() });
+				colourSelection = new JComboBox<>(new Mode[] { new ModePaths(), new ModePathsDeviations(),
+						new ModePathsQueueLengths(), new ModePathsSojourn(), new ModePathsWaiting(),
+						new ModePathsService(), new ModeRelativePaths() });
 				IvMDecorator.decorate(colourSelection);
 				colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 				colourSelection.setFocusable(false);
