@@ -49,7 +49,7 @@ public class AlignmentPerformance {
 
 		AcceptingPetriNetAlignment.addAllLeavesAsEventClasses(activityEventClasses2, model.getDfg());
 		AcceptingPetriNetAlignment.addAllLeavesAsPerformanceEventClasses(performanceEventClasses2, p.getA());
-		AcceptingPetriNetAlignmentCallback callback = new AcceptingPetriNetAlignmentCallbackImpl(xLog, model,
+		AcceptingPetriNetAlignmentCallbackImpl callback = new AcceptingPetriNetAlignmentCallbackImpl(xLog, model,
 				activityEventClasses2, p);
 		AcceptingPetriNetAlignment.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
 

@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.alignment;
 
 import java.util.SortedSet;
 
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 
 public interface AcceptingPetriNetAlignmentCallback {
@@ -18,6 +17,4 @@ public interface AcceptingPetriNetAlignmentCallback {
 			IvMEventClasses eventClasses);
 
 	public void alignmentFailed() throws Exception;
-
-	public IvMLogNotFiltered getAlignedLog();
 }
