@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
-import java.util.Set;
-
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.model.XLog;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
@@ -9,7 +7,6 @@ import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.semantics.petrinet.Marking;
-import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.astar.petrinet.PetrinetReplayerWithILP;
 import org.processmining.plugins.connectionfactories.logpetrinet.TransEvClassMapping;
 import org.processmining.plugins.petrinet.replayer.PNLogReplayer;
@@ -18,16 +15,11 @@ import org.processmining.plugins.petrinet.replayer.algorithms.costbasedcomplete.
 import org.processmining.plugins.petrinet.replayresult.PNRepResult;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 
-import gnu.trove.map.TObjectIntMap;
 import nl.tue.astar.AStarException;
 
 public class AcceptingPetriNetAlignment {
-	public static void align(DirectlyFollowsModel dfg,
-			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, Transition> p,
-			XLog log, IvMEventClasses eventClasses, AcceptingPetriNetAlignmentCallback callback,
-			final ProMCanceller canceller) throws AStarException {
-
-		AcceptingPetriNet aNet = p.getA();
+	public static void align(AcceptingPetriNet aNet, XLog log, IvMEventClasses eventClasses,
+			AcceptingPetriNetAlignmentCallback callback, final ProMCanceller canceller) throws AStarException {
 
 		//create mapping transition -> eventclass
 		XEventClass dummy = new XEventClass("", 1);
