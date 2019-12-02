@@ -72,10 +72,11 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		return discoveryTechniques;
 	}
 
-	public Chain getChain(PluginContext context, InductiveVisualMinerState state, InductiveVisualMinerPanel panel,
-			ProMCanceller canceller, Executor executor, Runnable onChange) {
+	public Chain getChain(final PluginContext context, final InductiveVisualMinerState state,
+			final InductiveVisualMinerPanel panel, final ProMCanceller canceller, final Executor executor,
+			final Runnable onChange) {
 		//set up the chain
-		Chain chain = new Chain(state, canceller, executor, onChange);
+		final Chain chain = new Chain(state, canceller, executor, onChange);
 
 		//gather attributes
 		{
