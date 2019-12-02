@@ -118,14 +118,14 @@ public class InductiveVisualMinerController {
 					//on start, set the status
 					chainLink.setOnStartStatus(new Runnable() {
 						public void run() {
-							setStatus(chainLink2.getStatusBusyMessage(), chainLink.hashCode());
+							setStatus(chainLink2.getStatusBusyMessage(), chainLink2.hashCode());
 						}
 					});
 
 					//on completion, remove the status
 					chainLink.setOnCompleteStatus(new Runnable() {
 						public void run() {
-							setStatus(null, chainLink.hashCode());
+							setStatus(null, chainLink2.hashCode());
 						}
 					});
 				}
