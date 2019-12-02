@@ -83,4 +83,8 @@ public class Cl07Align extends
 	public String getName() {
 		return "align";
 	}
+
+	public String getStatusBusyMessage() {
+		return "Aligning log and model..";
+	}
 }

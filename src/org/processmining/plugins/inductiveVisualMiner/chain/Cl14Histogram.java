@@ -56,4 +56,8 @@ public class Cl14Histogram extends
 	public String getName() {
 		return "compute histograms";
 	}
+
+	public String getStatusBusyMessage() {
+		return "Computing histogram..";
+	}
 }

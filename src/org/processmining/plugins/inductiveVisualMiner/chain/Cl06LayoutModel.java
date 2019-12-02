@@ -65,4 +65,8 @@ public class Cl06LayoutModel extends
 	public String getName() {
 		return "layout model";
 	}
+
+	public String getStatusBusyMessage() {
+		return "Layouting model..";
+	}
 }

@@ -62,8 +62,12 @@ public class Cl08LayoutAlignment extends
 	protected void invalidateResult(InductiveVisualMinerState state) {
 		state.setLayout(null, null, null, null);
 	}
-	
+
 	public String getName() {
 		return "layout alignment";
+	}
+
+	public String getStatusBusyMessage() {
+		return "Layouting aligned model..";
 	}
 }

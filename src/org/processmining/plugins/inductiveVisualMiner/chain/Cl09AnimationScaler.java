@@ -31,4 +31,8 @@ public class Cl09AnimationScaler extends ChainLink<IvMLog, Scaler> {
 	public String getName() {
 		return "scale animation";
 	}
+
+	public String getStatusBusyMessage() {
+		return "Scaling animation..";
+	}
 }

@@ -57,7 +57,7 @@ public class Cl02SortEvents extends ChainLink<XLog, XLog> {
 			state.setIllogicalTimeStamps(true);
 		}
 	}
-	
+
 	protected void invalidateResult(InductiveVisualMinerState state) {
 		state.setSortedXLog(null);
 	}
@@ -98,8 +98,12 @@ public class Cl02SortEvents extends ChainLink<XLog, XLog> {
 		}
 		return false;
 	}
-	
+
 	public String getName() {
 		return "sort events";
+	}
+
+	public String getStatusBusyMessage() {
+		return "Checking time stamps..";
 	}
 }

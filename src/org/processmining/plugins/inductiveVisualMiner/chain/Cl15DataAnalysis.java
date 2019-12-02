@@ -31,4 +31,8 @@ public class Cl15DataAnalysis
 		state.setDataAnalysis(null);
 	}
 
+	public String getStatusBusyMessage() {
+		return "Performing data analysis..";
+	}
+
 }

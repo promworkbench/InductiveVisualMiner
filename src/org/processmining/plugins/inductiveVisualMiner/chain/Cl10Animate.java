@@ -57,4 +57,8 @@ public class Cl10Animate extends
 	public String getName() {
 		return "animate";
 	}
+
+	public String getStatusBusyMessage() {
+		return "Creating animation..";
+	}
 }

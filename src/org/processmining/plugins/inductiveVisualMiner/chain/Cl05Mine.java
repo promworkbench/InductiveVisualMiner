@@ -51,4 +51,8 @@ public class Cl05Mine
 	public String getName() {
 		return "mine";
 	}
+
+	public String getStatusBusyMessage() {
+		return "Mining..";
+	}
 }

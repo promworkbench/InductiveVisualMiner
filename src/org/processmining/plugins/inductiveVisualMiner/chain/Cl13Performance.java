@@ -127,4 +127,8 @@ public class Cl13Performance extends ChainLink<Pair<IvMModel, IvMLog>, Performan
 	public String getName() {
 		return "measure performance";
 	}
+
+	public String getStatusBusyMessage() {
+		return "Measuring performance..";
+	}
 }

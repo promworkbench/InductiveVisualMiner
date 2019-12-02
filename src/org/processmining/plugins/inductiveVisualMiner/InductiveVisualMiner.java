@@ -19,9 +19,11 @@ import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.ProcessTree2EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationPreSet;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapperPluginFinder;
 import org.processmining.processtree.ProcessTree;
 
 public class InductiveVisualMiner {
@@ -35,12 +37,12 @@ public class InductiveVisualMiner {
 	public JComponent visualise(final PluginContext context, XLog xLog, ProMCanceller canceller)
 			throws UnknownTreeNodeException {
 
-		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog);
-		InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state,
-				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), canceller);
-		new InductiveVisualMinerController(context, panel, state, canceller);
+		InductiveVisualMinerConfiguration configuration = new InductiveVisualMinerConfigurationDefault(context, xLog,
+				canceller);
+		InductiveVisualMinerController controller = new InductiveVisualMinerController(context, configuration,
+				canceller);
 
-		return panel;
+		return controller.getPanel();
 	}
 
 	@Plugin(name = "Inductive visual Miner", level = PluginLevel.PeerReviewed, returnLabels = {
@@ -84,11 +86,14 @@ public class InductiveVisualMiner {
 			state.setPreMinedModel(new IvMModel(preMinedDfm));
 		}
 
-		VisualMinerWrapper[] miners = VisualMinerWrapperPluginFinder.find(context, state.getMiner());
-		final InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state, miners, canceller);
-		new InductiveVisualMinerController(context, panel, state, canceller);
+		InductiveVisualMinerConfigurationPreSet configuration = new InductiveVisualMinerConfigurationPreSet();
+		configuration.setPanel(
+				InductiveVisualMinerPanel.panel(context, state, configuration.discoveryTechniques, canceller));
+		configuration.setState(state);
+		InductiveVisualMinerController controller = new InductiveVisualMinerController(context, configuration,
+				canceller);
 
-		return panel;
+		return controller.getPanel();
 	}
 
 	public static class InductiveVisualMinerLauncher {

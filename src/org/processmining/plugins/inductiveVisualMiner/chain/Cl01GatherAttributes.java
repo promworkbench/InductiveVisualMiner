@@ -52,4 +52,8 @@ public class Cl01GatherAttributes
 		return "gather attributes";
 	}
 
+	public String getStatusBusyMessage() {
+		return "Gathering attributes..";
+	}
+
 }

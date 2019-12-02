@@ -44,4 +44,8 @@ public class Cl03MakeLog extends
 	public String getName() {
 		return "make log";
 	}
+
+	public String getStatusBusyMessage() {
+		return "Making log..";
+	}
 }

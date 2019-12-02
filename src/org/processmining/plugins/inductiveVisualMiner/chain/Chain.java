@@ -1,5 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -117,6 +120,10 @@ public class Chain {
 		}
 
 		return Pair.of(result, map);
+	}
+
+	public Collection<ChainLink<?, ?>> getChainLinks() {
+		return Collections.unmodifiableCollection(Arrays.asList(graph.getVertices()));
 	}
 
 	public Set<ChainLink<?, ?>> getCompletedChainLinks() {

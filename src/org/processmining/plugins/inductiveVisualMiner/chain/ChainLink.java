@@ -10,7 +10,9 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
 public abstract class ChainLink<I, O> {
 	private Runnable onStart;
+	private Runnable onStartStatus;
 	private Runnable onComplete;
+	private Runnable onCompleteStatus;
 	private OnException onException;
 	private Runnable onInvalidate;
 
@@ -19,6 +21,13 @@ public abstract class ChainLink<I, O> {
 	private UUID currentExecutionId = null;
 
 	public abstract String getName();
+
+	/**
+	 * 
+	 * @return The text that is to be shown when this chainlink is executing,
+	 *         with two postfix dots.
+	 */
+	public abstract String getStatusBusyMessage();
 
 	/**
 	 * 
@@ -98,6 +107,9 @@ public abstract class ChainLink<I, O> {
 				if (onStart != null) {
 					SwingUtilities.invokeLater(onStart);
 				}
+				if (onStartStatus != null) {
+					SwingUtilities.invokeLater(onStartStatus);
+				}
 				final O result;
 				try {
 					result = executeLink(input, canceller);
@@ -122,8 +134,11 @@ public abstract class ChainLink<I, O> {
 							if (onComplete != null) {
 								onComplete.run();
 							}
+							if (onCompleteStatus != null) {
+								onCompleteStatus.run();
+							}
 							isComplete = true;
-							
+
 							chain.executeNext(ChainLink.this);
 						} else {
 
@@ -145,6 +160,16 @@ public abstract class ChainLink<I, O> {
 	}
 
 	/**
+	 * Sets a callback that is executed on start of execution. Will be executed
+	 * in the main (gui) thread.
+	 * 
+	 * @param onStartStatus
+	 */
+	public void setOnStartStatus(Runnable onStartStatus) {
+		this.onStartStatus = onStartStatus;
+	}
+
+	/**
 	 * Sets a callback that is executed on completion of execution. Will be
 	 * executed in the main (gui) thread.
 	 * 
@@ -152,6 +177,16 @@ public abstract class ChainLink<I, O> {
 	 */
 	public void setOnComplete(Runnable onComplete) {
 		this.onComplete = onComplete;
+	}
+
+	/**
+	 * Sets a callback that is executed on completion of execution. Will be
+	 * executed in the main (gui) thread.
+	 * 
+	 * @param onStart
+	 */
+	public void setOnCompleteStatus(Runnable onCompleteStatus) {
+		this.onCompleteStatus = onCompleteStatus;
 	}
 
 	public void setOnException(OnException onException) {

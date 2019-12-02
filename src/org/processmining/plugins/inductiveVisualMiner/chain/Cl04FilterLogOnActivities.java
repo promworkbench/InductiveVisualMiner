@@ -56,4 +56,8 @@ public class Cl04FilterLogOnActivities extends
 	public String getName() {
 		return "filter log";
 	}
+
+	public String getStatusBusyMessage() {
+		return "Filtering activities..";
+	}
 }

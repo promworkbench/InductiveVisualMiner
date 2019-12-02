@@ -38,4 +38,8 @@ public class Cl11TraceColouring
 	public String getName() {
 		return "colour traces";
 	}
+
+	public String getStatusBusyMessage() {
+		return "Colouring traces..";
+	}
 }

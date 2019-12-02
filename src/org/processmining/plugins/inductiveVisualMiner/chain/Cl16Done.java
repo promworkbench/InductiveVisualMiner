@@ -24,4 +24,8 @@ public class Cl16Done extends ChainLink<Object, Object> {
 	public String getName() {
 		return "done";
 	}
+
+	public String getStatusBusyMessage() {
+		return "done";
+	}
 }
