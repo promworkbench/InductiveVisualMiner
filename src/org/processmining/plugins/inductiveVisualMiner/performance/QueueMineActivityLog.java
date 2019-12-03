@@ -60,6 +60,7 @@ public class QueueMineActivityLog {
 				Long enqueue = null;
 				Long start = null;
 				Long complete = null;
+				IvMMove completeMove = null;
 
 				if (activityInstance.getC() != null) {
 					initiate = activityInstance.getC().getLogTimestamp();
@@ -72,6 +73,7 @@ public class QueueMineActivityLog {
 				}
 				if (activityInstance.getF() != null) {
 					complete = activityInstance.getF().getLogTimestamp();
+					completeMove = activityInstance.getF();
 				}
 
 				//put this activity instance in its list
@@ -80,7 +82,7 @@ public class QueueMineActivityLog {
 				}
 
 				timestamps.get(node).add(activityInstance.getB(), startTrace, initiate, enqueue, start, complete,
-						endTrace, traceIndex);
+						completeMove, endTrace, traceIndex);
 			}
 		}
 	}

@@ -3,19 +3,23 @@ package org.processmining.plugins.inductiveVisualMiner.performance;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
+
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 
 public class QueueActivityLog {
 
+	private final List<IvMMove> completeMoves = new ArrayList<>();
 	private final TLongArrayList moves = new TLongArrayList();
 	private final List<String> resources = new ArrayList<>();
 	private final TIntArrayList traceIndices = new TIntArrayList();
 
 	public void add(String resource, Long startTrace, Long initiate, Long enqueue, Long start, Long complete,
-			Long endTrace, int traceIndex) {
+			IvMMove completeMove, Long endTrace, int traceIndex) {
 		resources.add(resource);
 		traceIndices.add(traceIndex);
+		completeMoves.add(completeMove);
 		if (initiate != null) {
 			moves.add(initiate);
 		} else {
@@ -94,6 +98,10 @@ public class QueueActivityLog {
 
 	public long getComplete(int activityInstanceIndex) {
 		return moves.get(activityInstanceIndex * 6 + 3);
+	}
+
+	public IvMMove getCompleteMove(int activityInstanceIndex) {
+		return completeMoves.get(activityInstanceIndex);
 	}
 
 	public long getStartTrace(int activityInstanceIndex) {
