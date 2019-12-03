@@ -31,6 +31,14 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl15DataAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl16Done;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsQueueLengths;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsService;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsWaiting;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModeRelativePaths;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
@@ -68,10 +76,20 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	public final VisualMinerWrapper[] discoveryTechniques = new VisualMinerWrapper[] { new Miner(), new DfgMiner(),
 			new LifeCycleMiner(), new AllOperatorsMiner() };
 
+	public final Mode[] modes = new Mode[] { new ModePaths(), new ModePathsDeviations(), new ModePathsQueueLengths(),
+			new ModePathsSojourn(), new ModePathsWaiting(), new ModePathsService(), new ModeRelativePaths() };
+
+	@Override
 	public VisualMinerWrapper[] getDiscoveryTechniques() {
 		return discoveryTechniques;
 	}
 
+	@Override
+	public Mode[] getModes() {
+		return modes;
+	}
+
+	@Override
 	public Chain getChain(final PluginContext context, final InductiveVisualMinerState state,
 			final InductiveVisualMinerPanel panel, final ProMCanceller canceller, final Executor executor,
 			final Runnable onChange) {
@@ -128,6 +146,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		//reorder events
 		{
 			sortEvents.setOnStart(new Runnable() {
+
 				public void run() {
 					panel.getGraph().setAnimationEnabled(false);
 				}

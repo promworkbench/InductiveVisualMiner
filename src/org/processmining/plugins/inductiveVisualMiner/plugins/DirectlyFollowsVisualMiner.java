@@ -17,7 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMiner.Induc
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapperPluginFinder;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationPreSet;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.DfgMiner;
 
 public class DirectlyFollowsVisualMiner {
@@ -48,11 +48,14 @@ public class DirectlyFollowsVisualMiner {
 	public static JComponent getDirectlyFollowsVisualMiner(final PluginContext context, XLog xLog,
 			ProMCanceller canceller) throws UnknownTreeNodeException {
 
+		InductiveVisualMinerConfigurationPreSet configuration = new InductiveVisualMinerConfigurationPreSet();
 		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog);
 		state.setMiner(new DfgMiner());
+		configuration.setState(state);
 		InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state,
-				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), canceller);
-		new InductiveVisualMinerController(context, panel, state, canceller);
+				configuration.discoveryTechniques, canceller);
+		configuration.setPanel(panel);
+		new InductiveVisualMinerController(context, configuration, canceller);
 
 		return panel;
 	}

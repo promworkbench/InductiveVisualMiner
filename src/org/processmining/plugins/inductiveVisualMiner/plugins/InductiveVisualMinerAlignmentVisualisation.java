@@ -18,8 +18,8 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerContro
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationPreSet;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapperPluginFinder;
 
 public class InductiveVisualMinerAlignmentVisualisation {
 	@Plugin(name = "Inductive visual Miner", returnLabels = { "Dot visualization" }, returnTypes = {
@@ -45,11 +45,14 @@ public class InductiveVisualMinerAlignmentVisualisation {
 		state.setPreMinedClassifier(classifier);
 		state.setPreMinedAlignment(ivmAlignment);
 
-		InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state,
-				VisualMinerWrapperPluginFinder.find(context, state.getMiner()), canceller);
-		new InductiveVisualMinerController(context, panel, state, canceller);
+		InductiveVisualMinerConfigurationPreSet configuration = new InductiveVisualMinerConfigurationPreSet();
+		configuration.setPanel(
+				InductiveVisualMinerPanel.panel(context, state, configuration.discoveryTechniques, canceller));
+		configuration.setState(state);
+		InductiveVisualMinerController controller = new InductiveVisualMinerController(context, configuration,
+				canceller);
 
-		return panel;
+		return controller.getPanel();
 	}
 
 }

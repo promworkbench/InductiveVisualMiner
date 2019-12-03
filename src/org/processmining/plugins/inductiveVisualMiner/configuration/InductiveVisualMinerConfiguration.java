@@ -7,8 +7,23 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
+import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
+/**
+ * Use this class to extend the visual Miner considerably:
+ * 
+ * - discovery techniques;
+ * 
+ * - chain of computation steps, done out of the gui thread;
+ * 
+ * - state keeps track of computation results
+ * 
+ * - the gui panel
+ * 
+ * @author sander
+ *
+ */
 public interface InductiveVisualMinerConfiguration {
 
 	/**
@@ -17,6 +32,14 @@ public interface InductiveVisualMinerConfiguration {
 	 * @return
 	 */
 	public VisualMinerWrapper[] getDiscoveryTechniques();
+
+	/**
+	 * The list of available modes (arc colouring, which numbers to show on the
+	 * model nodes, etc.)
+	 * 
+	 * @return
+	 */
+	public Mode[] getModes();
 
 	/**
 	 * Set up the state that keeps the data related to the visual Miner.

@@ -100,9 +100,23 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private Runnable onGraphDirectionChanged = null;
 	private AnimationEnabledChangedListener onAnimationEnabledChanged = null;
 
+	@Deprecated
+	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
+			VisualMinerWrapper[] miners, boolean miningEnabled, ProMCanceller canceller) {
+		return panel(context, state, miners, canceller);
+	}
+
+	@Deprecated
 	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
 			VisualMinerWrapper[] miners, ProMCanceller canceller) {
-		return new InductiveVisualMinerPanel(context, state, miners, canceller);
+		Mode[] modes = new Mode[] { new ModePaths(), new ModePathsDeviations(), new ModePathsQueueLengths(),
+				new ModePathsSojourn(), new ModePathsWaiting(), new ModePathsService(), new ModeRelativePaths() };
+		return new InductiveVisualMinerPanel(context, state, miners, modes, canceller);
+	}
+
+	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
+			VisualMinerWrapper[] miners, Mode[] modes, ProMCanceller canceller) {
+		return new InductiveVisualMinerPanel(context, state, miners, modes, canceller);
 	}
 
 	private static final Image logo = Toolkit.getDefaultToolkit().getImage(InductiveVisualMinerPanel.class
@@ -110,25 +124,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	public static final String title = "visual Miner";
 
-	/**
-	 * Deprecated. For disabled mining, call state.setPreMinedModel() before
-	 * calling this method.
-	 * 
-	 * @param context
-	 * @param state
-	 * @param miners
-	 * @param miningEnabled
-	 * @param canceller
-	 * @return
-	 */
-	@Deprecated
-	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, boolean miningEnabled, ProMCanceller canceller) {
-		return new InductiveVisualMinerPanel(context, state, miners, canceller);
-	}
-
 	private InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, ProMCanceller canceller) {
+			VisualMinerWrapper[] miners, Mode[] modes, ProMCanceller canceller) {
 		int gridy = 0;
 
 		setLayout(new BorderLayout());
@@ -285,9 +282,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cColourLabel.anchor = GridBagConstraints.WEST;
 				otherSettingsPanel.add(colourLabel, cColourLabel);
 
-				colourSelection = new JComboBox<>(new Mode[] { new ModePaths(), new ModePathsDeviations(),
-						new ModePathsQueueLengths(), new ModePathsSojourn(), new ModePathsWaiting(),
-						new ModePathsService(), new ModeRelativePaths() });
+				colourSelection = new JComboBox<>(modes);
 				IvMDecorator.decorate(colourSelection);
 				colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 				colourSelection.setFocusable(false);
