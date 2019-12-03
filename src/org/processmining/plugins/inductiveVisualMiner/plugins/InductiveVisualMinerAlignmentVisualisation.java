@@ -46,8 +46,8 @@ public class InductiveVisualMinerAlignmentVisualisation {
 		state.setPreMinedAlignment(ivmAlignment);
 
 		InductiveVisualMinerConfigurationPreSet configuration = new InductiveVisualMinerConfigurationPreSet();
-		configuration.setPanel(
-				InductiveVisualMinerPanel.panel(context, state, configuration.discoveryTechniques, canceller));
+		configuration.setPanel(InductiveVisualMinerPanel.panel(context, state, configuration.discoveryTechniques,
+				configuration.modes, canceller));
 		configuration.setState(state);
 		InductiveVisualMinerController controller = new InductiveVisualMinerController(context, configuration,
 				canceller);

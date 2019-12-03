@@ -53,7 +53,7 @@ public class DirectlyFollowsVisualMiner {
 		state.setMiner(new DfgMiner());
 		configuration.setState(state);
 		InductiveVisualMinerPanel panel = InductiveVisualMinerPanel.panel(context, state,
-				configuration.discoveryTechniques, canceller);
+				configuration.discoveryTechniques, configuration.modes, canceller);
 		configuration.setPanel(panel);
 		new InductiveVisualMinerController(context, configuration, canceller);
 

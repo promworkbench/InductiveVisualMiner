@@ -23,7 +23,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	public InductiveVisualMinerPanel getPanel() {
-		return InductiveVisualMinerPanel.panel(context, state, discoveryTechniques, canceller);
+		return InductiveVisualMinerPanel.panel(context, state, discoveryTechniques, modes, canceller);
 	}
 
 }
