@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -34,6 +35,19 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl16Done;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCompleteEventTwice;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEventTwice;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterFollows;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterLogMove;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTrace;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceEndsWithEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceStartsWithEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTrace;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEventTwice;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFrequentTracesFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
@@ -75,12 +89,27 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 	@Override
 	protected List<IvMFilter> createPreMiningFilters() {
-		return new ArrayList<>();
+		return new ArrayList<>(Arrays.asList(new IvMFilter[] { //
+				new PreMiningFilterEvent(), //
+				new PreMiningFilterTrace(), //
+				new PreMiningFilterTraceWithEvent(), //
+				new PreMiningFilterTraceWithEventTwice(), //
+				new PreMiningFrequentTracesFilter()//
+		}));
 	}
 
 	@Override
 	protected List<IvMFilter> createHighlightingFilters() {
-		return new ArrayList<>();
+		return new ArrayList<>(Arrays.asList(new IvMFilter[] { //
+				new HighlightingFilterCompleteEventTwice(), // 
+				new HighlightingFilterEvent(), //
+				new HighlightingFilterEventTwice(), // 
+				new HighlightingFilterFollows(), //
+				new HighlightingFilterLogMove(), //
+				new HighlightingFilterTrace(), //
+				new HighlightingFilterTraceStartsWithEvent(), //
+				new HighlightingFilterTraceEndsWithEvent() //
+		}));
 	}
 
 	@Override
