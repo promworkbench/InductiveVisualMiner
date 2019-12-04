@@ -116,7 +116,8 @@ public class InductiveVisualMiner {
 		}
 
 		public static InductiveVisualMinerLauncher launcher(InductiveVisualMinerConfiguration configuration) {
-			return new InductiveVisualMinerLauncher(null, null, null, configuration);
+			return new InductiveVisualMinerLauncher(new SoftReference<>(configuration.getState().getXLog()), null, null,
+					configuration);
 		}
 
 		public static InductiveVisualMinerLauncher launcher(XLog xLog) {
