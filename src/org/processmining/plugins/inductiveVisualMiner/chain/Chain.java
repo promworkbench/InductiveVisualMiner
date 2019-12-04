@@ -32,11 +32,18 @@ public class Chain {
 	private final Executor executor;
 	private Runnable onChange;
 
-	public Chain(InductiveVisualMinerState state, ProMCanceller globalCanceller, Executor executor, Runnable onChange) {
+	public Runnable getOnChange() {
+		return onChange;
+	}
+
+	public void setOnChange(Runnable onChange) {
+		this.onChange = onChange;
+	}
+
+	public Chain(InductiveVisualMinerState state, ProMCanceller globalCanceller, Executor executor) {
 		this.state = state;
 		this.globalCanceller = globalCanceller;
 		this.executor = executor;
-		this.onChange = onChange;
 	}
 
 	public void addConnection(ChainLink<?, ?> from, ChainLink<?, ?> to) {

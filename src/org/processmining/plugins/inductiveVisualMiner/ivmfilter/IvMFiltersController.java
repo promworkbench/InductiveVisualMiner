@@ -7,18 +7,14 @@ import java.util.concurrent.Executor;
 
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
-import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilterAnnotation;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningEventFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningEventFilterAnnotation;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningTraceFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningTraceFilterAnnotation;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -36,12 +32,12 @@ public class IvMFiltersController {
 	 * @param state
 	 * @param attributesInfo
 	 */
-	public IvMFiltersController(PluginContext context, InductiveVisualMinerPanel panel,
-			InductiveVisualMinerState state, final Runnable onPreMiningUpdate, final Runnable onHighlightingUpdate) {
+	public IvMFiltersController(List<IvMFilter> preMiningFilters2, List<IvMFilter> highlightingFilters2,
+			InductiveVisualMinerState state, InductiveVisualMinerPanel panel, final Runnable onPreMiningUpdate,
+			final Runnable onHighlightingUpdate) {
 		//pre-mining filters
 		{
-			preMiningFilters = IvMFiltersFinder.findFilteringPlugins(context, IvMFilter.class,
-					PreMiningEventFilterAnnotation.class, PreMiningTraceFilterAnnotation.class);
+			this.preMiningFilters = preMiningFilters2;
 			panel.getPreMiningFiltersView().initialise(preMiningFilters);
 			for (IvMFilter filter : preMiningFilters) {
 				filter.createFilterGui(onPreMiningUpdate, state.getAttributesInfo());
@@ -51,8 +47,7 @@ public class IvMFiltersController {
 
 		//highlighting filters
 		{
-			highlightingFilters = IvMFiltersFinder.findFilteringPlugins(context, HighlightingFilter.class,
-					HighlightingFilterAnnotation.class);
+			highlightingFilters = highlightingFilters2;
 			//filter meta-filters
 			for (Iterator<IvMFilter> it = highlightingFilters.iterator(); it.hasNext();) {
 				if (!(it.next() instanceof HighlightingFilter)) {

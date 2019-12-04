@@ -1,12 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.configuration;
 
-import java.util.concurrent.Executor;
+import java.util.List;
 
-import org.processmining.framework.plugin.PluginContext;
-import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
@@ -32,6 +31,20 @@ public interface InductiveVisualMinerConfiguration {
 	 * @return
 	 */
 	public VisualMinerWrapper[] getDiscoveryTechniques();
+
+	/**
+	 * The list of available pre-mining filters.
+	 * 
+	 * @return
+	 */
+	public List<IvMFilter> getPreMiningFilters();
+
+	/**
+	 * The list of available highlighting filters.
+	 * 
+	 * @return
+	 */
+	public List<IvMFilter> getHighlightingFilters();
 
 	/**
 	 * The list of available modes (arc colouring, which numbers to show on the
@@ -69,13 +82,7 @@ public interface InductiveVisualMinerConfiguration {
 	 * - the typical way to extend the visual Miner is to connect the input(s)
 	 * of your chainlink to your chainlink, and your chainlink to CLxxDone.
 	 * 
-	 * @param state
-	 * @param panel
-	 * @param canceller
-	 * @param executor
-	 * @param onChange
 	 * @return
 	 */
-	public Chain getChain(PluginContext context, InductiveVisualMinerState state, InductiveVisualMinerPanel panel,
-			ProMCanceller canceller, Executor executor, Runnable onChange);
+	public Chain getChain();
 }

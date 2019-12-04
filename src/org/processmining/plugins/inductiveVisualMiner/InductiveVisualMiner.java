@@ -21,7 +21,6 @@ import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeExc
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationPreSet;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.processtree.ProcessTree;
@@ -37,8 +36,8 @@ public class InductiveVisualMiner {
 	public JComponent visualise(final PluginContext context, XLog xLog, ProMCanceller canceller)
 			throws UnknownTreeNodeException {
 
-		InductiveVisualMinerConfiguration configuration = new InductiveVisualMinerConfigurationDefault(context, xLog,
-				canceller);
+		InductiveVisualMinerConfiguration configuration = new InductiveVisualMinerConfigurationDefault(xLog, canceller,
+				context.getExecutor());
 		InductiveVisualMinerController controller = new InductiveVisualMinerController(context, configuration,
 				canceller);
 
@@ -64,11 +63,12 @@ public class InductiveVisualMiner {
 		if (log == null) {
 			throw new RuntimeException("The log has been removed by garbage collection.");
 		}
-		final InductiveVisualMinerState state = new InductiveVisualMinerState(log);
+		InductiveVisualMinerConfiguration configuration = new InductiveVisualMinerConfigurationDefault(log, canceller,
+				context.getExecutor());
 		if (launcher.preMinedTree == null && launcher.preMinedDfg == null) {
 			//pre-set the miner if necessary
 			if (launcher.getMiner() != null) {
-				state.setMiner(launcher.getMiner());
+				configuration.getState().setMiner(launcher.getMiner());
 			}
 		} else if (launcher.preMinedTree != null) {
 			//launch with pre-mined tree
@@ -76,20 +76,16 @@ public class InductiveVisualMiner {
 			if (preMinedTree == null) {
 				throw new RuntimeException("The pre-mined tree has been removed by garbage collection.");
 			}
-			state.setPreMinedModel(new IvMModel(preMinedTree));
+			configuration.getState().setPreMinedModel(new IvMModel(preMinedTree));
 		} else {
 			//launch with pre-mined dfg
 			DirectlyFollowsModel preMinedDfm = launcher.preMinedDfg.get();
 			if (preMinedDfm == null) {
 				throw new RuntimeException("The pre-mined tree has been removed by garbage collection.");
 			}
-			state.setPreMinedModel(new IvMModel(preMinedDfm));
+			configuration.getState().setPreMinedModel(new IvMModel(preMinedDfm));
 		}
 
-		InductiveVisualMinerConfigurationPreSet configuration = new InductiveVisualMinerConfigurationPreSet();
-		configuration.setPanel(InductiveVisualMinerPanel.panel(context, state, configuration.discoveryTechniques,
-				configuration.modes, canceller));
-		configuration.setState(state);
 		InductiveVisualMinerController controller = new InductiveVisualMinerController(context, configuration,
 				canceller);
 

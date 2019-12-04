@@ -27,6 +27,8 @@ import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSele
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationFake;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisView;
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ControllerView;
@@ -36,14 +38,6 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
-import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
-import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
-import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
-import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsQueueLengths;
-import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsService;
-import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
-import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsWaiting;
-import org.processmining.plugins.inductiveVisualMiner.mode.ModeRelativePaths;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapView;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceView;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
@@ -109,14 +103,10 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	@Deprecated
 	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
 			VisualMinerWrapper[] miners, ProMCanceller canceller) {
-		Mode[] modes = new Mode[] { new ModePaths(), new ModePathsDeviations(), new ModePathsQueueLengths(),
-				new ModePathsSojourn(), new ModePathsWaiting(), new ModePathsService(), new ModeRelativePaths() };
-		return new InductiveVisualMinerPanel(context, state, miners, modes, canceller);
-	}
-
-	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, Mode[] modes, ProMCanceller canceller) {
-		return new InductiveVisualMinerPanel(context, state, miners, modes, canceller);
+		InductiveVisualMinerConfigurationFake configuration = new InductiveVisualMinerConfigurationFake(state, null,
+				canceller, context.getExecutor());
+		configuration.setDiscoveryTechniques(miners);
+		return new InductiveVisualMinerPanel(configuration, canceller);
 	}
 
 	private static final Image logo = Toolkit.getDefaultToolkit().getImage(InductiveVisualMinerPanel.class
@@ -124,8 +114,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	public static final String title = "visual Miner";
 
-	private InductiveVisualMinerPanel(final PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, Mode[] modes, ProMCanceller canceller) {
+	public InductiveVisualMinerPanel(InductiveVisualMinerConfiguration configuration, ProMCanceller canceller) {
 		int gridy = 0;
 
 		setLayout(new BorderLayout());
@@ -159,8 +148,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//paths slider
 			{
-				pathsSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0, state.getPaths(),
-						Orientation.VERTICAL);
+				pathsSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0,
+						configuration.getState().getPaths(), Orientation.VERTICAL);
 				slidersPanel.add(pathsSlider);
 			}
 		}
@@ -243,7 +232,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cMinerLabel.anchor = GridBagConstraints.WEST;
 				otherSettingsPanel.add(minerLabel, cMinerLabel);
 
-				minerCombobox = new JComboBox<>(miners);
+				minerCombobox = new JComboBox<>(configuration.getDiscoveryTechniques());
 				IvMDecorator.decorate(minerCombobox);
 				minerCombobox.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 				minerCombobox.setFocusable(false);
@@ -254,7 +243,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cMiners.insets = margins;
 				cMiners.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(minerCombobox, cMiners);
-				minerCombobox.setSelectedItem(state.getMiner());
+				minerCombobox.setSelectedItem(configuration.getState().getMiner());
 			}
 
 			//edit model view
@@ -282,7 +271,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cColourLabel.anchor = GridBagConstraints.WEST;
 				otherSettingsPanel.add(colourLabel, cColourLabel);
 
-				colourSelection = new JComboBox<>(modes);
+				colourSelection = new JComboBox<>(configuration.getModes());
 				IvMDecorator.decorate(colourSelection);
 				colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 				colourSelection.setFocusable(false);
@@ -453,7 +442,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 		//graph panel
 		{
-			graphPanel = new InductiveVisualMinerAnimationPanel(canceller, state.isAnimationGlobalEnabled());
+			graphPanel = new InductiveVisualMinerAnimationPanel(canceller,
+					configuration.getState().isAnimationGlobalEnabled());
 			graphPanel.setFocusable(true);
 
 			//set the graph changed listener
@@ -501,7 +491,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		}
 
 		//handle pre-mined tree case
-		if (state.getPreMinedModel() != null) {
+		if (configuration.getState().getPreMinedModel() != null) {
 			activitiesSlider.setVisible(false);
 			pathsSlider.setVisible(false);
 			preMiningFiltersButton.setVisible(false);
@@ -510,7 +500,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		}
 
 		//handle pre-mined classifier case
-		if (state.getPreMinedPerformanceClassifier() != null) {
+		if (configuration.getState().getPreMinedPerformanceClassifier() != null) {
 			editModelButton.setVisible(false);
 			classifierLabel.setVisible(false);
 			classifiersCombobox.setVisible(false);

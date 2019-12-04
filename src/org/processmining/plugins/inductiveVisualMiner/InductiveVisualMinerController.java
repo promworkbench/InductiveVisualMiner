@@ -44,7 +44,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl12FilterNodeSelect
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationPreSet;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
@@ -79,6 +79,7 @@ public class InductiveVisualMinerController {
 		this.panel = configuration.getPanel();
 		this.userStatus = new UserStatus();
 		this.context = context;
+		chain = configuration.getChain();
 
 		state.setGraphUserSettings(panel.getGraph().getUserSettings());
 		state.getGraphUserSettings().setDirection(GraphDirection.leftRight);
@@ -87,16 +88,15 @@ public class InductiveVisualMinerController {
 		initGui(canceller);
 
 		//set up the controller view
-		final Runnable onChange = new Runnable() {
+		chain.setOnChange(new Runnable() {
 			public void run() {
 				if (panel.getControllerView().isVisible()) {
 					panel.getControllerView().pushCompleteChainLinks(chain.getCompletedChainLinks());
 				}
 			}
-		};
+		});
 
 		//set up the chain
-		chain = configuration.getChain(context, state, panel, canceller, context.getExecutor(), onChange);
 		{
 			//set up exception handling
 			{
@@ -138,10 +138,20 @@ public class InductiveVisualMinerController {
 		}
 	}
 
+	/**
+	 * Given panel and state are ignored.
+	 * 
+	 * @param context
+	 * @param panel
+	 * @param state
+	 * @param canceller
+	 */
 	@Deprecated
 	public InductiveVisualMinerController(final PluginContext context, final InductiveVisualMinerPanel panel,
 			final InductiveVisualMinerState state, ProMCanceller canceller) {
-		this(context, new InductiveVisualMinerConfigurationPreSet(panel, state), canceller);
+		this(context,
+				new InductiveVisualMinerConfigurationDefault(state.getXLog(), canceller, context.getExecutor()),
+				canceller);
 	}
 
 	private void initGui(final ProMCanceller canceller) {

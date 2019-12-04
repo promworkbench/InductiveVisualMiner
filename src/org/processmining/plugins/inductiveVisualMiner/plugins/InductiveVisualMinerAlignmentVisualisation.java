@@ -15,10 +15,9 @@ import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationPreSet;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
 public class InductiveVisualMinerAlignmentVisualisation {
@@ -40,19 +39,15 @@ public class InductiveVisualMinerAlignmentVisualisation {
 					" Unfortunately, this Inductive visual Miner alignment does not have the fields necessary to be visualised.");
 		}
 
-		InductiveVisualMinerState state = new InductiveVisualMinerState(xLog);
-		state.setPreMinedModel(model);
-		state.setPreMinedClassifier(classifier);
-		state.setPreMinedAlignment(ivmAlignment);
+		InductiveVisualMinerConfiguration configuration = new InductiveVisualMinerConfigurationDefault(xLog, canceller,
+				context.getExecutor());
+		configuration.getState().setPreMinedModel(model);
+		configuration.getState().setPreMinedClassifier(classifier);
+		configuration.getState().setPreMinedAlignment(ivmAlignment);
 
-		InductiveVisualMinerConfigurationPreSet configuration = new InductiveVisualMinerConfigurationPreSet();
-		configuration.setPanel(InductiveVisualMinerPanel.panel(context, state, configuration.discoveryTechniques,
-				configuration.modes, canceller));
-		configuration.setState(state);
-		InductiveVisualMinerController controller = new InductiveVisualMinerController(context, configuration,
-				canceller);
+		new InductiveVisualMinerController(context, configuration, canceller);
 
-		return controller.getPanel();
+		return configuration.getPanel();
 	}
 
 }
