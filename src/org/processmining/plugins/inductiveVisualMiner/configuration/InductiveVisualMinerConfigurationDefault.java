@@ -105,8 +105,9 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	public Chain createChain(InductiveVisualMinerState state, InductiveVisualMinerPanel panel, ProMCanceller canceller,
-			Executor executor, List<IvMFilter> preMiningFilters, List<IvMFilter> highlightingFilters) {
+	public Chain createChain(final InductiveVisualMinerState state, final InductiveVisualMinerPanel panel,
+			final ProMCanceller canceller, final Executor executor, final List<IvMFilter> preMiningFilters,
+			final List<IvMFilter> highlightingFilters) {
 		//set up the chain
 		final Chain chain = new Chain(state, canceller, executor);
 
