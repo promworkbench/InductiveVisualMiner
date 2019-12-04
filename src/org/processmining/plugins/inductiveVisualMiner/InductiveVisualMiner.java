@@ -63,8 +63,12 @@ public class InductiveVisualMiner {
 		if (log == null) {
 			throw new RuntimeException("The log has been removed by garbage collection.");
 		}
-		InductiveVisualMinerConfiguration configuration = new InductiveVisualMinerConfigurationDefault(log, canceller,
-				context.getExecutor());
+		InductiveVisualMinerConfiguration configuration;
+		if (launcher.configuration != null) {
+			configuration = launcher.configuration;
+		} else {
+			configuration = new InductiveVisualMinerConfigurationDefault(log, canceller, context.getExecutor());
+		}
 		if (launcher.preMinedTree == null && launcher.preMinedDfg == null) {
 			//pre-set the miner if necessary
 			if (launcher.getMiner() != null) {
@@ -97,45 +101,53 @@ public class InductiveVisualMiner {
 		public final SoftReference<EfficientTree> preMinedTree;
 		public final SoftReference<DirectlyFollowsModel> preMinedDfg;
 		private VisualMinerWrapper miner;
+		private final InductiveVisualMinerConfiguration configuration;
 
 		private InductiveVisualMinerLauncher(SoftReference<XLog> xLog, SoftReference<EfficientTree> preMinedTree,
-				SoftReference<DirectlyFollowsModel> preMinedDfg) {
+				SoftReference<DirectlyFollowsModel> preMinedDfg, InductiveVisualMinerConfiguration configuration) {
 			this.xLog = xLog;
 			this.preMinedTree = preMinedTree;
 			this.preMinedDfg = preMinedDfg;
+			this.configuration = configuration;
 		}
 
 		public VisualMinerWrapper getMiner() {
 			return miner;
 		}
 
+		public static InductiveVisualMinerLauncher launcher(InductiveVisualMinerConfiguration configuration) {
+			return new InductiveVisualMinerLauncher(null, null, null, configuration);
+		}
+
 		public static InductiveVisualMinerLauncher launcher(XLog xLog) {
-			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, null);
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, null, null);
 		}
 
 		@Deprecated
 		public static InductiveVisualMinerLauncher launcher(XLog xLog, ProcessTree preMinedTree) {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog),
-					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)), null);
+					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)), null, null);
 		}
 
 		public static InductiveVisualMinerLauncher launcher(XLog xLog, EfficientTree preMinedTree) {
-			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), new SoftReference<>(preMinedTree), null);
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), new SoftReference<>(preMinedTree), null,
+					null);
 		}
 
 		public static InductiveVisualMinerLauncher launcher(XLog xLog, DirectlyFollowsModel preMinedDfg) {
-			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, new SoftReference<>(preMinedDfg));
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, new SoftReference<>(preMinedDfg),
+					null);
 		}
 
 		@Deprecated
 		public static InductiveVisualMinerLauncher launcherPro(XLog xLog) {
-			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, null);
+			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog), null, null, null);
 		}
 
 		@Deprecated
 		public static InductiveVisualMinerLauncher launcherPro(XLog xLog, ProcessTree preMinedTree) {
 			return new InductiveVisualMinerLauncher(new SoftReference<>(xLog),
-					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)), null);
+					new SoftReference<>(ProcessTree2EfficientTree.convert(preMinedTree)), null, null);
 		}
 
 		public void setMiner(VisualMinerWrapper miner) {
