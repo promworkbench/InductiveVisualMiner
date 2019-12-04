@@ -52,22 +52,22 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.
 
 public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMinerConfigurationAbstract {
 
-	protected final Cl01GatherAttributes gatherAttributes = new Cl01GatherAttributes();
-	protected final Cl02SortEvents sortEvents = new Cl02SortEvents();
-	protected final Cl03MakeLog makeLog = new Cl03MakeLog();
-	protected final Cl04FilterLogOnActivities filterLogOnActivities = new Cl04FilterLogOnActivities();
-	protected final Cl05Mine mine = new Cl05Mine();
-	protected final Cl06LayoutModel layoutModel = new Cl06LayoutModel();
-	protected final Cl07Align align = new Cl07Align();
-	protected final Cl08LayoutAlignment layoutAlignment = new Cl08LayoutAlignment();
-	protected final Cl09AnimationScaler animationScaler = new Cl09AnimationScaler();
-	protected final Cl10Animate animate = new Cl10Animate();
-	protected final Cl11TraceColouring traceColouring = new Cl11TraceColouring();
-	protected final Cl12FilterNodeSelection filterNodeSelection = new Cl12FilterNodeSelection();
-	protected final Cl13Performance performance = new Cl13Performance();
-	protected final Cl14Histogram histogram = new Cl14Histogram();
-	protected final Cl15DataAnalysis dataAnalysis = new Cl15DataAnalysis();
-	protected final Cl16Done done = new Cl16Done();
+	protected Cl01GatherAttributes gatherAttributes;
+	protected Cl02SortEvents sortEvents;
+	protected Cl03MakeLog makeLog;
+	protected Cl04FilterLogOnActivities filterLogOnActivities;
+	protected Cl05Mine mine;
+	protected Cl06LayoutModel layoutModel;
+	protected Cl07Align align;
+	protected Cl08LayoutAlignment layoutAlignment;
+	protected Cl09AnimationScaler animationScaler;
+	protected Cl10Animate animate;
+	protected Cl11TraceColouring traceColouring;
+	protected Cl12FilterNodeSelection filterNodeSelection;
+	protected Cl13Performance performance;
+	protected Cl14Histogram histogram;
+	protected Cl15DataAnalysis dataAnalysis;
+	protected Cl16Done done;
 
 	public InductiveVisualMinerConfigurationDefault(XLog log, ProMCanceller canceller, Executor executor) {
 		super(log, canceller, executor);
@@ -109,6 +109,23 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			Executor executor, List<IvMFilter> preMiningFilters, List<IvMFilter> highlightingFilters) {
 		//set up the chain
 		final Chain chain = new Chain(state, canceller, executor);
+
+		gatherAttributes = new Cl01GatherAttributes();
+		sortEvents = new Cl02SortEvents();
+		makeLog = new Cl03MakeLog();
+		filterLogOnActivities = new Cl04FilterLogOnActivities();
+		mine = new Cl05Mine();
+		layoutModel = new Cl06LayoutModel();
+		align = new Cl07Align();
+		layoutAlignment = new Cl08LayoutAlignment();
+		animationScaler = new Cl09AnimationScaler();
+		animate = new Cl10Animate();
+		traceColouring = new Cl11TraceColouring();
+		filterNodeSelection = new Cl12FilterNodeSelection();
+		performance = new Cl13Performance();
+		histogram = new Cl14Histogram();
+		dataAnalysis = new Cl15DataAnalysis();
+		done = new Cl16Done();
 
 		//gather attributes
 		{

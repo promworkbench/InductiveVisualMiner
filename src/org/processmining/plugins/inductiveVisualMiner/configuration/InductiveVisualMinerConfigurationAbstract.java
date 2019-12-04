@@ -55,31 +55,31 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 			ProMCanceller canceller, Executor executor, List<IvMFilter> preMiningFilters,
 			List<IvMFilter> highlightingFilters);
 
-	public Chain getChain() {
+	public final Chain getChain() {
 		return chain;
 	}
 
-	public InductiveVisualMinerState getState() {
+	public final InductiveVisualMinerState getState() {
 		return state;
 	}
 
-	public InductiveVisualMinerPanel getPanel() {
+	public final InductiveVisualMinerPanel getPanel() {
 		return panel;
 	}
 
-	public VisualMinerWrapper[] getDiscoveryTechniques() {
+	public final VisualMinerWrapper[] getDiscoveryTechniques() {
 		return discoveryTechniques;
 	}
 
-	public Mode[] getModes() {
+	public final Mode[] getModes() {
 		return modes;
 	}
 
-	public List<IvMFilter> getPreMiningFilters() {
+	public final List<IvMFilter> getPreMiningFilters() {
 		return preMiningFilters;
 	}
 
-	public List<IvMFilter> getHighlightingFilters() {
+	public final List<IvMFilter> getHighlightingFilters() {
 		return highlightingFilters;
 	}
 }
