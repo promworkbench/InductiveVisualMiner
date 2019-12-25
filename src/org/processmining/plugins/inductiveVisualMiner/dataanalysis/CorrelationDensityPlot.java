@@ -23,11 +23,18 @@ public class CorrelationDensityPlot {
 	private static final int alias = 5;
 	private static final ColourMap colourMap = new ColourMapViridis();
 
+	public static int getWidth() {
+		return sizeX1DPlot + marginX + sizeX2DPlot;
+	}
+
+	public static int getHeight() {
+		return sizeY1DPlot + marginY + sizeY2DPlot;
+	}
+
 	public static BufferedImage create(String nameX, double[] valuesX, double minX, double maxX, String nameY,
 			double[] valuesY, double minY, double maxY) {
 
-		BufferedImage image = new BufferedImage(sizeX1DPlot + marginX + sizeX2DPlot,
-				sizeY1DPlot + marginY + sizeY2DPlot, BufferedImage.TYPE_4BYTE_ABGR);
+		BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 
 		fillImage2DPlot(image, valuesX, minX, maxX, valuesY, minY, maxY, sizeX1DPlot + marginX, 0, sizeX2DPlot,
 				sizeY2DPlot);

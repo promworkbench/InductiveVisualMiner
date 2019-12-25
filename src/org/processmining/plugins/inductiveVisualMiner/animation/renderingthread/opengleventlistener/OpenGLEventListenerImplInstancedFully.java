@@ -55,8 +55,7 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 		//gl.glEnable(GL.GL_DEPTH_TEST);
 		gl.glDisable(GL2.GL_CULL_FACE);
 
-		//set up the shaders
-
+		//set up the shaderssome
 		String vertexShader;
 		String fragmentShader;
 		if (RendererFactory.christmas) {

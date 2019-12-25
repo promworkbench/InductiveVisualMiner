@@ -23,17 +23,20 @@ public class DataAnalysisView extends SideWindow {
 
 	private final JTextArea busyMessage;
 	private final DataAnalysisAttributesPanel attributesPanel;
+	private final DataAnalysisAttributesPanel2 attributesPanel2;
 	private final JScrollPane scrollPane;
 
 	public DataAnalysisView(Component parent) {
 		super(parent, "Data analysis - " + InductiveVisualMinerPanel.title);
 		setLayout(new BorderLayout());
+
 		IvMPanel topPanel = new IvMPanel();
 		topPanel.setLayout(new BorderLayout());
 		add(topPanel, BorderLayout.CENTER);
 
 		attributesPanel = new DataAnalysisAttributesPanel();
-		scrollPane = new JScrollPane(attributesPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		attributesPanel2 = new DataAnalysisAttributesPanel2();
+		scrollPane = new JScrollPane(attributesPanel2, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.getViewport().setBackground(IvMDecorator.backGroundColour1);
 		topPanel.add(scrollPane, BorderLayout.CENTER);
@@ -44,6 +47,7 @@ public class DataAnalysisView extends SideWindow {
 		busyMessage.setLineWrap(true);
 		busyMessage.setEnabled(false);
 		busyMessage.setMargin(new Insets(5, 5, 5, 5));
+
 		topPanel.add(busyMessage, BorderLayout.PAGE_START);
 
 		invalidateContent();
@@ -67,6 +71,8 @@ public class DataAnalysisView extends SideWindow {
 			}
 		}
 
+		attributesPanel2.setAttributesInfo(attributesInfo);
+
 		revalidate();
 		repaint();
 	}
@@ -76,6 +82,7 @@ public class DataAnalysisView extends SideWindow {
 		scrollPane.setVisible(true);
 
 		attributesPanel.setDataAnalysis(dataAnalysis);
+		attributesPanel2.setDataAnalysis(dataAnalysis);
 
 		revalidate();
 		repaint();

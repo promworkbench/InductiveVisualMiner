@@ -19,7 +19,9 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysis.AttributeData.Field;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -40,6 +42,7 @@ import gnu.trove.map.hash.THashMap;
  */
 public class DataAnalysis {
 	public static final DecimalFormat numberFormat = new DecimalFormat("#.####");
+	public static final int pieSize = 40;
 
 	public static class AttributeData {
 		public static enum Field {
@@ -220,13 +223,17 @@ public class DataAnalysis {
 		}
 	}
 
-	private static class LogData {
+	public static class LogData {
 		public int numberOfTraces;
 		double[] fitness;
+		BufferedImage pieSize;
 	}
 
-	Map<Attribute, AttributeData> attribute2data = new THashMap<>();
-	Map<Attribute, AttributeData> attribute2dataNegative = new THashMap<>();
+	private Map<Attribute, AttributeData> attribute2data = new THashMap<>();
+	private Map<Attribute, AttributeData> attribute2dataNegative = new THashMap<>();
+
+	private LogData logData;
+	private LogData logDataNegative;
 
 	private double globalMinFitness;
 	private double globalMaxFitness;
@@ -255,11 +262,13 @@ public class DataAnalysis {
 
 		isSomethingFiltered = logFiltered.isSomethingFiltered();
 
-		final LogData logFilteredData = createLogData(logFiltered);
+		final LogData logFilteredData = createLogData(logFiltered, true);
+		logData = logFilteredData;
 
 		final IvMLogFilteredImpl logFilteredNegative = logFiltered.clone();
 		logFilteredNegative.invert();
-		final LogData logFilteredDataNegative = createLogData(logFilteredNegative);
+		final LogData logFilteredDataNegative = createLogData(logFilteredNegative, false);
+		logDataNegative = logFilteredDataNegative;
 
 		final ConcurrentMap<Attribute, AttributeData> attribute2dataC = new ConcurrentHashMap<>();
 		final ConcurrentMap<Attribute, AttributeData> attribute2dataNegativeC = new ConcurrentHashMap<>();
@@ -318,7 +327,7 @@ public class DataAnalysis {
 		}
 	}
 
-	public LogData createLogData(IvMLogFiltered log) {
+	public LogData createLogData(IvMLogFiltered log, boolean isPositive) {
 		LogData result = new LogData();
 
 		//count the number of traces
@@ -329,6 +338,21 @@ public class DataAnalysis {
 				result.numberOfTraces++;
 			}
 		}
+
+		//count the number of traces in the unfiltered log
+		int unfilteredNumberOfTraces = 0;
+		{
+			for (IteratorWithPosition<IvMTrace> it = log.iteratorUnfiltered(); it.hasNext();) {
+				it.next();
+				unfilteredNumberOfTraces++;
+			}
+		}
+
+		double part = result.numberOfTraces / (unfilteredNumberOfTraces * 1.0);
+		if (!isPositive) {
+			part = -(1 - part);
+		}
+		result.pieSize = PieChart.drawPie(pieSize, part, IvMDecorator.textColour);
 
 		//compute fitness
 		result.fitness = new double[result.numberOfTraces];
@@ -536,6 +560,14 @@ public class DataAnalysis {
 
 	public AttributeData getAttributeDataNegative(Attribute attribute) {
 		return attribute2dataNegative.get(attribute);
+	}
+
+	public LogData getLogData() {
+		return logData;
+	}
+
+	public LogData getLogDataNegative() {
+		return logDataNegative;
 	}
 
 	public boolean isSomethingFiltered() {
