@@ -48,7 +48,7 @@ public class DataAnalysisView extends SideWindow {
 		busyMessage.setEnabled(false);
 		busyMessage.setMargin(new Insets(5, 5, 5, 5));
 
-		topPanel.add(busyMessage, BorderLayout.PAGE_START);
+		//topPanel.add(busyMessage, BorderLayout.PAGE_START);
 
 		invalidateContent();
 	}

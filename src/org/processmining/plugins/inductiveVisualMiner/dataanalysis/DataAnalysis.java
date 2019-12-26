@@ -41,30 +41,17 @@ import gnu.trove.map.hash.THashMap;
  *
  */
 public class DataAnalysis {
-	public static final DecimalFormat numberFormat = new DecimalFormat("#.####");
+	public static final DecimalFormat numberFormat = new DecimalFormat("0.0000");
 	public static final int pieSize = 40;
 
 	public static class AttributeData {
 		public static enum Field {
-			set {
-				public String toString() {
-					return "traces with attribute";
-				}
-
-				public boolean forcedNumeric() {
-					return true;
-				}
-
-				public FieldType type() {
-					return FieldType.number;
-				}
-			},
 			min {
 				public String toString() {
 					return "minimum";
 				}
 
-				public boolean forcedNumeric() {
+				public boolean outputNumeric() {
 					return false;
 				}
 
@@ -77,7 +64,7 @@ public class DataAnalysis {
 					return "average";
 				}
 
-				public boolean forcedNumeric() {
+				public boolean outputNumeric() {
 					return false;
 				}
 
@@ -90,7 +77,7 @@ public class DataAnalysis {
 					return "median";
 				}
 
-				public boolean forcedNumeric() {
+				public boolean outputNumeric() {
 					return false;
 				}
 
@@ -103,7 +90,7 @@ public class DataAnalysis {
 					return "maximum";
 				}
 
-				public boolean forcedNumeric() {
+				public boolean outputNumeric() {
 					return false;
 				}
 
@@ -116,8 +103,21 @@ public class DataAnalysis {
 					return "standard deviation";
 				}
 
-				public boolean forcedNumeric() {
-					return false;
+				public boolean outputNumeric() {
+					return true;
+				}
+
+				public FieldType type() {
+					return FieldType.number;
+				}
+			},
+			set {
+				public String toString() {
+					return "traces with attribute";
+				}
+
+				public boolean outputNumeric() {
+					return true;
 				}
 
 				public FieldType type() {
@@ -129,7 +129,7 @@ public class DataAnalysis {
 					return "minimum fitness";
 				}
 
-				public boolean forcedNumeric() {
+				public boolean outputNumeric() {
 					return true;
 				}
 
@@ -142,7 +142,7 @@ public class DataAnalysis {
 					return "average fitness";
 				}
 
-				public boolean forcedNumeric() {
+				public boolean outputNumeric() {
 					return true;
 				}
 
@@ -155,7 +155,7 @@ public class DataAnalysis {
 					return "maximum fitness";
 				}
 
-				public boolean forcedNumeric() {
+				public boolean outputNumeric() {
 					return true;
 				}
 
@@ -168,7 +168,7 @@ public class DataAnalysis {
 					return "correlation with fitness";
 				}
 
-				public boolean forcedNumeric() {
+				public boolean outputNumeric() {
 					return true;
 				}
 
@@ -178,10 +178,10 @@ public class DataAnalysis {
 			},
 			correlationPlot {
 				public String toString() {
-					return "correlation plot";
+					return "correlation with fitness plot";
 				}
 
-				public boolean forcedNumeric() {
+				public boolean outputNumeric() {
 					return false;
 				}
 
@@ -190,7 +190,7 @@ public class DataAnalysis {
 				}
 			};
 
-			public abstract boolean forcedNumeric();
+			public abstract boolean outputNumeric();
 
 			public abstract FieldType type();
 		}
@@ -542,13 +542,20 @@ public class DataAnalysis {
 		}
 	}
 
-	public static String getString(Attribute attribute, double value) {
-		if (attribute.isNumeric()) {
-			return numberFormat.format(value);
+	public static String getString(Attribute attribute, Field field, double value) {
+		if (attribute.isNumeric() || field.outputNumeric()) {
+			String s = numberFormat.format(value);
+			s = s.replaceAll("0[ ]*$", " ");
+			s = s.replaceAll("0([ ]*)$", " $1");
+			s = s.replaceAll("0([ ]*)$", " $1");
+			s = s.replaceAll("0([ ]*)$", " $1");
+			s = s.replaceAll(".([ ]*)$", " $1");
+
+			return s;
 		} else if (attribute.isTraceDuration()) {
 			return ResourceTimeUtils.getDuration(value);
 		} else if (attribute.isTraceNumberofEvents()) {
-			return ((long) value) + "";
+			return ((long) value) + "     ";
 		} else {
 			return ResourceTimeUtils.timeToString((long) value);
 		}

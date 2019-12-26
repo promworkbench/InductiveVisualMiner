@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -55,6 +54,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunctio
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.UserStatus;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
@@ -149,8 +149,7 @@ public class InductiveVisualMinerController {
 	@Deprecated
 	public InductiveVisualMinerController(final PluginContext context, final InductiveVisualMinerPanel panel,
 			final InductiveVisualMinerState state, ProMCanceller canceller) {
-		this(context,
-				new InductiveVisualMinerConfigurationDefault(state.getXLog(), canceller, context.getExecutor()),
+		this(context, new InductiveVisualMinerConfigurationDefault(state.getXLog(), canceller, context.getExecutor()),
 				canceller);
 	}
 
@@ -501,7 +500,7 @@ public class InductiveVisualMinerController {
 
 	public static void setAnimationStatus(InductiveVisualMinerPanel panel, String s, boolean isTime) {
 		if (isTime) {
-			panel.getAnimationTimeLabel().setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+			panel.getAnimationTimeLabel().setFont(IvMDecorator.fontMonoSpace);
 			panel.getAnimationTimeLabel().setText("time: " + s);
 		} else {
 			panel.getAnimationTimeLabel().setFont(panel.getStatusLabel().getFont());

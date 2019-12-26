@@ -49,10 +49,12 @@ public class IvMDecorator {
 	public static final float fontSizeLarger = 12;
 	public static final Font font;
 	public static final Font fontLarger;
+	public static final Font fontMonoSpace;
 	static {
 		JLabel label = new JLabel("abc");
 		font = label.getFont().deriveFont(fontSize);
 		fontLarger = label.getFont().deriveFont(fontSizeLarger);
+		fontMonoSpace = new Font(Font.MONOSPACED, Font.BOLD, 12);
 	}
 
 	private static final EmptyBorder paddings = new EmptyBorder(3, 3, 3, 3);
@@ -247,7 +249,7 @@ public class IvMDecorator {
 	public static class IvMMultiComboBoxUI<X> extends IvMComboBoxUI<X> {
 		public void installUI(JComponent c) {
 			super.installUI(c);
-			
+
 			@SuppressWarnings("unchecked")
 			MultiComboBox<X> comboBox = (MultiComboBox<X>) c;
 			@SuppressWarnings("unchecked")
@@ -255,7 +257,7 @@ public class IvMDecorator {
 			JLabel label = renderer.getLabel();
 			decorate(label);
 			label.setHorizontalAlignment(SwingConstants.CENTER);
-			
+
 			comboBox.addListeners();
 		}
 	}

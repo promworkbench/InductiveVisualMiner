@@ -190,10 +190,10 @@ public class DataAnalysisAttributeView extends JPanel {
 					break;
 				case number :
 					if (data.getNumber(field) > -Double.MAX_VALUE) {
-						if (field.forcedNumeric()) {
+						if (field.outputNumeric()) {
 							right.add(createLabel(DataAnalysis.numberFormat.format(data.getNumber(field))));
 						} else {
-							right.add(createLabel(DataAnalysis.getString(attribute, data.getNumber(field))));
+							right.add(createLabel(DataAnalysis.getString(attribute, field, data.getNumber(field))));
 						}
 					} else {
 						right.add(createLabel("n/a"));
