@@ -14,16 +14,23 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.deckfour.xes.model.XAttribute;
+import org.deckfour.xes.model.XLog;
 import org.math.plot.utils.Array;
+import org.processmining.earthmoversstochasticconformancechecking.plugins.EarthMoversStochasticConformancePlugin;
+import org.processmining.earthmoversstochasticconformancechecking.stochasticalignment.StochasticTraceAlignmentsParametersLogLogAbstract;
+import org.processmining.earthmoversstochasticconformancechecking.stochasticalignment.StochasticTraceAlignmentsParametersLogLogDefault;
+import org.processmining.earthmoversstochasticconformancechecking.tracealignments.StochasticTraceAlignmentsLogLog;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysis.AttributeData.Field;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog2XLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -234,32 +241,12 @@ public class DataAnalysis {
 
 	private LogData logData;
 	private LogData logDataNegative;
-
-	private double globalMinFitness;
-	private double globalMaxFitness;
+	private double stochasticSimilarity;
 	private boolean isSomethingFiltered;
 
-	public DataAnalysis(IvMLogNotFiltered fullLog, final IvMLogFiltered logFiltered, AttributesInfo attributes,
-			final IvMCanceller canceller) throws CloneNotSupportedException, InterruptedException {
-		//compute global min and max fitness
-		{
-			double min = 1;
-			double max = 0;
-			for (Iterator<IvMTrace> it = fullLog.iterator(); it.hasNext();) {
-				IvMTrace trace = it.next();
-
-				double fitness = Fitness.compute(trace);
-				min = Math.min(min, fitness);
-				max = Math.max(max, fitness);
-			}
-			globalMinFitness = min;
-			globalMaxFitness = max;
-		}
-
-		if (canceller.isCancelled()) {
-			return;
-		}
-
+	public DataAnalysis(final IvMModel model, IvMLogNotFiltered fullLog, final IvMLogFiltered logFiltered,
+			AttributesInfo attributes, final IvMCanceller canceller)
+			throws CloneNotSupportedException, InterruptedException {
 		isSomethingFiltered = logFiltered.isSomethingFiltered();
 
 		final LogData logFilteredData = createLogData(logFiltered, true);
@@ -276,7 +263,6 @@ public class DataAnalysis {
 				Math.max(Runtime.getRuntime().availableProcessors() - 1, 1),
 				new ThreadFactoryBuilder().setNameFormat("ivm-thread-dataanalysis-%d").build());
 		try {
-
 			for (Attribute attribute : attributes.getTraceAttributes()) {
 				if (isSupported(attribute)) {
 					final Attribute attribute2 = attribute;
@@ -313,6 +299,23 @@ public class DataAnalysis {
 					}
 				}
 			}
+
+			//compute stochastic similarity
+			{
+				executor.execute(new Runnable() {
+					public void run() {
+						//transform to xlog
+						XLog logA = IvMLog2XLog.convert(logFiltered, model);
+						XLog logB = IvMLog2XLog.convert(logFilteredNegative, model);
+
+						StochasticTraceAlignmentsParametersLogLogAbstract parameters = new StochasticTraceAlignmentsParametersLogLogDefault();
+						StochasticTraceAlignmentsLogLog alignments = EarthMoversStochasticConformancePlugin
+								.measureLogLog(logA, logB, parameters, canceller);
+						stochasticSimilarity = alignments.getSimilarity();
+					}
+				});
+			}
+
 			executor.shutdown();
 			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} finally {
@@ -588,6 +591,10 @@ public class DataAnalysis {
 			return trace.getNumberOfEvents() + "";
 		}
 		return null;
+	}
+
+	public double getStochasticSimilarity() {
+		return stochasticSimilarity;
 	}
 
 }
