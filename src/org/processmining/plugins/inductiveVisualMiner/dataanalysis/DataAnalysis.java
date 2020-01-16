@@ -16,9 +16,9 @@ import java.util.concurrent.TimeUnit;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XLog;
 import org.math.plot.utils.Array;
+import org.processmining.earthmoversstochasticconformancechecking.parameters.EMSCParametersLogLogAbstract;
+import org.processmining.earthmoversstochasticconformancechecking.parameters.EMSCParametersLogLogDefault;
 import org.processmining.earthmoversstochasticconformancechecking.plugins.EarthMoversStochasticConformancePlugin;
-import org.processmining.earthmoversstochasticconformancechecking.stochasticalignment.StochasticTraceAlignmentsParametersLogLogAbstract;
-import org.processmining.earthmoversstochasticconformancechecking.stochasticalignment.StochasticTraceAlignmentsParametersLogLogDefault;
 import org.processmining.earthmoversstochasticconformancechecking.tracealignments.StochasticTraceAlignmentsLogLog;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
@@ -308,10 +308,15 @@ public class DataAnalysis {
 						XLog logA = IvMLog2XLog.convert(logFiltered, model);
 						XLog logB = IvMLog2XLog.convert(logFilteredNegative, model);
 
-						StochasticTraceAlignmentsParametersLogLogAbstract parameters = new StochasticTraceAlignmentsParametersLogLogDefault();
-						StochasticTraceAlignmentsLogLog alignments = EarthMoversStochasticConformancePlugin
-								.measureLogLog(logA, logB, parameters, canceller);
-						stochasticSimilarity = alignments.getSimilarity();
+						EMSCParametersLogLogAbstract parameters = new EMSCParametersLogLogDefault();
+						StochasticTraceAlignmentsLogLog alignments;
+						try {
+							alignments = EarthMoversStochasticConformancePlugin
+									.measureLogLog(logA, logB, parameters, canceller);
+							stochasticSimilarity = alignments.getSimilarity();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				});
 			}
