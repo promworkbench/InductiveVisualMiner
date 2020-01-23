@@ -40,9 +40,10 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilt
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterFollows;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterLogMove;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTrace;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceAttribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceEndsWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceStartsWithEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterWithoutEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEvent;
@@ -101,12 +102,13 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	@Override
 	protected List<IvMFilter> createHighlightingFilters() {
 		return new ArrayList<>(Arrays.asList(new IvMFilter[] { //
-				new HighlightingFilterCompleteEventTwice(), // 
+				new HighlightingFilterTraceAttribute(), //
 				new HighlightingFilterEvent(), //
+				new HighlightingFilterWithoutEvent(), //
 				new HighlightingFilterEventTwice(), // 
+				new HighlightingFilterCompleteEventTwice(), //
 				new HighlightingFilterFollows(), //
 				new HighlightingFilterLogMove(), //
-				new HighlightingFilterTrace(), //
 				new HighlightingFilterTraceStartsWithEvent(), //
 				new HighlightingFilterTraceEndsWithEvent() //
 		}));

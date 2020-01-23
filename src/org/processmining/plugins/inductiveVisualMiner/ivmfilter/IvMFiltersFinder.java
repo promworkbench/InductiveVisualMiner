@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilt
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterFollows;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterLogMove;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTrace;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceAttribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceEndsWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceStartsWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterEvent;
@@ -37,7 +37,7 @@ public class IvMFiltersFinder {
 		maybeAdd(colouringFilters, new HighlightingFilterEventTwice(), annotations);
 		maybeAdd(colouringFilters, new HighlightingFilterEvent(), annotations);
 		maybeAdd(colouringFilters, new HighlightingFilterLogMove(), annotations);
-		maybeAdd(colouringFilters, new HighlightingFilterTrace(), annotations);
+		maybeAdd(colouringFilters, new HighlightingFilterTraceAttribute(), annotations);
 		maybeAdd(colouringFilters, new HighlightingFilterCompleteEventTwice(), annotations);
 		maybeAdd(colouringFilters, new HighlightingFilterLogMove(), annotations);
 		maybeAdd(colouringFilters, new HighlightingFilterFollows(), annotations);

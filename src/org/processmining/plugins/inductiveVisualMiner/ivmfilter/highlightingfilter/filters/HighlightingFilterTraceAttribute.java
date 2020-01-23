@@ -7,7 +7,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapPropertyDuration;
 
-public class HighlightingFilterTrace extends HighlightingFilterEvent {
+public class HighlightingFilterTraceAttribute extends HighlightingFilterEvent {
 
 	@Override
 	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
@@ -23,7 +23,7 @@ public class HighlightingFilterTrace extends HighlightingFilterEvent {
 
 	@Override
 	public String getName() {
-		return "Trace filter";
+		return "Trace attribute filter";
 	}
 
 	@Override
