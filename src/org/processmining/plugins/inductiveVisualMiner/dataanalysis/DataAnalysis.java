@@ -311,8 +311,11 @@ public class DataAnalysis {
 						EMSCParametersLogLogAbstract parameters = new EMSCParametersLogLogDefault();
 						StochasticTraceAlignmentsLogLog alignments;
 						try {
-							alignments = EarthMoversStochasticConformancePlugin
-									.measureLogLog(logA, logB, parameters, canceller);
+							alignments = EarthMoversStochasticConformancePlugin.measureLogLog(logA, logB, parameters,
+									canceller);
+							if (canceller.isCancelled()) {
+								return;
+							}
 							stochasticSimilarity = alignments.getSimilarity();
 						} catch (InterruptedException e) {
 							e.printStackTrace();

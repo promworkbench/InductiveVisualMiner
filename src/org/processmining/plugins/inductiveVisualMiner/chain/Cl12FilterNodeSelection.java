@@ -55,7 +55,6 @@ public class Cl12FilterNodeSelection extends
 
 	protected void processResult(Pair<IvMLogFilteredImpl, IvMLogInfo> result, InductiveVisualMinerState state) {
 		state.setIvMLogFiltered(result.getA(), result.getB());
-		state.setVisualisationData(state.getMode().getVisualisationData(state));
 	}
 
 	protected void invalidateResult(InductiveVisualMinerState state) {
@@ -64,7 +63,6 @@ public class Cl12FilterNodeSelection extends
 		} else {
 			state.setIvMLogFiltered(null, null);
 		}
-		state.setVisualisationData(null);
 	}
 
 	/**

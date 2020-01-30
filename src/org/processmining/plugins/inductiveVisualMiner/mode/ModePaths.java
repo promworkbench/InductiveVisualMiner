@@ -4,8 +4,15 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
+
+import gnu.trove.map.TIntObjectMap;
 
 public class ModePaths extends Mode {
 
@@ -41,7 +48,9 @@ public class ModePaths extends Mode {
 		return false;
 	}
 
-	protected AlignedLogVisualisationData getFinalVisualisationData(InductiveVisualMinerState state) {
-		return new AlignedLogVisualisationDataImplFrequencies(state.getModel(), state.getIvMLogInfoFiltered());
+	@Override
+	public AlignedLogVisualisationData getVisualisationData(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfo,
+			TIntObjectMap<QueueActivityLog> queueActivityLogs, PerformanceWrapper performance) {
+		return new AlignedLogVisualisationDataImplFrequencies(model, logInfo);
 	}
 }

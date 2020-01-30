@@ -5,7 +5,7 @@ import java.util.Collections;
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.ActivityInstanceIterator;
@@ -15,7 +15,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 
 public class QueueMineActivityLog {
 
-	public static TIntObjectMap<QueueActivityLog> mine(IvMModel model, IvMLog tLog) {
+	public static TIntObjectMap<QueueActivityLog> mine(IvMModel model, IvMLogFiltered tLog) {
 		TIntObjectMap<QueueActivityLog> queueActivityLogs = new TIntObjectHashMap<QueueActivityLog>(10, 0.5f, -1);
 		for (IteratorWithPosition<IvMTrace> it = tLog.iterator(); it.hasNext();) {
 			IvMTrace tTrace = it.next();

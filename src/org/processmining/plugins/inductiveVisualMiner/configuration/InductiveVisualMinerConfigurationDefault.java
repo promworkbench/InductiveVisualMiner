@@ -403,12 +403,12 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getTraceView().set(state.getModel(), state.getIvMLogFiltered(), state.getSelection(),
 							state.getTraceColourMap());
 
-					try {
-						InductiveVisualMinerController.updateHighlighting(panel, state);
-						PopupPopulator.updatePopup(panel, state);
-					} catch (UnknownTreeNodeException e) {
-						e.printStackTrace();
-					}
+//					try {
+//						InductiveVisualMinerController.updateHighlighting(panel, state);
+//						PopupPopulator.updatePopup(panel, state);
+//					} catch (UnknownTreeNodeException e) {
+//						e.printStackTrace();
+//					}
 
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(state.getIvMLogFiltered());
@@ -421,11 +421,11 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(null);
 
-					try {
-						PopupPopulator.updatePopup(panel, state);
-					} catch (UnknownTreeNodeException e) {
-						e.printStackTrace();
-					}
+//					try {
+//						PopupPopulator.updatePopup(panel, state);
+//					} catch (UnknownTreeNodeException e) {
+//						e.printStackTrace();
+//					}
 					panel.getGraph().repaint();
 				}
 			});

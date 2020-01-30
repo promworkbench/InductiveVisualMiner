@@ -227,6 +227,7 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 				result++;
 			}
 		}
+		assert (result > 2);
 		return result;
 	}
 }
