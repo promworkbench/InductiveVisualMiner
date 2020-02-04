@@ -11,14 +11,16 @@ import gnu.trove.list.array.TLongArrayList;
 public class QueueActivityLog {
 
 	private final List<IvMMove> completeMoves = new ArrayList<>();
+	private final List<IvMMove> initiateMoves = new ArrayList<>();
 	private final TLongArrayList moves = new TLongArrayList();
 	private final List<String> resources = new ArrayList<>();
 	private final TIntArrayList traceIndices = new TIntArrayList();
 
-	public void add(String resource, Long startTrace, Long initiate, Long enqueue, Long start, Long complete,
-			IvMMove completeMove, Long endTrace, int traceIndex) {
+	public void add(String resource, Long startTrace, Long initiate, IvMMove initiateMove, Long enqueue, Long start,
+			Long complete, IvMMove completeMove, Long endTrace, int traceIndex) {
 		resources.add(resource);
 		traceIndices.add(traceIndex);
+		initiateMoves.add(initiateMove);
 		completeMoves.add(completeMove);
 		if (initiate != null) {
 			moves.add(initiate);
@@ -86,6 +88,10 @@ public class QueueActivityLog {
 
 	public long getInitiate(int activityInstanceIndex) {
 		return moves.get(activityInstanceIndex * 6);
+	}
+
+	public IvMMove getInitiateMove(int activityInstanceIndex) {
+		return initiateMoves.get(activityInstanceIndex);
 	}
 
 	public long getEnqueue(int activityInstanceIndex) {
