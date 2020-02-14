@@ -36,17 +36,21 @@ public class PopupPopulator {
 			if (element instanceof LocalDotNode) {
 				int unode = ((LocalDotNode) element).getUnode();
 
-				for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
-					
-				}
-
 				if (state.isAlignmentReady()) {
 					//popup of an activity
 					if (state.getModel().isActivity(unode)) {
+						
 						List<String> popup = new ArrayList<>();
 
-						//name
-						popup.add("activity " + state.getModel().getActivityName(unode));
+						for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
+							if (!item.isTwoColumns()) {
+								//one column
+								popup.add(item.getSingleColumn(state, unode));
+							} else {
+								//two columns
+								popup.add(item.getColumnA(state, unode) + " " + item.getColumnB(state, unode));
+							}
+						}
 
 						//frequencies
 						popup.add("number of occurrences  " + IvMLogMetrics.getNumberOfTracesRepresented(
