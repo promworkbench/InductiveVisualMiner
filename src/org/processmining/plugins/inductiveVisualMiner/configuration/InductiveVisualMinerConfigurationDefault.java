@@ -59,7 +59,11 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsWaiting;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModeRelativePaths;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityEmpty;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityName;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrences;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrencesPerTrace;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityPerformance;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.AllOperatorsMiner;
@@ -140,7 +144,12 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	@Override
 	protected PopupItemActivity[] createPopupItemActivity() {
 		return new PopupItemActivity[] { //
-				new PopupItemActivityName() };
+				new PopupItemActivityName(), //
+				new PopupItemActivityOccurrences(), //
+				new PopupItemActivityOccurrencesPerTrace(), //
+				new PopupItemActivityEmpty(), //
+				new PopupItemActivityPerformance(),//
+		};
 	}
 
 	@Override

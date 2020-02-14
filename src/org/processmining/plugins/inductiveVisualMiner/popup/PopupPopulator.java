@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.popup;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +17,6 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeGlobal;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
@@ -39,41 +39,55 @@ public class PopupPopulator {
 				if (state.isAlignmentReady()) {
 					//popup of an activity
 					if (state.getModel().isActivity(unode)) {
-						
+
 						List<String> popup = new ArrayList<>();
+
+						//gather the width of the first column
+						int widthColumnA = 0;
+						{
+							for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
+								if (item.isTwoColumns()) {
+									for (String value : item.getColumnA(state, unode)) {
+										if (value != null) {
+											widthColumnA = Math.max(widthColumnA, value.length());
+										}
+									}
+								}
+							}
+						}
 
 						for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
 							if (!item.isTwoColumns()) {
 								//one column
-								popup.add(item.getSingleColumn(state, unode));
+								for (String value : item.getSingleColumn(state, unode)) {
+									popup.add(value);
+								}
 							} else {
 								//two columns
-								popup.add(item.getColumnA(state, unode) + " " + item.getColumnB(state, unode));
+								String[] columnA = item.getColumnA(state, unode);
+								String[] columnB = item.getColumnB(state, unode);
+								for (int i = 0; i < columnA.length; i++) {
+									if (columnA[i] != null && columnB[i] != null) {
+										popup.add(padRight(columnA[i], widthColumnA) + " " + columnB[i]);
+									} else {
+										popup.add(null);
+									}
+								}
 							}
 						}
 
-						//frequencies
-						popup.add("number of occurrences  " + IvMLogMetrics.getNumberOfTracesRepresented(
-								state.getModel(), unode, false, state.getIvMLogInfoFiltered()));
-						//frequencies
-						popup.add("occurrences per trace  "
-								+ (IvMLogMetrics.getNumberOfTracesRepresented(state.getModel(), unode, false,
-										state.getIvMLogInfoFiltered())
-										/ (state.getIvMLogInfoFiltered().getNumberOfTraces() * 1.0)));
-						popup.add(null);
-
-						//times
-						if (state.isPerformanceReady()) {
-							for (TypeNode type : TypeNode.values()) {
-								for (Gather gather : Gather.values()) {
-									long m = state.getPerformance().getNodeMeasure(type, gather, unode);
-									if (m > -1) {
-										popup.add(gather.toString() + " " + type.toString() + " "
-												+ Performance.timeToString(m));
+						//post-process: remove double empty lines
+						{
+							boolean seenNull = false;
+							for (Iterator<String> it = popup.iterator(); it.hasNext();) {
+								if (it.next() == null) {
+									if (seenNull) {
+										it.remove();
+									} else {
+										seenNull = true;
 									}
-								}
-								if (popup.get(popup.size() - 1) != null) {
-									popup.add(null);
+								} else {
+									seenNull = false;
 								}
 							}
 						}
@@ -180,5 +194,9 @@ public class PopupPopulator {
 				panel.getGraph().setShowPopup(false, 10);
 			}
 		}
+	}
+
+	public static String padRight(String s, int n) {
+		return String.format("%-" + n + "s", s);
 	}
 }
