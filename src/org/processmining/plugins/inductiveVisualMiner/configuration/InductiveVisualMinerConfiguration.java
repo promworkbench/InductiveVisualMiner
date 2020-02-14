@@ -7,10 +7,11 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
 /**
- * Use this class to extend the visual Miner considerably:
+ * Use this class to extend the visual Miner:
  * 
  * - discovery techniques;
  * 
@@ -53,6 +54,13 @@ public interface InductiveVisualMinerConfiguration {
 	 * @return
 	 */
 	public Mode[] getModes();
+
+	/**
+	 * The list of items that are shown in the pop-ups of activities.
+	 * 
+	 * @return
+	 */
+	public PopupItemActivity[] getPopupItemsActivity();
 
 	/**
 	 * Set up the state that keeps the data related to the visual Miner.

@@ -35,6 +35,11 @@ public class PopupPopulator {
 			DotElement element = panel.getGraph().getMouseInElements().iterator().next();
 			if (element instanceof LocalDotNode) {
 				int unode = ((LocalDotNode) element).getUnode();
+
+				for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
+					
+				}
+
 				if (state.isAlignmentReady()) {
 					//popup of an activity
 					if (state.getModel().isActivity(unode)) {

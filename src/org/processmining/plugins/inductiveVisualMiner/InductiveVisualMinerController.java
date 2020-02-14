@@ -76,6 +76,7 @@ public class InductiveVisualMinerController {
 	public InductiveVisualMinerController(final PluginContext context,
 			final InductiveVisualMinerConfiguration configuration, final ProMCanceller canceller) {
 		this.state = configuration.getState();
+		state.setConfiguration(configuration);
 		this.panel = configuration.getPanel();
 		this.userStatus = new UserStatus();
 		this.context = context;

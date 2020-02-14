@@ -22,6 +22,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualM
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
@@ -64,6 +65,17 @@ public class InductiveVisualMinerState {
 	public InductiveVisualMinerState(XLog xLog, EfficientTree preMinedTree) {
 		this(xLog);
 		setPreMinedModel(new IvMModel(preMinedTree));
+	}
+
+	//==configuration
+	private InductiveVisualMinerConfiguration configuration;
+
+	public void setConfiguration(InductiveVisualMinerConfiguration configuration) {
+		this.configuration = configuration;
+	}
+
+	public InductiveVisualMinerConfiguration getConfiguration() {
+		return configuration;
 	}
 
 	//==attributes==

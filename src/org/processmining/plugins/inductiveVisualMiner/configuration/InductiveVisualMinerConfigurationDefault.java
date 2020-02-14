@@ -57,7 +57,9 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsService;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsWaiting;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModeRelativePaths;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityName;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.AllOperatorsMiner;
@@ -116,13 +118,29 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 	@Override
 	protected VisualMinerWrapper[] createDiscoveryTechniques() {
-		return new VisualMinerWrapper[] { new Miner(), new DfgMiner(), new LifeCycleMiner(), new AllOperatorsMiner() };
+		return new VisualMinerWrapper[] { //
+				new Miner(), // 
+				new DfgMiner(), //
+				new LifeCycleMiner(), //
+				new AllOperatorsMiner() };
 	}
 
 	@Override
 	protected Mode[] createModes() {
-		return new Mode[] { new ModePaths(), new ModePathsDeviations(), new ModePathsQueueLengths(),
-				new ModePathsSojourn(), new ModePathsWaiting(), new ModePathsService(), new ModeRelativePaths() };
+		return new Mode[] { //
+				new ModePaths(), //
+				new ModePathsDeviations(), //
+				new ModePathsQueueLengths(), //
+				new ModePathsSojourn(), //
+				new ModePathsWaiting(), //
+				new ModePathsService(), //
+				new ModeRelativePaths() };
+	}
+
+	@Override
+	protected PopupItemActivity[] createPopupItemActivity() {
+		return new PopupItemActivity[] { //
+				new PopupItemActivityName() };
 	}
 
 	@Override
@@ -403,12 +421,12 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getTraceView().set(state.getModel(), state.getIvMLogFiltered(), state.getSelection(),
 							state.getTraceColourMap());
 
-//					try {
-//						InductiveVisualMinerController.updateHighlighting(panel, state);
-//						PopupPopulator.updatePopup(panel, state);
-//					} catch (UnknownTreeNodeException e) {
-//						e.printStackTrace();
-//					}
+					//					try {
+					//						InductiveVisualMinerController.updateHighlighting(panel, state);
+					//						PopupPopulator.updatePopup(panel, state);
+					//					} catch (UnknownTreeNodeException e) {
+					//						e.printStackTrace();
+					//					}
 
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(state.getIvMLogFiltered());
@@ -421,11 +439,11 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(null);
 
-//					try {
-//						PopupPopulator.updatePopup(panel, state);
-//					} catch (UnknownTreeNodeException e) {
-//						e.printStackTrace();
-//					}
+					//					try {
+					//						PopupPopulator.updatePopup(panel, state);
+					//					} catch (UnknownTreeNodeException e) {
+					//						e.printStackTrace();
+					//					}
 					panel.getGraph().repaint();
 				}
 			});

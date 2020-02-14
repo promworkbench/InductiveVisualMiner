@@ -10,11 +10,13 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
 /**
- * IvM configuration that contains the chainlink. To extend, please subclass and
- * override the getChain() method.
+ * IvM configuration that contains the chainlink. To extend, please use the
+ * InductiveVisualMinerConfigurationDefault class. This one is not guaranteed to
+ * be stable.
  * 
  * @author sander
  *
@@ -26,6 +28,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final InductiveVisualMinerPanel panel;
 	private final VisualMinerWrapper[] discoveryTechniques;
 	private final Mode[] modes;
+	private final PopupItemActivity[] popupItemsActivity;
 	private final List<IvMFilter> preMiningFilters;
 	private final List<IvMFilter> highlightingFilters;
 
@@ -34,6 +37,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		preMiningFilters = createPreMiningFilters();
 		highlightingFilters = createHighlightingFilters();
 		modes = createModes();
+		popupItemsActivity = createPopupItemActivity();
 		state = createState(log);
 		panel = createPanel(canceller);
 		chain = createChain(state, panel, canceller, executor, preMiningFilters, highlightingFilters);
@@ -46,6 +50,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract VisualMinerWrapper[] createDiscoveryTechniques();
 
 	protected abstract Mode[] createModes();
+
+	protected abstract PopupItemActivity[] createPopupItemActivity();
 
 	protected abstract InductiveVisualMinerState createState(XLog log);
 
@@ -81,5 +87,9 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	public final List<IvMFilter> getHighlightingFilters() {
 		return highlightingFilters;
+	}
+
+	public PopupItemActivity[] getPopupItemsActivity() {
+		return popupItemsActivity;
 	}
 }
