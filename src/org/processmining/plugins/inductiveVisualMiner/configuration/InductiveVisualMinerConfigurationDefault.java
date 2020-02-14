@@ -318,6 +318,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getSaveLogButton().setEnabled(true);
 					panel.getTraceView().set(state.getModel(), state.getIvMLog(), state.getSelection(),
 							state.getTraceColourMap());
+					
+					PopupPopulator.updatePopup(panel, state);
 
 					state.getFiltersController().updateFiltersWithIvMLog(panel, state.getIvMLog(), executor);
 				}
@@ -325,6 +327,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			align.setOnInvalidate(new Runnable() {
 				public void run() {
 					panel.getSaveLogButton().setEnabled(false);
+					PopupPopulator.updatePopup(panel, state);
 				}
 			});
 
@@ -429,13 +432,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					//tell trace view the colour map and the selection
 					panel.getTraceView().set(state.getModel(), state.getIvMLogFiltered(), state.getSelection(),
 							state.getTraceColourMap());
-
-					//					try {
-					//						InductiveVisualMinerController.updateHighlighting(panel, state);
-					//						PopupPopulator.updatePopup(panel, state);
-					//					} catch (UnknownTreeNodeException e) {
-					//						e.printStackTrace();
-					//					}
+					
+					PopupPopulator.updatePopup(panel, state);
 
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(state.getIvMLogFiltered());
@@ -447,12 +445,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				public void run() {
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(null);
-
-					//					try {
-					//						PopupPopulator.updatePopup(panel, state);
-					//					} catch (UnknownTreeNodeException e) {
-					//						e.printStackTrace();
-					//					}
+					PopupPopulator.updatePopup(panel, state);
+					
 					panel.getGraph().repaint();
 				}
 			});
@@ -464,9 +458,9 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		{
 			performance.setOnComplete(new Runnable() {
 				public void run() {
+					PopupPopulator.updatePopup(panel, state);
 					try {
 						InductiveVisualMinerController.updateHighlighting(panel, state);
-						PopupPopulator.updatePopup(panel, state);
 					} catch (UnknownTreeNodeException e) {
 						e.printStackTrace();
 					}
@@ -475,11 +469,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			});
 			performance.setOnInvalidate(new Runnable() {
 				public void run() {
-					try {
-						PopupPopulator.updatePopup(panel, state);
-					} catch (UnknownTreeNodeException e) {
-						e.printStackTrace();
-					}
+					PopupPopulator.updatePopup(panel, state);
 					panel.getGraph().repaint();
 				}
 			});
