@@ -8,6 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
 /**
@@ -61,6 +62,14 @@ public interface InductiveVisualMinerConfiguration {
 	 * @return
 	 */
 	public PopupItemActivity[] getPopupItemsActivity();
+
+	/**
+	 * The list of items that are shown in the pop-ups of the start and end
+	 * node.
+	 * 
+	 * @return
+	 */
+	public PopupItemStartEnd[] getPopupItemsStartEnd();
 
 	/**
 	 * Set up the state that keeps the data related to the visual Miner.

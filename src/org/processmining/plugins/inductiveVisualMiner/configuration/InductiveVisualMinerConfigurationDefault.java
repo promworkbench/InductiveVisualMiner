@@ -58,12 +58,15 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsWaiting;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModeRelativePaths;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityEmpty;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityName;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrences;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrencesPerTrace;
-import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityPerformance;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndEmpty;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndName;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndNumberOfTraces;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.AllOperatorsMiner;
@@ -148,7 +151,16 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				new PopupItemActivityOccurrences(), //
 				new PopupItemActivityOccurrencesPerTrace(), //
 				new PopupItemActivityEmpty(), //
-				new PopupItemActivityPerformance(),//
+				//				new PopupItemActivityPerformance(),//
+		};
+	}
+
+	@Override
+	protected PopupItemStartEnd[] createPopupItemStartEnd() {
+		return new PopupItemStartEnd[] { //
+				new PopupItemStartEndName(), //
+				new PopupItemStartEndNumberOfTraces(), //
+				new PopupItemStartEndEmpty(), //
 		};
 	}
 
@@ -318,7 +330,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getSaveLogButton().setEnabled(true);
 					panel.getTraceView().set(state.getModel(), state.getIvMLog(), state.getSelection(),
 							state.getTraceColourMap());
-					
+
 					PopupPopulator.updatePopup(panel, state);
 
 					state.getFiltersController().updateFiltersWithIvMLog(panel, state.getIvMLog(), executor);
@@ -432,7 +444,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					//tell trace view the colour map and the selection
 					panel.getTraceView().set(state.getModel(), state.getIvMLogFiltered(), state.getSelection(),
 							state.getTraceColourMap());
-					
+
 					PopupPopulator.updatePopup(panel, state);
 
 					//tell the animation the filtered log
@@ -446,7 +458,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					//tell the animation the filtered log
 					panel.getGraph().setFilteredLog(null);
 					PopupPopulator.updatePopup(panel, state);
-					
+
 					panel.getGraph().repaint();
 				}
 			});

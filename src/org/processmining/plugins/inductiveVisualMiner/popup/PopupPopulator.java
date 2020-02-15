@@ -14,9 +14,6 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeGlobal;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
@@ -36,103 +33,46 @@ public class PopupPopulator {
 			if (element instanceof LocalDotNode) {
 				int unode = ((LocalDotNode) element).getUnode();
 
-				if (state.isAlignmentReady()) {
+				List<String> popup = new ArrayList<>();
+				if (state.getModel().isActivity(unode)) {
 					//popup of an activity
-					if (state.getModel().isActivity(unode)) {
 
-						List<String> popup = new ArrayList<>();
+					popupActivity(state, unode, popup);
 
-						//gather the width of the first column
-						int widthColumnA = 0;
-						{
-							for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
-								if (item.isTwoColumns()) {
-									for (String value : item.getColumnA(state, unode)) {
-										if (value != null) {
-											widthColumnA = Math.max(widthColumnA, value.length());
-										}
-									}
-								}
-							}
-						}
+					removeDoubleEmpty(popup);
+					panel.getGraph().setPopupActivity(popup, unode);
+					panel.getGraph().setShowPopup(true, popupWidthNodes);
+					return;
+				} else if (((LocalDotNode) element).getType() == NodeType.source
+						|| ((LocalDotNode) element).getType() == NodeType.sink) {
+					//popup at the source or sink
+					popupStartEnd(state, popup);
 
-						for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
-							if (!item.isTwoColumns()) {
-								//one column
-								for (String value : item.getSingleColumn(state, unode)) {
-									popup.add(value);
-								}
-							} else {
-								//two columns
-								String[] columnA = item.getColumnA(state, unode);
-								String[] columnB = item.getColumnB(state, unode);
-								for (int i = 0; i < columnA.length; i++) {
-									if (columnA[i] != null && columnB[i] != null) {
-										popup.add(padRight(columnA[i], widthColumnA) + " " + columnB[i]);
-									} else {
-										popup.add(null);
-									}
-								}
-							}
-						}
-
-						//post-process: remove double empty lines
-						{
-							boolean seenNull = false;
-							for (Iterator<String> it = popup.iterator(); it.hasNext();) {
-								if (it.next() == null) {
-									if (seenNull) {
-										it.remove();
-									} else {
-										seenNull = true;
-									}
-								} else {
-									seenNull = false;
-								}
-							}
-						}
-
-						popup.remove(popup.size() - 1);
-						panel.getGraph().setPopupActivity(popup, unode);
-						panel.getGraph().setShowPopup(true, popupWidthNodes);
-					} else if (((LocalDotNode) element).getType() == NodeType.source
-							|| ((LocalDotNode) element).getType() == NodeType.sink) {
-						//popup at the source or sink
-						List<String> popup = new ArrayList<>();
-
-						//name
-						popup.add("all highlighted traces");
-
-						//frequencies
-						popup.add(
-								"number of traces                " + state.getIvMLogInfoFiltered().getNumberOfTraces());
-						popup.add(null);
-
-						//times
-						if (state.isPerformanceReady()) {
-							for (TypeGlobal type : TypeGlobal.values()) {
-								for (Gather gather : Gather.values()) {
-									long m = state.getPerformance().getGlobalMeasure(type, gather);
-									if (m > -1) {
-										popup.add(gather.toString() + " " + type.toString() + " "
-												+ Performance.timeToString(m));
-									}
-								}
-								if (popup.get(popup.size() - 1) != null) {
-									popup.add(null);
-								}
-							}
-						}
-
-						popup.remove(popup.size() - 1);
-						panel.getGraph().setPopupLog(popup);
-						panel.getGraph().setShowPopup(true, popupWidthSourceSink);
-					} else {
-						panel.getGraph().setShowPopup(false, 10);
-					}
+					removeDoubleEmpty(popup);
+					panel.getGraph().setPopupLog(popup);
+					panel.getGraph().setShowPopup(true, popupWidthSourceSink);
+					return;
 				} else {
+					//popup somewhere else
 					panel.getGraph().setShowPopup(false, 10);
+					return;
 				}
+
+				//					//times
+				//					if (state.isPerformanceReady()) {
+				//						for (TypeGlobal type : TypeGlobal.values()) {
+				//							for (Gather gather : Gather.values()) {
+				//								long m = state.getPerformance().getGlobalMeasure(type, gather);
+				//								if (m > -1) {
+				//									popup.add(gather.toString() + " " + type.toString() + " "
+				//											+ Performance.timeToString(m));
+				//								}
+				//							}
+				//							if (popup.get(popup.size() - 1) != null) {
+				//								popup.add(null);
+				//							}
+				//						}
+				//					}
 			} else if (state.getVisualisationInfo() != null && element instanceof LocalDotEdge
 					&& state.getVisualisationInfo().getAllLogMoveEdges().contains(element)) {
 				//log move edge
@@ -192,6 +132,97 @@ public class PopupPopulator {
 				}
 			} else {
 				panel.getGraph().setShowPopup(false, 10);
+			}
+		}
+
+	}
+
+	public static void popupActivity(InductiveVisualMinerState state, int unode, List<String> popup) {
+		//gather the width of the first column
+		int widthColumnA = 0;
+		{
+			for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
+				if (item.isTwoColumns()) {
+					for (String value : item.getColumnA(state, unode)) {
+						if (value != null) {
+							widthColumnA = Math.max(widthColumnA, value.length());
+						}
+					}
+				}
+			}
+		}
+
+		for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
+			if (!item.isTwoColumns()) {
+				//one column
+				for (String value : item.getSingleColumn(state, unode)) {
+					popup.add(value);
+				}
+			} else {
+				//two columns
+				String[] columnA = item.getColumnA(state, unode);
+				String[] columnB = item.getColumnB(state, unode);
+				for (int i = 0; i < columnA.length; i++) {
+					if (columnA[i] != null && columnB[i] != null) {
+						popup.add(padRight(columnA[i], widthColumnA) + " " + columnB[i]);
+					} else {
+						popup.add(null);
+					}
+				}
+			}
+		}
+	}
+
+	public static void popupStartEnd(InductiveVisualMinerState state, List<String> popup) {
+		//gather the width of the first column
+		int widthColumnA = 0;
+		{
+			for (PopupItemStartEnd item : state.getConfiguration().getPopupItemsStartEnd()) {
+				if (item.isTwoColumns()) {
+					for (String value : item.getColumnA(state)) {
+						if (value != null) {
+							widthColumnA = Math.max(widthColumnA, value.length());
+						}
+					}
+				}
+			}
+		}
+
+		for (PopupItemStartEnd item : state.getConfiguration().getPopupItemsStartEnd()) {
+			if (!item.isTwoColumns()) {
+				//one column
+				for (String value : item.getSingleColumn(state)) {
+					popup.add(value);
+				}
+			} else {
+				//two columns
+				String[] columnA = item.getColumnA(state);
+				String[] columnB = item.getColumnB(state);
+				for (int i = 0; i < columnA.length; i++) {
+					if (columnA[i] != null && columnB[i] != null) {
+						popup.add(padRight(columnA[i], widthColumnA) + " " + columnB[i]);
+					} else {
+						popup.add(null);
+					}
+				}
+			}
+		}
+	}
+
+	public static void removeDoubleEmpty(List<String> popup) {
+		//post-process: remove double empty lines, and the last one
+		{
+			boolean seenNull = false;
+			for (Iterator<String> it = popup.iterator(); it.hasNext();) {
+				if (it.next() == null) {
+					if (seenNull || !it.hasNext()) {
+						it.remove();
+					} else {
+						seenNull = true;
+					}
+				} else {
+					seenNull = false;
+				}
 			}
 		}
 	}

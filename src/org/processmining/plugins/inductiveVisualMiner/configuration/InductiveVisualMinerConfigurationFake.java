@@ -10,6 +10,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
 public class InductiveVisualMinerConfigurationFake implements InductiveVisualMinerConfiguration {
@@ -70,5 +71,9 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 
 	public PopupItemActivity[] getPopupItemsActivity() {
 		return phantom.getPopupItemsActivity();
+	}
+
+	public PopupItemStartEnd[] getPopupItemsStartEnd() {
+		return phantom.getPopupItemsStartEnd();
 	}
 }

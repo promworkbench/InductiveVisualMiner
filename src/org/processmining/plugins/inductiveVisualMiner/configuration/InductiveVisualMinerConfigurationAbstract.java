@@ -11,6 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
 /**
@@ -29,6 +30,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final VisualMinerWrapper[] discoveryTechniques;
 	private final Mode[] modes;
 	private final PopupItemActivity[] popupItemsActivity;
+	private final PopupItemStartEnd[] popupItemsStartEnd;
 	private final List<IvMFilter> preMiningFilters;
 	private final List<IvMFilter> highlightingFilters;
 
@@ -38,6 +40,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		highlightingFilters = createHighlightingFilters();
 		modes = createModes();
 		popupItemsActivity = createPopupItemActivity();
+		popupItemsStartEnd = createPopupItemStartEnd();
 		state = createState(log);
 		panel = createPanel(canceller);
 		chain = createChain(state, panel, canceller, executor, preMiningFilters, highlightingFilters);
@@ -52,6 +55,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract Mode[] createModes();
 
 	protected abstract PopupItemActivity[] createPopupItemActivity();
+
+	protected abstract PopupItemStartEnd[] createPopupItemStartEnd();
 
 	protected abstract InductiveVisualMinerState createState(XLog log);
 
@@ -91,5 +96,9 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	public PopupItemActivity[] getPopupItemsActivity() {
 		return popupItemsActivity;
+	}
+
+	public PopupItemStartEnd[] getPopupItemsStartEnd() {
+		return popupItemsStartEnd;
 	}
 }
