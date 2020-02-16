@@ -65,6 +65,7 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityName;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrences;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrencesPerTrace;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityPerformance;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivitySpacer;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveActivities;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveTitle;
@@ -158,7 +159,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				new PopupItemActivityOccurrences(), //
 				new PopupItemActivityOccurrencesPerTrace(), //
 				new PopupItemActivitySpacer(), //
-				//				new PopupItemActivityPerformance(),//
+				new PopupItemActivityPerformance(),//
 		}));
 	}
 

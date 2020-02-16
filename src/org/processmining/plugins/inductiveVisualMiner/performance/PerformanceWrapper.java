@@ -13,29 +13,36 @@ public class PerformanceWrapper {
 			public String toString() {
 				return "elapsed time  ";
 			}
-		}, queueing {
+		},
+		queueing {
 			public String toString() {
 				return "queueing time ";
 			}
-		}, waiting {
+		},
+		waiting {
 			public String toString() {
 				return "waiting time  ";
 			}
-		}, service {
+		},
+		service {
 			public String toString() {
 				return "service time  ";
 			}
-		}, sojourn {
+		},
+		sojourn {
 			public String toString() {
 				return "sojourn time  ";
 			}
-		}, remaining {
+		},
+		remaining {
 			public String toString() {
 				return "remaining time";
 			}
 		};
-		
+
 		public abstract String toString();
+
+		public static final int size = TypeNode.values().length;
 	}
 
 	public enum TypeGlobal {
@@ -66,6 +73,8 @@ public class PerformanceWrapper {
 		};
 
 		public abstract String toString();
+
+		public static final int size = TypeGlobal.values().length;
 	}
 
 	public enum Gather {
@@ -110,6 +119,8 @@ public class PerformanceWrapper {
 		public abstract BigInteger addValue(BigInteger oldValue, long value);
 
 		public abstract long finalise(BigInteger value, int numberOfMeasures);
+
+		public static final int size = Gather.values().length;
 	}
 
 	private final TIntObjectMap<QueueActivityLog> queueActivityLogs;

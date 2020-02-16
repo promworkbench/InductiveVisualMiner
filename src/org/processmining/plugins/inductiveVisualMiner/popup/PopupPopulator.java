@@ -116,7 +116,7 @@ public class PopupPopulator {
 		int widthColumnA = 0;
 		{
 			for (String[] item : items) {
-				if (item.length == 2) {
+				if (item != null && item.length == 2) {
 					if (item[0] != null && item[1] != null) {
 						widthColumnA = Math.max(widthColumnA, item[0].length());
 					}
@@ -125,18 +125,20 @@ public class PopupPopulator {
 		}
 
 		for (String[] item : items) {
-			if (item.length == 0) {
-				//no columns (spacer)
-				popup.add(null);
-			} else if (item.length == 1) {
-				//one column
-				if (item[0] != null) {
-					popup.add(item[0]);
-				}
-			} else {
-				//two columns
-				if (item[0] != null && item[1] != null) {
-					popup.add(padRight(item[0], widthColumnA) + " " + item[1]);
+			if (item != null) {
+				if (item.length == 0) {
+					//no columns (spacer)
+					popup.add(null);
+				} else if (item.length == 1) {
+					//one column
+					if (item[0] != null) {
+						popup.add(item[0]);
+					}
+				} else {
+					//two columns
+					if (item[0] != null && item[1] != null) {
+						popup.add(padRight(item[0], widthColumnA) + " " + item[1]);
+					}
 				}
 			}
 		}
