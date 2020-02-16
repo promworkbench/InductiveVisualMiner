@@ -1,11 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.popup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
@@ -28,185 +26,121 @@ public class PopupPopulator {
 		if (panel.getGraph().getMouseInElements().isEmpty()) {
 			panel.getGraph().setShowPopup(false, 10);
 		} else {
-			//output statistics about the node
+			//output the popup items about the particular node or edge
+
+			List<String> popup = new ArrayList<>();
+
 			DotElement element = panel.getGraph().getMouseInElements().iterator().next();
 			if (element instanceof LocalDotNode) {
 				int unode = ((LocalDotNode) element).getUnode();
 
-				List<String> popup = new ArrayList<>();
 				if (state.getModel().isActivity(unode)) {
 					//popup of an activity
 
-					popupActivity(state, unode, popup);
+					PopupItemInputActivity input = new PopupItemInputActivity(unode);
+					List<PopupItemActivity> items = state.getConfiguration().getPopupItemsActivity();
+					popupProcess(state, input, popup, items);
 
-					removeDoubleEmpty(popup);
 					panel.getGraph().setPopupActivity(popup, unode);
 					panel.getGraph().setShowPopup(true, popupWidthNodes);
 					return;
 				} else if (((LocalDotNode) element).getType() == NodeType.source
 						|| ((LocalDotNode) element).getType() == NodeType.sink) {
 					//popup at the source or sink
-					popupStartEnd(state, popup);
 
-					removeDoubleEmpty(popup);
-					panel.getGraph().setPopupLog(popup);
+					PopupItemInputStartEnd input = new PopupItemInputStartEnd();
+					List<PopupItemStartEnd> items = state.getConfiguration().getPopupItemsStartEnd();
+					popupProcess(state, input, popup, items);
+
+					panel.getGraph().setPopupStartEnd(popup);
 					panel.getGraph().setShowPopup(true, popupWidthSourceSink);
 					return;
-				} else {
-					//popup somewhere else
-					panel.getGraph().setShowPopup(false, 10);
-					return;
 				}
-
-				//					//times
-				//					if (state.isPerformanceReady()) {
-				//						for (TypeGlobal type : TypeGlobal.values()) {
-				//							for (Gather gather : Gather.values()) {
-				//								long m = state.getPerformance().getGlobalMeasure(type, gather);
-				//								if (m > -1) {
-				//									popup.add(gather.toString() + " " + type.toString() + " "
-				//											+ Performance.timeToString(m));
-				//								}
-				//							}
-				//							if (popup.get(popup.size() - 1) != null) {
-				//								popup.add(null);
-				//							}
-				//						}
-				//					}
 			} else if (state.getVisualisationInfo() != null && element instanceof LocalDotEdge
 					&& state.getVisualisationInfo().getAllLogMoveEdges().contains(element)) {
 				//log move edge
 				LocalDotEdge edge = (LocalDotEdge) element;
-				int maxNumberOfLogMoves = 10;
+
 				if (state.isAlignmentReady()) {
-					List<String> popup = new ArrayList<>();
+					//gather input
 					LogMovePosition position = LogMovePosition.of(edge);
 					MultiSet<XEventClass> logMoves = IvMLogMetrics.getLogMoves(position, state.getIvMLogInfoFiltered());
+					PopupItemInputLogMove input = new PopupItemInputLogMove(position, logMoves);
+					List<PopupItemLogMove> items = state.getConfiguration().getPopupItemsLogMove();
 
-					popup.add(logMoves.size() + (logMoves.size() <= 1 ? " event" : " events")
-							+ " additional to the model:");
-
-					//get digits of the maximum cardinality
-					long max = logMoves.getCardinalityOf(logMoves.getElementWithHighestCardinality());
-					int maxDigits = (int) (Math.log10(max) + 1);
-
-					if (max == 0) {
-						panel.getGraph().setShowPopup(false, 10);
-					}
-
-					List<XEventClass> activities = logMoves.sortByCardinality();
-					Collections.reverse(activities);
-					for (XEventClass activity : activities) {
-						if (maxNumberOfLogMoves > 0) {
-							popup.add(String.format("%" + maxDigits + "d", logMoves.getCardinalityOf(activity)) + " "
-									+ StringUtils.abbreviate(activity.toString(), 40 - maxDigits));
-						}
-						maxNumberOfLogMoves--;
-					}
-					if (maxNumberOfLogMoves < 0) {
-						popup.add("... and " + Math.abs(maxNumberOfLogMoves) + " more "
-								+ (Math.abs(maxNumberOfLogMoves) > 1 ? "activities" : "activity") + " ");
-					}
+					//get popup items
+					popupProcess(state, input, popup, items);
 
 					panel.getGraph().setPopupLogMove(popup, position);
 					panel.getGraph().setShowPopup(true, popupWidthNodes);
-				} else {
-					panel.getGraph().setShowPopup(false, 10);
+					return;
 				}
 			} else if (state.getVisualisationInfo() != null && element instanceof LocalDotEdge
 					&& state.getVisualisationInfo().getAllModelMoveEdges().contains(element)) {
 				//model move edge
 				if (state.isAlignmentReady()) {
 					LocalDotEdge edge = (LocalDotEdge) element;
-					int node = edge.getUnode();
-					List<String> popup = new ArrayList<>();
-					long t = IvMLogMetrics.getModelMovesLocal(node, state.getIvMLogInfoFiltered());
-					popup.add((t > 1 ? (t + " times") : "Once") + ", activity ");
-					popup.add(StringUtils.abbreviate(state.getModel().getActivityName(edge.getUnode()), 40));
-					popup.add("was not executed.");
+					int unode = edge.getUnode();
+					PopupItemInputModelMove input = new PopupItemInputModelMove(unode);
+					List<PopupItemModelMove> items = state.getConfiguration().getPopupItemsModelMove();
+
+					//get popup items
+					popupProcess(state, input, popup, items);
 
 					panel.getGraph().setPopupActivity(popup, -1);
 					panel.getGraph().setShowPopup(true, popupWidthNodes);
-				} else {
-					panel.getGraph().setShowPopup(false, 10);
+					return;
 				}
-			} else {
-				panel.getGraph().setShowPopup(false, 10);
 			}
 		}
 
+		panel.getGraph().setShowPopup(false, 10);
+		return;
 	}
 
-	public static void popupActivity(InductiveVisualMinerState state, int unode, List<String> popup) {
+	public static <T> void popupProcess(InductiveVisualMinerState state, PopupItemInput<T> input, List<String> popup,
+			List<? extends PopupItem<T>> popupItems) {
+		//gather the values
+		String[][] items = new String[0][0];
+		for (PopupItem<T> item : popupItems) {
+			String[][] newItems = item.get(state, input);
+
+			//merge arrays
+			String[][] result2 = new String[items.length + newItems.length][];
+			System.arraycopy(items, 0, result2, 0, items.length);
+			System.arraycopy(newItems, 0, result2, items.length, newItems.length);
+			items = result2;
+		}
+
 		//gather the width of the first column
 		int widthColumnA = 0;
 		{
-			for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
-				if (item.isTwoColumns()) {
-					for (String value : item.getColumnA(state, unode)) {
-						if (value != null) {
-							widthColumnA = Math.max(widthColumnA, value.length());
-						}
+			for (String[] item : items) {
+				if (item.length == 2) {
+					if (item[0] != null && item[1] != null) {
+						widthColumnA = Math.max(widthColumnA, item[0].length());
 					}
 				}
 			}
 		}
 
-		for (PopupItemActivity item : state.getConfiguration().getPopupItemsActivity()) {
-			if (!item.isTwoColumns()) {
+		for (String[] item : items) {
+			if (item.length == 0) {
+				//no columns (spacer)
+				popup.add(null);
+			} else if (item.length == 1) {
 				//one column
-				for (String value : item.getSingleColumn(state, unode)) {
-					popup.add(value);
+				if (item[0] != null) {
+					popup.add(item[0]);
 				}
 			} else {
 				//two columns
-				String[] columnA = item.getColumnA(state, unode);
-				String[] columnB = item.getColumnB(state, unode);
-				for (int i = 0; i < columnA.length; i++) {
-					if (columnA[i] != null && columnB[i] != null) {
-						popup.add(padRight(columnA[i], widthColumnA) + " " + columnB[i]);
-					} else {
-						popup.add(null);
-					}
+				if (item[0] != null && item[1] != null) {
+					popup.add(padRight(item[0], widthColumnA) + " " + item[1]);
 				}
 			}
 		}
-	}
-
-	public static void popupStartEnd(InductiveVisualMinerState state, List<String> popup) {
-		//gather the width of the first column
-		int widthColumnA = 0;
-		{
-			for (PopupItemStartEnd item : state.getConfiguration().getPopupItemsStartEnd()) {
-				if (item.isTwoColumns()) {
-					for (String value : item.getColumnA(state)) {
-						if (value != null) {
-							widthColumnA = Math.max(widthColumnA, value.length());
-						}
-					}
-				}
-			}
-		}
-
-		for (PopupItemStartEnd item : state.getConfiguration().getPopupItemsStartEnd()) {
-			if (!item.isTwoColumns()) {
-				//one column
-				for (String value : item.getSingleColumn(state)) {
-					popup.add(value);
-				}
-			} else {
-				//two columns
-				String[] columnA = item.getColumnA(state);
-				String[] columnB = item.getColumnB(state);
-				for (int i = 0; i < columnA.length; i++) {
-					if (columnA[i] != null && columnB[i] != null) {
-						popup.add(padRight(columnA[i], widthColumnA) + " " + columnB[i]);
-					} else {
-						popup.add(null);
-					}
-				}
-			}
-		}
+		removeDoubleEmpty(popup);
 	}
 
 	public static void removeDoubleEmpty(List<String> popup) {

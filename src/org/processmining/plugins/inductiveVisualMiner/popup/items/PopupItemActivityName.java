@@ -1,12 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner.popup.items;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivityOneColumn;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInput;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInputActivity;
 
-public class PopupItemActivityName extends PopupItemActivityOneColumn {
+public class PopupItemActivityName implements PopupItemActivity {
 
-	public String[] getSingleColumn(InductiveVisualMinerState state, int unode) {
-		return new String[] {"activity " + state.getModel().getActivityName(unode)};
+	public String[][] get(InductiveVisualMinerState state, PopupItemInput<PopupItemInputActivity> input) {
+		int unode = input.get().getUnode();
+		return new String[][] { { "activity " + state.getModel().getActivityName(unode) } };
 	}
 
 }

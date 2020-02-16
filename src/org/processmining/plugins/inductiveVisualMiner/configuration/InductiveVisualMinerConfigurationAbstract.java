@@ -11,6 +11,8 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
@@ -27,10 +29,12 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final Chain chain;
 	private final InductiveVisualMinerState state;
 	private final InductiveVisualMinerPanel panel;
-	private final VisualMinerWrapper[] discoveryTechniques;
-	private final Mode[] modes;
-	private final PopupItemActivity[] popupItemsActivity;
-	private final PopupItemStartEnd[] popupItemsStartEnd;
+	private final List<VisualMinerWrapper> discoveryTechniques;
+	private final List<Mode> modes;
+	private final List<PopupItemActivity> popupItemsActivity;
+	private final List<PopupItemStartEnd> popupItemsStartEnd;
+	private final List<PopupItemLogMove> popupItemsLogMove;
+	private final List<PopupItemModelMove> popupItemsModelMove;
 	private final List<IvMFilter> preMiningFilters;
 	private final List<IvMFilter> highlightingFilters;
 
@@ -39,8 +43,11 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		preMiningFilters = createPreMiningFilters();
 		highlightingFilters = createHighlightingFilters();
 		modes = createModes();
-		popupItemsActivity = createPopupItemActivity();
-		popupItemsStartEnd = createPopupItemStartEnd();
+		popupItemsActivity = createPopupItemsActivity();
+		popupItemsStartEnd = createPopupItemsStartEnd();
+		popupItemsLogMove = createPopupItemsLogMove();
+		popupItemsModelMove = createPopupItemsModelMove();
+
 		state = createState(log);
 		panel = createPanel(canceller);
 		chain = createChain(state, panel, canceller, executor, preMiningFilters, highlightingFilters);
@@ -50,13 +57,17 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	protected abstract List<IvMFilter> createHighlightingFilters();
 
-	protected abstract VisualMinerWrapper[] createDiscoveryTechniques();
+	protected abstract List<VisualMinerWrapper> createDiscoveryTechniques();
 
-	protected abstract Mode[] createModes();
+	protected abstract List<Mode> createModes();
 
-	protected abstract PopupItemActivity[] createPopupItemActivity();
+	protected abstract List<PopupItemActivity> createPopupItemsActivity();
 
-	protected abstract PopupItemStartEnd[] createPopupItemStartEnd();
+	protected abstract List<PopupItemStartEnd> createPopupItemsStartEnd();
+
+	protected abstract List<PopupItemLogMove> createPopupItemsLogMove();
+
+	protected abstract List<PopupItemModelMove> createPopupItemsModelMove();
 
 	protected abstract InductiveVisualMinerState createState(XLog log);
 
@@ -66,39 +77,70 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 			ProMCanceller canceller, Executor executor, List<IvMFilter> preMiningFilters,
 			List<IvMFilter> highlightingFilters);
 
+	@Override
 	public final Chain getChain() {
 		return chain;
 	}
 
+	@Override
 	public final InductiveVisualMinerState getState() {
 		return state;
 	}
 
+	@Override
 	public final InductiveVisualMinerPanel getPanel() {
 		return panel;
 	}
 
-	public final VisualMinerWrapper[] getDiscoveryTechniques() {
+	@Override
+	public final List<VisualMinerWrapper> getDiscoveryTechniques() {
 		return discoveryTechniques;
 	}
 
-	public final Mode[] getModes() {
+	@Override
+	public VisualMinerWrapper[] getDiscoveryTechniquesArray() {
+		VisualMinerWrapper[] result = new VisualMinerWrapper[discoveryTechniques.size()];
+		return discoveryTechniques.toArray(result);
+	}
+
+	@Override
+	public final List<Mode> getModes() {
 		return modes;
 	}
 
+	@Override
+	public Mode[] getModesArray() {
+		Mode[] result = new Mode[modes.size()];
+		return modes.toArray(result);
+	}
+
+	@Override
 	public final List<IvMFilter> getPreMiningFilters() {
 		return preMiningFilters;
 	}
 
+	@Override
 	public final List<IvMFilter> getHighlightingFilters() {
 		return highlightingFilters;
 	}
 
-	public PopupItemActivity[] getPopupItemsActivity() {
+	@Override
+	public List<PopupItemActivity> getPopupItemsActivity() {
 		return popupItemsActivity;
 	}
 
-	public PopupItemStartEnd[] getPopupItemsStartEnd() {
+	@Override
+	public List<PopupItemStartEnd> getPopupItemsStartEnd() {
 		return popupItemsStartEnd;
+	}
+
+	@Override
+	public List<PopupItemLogMove> getPopupItemsLogMove() {
+		return popupItemsLogMove;
+	}
+
+	@Override
+	public List<PopupItemModelMove> getPopupItemsModelMove() {
+		return popupItemsModelMove;
 	}
 }

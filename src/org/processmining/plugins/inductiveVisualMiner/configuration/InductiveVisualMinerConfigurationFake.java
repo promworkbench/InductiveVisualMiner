@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.configuration;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -10,6 +12,8 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
@@ -21,7 +25,7 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 	private InductiveVisualMinerPanel panel;
 	private ProMCanceller canceller;
 	private Executor executor;
-	private VisualMinerWrapper[] discoveryTechniques;
+	private List<VisualMinerWrapper> discoveryTechniques;
 
 	public InductiveVisualMinerConfigurationFake(InductiveVisualMinerState state, InductiveVisualMinerPanel panel,
 			ProMCanceller canceller, Executor executor) {
@@ -33,8 +37,13 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		this.discoveryTechniques = phantom.getDiscoveryTechniques();
 	}
 
-	public VisualMinerWrapper[] getDiscoveryTechniques() {
-		return phantom.getDiscoveryTechniques();
+	public List<VisualMinerWrapper> getDiscoveryTechniques() {
+		return discoveryTechniques;
+	}
+
+	public VisualMinerWrapper[] getDiscoveryTechniquesArray() {
+		VisualMinerWrapper[] result = new VisualMinerWrapper[discoveryTechniques.size()];
+		return discoveryTechniques.toArray(result);
 	}
 
 	public List<IvMFilter> getPreMiningFilters() {
@@ -45,8 +54,12 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return phantom.getHighlightingFilters();
 	}
 
-	public Mode[] getModes() {
+	public List<Mode> getModes() {
 		return phantom.getModes();
+	}
+
+	public Mode[] getModesArray() {
+		return phantom.getModesArray();
 	}
 
 	public InductiveVisualMinerState getState() {
@@ -65,15 +78,28 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return chain;
 	}
 
-	public void setDiscoveryTechniques(VisualMinerWrapper[] discoveryTechniques) {
+	public void setDiscoveryTechniques(List<VisualMinerWrapper> discoveryTechniques) {
 		this.discoveryTechniques = discoveryTechniques;
 	}
 
-	public PopupItemActivity[] getPopupItemsActivity() {
+	public void setDiscoveryTechniques(VisualMinerWrapper[] miners) {
+		this.discoveryTechniques = new ArrayList<>(Arrays.asList(miners));
+	}
+
+	public List<PopupItemActivity> getPopupItemsActivity() {
 		return phantom.getPopupItemsActivity();
 	}
 
-	public PopupItemStartEnd[] getPopupItemsStartEnd() {
+	public List<PopupItemStartEnd> getPopupItemsStartEnd() {
 		return phantom.getPopupItemsStartEnd();
 	}
+
+	public List<PopupItemLogMove> getPopupItemsLogMove() {
+		return phantom.getPopupItemsLogMove();
+	}
+
+	public List<PopupItemModelMove> getPopupItemsModelMove() {
+		return phantom.getPopupItemsModelMove();
+	}
+
 }

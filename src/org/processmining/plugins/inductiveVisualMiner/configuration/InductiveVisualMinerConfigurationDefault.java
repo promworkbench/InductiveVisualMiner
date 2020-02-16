@@ -58,15 +58,21 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsWaiting;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModeRelativePaths;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
-import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityEmpty;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityName;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrences;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrencesPerTrace;
-import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndEmpty;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivitySpacer;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveActivities;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveTitle;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemModelMoveOccurrences;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndName;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndNumberOfTraces;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndPerformance;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndSpacer;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.AllOperatorsMiner;
@@ -124,44 +130,61 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	protected VisualMinerWrapper[] createDiscoveryTechniques() {
-		return new VisualMinerWrapper[] { //
+	protected List<VisualMinerWrapper> createDiscoveryTechniques() {
+		return new ArrayList<>(Arrays.asList(new VisualMinerWrapper[] { //
 				new Miner(), // 
 				new DfgMiner(), //
 				new LifeCycleMiner(), //
-				new AllOperatorsMiner() };
+				new AllOperatorsMiner(), //
+		}));
 	}
 
 	@Override
-	protected Mode[] createModes() {
-		return new Mode[] { //
+	protected List<Mode> createModes() {
+		return new ArrayList<>(Arrays.asList(new Mode[] { //
 				new ModePaths(), //
 				new ModePathsDeviations(), //
 				new ModePathsQueueLengths(), //
 				new ModePathsSojourn(), //
 				new ModePathsWaiting(), //
 				new ModePathsService(), //
-				new ModeRelativePaths() };
+				new ModeRelativePaths() }));
 	}
 
 	@Override
-	protected PopupItemActivity[] createPopupItemActivity() {
-		return new PopupItemActivity[] { //
+	protected List<PopupItemActivity> createPopupItemsActivity() {
+		return new ArrayList<>(Arrays.asList(new PopupItemActivity[] { //
 				new PopupItemActivityName(), //
 				new PopupItemActivityOccurrences(), //
 				new PopupItemActivityOccurrencesPerTrace(), //
-				new PopupItemActivityEmpty(), //
+				new PopupItemActivitySpacer(), //
 				//				new PopupItemActivityPerformance(),//
-		};
+		}));
 	}
 
 	@Override
-	protected PopupItemStartEnd[] createPopupItemStartEnd() {
-		return new PopupItemStartEnd[] { //
+	protected List<PopupItemStartEnd> createPopupItemsStartEnd() {
+		return new ArrayList<>(Arrays.asList(new PopupItemStartEnd[] { //
 				new PopupItemStartEndName(), //
 				new PopupItemStartEndNumberOfTraces(), //
-				new PopupItemStartEndEmpty(), //
-		};
+				new PopupItemStartEndSpacer(), //
+				new PopupItemStartEndPerformance(), //
+		}));
+	}
+
+	@Override
+	protected List<PopupItemLogMove> createPopupItemsLogMove() {
+		return new ArrayList<>(Arrays.asList(new PopupItemLogMove[] { //
+				new PopupItemLogMoveTitle(), //
+				new PopupItemLogMoveActivities(), //
+		}));
+	}
+
+	@Override
+	protected List<PopupItemModelMove> createPopupItemsModelMove() {
+		return new ArrayList<>(Arrays.asList(new PopupItemModelMove[] { //
+				new PopupItemModelMoveOccurrences(), //
+		}));
 	}
 
 	@Override

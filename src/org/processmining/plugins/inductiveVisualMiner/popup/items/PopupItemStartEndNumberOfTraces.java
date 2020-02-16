@@ -1,21 +1,16 @@
 package org.processmining.plugins.inductiveVisualMiner.popup.items;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEndTwoColumn;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInput;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInputStartEnd;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 
-public class PopupItemStartEndNumberOfTraces extends PopupItemStartEndTwoColumn {
+public class PopupItemStartEndNumberOfTraces implements PopupItemStartEnd {
 
-	public String[] getColumnA(InductiveVisualMinerState state) {
-		if (state.isAlignmentReady() && state.getIvMLogFiltered() != null) {
-			return new String[] { "number of traces" };
-		} else {
-			return nothing;
-		}
-	}
-
-	public String[] getColumnB(InductiveVisualMinerState state) {
-		if (state.isAlignmentReady() && state.getIvMLogFiltered() != null) {
-			return new String[] { state.getIvMLogInfoFiltered().getNumberOfTraces() + "" };
+	public String[][] get(InductiveVisualMinerState state, PopupItemInput<PopupItemInputStartEnd> input) {
+		if (state.isAlignmentReady()) {
+			int value = state.getIvMLogInfoFiltered().getNumberOfTraces();
+			return new String[][] { { "number of traces", value + "" } };
 		} else {
 			return nothing;
 		}

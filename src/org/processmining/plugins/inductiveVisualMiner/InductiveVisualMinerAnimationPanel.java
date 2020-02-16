@@ -362,7 +362,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		this.popupHistogramLog = false;
 	}
 
-	public void setPopupLog(List<String> popup) {
+	public void setPopupStartEnd(List<String> popup) {
 		this.popupText = popup;
 		this.popupHistogramNode = -1;
 		this.popupHistogramEdge = -1;

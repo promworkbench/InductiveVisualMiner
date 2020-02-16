@@ -1,12 +1,14 @@
 package org.processmining.plugins.inductiveVisualMiner.popup.items;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEndOneColumn;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInput;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInputStartEnd;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 
-public class PopupItemStartEndName extends PopupItemStartEndOneColumn {
+public class PopupItemStartEndName implements PopupItemStartEnd {
 
-	public String[] getSingleColumn(InductiveVisualMinerState state) {
-		return new String[] { "all highlighted traces" };
+	public String[][] get(InductiveVisualMinerState state, PopupItemInput<PopupItemInputStartEnd> input) {
+		return new String[][] { { "all highlighted traces" } };
 	}
 
 }

@@ -8,6 +8,8 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
@@ -32,7 +34,9 @@ public interface InductiveVisualMinerConfiguration {
 	 * 
 	 * @return
 	 */
-	public VisualMinerWrapper[] getDiscoveryTechniques();
+	public List<VisualMinerWrapper> getDiscoveryTechniques();
+
+	public VisualMinerWrapper[] getDiscoveryTechniquesArray();
 
 	/**
 	 * The list of available pre-mining filters.
@@ -54,14 +58,16 @@ public interface InductiveVisualMinerConfiguration {
 	 * 
 	 * @return
 	 */
-	public Mode[] getModes();
+	public List<Mode> getModes();
+
+	public Mode[] getModesArray();
 
 	/**
 	 * The list of items that are shown in the pop-ups of activities.
 	 * 
 	 * @return
 	 */
-	public PopupItemActivity[] getPopupItemsActivity();
+	public List<PopupItemActivity> getPopupItemsActivity();
 
 	/**
 	 * The list of items that are shown in the pop-ups of the start and end
@@ -69,7 +75,11 @@ public interface InductiveVisualMinerConfiguration {
 	 * 
 	 * @return
 	 */
-	public PopupItemStartEnd[] getPopupItemsStartEnd();
+	public List<PopupItemStartEnd> getPopupItemsStartEnd();
+
+	public List<PopupItemLogMove> getPopupItemsLogMove();
+
+	public List<PopupItemModelMove> getPopupItemsModelMove();
 
 	/**
 	 * Set up the state that keeps the data related to the visual Miner.
@@ -102,4 +112,5 @@ public interface InductiveVisualMinerConfiguration {
 	 * @return
 	 */
 	public Chain getChain();
+
 }

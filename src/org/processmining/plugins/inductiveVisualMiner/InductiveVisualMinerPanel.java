@@ -232,7 +232,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cMinerLabel.anchor = GridBagConstraints.WEST;
 				otherSettingsPanel.add(minerLabel, cMinerLabel);
 
-				minerCombobox = new JComboBox<>(configuration.getDiscoveryTechniques());
+				minerCombobox = new JComboBox<>(configuration.getDiscoveryTechniquesArray());
 				IvMDecorator.decorate(minerCombobox);
 				minerCombobox.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 				minerCombobox.setFocusable(false);
@@ -271,7 +271,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cColourLabel.anchor = GridBagConstraints.WEST;
 				otherSettingsPanel.add(colourLabel, cColourLabel);
 
-				colourSelection = new JComboBox<>(configuration.getModes());
+				colourSelection = new JComboBox<>(configuration.getModesArray());
 				IvMDecorator.decorate(colourSelection);
 				colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 				colourSelection.setFocusable(false);

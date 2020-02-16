@@ -2,18 +2,18 @@ package org.processmining.plugins.inductiveVisualMiner.popup.items;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
-import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivityTwoColumn;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInput;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInputActivity;
 
-public class PopupItemActivityOccurrencesPerTrace extends PopupItemActivityTwoColumn {
+public class PopupItemActivityOccurrencesPerTrace implements PopupItemActivity {
 
-	public String[] getColumnA(InductiveVisualMinerState state, int unode) {
-		return new String[] { "occurrences per trace" };
-	}
-
-	public String[] getColumnB(InductiveVisualMinerState state, int unode) {
+	public String[][] get(InductiveVisualMinerState state, PopupItemInput<PopupItemInputActivity> input) {
 		if (state.isAlignmentReady()) {
-			return new String[] { (IvMLogMetrics.getNumberOfTracesRepresented(state.getModel(), unode, false,
-					state.getIvMLogInfoFiltered()) / (state.getIvMLogInfoFiltered().getNumberOfTraces() * 1.0)) + "" };
+			int unode = input.get().getUnode();
+			double value = IvMLogMetrics.getNumberOfTracesRepresented(state.getModel(), unode, false,
+					state.getIvMLogInfoFiltered()) / (state.getIvMLogInfoFiltered().getNumberOfTraces() * 1.0);
+			return new String[][] { { "occurrences per trace", value + "" } };
 		} else {
 			return nothing;
 		}
