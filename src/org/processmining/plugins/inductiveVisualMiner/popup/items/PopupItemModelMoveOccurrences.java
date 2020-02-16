@@ -14,7 +14,7 @@ public class PopupItemModelMoveOccurrences implements PopupItemModelMove {
 			int unode = input.get().getUnode();
 			long t = IvMLogMetrics.getModelMovesLocal(unode, state.getIvMLogInfoFiltered());
 			return new String[][] { //
-					{ (t > 1 ? (t + " times") : "once") + ", activity " }, //
+					{ (t > 1 ? (t + " times") : "Once") + ", activity " }, //
 					{ StringUtils.abbreviate(state.getModel().getActivityName(unode), 40) }, //
 					{ "was not executed." } //
 			};

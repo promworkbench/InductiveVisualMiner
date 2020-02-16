@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
@@ -137,7 +138,10 @@ public class PopupPopulator {
 				} else {
 					//two columns
 					if (item[0] != null && item[1] != null) {
-						popup.add(padRight(item[0], widthColumnA) + " " + item[1]);
+						popup.add(//
+								padRight(item[0], widthColumnA) + //
+										" " + //
+										StringUtils.abbreviate(item[1], 40));
 					}
 				}
 			}
