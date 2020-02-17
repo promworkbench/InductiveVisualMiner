@@ -10,17 +10,22 @@ import gnu.trove.list.array.TLongArrayList;
 
 public class QueueActivityLog {
 
-	private final List<IvMMove> completeMoves = new ArrayList<>();
 	private final List<IvMMove> initiateMoves = new ArrayList<>();
+	private final List<IvMMove> enqueueMoves = new ArrayList<>();
+	private final List<IvMMove> startMoves = new ArrayList<>();
+	private final List<IvMMove> completeMoves = new ArrayList<>();
 	private final TLongArrayList moves = new TLongArrayList();
 	private final List<String> resources = new ArrayList<>();
 	private final TIntArrayList traceIndices = new TIntArrayList();
 
-	public void add(String resource, Long startTrace, Long initiate, IvMMove initiateMove, Long enqueue, Long start,
-			Long complete, IvMMove completeMove, Long endTrace, int traceIndex) {
+	public void add(String resource, Long startTrace, Long initiate, IvMMove initiateMove, Long enqueue,
+			IvMMove enqueueMove, Long start, IvMMove startMove, Long complete, IvMMove completeMove, Long endTrace,
+			int traceIndex) {
 		resources.add(resource);
 		traceIndices.add(traceIndex);
 		initiateMoves.add(initiateMove);
+		enqueueMoves.add(enqueueMove);
+		startMoves.add(startMove);
 		completeMoves.add(completeMove);
 		if (initiate != null) {
 			moves.add(initiate);
@@ -98,8 +103,16 @@ public class QueueActivityLog {
 		return moves.get(activityInstanceIndex * 6 + 1);
 	}
 
+	public IvMMove getEnqueueMove(int activityInstanceIndex) {
+		return enqueueMoves.get(activityInstanceIndex);
+	}
+
 	public long getStart(int activityInstanceIndex) {
 		return moves.get(activityInstanceIndex * 6 + 2);
+	}
+
+	public IvMMove getStartMove(int activityInstanceIndex) {
+		return startMoves.get(activityInstanceIndex);
 	}
 
 	public long getComplete(int activityInstanceIndex) {

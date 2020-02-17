@@ -60,8 +60,10 @@ public class QueueMineActivityLog {
 				Long enqueue = null;
 				Long start = null;
 				Long complete = null;
-				IvMMove completeMove = null;
 				IvMMove initiateMove = null;
+				IvMMove enqueueMove = null;
+				IvMMove startMove = null;
+				IvMMove completeMove = null;
 
 				if (activityInstance.getC() != null) {
 					initiate = activityInstance.getC().getLogTimestamp();
@@ -69,9 +71,11 @@ public class QueueMineActivityLog {
 				}
 				if (activityInstance.getD() != null) {
 					enqueue = activityInstance.getD().getLogTimestamp();
+					enqueueMove = activityInstance.getD();
 				}
 				if (activityInstance.getE() != null) {
 					start = activityInstance.getE().getLogTimestamp();
+					startMove = activityInstance.getE();
 				}
 				if (activityInstance.getF() != null) {
 					complete = activityInstance.getF().getLogTimestamp();
@@ -83,8 +87,8 @@ public class QueueMineActivityLog {
 					timestamps.put(node, new QueueActivityLog());
 				}
 
-				timestamps.get(node).add(activityInstance.getB(), startTrace, initiate, initiateMove, enqueue, start,
-						complete, completeMove, endTrace, traceIndex);
+				timestamps.get(node).add(activityInstance.getB(), startTrace, initiate, initiateMove, enqueue,
+						enqueueMove, start, startMove, complete, completeMove, endTrace, traceIndex);
 			}
 		}
 	}
