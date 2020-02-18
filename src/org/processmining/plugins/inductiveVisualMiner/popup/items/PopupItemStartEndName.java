@@ -8,7 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 public class PopupItemStartEndName implements PopupItemStartEnd {
 
 	public String[][] get(InductiveVisualMinerState state, PopupItemInput<PopupItemInputStartEnd> input) {
-		return new String[][] { { "all highlighted traces" } };
+		return new String[][] { { "All highlighted traces" } };
 	}
 
 }

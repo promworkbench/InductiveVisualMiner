@@ -9,7 +9,7 @@ public class PopupItemActivityName implements PopupItemActivity {
 
 	public String[][] get(InductiveVisualMinerState state, PopupItemInput<PopupItemInputActivity> input) {
 		int unode = input.get().getUnode();
-		return new String[][] { { "activity " + state.getModel().getActivityName(unode) } };
+		return new String[][] { { "Activity " + state.getModel().getActivityName(unode) } };
 	}
 
 }

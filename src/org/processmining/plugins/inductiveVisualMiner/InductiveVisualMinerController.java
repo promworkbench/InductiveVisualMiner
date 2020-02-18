@@ -57,6 +57,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.UserStatus;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.popup.LogPopupListener;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
@@ -440,6 +441,14 @@ public class InductiveVisualMinerController {
 					e.printStackTrace();
 					panel.getGraph().setShowPopup(false, 10);
 				}
+				panel.repaint();
+			}
+		});
+
+		//set log popup handler
+		panel.getGraph().addLogPopupListener(new LogPopupListener() {
+			public void isMouseInButton(boolean isIn) {
+				PopupPopulator.updatePopup(panel, state);
 				panel.repaint();
 			}
 		});

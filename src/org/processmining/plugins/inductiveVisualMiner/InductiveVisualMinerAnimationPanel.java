@@ -4,15 +4,19 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -37,6 +41,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.AboutMessage
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
+import org.processmining.plugins.inductiveVisualMiner.popup.LogPopupListener;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 
 /**
@@ -62,6 +67,10 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	public static final int popupRightMargin = 40;
 	public static final int popupHistogramHeight = 120;
 	public static final int popupHistogramYPadding = 10;
+
+	private boolean isMouseInLogPopupButton = false;
+	private Arc2D logPopupButton;
+	private CopyOnWriteArrayList<LogPopupListener> logPopupListeners = new CopyOnWriteArrayList<>();
 
 	//animation
 	protected boolean animationEnabled = false;
@@ -181,6 +190,9 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		if (isAnimationControlsShowing() && histogramData != null) {
 			paintGlobalHistogram((Graphics2D) g);
 		}
+
+		//draw log-help circle
+		paintLogPopupCircle((Graphics2D) g);
 	};
 
 	@Override
@@ -217,6 +229,36 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	@Override
 	public void paintImage(Graphics2D g) {
 		super.paintImage(g);
+	}
+
+	public void paintLogPopupCircle(Graphics2D g) {
+		Color backupColour = g.getColor();
+		Font backupFont = g.getFont();
+
+		//draw the background arc
+		if (isMouseInLogPopupButton) {
+			g.setColor(new Color(0, 0, 0, 180));
+		} else {
+			g.setColor(new Color(0, 0, 0, 20));
+		}
+		logPopupButton = new Arc2D.Float(Arc2D.PIE);
+		logPopupButton.setFrame(-25, getHeight() - 25, 50, 50);
+		logPopupButton.setAngleStart(0);
+		logPopupButton.setAngleExtent(90);
+		g.fillArc(-25, getHeight() - 25, 50, 50, 0, 90);
+
+		//draw the question mark
+		if (isMouseInLogPopupButton) {
+			g.setColor(new Color(255, 255, 255, 128));
+		} else {
+			g.setColor(new Color(0, 0, 0, 128));
+		}
+		g.setFont(helperControlsButtonFont);
+		g.drawString("L", 3, getHeight() - 3);
+
+		//revert colour and font
+		g.setColor(backupColour);
+		g.setFont(backupFont);
 	}
 
 	public void paintPopup(Graphics2D g) {
@@ -348,6 +390,27 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		g.setColor(backupColour);
 	}
 
+	public boolean isInLogPopupButton(Point pointInUserCoordinates) {
+		return logPopupButton != null && logPopupButton.contains(pointInUserCoordinates);
+	}
+
+	@Override
+	protected boolean processMouseMove(MouseEvent e) {
+		//process mouse move in/out of log popup button
+		boolean newValue = !isDraggingImage && logPopupButton != null && isInLogPopupButton(e.getPoint());
+		boolean notify = newValue != isMouseInLogPopupButton;
+		isMouseInLogPopupButton = newValue;
+		if (notify) {
+			if (logPopupListeners != null) {
+				for (LogPopupListener listener : logPopupListeners) {
+					listener.isMouseInButton(isMouseInLogPopupButton);
+				}
+			}
+		}
+
+		return super.processMouseMove(e);
+	}
+
 	public void setPopupActivity(List<String> popup, int popupHistogramUnode) {
 		this.popupText = popup;
 		this.popupHistogramNode = popupHistogramUnode;
@@ -380,7 +443,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	public static Dot getSplashScreen() {
 		Dot dot = new Dot();
-		dot.addNode("Inductive visual Miner");
+		dot.addNode("visual Miner");
 		dot.addNode("Mining model...");
 		return dot;
 	}
@@ -483,12 +546,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	@Override
 	public double getAnimationTime() {
-		//		RenderedFrame frame = renderingThread.getRenderedFrameManager().getLastRenderedFrame();
-		//		if (frame != null) {
-		//			return frame.time;
-		//		}
 		return renderingThread.getTimeManager().getLastRenderedTime();
-		//return -1;
 	}
 
 	@Override
@@ -535,5 +593,13 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 	public void setGetExporters(GetExporters getExporters) {
 		this.getExporters = getExporters;
+	}
+
+	public boolean isMouseInLogPopupButton() {
+		return isMouseInLogPopupButton;
+	}
+
+	public void addLogPopupListener(LogPopupListener logPopupListener) {
+		logPopupListeners.add(logPopupListener);
 	}
 }

@@ -58,6 +58,7 @@ import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsSojourn;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsWaiting;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModeRelativePaths;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLog;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
@@ -67,8 +68,12 @@ import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActiv
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrencesPerTrace;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityPerformance;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivitySpacer;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogAttributes;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveActivities;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveTitle;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogName;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogSpacer;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogTitle;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemModelMoveOccurrences;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndName;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndNumberOfTraces;
@@ -156,6 +161,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	protected List<PopupItemActivity> createPopupItemsActivity() {
 		return new ArrayList<>(Arrays.asList(new PopupItemActivity[] { //
 				new PopupItemActivityName(), //
+				new PopupItemActivitySpacer(), //
 				new PopupItemActivityOccurrences(), //
 				new PopupItemActivityOccurrencesPerTrace(), //
 				new PopupItemActivitySpacer(), //
@@ -167,6 +173,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	protected List<PopupItemStartEnd> createPopupItemsStartEnd() {
 		return new ArrayList<>(Arrays.asList(new PopupItemStartEnd[] { //
 				new PopupItemStartEndName(), //
+				new PopupItemStartEndSpacer(), //
 				new PopupItemStartEndNumberOfTraces(), //
 				new PopupItemStartEndSpacer(), //
 				new PopupItemStartEndPerformance(), //
@@ -185,6 +192,16 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	protected List<PopupItemModelMove> createPopupItemsModelMove() {
 		return new ArrayList<>(Arrays.asList(new PopupItemModelMove[] { //
 				new PopupItemModelMoveOccurrences(), //
+		}));
+	}
+
+	@Override
+	protected List<PopupItemLog> createPopupItemsLog() {
+		return new ArrayList<>(Arrays.asList(new PopupItemLog[] { //
+				new PopupItemLogTitle(), //
+				new PopupItemLogSpacer(), //
+				new PopupItemLogName(), //
+				new PopupItemLogAttributes(), //
 		}));
 	}
 

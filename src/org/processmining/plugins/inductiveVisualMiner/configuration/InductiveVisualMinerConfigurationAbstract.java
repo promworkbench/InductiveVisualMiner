@@ -11,6 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLog;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
@@ -35,6 +36,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<PopupItemStartEnd> popupItemsStartEnd;
 	private final List<PopupItemLogMove> popupItemsLogMove;
 	private final List<PopupItemModelMove> popupItemsModelMove;
+	private final List<PopupItemLog> popupItemsLog;
 	private final List<IvMFilter> preMiningFilters;
 	private final List<IvMFilter> highlightingFilters;
 
@@ -47,6 +49,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		popupItemsStartEnd = createPopupItemsStartEnd();
 		popupItemsLogMove = createPopupItemsLogMove();
 		popupItemsModelMove = createPopupItemsModelMove();
+		popupItemsLog = createPopupItemsLog();
 
 		state = createState(log);
 		panel = createPanel(canceller);
@@ -68,6 +71,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract List<PopupItemLogMove> createPopupItemsLogMove();
 
 	protected abstract List<PopupItemModelMove> createPopupItemsModelMove();
+
+	protected abstract List<PopupItemLog> createPopupItemsLog();
 
 	protected abstract InductiveVisualMinerState createState(XLog log);
 
@@ -142,5 +147,10 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	@Override
 	public List<PopupItemModelMove> getPopupItemsModelMove() {
 		return popupItemsModelMove;
+	}
+
+	@Override
+	public List<PopupItemLog> getPopupItemsLog() {
+		return popupItemsLog;
 	}
 }

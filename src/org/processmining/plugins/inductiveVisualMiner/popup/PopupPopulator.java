@@ -22,15 +22,26 @@ public class PopupPopulator {
 	public static final int popupWidthNodes = 300;
 	public static final int popupWidthSourceSink = 350;
 
+	public static final int maxCharactersPerLine = 43;
+
 	public static void updatePopup(InductiveVisualMinerPanel panel, InductiveVisualMinerState state)
 			throws UnknownTreeNodeException {
-		if (panel.getGraph().getMouseInElements().isEmpty()) {
+		List<String> popup = new ArrayList<>();
+
+		if (panel.getGraph().isMouseInLogPopupButton()) {
+			//log popup
+
+			PopupItemInputLog input = new PopupItemInputLog();
+			List<PopupItemLog> items = state.getConfiguration().getPopupItemsLog();
+			popupProcess(state, input, popup, items);
+
+			panel.getGraph().setPopupActivity(popup, -1);
+			panel.getGraph().setShowPopup(true, popupWidthNodes);
+			return;
+		} else if (panel.getGraph().getMouseInElements().isEmpty()) {
 			panel.getGraph().setShowPopup(false, 10);
 		} else {
 			//output the popup items about the particular node or edge
-
-			List<String> popup = new ArrayList<>();
-
 			DotElement element = panel.getGraph().getMouseInElements().iterator().next();
 			if (element instanceof LocalDotNode) {
 				int unode = ((LocalDotNode) element).getUnode();
@@ -133,7 +144,7 @@ public class PopupPopulator {
 				} else if (item.length == 1) {
 					//one column
 					if (item[0] != null) {
-						popup.add(item[0]);
+						popup.add(StringUtils.abbreviate(item[0], maxCharactersPerLine));
 					}
 				} else {
 					//two columns
@@ -141,7 +152,7 @@ public class PopupPopulator {
 						popup.add(//
 								padRight(item[0], widthColumnA) + //
 										" " + //
-										StringUtils.abbreviate(item[1], 40));
+										StringUtils.abbreviate(item[1], maxCharactersPerLine - widthColumnA - 1));
 					}
 				}
 			}
