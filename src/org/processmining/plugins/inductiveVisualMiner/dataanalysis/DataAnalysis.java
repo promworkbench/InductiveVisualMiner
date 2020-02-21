@@ -301,7 +301,7 @@ public class DataAnalysis {
 			}
 
 			//compute stochastic similarity
-			{
+			if (isSomethingFiltered) {
 				executor.execute(new Runnable() {
 					public void run() {
 						//transform to xlog
@@ -309,10 +309,10 @@ public class DataAnalysis {
 						XLog logB = IvMLog2XLog.convert(logFilteredNegative, model);
 
 						EMSCParametersLogLogAbstract parameters = new EMSCParametersLogLogDefault();
-						StochasticTraceAlignmentsLogLog alignments;
+						parameters.setComputeStochasticTraceAlignments(false);
 						try {
-							alignments = EarthMoversStochasticConformancePlugin.measureLogLog(logA, logB, parameters,
-									canceller);
+							StochasticTraceAlignmentsLogLog alignments = EarthMoversStochasticConformancePlugin
+									.measureLogLog(logA, logB, parameters, canceller);
 							if (canceller.isCancelled()) {
 								return;
 							}
