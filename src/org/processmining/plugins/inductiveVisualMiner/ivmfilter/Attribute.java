@@ -183,6 +183,10 @@ public class Attribute implements Comparable<Attribute> {
 		return type == Type.traceNumberOfEvents;
 	}
 
+	public boolean isVirtual() {
+		return type == Type.traceDuration || type == Type.traceNumberOfEvents;
+	}
+
 	public Collection<String> getStringValues() {
 		return valuesLiteral;
 	}
