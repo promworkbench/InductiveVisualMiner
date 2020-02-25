@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 
+import org.deckfour.xes.model.XAttributeMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 
 /**
@@ -37,6 +38,8 @@ public interface IvMLogFiltered extends Cloneable {
 	public IteratorWithPosition<IvMTrace> iteratorUnfiltered();
 
 	public boolean equals(IvMLogFiltered otherLog);
-	
+
 	public IvMLogFilteredImpl clone() throws CloneNotSupportedException;
+
+	public XAttributeMap getAttributes();
 }
