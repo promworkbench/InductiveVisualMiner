@@ -51,7 +51,8 @@ public class AlignmentPerformance {
 		AcceptingPetriNetAlignment.addAllLeavesAsPerformanceEventClasses(performanceEventClasses2, p.getA());
 		AcceptingPetriNetAlignmentCallbackImpl callback = new AcceptingPetriNetAlignmentCallbackImpl(xLog, model,
 				activityEventClasses2, p);
-		AlignmentsWithAlignmentPackage.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
+		//AlignmentsWithAlignmentPackage.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
+		AcceptingPetriNetAlignment.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
 
 		if (!canceller.isCancelled()) {
 			return callback.getAlignedLog();

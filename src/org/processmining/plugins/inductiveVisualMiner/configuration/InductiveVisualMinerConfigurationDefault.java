@@ -30,7 +30,6 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl11TraceColouring;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl12FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Histogram;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl15DataAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl16Done;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
@@ -102,7 +101,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	protected Cl12FilterNodeSelection filterNodeSelection;
 	protected Cl13Performance performance;
 	protected Cl14Histogram histogram;
-	protected Cl15DataAnalysis dataAnalysis;
+	//protected Cl15DataAnalysis dataAnalysis;
 	protected Cl16Done done;
 
 	public InductiveVisualMinerConfigurationDefault(XLog log, ProMCanceller canceller, Executor executor) {
@@ -236,7 +235,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		filterNodeSelection = new Cl12FilterNodeSelection();
 		performance = new Cl13Performance();
 		histogram = new Cl14Histogram();
-		dataAnalysis = new Cl15DataAnalysis();
+		//dataAnalysis = new Cl15DataAnalysis();
 		done = new Cl16Done();
 
 		//gather attributes
@@ -545,21 +544,21 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			chain.addConnection(filterNodeSelection, histogram);
 		}
 
-		//15 data analysis
-		{
-			dataAnalysis.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getDataAnalysisView().setDataAnalysis(state.getDataAnalysis());
-				}
-			});
-			dataAnalysis.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getDataAnalysisView().invalidateContent();
-				}
-			});
-
-			chain.addConnection(filterNodeSelection, dataAnalysis);
-		}
+		//		//15 data analysis
+		//		{
+		//			dataAnalysis.setOnComplete(new Runnable() {
+		//				public void run() {
+		//					panel.getDataAnalysisView().setDataAnalysis(state.getDataAnalysis());
+		//				}
+		//			});
+		//			dataAnalysis.setOnInvalidate(new Runnable() {
+		//				public void run() {
+		//					panel.getDataAnalysisView().invalidateContent();
+		//				}
+		//			});
+		//
+		//			chain.addConnection(filterNodeSelection, dataAnalysis);
+		//		}
 
 		//done
 		{
@@ -567,7 +566,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			chain.addConnection(performance, done);
 			chain.addConnection(traceColouring, done);
 			chain.addConnection(animate, done);
-			chain.addConnection(dataAnalysis, done);
+			//chain.addConnection(dataAnalysis, done);
 		}
 
 		return chain;

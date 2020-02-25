@@ -14,12 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.deckfour.xes.model.XAttribute;
-import org.deckfour.xes.model.XLog;
 import org.math.plot.utils.Array;
-import org.processmining.earthmoversstochasticconformancechecking.parameters.EMSCParametersLogLogAbstract;
-import org.processmining.earthmoversstochasticconformancechecking.parameters.EMSCParametersLogLogDefault;
-import org.processmining.earthmoversstochasticconformancechecking.plugins.EarthMoversStochasticConformancePlugin;
-import org.processmining.earthmoversstochasticconformancechecking.tracealignments.StochasticTraceAlignmentsLogLog;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
@@ -30,7 +25,6 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTime
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog2XLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -302,26 +296,26 @@ public class DataAnalysis {
 
 			//compute stochastic similarity
 			if (isSomethingFiltered) {
-				executor.execute(new Runnable() {
-					public void run() {
-						//transform to xlog
-						XLog logA = IvMLog2XLog.convert(logFiltered, model);
-						XLog logB = IvMLog2XLog.convert(logFilteredNegative, model);
-
-						EMSCParametersLogLogAbstract parameters = new EMSCParametersLogLogDefault();
-						parameters.setComputeStochasticTraceAlignments(false);
-						try {
-							StochasticTraceAlignmentsLogLog alignments = EarthMoversStochasticConformancePlugin
-									.measureLogLog(logA, logB, parameters, canceller);
-							if (canceller.isCancelled()) {
-								return;
-							}
-							stochasticSimilarity = alignments.getSimilarity();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				});
+//				executor.execute(new Runnable() {
+//					public void run() {
+//						//transform to xlog
+//						XLog logA = IvMLog2XLog.convert(logFiltered, model);
+//						XLog logB = IvMLog2XLog.convert(logFilteredNegative, model);
+//
+//						EMSCParametersLogLogAbstract parameters = new EMSCParametersLogLogDefault();
+//						parameters.setComputeStochasticTraceAlignments(false);
+//						try {
+//							StochasticTraceAlignmentsLogLog alignments = EarthMoversStochasticConformancePlugin
+//									.measureLogLog(logA, logB, parameters, canceller);
+//							if (canceller.isCancelled()) {
+//								return;
+//							}
+//							stochasticSimilarity = alignments.getSimilarity();
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//						}
+//					}
+//				});
 			}
 
 			executor.shutdown();
