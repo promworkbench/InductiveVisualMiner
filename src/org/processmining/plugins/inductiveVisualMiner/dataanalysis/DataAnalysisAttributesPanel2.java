@@ -172,11 +172,11 @@ public class DataAnalysisAttributesPanel2 extends JTable {
 	}
 
 	public int getRows() {
-		if (attributesInfo == null) {
+		if (dataAnalysis == null) {
 			return 0;
 		}
 		return headerRows + //header rows
-				attributesInfo.getTraceAttributes().size() * DataAnalysis.AttributeData.Field.values().length;
+				dataAnalysis.getTraceAttributes().size() * DataAnalysis.AttributeData.Field.values().length;
 	}
 
 	public void setRowHeights() {
@@ -209,13 +209,11 @@ public class DataAnalysisAttributesPanel2 extends JTable {
 			return null;
 		}
 		int attributeNr = rowNr / fields;
-		for (Attribute attribute : attributesInfo.getTraceAttributes()) {
-			if (DataAnalysis.isSupported(attribute)) {
-				if (attributeNr == 0) {
-					return attribute;
-				}
-				attributeNr--;
+		for (Attribute attribute : dataAnalysis.getTraceAttributes()) {
+			if (attributeNr == 0) {
+				return attribute;
 			}
+			attributeNr--;
 		}
 		return null;
 	}
