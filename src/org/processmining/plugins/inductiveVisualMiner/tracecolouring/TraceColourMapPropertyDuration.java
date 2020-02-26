@@ -20,6 +20,13 @@ public class TraceColourMapPropertyDuration extends TraceColourMapProperty {
 		return getTraceDuration(trace);
 	}
 
+	/**
+	 * 
+	 * @param trace
+	 * @return The duration of the trace, that is, the difference between the
+	 *         highest and the lowest timestamp. If no timestamps are present,
+	 *         Long.MIN_VALUE is returned.
+	 */
 	public static long getTraceDuration(IvMTrace trace) {
 		long min = Long.MAX_VALUE;
 		long max = Long.MIN_VALUE;
@@ -30,7 +37,7 @@ public class TraceColourMapPropertyDuration extends TraceColourMapProperty {
 			}
 		}
 		if (max == Long.MIN_VALUE) {
-			return max;
+			return Long.MIN_VALUE;
 		}
 		return max - min;
 	}

@@ -296,26 +296,26 @@ public class DataAnalysis {
 
 			//compute stochastic similarity
 			if (isSomethingFiltered) {
-//				executor.execute(new Runnable() {
-//					public void run() {
-//						//transform to xlog
-//						XLog logA = IvMLog2XLog.convert(logFiltered, model);
-//						XLog logB = IvMLog2XLog.convert(logFilteredNegative, model);
-//
-//						EMSCParametersLogLogAbstract parameters = new EMSCParametersLogLogDefault();
-//						parameters.setComputeStochasticTraceAlignments(false);
-//						try {
-//							StochasticTraceAlignmentsLogLog alignments = EarthMoversStochasticConformancePlugin
-//									.measureLogLog(logA, logB, parameters, canceller);
-//							if (canceller.isCancelled()) {
-//								return;
-//							}
-//							stochasticSimilarity = alignments.getSimilarity();
-//						} catch (InterruptedException e) {
-//							e.printStackTrace();
-//						}
-//					}
-//				});
+				//				executor.execute(new Runnable() {
+				//					public void run() {
+				//						//transform to xlog
+				//						XLog logA = IvMLog2XLog.convert(logFiltered, model);
+				//						XLog logB = IvMLog2XLog.convert(logFilteredNegative, model);
+				//
+				//						EMSCParametersLogLogAbstract parameters = new EMSCParametersLogLogDefault();
+				//						parameters.setComputeStochasticTraceAlignments(false);
+				//						try {
+				//							StochasticTraceAlignmentsLogLog alignments = EarthMoversStochasticConformancePlugin
+				//									.measureLogLog(logA, logB, parameters, canceller);
+				//							if (canceller.isCancelled()) {
+				//								return;
+				//							}
+				//							stochasticSimilarity = alignments.getSimilarity();
+				//						} catch (InterruptedException e) {
+				//							e.printStackTrace();
+				//						}
+				//					}
+				//				});
 			}
 
 			executor.shutdown();
@@ -500,7 +500,11 @@ public class DataAnalysis {
 			}
 		}
 		if (attribute.isTraceDuration()) {
-			return TraceColourMapPropertyDuration.getTraceDuration(trace);
+			long value = TraceColourMapPropertyDuration.getTraceDuration(trace);
+			if (value == Long.MIN_VALUE) {
+				return -Double.MAX_VALUE;
+			}
+			return value;
 		} else if (attribute.isTraceNumberofEvents()) {
 			return trace.getNumberOfEvents();
 		}

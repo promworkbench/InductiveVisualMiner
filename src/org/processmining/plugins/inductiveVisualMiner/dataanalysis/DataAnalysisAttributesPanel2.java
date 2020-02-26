@@ -210,10 +210,12 @@ public class DataAnalysisAttributesPanel2 extends JTable {
 		}
 		int attributeNr = rowNr / fields;
 		for (Attribute attribute : attributesInfo.getTraceAttributes()) {
-			if (attributeNr == 0) {
-				return attribute;
+			if (DataAnalysis.isSupported(attribute)) {
+				if (attributeNr == 0) {
+					return attribute;
+				}
+				attributeNr--;
 			}
-			attributeNr--;
 		}
 		return null;
 	}
