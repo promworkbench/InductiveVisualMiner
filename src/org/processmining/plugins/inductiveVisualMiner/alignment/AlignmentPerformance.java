@@ -23,21 +23,21 @@ import gnu.trove.map.TObjectIntMap;
 
 public class AlignmentPerformance {
 
-	public static IvMLogNotFiltered align(IvMModel model, XEventPerformanceClassifier performanceClassifier, XLog xLog,
-			XEventClasses activityEventClasses, XEventClasses performanceEventClasses, ProMCanceller canceller)
-			throws Exception {
+	public static IvMLogNotFiltered align(AlignmentComputer computer, IvMModel model,
+			XEventPerformanceClassifier performanceClassifier, XLog xLog, XEventClasses activityEventClasses,
+			XEventClasses performanceEventClasses, ProMCanceller canceller) throws Exception {
 		if (model.isTree()) {
-			return alignTree(model, performanceClassifier, xLog, activityEventClasses, performanceEventClasses,
-					canceller);
+			return alignTree(computer, model, performanceClassifier, xLog, activityEventClasses,
+					performanceEventClasses, canceller);
 		} else {
-			return alignDfg(model, performanceClassifier, xLog, activityEventClasses, performanceEventClasses,
+			return alignDfg(computer, model, performanceClassifier, xLog, activityEventClasses, performanceEventClasses,
 					canceller);
 		}
 	}
 
-	public static IvMLogNotFiltered alignDfg(IvMModel model, XEventPerformanceClassifier performanceClassifier,
-			XLog xLog, XEventClasses activityEventClasses, XEventClasses performanceEventClasses,
-			ProMCanceller canceller) throws Exception {
+	public static IvMLogNotFiltered alignDfg(AlignmentComputer computer, IvMModel model,
+			XEventPerformanceClassifier performanceClassifier, XLog xLog, XEventClasses activityEventClasses,
+			XEventClasses performanceEventClasses, ProMCanceller canceller) throws Exception {
 
 		//the event classes are not thread-safe; copy them
 		IvMEventClasses activityEventClasses2 = new IvMEventClasses(activityEventClasses);
@@ -49,21 +49,18 @@ public class AlignmentPerformance {
 
 		AcceptingPetriNetAlignment.addAllLeavesAsEventClasses(activityEventClasses2, model.getDfg());
 		AcceptingPetriNetAlignment.addAllLeavesAsPerformanceEventClasses(performanceEventClasses2, p.getA());
-		AcceptingPetriNetAlignmentCallbackImpl callback = new AcceptingPetriNetAlignmentCallbackImpl(xLog, model,
-				activityEventClasses2, p);
-		//AlignmentsWithAlignmentPackage.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
-		AcceptingPetriNetAlignment.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
 
 		if (!canceller.isCancelled()) {
-			return callback.getAlignedLog();
+			return computer.computeAcceptingPetriNet(model, xLog, canceller, activityEventClasses2,
+					performanceEventClasses2, p);
 		} else {
 			return null;
 		}
 	}
 
-	public static IvMLogNotFiltered alignTree(IvMModel model, XEventPerformanceClassifier performanceClassifier,
-			XLog xLog, XEventClasses activityEventClasses, XEventClasses performanceEventClasses,
-			ProMCanceller canceller) throws Exception {
+	public static IvMLogNotFiltered alignTree(AlignmentComputer computer, IvMModel model,
+			XEventPerformanceClassifier performanceClassifier, XLog xLog, XEventClasses activityEventClasses,
+			XEventClasses performanceEventClasses, ProMCanceller canceller) throws Exception {
 
 		IvMEfficientTree tree = model.getTree();
 
@@ -84,15 +81,9 @@ public class AlignmentPerformance {
 
 		ETMAlignment.addAllLeavesAsEventClasses(performanceEventClasses2, performanceTree.getDTree());
 
-		ETMAlignmentCallbackImpl callback = new ETMAlignmentCallbackImpl(model, performanceTree, xLog,
-				activityEventClasses2, performanceNodeMapping, performanceEventClasses2, nodeId2performanceNode,
-				enqueueTaus);
-		ETMAlignment alignment = new ETMAlignment(performanceTree.getDTree(), xLog, performanceEventClasses2, callback,
-				canceller);
-		alignment.alignLog();
-
 		if (!canceller.isCancelled()) {
-			return callback.getAlignedLog();
+			return computer.computeProcessTree(model, xLog, canceller, activityEventClasses2, performanceEventClasses2,
+					performanceTree, performanceNodeMapping, enqueueTaus, nodeId2performanceNode);
 		} else {
 			return null;
 		}

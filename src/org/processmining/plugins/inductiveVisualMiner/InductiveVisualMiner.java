@@ -73,6 +73,7 @@ public class InductiveVisualMiner {
 			//pre-set the miner if necessary
 			if (launcher.getMiner() != null) {
 				configuration.getState().setMiner(launcher.getMiner());
+				configuration.getPanel().getMinerSelection().setSelectedItem(launcher.getMiner());
 			}
 		} else if (launcher.preMinedTree != null) {
 			//launch with pre-mined tree

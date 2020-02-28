@@ -15,6 +15,8 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerContro
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01GatherAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl02SortEvents;
@@ -573,4 +575,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		return chain;
 	}
 
+	protected AlignmentComputer createAlignmentComputer() {
+		return new AlignmentComputerImpl();
+	}
 }

@@ -8,6 +8,7 @@ import java.util.concurrent.Executor;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -105,6 +106,10 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 
 	public List<PopupItemLog> getPopupItemsLog() {
 		return phantom.getPopupItemsLog();
+	}
+
+	public AlignmentComputer getAlignmentComputer() {
+		return phantom.getAlignmentComputer();
 	}
 
 }

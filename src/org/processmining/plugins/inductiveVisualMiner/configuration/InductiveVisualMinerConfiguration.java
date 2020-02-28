@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -115,5 +116,7 @@ public interface InductiveVisualMinerConfiguration {
 	 * @return
 	 */
 	public Chain getChain();
+
+	public AlignmentComputer getAlignmentComputer();
 
 }

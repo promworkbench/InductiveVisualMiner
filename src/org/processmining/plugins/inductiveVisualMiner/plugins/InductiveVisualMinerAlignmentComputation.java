@@ -14,6 +14,8 @@ import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentPerformance;
 import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
@@ -63,8 +65,9 @@ public class InductiveVisualMinerAlignmentComputation {
 		XEventClasses activityEventClasses = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
 		XEventClasses performanceEventClasses = XLogInfoFactory.createLogInfo(log, performanceClassifier)
 				.getEventClasses();
+		AlignmentComputer computer = new AlignmentComputerImpl();
 
-		return AlignmentPerformance.align(new IvMModel(tree), performanceClassifier, log, activityEventClasses,
-				performanceEventClasses, canceller);
+		return AlignmentPerformance.align(computer, new IvMModel(tree), performanceClassifier, log,
+				activityEventClasses, performanceEventClasses, canceller);
 	}
 }

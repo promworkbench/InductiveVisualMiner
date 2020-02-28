@@ -6,31 +6,32 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentPerformance;
 import org.processmining.plugins.inductiveVisualMiner.alignment.ImportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
 public class Cl07Align extends
-		ChainLink<Sextuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
+		ChainLink<Septuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment, InductiveVisualMinerConfiguration>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
 
 	private static ConcurrentHashMap<Triple<IvMModel, XEventPerformanceClassifier, XLog>, SoftReference<IvMLogNotFiltered>> cache = new ConcurrentHashMap<>();
 
-	protected Sextuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment> generateInput(
+	protected Septuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment, InductiveVisualMinerConfiguration> generateInput(
 			InductiveVisualMinerState state) {
-		return Sextuple.of(state.getModel(), state.getPerformanceClassifier(), state.getSortedXLog(),
+		return Septuple.of(state.getModel(), state.getPerformanceClassifier(), state.getSortedXLog(),
 				state.getXLogInfo().getEventClasses(), state.getXLogInfoPerformance().getEventClasses(),
-				state.getPreMinedIvMLog());
+				state.getPreMinedIvMLog(), state.getConfiguration());
 	}
 
 	protected Pair<IvMLogNotFiltered, IvMLogInfo> executeLink(
-			Sextuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment> input,
+			Septuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment, InductiveVisualMinerConfiguration> input,
 			IvMCanceller canceller) throws Exception {
 		IvMModel model = input.getA();
 
@@ -56,8 +57,8 @@ public class Cl07Align extends
 			}
 		}
 
-		IvMLogNotFiltered log = AlignmentPerformance.align(model, input.getB(), input.getC(), input.getD(),
-				input.getE(), canceller);
+		IvMLogNotFiltered log = AlignmentPerformance.align(input.getG().getAlignmentComputer(), model, input.getB(),
+				input.getC(), input.getD(), input.getE(), canceller);
 		if (log == null && !canceller.isCancelled()) {
 			throw new Exception("alignment failed");
 		}

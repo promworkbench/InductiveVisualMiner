@@ -7,6 +7,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -31,6 +32,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final InductiveVisualMinerState state;
 	private final InductiveVisualMinerPanel panel;
 	private final List<VisualMinerWrapper> discoveryTechniques;
+	private final AlignmentComputer alignmentComputer;
 	private final List<Mode> modes;
 	private final List<PopupItemActivity> popupItemsActivity;
 	private final List<PopupItemStartEnd> popupItemsStartEnd;
@@ -44,6 +46,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		discoveryTechniques = createDiscoveryTechniques();
 		preMiningFilters = createPreMiningFilters();
 		highlightingFilters = createHighlightingFilters();
+		alignmentComputer = createAlignmentComputer();
 		modes = createModes();
 		popupItemsActivity = createPopupItemsActivity();
 		popupItemsStartEnd = createPopupItemsStartEnd();
@@ -61,6 +64,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract List<IvMFilter> createHighlightingFilters();
 
 	protected abstract List<VisualMinerWrapper> createDiscoveryTechniques();
+
+	protected abstract AlignmentComputer createAlignmentComputer();
 
 	protected abstract List<Mode> createModes();
 
@@ -106,6 +111,11 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	public VisualMinerWrapper[] getDiscoveryTechniquesArray() {
 		VisualMinerWrapper[] result = new VisualMinerWrapper[discoveryTechniques.size()];
 		return discoveryTechniques.toArray(result);
+	}
+
+	@Override
+	public AlignmentComputer getAlignmentComputer() {
+		return alignmentComputer;
 	}
 
 	@Override
