@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
  * @author sander
  *
  */
-public interface DisplayType {
+public abstract class DisplayType {
 
 	/*
 	 * Create using enum
@@ -22,7 +22,7 @@ public interface DisplayType {
 		numeric, duration, time, NA
 	}
 
-	public Type getType();
+	public abstract Type getType();
 
 	public static Type fromAttribute(Attribute attribute) {
 		if (attribute.isNumeric()) {
@@ -98,9 +98,9 @@ public interface DisplayType {
 
 	public static final DecimalFormat numberFormat = new DecimalFormat("0.0000");
 
-	public double getValue();
+	public abstract double getValue();
 
-	public static class NA implements DisplayType {
+	public static class NA extends DisplayType {
 
 		private NA() {
 		}
@@ -119,7 +119,7 @@ public interface DisplayType {
 
 	}
 
-	public static class NumericUnpadded implements DisplayType {
+	public static class NumericUnpadded extends DisplayType {
 		long value;
 
 		public NumericUnpadded(long value) {
@@ -139,7 +139,7 @@ public interface DisplayType {
 		}
 	}
 
-	public static class Numeric implements DisplayType {
+	public static class Numeric extends DisplayType {
 		double valueDouble;
 		long valueLong;
 
@@ -176,7 +176,7 @@ public interface DisplayType {
 		}
 	}
 
-	public static class Duration implements DisplayType {
+	public static class Duration extends DisplayType {
 		double value;
 
 		private Duration(double value) {
@@ -196,7 +196,7 @@ public interface DisplayType {
 		}
 	}
 
-	public static class Time implements DisplayType {
+	public static class Time extends DisplayType {
 		long value;
 
 		private Time(long value) {
