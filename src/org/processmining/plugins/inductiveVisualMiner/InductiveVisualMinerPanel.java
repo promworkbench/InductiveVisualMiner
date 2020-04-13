@@ -29,7 +29,7 @@ import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChang
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationFake;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisView;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ControllerView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
@@ -83,7 +83,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final JButton traceViewButton;
 	private final TraceView traceView;
 	private final JButton dataAnalysisViewButton;
-	private final DataAnalysisView dataAnalysisView;
+	private final DataAnalysesView dataAnalysisView;
 	private final JButton traceColourMapViewButton;
 	private final TraceColourMapView traceColourMapView;
 	private final JButton highlightingFiltersViewButton;
@@ -328,7 +328,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//data analysis view
 			{
-				dataAnalysisView = new DataAnalysisView(this);
+				dataAnalysisView = new DataAnalysesView(this, configuration);
 				dataAnalysisViewButton = new JButton("data analysis");
 				IvMDecorator.decorate(dataAnalysisViewButton);
 				GridBagConstraints cDataAnalysisViewButton = new GridBagConstraints();
@@ -650,7 +650,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return traceViewButton;
 	}
 
-	public DataAnalysisView getDataAnalysisView() {
+	public DataAnalysesView getDataAnalysisView() {
 		return dataAnalysisView;
 	}
 

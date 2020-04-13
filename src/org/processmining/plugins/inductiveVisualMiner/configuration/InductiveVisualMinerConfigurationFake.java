@@ -10,6 +10,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
@@ -110,6 +111,10 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 
 	public AlignmentComputer getAlignmentComputer() {
 		return phantom.getAlignmentComputer();
+	}
+
+	public List<DataAnalysisTableFactory<?>> getDataAnalysisTables() {
+		return phantom.getDataAnalysisTables();
 	}
 
 }

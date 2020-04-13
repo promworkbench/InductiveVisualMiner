@@ -6,6 +6,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
@@ -84,6 +85,8 @@ public interface InductiveVisualMinerConfiguration {
 	public List<PopupItemModelMove> getPopupItemsModelMove();
 
 	public List<PopupItemLog> getPopupItemsLog();
+
+	public List<DataAnalysisTableFactory<?>> getDataAnalysisTables();
 
 	/**
 	 * Set up the state that keeps the data related to the visual Miner.

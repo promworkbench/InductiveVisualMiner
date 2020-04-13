@@ -8,6 +8,7 @@ import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.classification.XEventNameClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
+import org.processmining.cohortanalysis.cohort.Cohorts;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
@@ -23,7 +24,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysis;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
@@ -488,13 +489,24 @@ public class InductiveVisualMinerState {
 	}
 
 	//== data analysis
-	private DataAnalysis dataAnalysis;
+	private TraceAttributeAnalysis dataAnalysis;
 
-	public void setDataAnalysis(DataAnalysis dataAnalysis) {
+	public void setTraceAttributesAnalysis(TraceAttributeAnalysis dataAnalysis) {
 		this.dataAnalysis = dataAnalysis;
 	}
 
-	public DataAnalysis getDataAnalysis() {
+	public TraceAttributeAnalysis getDataAnalysis() {
 		return dataAnalysis;
+	}
+
+	//==cohort analysis
+	private Cohorts cohortAnalysis;
+
+	public void setCohortAnalysis(Cohorts result) {
+		this.cohortAnalysis = result;
+	}
+
+	public Cohorts getCohortAnalysis() {
+		return cohortAnalysis;
 	}
 }

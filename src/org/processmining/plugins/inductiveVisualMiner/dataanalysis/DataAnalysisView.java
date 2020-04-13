@@ -1,90 +1,39 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Insets;
 
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 
-public class DataAnalysisView extends SideWindow {
+public class DataAnalysisView<D> extends JPanel {
 
-	private static final long serialVersionUID = -1113805892324898124L;
+	private static final long serialVersionUID = -5719337013697465055L;
 
-	private static final String busyMessageString = "Data analysis will become available after the computations of alignments and highlighting filters have been completed.";
-	private static final String messageString = "For each numeric trace attribute, the correlation of that attribute with the trace's fitness (that is, its conformance to the model) is shown.";
-
-	private final JTextArea busyMessage;
-	private final DataAnalysisAttributesPanel attributesPanel;
-	private final DataAnalysisAttributesPanel2 attributesPanel2;
-	private final JScrollPane scrollPane;
-
-	public DataAnalysisView(Component parent) {
-		super(parent, "Data analysis - " + InductiveVisualMinerPanel.title);
+	public DataAnalysisView(DataAnalysisTable<D> table, String explanation) {
 		setLayout(new BorderLayout());
 
 		IvMPanel topPanel = new IvMPanel();
 		topPanel.setLayout(new BorderLayout());
 		add(topPanel, BorderLayout.CENTER);
 
-		attributesPanel = new DataAnalysisAttributesPanel();
-		attributesPanel2 = new DataAnalysisAttributesPanel2();
-		scrollPane = new JScrollPane(attributesPanel2, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		JTextArea explanationT = new JTextArea();
+		explanationT.setLineWrap(true);
+		explanationT.setWrapStyleWord(true);
+		explanationT.setEnabled(false);
+		explanationT.setText(explanation);
+		explanationT.setMargin(new Insets(5, 5, 5, 5));
+		IvMDecorator.decorate(explanationT);
+		topPanel.add(explanationT, BorderLayout.PAGE_START);
+
+		JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.getViewport().setBackground(IvMDecorator.backGroundColour1);
 		topPanel.add(scrollPane, BorderLayout.CENTER);
-
-		busyMessage = new JTextArea(busyMessageString);
-		IvMDecorator.decorate(busyMessage);
-		busyMessage.setWrapStyleWord(true);
-		busyMessage.setLineWrap(true);
-		busyMessage.setEnabled(false);
-		busyMessage.setMargin(new Insets(5, 5, 5, 5));
-
-		//topPanel.add(busyMessage, BorderLayout.PAGE_START);
-
-		invalidateContent();
 	}
 
-	public void invalidateContent() {
-		busyMessage.setText(busyMessageString);
-		scrollPane.setVisible(false);
-		revalidate();
-		repaint();
-	}
-
-	public void initialiseAttributes(AttributesInfo attributesInfo) {
-		//clear the existing list
-		attributesPanel.removeAll();
-
-		for (Attribute attribute : attributesInfo.getTraceAttributes()) {
-			if (DataAnalysis.isSupported(attribute)) {
-				DataAnalysisAttributeView attributePanel = new DataAnalysisAttributeView(attribute);
-				attributesPanel.add(attributePanel);
-			}
-		}
-
-		attributesPanel2.setAttributesInfo(attributesInfo);
-
-		revalidate();
-		repaint();
-	}
-
-	public void setDataAnalysis(DataAnalysis dataAnalysis) {
-		busyMessage.setText(messageString);
-		scrollPane.setVisible(true);
-
-		attributesPanel.setDataAnalysis(dataAnalysis);
-		attributesPanel2.setDataAnalysis(dataAnalysis);
-
-		revalidate();
-		repaint();
-	}
 }

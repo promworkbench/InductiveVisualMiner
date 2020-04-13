@@ -33,7 +33,11 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl12FilterNodeSelect
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl15DataAnalysis;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl16Done;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl16CohortAnalysis;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl17Done;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
@@ -105,7 +109,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	protected Cl13Performance performance;
 	protected Cl14Histogram histogram;
 	protected Cl15DataAnalysis dataAnalysis;
-	protected Cl16Done done;
+	protected Cl16CohortAnalysis cohortAnalysis;
+	protected Cl17Done done;
 
 	public InductiveVisualMinerConfigurationDefault(XLog log, ProMCanceller canceller, Executor executor) {
 		super(log, canceller, executor);
@@ -208,6 +213,14 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
+	public List<DataAnalysisTableFactory<?>> getDataAnalysisTables() {
+		ArrayList<DataAnalysisTableFactory<?>> result = new ArrayList<>();
+		result.add(new TraceAttributeAnalysisTableFactory());
+		result.add(new CohortAnalysisTableFactory());
+		return result;
+	}
+
+	@Override
 	protected InductiveVisualMinerState createState(XLog log) {
 		return new InductiveVisualMinerState(log);
 	}
@@ -239,7 +252,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		performance = new Cl13Performance();
 		histogram = new Cl14Histogram();
 		dataAnalysis = new Cl15DataAnalysis();
-		done = new Cl16Done();
+		cohortAnalysis = new Cl16CohortAnalysis();
+		done = new Cl17Done();
 
 		//gather attributes
 		{
@@ -551,16 +565,33 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		{
 			dataAnalysis.setOnComplete(new Runnable() {
 				public void run() {
-					panel.getDataAnalysisView().setDataAnalysis(state.getDataAnalysis());
+					panel.getDataAnalysisView().setData(TraceAttributeAnalysisTableFactory.name,
+							state.getDataAnalysis());
 				}
 			});
 			dataAnalysis.setOnInvalidate(new Runnable() {
 				public void run() {
-					panel.getDataAnalysisView().invalidateContent();
+					panel.getDataAnalysisView().invalidate(TraceAttributeAnalysisTableFactory.name);
 				}
 			});
 
 			chain.addConnection(filterNodeSelection, dataAnalysis);
+		}
+
+		//16 cohort analysis
+		{
+			cohortAnalysis.setOnComplete(new Runnable() {
+				public void run() {
+					panel.getDataAnalysisView().setData(CohortAnalysisTableFactory.name, state.getCohortAnalysis());
+				}
+			});
+			cohortAnalysis.setOnInvalidate(new Runnable() {
+				public void run() {
+					panel.getDataAnalysisView().invalidate(CohortAnalysisTableFactory.name);
+				}
+			});
+
+			chain.addConnection(makeLog, cohortAnalysis);
 		}
 
 		//done
@@ -570,6 +601,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			chain.addConnection(traceColouring, done);
 			chain.addConnection(animate, done);
 			chain.addConnection(dataAnalysis, done);
+			chain.addConnection(cohortAnalysis, done);
 		}
 
 		return chain;
