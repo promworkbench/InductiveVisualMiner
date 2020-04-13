@@ -72,6 +72,10 @@ public interface DisplayType {
 		return new Numeric(value);
 	}
 
+	public static NumericUnpadded numericUnpadded(long value) {
+		return new NumericUnpadded(value);
+	}
+
 	public static Numeric numeric(long value) {
 		return new Numeric(value);
 	}
@@ -113,6 +117,26 @@ public interface DisplayType {
 			return -Double.MAX_VALUE;
 		}
 
+	}
+
+	public static class NumericUnpadded implements DisplayType {
+		long value;
+
+		public NumericUnpadded(long value) {
+			this.value = value;
+		}
+
+		public String toString() {
+			return value + "";
+		}
+
+		public Type getType() {
+			return Type.numeric;
+		}
+
+		public double getValue() {
+			return value;
+		}
 	}
 
 	public static class Numeric implements DisplayType {

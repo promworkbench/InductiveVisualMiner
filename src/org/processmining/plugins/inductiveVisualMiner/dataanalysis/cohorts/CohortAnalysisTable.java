@@ -60,7 +60,7 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 					case 1 :
 						return "<html>" + cohort.getFeatures().iterator().next().getDescriptionSelector() + "</html>";
 					case 2 :
-						return DisplayType.numeric(cohort.getSize());
+						return DisplayType.numericUnpadded(cohort.getSize());
 					default :
 						return DisplayType.numeric(cohort.getDistance());
 				}
