@@ -9,8 +9,8 @@ import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeCl
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
+import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class Cl01GatherAttributes
 		extends ChainLink<XLog, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {

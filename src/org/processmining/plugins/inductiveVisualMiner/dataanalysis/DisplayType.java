@@ -3,8 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 import java.text.DecimalFormat;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
-
+import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 /**
  * Class to display values, i.e. handles durations, times and aligns values.
  * 

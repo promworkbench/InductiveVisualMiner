@@ -8,8 +8,8 @@ import org.processmining.cohortanalysis.parameters.CohortAnalysisParametersAbstr
 import org.processmining.cohortanalysis.parameters.CohortAnalysisParametersDefault;
 import org.processmining.cohortanalysis.plugins.CohortAnalysisPlugin;
 import org.processmining.framework.plugin.ProMCanceller;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class CohortAnalysis {
 

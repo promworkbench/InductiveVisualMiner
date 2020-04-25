@@ -9,7 +9,7 @@ import javax.swing.JTabbedPane;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 import gnu.trove.map.hash.THashMap;
 

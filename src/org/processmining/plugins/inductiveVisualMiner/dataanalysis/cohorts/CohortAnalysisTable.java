@@ -1,12 +1,16 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts;
 
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.cohortanalysis.cohort.Cohorts;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 
@@ -16,6 +20,8 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 	private Cohorts cohorts;
 
 	public CohortAnalysisTable() {
+
+		//fill the table
 		model = new AbstractTableModel() {
 
 			private static final long serialVersionUID = 6373287725995933319L;
@@ -29,7 +35,7 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 					case 2 :
 						return "Number of traces";
 					default :
-						return "Distance with rest of the log";
+						return "Distance with rest of log";
 				}
 			}
 
@@ -66,7 +72,22 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 				}
 			}
 		};
+
+		//enable and listen for selections, and pass the selection on to the trace attribute filter
+		setColumnSelectionAllowed(false);
+		setRowSelectionAllowed(true);
+		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					int selectedRow = ((DefaultListSelectionModel) e.getSource()).getAnchorSelectionIndex();
+					System.out.println(selectedRow);
+				}
+			}
+		});
+
 		setModel(model);
+
 	}
 
 	public void setAttributesInfo(AttributesInfo attributesInfo) {

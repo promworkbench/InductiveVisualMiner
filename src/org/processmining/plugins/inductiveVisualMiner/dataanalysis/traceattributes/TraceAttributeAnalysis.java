@@ -29,8 +29,8 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattribut
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
+import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog2XLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;

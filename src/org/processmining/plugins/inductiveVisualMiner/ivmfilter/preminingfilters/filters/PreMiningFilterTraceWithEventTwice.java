@@ -2,7 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilter
 
 import org.deckfour.xes.model.XEvent;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
 public class PreMiningFilterTraceWithEventTwice extends PreMiningFilterTraceWithEvent {
 
@@ -10,7 +10,7 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningFilterTraceWith
 	public String getName() {
 		return "Trace with event happening twice filter";
 	}
-	
+
 	@Override
 	public boolean staysInLog(IMTrace trace) {
 		Attribute attribute = panel.getSelectedAttribute();

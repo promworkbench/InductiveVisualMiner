@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInput;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInputLog;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLog;
+import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class PopupItemLogAttributes implements PopupItemLog {
 

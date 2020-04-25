@@ -2,7 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import javax.swing.JTable;
 
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public abstract class DataAnalysisTable<D> extends JTable {
 
@@ -18,6 +18,8 @@ public abstract class DataAnalysisTable<D> extends JTable {
 		setRowHeight(rowHeight);
 		getColumnModel().setColumnMargin(columnMargin);
 		setDefaultRenderer(Object.class, new DataAnalysisTableCellRenderer());
+		setColumnSelectionAllowed(false);
+		setRowSelectionAllowed(false);
 	}
 
 	public abstract void setAttributesInfo(AttributesInfo attributesInfo);

@@ -5,8 +5,8 @@ import org.processmining.cohortanalysis.cohort.Cohorts;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class Cl16CohortAnalysis extends ChainLink<Triple<AttributesInfo, XLog, XEventPerformanceClassifier>, Cohorts> {
 

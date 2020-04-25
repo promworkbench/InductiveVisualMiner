@@ -1,8 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
+import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
 public class HighlightingFilterEventTwice extends HighlightingFilterEvent {
 
@@ -12,7 +12,7 @@ public class HighlightingFilterEventTwice extends HighlightingFilterEvent {
 	}
 
 	@Override
-	public boolean countInColouring(IvMTrace trace) {		
+	public boolean countInColouring(IvMTrace trace) {
 		Attribute attribute = panel.getSelectedAttribute();
 		int count = 0;
 		if (attribute.isLiteral()) {
@@ -52,15 +52,15 @@ public class HighlightingFilterEventTwice extends HighlightingFilterEvent {
 		}
 		return false;
 	}
-	
+
 	@Override
-	public void updateExplanation() {		
+	public void updateExplanation() {
 		if (!isEnabled()) {
-			panel.getExplanationLabel().setText(
-					"Include only traces that have at least two events having an attribute as selected.");
+			panel.getExplanationLabel()
+					.setText("Include only traces that have at least two events having an attribute as selected.");
 		} else {
-			panel.getExplanationLabel().setText(
-					"Include only traces that have at least two events " + panel.getExplanation() + ".");
+			panel.getExplanationLabel()
+					.setText("Include only traces that have at least two events " + panel.getExplanation() + ".");
 		}
 	}
 

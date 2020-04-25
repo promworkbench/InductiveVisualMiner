@@ -10,8 +10,8 @@ import javax.swing.event.ChangeListener;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.RangeSlider;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 	private static final long serialVersionUID = 4742499018638960929L;

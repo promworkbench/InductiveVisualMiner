@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
+import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+
 public class AttributeKey {
 	public enum Type {
 		attribute, message
