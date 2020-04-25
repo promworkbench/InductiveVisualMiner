@@ -37,6 +37,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl16CohortAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl17Done;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysisFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
@@ -215,6 +216,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	@Override
 	public List<DataAnalysisTableFactory<?>> getDataAnalysisTables() {
 		ArrayList<DataAnalysisTableFactory<?>> result = new ArrayList<>();
+		result.add(new LogAttributeAnalysisFactory());
 		result.add(new TraceAttributeAnalysisTableFactory());
 		result.add(new CohortAnalysisTableFactory());
 		return result;
@@ -339,6 +341,14 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 					state.getFiltersController().updateFiltersWithIMLog(panel, state.getLog(), state.getSortedXLog(),
 							executor);
+
+					panel.getDataAnalysisView().setData(LogAttributeAnalysisFactory.name, state.getSortedXLog());
+				}
+			});
+
+			makeLog.setOnInvalidate(new Runnable() {
+				public void run() {
+					panel.getDataAnalysisView().invalidate(LogAttributeAnalysisFactory.name);
 				}
 			});
 
