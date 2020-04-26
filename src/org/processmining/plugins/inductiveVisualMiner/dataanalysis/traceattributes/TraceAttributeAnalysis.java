@@ -438,19 +438,23 @@ public class TraceAttributeAnalysis {
 				return null;
 			}
 
-			double correlation = Correlation
-					.correlation(fitnessFiltered, valuesFiltered, valuesAverage, standardDeviation).doubleValue();
-			if (correlation != -Double.MAX_VALUE) {
+			if (result.getValue(Field.minFitness).getValue() != result.getValue(Field.maxFitness).getValue()) {
+				double correlation = Correlation
+						.correlation(fitnessFiltered, valuesFiltered, valuesAverage, standardDeviation).doubleValue();
+				if (correlation != -Double.MAX_VALUE) {
 
-				result.set(Field.correlation, DisplayType.numeric(correlation));
+					result.set(Field.correlation, DisplayType.numeric(correlation));
 
-				if (canceller.isCancelled()) {
-					return null;
+					if (canceller.isCancelled()) {
+						return null;
+					}
+
+					result.set(Field.correlationPlot,
+							CorrelationDensityPlot.create(attribute.getName(), valuesFiltered, getDoubleMin(attribute),
+									getDoubleMax(attribute), "fitness", fitnessFiltered,
+									result.getValue(Field.minFitness).getValue(),
+									result.getValue(Field.maxFitness).getValue()));
 				}
-
-				result.set(Field.correlationPlot, CorrelationDensityPlot.create(attribute.getName(), valuesFiltered,
-						getDoubleMin(attribute), getDoubleMax(attribute), "fitness", fitnessFiltered,
-						result.getValue(Field.minFitness).getValue(), result.getValue(Field.maxFitness).getValue()));
 			}
 		}
 
