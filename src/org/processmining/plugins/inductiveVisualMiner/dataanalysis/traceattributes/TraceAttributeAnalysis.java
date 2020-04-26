@@ -29,14 +29,14 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattribut
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
-import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog2XLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapPropertyDuration;
+import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -438,16 +438,20 @@ public class TraceAttributeAnalysis {
 				return null;
 			}
 
-			result.set(Field.correlation, DisplayType.numeric(Correlation
-					.correlation(fitnessFiltered, valuesFiltered, valuesAverage, standardDeviation).doubleValue()));
+			double correlation = Correlation
+					.correlation(fitnessFiltered, valuesFiltered, valuesAverage, standardDeviation).doubleValue();
+			if (correlation != -Double.MAX_VALUE) {
 
-			if (canceller.isCancelled()) {
-				return null;
+				result.set(Field.correlation, DisplayType.numeric(correlation));
+
+				if (canceller.isCancelled()) {
+					return null;
+				}
+
+				result.set(Field.correlationPlot, CorrelationDensityPlot.create(attribute.getName(), valuesFiltered,
+						getDoubleMin(attribute), getDoubleMax(attribute), "fitness", fitnessFiltered,
+						result.getValue(Field.minFitness).getValue(), result.getValue(Field.maxFitness).getValue()));
 			}
-
-			result.set(Field.correlationPlot, CorrelationDensityPlot.create(attribute.getName(), valuesFiltered,
-					getDoubleMin(attribute), getDoubleMax(attribute), "fitness", fitnessFiltered,
-					result.getValue(Field.minFitness).getValue(), result.getValue(Field.maxFitness).getValue()));
 		}
 
 		return result;
