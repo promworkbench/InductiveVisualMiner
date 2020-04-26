@@ -190,10 +190,10 @@ public abstract class IvMFiltersView extends SideWindow {
 		}
 	}
 
-	public void setHighlightingFilterSelectedCohort(Cohort cohort) {
+	public void setHighlightingFilterSelectedCohort(Cohort cohort, boolean highlightInCohort) {
 		for (IvMFilter filter : filter2panel.keySet()) {
 			if (filter instanceof HighlightingFilterCohort) {
-				((HighlightingFilterCohort) filter).setSelectedCohort(cohort);
+				((HighlightingFilterCohort) filter).setSelectedCohort(cohort, highlightInCohort);
 				boolean enabled = cohort != null;
 				filter2checkbox.get(filter).setSelected(enabled);
 				filter.setEnabledFilter(enabled);

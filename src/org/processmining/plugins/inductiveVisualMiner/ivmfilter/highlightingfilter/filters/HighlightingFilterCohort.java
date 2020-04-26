@@ -24,6 +24,7 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 	HighlightingFilterCohortPanel panel = null;
 	private HighlightingFilter2CohortAnalysisHandler showCohortAnalysisHandler;
 	private Cohort selectedCohort = null;
+	private boolean highlightInCohort = true;
 
 	public boolean countInColouring(IvMTrace trace) {
 		if (selectedCohort == null) {
@@ -46,10 +47,10 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 		//a trace is in a cohort when all of the cohort's features are present in the trace.
 		for (Feature feature : selectedCohort.getFeatures()) {
 			if (!feature.includes(xTrace)) {
-				return false;
+				return !highlightInCohort;
 			}
 		}
-		return true;
+		return highlightInCohort;
 	}
 
 	public String getName() throws Exception {
@@ -89,11 +90,15 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 
 	public void updateExplanation() {
 		if (!isEnabled()) {
-			panel.getExplanationLabel().setText(
-					"Include only traces that are in the cohort selected in data analysis. Click here to select a cohort in the data analysis window.");
+			panel.getExplanationLabel()
+					.setText("Include only traces that are in the cohort selected in data analysis.\n"
+							+ "Click here to select a cohort in the data analysis window.");
 		} else {
 			StringBuilder s = new StringBuilder();
 			s.append("Include only traces having ");
+			if (!highlightInCohort) {
+				s.append("not ");
+			}
 			for (Iterator<Feature> it = selectedCohort.getFeatures().iterator(); it.hasNext();) {
 				Feature feature = it.next();
 				s.append("attribute `");
@@ -105,7 +110,7 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 					s.append(", and ");
 				}
 			}
-			s.append(". ");
+			s.append(".\n");
 			s.append("Click here to select a cohort in the data analysis window.");
 
 			panel.getExplanationLabel().setText(s.toString());
@@ -120,9 +125,11 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 	 * Set the selected cohort, or null to not select any cohort.
 	 * 
 	 * @param cohort
+	 * @param highlightInCohort
 	 */
-	public void setSelectedCohort(Cohort cohort) {
+	public void setSelectedCohort(Cohort cohort, boolean highlightInCohort) {
 		this.selectedCohort = cohort;
+		this.highlightInCohort = highlightInCohort;
 		updateExplanation();
 		update();
 	}

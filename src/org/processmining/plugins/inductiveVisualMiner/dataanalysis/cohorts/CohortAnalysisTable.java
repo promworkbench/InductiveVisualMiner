@@ -1,5 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts;
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -8,7 +13,9 @@ import javax.swing.table.AbstractTableModel;
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.cohortanalysis.cohort.Cohorts;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableCellRenderer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
@@ -17,7 +24,10 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 
 	private AbstractTableModel model;
 	private Cohorts cohorts;
+	private boolean highlightInCohort = true;
 	private CohortAnalysis2HighlightingFilterHandler cohortAnalysis2HighlightingFilterHandler;
+
+	private boolean shiftPressing = false;
 
 	public CohortAnalysisTable() {
 
@@ -80,18 +90,38 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 		getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
-					int selectedRow = getSelectedRow();
-					if (selectedRow == -1) {
-						cohortAnalysis2HighlightingFilterHandler.setSelectedCohort(null);
-					} else {
-						cohortAnalysis2HighlightingFilterHandler.setSelectedCohort(cohorts.get(selectedRow));
-					}
+					selectionChanged();
 				}
+			}
+		});
+		addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
+					highlightInCohort = false;
+					((DataAnalysisTableCellRenderer) getCellRenderer(0, 0)).setBackground(Color.red);
+				} else {
+					highlightInCohort = true;
+					((DataAnalysisTableCellRenderer) getCellRenderer(0, 0))
+							.setBackground(IvMDecorator.backGroundColour2);
+				}
+				repaint();
+
+				//fire a selection event
+				selectionChanged();
 			}
 		});
 
 		setModel(model);
 
+	}
+
+	private void selectionChanged() {
+		int selectedRow = getSelectedRow();
+		if (selectedRow == -1) {
+			cohortAnalysis2HighlightingFilterHandler.setSelectedCohort(null, true);
+		} else {
+			cohortAnalysis2HighlightingFilterHandler.setSelectedCohort(cohorts.get(selectedRow), highlightInCohort);
+		}
 	}
 
 	public void setAttributesInfo(AttributesInfo attributesInfo) {

@@ -7,9 +7,9 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 public class CohortAnalysisTableFactory implements DataAnalysisTableFactory<Cohorts> {
 
 	public static final String name = "Cohort analysis";
-	public static final String explanation = "Cohort analysis identifies differences between groups of traces. "
-			+ "It looks for the trace attributes with the largest influence on stochastic process behaviour: "
-			+ "1 means that the process is completely defined by the attribute, 0 means that the influence is indistinguishable from randomness.";
+	public static final String explanation = "Cohort analysis quantifies the influence of trace attributes on stochastic process behaviour: "
+			+ "1 means that the process is completely defined by the attribute, 0 means that the influence is indistinguishable from randomness.\n"
+			+ "Click on a cohort to highlight it; shift+click to highlight other traces; ctrl+click to un-highlight it.";
 
 	public DataAnalysisTable<Cohorts> create() {
 		return new CohortAnalysisTable();

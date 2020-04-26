@@ -10,6 +10,6 @@ import org.processmining.cohortanalysis.cohort.Cohort;
  */
 public interface CohortAnalysis2HighlightingFilterHandler {
 
-	public void setSelectedCohort(Cohort cohort);
+	public void setSelectedCohort(Cohort cohort, boolean filterInCohort);
 
 }

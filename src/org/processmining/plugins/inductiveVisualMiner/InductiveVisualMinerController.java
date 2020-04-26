@@ -430,13 +430,13 @@ public class InductiveVisualMinerController {
 					}
 
 					public void setEnabled(boolean enabled) {
-						System.out.println("cohort filter enabled " + enabled);
+						//do nothing if the user disables the cohort
 					}
 				});
 		panel.getDataAnalysisView()
 				.setCohortAnalysis2HighlightingFilterHandler(new CohortAnalysis2HighlightingFilterHandler() {
-					public void setSelectedCohort(Cohort cohort) {
-						panel.getColouringFiltersView().setHighlightingFilterSelectedCohort(cohort);
+					public void setSelectedCohort(Cohort cohort, boolean highlightInCohort) {
+						panel.getColouringFiltersView().setHighlightingFilterSelectedCohort(cohort, highlightInCohort);
 					}
 				});
 
