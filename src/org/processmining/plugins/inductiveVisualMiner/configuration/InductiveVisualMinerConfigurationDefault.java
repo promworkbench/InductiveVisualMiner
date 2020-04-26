@@ -42,6 +42,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattribut
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCohort;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCompleteEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEventTwice;
@@ -139,7 +140,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				new HighlightingFilterFollows(), //
 				new HighlightingFilterLogMove(), //
 				new HighlightingFilterTraceStartsWithEvent(), //
-				new HighlightingFilterTraceEndsWithEvent() //
+				new HighlightingFilterTraceEndsWithEvent(), //
+				new HighlightingFilterCohort() //
 		}));
 	}
 

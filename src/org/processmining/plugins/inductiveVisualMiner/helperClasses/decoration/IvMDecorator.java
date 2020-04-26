@@ -29,6 +29,7 @@ import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicPanelUI;
 import javax.swing.plaf.basic.BasicTextAreaUI;
+import javax.swing.text.JTextComponent;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.MultiComboBox;
 
@@ -273,7 +274,7 @@ public class IvMDecorator {
 	public static class IvMTextAreaUI extends BasicTextAreaUI {
 		public void installUI(JComponent c) {
 			super.installUI(c);
-			JTextArea text = (JTextArea) c;
+			JTextComponent text = (JTextComponent) c;
 			text.setOpaque(false);
 			text.setFont(font);
 			text.setForeground(textColour);

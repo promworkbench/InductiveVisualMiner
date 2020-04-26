@@ -18,6 +18,7 @@ import javax.swing.event.ChangeListener;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.std.XConceptExtension;
+import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
@@ -44,6 +45,9 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
@@ -412,11 +416,29 @@ public class InductiveVisualMinerController {
 			}
 		});
 
+		//set data analysis button
 		panel.getDataAnalysisViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.getDataAnalysisView().enableAndShow();
 			}
 		});
+		panel.getColouringFiltersView()
+				.setHighlightingFilter2CohortAnalysisHandler(new HighlightingFilter2CohortAnalysisHandler() {
+					public void showCohortAnalysis() {
+						panel.getDataAnalysisView().enableAndShow();
+						panel.getDataAnalysisView().showAnalysis(CohortAnalysisTableFactory.name);
+					}
+
+					public void setEnabled(boolean enabled) {
+						System.out.println("cohort filter enabled " + enabled);
+					}
+				});
+		panel.getDataAnalysisView()
+				.setCohortAnalysis2HighlightingFilterHandler(new CohortAnalysis2HighlightingFilterHandler() {
+					public void setSelectedCohort(Cohort cohort) {
+						panel.getColouringFiltersView().setHighlightingFilterSelectedCohort(cohort);
+					}
+				});
 
 		//set trace colouring button
 		panel.getTraceColourMapViewButton().addActionListener(new ActionListener() {

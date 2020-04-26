@@ -81,10 +81,9 @@ public abstract class IvMFilter implements Comparable<IvMFilter> {
 			e.printStackTrace();
 		}
 	}
-
-	public final boolean swapEnabledFilter() {
-		enabledFilter = !enabledFilter;
-		return enabledFilter;
+	
+	public void setEnabledFilter(boolean enabledFilter) {
+		this.enabledFilter = enabledFilter;
 	}
 
 	public final boolean isEnabledFilter() {

@@ -8,6 +8,8 @@ import javax.swing.JTabbedPane;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
@@ -19,11 +21,12 @@ public class DataAnalysesView extends SideWindow {
 
 	private final Map<String, DataAnalysisTable<?>> tables = new THashMap<>();
 	private final Map<String, OnOffPanel<?>> onOffPanels = new THashMap<>();
+	private final JTabbedPane tabbedPane;
 
 	public DataAnalysesView(Component parent, InductiveVisualMinerConfiguration configuration) {
 		super(parent, "Data analysis - " + InductiveVisualMinerPanel.title);
 
-		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane = new JTabbedPane();
 
 		for (DataAnalysisTableFactory<?> factory : configuration.getDataAnalysisTables()) {
 			DataAnalysisTable<?> table = factory.create();
@@ -68,6 +71,23 @@ public class DataAnalysesView extends SideWindow {
 		if (onOffPanels.containsKey(analysisName)) {
 			OnOffPanel<?> onOffPanel = onOffPanels.get(analysisName);
 			onOffPanel.off();
+		}
+	}
+
+	public void showAnalysis(String name) {
+		if (onOffPanels.containsKey(name)) {
+			OnOffPanel<?> onOffPanel = onOffPanels.get(name);
+			tabbedPane.setSelectedComponent(onOffPanel);
+		}
+	}
+
+	public void setCohortAnalysis2HighlightingFilterHandler(
+			CohortAnalysis2HighlightingFilterHandler showCohortHighlightingFilterHandler) {
+		for (DataAnalysisTable<?> table : tables.values()) {
+			if (table instanceof CohortAnalysisTable) {
+				((CohortAnalysisTable) table)
+						.setCohortAnalysis2HighlightingFilterHandler(showCohortHighlightingFilterHandler);
+			}
 		}
 	}
 

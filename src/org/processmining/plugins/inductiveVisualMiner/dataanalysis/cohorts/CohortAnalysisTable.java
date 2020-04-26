@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts;
 
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -18,6 +17,7 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 
 	private AbstractTableModel model;
 	private Cohorts cohorts;
+	private CohortAnalysis2HighlightingFilterHandler cohortAnalysis2HighlightingFilterHandler;
 
 	public CohortAnalysisTable() {
 
@@ -80,8 +80,12 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 		getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
-					int selectedRow = ((DefaultListSelectionModel) e.getSource()).getAnchorSelectionIndex();
-					System.out.println(selectedRow);
+					int selectedRow = getSelectedRow();
+					if (selectedRow == -1) {
+						cohortAnalysis2HighlightingFilterHandler.setSelectedCohort(null);
+					} else {
+						cohortAnalysis2HighlightingFilterHandler.setSelectedCohort(cohorts.get(selectedRow));
+					}
 				}
 			}
 		});
@@ -97,6 +101,11 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 	public void setData(Cohorts cohorts) {
 		this.cohorts = cohorts;
 		model.fireTableStructureChanged();
+	}
+
+	public void setCohortAnalysis2HighlightingFilterHandler(
+			CohortAnalysis2HighlightingFilterHandler cohortAnalysis2HighlightingFilterHandler) {
+		this.cohortAnalysis2HighlightingFilterHandler = cohortAnalysis2HighlightingFilterHandler;
 	}
 
 }

@@ -19,9 +19,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.Scrollable;
 
+import org.processmining.cohortanalysis.cohort.Cohort;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.SwitchPanel;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCohort;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.THashMap;
@@ -32,7 +35,11 @@ public abstract class IvMFiltersView extends SideWindow {
 	private final JPanel panel;
 	private final Map<IvMFilter, JPanel> filter2panel;
 	private final Map<IvMFilter, JLabel> filter2initialisationLabel;
+	private final Map<IvMFilter, JCheckBox> filter2checkbox;
+	private final Map<IvMFilter, Runnable> filter2onUpdate;
 	private final TObjectIntMap<IvMFilter> filter2index;
+
+	private HighlightingFilter2CohortAnalysisHandler highlightingFilter2CohortAnalysisHandler;
 
 	public class IvMFiltersViewPanel extends JPanel implements Scrollable {
 		private static final long serialVersionUID = 8311080909592746520L;
@@ -69,6 +76,8 @@ public abstract class IvMFiltersView extends SideWindow {
 		filter2panel = new THashMap<>();
 		filter2initialisationLabel = new THashMap<>();
 		filter2index = new TObjectIntHashMap<>();
+		filter2checkbox = new THashMap<>();
+		filter2onUpdate = new THashMap<>();
 
 		JTextArea explanation = new JTextArea(header);
 		IvMDecorator.decorate(explanation);
@@ -131,6 +140,10 @@ public abstract class IvMFiltersView extends SideWindow {
 			return;
 		}
 
+		if (filter instanceof HighlightingFilterCohort) {
+			((HighlightingFilterCohort) filter).setShowCohortAnalysisHandler(highlightingFilter2CohortAnalysisHandler);
+		}
+
 		final JPanel subPanel = filter2panel.get(filter);
 		final int index = filter2index.get(filter);
 
@@ -142,16 +155,52 @@ public abstract class IvMFiltersView extends SideWindow {
 
 		//add checkbox
 		{
-			JCheckBox checkBox = new JCheckBox();
+			final JCheckBox checkBox = new JCheckBox();
 			IvMDecorator.decorate(checkBox);
 			subPanel.add(checkBox, BorderLayout.LINE_START);
 			checkBox.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					boolean x = filter.swapEnabledFilter();
+					boolean x = checkBox.isSelected();
+					filter.setEnabledFilter(x);
 					subPanel.setEnabled(x);
 					onUpdate.run();
 				}
 			});
+			filter2checkbox.put(filter, checkBox);
+			filter2onUpdate.put(filter, onUpdate);
+		}
+
+		revalidate();
+		repaint();
+	}
+
+	public HighlightingFilter2CohortAnalysisHandler getHighlightingFilter2CohortAnalysisHandler() {
+		return highlightingFilter2CohortAnalysisHandler;
+	}
+
+	public void setHighlightingFilter2CohortAnalysisHandler(
+			HighlightingFilter2CohortAnalysisHandler highlightingFilter2CohortAnalysisHandler) {
+		this.highlightingFilter2CohortAnalysisHandler = highlightingFilter2CohortAnalysisHandler;
+
+		for (IvMFilter filter : filter2panel.keySet()) {
+			if (filter instanceof HighlightingFilterCohort) {
+				((HighlightingFilterCohort) filter)
+						.setShowCohortAnalysisHandler(highlightingFilter2CohortAnalysisHandler);
+			}
+		}
+	}
+
+	public void setHighlightingFilterSelectedCohort(Cohort cohort) {
+		for (IvMFilter filter : filter2panel.keySet()) {
+			if (filter instanceof HighlightingFilterCohort) {
+				((HighlightingFilterCohort) filter).setSelectedCohort(cohort);
+				boolean enabled = cohort != null;
+				filter2checkbox.get(filter).setSelected(enabled);
+				filter.setEnabledFilter(enabled);
+				filter2onUpdate.get(filter).run();
+				filter2panel.get(filter).setEnabled(enabled);
+				repaint();
+			}
 		}
 	}
 }
