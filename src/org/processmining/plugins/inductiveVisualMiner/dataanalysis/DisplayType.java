@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+
 /**
  * Class to display values, i.e. handles durations, times and aligns values.
  * 
@@ -18,7 +19,7 @@ public abstract class DisplayType {
 	 */
 
 	public enum Type {
-		numeric, duration, time, NA
+		numeric, duration, time, literal, NA
 	}
 
 	public abstract Type getType();
@@ -30,8 +31,10 @@ public abstract class DisplayType {
 			return Type.duration;
 		} else if (attribute.isTraceNumberofEvents()) {
 			return Type.numeric;
-		} else {
+		} else if (attribute.isTime()) {
 			return Type.time;
+		} else {
+			return Type.literal;
 		}
 	}
 
@@ -63,6 +66,18 @@ public abstract class DisplayType {
 		}
 	}
 
+	public static DisplayType create(Type type, String value) {
+		if (value == null) {
+			return NA();
+		}
+		switch (type) {
+			case literal :
+				return literal(value);
+			default :
+				return null;
+		}
+	}
+
 	/*
 	 * static constructors
 	 */
@@ -85,6 +100,10 @@ public abstract class DisplayType {
 
 	public static Time time(long value) {
 		return new Time(value);
+	}
+
+	public static Literal literal(String value) {
+		return new Literal(value);
 	}
 
 	public static NA NA() {
@@ -212,6 +231,26 @@ public abstract class DisplayType {
 
 		public Type getType() {
 			return Type.time;
+		}
+	}
+
+	public static class Literal extends DisplayType {
+		String value;
+
+		private Literal(String value) {
+			this.value = value;
+		}
+
+		public String toString() {
+			return value;
+		}
+
+		public double getValue() {
+			return -Double.MAX_VALUE;
+		}
+
+		public Type getType() {
+			return Type.literal;
 		}
 	}
 

@@ -33,7 +33,38 @@ public class Correlation {
 		}
 	}
 
-	public static double quickSelect(double[] arr, int left, int right, int k) {
+	public static double median(long[] values) {
+		values = values.clone();
+		if (values.length % 2 == 1) {
+			return quickSelect(values, 0, values.length - 1, values.length / 2);
+		} else {
+			return (quickSelect(values, 0, values.length - 1, values.length / 2 - 1)
+					+ quickSelect(values, 0, values.length - 1, values.length / 2)) / 2.0;
+		}
+	}
+
+	private static double quickSelect(double[] arr, int left, int right, int k) {
+		while (true) {
+			if (k >= 0 && k <= right - left + 1) {
+				int pos = randomPartition(arr, left, right);
+				if (pos - left == k) {
+					return arr[pos];
+				}
+				if (pos - left > k) {
+					right = pos - 1;
+					//return quickSelect(arr, left, pos - 1, k);
+				} else {
+					k = k - pos + left - 1;
+					left = pos + 1;
+					//return quickSelect(arr, pos + 1, right, k - pos + left - 1);
+				}
+			} else {
+				return 0;
+			}
+		}
+	}
+
+	private static long quickSelect(long[] arr, int left, int right, int k) {
 		while (true) {
 			if (k >= 0 && k <= right - left + 1) {
 				int pos = randomPartition(arr, left, right);
@@ -67,13 +98,39 @@ public class Correlation {
 		return i;
 	}
 
-	public static void swap(double[] arr, int n1, int n2) {
+	private static int partitionIterative(long[] arr, int left, int right) {
+		long pivot = arr[right];
+		int i = left;
+		for (int j = left; j <= right - 1; j++) {
+			if (arr[j] <= pivot) {
+				swap(arr, i, j);
+				i++;
+			}
+		}
+		swap(arr, i, right);
+		return i;
+	}
+
+	private static void swap(double[] arr, int n1, int n2) {
 		double temp = arr[n2];
 		arr[n2] = arr[n1];
 		arr[n1] = temp;
 	}
 
-	public static int randomPartition(double[] arr, int left, int right) {
+	private static void swap(long[] arr, int n1, int n2) {
+		long temp = arr[n2];
+		arr[n2] = arr[n1];
+		arr[n1] = temp;
+	}
+
+	private static int randomPartition(double[] arr, int left, int right) {
+		int n = right - left + 1;
+		int pivot = (int) (Math.random()) * n;
+		swap(arr, left + pivot, right);
+		return partitionIterative(arr, left, right);
+	}
+
+	private static int randomPartition(long[] arr, int left, int right) {
 		int n = right - left + 1;
 		int pivot = (int) (Math.random()) * n;
 		swap(arr, left + pivot, right);
@@ -117,7 +174,36 @@ public class Correlation {
 		}
 	}
 
+	public static BigDecimal mean(long[] values) {
+		if (values.length > 0) {
+			BigDecimal sum = BigDecimal.ZERO;
+			for (double value : values) {
+				sum = sum.add(BigDecimal.valueOf(value));
+			}
+			return sum.divide(BigDecimal.valueOf(values.length), 10, RoundingMode.HALF_UP);
+		} else {
+			return BigDecimal.ZERO;
+		}
+	}
+
 	public static double standardDeviation(double[] values, BigDecimal mean) {
+		if (values.length > 1) {
+			BigDecimal sum = BigDecimal.ZERO;
+			for (double value : values) {
+				BigDecimal p = BigDecimal.valueOf(value).subtract(mean).pow(2);
+				sum = sum.add(p);
+			}
+			BigDecimal d = sum.divide(BigDecimal.valueOf(values.length - 1), 10, RoundingMode.HALF_UP);
+
+			return Math.sqrt(d.doubleValue());
+		} else if (values.length == 1) {
+			return 0;
+		} else {
+			return -Double.MAX_VALUE;
+		}
+	}
+
+	public static double standardDeviation(long[] values, BigDecimal mean) {
 		if (values.length > 1) {
 			BigDecimal sum = BigDecimal.ZERO;
 			for (double value : values) {

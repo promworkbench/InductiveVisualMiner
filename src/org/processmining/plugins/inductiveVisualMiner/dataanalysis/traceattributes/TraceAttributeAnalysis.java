@@ -285,9 +285,7 @@ public class TraceAttributeAnalysis {
 			executor.shutdownNow();
 		}
 
-		for (
-
-		Entry<Attribute, AttributeData> e : attribute2dataC.entrySet()) {
+		for (Entry<Attribute, AttributeData> e : attribute2dataC.entrySet()) {
 			attribute2data.put(e.getKey(), e.getValue());
 		}
 		for (Entry<Attribute, AttributeData> e : attribute2dataNegativeC.entrySet()) {
@@ -466,7 +464,7 @@ public class TraceAttributeAnalysis {
 				|| attribute.isTraceNumberofEvents();
 	}
 
-	private static double getDoubleValue(Attribute attribute, IvMTrace trace) {
+	public static double getDoubleValue(Attribute attribute, IvMTrace trace) {
 		if (attribute.isNumeric() || attribute.isTime()) {
 			XAttribute xAttribute = trace.getAttributes().get(attribute.getName());
 			if (xAttribute == null) {

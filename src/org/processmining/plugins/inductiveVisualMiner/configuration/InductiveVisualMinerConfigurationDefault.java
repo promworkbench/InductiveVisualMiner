@@ -37,6 +37,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl16CohortAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl17Done;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysisFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
@@ -79,9 +80,6 @@ import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActiv
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogAttributes;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveActivities;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveTitle;
-import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogName;
-import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogSpacer;
-import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogTitle;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemModelMoveOccurrences;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndName;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndNumberOfTraces;
@@ -208,9 +206,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	@Override
 	protected List<PopupItemLog> createPopupItemsLog() {
 		return new ArrayList<>(Arrays.asList(new PopupItemLog[] { //
-				new PopupItemLogTitle(), //
-				new PopupItemLogSpacer(), //
-				new PopupItemLogName(), //
 				new PopupItemLogAttributes(), //
 		}));
 	}
@@ -220,6 +215,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		ArrayList<DataAnalysisTableFactory<?>> result = new ArrayList<>();
 		result.add(new LogAttributeAnalysisFactory());
 		result.add(new TraceAttributeAnalysisTableFactory());
+		result.add(new EventAttributeAnalysisTableFactory());
 		result.add(new CohortAnalysisTableFactory());
 		return result;
 	}
@@ -577,12 +573,15 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		{
 			dataAnalysis.setOnComplete(new Runnable() {
 				public void run() {
+					panel.getDataAnalysisView().setData(EventAttributeAnalysisTableFactory.name,
+							state.getEventAttributesAnalysis());
 					panel.getDataAnalysisView().setData(TraceAttributeAnalysisTableFactory.name,
-							state.getDataAnalysis());
+							state.getTraceAttributesAnalysis());
 				}
 			});
 			dataAnalysis.setOnInvalidate(new Runnable() {
 				public void run() {
+					panel.getDataAnalysisView().invalidate(EventAttributeAnalysisTableFactory.name);
 					panel.getDataAnalysisView().invalidate(TraceAttributeAnalysisTableFactory.name);
 				}
 			});
