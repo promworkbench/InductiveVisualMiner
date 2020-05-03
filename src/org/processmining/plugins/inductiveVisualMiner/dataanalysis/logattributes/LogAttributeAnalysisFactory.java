@@ -7,7 +7,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 public class LogAttributeAnalysisFactory implements DataAnalysisTableFactory<XLog> {
 
 	public static final String name = "Log attributes";
-	public static final String explanation = "Attributes defined at the log level.";
+	public static final String explanation = "Attributes at the log level.";
 
 	public DataAnalysisTable<XLog> create() {
 		return new LogAttributeAnalysisTable();

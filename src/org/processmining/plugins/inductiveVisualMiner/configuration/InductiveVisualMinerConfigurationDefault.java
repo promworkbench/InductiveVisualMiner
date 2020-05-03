@@ -604,7 +604,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				}
 			});
 
-			chain.addConnection(filterNodeSelection, dataAnalysisTrace);
+			chain.addConnection(filterNodeSelection, dataAnalysisEvent);
 		}
 
 		//data analysis - cohort analysis
@@ -630,6 +630,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			chain.addConnection(traceColouring, done);
 			chain.addConnection(animate, done);
 			chain.addConnection(dataAnalysisTrace, done);
+			chain.addConnection(dataAnalysisEvent, done);
 			chain.addConnection(dataAnalysisCohort, done);
 		}
 
