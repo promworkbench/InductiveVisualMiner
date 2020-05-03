@@ -2,6 +2,8 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.text.DecimalFormat;
 
+import javax.swing.JLabel;
+
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
@@ -122,6 +124,8 @@ public abstract class DisplayType {
 
 	public abstract double getValue();
 
+	public abstract int getHorizontalAlignment();
+
 	public static class NA extends DisplayType {
 
 		private NA() {
@@ -137,6 +141,10 @@ public abstract class DisplayType {
 
 		public double getValue() {
 			return -Double.MAX_VALUE;
+		}
+
+		public int getHorizontalAlignment() {
+			return JLabel.RIGHT;
 		}
 
 	}
@@ -158,6 +166,10 @@ public abstract class DisplayType {
 
 		public double getValue() {
 			return value;
+		}
+
+		public int getHorizontalAlignment() {
+			return JLabel.RIGHT;
 		}
 	}
 
@@ -196,6 +208,10 @@ public abstract class DisplayType {
 		public Type getType() {
 			return Type.numeric;
 		}
+
+		public int getHorizontalAlignment() {
+			return JLabel.RIGHT;
+		}
 	}
 
 	public static class Duration extends DisplayType {
@@ -215,6 +231,10 @@ public abstract class DisplayType {
 
 		public Type getType() {
 			return Type.numeric;
+		}
+
+		public int getHorizontalAlignment() {
+			return JLabel.RIGHT;
 		}
 	}
 
@@ -240,6 +260,10 @@ public abstract class DisplayType {
 		public Type getType() {
 			return Type.time;
 		}
+
+		public int getHorizontalAlignment() {
+			return JLabel.RIGHT;
+		}
 	}
 
 	public static class Literal extends DisplayType {
@@ -259,6 +283,10 @@ public abstract class DisplayType {
 
 		public Type getType() {
 			return Type.literal;
+		}
+
+		public int getHorizontalAlignment() {
+			return JLabel.RIGHT;
 		}
 	}
 
@@ -285,6 +313,10 @@ public abstract class DisplayType {
 
 		public Type getType() {
 			return Type.html;
+		}
+
+		public int getHorizontalAlignment() {
+			return JLabel.LEFT;
 		}
 	}
 }

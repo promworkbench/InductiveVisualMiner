@@ -46,8 +46,11 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 			setIcon(null);
 		}
 
-		if (forceNumerical || object instanceof DisplayType) {
+		if (forceNumerical) {
 			setHorizontalAlignment(JLabel.RIGHT);
+			setFont(IvMDecorator.fontMonoSpace);
+		} else if (object instanceof DisplayType) {
+			setHorizontalAlignment(((DisplayType) object).getHorizontalAlignment());
 			setFont(IvMDecorator.fontMonoSpace);
 		} else {
 			setHorizontalAlignment(JLabel.LEFT);

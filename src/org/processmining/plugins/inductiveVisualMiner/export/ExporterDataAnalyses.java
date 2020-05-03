@@ -31,7 +31,7 @@ public class ExporterDataAnalyses extends Exporter {
 
 	@Override
 	public String getDescription() {
-		return "data analyses (xlsx)";
+		return "xlsx (data analyses)";
 	}
 
 	protected String getExtension() {

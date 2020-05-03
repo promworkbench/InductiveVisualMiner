@@ -69,7 +69,7 @@ public class CohortAnalysisTable extends DataAnalysisTable {
 
 				switch (column) {
 					case 0 :
-						return DisplayType.literal(cohort.getFeatures().iterator().next().getDescriptionField());
+						return cohort.getFeatures().iterator().next().getDescriptionField();
 					case 1 :
 						return DisplayType.html(cohort.getFeatures().iterator().next().getDescriptionSelector());
 					case 2 :

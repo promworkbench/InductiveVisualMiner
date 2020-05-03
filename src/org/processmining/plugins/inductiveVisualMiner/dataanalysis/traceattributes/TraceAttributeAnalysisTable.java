@@ -73,7 +73,7 @@ public class TraceAttributeAnalysisTable extends DataAnalysisTable {
 						if (column == 0) {
 							return "stochastic similarity";
 						} else if (column == 1) {
-							return dataAnalysis.getStochasticSimilarity();
+							return DisplayType.numeric(dataAnalysis.getStochasticSimilarity());
 						}
 					}
 					return "";
