@@ -232,33 +232,38 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	}
 
 	public void paintLogPopupCircle(Graphics2D g) {
-		Color backupColour = g.getColor();
-		Font backupFont = g.getFont();
+		if (!logPopupListeners.isEmpty()) {
+			Color backupColour = g.getColor();
+			Font backupFont = g.getFont();
 
-		//draw the background arc
-		if (isMouseInLogPopupButton) {
-			g.setColor(new Color(0, 0, 0, 180));
+			//draw the background arc
+			if (isMouseInLogPopupButton) {
+				g.setColor(new Color(0, 0, 0, 180));
+			} else {
+				g.setColor(new Color(0, 0, 0, 20));
+			}
+
+			logPopupButton = new Arc2D.Float(Arc2D.PIE);
+			logPopupButton.setFrame(-25, getHeight() - 25, 50, 50);
+			logPopupButton.setAngleStart(0);
+			logPopupButton.setAngleExtent(90);
+			g.fillArc(-25, getHeight() - 25, 50, 50, 0, 90);
+
+			//draw the question mark
+			if (isMouseInLogPopupButton) {
+				g.setColor(new Color(255, 255, 255, 128));
+			} else {
+				g.setColor(new Color(0, 0, 0, 128));
+			}
+			g.setFont(helperControlsButtonFont);
+			g.drawString("L", 3, getHeight() - 3);
+
+			//revert colour and font
+			g.setColor(backupColour);
+			g.setFont(backupFont);
 		} else {
-			g.setColor(new Color(0, 0, 0, 20));
+			logPopupButton = null;
 		}
-		logPopupButton = new Arc2D.Float(Arc2D.PIE);
-		logPopupButton.setFrame(-25, getHeight() - 25, 50, 50);
-		logPopupButton.setAngleStart(0);
-		logPopupButton.setAngleExtent(90);
-		g.fillArc(-25, getHeight() - 25, 50, 50, 0, 90);
-
-		//draw the question mark
-		if (isMouseInLogPopupButton) {
-			g.setColor(new Color(255, 255, 255, 128));
-		} else {
-			g.setColor(new Color(0, 0, 0, 128));
-		}
-		g.setFont(helperControlsButtonFont);
-		g.drawString("L", 3, getHeight() - 3);
-
-		//revert colour and font
-		g.setColor(backupColour);
-		g.setFont(backupFont);
 	}
 
 	public void paintPopup(Graphics2D g) {
@@ -599,6 +604,11 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		return isMouseInLogPopupButton;
 	}
 
+	/**
+	 * The log popup will only show if there are listeners registered.
+	 * 
+	 * @param logPopupListener
+	 */
 	public void addLogPopupListener(LogPopupListener logPopupListener) {
 		logPopupListeners.add(logPopupListener);
 	}

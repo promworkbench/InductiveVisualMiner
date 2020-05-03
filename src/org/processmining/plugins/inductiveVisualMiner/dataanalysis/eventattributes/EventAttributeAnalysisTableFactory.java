@@ -6,7 +6,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 public class EventAttributeAnalysisTableFactory implements DataAnalysisTableFactory<EventAttributeAnalysis> {
 
 	public static final String name = "Event attributes";
-	public static final String explanation = "Event attribute analysis shows descriptive statistics of event attributes. If a highlighting filter is active, it will show this for both the highlighted and the non-highlighted traces.";
+	public static final String explanation = "Attributes at the event level.\nIf traces are highlighted, attributes will be shown for highlighted and non-highlighted traces.";
 
 	public DataAnalysisTable<EventAttributeAnalysis> create() {
 		return new EventAttributeAnalysisTable();

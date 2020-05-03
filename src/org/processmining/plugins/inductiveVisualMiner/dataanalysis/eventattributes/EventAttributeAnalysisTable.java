@@ -1,6 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes;
 
+import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.Iterator;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -13,10 +15,10 @@ import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 public class EventAttributeAnalysisTable extends DataAnalysisTable<EventAttributeAnalysis> {
 
 	private static final long serialVersionUID = 4494120805010679270L;
-	private static final int fields = Field.values().length;
 
 	private EventAttributeAnalysis dataAnalysis;
 	private AbstractTableModel model;
+	private int[] startRowOfField;
 
 	public EventAttributeAnalysisTable() {
 		model = new AbstractTableModel() {
@@ -49,20 +51,19 @@ public class EventAttributeAnalysisTable extends DataAnalysisTable<EventAttribut
 				if (dataAnalysis == null) {
 					return 0;
 				}
-				int result = 0;
-				for (Attribute attribute : dataAnalysis.getEventAttributes()) {
-
-				}
-				return dataAnalysis.getEventAttributes().size() * Field.values().length;
+				return startRowOfField[startRowOfField.length - 1];
 			}
 
 			public Object getValueAt(int row, int column) {
+				if (dataAnalysis == null) {
+					return null;
+				}
 				Attribute attribute = getAttribute(row);
-				int fieldNr = getNrInAttribute(row);
-				Field field = getField(row);
+				int nrInAttribute = getNrInAttribute(row);
+				Field field = getField(attribute, nrInAttribute);
 
 				if (column == 0) {
-					if (fieldNr == 0) {
+					if (nrInAttribute == 0) {
 						return attribute.getName();
 					} else {
 						return "";
@@ -97,6 +98,18 @@ public class EventAttributeAnalysisTable extends DataAnalysisTable<EventAttribut
 
 	public void setData(EventAttributeAnalysis dataAnalysis) {
 		this.dataAnalysis = dataAnalysis;
+
+		startRowOfField = new int[dataAnalysis.getEventAttributes().size() + 1];
+		int i = 0;
+		int row = 0;
+		for (Attribute attribute : dataAnalysis.getEventAttributes()) {
+			EnumMap<Field, DisplayType> map = dataAnalysis.getAttributeData(attribute);
+			startRowOfField[i] = row;
+			i++;
+			row += map.size();
+		}
+		startRowOfField[i] = row;
+
 		model.fireTableStructureChanged();
 	}
 
@@ -104,22 +117,44 @@ public class EventAttributeAnalysisTable extends DataAnalysisTable<EventAttribut
 		if (dataAnalysis == null) {
 			return null;
 		}
-		int attributeNr = rowNr / fields;
+		int index = Arrays.binarySearch(startRowOfField, rowNr);
+		if (index < 0) {
+			index = (~index) - 1;
+		}
+
 		for (Attribute attribute : dataAnalysis.getEventAttributes()) {
-			if (attributeNr == 0) {
+			if (index == 0) {
 				return attribute;
 			}
-			attributeNr--;
+			index--;
 		}
 		return null;
 	}
 
 	private int getNrInAttribute(int rowNr) {
-		return rowNr % fields;
+		if (dataAnalysis == null) {
+			return Integer.MIN_VALUE;
+		}
+		int index = Arrays.binarySearch(startRowOfField, rowNr);
+		if (index < 0) {
+			index = (~index - 1);
+		}
+
+		return rowNr - startRowOfField[index];
 	}
 
-	private Field getField(int rowNr) {
-		int fieldNr = getNrInAttribute(rowNr);
-		return Field.values()[fieldNr];
+	private Field getField(Attribute attribute, int nrInAttribute) {
+		if (dataAnalysis == null) {
+			return null;
+		}
+		EnumMap<Field, DisplayType> map = dataAnalysis.getAttributeData(attribute);
+
+		Iterator<Field> it = map.keySet().iterator();
+		Field result = it.next();
+		while (nrInAttribute > 0) {
+			result = it.next();
+			nrInAttribute--;
+		}
+		return result;
 	}
 }

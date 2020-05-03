@@ -215,7 +215,7 @@ public class TraceAttributeAnalysis {
 		final ConcurrentMap<Attribute, AttributeData> attribute2dataNegativeC = new ConcurrentHashMap<>();
 		ExecutorService executor = Executors.newFixedThreadPool(
 				Math.max(Runtime.getRuntime().availableProcessors() - 1, 1),
-				new ThreadFactoryBuilder().setNameFormat("ivm-thread-dataanalysis-%d").build());
+				new ThreadFactoryBuilder().setNameFormat("ivm-thread-tracedataanalysis-%d").build());
 		try {
 			for (Attribute attribute : attributes.getTraceAttributes()) {
 				if (isSupported(attribute)) {

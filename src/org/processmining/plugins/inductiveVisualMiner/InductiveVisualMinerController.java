@@ -468,12 +468,14 @@ public class InductiveVisualMinerController {
 		});
 
 		//set log popup handler
-		panel.getGraph().addLogPopupListener(new LogPopupListener() {
-			public void isMouseInButton(boolean isIn) {
-				PopupPopulator.updatePopup(panel, state);
-				panel.repaint();
-			}
-		});
+		if (!state.getConfiguration().getPopupItemsLog().isEmpty()) {
+			panel.getGraph().addLogPopupListener(new LogPopupListener() {
+				public void isMouseInButton(boolean isIn) {
+					PopupPopulator.updatePopup(panel, state);
+					panel.repaint();
+				}
+			});
+		}
 
 		//set animation time updater
 		panel.getGraph().setAnimationTimeChangedListener(new AnimationTimeChangedListener() {

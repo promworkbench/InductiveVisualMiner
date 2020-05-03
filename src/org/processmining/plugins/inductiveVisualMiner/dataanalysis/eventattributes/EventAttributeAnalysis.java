@@ -3,9 +3,11 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattribu
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -33,19 +35,18 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.map.hash.THashMap;
 
 public class EventAttributeAnalysis {
 
 	public static enum Field {
 		first {
 			public String toString() {
-				return "alphabetically first";
+				return "first (alphabetically)";
 			}
 		},
 		last {
 			public String toString() {
-				return "alphabetically last";
+				return "last (alphabetically)";
 			}
 		},
 		min {
@@ -73,6 +74,11 @@ public class EventAttributeAnalysis {
 				return "standard deviation";
 			}
 		},
+		numberOfDifferentValues {
+			public String toString() {
+				return "number of distinct values";
+			}
+		},
 		numberOfEventsWithAttribute {
 			public String toString() {
 				return "events with attribute";
@@ -83,15 +89,25 @@ public class EventAttributeAnalysis {
 				return "traces having event with attribute";
 			}
 		},
-		numberOfDifferentValues {
+		numberOfEventsWithoutAttribute {
 			public String toString() {
-				return "number of values";
+				return "events without attribute";
 			}
-		}
+		},
+		numberOfTracesWithEventWithoutAttribute {
+			public String toString() {
+				return "traces having event without attribute";
+			}
+		},
 	}
 
-	private Map<Attribute, EnumMap<Field, DisplayType>> attribute2data = new THashMap<>();
-	private Map<Attribute, EnumMap<Field, DisplayType>> attribute2dataNegative = new THashMap<>();
+	private static final Comparator<Attribute> attributeNameComparator = new Comparator<Attribute>() {
+		public int compare(Attribute o1, Attribute o2) {
+			return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+		}
+	};
+	private Map<Attribute, EnumMap<Field, DisplayType>> attribute2data = new TreeMap<>(attributeNameComparator);
+	private Map<Attribute, EnumMap<Field, DisplayType>> attribute2dataNegative = new TreeMap<>(attributeNameComparator);
 
 	private boolean isSomethingFiltered;
 
@@ -179,7 +195,7 @@ public class EventAttributeAnalysis {
 			IvMCanceller canceller) {
 		EnumMap<Field, DisplayType> result = new EnumMap<Field, DisplayType>(Field.class);
 		if (attribute.isNumeric()) {
-			createAttributeDataContinuous(result, logFiltered, attribute, canceller);
+			createAttributeDataNumeric(result, logFiltered, attribute, canceller);
 		} else if (attribute.isTime()) {
 			createAttributeDataTime(result, logFiltered, attribute, canceller);
 		} else if (attribute.isLiteral()) {
@@ -199,23 +215,32 @@ public class EventAttributeAnalysis {
 
 		int numberOfEventsWithAttribute = 0;
 		int numberOfTracesWithEventWithAttribute = 0;
+		int numberOfEventsWithoutAttribute = 0;
+		int numberOfTracesWithoutEventWithAttribute = 0;
 		{
 			for (IteratorWithPosition<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
 				IvMTrace trace = it.next();
 
 				boolean traceHasEvent = false;
+				boolean traceHasEventWithout = false;
 
 				for (IvMMove move : trace) {
 					if (move.getAttributes() != null) {
 						if (move.getAttributes().containsKey(attribute.getName())) {
 							traceHasEvent = true;
 							numberOfEventsWithAttribute++;
+						} else {
+							traceHasEventWithout = true;
+							numberOfEventsWithoutAttribute++;
 						}
 					}
 				}
 
 				if (traceHasEvent) {
 					numberOfTracesWithEventWithAttribute++;
+				}
+				if (traceHasEventWithout) {
+					numberOfTracesWithoutEventWithAttribute++;
 				}
 			}
 		}
@@ -229,6 +254,11 @@ public class EventAttributeAnalysis {
 		result.put(Field.numberOfTracesWithEventWithAttribute,
 				DisplayType.numeric(numberOfTracesWithEventWithAttribute));
 
+		result.put(Field.numberOfEventsWithoutAttribute, DisplayType.numeric(numberOfEventsWithoutAttribute));
+
+		result.put(Field.numberOfTracesWithEventWithoutAttribute,
+				DisplayType.numeric(numberOfTracesWithoutEventWithAttribute));
+
 		ArrayList<String> valueSet = new ArrayList<>(attribute.getStringValues());
 		result.put(Field.numberOfDifferentValues, DisplayType.numeric(valueSet.size()));
 
@@ -239,9 +269,9 @@ public class EventAttributeAnalysis {
 			int first = 0;
 			int last = 0;
 			for (int i = 1; i < valueSet.size(); i++) {
-				if (valueSet.get(first).toLowerCase().compareTo(valueSet.get(i).toLowerCase()) < 0) {
+				if (valueSet.get(first).toLowerCase().compareTo(valueSet.get(i).toLowerCase()) > 0) {
 					first = i;
-				} else if (valueSet.get(last).toLowerCase().compareTo(valueSet.get(i).toLowerCase()) > 0) {
+				} else if (valueSet.get(last).toLowerCase().compareTo(valueSet.get(i).toLowerCase()) < 0) {
 					last = i;
 				}
 			}
@@ -257,12 +287,15 @@ public class EventAttributeAnalysis {
 		//gather values
 		long[] valuesFiltered;
 		int numberOfTracesWithEventWithAttribute = 0;
+		int numberOfEventsWithoutAttribute = 0;
+		int numberOfTracesWithoutEventWithAttribute = 0;
 		{
 			TLongArrayList values = new TLongArrayList();
 			for (IteratorWithPosition<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
 				IvMTrace trace = it.next();
 
 				boolean traceHasEvent = false;
+				boolean traceHasEventWithout = false;
 
 				for (IvMMove move : trace) {
 					if (move.getAttributes() != null) {
@@ -270,12 +303,18 @@ public class EventAttributeAnalysis {
 						if (value != Long.MIN_VALUE) {
 							values.add(value);
 							traceHasEvent = true;
+						} else {
+							traceHasEventWithout = true;
+							numberOfEventsWithoutAttribute++;
 						}
 					}
 				}
 
 				if (traceHasEvent) {
 					numberOfTracesWithEventWithAttribute++;
+				}
+				if (traceHasEventWithout) {
+					numberOfTracesWithoutEventWithAttribute++;
 				}
 			}
 
@@ -294,6 +333,11 @@ public class EventAttributeAnalysis {
 
 		result.put(Field.numberOfTracesWithEventWithAttribute,
 				DisplayType.numeric(numberOfTracesWithEventWithAttribute));
+
+		result.put(Field.numberOfEventsWithoutAttribute, DisplayType.numeric(numberOfEventsWithoutAttribute));
+
+		result.put(Field.numberOfTracesWithEventWithoutAttribute,
+				DisplayType.numeric(numberOfTracesWithoutEventWithAttribute));
 
 		//if the list is empty, better fail now and do not attempt the rest
 		if (valuesFiltered.length == 0) {
@@ -335,19 +379,22 @@ public class EventAttributeAnalysis {
 		}
 	}
 
-	private void createAttributeDataContinuous(EnumMap<Field, DisplayType> result, IvMLogFiltered logFiltered,
+	private void createAttributeDataNumeric(EnumMap<Field, DisplayType> result, IvMLogFiltered logFiltered,
 			Attribute attribute, IvMCanceller canceller) {
 		Type attributeType = DisplayType.fromAttribute(attribute);
 
 		//gather values
 		double[] valuesFiltered;
 		int numberOfTracesWithEventWithAttribute = 0;
+		int numberOfEventsWithoutAttribute = 0;
+		int numberOfTracesWithoutEventWithAttribute = 0;
 		{
 			TDoubleArrayList values = new TDoubleArrayList();
 			for (IteratorWithPosition<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
 				IvMTrace trace = it.next();
 
 				boolean traceHasEvent = false;
+				boolean traceHasEventWithout = false;
 
 				for (IvMMove move : trace) {
 					if (move.getAttributes() != null) {
@@ -355,12 +402,18 @@ public class EventAttributeAnalysis {
 						if (value != -Double.MAX_VALUE) {
 							values.add(value);
 							traceHasEvent = true;
+						} else {
+							traceHasEventWithout = true;
+							numberOfEventsWithoutAttribute++;
 						}
 					}
 				}
 
 				if (traceHasEvent) {
 					numberOfTracesWithEventWithAttribute++;
+				}
+				if (traceHasEventWithout) {
+					numberOfTracesWithoutEventWithAttribute++;
 				}
 			}
 
@@ -379,6 +432,11 @@ public class EventAttributeAnalysis {
 
 		result.put(Field.numberOfTracesWithEventWithAttribute,
 				DisplayType.numeric(numberOfTracesWithEventWithAttribute));
+
+		result.put(Field.numberOfEventsWithoutAttribute, DisplayType.numeric(numberOfEventsWithoutAttribute));
+
+		result.put(Field.numberOfTracesWithEventWithoutAttribute,
+				DisplayType.numeric(numberOfTracesWithoutEventWithAttribute));
 
 		//if the list is empty, better fail now and do not attempt the rest
 		if (valuesFiltered.length == 0) {
@@ -416,19 +474,15 @@ public class EventAttributeAnalysis {
 
 			if (result.get(Field.min).getValue() != result.get(Field.max).getValue()) {
 				double standardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
-				{
-					if (attribute.isTime()) {
-						result.put(Field.standardDeviation, DisplayType.time(Math.round(standardDeviation)));
-					} else {
-						result.put(Field.standardDeviation, DisplayType.create(attributeType, standardDeviation));
-					}
-				}
+				result.put(Field.standardDeviation, DisplayType.create(attributeType, standardDeviation));
+			} else {
+				result.put(Field.standardDeviation, DisplayType.NA());
 			}
 		}
 	}
 
 	private static boolean isSupported(Attribute attribute) {
-		return attribute.isNumeric() || attribute.isTime();
+		return attribute.isNumeric() || attribute.isTime() || attribute.isLiteral();
 	}
 
 	public static double getDoubleValue(Attribute attribute, IvMMove move) {
