@@ -323,7 +323,7 @@ public class InductiveVisualMinerController {
 		//add animation and statistics to export
 		panel.getGraph().setGetExporters(new GetExporters() {
 			public List<Exporter> getExporters(List<Exporter> exporters) {
-				exporters.add(new ExporterDataAnalyses(state, panel));
+				exporters.add(new ExporterDataAnalyses(state));
 				if (state.getIvMLogFiltered() != null && state.isAlignmentReady()) {
 					exporters.add(new ExporterTraceData(state));
 				}

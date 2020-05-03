@@ -28,7 +28,6 @@ public class CohortAnalysisTable extends DataAnalysisTable {
 	private CohortAnalysis2HighlightingFilterHandler cohortAnalysis2HighlightingFilterHandler;
 
 	public CohortAnalysisTable() {
-
 		//fill the table
 		model = new AbstractTableModel() {
 
@@ -70,9 +69,9 @@ public class CohortAnalysisTable extends DataAnalysisTable {
 
 				switch (column) {
 					case 0 :
-						return cohort.getFeatures().iterator().next().getDescriptionField();
+						return DisplayType.literal(cohort.getFeatures().iterator().next().getDescriptionField());
 					case 1 :
-						return "<html>" + cohort.getFeatures().iterator().next().getDescriptionSelector() + "</html>";
+						return DisplayType.html(cohort.getFeatures().iterator().next().getDescriptionSelector());
 					case 2 :
 						return DisplayType.numericUnpadded(cohort.getSize());
 					default :

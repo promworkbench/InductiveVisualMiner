@@ -19,7 +19,7 @@ public abstract class DisplayType {
 	 */
 
 	public enum Type {
-		numeric, duration, time, literal, NA
+		numeric, duration, time, literal, html, NA
 	}
 
 	public abstract Type getType();
@@ -104,6 +104,10 @@ public abstract class DisplayType {
 
 	public static Literal literal(String value) {
 		return new Literal(value);
+	}
+
+	public static HTML html(String value) {
+		return new HTML(value);
 	}
 
 	public static NA NA() {
@@ -229,6 +233,10 @@ public abstract class DisplayType {
 			return value;
 		}
 
+		public long getValueLong() {
+			return value;
+		}
+
 		public Type getType() {
 			return Type.time;
 		}
@@ -254,4 +262,29 @@ public abstract class DisplayType {
 		}
 	}
 
+	public static class HTML extends DisplayType {
+		String value;
+
+		private HTML(String value) {
+			this.value = value;
+		}
+
+		public String toString() {
+			return "<html>" + value + "</html>";
+		}
+
+		public double getValue() {
+			return -Double.MAX_VALUE;
+		}
+
+		public String getRawValue() {
+			return value //
+					.replace("&lt;", "<") //
+					.replace("&gt;", ">");
+		}
+
+		public Type getType() {
+			return Type.html;
+		}
+	}
 }
