@@ -8,7 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.Cohor
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class Cl16CohortAnalysis extends ChainLink<Triple<AttributesInfo, XLog, XEventPerformanceClassifier>, Cohorts> {
+public class Cl17DataAnalysisCohort extends ChainLink<Triple<AttributesInfo, XLog, XEventPerformanceClassifier>, Cohorts> {
 
 	public String getName() {
 		return "cohort analysis";
