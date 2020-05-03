@@ -7,18 +7,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis.AttributeData;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis.AttributeData.Field;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis.AttributeData.FieldType;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class TraceAttributeAnalysisTable extends DataAnalysisTable<TraceAttributeAnalysis> {
+public class TraceAttributeAnalysisTable extends DataAnalysisTable {
 
 	private static final long serialVersionUID = -991411001730872783L;
-	private AttributesInfo attributesInfo;
 	private TraceAttributeAnalysis dataAnalysis;
 	private AbstractTableModel model;
 
@@ -149,14 +148,11 @@ public class TraceAttributeAnalysisTable extends DataAnalysisTable<TraceAttribut
 		setModel(model);
 	}
 
-	public void setAttributesInfo(AttributesInfo attributesInfo) {
-		this.attributesInfo = attributesInfo;
-	}
-
-	public void setData(TraceAttributeAnalysis dataAnalysis) {
-		this.dataAnalysis = dataAnalysis;
+	public boolean setData(InductiveVisualMinerState state) {
+		dataAnalysis = state.getTraceAttributesAnalysis();
 		setRowHeights();
 		model.fireTableStructureChanged();
+		return dataAnalysis != null;
 	}
 
 	public int getRows() {
@@ -193,7 +189,7 @@ public class TraceAttributeAnalysisTable extends DataAnalysisTable<TraceAttribut
 
 	private Attribute getAttribute(int rowNr) {
 		rowNr -= headerRows;
-		if (attributesInfo == null) {
+		if (dataAnalysis == null) {
 			return null;
 		}
 		int attributeNr = rowNr / fields;

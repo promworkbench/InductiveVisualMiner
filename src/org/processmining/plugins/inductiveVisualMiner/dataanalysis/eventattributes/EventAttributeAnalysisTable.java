@@ -6,13 +6,13 @@ import java.util.Iterator;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis.Field;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class EventAttributeAnalysisTable extends DataAnalysisTable<EventAttributeAnalysis> {
+public class EventAttributeAnalysisTable extends DataAnalysisTable {
 
 	private static final long serialVersionUID = 4494120805010679270L;
 
@@ -93,12 +93,12 @@ public class EventAttributeAnalysisTable extends DataAnalysisTable<EventAttribut
 		setModel(model);
 	}
 
-	public void setAttributesInfo(AttributesInfo attributesInfo) {
+	public boolean setData(InductiveVisualMinerState state) {
+		dataAnalysis = state.getEventAttributesAnalysis();
 
-	}
-
-	public void setData(EventAttributeAnalysis dataAnalysis) {
-		this.dataAnalysis = dataAnalysis;
+		if (dataAnalysis == null) {
+			return false;
+		}
 
 		startRowOfField = new int[dataAnalysis.getEventAttributes().size() + 1];
 		int i = 0;
@@ -112,6 +112,7 @@ public class EventAttributeAnalysisTable extends DataAnalysisTable<EventAttribut
 		startRowOfField[i] = row;
 
 		model.fireTableStructureChanged();
+		return true;
 	}
 
 	private Attribute getAttribute(int rowNr) {

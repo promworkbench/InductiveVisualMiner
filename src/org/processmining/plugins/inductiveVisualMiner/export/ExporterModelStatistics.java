@@ -18,11 +18,11 @@ import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWra
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
-public class ExporterStatistics extends Exporter {
+public class ExporterModelStatistics extends Exporter {
 
 	private final InductiveVisualMinerState state;
 
-	public ExporterStatistics(InductiveVisualMinerState state) {
+	public ExporterModelStatistics(InductiveVisualMinerState state) {
 		this.state = state;
 	}
 

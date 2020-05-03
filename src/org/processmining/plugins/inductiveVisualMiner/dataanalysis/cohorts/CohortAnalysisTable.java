@@ -12,13 +12,13 @@ import javax.swing.table.AbstractTableModel;
 
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.cohortanalysis.cohort.Cohorts;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableCellRenderer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
+public class CohortAnalysisTable extends DataAnalysisTable {
 
 	private static final long serialVersionUID = 5291003482927941387L;
 
@@ -122,13 +122,10 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 		}
 	}
 
-	public void setAttributesInfo(AttributesInfo attributesInfo) {
-
-	}
-
-	public void setData(Cohorts cohorts) {
-		this.cohorts = cohorts;
+	public boolean setData(InductiveVisualMinerState state) {
+		cohorts = state.getCohortAnalysis();
 		model.fireTableStructureChanged();
+		return cohorts != null;
 	}
 
 	public void setCohortAnalysis2HighlightingFilterHandler(

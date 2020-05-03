@@ -25,7 +25,7 @@ public class ExporterTraceData extends Exporter {
 
 	@Override
 	public String getDescription() {
-		return "csv (trace data)";
+		return "csv (trace attributes)";
 	}
 
 	protected String getExtension() {
@@ -51,15 +51,16 @@ public class ExporterTraceData extends Exporter {
 		//body
 		for (IvMTrace trace : log) {
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				XAttribute value = trace.getAttributes().get(attribute.getName());
-				if (value != null) {
-					w.print(escape(value.toString()));
-				} else {
-					String v;
+				if (attribute.isVirtual()) {
 					if (attribute.isTraceDuration()) {
-						v = TraceColourMapPropertyDuration.getTraceDuration(trace) + "";
+						w.print(TraceColourMapPropertyDuration.getTraceDuration(trace));
 					} else if (attribute.isTraceNumberofEvents()) {
-						v = trace.getNumberOfEvents() + "";
+						w.print(trace.getNumberOfEvents());
+					}
+				} else {
+					XAttribute value = trace.getAttributes().get(attribute.getName());
+					if (value != null) {
+						w.print(escape(value.toString()));
 					}
 				}
 				w.print(fieldSeparator);

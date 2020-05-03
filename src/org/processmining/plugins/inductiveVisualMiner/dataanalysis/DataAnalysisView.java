@@ -10,11 +10,11 @@ import javax.swing.JTextArea;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
 
-public class DataAnalysisView<D> extends JPanel {
+public class DataAnalysisView extends JPanel {
 
 	private static final long serialVersionUID = -5719337013697465055L;
 
-	public DataAnalysisView(DataAnalysisTable<D> table, String explanation) {
+	public DataAnalysisView(DataAnalysisTable table, String explanation) {
 		setLayout(new BorderLayout());
 
 		IvMPanel topPanel = new IvMPanel();

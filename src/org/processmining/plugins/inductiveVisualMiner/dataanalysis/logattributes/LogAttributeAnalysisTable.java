@@ -8,11 +8,10 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import org.deckfour.xes.model.XAttribute;
-import org.deckfour.xes.model.XLog;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class LogAttributeAnalysisTable extends DataAnalysisTable<XLog> {
+public class LogAttributeAnalysisTable extends DataAnalysisTable {
 
 	private static final long serialVersionUID = 192566312464894607L;
 
@@ -65,12 +64,13 @@ public class LogAttributeAnalysisTable extends DataAnalysisTable<XLog> {
 		setModel(model);
 	}
 
-	public void setAttributesInfo(AttributesInfo attributesInfo) {
+	public boolean setData(InductiveVisualMinerState state) {
+		if (state.getSortedXLog() == null) {
+			attributes = null;
+			return false;
+		}
 
-	}
-
-	public void setData(XLog log) {
-		attributes = new ArrayList<>(log.getAttributes().values());
+		attributes = new ArrayList<>(state.getSortedXLog().getAttributes().values());
 		Collections.sort(attributes, new Comparator<XAttribute>() {
 
 			public int compare(XAttribute o1, XAttribute o2) {
@@ -78,6 +78,7 @@ public class LogAttributeAnalysisTable extends DataAnalysisTable<XLog> {
 			}
 		});
 		model.fireTableStructureChanged();
+		return true;
 	}
 
 }

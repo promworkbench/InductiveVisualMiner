@@ -214,13 +214,13 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	public List<DataAnalysisTableFactory<?>> getDataAnalysisTables() {
-		ArrayList<DataAnalysisTableFactory<?>> result = new ArrayList<>();
-		result.add(new LogAttributeAnalysisFactory());
-		result.add(new TraceAttributeAnalysisTableFactory());
-		result.add(new EventAttributeAnalysisTableFactory());
-		result.add(new CohortAnalysisTableFactory());
-		return result;
+	public List<DataAnalysisTableFactory> getDataAnalysisTables() {
+		return new ArrayList<>(Arrays.asList(new DataAnalysisTableFactory[] { //
+				new LogAttributeAnalysisFactory(), //
+				new TraceAttributeAnalysisTableFactory(), //
+				new EventAttributeAnalysisTableFactory(), //
+				new CohortAnalysisTableFactory(), //
+		}));
 	}
 
 	@Override
@@ -291,11 +291,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 								state, panel, onUpdatePreMining, onUpdateHighlighting));
 						panel.getTraceColourMapView().initialise(state.getAttributesInfo(), onUpdateTraceColourMap);
 					}
-
-					//initialise the data analysis view
-					{
-						panel.getDataAnalysisView().initialiseAttributes(state.getAttributesInfo());
-					}
 				}
 			});
 			gatherAttributes.setOnInvalidate(new Runnable() {
@@ -344,13 +339,13 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					state.getFiltersController().updateFiltersWithIMLog(panel, state.getLog(), state.getSortedXLog(),
 							executor);
 
-					panel.getDataAnalysisView().setData(LogAttributeAnalysisFactory.name, state.getSortedXLog());
+					panel.getDataAnalysesView().setData(LogAttributeAnalysisFactory.name, state);
 				}
 			});
 
 			makeLog.setOnInvalidate(new Runnable() {
 				public void run() {
-					panel.getDataAnalysisView().invalidate(LogAttributeAnalysisFactory.name);
+					panel.getDataAnalysesView().invalidate(LogAttributeAnalysisFactory.name);
 				}
 			});
 
@@ -577,13 +572,12 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		{
 			dataAnalysisTrace.setOnComplete(new Runnable() {
 				public void run() {
-					panel.getDataAnalysisView().setData(TraceAttributeAnalysisTableFactory.name,
-							state.getTraceAttributesAnalysis());
+					panel.getDataAnalysesView().setData(TraceAttributeAnalysisTableFactory.name, state);
 				}
 			});
 			dataAnalysisTrace.setOnInvalidate(new Runnable() {
 				public void run() {
-					panel.getDataAnalysisView().invalidate(TraceAttributeAnalysisTableFactory.name);
+					panel.getDataAnalysesView().invalidate(TraceAttributeAnalysisTableFactory.name);
 				}
 			});
 
@@ -594,13 +588,12 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		{
 			dataAnalysisEvent.setOnComplete(new Runnable() {
 				public void run() {
-					panel.getDataAnalysisView().setData(EventAttributeAnalysisTableFactory.name,
-							state.getEventAttributesAnalysis());
+					panel.getDataAnalysesView().setData(EventAttributeAnalysisTableFactory.name, state);
 				}
 			});
 			dataAnalysisEvent.setOnInvalidate(new Runnable() {
 				public void run() {
-					panel.getDataAnalysisView().invalidate(EventAttributeAnalysisTableFactory.name);
+					panel.getDataAnalysesView().invalidate(EventAttributeAnalysisTableFactory.name);
 				}
 			});
 
@@ -611,12 +604,12 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		{
 			dataAnalysisCohort.setOnComplete(new Runnable() {
 				public void run() {
-					panel.getDataAnalysisView().setData(CohortAnalysisTableFactory.name, state.getCohortAnalysis());
+					panel.getDataAnalysesView().setData(CohortAnalysisTableFactory.name, state);
 				}
 			});
 			dataAnalysisCohort.setOnInvalidate(new Runnable() {
 				public void run() {
-					panel.getDataAnalysisView().invalidate(CohortAnalysisTableFactory.name);
+					panel.getDataAnalysesView().invalidate(CohortAnalysisTableFactory.name);
 				}
 			});
 

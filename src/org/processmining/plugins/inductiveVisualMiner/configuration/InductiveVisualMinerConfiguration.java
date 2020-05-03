@@ -86,7 +86,7 @@ public interface InductiveVisualMinerConfiguration {
 
 	public List<PopupItemLog> getPopupItemsLog();
 
-	public List<DataAnalysisTableFactory<?>> getDataAnalysisTables();
+	public List<DataAnalysisTableFactory> getDataAnalysisTables();
 
 	/**
 	 * Set up the state that keeps the data related to the visual Miner.

@@ -52,7 +52,8 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
-import org.processmining.plugins.inductiveVisualMiner.export.ExporterStatistics;
+import org.processmining.plugins.inductiveVisualMiner.export.ExporterDataAnalyses;
+import org.processmining.plugins.inductiveVisualMiner.export.ExporterModelStatistics;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterTraceData;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -322,11 +323,12 @@ public class InductiveVisualMinerController {
 		//add animation and statistics to export
 		panel.getGraph().setGetExporters(new GetExporters() {
 			public List<Exporter> getExporters(List<Exporter> exporters) {
+				exporters.add(new ExporterDataAnalyses(state, panel));
 				if (state.getIvMLogFiltered() != null && state.isAlignmentReady()) {
 					exporters.add(new ExporterTraceData(state));
 				}
 				if (state.isPerformanceReady()) {
-					exporters.add(new ExporterStatistics(state));
+					exporters.add(new ExporterModelStatistics(state));
 				}
 				if (panel.getGraph().isAnimationEnabled()) {
 					exporters.add(new ExporterAvi(state));
@@ -419,21 +421,21 @@ public class InductiveVisualMinerController {
 		//set data analysis button
 		panel.getDataAnalysisViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panel.getDataAnalysisView().enableAndShow();
+				panel.getDataAnalysesView().enableAndShow();
 			}
 		});
 		panel.getColouringFiltersView()
 				.setHighlightingFilter2CohortAnalysisHandler(new HighlightingFilter2CohortAnalysisHandler() {
 					public void showCohortAnalysis() {
-						panel.getDataAnalysisView().enableAndShow();
-						panel.getDataAnalysisView().showAnalysis(CohortAnalysisTableFactory.name);
+						panel.getDataAnalysesView().enableAndShow();
+						panel.getDataAnalysesView().showAnalysis(CohortAnalysisTableFactory.name);
 					}
 
 					public void setEnabled(boolean enabled) {
 						//do nothing if the user disables the cohort
 					}
 				});
-		panel.getDataAnalysisView()
+		panel.getDataAnalysesView()
 				.setCohortAnalysis2HighlightingFilterHandler(new CohortAnalysis2HighlightingFilterHandler() {
 					public void setSelectedCohort(Cohort cohort, boolean highlightInCohort) {
 						panel.getColouringFiltersView().setHighlightingFilterSelectedCohort(cohort, highlightInCohort);

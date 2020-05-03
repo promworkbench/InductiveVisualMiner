@@ -1,8 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
-public interface DataAnalysisTableFactory<D> {
+public interface DataAnalysisTableFactory {
 
-	public DataAnalysisTable<D> create();
+	public DataAnalysisTable create();
 
 	/**
 	 * 

@@ -23,5 +23,6 @@
         <dependency org="prom" name="XESLite" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="EarthMoversStochasticConformanceChecking" rev="latest" changing="true" transitive="true" />
         <dependency org="prom" name="CohortAnalysis" rev="latest" changing="true" transitive="true" />
+        <dependency org="jexcelapi" name="jxl" rev="2.6" />
      </dependencies>
 </ivy-module>

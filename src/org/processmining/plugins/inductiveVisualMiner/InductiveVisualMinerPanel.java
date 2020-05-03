@@ -650,7 +650,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return traceViewButton;
 	}
 
-	public DataAnalysesView getDataAnalysisView() {
+	public DataAnalysesView getDataAnalysesView() {
 		return dataAnalysisView;
 	}
 
@@ -689,4 +689,5 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	public JLabel getAnimationTimeLabel() {
 		return animationTimeLabel;
 	}
+
 }

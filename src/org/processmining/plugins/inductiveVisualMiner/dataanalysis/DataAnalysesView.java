@@ -7,11 +7,11 @@ import java.util.Map;
 import javax.swing.JTabbedPane;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 import gnu.trove.map.hash.THashMap;
 
@@ -19,7 +19,7 @@ public class DataAnalysesView extends SideWindow {
 
 	private static final long serialVersionUID = -1113805892324898124L;
 
-	private final Map<String, DataAnalysisTable<?>> tables = new THashMap<>();
+	private final Map<String, DataAnalysisTable> tables = new THashMap<>();
 	private final Map<String, OnOffPanel<?>> onOffPanels = new THashMap<>();
 	private final JTabbedPane tabbedPane;
 
@@ -28,8 +28,8 @@ public class DataAnalysesView extends SideWindow {
 
 		tabbedPane = new JTabbedPane();
 
-		for (DataAnalysisTableFactory<?> factory : configuration.getDataAnalysisTables()) {
-			DataAnalysisTable<?> table = factory.create();
+		for (DataAnalysisTableFactory factory : configuration.getDataAnalysisTables()) {
+			DataAnalysisTable table = factory.create();
 			String analysisName = factory.getAnalysisName();
 			String explanation = factory.getExplanation();
 
@@ -46,21 +46,20 @@ public class DataAnalysesView extends SideWindow {
 		add(tabbedPane, BorderLayout.CENTER);
 	}
 
-	private static <D> OnOffPanel<DataAnalysisView<D>> createView(DataAnalysisTable<D> table, String explanation) {
-		return new OnOffPanel<>(new DataAnalysisView<>(table, explanation));
+	private static OnOffPanel<DataAnalysisView> createView(DataAnalysisTable table, String explanation) {
+		return new OnOffPanel<>(new DataAnalysisView(table, explanation));
 	}
 
-	public void initialiseAttributes(AttributesInfo attributesInfo) {
-		for (DataAnalysisTable<?> table : tables.values()) {
-			table.setAttributesInfo(attributesInfo);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public <D> void setData(String analysisName, D data) {
+	/**
+	 * Sets the data and enables the table.
+	 * 
+	 * @param analysisName
+	 * @param state
+	 */
+	public void setData(String analysisName, InductiveVisualMinerState state) {
 		if (tables.containsKey(analysisName)) {
-			DataAnalysisTable<D> table = (DataAnalysisTable<D>) tables.get(analysisName);
-			table.setData(data);
+			DataAnalysisTable table = tables.get(analysisName);
+			table.setData(state);
 
 			OnOffPanel<?> onOffPanel = onOffPanels.get(analysisName);
 			onOffPanel.on();
@@ -83,12 +82,11 @@ public class DataAnalysesView extends SideWindow {
 
 	public void setCohortAnalysis2HighlightingFilterHandler(
 			CohortAnalysis2HighlightingFilterHandler showCohortHighlightingFilterHandler) {
-		for (DataAnalysisTable<?> table : tables.values()) {
+		for (DataAnalysisTable table : tables.values()) {
 			if (table instanceof CohortAnalysisTable) {
 				((CohortAnalysisTable) table)
 						.setCohortAnalysis2HighlightingFilterHandler(showCohortHighlightingFilterHandler);
 			}
 		}
 	}
-
 }
