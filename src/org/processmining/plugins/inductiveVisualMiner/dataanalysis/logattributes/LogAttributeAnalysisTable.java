@@ -34,7 +34,7 @@ public class LogAttributeAnalysisTable extends DataAnalysisTable<XLog> {
 					case 0 :
 						return "Attribute";
 					default :
-						return "Value";
+						return "value";
 				}
 			}
 

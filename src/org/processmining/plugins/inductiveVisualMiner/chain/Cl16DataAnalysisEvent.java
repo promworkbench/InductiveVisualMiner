@@ -36,7 +36,7 @@ public class Cl16DataAnalysisEvent extends
 	}
 
 	public String getStatusBusyMessage() {
-		return "Performing data analysis..";
+		return "Performing event analysis..";
 	}
 
 }

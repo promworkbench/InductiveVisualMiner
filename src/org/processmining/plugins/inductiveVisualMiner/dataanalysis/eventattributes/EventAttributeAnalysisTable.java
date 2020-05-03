@@ -28,6 +28,7 @@ public class EventAttributeAnalysisTable extends DataAnalysisTable<EventAttribut
 			public String getColumnName(int col) {
 				switch (col) {
 					case 0 :
+						return "Attribute";
 					case 1 :
 						return "";
 					case 2 :

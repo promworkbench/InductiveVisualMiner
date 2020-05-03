@@ -27,8 +27,6 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 	private boolean highlightInCohort = true;
 	private CohortAnalysis2HighlightingFilterHandler cohortAnalysis2HighlightingFilterHandler;
 
-	private boolean shiftPressing = false;
-
 	public CohortAnalysisTable() {
 
 		//fill the table
@@ -41,11 +39,11 @@ public class CohortAnalysisTable extends DataAnalysisTable<Cohorts> {
 					case 0 :
 						return "Cohort attribute";
 					case 1 :
-						return "Cohort value range";
+						return "value range";
 					case 2 :
-						return "Number of traces";
+						return "number of traces";
 					default :
-						return "Distance with rest of log";
+						return "distance with rest of log";
 				}
 			}
 

@@ -36,7 +36,7 @@ public class Cl15DataAnalysisTrace extends
 	}
 
 	public String getStatusBusyMessage() {
-		return "Performing data analysis..";
+		return "Performing trace analysis..";
 	}
 
 }
