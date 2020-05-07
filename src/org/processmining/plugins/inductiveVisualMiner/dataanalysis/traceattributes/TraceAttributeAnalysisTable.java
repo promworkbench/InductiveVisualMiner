@@ -1,6 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.Iterator;
 
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
@@ -10,23 +13,22 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis.AttributeData;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis.AttributeData.Field;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis.AttributeData.FieldType;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis.Field;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
 public class TraceAttributeAnalysisTable extends DataAnalysisTable {
 
 	private static final long serialVersionUID = -991411001730872783L;
+
 	private TraceAttributeAnalysis dataAnalysis;
 	private AbstractTableModel model;
+	private int[] startRowOfField;
 
 	private static final int rowHeightImage = CorrelationDensityPlot.getHeight();
 	private static final int rowMarginAttribute = 20;
 
 	private static final int headerRows = 2;
-
-	private static final int fields = Field.values().length;
 
 	public TraceAttributeAnalysisTable() {
 		model = new AbstractTableModel() {
@@ -51,18 +53,47 @@ public class TraceAttributeAnalysisTable extends DataAnalysisTable {
 				return "";
 			}
 
-			public int getRowCount() {
-				return getRows();
-			}
-
 			public int getColumnCount() {
 				return 1 //attribute name
 						+ 2 //property + value
-						+ (dataAnalysis != null && dataAnalysis.isSomethingFiltered() ? 1 : 0); //property + value
+						+ (dataAnalysis != null && dataAnalysis.isSomethingFiltered() ? 1 : 0); //not-highlighted value
+			}
+
+			public int getRowCount() {
+				if (dataAnalysis == null) {
+					return 0;
+				}
+				return startRowOfField[startRowOfField.length - 1];
 			}
 
 			@Override
 			public Object getValueAt(int row, int column) {
+				if (dataAnalysis == null) {
+					return null;
+				}
+				Attribute attribute = getAttribute(row);
+				int nrInAttribute = getNrInAttribute(row);
+				Field field = getField(attribute, nrInAttribute);
+
+				if (column == 0) {
+					if (nrInAttribute == 0) {
+						return attribute.getName();
+					} else {
+						return "";
+					}
+				} else if (column == 1) {
+					return field.toString();
+				} else if (column == 2) {
+					EnumMap<Field, DisplayType> data = dataAnalysis.getAttributeData(attribute);
+					return getValue(attribute, field, data);
+				} else if (column == 3) {
+					EnumMap<Field, DisplayType> data = dataAnalysis.getAttributeDataNegative(attribute);
+					return getValue(attribute, field, data);
+				}
+				return "";
+			}
+
+			public Object getValueAt2(int row, int column) {
 				Attribute attribute = getAttribute(row);
 				int fieldNr = getNrInAttribute(row);
 				Field field = getField(row);
@@ -113,35 +144,21 @@ public class TraceAttributeAnalysisTable extends DataAnalysisTable {
 				} else if (column == 1) {
 					return field.toString();
 				} else if (column == 2) {
-					AttributeData data = dataAnalysis.getAttributeData(attribute);
+					EnumMap<Field, DisplayType> data = dataAnalysis.getAttributeData(attribute);
 					return getValue(attribute, field, data);
 				} else if (column == 3) {
-					AttributeData data = dataAnalysis.getAttributeDataNegative(attribute);
+					EnumMap<Field, DisplayType> data = dataAnalysis.getAttributeDataNegative(attribute);
 					return getValue(attribute, field, data);
 				}
 				return "";
 			}
 
-			private Object getValue(Attribute attribute, Field field, AttributeData data) {
-				if (field.type() == FieldType.image) {
-					BufferedImage im = data.getImage(field);
-					if (im != null) {
-						return new ImageIcon(im);
-					} else {
-						return DisplayType.NA();
-					}
-				} else if (field.type() == FieldType.value) {
-					if (data.getValue(field) != null) {
-						return data.getValue(field);
-					} else {
-						return DisplayType.NA();
-					}
+			private DisplayType getValue(Attribute attribute, Field field, EnumMap<Field, DisplayType> data) {
+				if (data.get(field) != null) {
+					return data.get(field);
+				} else {
+					return DisplayType.NA();
 				}
-				return "";
-			}
-
-			public boolean isCellEditable(int row, int col) {
-				return false;
 			}
 		};
 
@@ -150,71 +167,90 @@ public class TraceAttributeAnalysisTable extends DataAnalysisTable {
 
 	public boolean setData(InductiveVisualMinerState state) {
 		dataAnalysis = state.getTraceAttributesAnalysis();
-		setRowHeights();
-		model.fireTableStructureChanged();
-		return dataAnalysis != null;
-	}
 
-	public int getRows() {
 		if (dataAnalysis == null) {
-			return 0;
+			return false;
 		}
-		return headerRows + //header rows
-				dataAnalysis.getTraceAttributes().size() * TraceAttributeAnalysis.AttributeData.Field.values().length;
+
+		//count the row starts
+		startRowOfField = new int[dataAnalysis.getTraceAttributes().size() + 1];
+		int i = 0;
+		int row = 0;
+		for (Attribute attribute : dataAnalysis.getTraceAttributes()) {
+			EnumMap<?, ?> map = dataAnalysis.getAttributeData(attribute);
+			startRowOfField[i] = row;
+			i++;
+			row += map.size();
+		}
+		startRowOfField[i] = row;
+
+		setRowHeights();
+
+		model.fireTableStructureChanged();
+		return true;
 	}
 
 	public void setRowHeights() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				setRowHeight(0, rowHeight + rowMarginAttribute);
-				setRowHeight(1, TraceAttributeAnalysis.pieSize + 5);
-				for (int row = headerRows; row < getRowCount(); row++) {
-					int height;
-					if (isImage(row)) {
-						height = rowHeightImage;
-					} else {
-						height = rowHeight;
-					}
+				setRowHeight(getRowHeight());
 
-					//add a bit of margin to the last row of each attribute
-					if (getNrInAttribute(row) == fields - 1) {
-						height += rowMarginAttribute;
+				for (int row = 0; row < startRowOfField[startRowOfField.length - 1]; row++) {
+					for (int column = 0; column < model.getColumnCount(); column++) {
+						Object value = model.getValueAt(row, column);
+						if (value instanceof DisplayType && ((DisplayType) value).getType() == Type.image
+								&& ((DisplayType.Image) value).getImage() != null) {
+							setRowHeight(row, rowHeightImage);
+						}
 					}
-					setRowHeight(row, height);
 				}
 			}
 		});
-
 	}
 
 	private Attribute getAttribute(int rowNr) {
-		rowNr -= headerRows;
 		if (dataAnalysis == null) {
 			return null;
 		}
-		int attributeNr = rowNr / fields;
+		int index = Arrays.binarySearch(startRowOfField, rowNr);
+		if (index < 0) {
+			index = (~index) - 1;
+		}
+
 		for (Attribute attribute : dataAnalysis.getTraceAttributes()) {
-			if (attributeNr == 0) {
+			if (index == 0) {
 				return attribute;
 			}
-			attributeNr--;
+			index--;
 		}
 		return null;
 	}
 
 	private int getNrInAttribute(int rowNr) {
-		rowNr -= headerRows;
-		return rowNr % fields;
+		if (dataAnalysis == null) {
+			return Integer.MIN_VALUE;
+		}
+		int index = Arrays.binarySearch(startRowOfField, rowNr);
+		if (index < 0) {
+			index = (~index - 1);
+		}
+
+		return rowNr - startRowOfField[index];
 	}
 
-	private boolean isImage(int rowNr) {
-		if (rowNr == 0) {
-			return true;
+	private Field getField(Attribute attribute, int nrInAttribute) {
+		if (dataAnalysis == null) {
+			return null;
 		}
-		if (rowNr == 1) {
-			return false;
+		EnumMap<Field, ?> map = dataAnalysis.getAttributeData(attribute);
+
+		Iterator<Field> it = map.keySet().iterator();
+		Field result = it.next();
+		while (nrInAttribute > 0) {
+			result = it.next();
+			nrInAttribute--;
 		}
-		return getField(rowNr).type() == FieldType.image;
+		return result;
 	}
 
 	private Field getField(int rowNr) {

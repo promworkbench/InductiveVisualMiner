@@ -6,15 +6,37 @@ import java.math.RoundingMode;
 import org.processmining.plugins.InductiveMiner.Pair;
 
 import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TLongArrayList;
 
 public class Correlation {
 
+	/**
+	 * Only keeps the elements of which both lists have a value.
+	 * 
+	 * @param valuesX
+	 * @param valuesY
+	 * @return
+	 */
 	public static Pair<double[], double[]> filterMissingValues(double[] valuesX, double[] valuesY) {
 		TDoubleArrayList newValuesX = new TDoubleArrayList();
 		TDoubleArrayList newValuesY = new TDoubleArrayList();
 
 		for (int i = 0; i < valuesX.length; i++) {
 			if (valuesX[i] > -Double.MAX_VALUE && valuesY[i] > -Double.MAX_VALUE) {
+				newValuesX.add(valuesX[i]);
+				newValuesY.add(valuesY[i]);
+			}
+		}
+
+		return Pair.of(newValuesX.toArray(), newValuesY.toArray());
+	}
+
+	public static Pair<long[], double[]> filterMissingValues(long[] valuesX, double[] valuesY) {
+		TLongArrayList newValuesX = new TLongArrayList();
+		TDoubleArrayList newValuesY = new TDoubleArrayList();
+
+		for (int i = 0; i < valuesX.length; i++) {
+			if (valuesX[i] > Long.MIN_VALUE && valuesY[i] > -Double.MAX_VALUE) {
 				newValuesX.add(valuesX[i]);
 				newValuesY.add(valuesY[i]);
 			}
@@ -138,6 +160,31 @@ public class Correlation {
 	}
 
 	public static BigDecimal correlation(double[] valuesX, double[] valuesY, BigDecimal meanY,
+			double standardDeviationYd) {
+		if (valuesX.length <= 1) {
+			return BigDecimal.valueOf(-Double.MAX_VALUE);
+		}
+
+		BigDecimal meanX = mean(valuesX);
+		BigDecimal standardDeviationX = new BigDecimal(standardDeviation(valuesX, meanX));
+		BigDecimal standardDeviationY = BigDecimal.valueOf(standardDeviationYd);
+
+		if (standardDeviationX.compareTo(BigDecimal.ZERO) == 0 || standardDeviationY.compareTo(BigDecimal.ZERO) == 0) {
+			return BigDecimal.valueOf(-Double.MAX_VALUE);
+		}
+
+		BigDecimal sum = BigDecimal.ZERO;
+		for (int i = 0; i < valuesX.length; i++) {
+			BigDecimal x = BigDecimal.valueOf(valuesX[i]).subtract(meanX).divide(standardDeviationX, 10,
+					RoundingMode.HALF_UP);
+			BigDecimal y = BigDecimal.valueOf(valuesY[i]).subtract(meanY).divide(standardDeviationY, 10,
+					RoundingMode.HALF_UP);
+			sum = sum.add(x.multiply(y));
+		}
+		return sum.divide(BigDecimal.valueOf(valuesX.length - 1), 10, RoundingMode.HALF_UP);
+	}
+
+	public static BigDecimal correlation(double[] valuesX, long[] valuesY, BigDecimal meanY,
 			double standardDeviationYd) {
 		if (valuesX.length <= 1) {
 			return BigDecimal.valueOf(-Double.MAX_VALUE);

@@ -100,6 +100,7 @@ public class EventAttributeAnalysisTable extends DataAnalysisTable {
 			return false;
 		}
 
+		//count the row starts
 		startRowOfField = new int[dataAnalysis.getEventAttributes().size() + 1];
 		int i = 0;
 		int row = 0;

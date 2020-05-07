@@ -101,7 +101,7 @@ public class EventAttributeAnalysis {
 		},
 	}
 
-	private static final Comparator<Attribute> attributeNameComparator = new Comparator<Attribute>() {
+	public static final Comparator<Attribute> attributeNameComparator = new Comparator<Attribute>() {
 		public int compare(Attribute o1, Attribute o2) {
 			return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
 		}
@@ -375,6 +375,8 @@ public class EventAttributeAnalysis {
 			if (result.get(Field.min).getValue() != result.get(Field.max).getValue()) {
 				double standardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
 				result.put(Field.standardDeviation, DisplayType.duration(standardDeviation));
+			} else {
+				result.put(Field.standardDeviation, DisplayType.NA());
 			}
 		}
 	}

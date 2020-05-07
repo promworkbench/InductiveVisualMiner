@@ -48,7 +48,7 @@ public class ExporterDataAnalyses extends Exporter {
 
 			DataAnalysisTable analysisTable = analysis.create();
 			if (!analysisTable.setData(state)) {
-				sheet.addCell(new Label(0, 0, "Still computing at time of export."));
+				sheet.addCell(new Label(0, 0, "Still computing at time of export.."));
 			} else {
 				TableModel model = analysisTable.getModel();
 

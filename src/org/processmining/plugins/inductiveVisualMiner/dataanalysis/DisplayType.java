@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
+import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 
 import javax.swing.JLabel;
@@ -21,7 +22,7 @@ public abstract class DisplayType {
 	 */
 
 	public enum Type {
-		numeric, duration, time, literal, html, NA
+		numeric, duration, time, literal, html, image, NA
 	}
 
 	public abstract Type getType();
@@ -50,6 +51,7 @@ public abstract class DisplayType {
 			case numeric :
 				return numeric(value);
 			default :
+				assert false; //a double cannot represent time, as it is inaccurate
 				return null;
 		}
 	}
@@ -64,6 +66,7 @@ public abstract class DisplayType {
 			case time :
 				return time(value);
 			default :
+				assert false;
 				return null;
 		}
 	}
@@ -112,6 +115,10 @@ public abstract class DisplayType {
 		return new HTML(value);
 	}
 
+	public static Image image(BufferedImage value) {
+		return new Image(value);
+	}
+
 	public static NA NA() {
 		return new NA();
 	}
@@ -124,7 +131,23 @@ public abstract class DisplayType {
 
 	public abstract double getValue();
 
-	public abstract int getHorizontalAlignment();
+	/*
+	 * Non-abstract methods
+	 */
+
+	private int horizontalAlignment = JLabel.RIGHT;
+
+	public int getHorizontalAlignment() {
+		return horizontalAlignment;
+	}
+
+	public void setHorizontalAlignment(int horizontalAlignment) {
+		this.horizontalAlignment = horizontalAlignment;
+	}
+
+	/*
+	 * Subclasses
+	 */
 
 	public static class NA extends DisplayType {
 
@@ -141,10 +164,6 @@ public abstract class DisplayType {
 
 		public double getValue() {
 			return -Double.MAX_VALUE;
-		}
-
-		public int getHorizontalAlignment() {
-			return JLabel.RIGHT;
 		}
 
 	}
@@ -168,9 +187,6 @@ public abstract class DisplayType {
 			return value;
 		}
 
-		public int getHorizontalAlignment() {
-			return JLabel.RIGHT;
-		}
 	}
 
 	public static class Numeric extends DisplayType {
@@ -205,12 +221,12 @@ public abstract class DisplayType {
 			return valueDouble != -Double.MAX_VALUE ? valueDouble : valueLong;
 		}
 
-		public Type getType() {
-			return Type.numeric;
+		public long getValueLong() {
+			return valueLong;
 		}
 
-		public int getHorizontalAlignment() {
-			return JLabel.RIGHT;
+		public Type getType() {
+			return Type.numeric;
 		}
 	}
 
@@ -233,9 +249,6 @@ public abstract class DisplayType {
 			return Type.numeric;
 		}
 
-		public int getHorizontalAlignment() {
-			return JLabel.RIGHT;
-		}
 	}
 
 	public static class Time extends DisplayType {
@@ -261,9 +274,6 @@ public abstract class DisplayType {
 			return Type.time;
 		}
 
-		public int getHorizontalAlignment() {
-			return JLabel.RIGHT;
-		}
 	}
 
 	public static class Literal extends DisplayType {
@@ -285,9 +295,6 @@ public abstract class DisplayType {
 			return Type.literal;
 		}
 
-		public int getHorizontalAlignment() {
-			return JLabel.RIGHT;
-		}
 	}
 
 	public static class HTML extends DisplayType {
@@ -315,8 +322,29 @@ public abstract class DisplayType {
 			return Type.html;
 		}
 
-		public int getHorizontalAlignment() {
-			return JLabel.LEFT;
+	}
+
+	public static class Image extends DisplayType {
+		BufferedImage value;
+
+		private Image(BufferedImage value) {
+			this.value = value;
+		}
+
+		public String toString() {
+			return "";
+		}
+
+		public double getValue() {
+			return -Double.MAX_VALUE;
+		}
+
+		public Type getType() {
+			return Type.image;
+		}
+
+		public BufferedImage getImage() {
+			return value;
 		}
 	}
 }

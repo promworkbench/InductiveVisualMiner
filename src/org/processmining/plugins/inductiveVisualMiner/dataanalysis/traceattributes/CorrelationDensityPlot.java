@@ -48,6 +48,21 @@ public class CorrelationDensityPlot {
 		return image;
 	}
 
+	public static BufferedImage create(String nameX, long[] valuesX, long minX, long maxX, String nameY,
+			double[] valuesY, double minY, double maxY) {
+		/*
+		 * here we do not need the precision of long anymore, so transform to
+		 * double and keep things maintainable around here..
+		 */
+
+		double[] valuesXd = new double[valuesX.length];
+		for (int i = 0; i < valuesXd.length; i++) {
+			valuesXd[i] = valuesX[i];
+		}
+
+		return create(nameX, valuesXd, minX, maxX, nameY, valuesY, minY, maxY);
+	}
+
 	public static void drawTextHorizontal(BufferedImage image, String name, int offsetX, int offsetY, int sizeX,
 			int sizeY) {
 		Graphics2D g = (Graphics2D) image.getGraphics();

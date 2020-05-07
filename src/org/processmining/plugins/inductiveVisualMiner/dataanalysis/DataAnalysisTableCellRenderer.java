@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.awt.Component;
+import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 
 import javax.swing.ImageIcon;
@@ -10,6 +11,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 
 public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRenderer {
@@ -27,11 +29,27 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 
 	public Component getTableCellRendererComponent(JTable table, Object object, boolean isSelected, boolean hasFocus,
 			int row, int column) {
-		boolean forceNumerical = false;
+
+		//default properties
+		setHorizontalAlignment(JLabel.LEFT);
+		setFont(IvMDecorator.fontLarger);
 
 		if (object == null) {
 			setText("");
 			setIcon(null);
+		} else if (object instanceof DisplayType) {
+			if (((DisplayType) object).getType() == Type.image) {
+				//image
+				setText("");
+				BufferedImage im = ((DisplayType.Image) object).getImage();
+				setIcon(new ImageIcon(im));
+			} else {
+				//text
+				setText(object.toString());
+				setIcon(null);
+			}
+			setHorizontalAlignment(((DisplayType) object).getHorizontalAlignment());
+			setFont(IvMDecorator.fontMonoSpace);
 		} else if (object instanceof ImageIcon) {
 			setText("");
 			setIcon((ImageIcon) object);
@@ -40,21 +58,9 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 			Pair<Integer, ImageIcon> p = (Pair<Integer, ImageIcon>) object;
 			setText(p.getA() + " ");
 			setIcon(p.getB());
-			forceNumerical = true;
 		} else {
 			setText(object.toString());
 			setIcon(null);
-		}
-
-		if (forceNumerical) {
-			setHorizontalAlignment(JLabel.RIGHT);
-			setFont(IvMDecorator.fontMonoSpace);
-		} else if (object instanceof DisplayType) {
-			setHorizontalAlignment(((DisplayType) object).getHorizontalAlignment());
-			setFont(IvMDecorator.fontMonoSpace);
-		} else {
-			setHorizontalAlignment(JLabel.LEFT);
-			setFont(IvMDecorator.fontLarger);
 		}
 
 		if (isSelected) {
