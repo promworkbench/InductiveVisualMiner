@@ -100,6 +100,9 @@ public class ExporterDataAnalyses extends Exporter {
 				case html :
 					sheet.addCell(new Label(column, row, ((DisplayType.HTML) value).getRawValue()));
 					return;
+				case image :
+					sheet.addCell(new Label(column, row, "[image not exported]"));
+					return;
 				default :
 					break;
 			}
