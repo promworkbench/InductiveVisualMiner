@@ -68,8 +68,8 @@ public class DataAnalysesView extends SideWindow {
 
 	public void invalidate(String analysisName) {
 		if (onOffPanels.containsKey(analysisName)) {
-			OnOffPanel<?> onOffPanel = onOffPanels.get(analysisName);
-			onOffPanel.off();
+			onOffPanels.get(analysisName).off();
+			tables.get(analysisName).invalidateData();
 		}
 	}
 

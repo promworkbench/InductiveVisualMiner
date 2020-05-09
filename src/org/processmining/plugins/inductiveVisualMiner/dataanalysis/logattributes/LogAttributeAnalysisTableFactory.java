@@ -3,7 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattribute
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 
-public class LogAttributeAnalysisFactory implements DataAnalysisTableFactory {
+public class LogAttributeAnalysisTableFactory implements DataAnalysisTableFactory {
 
 	public static final String name = "Log attributes";
 	public static final String explanation = "Attributes at the log level.";

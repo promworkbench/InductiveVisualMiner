@@ -190,6 +190,11 @@ public class TraceAttributeAnalysisTable extends DataAnalysisTable {
 		return true;
 	}
 
+	public void invalidateData() {
+		dataAnalysis = null;
+		model.fireTableStructureChanged();
+	}
+
 	public void setRowHeights() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

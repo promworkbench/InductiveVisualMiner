@@ -116,6 +116,11 @@ public class EventAttributeAnalysisTable extends DataAnalysisTable {
 		return true;
 	}
 
+	public void invalidateData() {
+		dataAnalysis = null;
+		model.fireTableStructureChanged();
+	}
+
 	private Attribute getAttribute(int rowNr) {
 		if (dataAnalysis == null) {
 			return null;

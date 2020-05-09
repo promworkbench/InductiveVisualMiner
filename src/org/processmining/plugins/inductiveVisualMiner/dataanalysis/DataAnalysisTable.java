@@ -30,4 +30,6 @@ public abstract class DataAnalysisTable extends JTable {
 	 * @return
 	 */
 	public abstract boolean setData(InductiveVisualMinerState state);
+
+	public abstract void invalidateData();
 }

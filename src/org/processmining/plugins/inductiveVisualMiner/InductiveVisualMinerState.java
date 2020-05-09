@@ -25,6 +25,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
@@ -492,6 +493,15 @@ public class InductiveVisualMinerState {
 	//== data analysis
 	private EventAttributeAnalysis eventAttributesAnalysis;
 	private TraceAttributeAnalysis traceAttributesAnalysis;
+	private LogAttributeAnalysis logAttributesAnalysis;
+
+	public void setEventAttributesAnalysis(EventAttributeAnalysis dataAnalysis) {
+		this.eventAttributesAnalysis = dataAnalysis;
+	}
+
+	public EventAttributeAnalysis getEventAttributesAnalysis() {
+		return eventAttributesAnalysis;
+	}
 
 	public void setTraceAttributesAnalysis(TraceAttributeAnalysis dataAnalysis) {
 		this.traceAttributesAnalysis = dataAnalysis;
@@ -501,12 +511,12 @@ public class InductiveVisualMinerState {
 		return traceAttributesAnalysis;
 	}
 
-	public void setEventAttributesAnalysis(EventAttributeAnalysis dataAnalysis) {
-		this.eventAttributesAnalysis = dataAnalysis;
+	public void setLogAttributesAnalysis(LogAttributeAnalysis dataAnalysis) {
+		this.logAttributesAnalysis = dataAnalysis;
 	}
 
-	public EventAttributeAnalysis getEventAttributesAnalysis() {
-		return eventAttributesAnalysis;
+	public LogAttributeAnalysis getLogAttributesAnalysis() {
+		return logAttributesAnalysis;
 	}
 
 	//==cohort analysis

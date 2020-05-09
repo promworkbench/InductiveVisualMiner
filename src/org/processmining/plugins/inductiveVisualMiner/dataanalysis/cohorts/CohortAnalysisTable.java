@@ -127,6 +127,11 @@ public class CohortAnalysisTable extends DataAnalysisTable {
 		return cohorts != null;
 	}
 
+	public void invalidateData() {
+		cohorts = null;
+		model.fireTableStructureChanged();
+	}
+
 	public void setCohortAnalysis2HighlightingFilterHandler(
 			CohortAnalysis2HighlightingFilterHandler cohortAnalysis2HighlightingFilterHandler) {
 		this.cohortAnalysis2HighlightingFilterHandler = cohortAnalysis2HighlightingFilterHandler;

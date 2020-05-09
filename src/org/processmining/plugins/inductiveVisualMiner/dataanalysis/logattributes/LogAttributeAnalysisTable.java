@@ -1,13 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import javax.swing.table.AbstractTableModel;
 
-import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 
@@ -16,7 +10,7 @@ public class LogAttributeAnalysisTable extends DataAnalysisTable {
 	private static final long serialVersionUID = 192566312464894607L;
 
 	private AbstractTableModel model;
-	private List<XAttribute> attributes;
+	private LogAttributeAnalysis dataAnalysis;
 
 	public LogAttributeAnalysisTable() {
 		//fill the table
@@ -38,24 +32,24 @@ public class LogAttributeAnalysisTable extends DataAnalysisTable {
 			}
 
 			public int getRowCount() {
-				if (attributes == null) {
+				if (dataAnalysis == null) {
 					return 0;
 				}
-				return attributes.size();
+				return dataAnalysis.size();
 			}
 
 			public Object getValueAt(int row, int column) {
-				if (attributes == null) {
+				if (dataAnalysis == null) {
 					return "";
 				}
 
 				switch (column) {
 					case 0 :
 						//attribute name
-						return attributes.get(row).getKey();
+						return dataAnalysis.get(row).getA();
 					default :
 						//attribute value
-						return attributes.get(row).toString();
+						return dataAnalysis.get(row).getB();
 				}
 			}
 
@@ -65,20 +59,14 @@ public class LogAttributeAnalysisTable extends DataAnalysisTable {
 	}
 
 	public boolean setData(InductiveVisualMinerState state) {
-		if (state.getSortedXLog() == null) {
-			attributes = null;
-			return false;
-		}
-
-		attributes = new ArrayList<>(state.getSortedXLog().getAttributes().values());
-		Collections.sort(attributes, new Comparator<XAttribute>() {
-
-			public int compare(XAttribute o1, XAttribute o2) {
-				return o1.getKey().toLowerCase().compareTo(o2.getKey().toLowerCase());
-			}
-		});
+		dataAnalysis = state.getLogAttributesAnalysis();
 		model.fireTableStructureChanged();
-		return true;
+		return dataAnalysis != null;
+	}
+
+	public void invalidateData() {
+		dataAnalysis = null;
+		model.fireTableStructureChanged();
 	}
 
 }
