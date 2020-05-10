@@ -114,8 +114,11 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, ? extends Displ
 
 		}
 
-		result.add(Pair.of(Field.tracesHighlighted.toString(), DisplayType.numeric(numberOfTraces)));
-		result.add(Pair.of(Field.eventsHighlighted.toString(), DisplayType.numeric(numberOfEvents)));
+		DisplayType x = DisplayType.numeric(numberOfTraces);
+		result.add(Pair.of(Field.tracesHighlighted.toString(), x));
+
+		DisplayType y = DisplayType.numeric(numberOfEvents);
+		result.add(Pair.of(Field.eventsHighlighted.toString(), y));
 
 		if (input.isSomethingFiltered()) {
 
