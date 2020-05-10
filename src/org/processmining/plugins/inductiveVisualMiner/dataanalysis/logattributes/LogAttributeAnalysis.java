@@ -30,7 +30,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
  * @author sander
  *
  */
-public class LogAttributeAnalysis extends ArrayList<Pair<String, DisplayType>> {
+public class LogAttributeAnalysis extends ArrayList<Pair<String, ? extends DisplayType>> {
 
 	private static final long serialVersionUID = 5687504321633958714L;
 
@@ -72,8 +72,8 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, DisplayType>> {
 	}
 
 	private void sort() {
-		Collections.sort(this, new Comparator<Pair<String, DisplayType>>() {
-			public int compare(Pair<String, DisplayType> arg0, Pair<String, DisplayType> arg1) {
+		Collections.sort(this, new Comparator<Pair<String, ? extends DisplayType>>() {
+			public int compare(Pair<String, ? extends DisplayType> arg0, Pair<String, ? extends DisplayType> arg1) {
 				return arg0.getA().toLowerCase().compareTo(arg1.getA().toLowerCase());
 			}
 		});
@@ -139,7 +139,7 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, DisplayType>> {
 	public void setVirtualAttributesToPlaceholders() {
 		for (int i = 0; i < size(); i++) {
 			for (Field field : Field.values()) {
-				Pair<String, DisplayType> p = get(i);
+				Pair<String, ? extends DisplayType> p = get(i);
 				if (p.getA().equals(field.toString())) {
 					set(i, Pair.of(p.toString(), DisplayType.literal("[computing..]")));
 					break;
@@ -149,9 +149,9 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, DisplayType>> {
 	}
 
 	private void removeVirtualAttributes() {
-		Iterator<Pair<String, DisplayType>> it = iterator();
+		Iterator<Pair<String, ? extends DisplayType>> it = iterator();
 		while (it.hasNext()) {
-			Pair<String, DisplayType> p = it.next();
+			Pair<String, ? extends DisplayType> p = it.next();
 			for (Field field : Field.values()) {
 				if (p.getA().equals(field.toString())) {
 					it.remove();
