@@ -16,18 +16,19 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
  * @author sander
  *
  */
-public class Cl18DataAnalysisLog extends ChainLink<Pair<IvMModel, IvMLogFiltered>, List<Pair<String, DisplayType>>> {
+public class Cl18DataAnalysisLog
+		extends ChainLink<Pair<IvMModel, ? extends IvMLogFiltered>, List<Pair<String, DisplayType>>> {
 
 	public String getName() {
 		return "data analysis - log";
 	}
 
-	protected Pair<IvMModel, IvMLogFiltered> generateInput(InductiveVisualMinerState state) {
+	protected Pair<IvMModel, ? extends IvMLogFiltered> generateInput(InductiveVisualMinerState state) {
 		return Pair.of(state.getModel(), state.getIvMLogFiltered());
 	}
 
-	protected List<Pair<String, DisplayType>> executeLink(Pair<IvMModel, IvMLogFiltered> input, IvMCanceller canceller)
-			throws Exception {
+	protected List<Pair<String, DisplayType>> executeLink(Pair<IvMModel, ? extends IvMLogFiltered> input,
+			IvMCanceller canceller) throws Exception {
 		return LogAttributeAnalysis.computeVirtualAttributes(input.getA(), input.getB(), canceller);
 	}
 
