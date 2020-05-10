@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes;
+package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.awt.Color;
 import java.awt.Dimension;

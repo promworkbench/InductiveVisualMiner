@@ -15,11 +15,18 @@ import org.deckfour.xes.model.XAttributeLiteral;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.model.impl.XAttributeDiscreteImpl;
+import org.processmining.earthmoversstochasticconformancechecking.parameters.EMSCParametersLogLogAbstract;
+import org.processmining.earthmoversstochasticconformancechecking.parameters.EMSCParametersLogLogDefault;
+import org.processmining.earthmoversstochasticconformancechecking.plugins.EarthMoversStochasticConformancePlugin;
+import org.processmining.earthmoversstochasticconformancechecking.tracealignments.StochasticTraceAlignmentsLogLog;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog2XLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
@@ -60,10 +67,10 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, ? extends Displ
 			for (XTrace trace : sortedXLog) {
 				numberOfEvents += trace.size();
 			}
-			add(Pair.of("number of events", DisplayType.numeric(numberOfEvents)));
+			add(Pair.of("number of events (full log)", DisplayType.numeric(numberOfEvents)));
 		}
 
-		add(Pair.of("number of traces", DisplayType.numeric(sortedXLog.size())));
+		add(Pair.of("number of traces (full log)", DisplayType.numeric(sortedXLog.size())));
 
 		//add placeholders for part two
 		addVirtualAttributePlaceholders();
@@ -84,44 +91,125 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, ? extends Displ
 	 */
 
 	public static enum Field {
+		stochasticSimilarity {
+			public String toString() {
+				return "stochastic similarity between highlighted and non-highlighted traces";
+			}
+		},
 		tracesHighlighted {
 			public String toString() {
-				return "number of highlighted traces";
+				return "number of traces (highlighted)";
+			}
+		},
+		tracesNotHighlighted {
+			public String toString() {
+				return "number of traces (not highlighted)";
 			}
 		},
 		eventsHighlighted {
 			public String toString() {
-				return "number of highlighted events";
+				return "number of events (highlighted)";
+			}
+		},
+		eventsNotHighlighted {
+			public String toString() {
+				return "number of events (not highlighted)";
 			}
 		}
 	}
 
-	public static List<Pair<String, DisplayType>> computeVirtualAttributes(IvMLogFiltered input,
-			IvMCanceller canceller) {
+	public static List<Pair<String, DisplayType>> computeVirtualAttributes(IvMModel model, IvMLogFiltered input,
+			IvMCanceller canceller) throws CloneNotSupportedException, InterruptedException {
 		ArrayList<Pair<String, DisplayType>> result = new ArrayList<>();
 
-		int numberOfTraces = 0;
-		int numberOfEvents = 0;
-		for (IteratorWithPosition<IvMTrace> it = input.iterator(); it.hasNext();) {
-			numberOfTraces++;
+		{
+			int numberOfTraces = 0;
+			int numberOfEvents = 0;
+			for (IteratorWithPosition<IvMTrace> it = input.iterator(); it.hasNext();) {
+				numberOfTraces++;
 
-			IvMTrace trace = it.next();
-			for (IvMMove move : trace) {
-				if (move.getAttributes() != null) {
-					numberOfEvents++;
+				IvMTrace trace = it.next();
+				for (IvMMove move : trace) {
+					if (move.getAttributes() != null) {
+						numberOfEvents++;
+					}
+				}
+
+				if (canceller.isCancelled()) {
+					return null;
 				}
 			}
 
+			DisplayType x = DisplayType.numeric(numberOfTraces);
+			result.add(Pair.of(Field.tracesHighlighted.toString(), x));
+
+			DisplayType y = DisplayType.numeric(numberOfEvents);
+			result.add(Pair.of(Field.eventsHighlighted.toString(), y));
 		}
 
-		DisplayType x = DisplayType.numeric(numberOfTraces);
-		result.add(Pair.of(Field.tracesHighlighted.toString(), x));
-
-		DisplayType y = DisplayType.numeric(numberOfEvents);
-		result.add(Pair.of(Field.eventsHighlighted.toString(), y));
+		if (canceller.isCancelled()) {
+			return null;
+		}
 
 		if (input.isSomethingFiltered()) {
+			IvMLogFilteredImpl negativeLog = input.clone();
+			negativeLog.invert();
 
+			int numberOfTraces = 0;
+			int numberOfEvents = 0;
+			for (IteratorWithPosition<IvMTrace> it = negativeLog.iterator(); it.hasNext();) {
+				numberOfTraces++;
+
+				IvMTrace trace = it.next();
+				for (IvMMove move : trace) {
+					if (move.getAttributes() != null) {
+						numberOfEvents++;
+					}
+				}
+
+				if (canceller.isCancelled()) {
+					return null;
+				}
+			}
+
+			DisplayType x = DisplayType.numeric(numberOfTraces);
+			result.add(Pair.of(Field.tracesNotHighlighted.toString(), x));
+
+			DisplayType y = DisplayType.numeric(numberOfEvents);
+			result.add(Pair.of(Field.eventsNotHighlighted.toString(), y));
+
+			if (canceller.isCancelled()) {
+				return null;
+			}
+
+			//compute stochastic similarity
+			{
+				//transform to xlog
+				XLog logA = IvMLog2XLog.convert(input, model);
+				XLog logB = IvMLog2XLog.convert(negativeLog, model);
+
+				EMSCParametersLogLogAbstract parameters = new EMSCParametersLogLogDefault();
+				parameters.setComputeStochasticTraceAlignments(false);
+				StochasticTraceAlignmentsLogLog alignments = EarthMoversStochasticConformancePlugin.measureLogLog(logA,
+						logB, parameters, canceller);
+
+				if (canceller.isCancelled()) {
+					return null;
+				}
+
+				DisplayType z = DisplayType.numeric(alignments.getSimilarity());
+				result.add(Pair.of(Field.stochasticSimilarity.toString(), z));
+			}
+
+		} else {
+			DisplayType x = DisplayType.NA();
+			result.add(Pair.of(Field.tracesNotHighlighted.toString(), x));
+
+			DisplayType y = DisplayType.NA();
+			result.add(Pair.of(Field.eventsNotHighlighted.toString(), y));
+
+			DisplayType z = DisplayType.NA();
+			result.add(Pair.of(Field.stochasticSimilarity.toString(), z));
 		}
 
 		return result;
@@ -144,7 +232,7 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, ? extends Displ
 			for (Field field : Field.values()) {
 				Pair<String, ? extends DisplayType> p = get(i);
 				if (p.getA().equals(field.toString())) {
-					set(i, Pair.of(p.toString(), DisplayType.literal("[computing..]")));
+					set(i, Pair.of(p.getA(), DisplayType.literal("[computing..]")));
 					break;
 				}
 			}

@@ -6,6 +6,7 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 /**
@@ -15,19 +16,19 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
  * @author sander
  *
  */
-public class Cl18DataAnalysisLog extends ChainLink<IvMLogFiltered, List<Pair<String, DisplayType>>> {
+public class Cl18DataAnalysisLog extends ChainLink<Pair<IvMModel, IvMLogFiltered>, List<Pair<String, DisplayType>>> {
 
 	public String getName() {
 		return "data analysis - log";
 	}
 
-	protected IvMLogFiltered generateInput(InductiveVisualMinerState state) {
-		return state.getIvMLogFiltered();
+	protected Pair<IvMModel, IvMLogFiltered> generateInput(InductiveVisualMinerState state) {
+		return Pair.of(state.getModel(), state.getIvMLogFiltered());
 	}
 
-	protected List<Pair<String, DisplayType>> executeLink(IvMLogFiltered input, IvMCanceller canceller)
+	protected List<Pair<String, DisplayType>> executeLink(Pair<IvMModel, IvMLogFiltered> input, IvMCanceller canceller)
 			throws Exception {
-		return LogAttributeAnalysis.computeVirtualAttributes(input, canceller);
+		return LogAttributeAnalysis.computeVirtualAttributes(input.getA(), input.getB(), canceller);
 	}
 
 	protected void processResult(List<Pair<String, DisplayType>> result, InductiveVisualMinerState state) {

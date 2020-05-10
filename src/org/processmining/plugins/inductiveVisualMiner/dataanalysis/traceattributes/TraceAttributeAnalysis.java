@@ -17,12 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.deckfour.xes.model.XAttribute;
-import org.deckfour.xes.model.XLog;
 import org.math.plot.utils.Array;
-import org.processmining.earthmoversstochasticconformancechecking.parameters.EMSCParametersLogLogAbstract;
-import org.processmining.earthmoversstochasticconformancechecking.parameters.EMSCParametersLogLogDefault;
-import org.processmining.earthmoversstochasticconformancechecking.plugins.EarthMoversStochasticConformancePlugin;
-import org.processmining.earthmoversstochasticconformancechecking.tracealignments.StochasticTraceAlignmentsLogLog;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
@@ -31,8 +26,6 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.T
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog2XLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -132,7 +125,6 @@ public class TraceAttributeAnalysis {
 	public static class LogData {
 		public int numberOfTraces;
 		public double[] fitness;
-		public BufferedImage pieSize;
 	}
 
 	private Map<Attribute, EnumMap<Field, DisplayType>> attribute2data = new TreeMap<>(
@@ -142,7 +134,6 @@ public class TraceAttributeAnalysis {
 
 	private LogData logData;
 	private LogData logDataNegative;
-	private double stochasticSimilarity;
 	private boolean isSomethingFiltered;
 
 	public TraceAttributeAnalysis(final IvMModel model, IvMLogNotFiltered fullLog, final IvMLogFiltered logFiltered,
@@ -201,31 +192,6 @@ public class TraceAttributeAnalysis {
 				}
 			}
 
-			//compute stochastic similarity
-			if (isSomethingFiltered) {
-				executor.execute(new Runnable() {
-
-					public void run() {
-						//transform to xlog
-						XLog logA = IvMLog2XLog.convert(logFiltered, model);
-						XLog logB = IvMLog2XLog.convert(logFilteredNegative, model);
-
-						EMSCParametersLogLogAbstract parameters = new EMSCParametersLogLogDefault();
-						parameters.setComputeStochasticTraceAlignments(false);
-						try {
-							StochasticTraceAlignmentsLogLog alignments = EarthMoversStochasticConformancePlugin
-									.measureLogLog(logA, logB, parameters, canceller);
-							if (canceller.isCancelled()) {
-								return;
-							}
-							stochasticSimilarity = alignments.getSimilarity();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				});
-			}
-
 			executor.shutdown();
 			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} finally {
@@ -251,21 +217,6 @@ public class TraceAttributeAnalysis {
 				result.numberOfTraces++;
 			}
 		}
-
-		//count the number of traces in the unfiltered log
-		int unfilteredNumberOfTraces = 0;
-		{
-			for (IteratorWithPosition<IvMTrace> it = log.iteratorUnfiltered(); it.hasNext();) {
-				it.next();
-				unfilteredNumberOfTraces++;
-			}
-		}
-
-		double part = result.numberOfTraces / (unfilteredNumberOfTraces * 1.0);
-		if (!isPositive) {
-			part = -(1 - part);
-		}
-		result.pieSize = PieChart.drawPie(pieSize, part, IvMDecorator.textColour);
 
 		//compute fitness
 		result.fitness = new double[result.numberOfTraces];
@@ -690,10 +641,6 @@ public class TraceAttributeAnalysis {
 
 	public boolean isSomethingFiltered() {
 		return isSomethingFiltered;
-	}
-
-	public double getStochasticSimilarity() {
-		return stochasticSimilarity;
 	}
 
 	public Collection<Attribute> getTraceAttributes() {
