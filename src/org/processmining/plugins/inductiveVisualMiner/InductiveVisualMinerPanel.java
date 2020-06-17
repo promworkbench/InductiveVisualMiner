@@ -53,7 +53,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	private static final long serialVersionUID = -1078786029763735572L;
 
-	private static final int sidePanelWidth = 240;
+	private static final int sidePanelWidth = 260;
 	private static final int lineHeight = 20;
 
 	private static final Insets margins = new Insets(2, 0, 0, 0);
@@ -122,7 +122,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		setOpaque(false);
 
 		//controls the margin on the left side of the settings panel
-		Border leftBorder = new EmptyBorder(0, 5, 0, 0);
+		Border leftBorder = new EmptyBorder(0, 2, 0, 0);
 
 		JPanel sidePanel = new JPanel();
 		sidePanel.setOpaque(false);

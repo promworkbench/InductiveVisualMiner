@@ -20,6 +20,7 @@ import org.processmining.earthmoversstochasticconformancechecking.parameters.EMS
 import org.processmining.earthmoversstochasticconformancechecking.plugins.EarthMoversStochasticConformancePlugin;
 import org.processmining.earthmoversstochasticconformancechecking.tracealignments.StochasticTraceAlignmentsLogLog;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
@@ -108,20 +109,31 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, ? extends Displ
 		},
 		eventsHighlighted {
 			public String toString() {
-				return "number of events (highlighted)";
+				return "number of events (highlighted traces)";
 			}
 		},
 		eventsNotHighlighted {
 			public String toString() {
-				return "number of events (not highlighted)";
+				return "number of events (not-highlighted traces)";
 			}
-		}
+		},
+		fitnessHighlighted {
+			public String toString() {
+				return "fitness (highlighted traces)";
+			}
+		},
+		fitnessNotHighlighted {
+			public String toString() {
+				return "fitness (not-highlighted traces)";
+			}
+		},
 	}
 
 	public static List<Pair<String, DisplayType>> computeVirtualAttributes(IvMModel model, IvMLogFiltered input,
 			IvMCanceller canceller) throws CloneNotSupportedException, InterruptedException {
 		ArrayList<Pair<String, DisplayType>> result = new ArrayList<>();
 
+		//number of traces and events (highlighted)
 		{
 			int numberOfTraces = 0;
 			int numberOfEvents = 0;
@@ -147,10 +159,17 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, ? extends Displ
 			result.add(Pair.of(Field.eventsHighlighted.toString(), y));
 		}
 
+		//fitness (highlighted)
+		{
+			DisplayType x = DisplayType.numeric(Fitness.compute(input));
+			result.add(Pair.of(Field.fitnessHighlighted.toString(), x));
+		}
+
 		if (canceller.isCancelled()) {
 			return null;
 		}
 
+		//not-highlighted
 		if (input.isSomethingFiltered()) {
 			IvMLogFilteredImpl negativeLog = input.clone();
 			negativeLog.invert();
@@ -178,6 +197,9 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, ? extends Displ
 			DisplayType y = DisplayType.numeric(numberOfEvents);
 			result.add(Pair.of(Field.eventsNotHighlighted.toString(), y));
 
+			DisplayType z = DisplayType.numeric(Fitness.compute(negativeLog));
+			result.add(Pair.of(Field.fitnessNotHighlighted.toString(), z));
+
 			if (canceller.isCancelled()) {
 				return null;
 			}
@@ -197,16 +219,19 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, ? extends Displ
 					return null;
 				}
 
-				DisplayType z = DisplayType.numeric(alignments.getSimilarity());
-				result.add(Pair.of(Field.stochasticSimilarity.toString(), z));
+				DisplayType zz = DisplayType.numeric(alignments.getSimilarity());
+				result.add(Pair.of(Field.stochasticSimilarity.toString(), zz));
 			}
 
 		} else {
-			DisplayType x = DisplayType.NA();
+			DisplayType x = DisplayType.numeric(0);
 			result.add(Pair.of(Field.tracesNotHighlighted.toString(), x));
 
-			DisplayType y = DisplayType.NA();
+			DisplayType y = DisplayType.numeric(0);
 			result.add(Pair.of(Field.eventsNotHighlighted.toString(), y));
+
+			DisplayType zz = DisplayType.NA();
+			result.add(Pair.of(Field.fitnessNotHighlighted.toString(), zz));
 
 			DisplayType z = DisplayType.NA();
 			result.add(Pair.of(Field.stochasticSimilarity.toString(), z));
