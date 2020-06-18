@@ -19,6 +19,7 @@ public class CohortAnalysis {
 		parameters.setClassifier(classifier);
 		parameters.setMaxFeatureSetSize(1);
 		parameters.setDiversifyThreshold(1); //disable diversification
+		parameters.setNumberOfThreads(Math.max(1, Runtime.getRuntime().availableProcessors() / 2)); //keep half of the cores available for other tasks. A bit crude, but we don't want to interfere with the alignments too much.
 		parameters.setDebug(false);
 		return CohortAnalysisPlugin.measure(log, parameters, canceller);
 	}
