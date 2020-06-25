@@ -216,7 +216,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	public List<DataAnalysisTableFactory> getDataAnalysisTables() {
+	public List<DataAnalysisTableFactory> createDataAnalysisTables() {
 		return new ArrayList<>(Arrays.asList(new DataAnalysisTableFactory[] { //
 				new LogAttributeAnalysisTableFactory(), //
 				new TraceAttributeAnalysisTableFactory(), //

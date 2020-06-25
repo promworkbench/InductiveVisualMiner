@@ -9,6 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
@@ -39,6 +40,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<PopupItemLogMove> popupItemsLogMove;
 	private final List<PopupItemModelMove> popupItemsModelMove;
 	private final List<PopupItemLog> popupItemsLog;
+	private final List<DataAnalysisTableFactory> dataAnalyses;
 	private final List<IvMFilter> preMiningFilters;
 	private final List<IvMFilter> highlightingFilters;
 
@@ -53,6 +55,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		popupItemsLogMove = createPopupItemsLogMove();
 		popupItemsModelMove = createPopupItemsModelMove();
 		popupItemsLog = createPopupItemsLog();
+		dataAnalyses = createDataAnalysisTables();
 
 		state = createState(log);
 		panel = createPanel(canceller);
@@ -78,6 +81,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract List<PopupItemModelMove> createPopupItemsModelMove();
 
 	protected abstract List<PopupItemLog> createPopupItemsLog();
+
+	protected abstract List<DataAnalysisTableFactory> createDataAnalysisTables();
 
 	protected abstract InductiveVisualMinerState createState(XLog log);
 
@@ -162,5 +167,10 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	@Override
 	public List<PopupItemLog> getPopupItemsLog() {
 		return popupItemsLog;
+	}
+
+	@Override
+	public List<DataAnalysisTableFactory> getDataAnalysisTables() {
+		return dataAnalyses;
 	}
 }
