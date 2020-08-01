@@ -43,6 +43,14 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 		((CardLayout) getLayout()).show(this, "off");
 	}
 
+	public void set(boolean on) {
+		if (on) {
+			on();
+		} else {
+			off();
+		}
+	}
+
 	public String getOffMessage() {
 		return offMessage.getText();
 	}
