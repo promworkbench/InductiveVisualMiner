@@ -29,7 +29,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
  */
 public abstract class InductiveVisualMinerConfigurationAbstract implements InductiveVisualMinerConfiguration {
 
-	private final Chain chain;
+	private final Chain<InductiveVisualMinerState> chain;
 	private final InductiveVisualMinerState state;
 	private final InductiveVisualMinerPanel panel;
 	private final List<VisualMinerWrapper> discoveryTechniques;
@@ -88,12 +88,12 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	protected abstract InductiveVisualMinerPanel createPanel(ProMCanceller canceller);
 
-	protected abstract Chain createChain(InductiveVisualMinerState state, InductiveVisualMinerPanel panel,
-			ProMCanceller canceller, Executor executor, List<IvMFilter> preMiningFilters,
-			List<IvMFilter> highlightingFilters);
+	protected abstract Chain<InductiveVisualMinerState> createChain(InductiveVisualMinerState state,
+			InductiveVisualMinerPanel panel, ProMCanceller canceller, Executor executor,
+			List<IvMFilter> preMiningFilters, List<IvMFilter> highlightingFilters);
 
 	@Override
-	public final Chain getChain() {
+	public final Chain<InductiveVisualMinerState> getChain() {
 		return chain;
 	}
 

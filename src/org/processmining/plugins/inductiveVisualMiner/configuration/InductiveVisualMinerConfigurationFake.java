@@ -23,7 +23,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
 public class InductiveVisualMinerConfigurationFake implements InductiveVisualMinerConfiguration {
 
 	private InductiveVisualMinerConfigurationDefault phantom;
-	private Chain chain;
+	private Chain<InductiveVisualMinerState> chain;
 	private InductiveVisualMinerState state;
 	private InductiveVisualMinerPanel panel;
 	private ProMCanceller canceller;
@@ -73,7 +73,7 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return panel;
 	}
 
-	public Chain getChain() {
+	public Chain<InductiveVisualMinerState> getChain() {
 		if (chain == null) {
 			chain = phantom.createChain(state, panel, canceller, executor, getPreMiningFilters(),
 					getHighlightingFilters());
