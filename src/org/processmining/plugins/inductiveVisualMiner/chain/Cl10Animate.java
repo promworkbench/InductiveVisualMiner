@@ -17,7 +17,7 @@ import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGException;
 
 public class Cl10Animate extends
-		ChainLink<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMModel>, GraphVizTokens> {
+		IvMChainLink<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMModel>, GraphVizTokens> {
 
 	protected Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMModel> generateInput(
 			InductiveVisualMinerState state) {

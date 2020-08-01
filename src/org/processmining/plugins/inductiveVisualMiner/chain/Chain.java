@@ -13,7 +13,6 @@ import org.processmining.plugins.InductiveMiner.graphs.Graph;
 import org.processmining.plugins.InductiveMiner.graphs.GraphFactory;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotNode;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -25,9 +24,9 @@ import gnu.trove.set.hash.THashSet;
  * @author sander
  *
  */
-public class Chain {
-	private final Graph<ChainLink<?, ?>> graph = GraphFactory.create(ChainLink.class, 13);
-	private final InductiveVisualMinerState state;
+public class Chain<State> {
+	private final Graph<ChainLink<State, ?, ?>> graph = GraphFactory.create(ChainLink.class, 13);
+	private final State state;
 	private final ProMCanceller globalCanceller;
 	private final Executor executor;
 	private Runnable onChange;
@@ -40,13 +39,13 @@ public class Chain {
 		this.onChange = onChange;
 	}
 
-	public Chain(InductiveVisualMinerState state, ProMCanceller globalCanceller, Executor executor) {
+	public Chain(State state, ProMCanceller globalCanceller, Executor executor) {
 		this.state = state;
 		this.globalCanceller = globalCanceller;
 		this.executor = executor;
 	}
 
-	public void addConnection(ChainLink<?, ?> from, ChainLink<?, ?> to) {
+	public void addConnection(ChainLink<State, ?, ?> from, ChainLink<State, ?, ?> to) {
 		graph.addEdge(from, to, 1);
 	}
 
@@ -55,9 +54,9 @@ public class Chain {
 	 * 
 	 * @param clazz
 	 */
-	public synchronized void execute(Class<? extends ChainLink<?, ?>> clazz) {
+	public synchronized void execute(Class<? extends ChainLink<State, ?, ?>> clazz) {
 		//locate the chain link
-		ChainLink<?, ?> chainLink = getChainLink(clazz);
+		ChainLink<State, ?, ?> chainLink = getChainLink(clazz);
 		if (chainLink == null) {
 			return;
 		}
@@ -76,9 +75,9 @@ public class Chain {
 	 * 
 	 * @param chainLink
 	 */
-	public synchronized void executeNext(ChainLink<?, ?> chainLink) {
+	public synchronized void executeNext(ChainLink<State, ?, ?> chainLink) {
 		for (long edge : graph.getOutgoingEdgesOf(chainLink)) {
-			ChainLink<?, ?> newChainLink = graph.getEdgeTarget(edge);
+			ChainLink<State, ?, ?> newChainLink = graph.getEdgeTarget(edge);
 
 			//execute the link
 			if (canExecute(newChainLink)) {
@@ -88,7 +87,7 @@ public class Chain {
 		onChange.run();
 	}
 
-	public boolean canExecute(ChainLink<?, ?> chainLink) {
+	public boolean canExecute(ChainLink<State, ?, ?> chainLink) {
 		for (long edge : graph.getIncomingEdgesOf(chainLink)) {
 			if (!graph.getEdgeSource(edge).isComplete()) {
 				return false;
@@ -97,8 +96,8 @@ public class Chain {
 		return true;
 	}
 
-	private ChainLink<?, ?> getChainLink(Class<? extends ChainLink<?, ?>> clazz) {
-		for (ChainLink<?, ?> chainLink : graph.getVertices()) {
+	private ChainLink<State, ?, ?> getChainLink(Class<? extends ChainLink<State, ?, ?>> clazz) {
+		for (ChainLink<State, ?, ?> chainLink : graph.getVertices()) {
 			if (clazz.isInstance(chainLink)) {
 				return chainLink;
 			}
@@ -107,18 +106,18 @@ public class Chain {
 		return null;
 	}
 
-	private void cancelAndInvalidateResultRecursively(ChainLink<?, ?> chainLink, InductiveVisualMinerState state) {
+	private void cancelAndInvalidateResultRecursively(ChainLink<State, ?, ?> chainLink, State state) {
 		chainLink.cancelAndInvalidateResult(state);
 		for (long edge : graph.getOutgoingEdgesOf(chainLink)) {
 			cancelAndInvalidateResultRecursively(graph.getEdgeTarget(edge), state);
 		}
 	}
 
-	public Pair<Dot, Map<ChainLink<?, ?>, DotNode>> toDot() {
+	public Pair<Dot, Map<ChainLink<State, ?, ?>, DotNode>> toDot() {
 		Dot result = new Dot();
 
-		Map<ChainLink<?, ?>, DotNode> map = new THashMap<>();
-		for (ChainLink<?, ?> vertex : graph.getVertices()) {
+		Map<ChainLink<State, ?, ?>, DotNode> map = new THashMap<>();
+		for (ChainLink<State, ?, ?> vertex : graph.getVertices()) {
 			map.put(vertex, result.addNode(vertex.getName()));
 		}
 
@@ -129,13 +128,13 @@ public class Chain {
 		return Pair.of(result, map);
 	}
 
-	public Collection<ChainLink<?, ?>> getChainLinks() {
+	public Collection<ChainLink<State, ?, ?>> getChainLinks() {
 		return Collections.unmodifiableCollection(Arrays.asList(graph.getVertices()));
 	}
 
-	public Set<ChainLink<?, ?>> getCompletedChainLinks() {
-		Set<ChainLink<?, ?>> result = new THashSet<>();
-		for (ChainLink<?, ?> vertex : graph.getVertices()) {
+	public Set<ChainLink<State, ?, ?>> getCompletedChainLinks() {
+		Set<ChainLink<State, ?, ?>> result = new THashSet<>();
+		for (ChainLink<State, ?, ?> vertex : graph.getVertices()) {
 			if (vertex.isComplete()) {
 				result.add(vertex);
 			}

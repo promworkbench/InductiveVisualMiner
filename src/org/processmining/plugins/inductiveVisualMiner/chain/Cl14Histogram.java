@@ -10,7 +10,7 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 public class Cl14Histogram extends
-		ChainLink<Quintuple<IvMModel, IvMLogFiltered, Scaler, Integer, ProcessTreeVisualisationInfo>, HistogramData> {
+		IvMChainLink<Quintuple<IvMModel, IvMLogFiltered, Scaler, Integer, ProcessTreeVisualisationInfo>, HistogramData> {
 
 	protected Quintuple<IvMModel, IvMLogFiltered, Scaler, Integer, ProcessTreeVisualisationInfo> generateInput(
 			InductiveVisualMinerState state) {

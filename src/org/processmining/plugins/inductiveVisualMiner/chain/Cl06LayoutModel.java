@@ -19,7 +19,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import com.kitfox.svg.SVGDiagram;
 
 public class Cl06LayoutModel extends
-		ChainLink<Triple<IvMModel, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap>> {
+		IvMChainLink<Triple<IvMModel, ProcessTreeVisualisationParameters, DotPanelUserSettings>, Quadruple<Dot, SVGDiagram, ProcessTreeVisualisationInfo, TraceViewEventColourMap>> {
 
 	protected Triple<IvMModel, ProcessTreeVisualisationParameters, DotPanelUserSettings> generateInput(
 			InductiveVisualMinerState state) {

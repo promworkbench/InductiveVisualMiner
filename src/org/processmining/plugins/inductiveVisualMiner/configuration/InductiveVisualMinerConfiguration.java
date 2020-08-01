@@ -118,7 +118,7 @@ public interface InductiveVisualMinerConfiguration {
 	 * 
 	 * @return
 	 */
-	public Chain getChain();
+	public Chain<InductiveVisualMinerState> getChain();
 
 	public AlignmentComputer getAlignmentComputer();
 

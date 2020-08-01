@@ -75,7 +75,7 @@ public class InductiveVisualMinerController {
 	private final InductiveVisualMinerPanel panel;
 	private final InductiveVisualMinerState state;
 
-	private final Chain chain;
+	private final Chain<InductiveVisualMinerState> chain;
 	private final PluginContext context;
 	private final UserStatus userStatus;
 
@@ -112,15 +112,15 @@ public class InductiveVisualMinerController {
 						setStatus("- error - aborted -", 0);
 					}
 				};
-				for (ChainLink<?, ?> chainLink : chain.getChainLinks()) {
+				for (ChainLink<InductiveVisualMinerState, ?, ?> chainLink : chain.getChainLinks()) {
 					chainLink.setOnException(onException);
 				}
 			}
 
 			//set up status handling
 			{
-				for (ChainLink<?, ?> chainLink : chain.getChainLinks()) {
-					final ChainLink<?, ?> chainLink2 = chainLink;
+				for (ChainLink<InductiveVisualMinerState, ?, ?> chainLink : chain.getChainLinks()) {
+					final ChainLink<InductiveVisualMinerState, ?, ?> chainLink2 = chainLink;
 
 					//on start, set the status
 					chainLink.setOnStartStatus(new Runnable() {

@@ -17,7 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class Cl12FilterNodeSelection extends
-		ChainLink<Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMModel>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
+		IvMChainLink<Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMModel>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
 
 	protected Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMModel> generateInput(
 			InductiveVisualMinerState state) {

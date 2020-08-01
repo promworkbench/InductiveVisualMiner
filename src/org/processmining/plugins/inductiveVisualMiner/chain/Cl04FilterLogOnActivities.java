@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersContro
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
 
 public class Cl04FilterLogOnActivities extends
-		ChainLink<Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMFiltersController>, Triple<IMLog, IMLogInfo, Set<XEventClass>>> {
+		IvMChainLink<Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMFiltersController>, Triple<IMLog, IMLogInfo, Set<XEventClass>>> {
 
 	protected Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMFiltersController> generateInput(
 			InductiveVisualMinerState state) {

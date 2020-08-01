@@ -13,7 +13,7 @@ import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class Cl01GatherAttributes
-		extends ChainLink<XLog, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
+		extends IvMChainLink<XLog, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
 
 	protected XLog generateInput(InductiveVisualMinerState state) {
 		return state.getXLog();

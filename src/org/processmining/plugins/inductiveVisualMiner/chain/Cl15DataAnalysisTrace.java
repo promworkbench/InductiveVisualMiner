@@ -9,7 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class Cl15DataAnalysisTrace extends
-		ChainLink<Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, AttributesInfo>, TraceAttributeAnalysis> {
+		IvMChainLink<Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, AttributesInfo>, TraceAttributeAnalysis> {
 
 	public String getName() {
 		return "data analysis - traces";

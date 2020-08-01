@@ -10,7 +10,7 @@ import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColour
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 
 public class Cl11TraceColouring
-		extends ChainLink<Triple<IvMModel, IvMLogNotFiltered, TraceColourMapSettings>, TraceColourMap> {
+		extends IvMChainLink<Triple<IvMModel, IvMLogNotFiltered, TraceColourMapSettings>, TraceColourMap> {
 
 	protected Triple<IvMModel, IvMLogNotFiltered, TraceColourMapSettings> generateInput(
 			InductiveVisualMinerState state) {

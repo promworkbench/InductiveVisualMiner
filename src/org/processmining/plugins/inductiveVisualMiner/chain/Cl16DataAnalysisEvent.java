@@ -9,7 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class Cl16DataAnalysisEvent extends
-		ChainLink<Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, AttributesInfo>, EventAttributeAnalysis> {
+		IvMChainLink<Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, AttributesInfo>, EventAttributeAnalysis> {
 
 	public String getName() {
 		return "data analysis - events";

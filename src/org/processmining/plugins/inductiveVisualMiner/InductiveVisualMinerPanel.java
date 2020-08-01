@@ -88,7 +88,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final TraceColourMapView traceColourMapView;
 	private final JButton highlightingFiltersViewButton;
 	private final HighlightingFiltersView highlightingFiltersView;
-	private final ControllerView controllerView;
+	private final ControllerView<InductiveVisualMinerState> controllerView;
 
 	private InputFunction<Selection> onSelectionChanged = null;
 	private Runnable onGraphDirectionChanged = null;
@@ -342,7 +342,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//controller view
 			{
-				controllerView = new ControllerView(this);
+				controllerView = new ControllerView<>(this);
 			}
 
 			//save log button
@@ -658,7 +658,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return dataAnalysisViewButton;
 	}
 
-	public ControllerView getControllerView() {
+	public ControllerView<InductiveVisualMinerState> getControllerView() {
 		return controllerView;
 	}
 

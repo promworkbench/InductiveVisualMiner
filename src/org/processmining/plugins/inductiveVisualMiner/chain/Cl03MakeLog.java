@@ -13,7 +13,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
 public class Cl03MakeLog extends
-		ChainLink<Quadruple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo, XLifeCycleClassifier>, Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo>> {
+		IvMChainLink<Quadruple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo, XLifeCycleClassifier>, Quadruple<XLogInfo, XLogInfo, IMLog, IMLogInfo>> {
 
 	protected Quadruple<XLog, XEventPerformanceClassifier, IMLog2IMLogInfo, XLifeCycleClassifier> generateInput(
 			InductiveVisualMinerState state) {

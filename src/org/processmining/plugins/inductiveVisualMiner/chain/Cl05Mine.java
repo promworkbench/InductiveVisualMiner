@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
 public class Cl05Mine
-		extends ChainLink<Quintuple<IvMModel, IMLog, IMLogInfo, VisualMinerWrapper, VisualMinerParameters>, IvMModel> {
+		extends IvMChainLink<Quintuple<IvMModel, IMLog, IMLogInfo, VisualMinerWrapper, VisualMinerParameters>, IvMModel> {
 
 	protected Quintuple<IvMModel, IMLog, IMLogInfo, VisualMinerWrapper, VisualMinerParameters> generateInput(
 			InductiveVisualMinerState state) {

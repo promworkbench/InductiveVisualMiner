@@ -13,11 +13,11 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.ChainLink;
 
-public class ControllerView extends SideWindow {
+public class ControllerView<State> extends SideWindow {
 
 	private static final long serialVersionUID = -7305901655789589843L;
 	private final DotPanel dotPanel;
-	private Map<ChainLink<?, ?>, DotNode> map;
+	private Map<ChainLink<State, ?, ?>, DotNode> map;
 
 	public ControllerView(Component parent) {
 		super(parent, "Controller view - " + InductiveVisualMinerPanel.title);
@@ -28,15 +28,15 @@ public class ControllerView extends SideWindow {
 		add(dotPanel);
 	}
 
-	public void setChain(Chain chain) {
-		Pair<Dot, Map<ChainLink<?, ?>, DotNode>> x = chain.toDot();
+	public void setChain(Chain<State> chain) {
+		Pair<Dot, Map<ChainLink<State, ?, ?>, DotNode>> x = chain.toDot();
 		dotPanel.changeDot(x.getLeft(), true);
 		map = x.getB();
 	}
 
-	public void pushCompleteChainLinks(Set<ChainLink<?, ?>> complete) {
+	public void pushCompleteChainLinks(Set<ChainLink<State, ?, ?>> complete) {
 		if (isVisible()) {
-			for (Entry<ChainLink<?, ?>, DotNode> entry : map.entrySet()) {
+			for (Entry<ChainLink<State, ?, ?>, DotNode> entry : map.entrySet()) {
 				if (complete.contains(entry.getKey())) {
 					entry.getValue().setOption("style", "filled");
 					entry.getValue().setOption("fillcolor", "cyan");

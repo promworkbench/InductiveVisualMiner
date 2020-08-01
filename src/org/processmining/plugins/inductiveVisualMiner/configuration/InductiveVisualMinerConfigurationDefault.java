@@ -240,7 +240,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			final ProMCanceller canceller, final Executor executor, final List<IvMFilter> preMiningFilters,
 			final List<IvMFilter> highlightingFilters) {
 		//set up the chain
-		final Chain chain = new Chain(state, canceller, executor);
+		final Chain<InductiveVisualMinerState> chain = new Chain<>(state, canceller, executor);
 
 		gatherAttributes = new Cl01GatherAttributes();
 		sortEvents = new Cl02SortEvents();

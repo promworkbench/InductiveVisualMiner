@@ -24,7 +24,7 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 
 public class Cl13Performance extends
-		ChainLink<Quadruple<IvMModel, IvMLogFiltered, IvMLogInfo, Mode>, Pair<PerformanceWrapper, AlignedLogVisualisationData>> {
+		IvMChainLink<Quadruple<IvMModel, IvMLogFiltered, IvMLogInfo, Mode>, Pair<PerformanceWrapper, AlignedLogVisualisationData>> {
 
 	protected Quadruple<IvMModel, IvMLogFiltered, IvMLogInfo, Mode> generateInput(InductiveVisualMinerState state) {
 		if (!state.isIllogicalTimeStamps()) {

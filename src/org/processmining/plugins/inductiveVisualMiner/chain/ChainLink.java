@@ -6,9 +6,8 @@ import java.util.concurrent.Executor;
 import javax.swing.SwingUtilities;
 
 import org.processmining.framework.plugin.ProMCanceller;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
-public abstract class ChainLink<I, O> {
+public abstract class ChainLink<State, I, O> {
 	private Runnable onStart;
 	private Runnable onStartStatus;
 	private Runnable onComplete;
@@ -35,7 +34,7 @@ public abstract class ChainLink<I, O> {
 	 * 
 	 * 		Gathers all inputs required for the computation
 	 */
-	protected abstract I generateInput(InductiveVisualMinerState state);
+	protected abstract I generateInput(State state);
 
 	/**
 	 * Performs the computation, given the input. Side-effects not allowed;
@@ -57,7 +56,7 @@ public abstract class ChainLink<I, O> {
 	 *            executed, then all inputs are still relevant and have not been
 	 *            replaced.
 	 */
-	protected abstract void processResult(O result, InductiveVisualMinerState state);
+	protected abstract void processResult(O result, State state);
 
 	/**
 	 * 
@@ -65,7 +64,7 @@ public abstract class ChainLink<I, O> {
 	 * 
 	 *            Invalidate the results of this computation.
 	 */
-	protected abstract void invalidateResult(InductiveVisualMinerState state);
+	protected abstract void invalidateResult(State state);
 
 	public boolean isComplete() {
 		return isComplete;
@@ -75,7 +74,7 @@ public abstract class ChainLink<I, O> {
 		return this.getClass() == other.getClass();
 	}
 
-	public void cancelAndInvalidateResult(InductiveVisualMinerState state) {
+	public void cancelAndInvalidateResult(State state) {
 		isComplete = false;
 		if (currentExecutionCanceller != null) {
 			currentExecutionCanceller.cancel();
@@ -88,8 +87,8 @@ public abstract class ChainLink<I, O> {
 		invalidateResult(state);
 	}
 
-	public void execute(ProMCanceller globalCanceller, Executor executor, final InductiveVisualMinerState state,
-			final Chain chain) {
+	public void execute(ProMCanceller globalCanceller, Executor executor, final State state,
+			final Chain<State> chain) {
 		if (currentExecutionCanceller != null) {
 			currentExecutionCanceller.cancel();
 		}

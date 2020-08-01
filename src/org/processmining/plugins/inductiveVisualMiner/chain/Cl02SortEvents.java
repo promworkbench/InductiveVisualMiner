@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.plugins.SortEventsPlugin.EventsComparator;
 
-public class Cl02SortEvents extends ChainLink<XLog, Pair<XLog, LogAttributeAnalysis>> {
+public class Cl02SortEvents extends IvMChainLink<XLog, Pair<XLog, LogAttributeAnalysis>> {
 
 	private Function<Object, Boolean> onIllogicalTimeStamps;
 
