@@ -84,7 +84,9 @@ public class Chain<State> {
 				newChainLink.execute(globalCanceller, executor, state, this);
 			}
 		}
-		onChange.run();
+		if (onChange != null) {
+			onChange.run();
+		}
 	}
 
 	public boolean canExecute(ChainLink<State, ?, ?> chainLink) {
