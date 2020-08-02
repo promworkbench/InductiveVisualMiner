@@ -30,7 +30,10 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 		if (selectedCohort == null) {
 			return true;
 		}
+		return countIn(trace, selectedCohort, highlightInCohort);
+	}
 
+	public static boolean countIn(IvMTrace trace, Cohort cohort, boolean trueInCohort) {
 		/*
 		 * Create a temporary xtrace. The CohortAnalysis package doesn't know
 		 * about IvMTraces or events (and conceptually, is unaware of alignment
@@ -45,12 +48,12 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 		}
 
 		//a trace is in a cohort when all of the cohort's features are present in the trace.
-		for (Feature feature : selectedCohort.getFeatures()) {
+		for (Feature feature : cohort.getFeatures()) {
 			if (!feature.includes(xTrace)) {
-				return !highlightInCohort;
+				return !trueInCohort;
 			}
 		}
-		return highlightInCohort;
+		return trueInCohort;
 	}
 
 	public String getName() throws Exception {
