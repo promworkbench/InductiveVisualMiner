@@ -30,15 +30,15 @@ public abstract class DisplayType {
 	public static Type fromAttribute(Attribute attribute) {
 		if (attribute.isNumeric()) {
 			return Type.numeric;
-		} else if (attribute.isTraceDuration()) {
-			return Type.duration;
-		} else if (attribute.isTraceNumberofEvents()) {
-			return Type.numeric;
+			//TODO: enable
+			//		} else if (attribute.isDuration()) {
+			//			return Type.duration;
 		} else if (attribute.isTime()) {
 			return Type.time;
 		} else {
 			return Type.literal;
 		}
+
 	}
 
 	public static DisplayType create(Type type, double value) {

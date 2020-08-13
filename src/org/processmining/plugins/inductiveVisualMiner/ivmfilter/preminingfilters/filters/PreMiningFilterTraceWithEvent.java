@@ -8,6 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterG
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningTraceFilter;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
@@ -31,6 +32,7 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 	}
 
 	public boolean staysInLog(IMTrace trace) {
+		//TODO: update
 		Attribute attribute = panel.getSelectedAttribute();
 		if (attribute.isLiteral()) {
 			for (XEvent event : trace) {
@@ -42,7 +44,7 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 		} else if (attribute.isNumeric()) {
 			for (XEvent event : trace) {
 				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName())) {
-					double value = Attribute.parseDoubleFast(event.getAttributes().get(attribute.getName()));
+					double value = AttributeUtils.parseDoubleFast(event.getAttributes().get(attribute.getName()));
 					if (value >= panel.getSelectedNumericMin() && value <= panel.getSelectedNumericMax()) {
 						return true;
 					}
@@ -51,7 +53,7 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 		} else if (attribute.isTime()) {
 			for (XEvent event : trace) {
 				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName())) {
-					long value = Attribute.parseTimeFast(event.getAttributes().get(attribute.getName()));
+					long value = AttributeUtils.parseTimeFast(event.getAttributes().get(attribute.getName()));
 					if (value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
 						return true;
 					}

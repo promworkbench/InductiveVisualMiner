@@ -2,11 +2,12 @@ package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 
 import java.util.List;
 
+import org.deckfour.xes.model.XAttributable;
 import org.deckfour.xes.model.XAttributeMap;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.ActivityInstanceIterator;
 
-public interface IvMTrace extends List<IvMMove> {
+public interface IvMTrace extends List<IvMMove>, XAttributable {
 
 	/**
 	 * Name to be shown in the trace view.

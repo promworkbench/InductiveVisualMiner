@@ -173,12 +173,16 @@ public class AttributeFilterGui extends IvMFilterGui {
 				//((CardLayout) valueLayout.getLayout()).show(valueLayout, "numeric");
 				valueLiteralSelector.setVisible(false);
 				valueNumericSelector.setVisible(true);
-			} else if (getSelectedAttribute().isTraceDuration()) {
-				valueLiteralSelector.setVisible(false);
-				valueNumericSelector.setVisible(true);
-			} else if (getSelectedAttribute().isTraceNumberofEvents()) {
-				valueLiteralSelector.setVisible(false);
-				valueNumericSelector.setVisible(true);
+				//			} else if (getSelectedAttribute().isDuration()) {
+				//TODO: ?
+				//				valueLiteralSelector.setVisible(false);
+				//				valueNumericSelector.setVisible(true);
+				//			} else if (getSelectedAttribute().isTraceDuration()) {
+				//				valueLiteralSelector.setVisible(false);
+				//				valueNumericSelector.setVisible(true);
+				//			} else if (getSelectedAttribute().isTraceNumberofEvents()) {
+				//				valueLiteralSelector.setVisible(false);
+				//				valueNumericSelector.setVisible(true);
 			}
 		}
 	}
@@ -245,11 +249,17 @@ public class AttributeFilterGui extends IvMFilterGui {
 	private static DecimalFormat numberFormat = new DecimalFormat("#.##");
 
 	public String getExplanation() {
+		String intro = "having ";
+		if (!getSelectedAttribute().isVirtual()) {
+			intro += "attribute `" + getSelectedAttribute().getName() + "' ";
+		} else {
+			intro += getSelectedAttribute() + " ";
+		}
+
 		if (getSelectedAttribute().isLiteral()) {
 			StringBuilder s = new StringBuilder();
-			s.append("having attribute `");
-			s.append(getSelectedAttribute().getName());
-			s.append("' being ");
+			s.append(intro);
+			s.append("being ");
 			List<String> attributes = getSelectedLiterals();
 			if (attributes.size() > 1) {
 				s.append("either ");
@@ -266,19 +276,22 @@ public class AttributeFilterGui extends IvMFilterGui {
 			}
 			return s.toString();
 		} else if (getSelectedAttribute().isNumeric()) {
-			return "having attribute `" + getSelectedAttribute().getName() + "' between "
-					+ numberFormat.format(getSelectedNumericMin()) + " and "
+			return intro + "between " + numberFormat.format(getSelectedNumericMin()) + " and "
 					+ numberFormat.format(getSelectedNumericMax());
 		} else if (getSelectedAttribute().isTime()) {
-			return "having attribute `" + getSelectedAttribute().getName() + "' between "
-					+ ResourceTimeUtils.timeToString(getSelectedTimeMin()) + " and "
+			return intro + "between " + ResourceTimeUtils.timeToString(getSelectedTimeMin()) + " and "
 					+ ResourceTimeUtils.timeToString(getSelectedTimeMax());
-		} else if (getSelectedAttribute().isTraceDuration()) {
-			return "lasting between " + ResourceTimeUtils.getDuration(getSelectedTimeMin()) + " and "
-					+ ResourceTimeUtils.getDuration(getSelectedTimeMax());
-		} else if (getSelectedAttribute().isTraceNumberofEvents()) {
-			return "having between " + numberFormat.format(getSelectedTimeMin()) + " and "
-					+ numberFormat.format(getSelectedTimeMax()) + " events";
+			//TODO: ?
+			//		} else if (getSelectedAttribute().isDuration()) {
+			//			return intro + "between "
+			//					+ ResourceTimeUtils.getDuration(getSelectedTimeMin()) + " and "
+			//					+ ResourceTimeUtils.getDuration(getSelectedTimeMax());
+			//		} else if (getSelectedAttribute().isTraceDuration()) {
+			//			return "lasting between " + ResourceTimeUtils.getDuration(getSelectedTimeMin()) + " and "
+			//					+ ResourceTimeUtils.getDuration(getSelectedTimeMax());
+			//		} else if (getSelectedAttribute().isTraceNumberofEvents()) {
+			//			return "having between " + numberFormat.format(getSelectedTimeMin()) + " and "
+			//					+ numberFormat.format(getSelectedTimeMax()) + " events";
 		} else {
 			return "blaaaa";
 		}

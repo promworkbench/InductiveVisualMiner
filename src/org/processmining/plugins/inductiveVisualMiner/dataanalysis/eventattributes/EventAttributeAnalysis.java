@@ -29,6 +29,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -494,9 +495,9 @@ public class EventAttributeAnalysis {
 				return -Double.MAX_VALUE;
 			}
 			if (attribute.isNumeric()) {
-				return Attribute.parseDoubleFast(xAttribute);
+				return AttributeUtils.parseDoubleFast(xAttribute);
 			} else if (attribute.isTime()) {
-				return Attribute.parseTimeFast(xAttribute);
+				return AttributeUtils.parseTimeFast(xAttribute);
 			}
 		}
 		return -Double.MAX_VALUE;
@@ -509,9 +510,9 @@ public class EventAttributeAnalysis {
 				return Long.MIN_VALUE;
 			}
 			if (attribute.isNumeric()) {
-				return Attribute.parseLongFast(xAttribute);
+				return AttributeUtils.parseLongFast(xAttribute);
 			} else if (attribute.isTime()) {
-				return Attribute.parseTimeFast(xAttribute);
+				return AttributeUtils.parseTimeFast(xAttribute);
 			}
 		}
 		return Long.MIN_VALUE;

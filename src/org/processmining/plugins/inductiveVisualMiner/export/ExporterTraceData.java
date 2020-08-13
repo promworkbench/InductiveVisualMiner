@@ -11,7 +11,6 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
-import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapPropertyDuration;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
@@ -52,11 +51,12 @@ public class ExporterTraceData extends Exporter {
 		for (IvMTrace trace : log) {
 			for (Attribute attribute : attributes.getTraceAttributes()) {
 				if (attribute.isVirtual()) {
-					if (attribute.isTraceDuration()) {
-						w.print(TraceColourMapPropertyDuration.getTraceDuration(trace));
-					} else if (attribute.isTraceNumberofEvents()) {
-						w.print(trace.getNumberOfEvents());
-					}
+					//TODO: ?
+					//					if (attribute.isTraceDuration()) {
+					//						w.print(TraceColourMapPropertyDuration.getTraceDuration(trace));
+					//					} else if (attribute.isTraceNumberofEvents()) {
+					//						w.print(trace.getNumberOfEvents());
+					//					}
 				} else {
 					XAttribute value = trace.getAttributes().get(attribute.getName());
 					if (value != null) {

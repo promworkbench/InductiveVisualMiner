@@ -10,6 +10,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWith
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 
 public class TraceColourMapAttributeNumber implements TraceColourMap {
 
@@ -34,10 +35,11 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 	}
 
 	public Color attributeValue2colour(XAttribute attribute) {
+		//TODO: add virtual attributes in callers
 		if (attribute == null) {
 			return RendererFactory.defaultTokenFillColour;
 		} else {
-			double value = Attribute.parseDoubleFast(attribute);
+			double value = AttributeUtils.parseDoubleFast(attribute);
 			if (value == -Double.MAX_VALUE) {
 				return RendererFactory.defaultTokenFillColour;
 			}

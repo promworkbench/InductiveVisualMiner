@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfil
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 
 public class HighlightingFilterLogMove extends HighlightingFilterEvent {
 
@@ -12,6 +13,7 @@ public class HighlightingFilterLogMove extends HighlightingFilterEvent {
 	}
 
 	@Override
+	//TODO: update
 	public boolean countInColouring(IvMTrace trace) {
 		Attribute attribute = panel.getSelectedAttribute();
 		if (attribute.isLiteral()) {
@@ -26,7 +28,7 @@ public class HighlightingFilterLogMove extends HighlightingFilterEvent {
 			for (IvMMove event : trace) {
 				if (event.isLogMove() && event.getAttributes() != null
 						&& event.getAttributes().containsKey(attribute.getName())) {
-					double value = Attribute.parseDoubleFast(event.getAttributes().get(attribute.getName()));
+					double value = AttributeUtils.parseDoubleFast(event.getAttributes().get(attribute.getName()));
 					if (value >= panel.getSelectedNumericMin() && value <= panel.getSelectedNumericMax()) {
 						return true;
 					}
@@ -36,7 +38,7 @@ public class HighlightingFilterLogMove extends HighlightingFilterEvent {
 			for (IvMMove event : trace) {
 				if (event.isLogMove() && event.getAttributes() != null
 						&& event.getAttributes().containsKey(attribute.getName())) {
-					long value = Attribute.parseTimeFast(event.getAttributes().get(attribute.getName()));
+					long value = AttributeUtils.parseTimeFast(event.getAttributes().get(attribute.getName()));
 					if (value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
 						return true;
 					}

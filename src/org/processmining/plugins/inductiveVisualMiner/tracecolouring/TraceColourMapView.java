@@ -189,6 +189,7 @@ public class TraceColourMapView extends SideWindow {
 	}
 
 	private void updateAttribute(Attribute attribute) throws Exception {
+		//TODO: update
 		if (attribute.isLiteral()) {
 			if (attribute.getStringValues().size() <= maxColours) {
 
@@ -234,20 +235,20 @@ public class TraceColourMapView extends SideWindow {
 			updateProperty(colourMap, attribute.getTimeMin(), attribute.getTimeMax(), false, true);
 			onUpdate.call(
 					TraceColourMapSettings.time(attribute, colourMap, attribute.getTimeMin(), attribute.getTimeMax()));
-		} else if (attribute.isTraceDuration()) {
-			//special virtual attribute: trace duration
-			long min = attribute.getTimeMin();
-			long max = attribute.getTimeMax();
-			ColourMap colourMap = TraceColourMapSettings.getColourMap();
-			updateProperty(colourMap, min, max, true, false);
-			onUpdate.call(TraceColourMapSettings.duration(colourMap, min, max));
-		} else if (attribute.isTraceNumberofEvents()) {
-			//special virtual attribute: number of events
-			long min = attribute.getTimeMin();
-			long max = attribute.getTimeMax();
-			ColourMap colourMap = TraceColourMapSettings.getColourMap();
-			updateProperty(colourMap, min, max, false, false);
-			onUpdate.call(TraceColourMapSettings.numberOfEvents(colourMap, min, max));
+//		} else if (attribute.isTraceDuration()) {
+//			//special virtual attribute: trace duration
+//			long min = attribute.getTimeMin();
+//			long max = attribute.getTimeMax();
+//			ColourMap colourMap = TraceColourMapSettings.getColourMap();
+//			updateProperty(colourMap, min, max, true, false);
+//			onUpdate.call(TraceColourMapSettings.duration(colourMap, min, max));
+//		} else if (attribute.isTraceNumberofEvents()) {
+//			//special virtual attribute: number of events
+//			long min = attribute.getTimeMin();
+//			long max = attribute.getTimeMax();
+//			ColourMap colourMap = TraceColourMapSettings.getColourMap();
+//			updateProperty(colourMap, min, max, false, false);
+//			onUpdate.call(TraceColourMapSettings.numberOfEvents(colourMap, min, max));
 		}
 	}
 

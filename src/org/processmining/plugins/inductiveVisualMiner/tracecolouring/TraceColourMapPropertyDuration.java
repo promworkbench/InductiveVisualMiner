@@ -27,7 +27,7 @@ public class TraceColourMapPropertyDuration extends TraceColourMapProperty {
 	 *         highest and the lowest timestamp. If no timestamps are present,
 	 *         Long.MIN_VALUE is returned.
 	 */
-	public static long getTraceDuration(IvMTrace trace) {
+	private static long getTraceDuration(IvMTrace trace) {
 		long min = Long.MAX_VALUE;
 		long max = Long.MIN_VALUE;
 		for (IvMMove move : trace) {
@@ -42,7 +42,7 @@ public class TraceColourMapPropertyDuration extends TraceColourMapProperty {
 		return max - min;
 	}
 
-	public static long getTraceDuration(IMTrace trace) {
+	private static long getTraceDuration(IMTrace trace) {
 		long min = Long.MAX_VALUE;
 		long max = Long.MIN_VALUE;
 		for (XEvent event : trace) {

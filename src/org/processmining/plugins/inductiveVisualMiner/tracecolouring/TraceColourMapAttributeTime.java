@@ -11,6 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTime
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 
 public class TraceColourMapAttributeTime implements TraceColourMap {
 
@@ -35,10 +36,11 @@ public class TraceColourMapAttributeTime implements TraceColourMap {
 	}
 
 	public Color attributeValue2colour(XAttribute attribute) {
+		//TODO: add virtual attributes to callers
 		if (attribute == null) {
 			return RendererFactory.defaultTokenFillColour;
 		} else {
-			long value = Attribute.parseTimeFast(attribute);
+			long value = AttributeUtils.parseTimeFast(attribute);
 			if (value == Long.MIN_VALUE) {
 				return RendererFactory.defaultTokenFillColour;
 			}
@@ -60,18 +62,20 @@ public class TraceColourMapAttributeTime implements TraceColourMap {
 	}
 
 	public String getValue(IvMTrace trace) {
+		//TODO: check callers for virtual attributes
 		XAttribute value = trace.getAttributes().get(attribute.getName());
 		if (value == null) {
 			return "";
 		}
-		return "\u2588 " + ResourceTimeUtils.timeToString(Attribute.parseTimeFast(value));
+		return "\u2588 " + ResourceTimeUtils.timeToString(AttributeUtils.parseTimeFast(value));
 	}
 
 	public String getValue(IMTrace trace) {
+		//TODO: check callers for virtual attributes
 		XAttribute value = trace.getAttributes().get(attribute.getName());
 		if (value == null) {
 			return "";
 		}
-		return "\u2588 " + ResourceTimeUtils.timeToString(Attribute.parseTimeFast(value));
+		return "\u2588 " + ResourceTimeUtils.timeToString(AttributeUtils.parseTimeFast(value));
 	}
 }

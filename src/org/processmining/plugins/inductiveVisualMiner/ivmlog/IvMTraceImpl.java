@@ -3,7 +3,9 @@ package org.processmining.plugins.inductiveVisualMiner.ivmlog;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
+import java.util.Set;
 
+import org.deckfour.xes.extension.XExtension;
 import org.deckfour.xes.model.XAttributeMap;
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -18,7 +20,7 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 	private Long realStartTime = null;
 	private Long realEndTime = null;
 	private String name;
-	private final XAttributeMap attributes;
+	private XAttributeMap attributes;
 
 	public IvMTraceImpl(String name, XAttributeMap attributes, int size) {
 		super(size);
@@ -68,6 +70,10 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 
 	public XAttributeMap getAttributes() {
 		return attributes;
+	}
+
+	public void setAttributes(XAttributeMap map) {
+		this.attributes = map;
 	}
 
 	public IvMTrace clone() {
@@ -228,5 +234,13 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 			}
 		}
 		return result;
+	}
+
+	public Set<XExtension> getExtensions() {
+		return null;
+	}
+
+	public boolean hasAttributes() {
+		return attributes != null;
 	}
 }
