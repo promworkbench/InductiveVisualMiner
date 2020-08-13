@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 
 import java.awt.Color;
 
+import org.deckfour.xes.model.XAttributable;
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
@@ -30,16 +31,15 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 		trace2colour = new Color[log.size()];
 		for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
 			IvMTrace trace = it.next();
-			trace2colour[it.getPosition()] = attributeValue2colour(trace.getAttributes().get(attribute.getName()));
+			trace2colour[it.getPosition()] = attributeValue2colour(attribute, trace);
 		}
 	}
 
-	public Color attributeValue2colour(XAttribute attribute) {
-		//TODO: add virtual attributes in callers
+	public Color attributeValue2colour(Attribute attribute, XAttributable trace) {
 		if (attribute == null) {
 			return RendererFactory.defaultTokenFillColour;
 		} else {
-			double value = AttributeUtils.parseDoubleFast(attribute);
+			double value = AttributeUtils.valueDouble(attribute, trace);
 			if (value == -Double.MAX_VALUE) {
 				return RendererFactory.defaultTokenFillColour;
 			}
@@ -53,11 +53,11 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 	}
 
 	public Color getColour(IMTrace trace) {
-		return attributeValue2colour(trace.getAttributes().get(attribute.getName()));
+		return attributeValue2colour(attribute, trace);
 	}
 
 	public Color getColour(IvMTrace trace) {
-		return attributeValue2colour(trace.getAttributes().get(attribute.getName()));
+		return attributeValue2colour(attribute, trace);
 	}
 
 	public String getValue(IvMTrace trace) {
