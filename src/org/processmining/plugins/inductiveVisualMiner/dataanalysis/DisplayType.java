@@ -30,15 +30,13 @@ public abstract class DisplayType {
 	public static Type fromAttribute(Attribute attribute) {
 		if (attribute.isNumeric()) {
 			return Type.numeric;
-			//TODO: enable
-			//		} else if (attribute.isDuration()) {
-			//			return Type.duration;
+		} else if (attribute.isDuration()) {
+			return Type.duration;
 		} else if (attribute.isTime()) {
 			return Type.time;
 		} else {
 			return Type.literal;
 		}
-
 	}
 
 	public static DisplayType create(Type type, double value) {
@@ -65,6 +63,8 @@ public abstract class DisplayType {
 				return numeric(value);
 			case time :
 				return time(value);
+			case duration :
+				return duration(value);
 			default :
 				assert false;
 				return null;

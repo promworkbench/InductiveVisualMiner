@@ -17,6 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributeVirtualTraceLength;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01GatherAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl02SortEvents;
@@ -93,6 +94,12 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.DfgMiner;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.LifeCycleMiner;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.Miner;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeImpl;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtual;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
+import org.processmining.plugins.inductiveminer2.attributes.virtual.AttributeVirtualTraceDuration;
+
+import gnu.trove.map.hash.THashMap;
 
 public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMinerConfigurationAbstract {
 
@@ -223,6 +230,28 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				new EventAttributeAnalysisTableFactory(), //
 				new CohortAnalysisTableFactory(), //
 		}));
+	}
+
+	@Override
+	protected AttributeVirtualFactory createVirtualAttributes() {
+		return new AttributeVirtualFactory() {
+			public Iterable<AttributeVirtual> createVirtualTraceAttributes(
+					THashMap<String, AttributeImpl> traceAttributesReal,
+					THashMap<String, AttributeImpl> eventAttributesReal) {
+				return new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
+						new AttributeVirtualTraceDuration(), //
+						new IvMAttributeVirtualTraceLength(),//
+				}));
+			}
+
+			public Iterable<AttributeVirtual> createVirtualEventAttributes(
+					THashMap<String, AttributeImpl> traceAttributesReal,
+					THashMap<String, AttributeImpl> eventAttributesReal) {
+				return new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
+						//
+				}));
+			}
+		};
 	}
 
 	@Override

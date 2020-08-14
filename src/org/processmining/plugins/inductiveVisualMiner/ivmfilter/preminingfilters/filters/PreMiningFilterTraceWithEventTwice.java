@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilter
 import org.deckfour.xes.model.XEvent;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 
 public class PreMiningFilterTraceWithEventTwice extends PreMiningFilterTraceWithEvent {
 
@@ -14,13 +13,12 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningFilterTraceWith
 
 	@Override
 	public boolean staysInLog(IMTrace trace) {
-		//TODO: update
 		Attribute attribute = panel.getSelectedAttribute();
 		int count = 0;
 		if (attribute.isLiteral()) {
 			for (XEvent event : trace) {
-				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName()) && panel
-						.getSelectedLiterals().contains(event.getAttributes().get(attribute.getName()).toString())) {
+				String value = attribute.getLiteral(event);
+				if (value != null && panel.getSelectedLiterals().contains(value)) {
 					count++;
 					if (count >= 2) {
 						return true;
@@ -29,25 +27,34 @@ public class PreMiningFilterTraceWithEventTwice extends PreMiningFilterTraceWith
 			}
 		} else if (attribute.isNumeric()) {
 			for (XEvent event : trace) {
-				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName())) {
-					double value = AttributeUtils.parseDoubleFast(event.getAttributes().get(attribute.getName()));
-					if (value >= panel.getSelectedNumericMin() && value <= panel.getSelectedNumericMax()) {
-						count++;
-						if (count >= 2) {
-							return true;
-						}
+				double value = attribute.getNumeric(event);
+				if (value != -Double.MAX_VALUE && value >= panel.getSelectedNumericMin()
+						&& value <= panel.getSelectedNumericMax()) {
+					count++;
+					if (count >= 2) {
+						return true;
 					}
 				}
 			}
 		} else if (attribute.isTime()) {
 			for (XEvent event : trace) {
-				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName())) {
-					long value = AttributeUtils.parseTimeFast(event.getAttributes().get(attribute.getName()));
-					if (value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
-						count++;
-						if (count >= 2) {
-							return true;
-						}
+				long value = attribute.getTime(event);
+				if (value != Long.MIN_VALUE && value >= panel.getSelectedTimeMin()
+						&& value <= panel.getSelectedTimeMax()) {
+					count++;
+					if (count >= 2) {
+						return true;
+					}
+				}
+			}
+		} else if (attribute.isDuration()) {
+			for (XEvent event : trace) {
+				long value = attribute.getDuration(event);
+				if (value != Long.MIN_VALUE && value >= panel.getSelectedTimeMin()
+						&& value <= panel.getSelectedTimeMax()) {
+					count++;
+					if (count >= 2) {
+						return true;
 					}
 				}
 			}

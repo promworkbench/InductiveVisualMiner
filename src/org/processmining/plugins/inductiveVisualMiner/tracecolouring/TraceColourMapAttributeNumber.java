@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 import java.awt.Color;
 
 import org.deckfour.xes.model.XAttributable;
-import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
@@ -11,7 +10,6 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWith
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 
 public class TraceColourMapAttributeNumber implements TraceColourMap {
 
@@ -39,7 +37,7 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 		if (attribute == null) {
 			return RendererFactory.defaultTokenFillColour;
 		} else {
-			double value = AttributeUtils.valueDouble(attribute, trace);
+			double value = attribute.getNumeric(trace);
 			if (value == -Double.MAX_VALUE) {
 				return RendererFactory.defaultTokenFillColour;
 			}
@@ -61,18 +59,18 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 	}
 
 	public String getValue(IvMTrace trace) {
-		XAttribute value = trace.getAttributes().get(attribute.getName());
-		if (value == null) {
+		double value = attribute.getNumeric(trace);
+		if (value == -Double.MAX_VALUE) {
 			return "";
 		}
-		return "\u2588 " + value.toString();
+		return "\u2588 " + value;
 	}
 
 	public String getValue(IMTrace trace) {
-		XAttribute value = trace.getAttributes().get(attribute.getName());
-		if (value == null) {
+		double value = attribute.getNumeric(trace);
+		if (value == -Double.MAX_VALUE) {
 			return "";
 		}
-		return "\u2588 " + value.toString();
+		return "\u2588 " + value;
 	}
 }

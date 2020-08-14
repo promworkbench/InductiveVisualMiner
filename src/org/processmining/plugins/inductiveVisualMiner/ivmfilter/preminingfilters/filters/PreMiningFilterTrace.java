@@ -4,7 +4,6 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class PreMiningFilterTrace extends PreMiningFilterTraceWithEvent {
@@ -13,7 +12,7 @@ public class PreMiningFilterTrace extends PreMiningFilterTraceWithEvent {
 	public String getName() {
 		return "Trace filter";
 	}
-	
+
 	@Override
 	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
 		panel = new AttributeFilterGui(getName(), attributesInfo.getTraceAttributes(), new Runnable() {
@@ -29,33 +28,28 @@ public class PreMiningFilterTrace extends PreMiningFilterTraceWithEvent {
 
 	@Override
 	public boolean staysInLog(IMTrace trace) {
-		//TODO: update
 		Attribute attribute = panel.getSelectedAttribute();
 		if (attribute.isLiteral()) {
-			if (trace.getAttributes() != null && trace.getAttributes().containsKey(attribute.getName()) && panel
-					.getSelectedLiterals().contains(trace.getAttributes().get(attribute.getName()).toString())) {
+			String value = attribute.getLiteral(trace);
+			if (value != null && panel.getSelectedLiterals().contains(value)) {
 				return true;
 			}
 		} else if (attribute.isNumeric()) {
-			if (trace.getAttributes() != null && trace.getAttributes().containsKey(attribute.getName())) {
-				double value = AttributeUtils.parseDoubleFast(trace.getAttributes().get(attribute.getName()));
-				if (value >= panel.getSelectedNumericMin() && value <= panel.getSelectedNumericMax()) {
-					return true;
-				}
+			double value = attribute.getNumeric(trace);
+			if (value != -Double.MAX_VALUE && value >= panel.getSelectedNumericMin()
+					&& value <= panel.getSelectedNumericMax()) {
+				return true;
 			}
 		} else if (attribute.isTime()) {
-			if (trace.getAttributes() != null && trace.getAttributes().containsKey(attribute.getName())) {
-				long value = AttributeUtils.parseTimeFast(trace.getAttributes().get(attribute.getName()));
-				if (value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
-					return true;
-				}
+			long value = attribute.getTime(trace);
+			if (value != Long.MIN_VALUE && value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
+				return true;
 			}
-//		} else if (attribute.isTraceNumberofEvents()) {
-//			int count = trace.size();
-//			return count >= panel.getSelectedTimeMin() && count <= panel.getSelectedTimeMax();
-//		} else if (attribute.isTraceDuration()) {
-//			long duration = TraceColourMapPropertyDuration.getTraceDuration(trace);
-//			return duration >= panel.getSelectedTimeMin() && duration <= panel.getSelectedTimeMax();
+		} else if (attribute.isDuration()) {
+			long value = attribute.getDuration(trace);
+			if (value != Long.MIN_VALUE && value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -63,11 +57,9 @@ public class PreMiningFilterTrace extends PreMiningFilterTraceWithEvent {
 	@Override
 	public void updateExplanation() {
 		if (!isEnabled()) {
-			panel.getExplanationLabel()
-					.setText("Include only traces having an attribute as selected.");
+			panel.getExplanationLabel().setText("Include only traces having an attribute as selected.");
 		} else {
-			panel.getExplanationLabel()
-					.setText("Include only traces " + panel.getExplanation() + ".");
+			panel.getExplanationLabel().setText("Include only traces " + panel.getExplanation() + ".");
 		}
 	}
 }

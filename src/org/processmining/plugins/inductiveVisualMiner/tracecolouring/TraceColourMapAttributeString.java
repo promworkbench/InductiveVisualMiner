@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 import java.awt.Color;
 import java.util.Map;
 
-import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
@@ -24,12 +23,12 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 		trace2colour = new Color[log.size()];
 		for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
 			IvMTrace trace = it.next();
-			XAttribute value = trace.getAttributes().get(attribute.getName());
+			String value = attribute.getLiteral(trace);
 			Color baseColour;
 			if (value == null) {
 				baseColour = RendererFactory.defaultTokenFillColour;
 			} else {
-				baseColour = value2colour.get(value.toString());
+				baseColour = value2colour.get(value);
 			}
 			trace2colour[it.getPosition()] = baseColour;
 		}
@@ -40,36 +39,36 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 	}
 
 	public Color getColour(IMTrace trace) {
-		XAttribute value = trace.getAttributes().get(attribute.getName());
+		String value = attribute.getLiteral(trace);
 		if (value == null) {
 			return RendererFactory.defaultTokenFillColour;
 		} else {
-			return value2colour.get(value.toString());
+			return value2colour.get(value);
 		}
 	}
 
 	public Color getColour(IvMTrace trace) {
-		XAttribute value = trace.getAttributes().get(attribute.getName());
+		String value = attribute.getLiteral(trace);
 		if (value == null) {
 			return RendererFactory.defaultTokenFillColour;
 		} else {
-			return value2colour.get(value.toString());
+			return value2colour.get(value);
 		}
 	}
 
 	public String getValue(IvMTrace trace) {
-		XAttribute value = trace.getAttributes().get(attribute.getName());
+		String value = attribute.getLiteral(trace);
 		if (value == null) {
 			return "";
 		}
-		return "\u2588 " + value.toString();
+		return "\u2588 " + value;
 	}
 
 	public String getValue(IMTrace trace) {
-		XAttribute value = trace.getAttributes().get(attribute.getName());
+		String value = attribute.getLiteral(trace);
 		if (value == null) {
 			return "";
 		}
-		return "\u2588 " + value.toString();
+		return "\u2588 " + value;
 	}
 }

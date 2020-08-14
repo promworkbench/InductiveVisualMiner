@@ -19,6 +19,7 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
 
 public class InductiveVisualMinerConfigurationFake implements InductiveVisualMinerConfiguration {
 
@@ -115,6 +116,10 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 
 	public List<DataAnalysisTableFactory> getDataAnalysisTables() {
 		return phantom.getDataAnalysisTables();
+	}
+
+	public AttributeVirtualFactory getVirtualAttributes() {
+		return phantom.getVirtualAttributes();
 	}
 
 }

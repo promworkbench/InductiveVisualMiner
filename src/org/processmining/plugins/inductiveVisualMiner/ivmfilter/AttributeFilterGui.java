@@ -173,10 +173,9 @@ public class AttributeFilterGui extends IvMFilterGui {
 				//((CardLayout) valueLayout.getLayout()).show(valueLayout, "numeric");
 				valueLiteralSelector.setVisible(false);
 				valueNumericSelector.setVisible(true);
-				//			} else if (getSelectedAttribute().isDuration()) {
-				//TODO: ?
-				//				valueLiteralSelector.setVisible(false);
-				//				valueNumericSelector.setVisible(true);
+			} else if (getSelectedAttribute().isDuration()) {
+				valueLiteralSelector.setVisible(false);
+				valueNumericSelector.setVisible(true);
 				//			} else if (getSelectedAttribute().isTraceDuration()) {
 				//				valueLiteralSelector.setVisible(false);
 				//				valueNumericSelector.setVisible(true);
@@ -281,17 +280,9 @@ public class AttributeFilterGui extends IvMFilterGui {
 		} else if (getSelectedAttribute().isTime()) {
 			return intro + "between " + ResourceTimeUtils.timeToString(getSelectedTimeMin()) + " and "
 					+ ResourceTimeUtils.timeToString(getSelectedTimeMax());
-			//TODO: ?
-			//		} else if (getSelectedAttribute().isDuration()) {
-			//			return intro + "between "
-			//					+ ResourceTimeUtils.getDuration(getSelectedTimeMin()) + " and "
-			//					+ ResourceTimeUtils.getDuration(getSelectedTimeMax());
-			//		} else if (getSelectedAttribute().isTraceDuration()) {
-			//			return "lasting between " + ResourceTimeUtils.getDuration(getSelectedTimeMin()) + " and "
-			//					+ ResourceTimeUtils.getDuration(getSelectedTimeMax());
-			//		} else if (getSelectedAttribute().isTraceNumberofEvents()) {
-			//			return "having between " + numberFormat.format(getSelectedTimeMin()) + " and "
-			//					+ numberFormat.format(getSelectedTimeMax()) + " events";
+		} else if (getSelectedAttribute().isDuration()) {
+			return intro + "between " + ResourceTimeUtils.getDuration(getSelectedTimeMin()) + " and "
+					+ ResourceTimeUtils.getDuration(getSelectedTimeMax());
 		} else {
 			return "blaaaa";
 		}

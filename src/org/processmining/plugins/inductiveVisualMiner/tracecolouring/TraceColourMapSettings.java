@@ -13,7 +13,7 @@ import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 public class TraceColourMapSettings {
 
 	private enum Type {
-		empty, attributeString, attributeNumber, attributeTime, propertyNumberOfEvents, propertyTraceDuration
+		empty, attributeString, attributeNumber, attributeTime, attributeDuration
 	}
 
 	private final Type type;
@@ -32,8 +32,8 @@ public class TraceColourMapSettings {
 	}
 
 	public static TraceColourMapSettings string(Attribute attribute, Map<String, Color> value2colour) {
-		return new TraceColourMapSettings(Type.attributeString, attribute, null, value2colour,
-				-Double.MAX_VALUE, -Double.MAX_VALUE);
+		return new TraceColourMapSettings(Type.attributeString, attribute, null, value2colour, -Double.MAX_VALUE,
+				-Double.MAX_VALUE);
 	}
 
 	public static TraceColourMapSettings number(Attribute attribute, ColourMap colourMap, double min, double max) {
@@ -44,16 +44,12 @@ public class TraceColourMapSettings {
 		return new TraceColourMapSettings(Type.attributeTime, attribute, colourMap, null, min, max);
 	}
 
-	public static TraceColourMapSettings duration(ColourMap colourMap, long min, long max) {
-		return new TraceColourMapSettings(Type.propertyTraceDuration, null, colourMap, null, min, max);
+	public static TraceColourMapSettings duration(Attribute attribute, ColourMap colourMap, long min, long max) {
+		return new TraceColourMapSettings(Type.attributeDuration, null, colourMap, null, min, max);
 	}
 
-	public static TraceColourMapSettings numberOfEvents(ColourMap colourMap, long min, long max) {
-		return new TraceColourMapSettings(Type.propertyNumberOfEvents, null, colourMap, null, min, max);
-	}
-
-	private TraceColourMapSettings(Type type, Attribute attribute, ColourMap colourMap,
-			Map<String, Color> value2colour, double min, double max) {
+	private TraceColourMapSettings(Type type, Attribute attribute, ColourMap colourMap, Map<String, Color> value2colour,
+			double min, double max) {
 		this.type = type;
 		this.attribute = attribute;
 		this.colourMap = colourMap;
@@ -77,12 +73,10 @@ public class TraceColourMapSettings {
 				return new TraceColourMapAttributeString(log, attribute, value2colour);
 			case attributeTime :
 				return new TraceColourMapAttributeTime(log, attribute, colourMap, (long) min, (long) max);
+			case attributeDuration :
+				return new TraceColourMapAttributeDuration(log, attribute, colourMap, (long) min, (long) max);
 			case empty :
 				return new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
-			case propertyNumberOfEvents :
-				return new TraceColourMapPropertyNumberOfEvents(model, log, colourMap, min, max);
-			case propertyTraceDuration :
-				return new TraceColourMapPropertyDuration(model, log, colourMap, min, max);
 			default :
 				return new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
 		}

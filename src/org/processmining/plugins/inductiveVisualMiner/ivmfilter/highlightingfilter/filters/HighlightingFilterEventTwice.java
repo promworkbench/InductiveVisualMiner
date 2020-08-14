@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfil
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 
 public class HighlightingFilterEventTwice extends HighlightingFilterEvent {
 
@@ -13,14 +12,13 @@ public class HighlightingFilterEventTwice extends HighlightingFilterEvent {
 	}
 
 	@Override
-	//TODO: update
 	public boolean countInColouring(IvMTrace trace) {
 		Attribute attribute = panel.getSelectedAttribute();
 		int count = 0;
 		if (attribute.isLiteral()) {
 			for (IvMMove event : trace) {
-				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName()) && panel
-						.getSelectedLiterals().contains(event.getAttributes().get(attribute.getName()).toString())) {
+				String value = attribute.getLiteral(event);
+				if (value != null && panel.getSelectedLiterals().contains(value)) {
 					count++;
 					if (count >= 2) {
 						return true;
@@ -29,25 +27,34 @@ public class HighlightingFilterEventTwice extends HighlightingFilterEvent {
 			}
 		} else if (attribute.isNumeric()) {
 			for (IvMMove event : trace) {
-				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName())) {
-					double value = AttributeUtils.parseDoubleFast(event.getAttributes().get(attribute.getName()));
-					if (value >= panel.getSelectedNumericMin() && value <= panel.getSelectedNumericMax()) {
-						count++;
-						if (count >= 2) {
-							return true;
-						}
+				double value = attribute.getNumeric(event);
+				if (value != -Double.MAX_VALUE && value >= panel.getSelectedNumericMin()
+						&& value <= panel.getSelectedNumericMax()) {
+					count++;
+					if (count >= 2) {
+						return true;
 					}
 				}
 			}
 		} else if (attribute.isTime()) {
 			for (IvMMove event : trace) {
-				if (event.getAttributes() != null && event.getAttributes().containsKey(attribute.getName())) {
-					long value = AttributeUtils.parseTimeFast(event.getAttributes().get(attribute.getName()));
-					if (value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
-						count++;
-						if (count >= 2) {
-							return true;
-						}
+				long value = attribute.getTime(event);
+				if (value != Long.MIN_VALUE && value >= panel.getSelectedTimeMin()
+						&& value <= panel.getSelectedTimeMax()) {
+					count++;
+					if (count >= 2) {
+						return true;
+					}
+				}
+			}
+		} else if (attribute.isDuration()) {
+			for (IvMMove event : trace) {
+				long value = attribute.getDuration(event);
+				if (value != Long.MIN_VALUE && value >= panel.getSelectedTimeMin()
+						&& value <= panel.getSelectedTimeMax()) {
+					count++;
+					if (count >= 2) {
+						return true;
 					}
 				}
 			}

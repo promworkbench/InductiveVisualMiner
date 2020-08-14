@@ -10,18 +10,21 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class Cl01GatherAttributes
-		extends IvMChainLink<XLog, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
+public class Cl01GatherAttributes extends
+		IvMChainLink<Pair<XLog, AttributeVirtualFactory>, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
 
-	protected XLog generateInput(InductiveVisualMinerState state) {
-		return state.getXLog();
+	protected Pair<XLog, AttributeVirtualFactory> generateInput(InductiveVisualMinerState state) {
+		return Pair.of(state.getXLog(), state.getConfiguration().getVirtualAttributes());
 	}
 
-	protected Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]> executeLink(XLog input,
-			IvMCanceller canceller) throws Exception {
-		AttributesInfo info = new AttributesInfo(input);
+	protected Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]> executeLink(
+			Pair<XLog, AttributeVirtualFactory> input, IvMCanceller canceller) throws Exception {
+		XLog log = input.getA();
+		AttributeVirtualFactory virtualAttributes = input.getB();
+		AttributesInfo info = new AttributesInfo(log, virtualAttributes);
 		Collection<Attribute> attributes = info.getEventAttributes();
 
 		String[] names = new String[attributes.size()];
@@ -29,7 +32,7 @@ public class Cl01GatherAttributes
 		for (int i = 0; i < names.length; i++) {
 			names[i] = it.next().getName();
 		}
-		Pair<AttributeClassifier[], AttributeClassifier> p = AttributeClassifiers.getAttributeClassifiers(input, names,
+		Pair<AttributeClassifier[], AttributeClassifier> p = AttributeClassifiers.getAttributeClassifiers(log, names,
 				true);
 		AttributeClassifier[] attributeClassifiers = p.getA();
 		AttributeClassifier firstClassifier = p.getB();

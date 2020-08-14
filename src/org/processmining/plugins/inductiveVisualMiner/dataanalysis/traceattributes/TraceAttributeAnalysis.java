@@ -16,7 +16,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.deckfour.xes.model.XAttribute;
 import org.math.plot.utils.Array;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
@@ -241,9 +240,8 @@ public class TraceAttributeAnalysis {
 			createAttributeDataTime(result, logFiltered, logData, attribute, canceller);
 		} else if (attribute.isLiteral()) {
 			createAttributeDataLiteral(result, logFiltered, logData, attribute, canceller);
-			//TODO: update
-//		} else if (attribute.isDuration()) {
-//			createAttributeDataDuration(result, logFiltered, logData, attribute, canceller);
+		} else if (attribute.isDuration()) {
+			createAttributeDataDuration(result, logFiltered, logData, attribute, canceller);
 		}
 
 		if (canceller.isCancelled()) {
@@ -265,7 +263,7 @@ public class TraceAttributeAnalysis {
 			int i = 0;
 			for (Iterator<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
 				IvMTrace trace = it.next();
-				double value = getDoubleValue(attribute, trace);
+				double value = AttributeUtils.valueDouble(attribute, trace);
 
 				//store the value
 				values[i] = value;
@@ -399,7 +397,7 @@ public class TraceAttributeAnalysis {
 			int i = 0;
 			for (Iterator<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
 				IvMTrace trace = it.next();
-				long value = getLongValue(attribute, trace);
+				long value = AttributeUtils.valueLong(attribute, trace);
 
 				//store the value
 				values[i] = value;
@@ -573,7 +571,7 @@ public class TraceAttributeAnalysis {
 			int i = 0;
 			for (Iterator<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
 				IvMTrace trace = it.next();
-				long value = getLongValue(attribute, trace);
+				long value = AttributeUtils.valueLong(attribute, trace);
 
 				//store the value
 				values[i] = value;
@@ -695,63 +693,11 @@ public class TraceAttributeAnalysis {
 		}
 	}
 
-	public static double getDoubleValue(Attribute attribute, IvMTrace trace) {
-		if (attribute.isVirtual()) {
-			//TODO: ?
-		} else if (attribute.isNumeric()) {
-			XAttribute xAttribute = trace.getAttributes().get(attribute.getName());
-			if (xAttribute == null) {
-				return -Double.MAX_VALUE;
-			}
-			return AttributeUtils.parseDoubleFast(xAttribute);
-		} else if (attribute.isTime()) {
-			XAttribute xAttribute = trace.getAttributes().get(attribute.getName());
-			if (xAttribute == null) {
-				return -Double.MAX_VALUE;
-			}
-			return AttributeUtils.parseTimeFast(xAttribute);
-		}
-		//		if (attribute.isTraceDuration()) {
-		//			long value = TraceColourMapPropertyDuration.getTraceDuration(trace);
-		//			if (value == Long.MIN_VALUE) {
-		//				return -Double.MAX_VALUE;
-		//			}
-		//			return value;
-		//		} else if (attribute.isTraceNumberofEvents()) {
-		//			return trace.getNumberOfEvents();
-		//		}
-		return -Double.MAX_VALUE;
-	}
-
-	public static long getLongValue(Attribute attribute, IvMTrace trace) {
-		if (attribute.isVirtual()) {
-			//TODO: ?
-		} else if (attribute.isNumeric()) {
-			XAttribute xAttribute = trace.getAttributes().get(attribute.getName());
-			if (xAttribute == null) {
-				return Long.MIN_VALUE;
-			}
-			return AttributeUtils.parseLongFast(xAttribute);
-		} else if (attribute.isTime()) {
-			XAttribute xAttribute = trace.getAttributes().get(attribute.getName());
-			if (xAttribute == null) {
-				return Long.MIN_VALUE;
-			}
-			return AttributeUtils.parseTimeFast(xAttribute);
-			//		} else if (attribute.isTraceDuration()) {
-			//			return TraceColourMapPropertyDuration.getTraceDuration(trace);
-			//		} else if (attribute.isTraceNumberofEvents()) {
-			//			return trace.getNumberOfEvents();
-		}
-		return Long.MIN_VALUE;
-	}
-
 	private static double getDoubleMin(Attribute attribute) {
 		if (attribute.isNumeric()) {
 			return attribute.getNumericMin();
-			//TODO: update
-//		} else if (attribute.isDuration()) {
-//			return attribute.getDurationMin();
+		} else if (attribute.isDuration()) {
+			return attribute.getDurationMin();
 		} else {
 			return attribute.getTimeMin();
 		}
@@ -760,9 +706,8 @@ public class TraceAttributeAnalysis {
 	private static double getDoubleMax(Attribute attribute) {
 		if (attribute.isNumeric()) {
 			return attribute.getNumericMax();
-			//TODO: update
-//		} else if (attribute.isDuration()) {
-//			return attribute.getDurationMax();
+		} else if (attribute.isDuration()) {
+			return attribute.getDurationMax();
 		} else {
 			return attribute.getTimeMax();
 		}

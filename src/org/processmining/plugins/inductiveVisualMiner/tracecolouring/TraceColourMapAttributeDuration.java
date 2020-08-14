@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
-public class TraceColourMapAttributeTime implements TraceColourMap {
+public class TraceColourMapAttributeDuration implements TraceColourMap {
 
 	private final Attribute attribute;
 	private final Color[] trace2colour;
@@ -20,7 +20,7 @@ public class TraceColourMapAttributeTime implements TraceColourMap {
 	private final long max;
 	private final ColourMap colourMap;
 
-	public TraceColourMapAttributeTime(IvMLogNotFiltered log, Attribute attribute, ColourMap colourMap, long min,
+	public TraceColourMapAttributeDuration(IvMLogNotFiltered log, Attribute attribute, ColourMap colourMap, long min,
 			long max) {
 		this.attribute = attribute;
 		this.min = min;
@@ -38,7 +38,7 @@ public class TraceColourMapAttributeTime implements TraceColourMap {
 		if (attribute == null) {
 			return RendererFactory.defaultTokenFillColour;
 		} else {
-			long value = attribute.getTime(trace);
+			long value = attribute.getDuration(trace);
 			if (value == Long.MIN_VALUE) {
 				return RendererFactory.defaultTokenFillColour;
 			}
@@ -60,18 +60,19 @@ public class TraceColourMapAttributeTime implements TraceColourMap {
 	}
 
 	public String getValue(IvMTrace trace) {
-		long value = attribute.getTime(trace);
+		long value = attribute.getDuration(trace);
 		if (value != Long.MIN_VALUE) {
 			return "";
 		}
-		return "\u2588 " + ResourceTimeUtils.timeToString(value);
+		return "\u2588 " + ResourceTimeUtils.getDuration(value);
 	}
 
 	public String getValue(IMTrace trace) {
-		long value = attribute.getTime(trace);
+		long value = attribute.getDuration(trace);
 		if (value != Long.MIN_VALUE) {
 			return "";
 		}
-		return "\u2588 " + ResourceTimeUtils.timeToString(value);
+		return "\u2588 " + ResourceTimeUtils.getDuration(value);
 	}
+
 }

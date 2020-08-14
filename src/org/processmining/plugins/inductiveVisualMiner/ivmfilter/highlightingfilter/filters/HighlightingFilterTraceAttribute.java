@@ -4,7 +4,6 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterG
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class HighlightingFilterTraceAttribute extends HighlightingFilterEvent {
@@ -27,34 +26,29 @@ public class HighlightingFilterTraceAttribute extends HighlightingFilterEvent {
 	}
 
 	@Override
-	//TODO: update
 	public boolean countInColouring(IvMTrace trace) {
 		Attribute attribute = panel.getSelectedAttribute();
 		if (attribute.isLiteral()) {
-			if (trace.getAttributes() != null && trace.getAttributes().containsKey(attribute.getName()) && panel
-					.getSelectedLiterals().contains(trace.getAttributes().get(attribute.getName()).toString())) {
+			String value = attribute.getLiteral(trace);
+			if (value != null && panel.getSelectedLiterals().contains(value)) {
 				return true;
 			}
 		} else if (attribute.isNumeric()) {
-			if (trace.getAttributes() != null && trace.getAttributes().containsKey(attribute.getName())) {
-				double value = AttributeUtils.parseDoubleFast(trace.getAttributes().get(attribute.getName()));
-				if (value >= panel.getSelectedNumericMin() && value <= panel.getSelectedNumericMax()) {
-					return true;
-				}
+			double value = attribute.getNumeric(trace);
+			if (value != -Double.MAX_VALUE && value >= panel.getSelectedNumericMin()
+					&& value <= panel.getSelectedNumericMax()) {
+				return true;
 			}
 		} else if (attribute.isTime()) {
-			if (trace.getAttributes() != null && trace.getAttributes().containsKey(attribute.getName())) {
-				long value = AttributeUtils.parseTimeFast(trace.getAttributes().get(attribute.getName()));
-				if (value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
-					return true;
-				}
+			long value = attribute.getTime(trace);
+			if (value != Long.MIN_VALUE && value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
+				return true;
 			}
-//		} else if (attribute.isTraceNumberofEvents()) {
-//			int count = trace.getNumberOfEvents();
-//			return count >= panel.getSelectedTimeMin() && count <= panel.getSelectedTimeMax();
-//		} else if (attribute.isTraceDuration()) {
-//			long duration = TraceColourMapPropertyDuration.getTraceDuration(trace);
-//			return duration >= panel.getSelectedTimeMin() && duration <= panel.getSelectedTimeMax();
+		} else if (attribute.isDuration()) {
+			long value = attribute.getDuration(trace);
+			if (value != Long.MIN_VALUE && value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
+				return true;
+			}
 		}
 		return false;
 	}

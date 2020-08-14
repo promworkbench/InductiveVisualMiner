@@ -15,6 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
 
 /**
  * Use this class to extend the visual Miner:
@@ -87,6 +88,8 @@ public interface InductiveVisualMinerConfiguration {
 	public List<PopupItemLog> getPopupItemsLog();
 
 	public List<DataAnalysisTableFactory> getDataAnalysisTables();
+	
+	public AttributeVirtualFactory getVirtualAttributes();
 
 	/**
 	 * Set up the state that keeps the data related to the visual Miner.

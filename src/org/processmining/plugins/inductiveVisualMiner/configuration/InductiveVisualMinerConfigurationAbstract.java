@@ -18,6 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
+import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
 
 /**
  * IvM configuration that contains the chainlink. To extend, please use the
@@ -43,6 +44,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<DataAnalysisTableFactory> dataAnalyses;
 	private final List<IvMFilter> preMiningFilters;
 	private final List<IvMFilter> highlightingFilters;
+	private final AttributeVirtualFactory virtualAttributeFactory;
 
 	public InductiveVisualMinerConfigurationAbstract(XLog log, ProMCanceller canceller, Executor executor) {
 		discoveryTechniques = createDiscoveryTechniques();
@@ -56,6 +58,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		popupItemsModelMove = createPopupItemsModelMove();
 		popupItemsLog = createPopupItemsLog();
 		dataAnalyses = createDataAnalysisTables();
+		virtualAttributeFactory = createVirtualAttributes();
 
 		state = createState(log);
 		panel = createPanel(canceller);
@@ -91,6 +94,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract Chain<InductiveVisualMinerState> createChain(InductiveVisualMinerState state,
 			InductiveVisualMinerPanel panel, ProMCanceller canceller, Executor executor,
 			List<IvMFilter> preMiningFilters, List<IvMFilter> highlightingFilters);
+	
+	protected abstract AttributeVirtualFactory createVirtualAttributes();
 
 	@Override
 	public final Chain<InductiveVisualMinerState> getChain() {
@@ -172,5 +177,10 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	@Override
 	public List<DataAnalysisTableFactory> getDataAnalysisTables() {
 		return dataAnalyses;
+	}
+
+	@Override
+	public AttributeVirtualFactory getVirtualAttributes() {
+		return virtualAttributeFactory;
 	}
 }
