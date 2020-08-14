@@ -24,7 +24,7 @@ public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 		super(title);
 		panelBefore = new AttributeFilterGui(null, attributesInfo.getEventAttributes(), onUpdate);
 		add(panelBefore);
-		
+
 		add(Box.createVerticalStrut(10));
 
 		{
@@ -40,7 +40,7 @@ public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 
 		add(Box.createVerticalStrut(5));
 
-		int maxTraceLength = (int) attributesInfo.getTraceAttributeValues("number of events").getTimeMax();
+		int maxTraceLength = (int) attributesInfo.getTraceAttributeValues("number of completion events").getNumericMax();
 		inBetweenSelector = new RangeSlider(0, maxTraceLength);
 		inBetweenSelector.setValue(0);
 		inBetweenSelector.setUpperValue(maxTraceLength);
@@ -50,7 +50,7 @@ public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 				onUpdate.run();
 			}
 		});
-		
+
 		add(Box.createVerticalStrut(10));
 
 		panelFollow = new AttributeFilterGui(null, attributesInfo.getEventAttributes(), onUpdate);

@@ -46,7 +46,8 @@ public class HighlightingFilterTraceAttribute extends HighlightingFilterEvent {
 			}
 		} else if (attribute.isDuration()) {
 			long value = attribute.getDuration(trace);
-			if (value != Long.MIN_VALUE && value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
+			if (value != Long.MIN_VALUE && value >= panel.getSelectedDurationMin()
+					&& value <= panel.getSelectedDurationMax()) {
 				return true;
 			}
 		}

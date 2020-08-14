@@ -176,12 +176,6 @@ public class AttributeFilterGui extends IvMFilterGui {
 			} else if (getSelectedAttribute().isDuration()) {
 				valueLiteralSelector.setVisible(false);
 				valueNumericSelector.setVisible(true);
-				//			} else if (getSelectedAttribute().isTraceDuration()) {
-				//				valueLiteralSelector.setVisible(false);
-				//				valueNumericSelector.setVisible(true);
-				//			} else if (getSelectedAttribute().isTraceNumberofEvents()) {
-				//				valueLiteralSelector.setVisible(false);
-				//				valueNumericSelector.setVisible(true);
 			}
 		}
 	}
@@ -227,6 +221,18 @@ public class AttributeFilterGui extends IvMFilterGui {
 	public long getSelectedTimeMax() {
 		return (long) (getSelectedAttribute().getTimeMin()
 				+ (getSelectedAttribute().getTimeMax() - getSelectedAttribute().getTimeMin())
+						* (valueNumericSelector.getUpperValue() / (valueNumericRange * 1.0)));
+	}
+	
+	public long getSelectedDurationMin() {
+		return (long) (getSelectedAttribute().getDurationMin()
+				+ (getSelectedAttribute().getDurationMax() - getSelectedAttribute().getDurationMin())
+						* (valueNumericSelector.getValue() / (valueNumericRange * 1.0)));
+	}
+	
+	public long getSelectedDurationMax() {
+		return (long) (getSelectedAttribute().getDurationMin()
+				+ (getSelectedAttribute().getDurationMax() - getSelectedAttribute().getDurationMin())
 						* (valueNumericSelector.getUpperValue() / (valueNumericRange * 1.0)));
 	}
 
@@ -281,8 +287,8 @@ public class AttributeFilterGui extends IvMFilterGui {
 			return intro + "between " + ResourceTimeUtils.timeToString(getSelectedTimeMin()) + " and "
 					+ ResourceTimeUtils.timeToString(getSelectedTimeMax());
 		} else if (getSelectedAttribute().isDuration()) {
-			return intro + "between " + ResourceTimeUtils.getDuration(getSelectedTimeMin()) + " and "
-					+ ResourceTimeUtils.getDuration(getSelectedTimeMax());
+			return intro + "between " + ResourceTimeUtils.getDuration(getSelectedDurationMin()) + " and "
+					+ ResourceTimeUtils.getDuration(getSelectedDurationMax());
 		} else {
 			return "blaaaa";
 		}

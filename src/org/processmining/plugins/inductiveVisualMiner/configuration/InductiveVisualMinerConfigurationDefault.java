@@ -17,6 +17,8 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
+import org.processmining.plugins.inductiveVisualMiner.attributes.AttributeVirtualTraceDuration;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributeVirtualTraceCompletionEvents;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributeVirtualTraceLength;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01GatherAttributes;
@@ -97,7 +99,6 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.
 import org.processmining.plugins.inductiveminer2.attributes.AttributeImpl;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtual;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
-import org.processmining.plugins.inductiveminer2.attributes.virtual.AttributeVirtualTraceDuration;
 
 import gnu.trove.map.hash.THashMap;
 
@@ -240,7 +241,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					THashMap<String, AttributeImpl> eventAttributesReal) {
 				return new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
 						new AttributeVirtualTraceDuration(), //
-						new IvMAttributeVirtualTraceLength(),//
+						new IvMAttributeVirtualTraceLength(), //
+						new IvMAttributeVirtualTraceCompletionEvents(),//
 				}));
 			}
 

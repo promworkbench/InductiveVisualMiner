@@ -3,45 +3,115 @@ package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
+
+import gnu.trove.map.hash.THashMap;
 
 public class ShortestPathGraph {
 
-	private DefaultDirectedGraph<LocalDotNode, LocalDotEdge> graph = new DefaultDirectedGraph<>(LocalDotEdge.class);
+	private DefaultDirectedGraph<SplitDotNode, SplitDotEdge> graph = new DefaultDirectedGraph<>(SplitDotEdge.class);
+
+	/**
+	 * In some cases, the shortest path between two nodes goes through an other
+	 * activity. Therefore, we add two nodes for each activity to make the path
+	 * through it longer.
+	 * 
+	 * @author sander
+	 *
+	 */
+	private static class SplitDotNode {
+		public SplitDotNode(LocalDotNode node) {
+			this.node = node;
+		}
+
+		LocalDotNode node;
+	}
+
+	private static class SplitDotEdge {
+		public SplitDotEdge(LocalDotEdge edge) {
+			this.edge = edge;
+		}
+
+		public SplitDotEdge() {
+			edge = null;
+		}
+
+		LocalDotEdge edge;
+	}
+
+	private Map<SplitDotNode, LocalDotNode> entryNodes = new THashMap<>();
+	private Map<LocalDotNode, SplitDotNode> entryNodes2 = new THashMap<>();
+	private Map<SplitDotNode, LocalDotNode> exitNodes = new THashMap<>();
+	private Map<LocalDotNode, SplitDotNode> exitNodes2 = new THashMap<>();
 
 	public ShortestPathGraph(Collection<LocalDotNode> nodes, Collection<LocalDotEdge> edges) {
 
 		//add all nodes
 		for (LocalDotNode node : nodes) {
-			graph.addVertex(node);
+			if (node.getType() == NodeType.activity) {
+				SplitDotNode startNode = new SplitDotNode(node);
+				entryNodes.put(startNode, node);
+				entryNodes2.put(node, startNode);
+				graph.addVertex(startNode);
+
+				SplitDotNode endNode = new SplitDotNode(node);
+				entryNodes.put(endNode, node);
+				exitNodes.put(endNode, node);
+				exitNodes2.put(node, endNode);
+				graph.addVertex(endNode);
+
+				graph.addEdge(startNode, endNode, new SplitDotEdge());
+			} else {
+				SplitDotNode splitNode = new SplitDotNode(node);
+				entryNodes.put(splitNode, node);
+				entryNodes2.put(node, splitNode);
+				exitNodes.put(splitNode, node);
+				exitNodes2.put(node, splitNode);
+				graph.addVertex(splitNode);
+			}
 		}
 
 		//add edges
 		for (LocalDotEdge edge : edges) {
-			graph.addEdge(edge.getSource(), edge.getTarget(), edge);
+			LocalDotNode source = edge.getSource();
+			LocalDotNode target = edge.getTarget();
+			SplitDotNode sourceExit = exitNodes2.get(source);
+			SplitDotNode targetEntry = entryNodes2.get(target);
+			graph.addEdge(sourceExit, targetEntry, new SplitDotEdge(edge));
 		}
 	}
 
 	public List<LocalDotEdge> getShortestPath(LocalDotNode from, LocalDotNode to) {
-		
+		SplitDotNode fromExit = exitNodes2.get(from);
+		SplitDotNode toEntry = entryNodes2.get(to);
+
 		if (from == to) {
-			if (graph.containsEdge(from, to)) {
+			if (graph.containsEdge(fromExit, toEntry)) {
 				List<LocalDotEdge> r = new ArrayList<>();
-				r.add(graph.getEdge(from, to));
+				r.add(graph.getEdge(fromExit, toEntry).edge);
 				return r;
 			}
 		}
-		
-		List<LocalDotEdge> path = DijkstraShortestPath.findPathBetween(graph, from, to);
+
+		List<SplitDotEdge> path = DijkstraShortestPath.findPathBetween(graph, fromExit, toEntry);
 
 		if (path == null) {
 			throw new RuntimeException("no path found in animation");
 		}
 
-		return path;
+		List<LocalDotEdge> result = new ArrayList<>();
+		for (SplitDotEdge splitEdge : path) {
+			if (splitEdge != null) {
+				result.add(splitEdge.edge);
+			}
+		}
+
+		return result;
 	}
 }
