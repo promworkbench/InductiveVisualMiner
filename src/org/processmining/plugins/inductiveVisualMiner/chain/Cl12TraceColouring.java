@@ -9,7 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColour
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 
-public class Cl11TraceColouring
+public class Cl12TraceColouring
 		extends IvMChainLink<Triple<IvMModel, IvMLogNotFiltered, TraceColourMapSettings>, TraceColourMap> {
 
 	protected Triple<IvMModel, IvMLogNotFiltered, TraceColourMapSettings> generateInput(

@@ -16,7 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.SVGException;
 
-public class Cl10Animate extends
+public class Cl11Animate extends
 		IvMChainLink<Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMModel>, GraphVizTokens> {
 
 	protected Sextuple<IvMLogNotFiltered, Mode, ProcessTreeVisualisationInfo, SVGDiagram, Scaler, IvMModel> generateInput(

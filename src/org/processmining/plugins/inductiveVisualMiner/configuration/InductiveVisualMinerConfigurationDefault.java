@@ -30,19 +30,19 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActiv
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Mine;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutModel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl07Align;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl08LayoutAlignment;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl08UpdateIvMAttributes;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl09AnimationScaler;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl10Animate;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl11TraceColouring;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl12FilterNodeSelection;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl13Performance;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Histogram;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl15DataAnalysisTrace;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl16DataAnalysisEvent;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl17DataAnalysisCohort;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisLog;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl19Done;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl10AnimationScaler;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Animate;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl12TraceColouring;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Performance;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl16DataAnalysisTrace;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl17DataAnalysisEvent;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisLog;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl20Done;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysisTableFactory;
@@ -115,18 +115,18 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	protected Cl06LayoutModel layoutModel;
 	protected Cl07Align align;
 	protected Cl08UpdateIvMAttributes ivmAttributes;
-	protected Cl08LayoutAlignment layoutAlignment;
-	protected Cl09AnimationScaler animationScaler;
-	protected Cl10Animate animate;
-	protected Cl11TraceColouring traceColouring;
-	protected Cl12FilterNodeSelection filterNodeSelection;
-	protected Cl13Performance performance;
-	protected Cl14Histogram histogram;
-	protected Cl15DataAnalysisTrace dataAnalysisTrace;
-	protected Cl16DataAnalysisEvent dataAnalysisEvent;
-	protected Cl17DataAnalysisCohort dataAnalysisCohort;
-	protected Cl18DataAnalysisLog dataAnalysisLog;
-	protected Cl19Done done;
+	protected Cl09LayoutAlignment layoutAlignment;
+	protected Cl10AnimationScaler animationScaler;
+	protected Cl11Animate animate;
+	protected Cl12TraceColouring traceColouring;
+	protected Cl13FilterNodeSelection filterNodeSelection;
+	protected Cl14Performance performance;
+	protected Cl15Histogram histogram;
+	protected Cl16DataAnalysisTrace dataAnalysisTrace;
+	protected Cl17DataAnalysisEvent dataAnalysisEvent;
+	protected Cl18DataAnalysisCohort dataAnalysisCohort;
+	protected Cl19DataAnalysisLog dataAnalysisLog;
+	protected Cl20Done done;
 
 	public InductiveVisualMinerConfigurationDefault(XLog log, ProMCanceller canceller, Executor executor) {
 		super(log, canceller, executor);
@@ -300,19 +300,19 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		mine = new Cl05Mine();
 		layoutModel = new Cl06LayoutModel();
 		align = new Cl07Align();
-		layoutAlignment = new Cl08LayoutAlignment();
-		animationScaler = new Cl09AnimationScaler();
-		animate = new Cl10Animate();
-		traceColouring = new Cl11TraceColouring();
-		filterNodeSelection = new Cl12FilterNodeSelection();
-		performance = new Cl13Performance();
-		histogram = new Cl14Histogram();
-		dataAnalysisTrace = new Cl15DataAnalysisTrace();
-		dataAnalysisEvent = new Cl16DataAnalysisEvent();
-		dataAnalysisCohort = new Cl17DataAnalysisCohort();
-		dataAnalysisLog = new Cl18DataAnalysisLog();
 		ivmAttributes = new Cl08UpdateIvMAttributes();
-		done = new Cl19Done();
+		layoutAlignment = new Cl09LayoutAlignment();
+		animationScaler = new Cl10AnimationScaler();
+		animate = new Cl11Animate();
+		traceColouring = new Cl12TraceColouring();
+		filterNodeSelection = new Cl13FilterNodeSelection();
+		performance = new Cl14Performance();
+		histogram = new Cl15Histogram();
+		dataAnalysisTrace = new Cl16DataAnalysisTrace();
+		dataAnalysisEvent = new Cl17DataAnalysisEvent();
+		dataAnalysisCohort = new Cl18DataAnalysisCohort();
+		dataAnalysisLog = new Cl19DataAnalysisLog();
+		done = new Cl20Done();
 
 		//gather attributes
 		{
@@ -482,7 +482,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					{
 						Runnable onUpdateHighlighting = new Runnable() {
 							public void run() {
-								chain.execute(Cl12FilterNodeSelection.class);
+								chain.execute(Cl13FilterNodeSelection.class);
 							}
 						};
 
@@ -497,7 +497,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 						Function<TraceColourMapSettings, Object> onUpdateTraceColourMap = new Function<TraceColourMapSettings, Object>() {
 							public Object call(TraceColourMapSettings input) throws Exception {
 								state.setTraceColourMapSettings(input);
-								chain.execute(Cl11TraceColouring.class);
+								chain.execute(Cl12TraceColouring.class);
 								return null;
 							}
 						};

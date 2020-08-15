@@ -23,7 +23,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActiv
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 
-public class Cl13Performance extends
+public class Cl14Performance extends
 		IvMChainLink<Quadruple<IvMModel, IvMLogFiltered, IvMLogInfo, Mode>, Pair<PerformanceWrapper, AlignedLogVisualisationData>> {
 
 	protected Quadruple<IvMModel, IvMLogFiltered, IvMLogInfo, Mode> generateInput(InductiveVisualMinerState state) {

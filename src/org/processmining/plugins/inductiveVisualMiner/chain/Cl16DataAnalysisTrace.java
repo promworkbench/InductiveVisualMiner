@@ -8,7 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 
-public class Cl15DataAnalysisTrace extends
+public class Cl16DataAnalysisTrace extends
 		IvMChainLink<Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, IvMAttributesInfo>, TraceAttributeAnalysis> {
 
 	public String getName() {

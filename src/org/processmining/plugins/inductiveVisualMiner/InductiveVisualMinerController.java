@@ -38,10 +38,10 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActiv
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Mine;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutModel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl07Align;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl08LayoutAlignment;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl10Animate;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl12FilterNodeSelection;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Histogram;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Animate;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
@@ -167,7 +167,7 @@ public class InductiveVisualMinerController {
 			public void componentResized(ComponentEvent e) {
 				//on resize, we have to resize the histogram as well
 				state.setHistogramWidth((int) panel.getGraph().getControlsProgressLine().getWidth());
-				chain.execute(Cl14Histogram.class);
+				chain.execute(Cl15Histogram.class);
 			}
 		});
 
@@ -228,7 +228,7 @@ public class InductiveVisualMinerController {
 		panel.getColourModeSelection().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				state.setMode((Mode) panel.getColourModeSelection().getSelectedItem());
-				chain.execute(Cl08LayoutAlignment.class);
+				chain.execute(Cl09LayoutAlignment.class);
 			}
 		});
 
@@ -236,14 +236,14 @@ public class InductiveVisualMinerController {
 		panel.setOnSelectionChanged(new InputFunction<Selection>() {
 			public void call(Selection input) throws Exception {
 				state.setSelection(input);
-				chain.execute(Cl12FilterNodeSelection.class);
+				chain.execute(Cl13FilterNodeSelection.class);
 			}
 		});
 
 		//graph direction changed
 		panel.setOnGraphDirectionChanged(new Runnable() {
 			public void run() {
-				chain.execute(Cl08LayoutAlignment.class);
+				chain.execute(Cl09LayoutAlignment.class);
 			}
 		});
 
@@ -260,7 +260,7 @@ public class InductiveVisualMinerController {
 				} else {
 					//animation gets enabled
 					state.setAnimationGlobalEnabled(true);
-					chain.execute(Cl10Animate.class);
+					chain.execute(Cl11Animate.class);
 					return true;
 				}
 			}

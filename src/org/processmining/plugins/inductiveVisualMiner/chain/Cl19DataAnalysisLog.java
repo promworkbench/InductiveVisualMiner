@@ -16,7 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
  * @author sander
  *
  */
-public class Cl18DataAnalysisLog
+public class Cl19DataAnalysisLog
 		extends IvMChainLink<Pair<IvMModel, ? extends IvMLogFiltered>, List<Pair<String, DisplayType>>> {
 
 	public String getName() {

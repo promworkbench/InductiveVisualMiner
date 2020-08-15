@@ -2,7 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 
-public class Cl19Done extends IvMChainLink<Object, Object> {
+public class Cl20Done extends IvMChainLink<Object, Object> {
 
 	protected Object generateInput(InductiveVisualMinerState state) {
 		return null;

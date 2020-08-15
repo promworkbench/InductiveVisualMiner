@@ -5,7 +5,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 
-public class Cl09AnimationScaler extends IvMChainLink<IvMLog, Scaler> {
+public class Cl10AnimationScaler extends IvMChainLink<IvMLog, Scaler> {
 
 	protected IvMLog generateInput(InductiveVisualMinerState state) {
 		return state.getIvMLog();
