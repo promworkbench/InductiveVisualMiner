@@ -4,7 +4,7 @@ import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 /**
@@ -16,7 +16,7 @@ import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
  *
  */
 public class Cl08UpdateIvMAttributes extends
-		ChainLink<InductiveVisualMinerState, Triple<IvMLog, AttributesInfo, IvMVirtualAttributeFactory>, IvMAttributesInfo> {
+		ChainLink<InductiveVisualMinerState, Triple<IvMLogNotFiltered, AttributesInfo, IvMVirtualAttributeFactory>, IvMAttributesInfo> {
 
 	public String getName() {
 		return "update IvM attributes";
@@ -26,12 +26,12 @@ public class Cl08UpdateIvMAttributes extends
 		return "updating attributes";
 	}
 
-	protected Triple<IvMLog, AttributesInfo, IvMVirtualAttributeFactory> generateInput(
+	protected Triple<IvMLogNotFiltered, AttributesInfo, IvMVirtualAttributeFactory> generateInput(
 			InductiveVisualMinerState state) {
 		return Triple.of(state.getIvMLog(), state.getAttributesInfo(), state.getConfiguration().getVirtualAttributes());
 	}
 
-	protected IvMAttributesInfo executeLink(Triple<IvMLog, AttributesInfo, IvMVirtualAttributeFactory> input,
+	protected IvMAttributesInfo executeLink(Triple<IvMLogNotFiltered, AttributesInfo, IvMVirtualAttributeFactory> input,
 			IvMCanceller canceller) throws Exception {
 		return new IvMAttributesInfo(input.getA(), input.getB(), input.getC());
 	}
