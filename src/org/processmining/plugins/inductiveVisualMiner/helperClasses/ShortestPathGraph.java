@@ -26,11 +26,7 @@ public class ShortestPathGraph {
 	 *
 	 */
 	private static class SplitDotNode {
-		public SplitDotNode(LocalDotNode node) {
-			this.node = node;
-		}
 
-		LocalDotNode node;
 	}
 
 	private static class SplitDotEdge {
@@ -55,12 +51,12 @@ public class ShortestPathGraph {
 		//add all nodes
 		for (LocalDotNode node : nodes) {
 			if (node.getType() == NodeType.activity) {
-				SplitDotNode startNode = new SplitDotNode(node);
+				SplitDotNode startNode = new SplitDotNode();
 				entryNodes.put(startNode, node);
 				entryNodes2.put(node, startNode);
 				graph.addVertex(startNode);
 
-				SplitDotNode endNode = new SplitDotNode(node);
+				SplitDotNode endNode = new SplitDotNode();
 				entryNodes.put(endNode, node);
 				exitNodes.put(endNode, node);
 				exitNodes2.put(node, endNode);
@@ -68,7 +64,7 @@ public class ShortestPathGraph {
 
 				graph.addEdge(startNode, endNode, new SplitDotEdge());
 			} else {
-				SplitDotNode splitNode = new SplitDotNode(node);
+				SplitDotNode splitNode = new SplitDotNode();
 				entryNodes.put(splitNode, node);
 				entryNodes2.put(node, splitNode);
 				exitNodes.put(splitNode, node);
@@ -90,11 +86,10 @@ public class ShortestPathGraph {
 	public List<LocalDotEdge> getShortestPath(LocalDotNode from, LocalDotNode to) {
 		SplitDotNode fromExit = exitNodes2.get(from);
 		SplitDotNode toEntry = entryNodes2.get(to);
-
+		
 		if (from == to) {
 			if (graph.containsEdge(fromExit, toEntry)) {
 				List<LocalDotEdge> r = new ArrayList<>();
-				r.add(graph.getEdge(fromExit, toEntry).edge);
 				return r;
 			}
 		}
