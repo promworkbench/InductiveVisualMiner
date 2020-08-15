@@ -12,6 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfoImpl;
 
 public class Cl01GatherAttributes extends
 		IvMChainLink<Pair<XLog, AttributeVirtualFactory>, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
@@ -24,9 +25,7 @@ public class Cl01GatherAttributes extends
 			Pair<XLog, AttributeVirtualFactory> input, IvMCanceller canceller) throws Exception {
 		XLog log = input.getA();
 		AttributeVirtualFactory virtualAttributes = input.getB();
-		//TODO: re-enable
-		//AttributesInfo info = new AttributesInfo(log, virtualAttributes);
-		AttributesInfo info = null;
+		AttributesInfo info = new AttributesInfoImpl(log, virtualAttributes);
 		Collection<Attribute> attributes = info.getEventAttributes();
 
 		String[] names = new String[attributes.size()];

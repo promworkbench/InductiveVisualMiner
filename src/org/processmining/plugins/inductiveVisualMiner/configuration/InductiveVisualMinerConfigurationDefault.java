@@ -17,6 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceCompletionEvents;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceDuration;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceFitness;
@@ -99,7 +100,6 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.Miner;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeImpl;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtual;
-import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
 
 import gnu.trove.map.hash.THashMap;
 
@@ -235,8 +235,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	protected AttributeVirtualFactory createVirtualAttributes() {
-		return new AttributeVirtualFactory() {
+	protected IvMVirtualAttributeFactory createVirtualAttributes() {
+		return new IvMVirtualAttributeFactory() {
 			public Iterable<AttributeVirtual> createVirtualTraceAttributes(
 					THashMap<String, AttributeImpl> traceAttributesReal,
 					THashMap<String, AttributeImpl> eventAttributesReal) {
@@ -244,11 +244,26 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 						new VirtualAttributeTraceDuration(), //
 						new VirtualAttributeTraceLength(), //
 						new VirtualAttributeTraceCompletionEvents(), //
-						new VirtualAttributeTraceFitness(), //
 				}));
 			}
 
 			public Iterable<AttributeVirtual> createVirtualEventAttributes(
+					THashMap<String, AttributeImpl> traceAttributesReal,
+					THashMap<String, AttributeImpl> eventAttributesReal) {
+				return new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
+						//
+				}));
+			}
+
+			public Iterable<AttributeVirtual> createVirtualIvMTraceAttributes(
+					THashMap<String, AttributeImpl> traceAttributesReal,
+					THashMap<String, AttributeImpl> eventAttributesReal) {
+				return new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
+						new VirtualAttributeTraceFitness(), //
+				}));
+			}
+
+			public Iterable<AttributeVirtual> createVirtualIvMEventAttributes(
 					THashMap<String, AttributeImpl> traceAttributesReal,
 					THashMap<String, AttributeImpl> eventAttributesReal) {
 				return new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //

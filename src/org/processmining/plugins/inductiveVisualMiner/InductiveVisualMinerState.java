@@ -23,6 +23,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualM
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
@@ -83,11 +84,16 @@ public class InductiveVisualMinerState {
 
 	//==attributes==
 	private AttributesInfo attributesInfo;
+	private IvMAttributesInfo attributesInfoIvM;
 	private AttributeClassifier initialClassifier;
 	private AttributeClassifier[] classifiers;
 
 	public AttributesInfo getAttributesInfo() {
-		return attributesInfo;
+		if (attributesInfoIvM != null) {
+			return attributesInfoIvM;
+		} else {
+			return attributesInfo;
+		}
 	}
 
 	public AttributeClassifier getInitialClassifier() {
@@ -103,6 +109,14 @@ public class InductiveVisualMinerState {
 		attributesInfo = info;
 		this.initialClassifier = initialClassifier;
 		this.classifiers = classifiers;
+	}
+
+	public AttributesInfo getAttributesInfoNonIvM() {
+		return attributesInfo;
+	}
+
+	public void setAttributesInfoIvM(IvMAttributesInfo attributesInfoIvM) {
+		this.attributesInfoIvM = attributesInfoIvM;
 	}
 
 	//==log==

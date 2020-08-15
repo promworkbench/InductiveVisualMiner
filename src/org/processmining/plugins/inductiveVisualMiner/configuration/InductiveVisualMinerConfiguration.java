@@ -5,6 +5,7 @@ import java.util.List;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
@@ -15,7 +16,6 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
-import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
 
 /**
  * Use this class to extend the visual Miner:
@@ -89,7 +89,7 @@ public interface InductiveVisualMinerConfiguration {
 
 	public List<DataAnalysisTableFactory> getDataAnalysisTables();
 	
-	public AttributeVirtualFactory getVirtualAttributes();
+	public IvMVirtualAttributeFactory getVirtualAttributes();
 
 	/**
 	 * Set up the state that keeps the data related to the visual Miner.

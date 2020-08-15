@@ -9,6 +9,7 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
@@ -19,7 +20,6 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
-import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
 
 public class InductiveVisualMinerConfigurationFake implements InductiveVisualMinerConfiguration {
 
@@ -118,7 +118,7 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return phantom.getDataAnalysisTables();
 	}
 
-	public AttributeVirtualFactory getVirtualAttributes() {
+	public IvMVirtualAttributeFactory getVirtualAttributes() {
 		return phantom.getVirtualAttributes();
 	}
 
