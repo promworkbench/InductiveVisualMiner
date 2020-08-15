@@ -571,7 +571,7 @@ public class TraceAttributeAnalysis {
 			int i = 0;
 			for (Iterator<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
 				IvMTrace trace = it.next();
-				long value = AttributeUtils.valueLong(attribute, trace);
+				double value = AttributeUtils.valueDouble(attribute, trace);
 
 				//store the value
 				values[i] = value;
