@@ -565,9 +565,9 @@ public class TraceAttributeAnalysis {
 
 		//compute correlation and plots
 		double[] fitnessFiltered;
-		long[] valuesFiltered;
+		double[] valuesFiltered;
 		{
-			long[] values = new long[logData.numberOfTraces];
+			double[] values = new double[logData.numberOfTraces];
 			int i = 0;
 			for (Iterator<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
 				IvMTrace trace = it.next();
@@ -584,7 +584,7 @@ public class TraceAttributeAnalysis {
 			}
 
 			//filter missing values
-			Pair<long[], double[]> p = Correlation.filterMissingValues(values, logData.fitness);
+			Pair<double[], double[]> p = Correlation.filterMissingValues(values, logData.fitness);
 			valuesFiltered = p.getA();
 			fitnessFiltered = p.getB();
 		}
@@ -683,8 +683,8 @@ public class TraceAttributeAnalysis {
 						}
 
 						BufferedImage plot = CorrelationDensityPlot.create(attribute.getName(), valuesFiltered,
-								((DisplayType.Time) result.get(Field.min)).getValueLong(),
-								((DisplayType.Time) result.get(Field.max)).getValueLong(), "fitness", fitnessFiltered,
+								((DisplayType.Duration) result.get(Field.min)).getValue(),
+								((DisplayType.Duration) result.get(Field.max)).getValue(), "fitness", fitnessFiltered,
 								result.get(Field.minFitness).getValue(), result.get(Field.maxFitness).getValue());
 						result.put(Field.correlationPlot, DisplayType.image(plot));
 					}

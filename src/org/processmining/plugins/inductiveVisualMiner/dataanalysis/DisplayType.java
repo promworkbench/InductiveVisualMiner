@@ -246,7 +246,7 @@ public abstract class DisplayType {
 		}
 
 		public Type getType() {
-			return Type.numeric;
+			return Type.duration;
 		}
 
 	}
