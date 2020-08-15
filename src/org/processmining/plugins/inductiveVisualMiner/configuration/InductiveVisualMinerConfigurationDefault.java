@@ -17,9 +17,10 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
-import org.processmining.plugins.inductiveVisualMiner.attributes.AttributeVirtualTraceDuration;
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributeVirtualTraceCompletionEvents;
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributeVirtualTraceLength;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceCompletionEvents;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceDuration;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceFitness;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceLength;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01GatherAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl02SortEvents;
@@ -240,9 +241,10 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					THashMap<String, AttributeImpl> traceAttributesReal,
 					THashMap<String, AttributeImpl> eventAttributesReal) {
 				return new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
-						new AttributeVirtualTraceDuration(), //
-						new IvMAttributeVirtualTraceLength(), //
-						new IvMAttributeVirtualTraceCompletionEvents(),//
+						new VirtualAttributeTraceDuration(), //
+						new VirtualAttributeTraceLength(), //
+						new VirtualAttributeTraceCompletionEvents(), //
+						new VirtualAttributeTraceFitness(), //
 				}));
 			}
 

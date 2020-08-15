@@ -5,11 +5,11 @@ import org.deckfour.xes.model.XAttributable;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualTraceDurationAbstract;
 
-public class AttributeVirtualTraceDuration extends AttributeVirtualTraceDurationAbstract {
+public class VirtualAttributeTraceDuration extends AttributeVirtualTraceDurationAbstract {
 
 	@Override
 	public String getName() {
-		return "trace duration";
+		return "duration";
 	}
 
 	@Override
