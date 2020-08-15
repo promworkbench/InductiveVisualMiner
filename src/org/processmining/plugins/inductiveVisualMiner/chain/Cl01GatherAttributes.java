@@ -9,22 +9,22 @@ import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeCl
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualFactory;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfoImpl;
 
 public class Cl01GatherAttributes extends
-		IvMChainLink<Pair<XLog, AttributeVirtualFactory>, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
+		IvMChainLink<Pair<XLog, IvMVirtualAttributeFactory>, Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]>> {
 
-	protected Pair<XLog, AttributeVirtualFactory> generateInput(InductiveVisualMinerState state) {
+	protected Pair<XLog, IvMVirtualAttributeFactory> generateInput(InductiveVisualMinerState state) {
 		return Pair.of(state.getXLog(), state.getConfiguration().getVirtualAttributes());
 	}
 
 	protected Triple<AttributesInfo, AttributeClassifier, AttributeClassifier[]> executeLink(
-			Pair<XLog, AttributeVirtualFactory> input, IvMCanceller canceller) throws Exception {
+			Pair<XLog, IvMVirtualAttributeFactory> input, IvMCanceller canceller) throws Exception {
 		XLog log = input.getA();
-		AttributeVirtualFactory virtualAttributes = input.getB();
+		IvMVirtualAttributeFactory virtualAttributes = input.getB();
 		AttributesInfo info = new AttributesInfoImpl(log, virtualAttributes);
 		Collection<Attribute> attributes = info.getEventAttributes();
 
