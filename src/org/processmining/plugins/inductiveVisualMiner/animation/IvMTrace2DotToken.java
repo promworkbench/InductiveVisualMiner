@@ -1,8 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.animation;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.TIntSet;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +18,9 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.processtree.Node;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.TIntSet;
+
 public class IvMTrace2DotToken {
 
 	public static DotToken trace2token(IvMEfficientTree tree, IvMTrace trace, boolean showDeviations,
@@ -31,16 +31,16 @@ public class IvMTrace2DotToken {
 		//copy the trace; remove ignored log moves and everything not start or complete
 		List<IvMMove> copyTrace = new ArrayList<IvMMove>();
 		for (IvMMove t : trace) {
-			if (!t.isIgnoredLogMove()
-					&& !t.isIgnoredModelMove()
-					&& (t.getLifeCycleTransition() == PerformanceTransition.start || t.getLifeCycleTransition() == PerformanceTransition.complete)) {
+			if (!t.isIgnoredLogMove() && !t.isIgnoredModelMove()
+					&& (t.getLifeCycleTransition() == PerformanceTransition.start
+							|| t.getLifeCycleTransition() == PerformanceTransition.complete)) {
 				copyTrace.add(t);
 			}
 		}
 
 		DotToken token = trace2dotToken(tree, copyTrace, Pair.of(info.getSource(), trace.getStartTime()),
-				Pair.of(info.getSink(), trace.getEndTime()), new TIntArrayList(), showDeviations, shortestPath, info,
-				0, scaler);
+				Pair.of(info.getSink(), trace.getEndTime()), new TIntArrayList(), showDeviations, shortestPath, info, 0,
+				scaler);
 
 		//interpolate the missing timestamps from the token
 		DotTokenInterpolate.interpolateToken(info, token);
@@ -108,7 +108,8 @@ public class IvMTrace2DotToken {
 
 					//move to the activity; arrive at the given timestamp
 					LocalDotNode nextDestination = Animation.getDotNodeFromActivity(move, info);
-					List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), nextDestination);
+					List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), nextDestination,
+							true);
 					if (!path.isEmpty()) {
 						for (int j = 0; j < path.size() - 1; j++) {
 							dotToken.addStepOverEdge(path.get(j), null);
@@ -134,7 +135,8 @@ public class IvMTrace2DotToken {
 				//then take the move tau itself
 				LocalDotEdge tauEdge = Animation.getTauEdge(move, info);
 
-				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), tauEdge.getSource());
+				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), tauEdge.getSource(),
+						false);
 				for (LocalDotEdge edge : path) {
 					dotToken.addStepOverEdge(edge, null);
 				}
@@ -151,7 +153,8 @@ public class IvMTrace2DotToken {
 
 				//move from the last known position to the new position
 				//the last edge gets a timestamp
-				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), nextDestination);
+				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), nextDestination,
+						true);
 				if (!path.isEmpty()) {
 					for (int j = 0; j < path.size() - 1; j++) {
 						dotToken.addStepOverEdge(path.get(j), null);
@@ -169,8 +172,8 @@ public class IvMTrace2DotToken {
 				//then take the move edge itself
 				LocalDotEdge moveEdge = Animation.getModelMoveEdge(move, info);
 
-				List<LocalDotEdge> path = shortestPath
-						.getShortestPath(dotToken.getLastPosition(), moveEdge.getSource());
+				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), moveEdge.getSource(),
+						false);
 				for (LocalDotEdge edge : path) {
 					dotToken.addStepOverEdge(edge, null);
 				}
@@ -184,8 +187,8 @@ public class IvMTrace2DotToken {
 
 				//move from the last known position to the start of the move edge,
 				//then take the move edge itself
-				List<LocalDotEdge> path = shortestPath
-						.getShortestPath(dotToken.getLastPosition(), moveEdge.getSource());
+				List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), moveEdge.getSource(),
+						false);
 				for (LocalDotEdge edge : path) {
 					dotToken.addStepOverEdge(edge, null);
 				}
@@ -203,7 +206,8 @@ public class IvMTrace2DotToken {
 		}
 
 		//add path to final destination
-		List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), endPosition.getLeft());
+		List<LocalDotEdge> path = shortestPath.getShortestPath(dotToken.getLastPosition(), endPosition.getLeft(),
+				false);
 		for (int j = 0; j < path.size() - 1; j++) {
 			dotToken.addStepOverEdge(path.get(j), null);
 		}
@@ -237,7 +241,7 @@ public class IvMTrace2DotToken {
 		//move the token up to the parallel split
 		LocalDotNode parallelSplit = Animation.getParallelSplit(enteringParallel, info);
 		{
-			List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), parallelSplit);
+			List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), parallelSplit, false);
 			for (LocalDotEdge edge : path) {
 				token.addStepOverEdge(edge, null);
 			}
@@ -298,7 +302,7 @@ public class IvMTrace2DotToken {
 			ProcessTreeVisualisationInfo info, int indent) {
 		//move the token to the parallel join
 		LocalDotNode parallelJoin = Animation.getParallelJoin(parallel, info);
-		List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), parallelJoin);
+		List<LocalDotEdge> path = shortestPath.getShortestPath(token.getLastPosition(), parallelJoin, false);
 		for (LocalDotEdge edge : path) {
 			token.addStepOverEdge(edge, null);
 		}

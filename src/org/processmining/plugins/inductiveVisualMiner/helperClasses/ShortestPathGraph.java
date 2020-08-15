@@ -83,13 +83,23 @@ public class ShortestPathGraph {
 		}
 	}
 
-	public List<LocalDotEdge> getShortestPath(LocalDotNode from, LocalDotNode to) {
+	public List<LocalDotEdge> getShortestPath(LocalDotNode from, LocalDotNode to, boolean addSelfEdgeIfNecessary) {
 		SplitDotNode fromExit = exitNodes2.get(from);
 		SplitDotNode toEntry = entryNodes2.get(to);
-		
+
 		if (from == to) {
 			if (graph.containsEdge(fromExit, toEntry)) {
 				List<LocalDotEdge> r = new ArrayList<>();
+
+				/*
+				 * Difficult one here: if the token flows over a regular edge
+				 * from a node to itself, then we should add this edge. However,
+				 * if it's a log move, then we should not add it.
+				 */
+				if (addSelfEdgeIfNecessary && graph.containsEdge(fromExit, toEntry)) {
+					r.add(graph.getEdge(fromExit, toEntry).edge);
+				}
+
 				return r;
 			}
 		}

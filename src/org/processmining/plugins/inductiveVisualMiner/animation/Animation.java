@@ -100,8 +100,10 @@ public class Animation {
 		}
 	}
 
-	public static void moveDotTokenTo(Input in, DotToken dotToken, LocalDotNode destination) {
-		List<LocalDotEdge> path = in.shortestPath.getShortestPath(dotToken.getLastPosition(), destination);
+	public static void moveDotTokenTo(Input in, DotToken dotToken, LocalDotNode destination,
+			boolean addSelfEdgeIfNecessary) {
+		List<LocalDotEdge> path = in.shortestPath.getShortestPath(dotToken.getLastPosition(), destination,
+				addSelfEdgeIfNecessary);
 		for (LocalDotEdge edge : path) {
 			dotToken.addStepOverEdge(edge, null);
 		}
@@ -115,7 +117,8 @@ public class Animation {
 	 * @param endPosition
 	 */
 	public static void moveDotTokenToFinalPosition(Animation.Input in, DotToken dotToken, Position endPosition) {
-		List<LocalDotEdge> path = in.shortestPath.getShortestPath(dotToken.getLastPosition(), endPosition.dotNode);
+		List<LocalDotEdge> path = in.shortestPath.getShortestPath(dotToken.getLastPosition(), endPosition.dotNode,
+				false);
 		for (int j = 0; j < path.size() - 1; j++) {
 			dotToken.addStepOverEdge(path.get(j), null);
 		}

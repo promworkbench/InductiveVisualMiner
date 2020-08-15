@@ -119,7 +119,7 @@ public class IvMTrace2dotToken2 {
 			LocalDotNode parallelJoin = Animation.getParallelJoin(enteringParallel, in.info);
 
 			//walk to the parallel split
-			Animation.moveDotTokenTo(in, dotToken, parallelSplit);
+			Animation.moveDotTokenTo(in, dotToken, parallelSplit, false);
 
 			//split the trace: for each parallel one a new trace and sub-token
 			List<List<IvMMove>> subTraces = new ArrayList<>();
@@ -182,7 +182,7 @@ public class IvMTrace2dotToken2 {
 			//this is a model move and we need to visualise it
 			LocalDotEdge moveEdge = Animation.getModelMoveEdge(move, in.info);
 			//walk to the edge
-			Animation.moveDotTokenTo(in, dotToken, moveEdge.getSource());
+			Animation.moveDotTokenTo(in, dotToken, moveEdge.getSource(), false);
 			//take the edge
 			dotToken.addStepOverEdge(moveEdge, null);
 		} else if (in.showDeviations && (move.isLogMove())) {
@@ -190,7 +190,7 @@ public class IvMTrace2dotToken2 {
 			LocalDotEdge moveEdge = Animation.getLogMoveEdge(move.getLogMoveUnode(), move.getLogMoveBeforeChild(),
 					in.info);
 			//walk to the edge
-			Animation.moveDotTokenTo(in, dotToken, moveEdge.getSource());
+			Animation.moveDotTokenTo(in, dotToken, moveEdge.getSource(), false);
 			//take the edge
 			dotToken.addStepOverEdge(moveEdge, null);
 		} else if (move.isModelSync()) {
@@ -198,14 +198,14 @@ public class IvMTrace2dotToken2 {
 			if (in.model.isTau(move.getTreeNode())) {
 				//tau
 				LocalDotEdge tauEdge = Animation.getTauEdge(move, in.info);
-				Animation.moveDotTokenTo(in, dotToken, tauEdge.getSource());
+				Animation.moveDotTokenTo(in, dotToken, tauEdge.getSource(), false);
 				dotToken.addStepOverEdge(tauEdge, null);
 			} else {
 				//activity
 				LocalDotNode destination = Animation.getDotNodeFromActivity(move, in.info);
 
 				if (!move.isStart()) {
-					Animation.moveDotTokenTo(in, dotToken, destination);
+					Animation.moveDotTokenTo(in, dotToken, destination, true);
 					dotToken.addStepInNode(destination, move.getUserTimestamp(in.scaler));
 				}
 			}
