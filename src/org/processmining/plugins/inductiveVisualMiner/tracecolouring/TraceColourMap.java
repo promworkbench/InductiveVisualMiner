@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 
 import java.awt.Color;
 
-import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 /**
@@ -32,13 +31,6 @@ public interface TraceColourMap {
 	 * @param trace
 	 * @return The colour of a trace.
 	 */
-	public Color getColour(IMTrace trace);
-
-	/**
-	 * 
-	 * @param trace
-	 * @return The colour of a trace.
-	 */
 	public Color getColour(IvMTrace trace);
 
 	/**
@@ -49,14 +41,5 @@ public interface TraceColourMap {
 	 * @return The value on which the colour is to be computed.
 	 */
 	public String getValue(IvMTrace trace);
-
-	/**
-	 * This method is less critical than getColour() and is not executed in the
-	 * animation thread.
-	 * 
-	 * @param trace
-	 * @return The value on which the colour is to be computed.
-	 */
-	public String getValue(IMTrace trace);
 
 }

@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 import java.awt.Color;
 import java.util.Map;
 
-import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -38,15 +37,6 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 		return trace2colour[traceIndex];
 	}
 
-	public Color getColour(IMTrace trace) {
-		String value = attribute.getLiteral(trace);
-		if (value == null) {
-			return RendererFactory.defaultTokenFillColour;
-		} else {
-			return value2colour.get(value);
-		}
-	}
-
 	public Color getColour(IvMTrace trace) {
 		String value = attribute.getLiteral(trace);
 		if (value == null) {
@@ -57,14 +47,6 @@ public class TraceColourMapAttributeString implements TraceColourMap {
 	}
 
 	public String getValue(IvMTrace trace) {
-		String value = attribute.getLiteral(trace);
-		if (value == null) {
-			return "";
-		}
-		return "\u2588 " + value;
-	}
-
-	public String getValue(IMTrace trace) {
 		String value = attribute.getLiteral(trace);
 		if (value == null) {
 			return "";

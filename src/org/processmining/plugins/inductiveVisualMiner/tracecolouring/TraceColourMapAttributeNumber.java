@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.tracecolouring;
 import java.awt.Color;
 
 import org.deckfour.xes.model.XAttributable;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
@@ -50,23 +49,11 @@ public class TraceColourMapAttributeNumber implements TraceColourMap {
 		return trace2colour[traceIndex];
 	}
 
-	public Color getColour(IMTrace trace) {
-		return attributeValue2colour(attribute, trace);
-	}
-
 	public Color getColour(IvMTrace trace) {
 		return attributeValue2colour(attribute, trace);
 	}
 
 	public String getValue(IvMTrace trace) {
-		double value = attribute.getNumeric(trace);
-		if (value == -Double.MAX_VALUE) {
-			return "";
-		}
-		return "\u2588 " + value;
-	}
-
-	public String getValue(IMTrace trace) {
 		double value = attribute.getNumeric(trace);
 		if (value == -Double.MAX_VALUE) {
 			return "";
