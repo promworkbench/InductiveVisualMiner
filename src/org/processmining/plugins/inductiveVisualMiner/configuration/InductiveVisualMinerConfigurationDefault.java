@@ -31,6 +31,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Mine;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutModel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl07Align;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl08LayoutAlignment;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl08UpdateIvMAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl09AnimationScaler;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl10Animate;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl11TraceColouring;
@@ -48,7 +49,8 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattribut
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCohort;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCompleteEventTwice;
@@ -112,6 +114,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	protected Cl05Mine mine;
 	protected Cl06LayoutModel layoutModel;
 	protected Cl07Align align;
+	protected Cl08UpdateIvMAttributes ivmAttributes;
 	protected Cl08LayoutAlignment layoutAlignment;
 	protected Cl09AnimationScaler animationScaler;
 	protected Cl10Animate animate;
@@ -308,6 +311,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		dataAnalysisEvent = new Cl16DataAnalysisEvent();
 		dataAnalysisCohort = new Cl17DataAnalysisCohort();
 		dataAnalysisLog = new Cl18DataAnalysisLog();
+		ivmAttributes = new Cl08UpdateIvMAttributes();
 		done = new Cl19Done();
 
 		//gather attributes
@@ -326,21 +330,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 								chain.execute(Cl04FilterLogOnActivities.class);
 							}
 						};
-						Runnable onUpdateHighlighting = new Runnable() {
-							public void run() {
-								chain.execute(Cl12FilterNodeSelection.class);
-							}
-						};
-						Function<TraceColourMapSettings, Object> onUpdateTraceColourMap = new Function<TraceColourMapSettings, Object>() {
-							public Object call(TraceColourMapSettings input) throws Exception {
-								state.setTraceColourMapSettings(input);
-								chain.execute(Cl11TraceColouring.class);
-								return null;
-							}
-						};
-						state.setFiltersController(new IvMFiltersController(preMiningFilters, highlightingFilters,
-								state, panel, onUpdatePreMining, onUpdateHighlighting));
-						panel.getTraceColourMapView().initialise(state.getAttributesInfo(), onUpdateTraceColourMap);
+						state.setPreMiningFiltersController(
+								new IvMPreMiningFiltersController(preMiningFilters, state, panel, onUpdatePreMining));
 					}
 				}
 			});
@@ -393,8 +384,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				public void run() {
 					panel.getTraceView().set(state.getLog(), state.getTraceColourMap());
 
-					state.getFiltersController().updateFiltersWithIMLog(panel, state.getLog(), state.getSortedXLog(),
-							executor);
+					state.getPreMiningFiltersController().updateFiltersWithIMLog(panel, state.getLog(),
+							state.getSortedXLog(), executor);
 				}
 			});
 
@@ -445,8 +436,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 							state.getTraceColourMap());
 
 					PopupPopulator.updatePopup(panel, state);
-
-					state.getFiltersController().updateFiltersWithIvMLog(panel, state.getIvMLog(), executor);
 				}
 			});
 			align.setOnInvalidate(new Runnable() {
@@ -483,6 +472,40 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 			chain.addConnection(layoutModel, layoutAlignment);
 			chain.addConnection(align, layoutAlignment);
+		}
+
+		//ivm attributes
+		{
+			ivmAttributes.setOnComplete(new Runnable() {
+				public void run() {
+					//initialise highlighting filters
+					{
+						Runnable onUpdateHighlighting = new Runnable() {
+							public void run() {
+								chain.execute(Cl12FilterNodeSelection.class);
+							}
+						};
+
+						state.setHighlightingFiltersController(new IvMHighlightingFiltersController(highlightingFilters,
+								state, panel, onUpdateHighlighting));
+						state.getHighlightingFiltersController().updateFiltersWithIvMLog(panel, state.getIvMLog(),
+								executor);
+					}
+
+					//initialise trace colour map
+					{
+						Function<TraceColourMapSettings, Object> onUpdateTraceColourMap = new Function<TraceColourMapSettings, Object>() {
+							public Object call(TraceColourMapSettings input) throws Exception {
+								state.setTraceColourMapSettings(input);
+								chain.execute(Cl11TraceColouring.class);
+								return null;
+							}
+						};
+						panel.getTraceColourMapView().initialise(state.getAttributesInfoIvM(), onUpdateTraceColourMap);
+					}
+				}
+			});
+			chain.addConnection(align, ivmAttributes);
 		}
 
 		//animation scaler
@@ -544,7 +567,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				}
 			});
 
-			chain.addConnection(align, traceColouring);
+			chain.addConnection(ivmAttributes, traceColouring);
 		}
 
 		//filter node selection
@@ -552,7 +575,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			filterNodeSelection.setOnComplete(new Runnable() {
 				public void run() {
 					HighlightingFiltersView.updateSelectionDescription(panel, state.getSelection(),
-							state.getFiltersController(), state.getModel());
+							state.getHighlightingFiltersController(), state.getModel());
 
 					//tell trace view the colour map and the selection
 					panel.getTraceView().set(state.getModel(), state.getIvMLogFiltered(), state.getSelection(),
@@ -577,6 +600,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			});
 
 			chain.addConnection(layoutAlignment, filterNodeSelection);
+			chain.addConnection(ivmAttributes, filterNodeSelection);
 		}
 
 		//mine performance

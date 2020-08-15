@@ -22,6 +22,7 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
@@ -29,7 +30,6 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.SwitchPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeKey;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 import gnu.trove.map.hash.THashMap;
 
@@ -146,7 +146,7 @@ public class TraceColourMapView extends SideWindow {
 		}
 	}
 
-	public void initialise(AttributesInfo attributesInfo,
+	public void initialise(IvMAttributesInfo attributesInfo,
 			final Function<TraceColourMapSettings, Object> onUpdateTraceColourMap) {
 		onUpdate = onUpdateTraceColourMap;
 
@@ -237,7 +237,7 @@ public class TraceColourMapView extends SideWindow {
 		} else if (attribute.isDuration()) {
 			//this is a time attribute; divide it in 7 parts
 			ColourMap colourMap = TraceColourMapSettings.getColourMap();
-			updateProperty(colourMap, attribute.getDurationMin(), attribute.getDurationMax(), false, true);
+			updateProperty(colourMap, attribute.getDurationMin(), attribute.getDurationMax(), true, false);
 			onUpdate.call(TraceColourMapSettings.duration(attribute, colourMap, attribute.getDurationMin(),
 					attribute.getDurationMax()));
 		}

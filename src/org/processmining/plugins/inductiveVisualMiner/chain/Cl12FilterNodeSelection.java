@@ -9,7 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -17,21 +17,21 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public class Cl12FilterNodeSelection extends
-		IvMChainLink<Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMModel>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
+		IvMChainLink<Quintuple<IvMLogNotFiltered, Selection, IvMHighlightingFiltersController, IvMLogInfo, IvMModel>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
 
-	protected Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMModel> generateInput(
+	protected Quintuple<IvMLogNotFiltered, Selection, IvMHighlightingFiltersController, IvMLogInfo, IvMModel> generateInput(
 			InductiveVisualMinerState state) {
-		return Quintuple.of(state.getIvMLog(), state.getSelection(), state.getFiltersController(),
+		return Quintuple.of(state.getIvMLog(), state.getSelection(), state.getHighlightingFiltersController(),
 				state.getIvMLogInfo(), state.getModel());
 	}
 
 	protected Pair<IvMLogFilteredImpl, IvMLogInfo> executeLink(
-			Quintuple<IvMLogNotFiltered, Selection, IvMFiltersController, IvMLogInfo, IvMModel> input,
+			Quintuple<IvMLogNotFiltered, Selection, IvMHighlightingFiltersController, IvMLogInfo, IvMModel> input,
 			IvMCanceller canceller) {
 
 		IvMLogNotFiltered logBase = input.getA();
 		Selection selection = input.getB();
-		IvMFiltersController highLightingFilters = input.getC();
+		IvMHighlightingFiltersController highLightingFilters = input.getC();
 		IvMLogInfo oldLogInfo = input.getD();
 		IvMModel model = input.getE();
 

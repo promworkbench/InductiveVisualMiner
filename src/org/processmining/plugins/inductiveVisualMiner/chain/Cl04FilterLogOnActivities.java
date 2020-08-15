@@ -10,20 +10,21 @@ import org.processmining.plugins.InductiveMiner.dfgOnly.log2logInfo.IMLog2IMLogI
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
 
 public class Cl04FilterLogOnActivities extends
-		IvMChainLink<Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMFiltersController>, Triple<IMLog, IMLogInfo, Set<XEventClass>>> {
+		IvMChainLink<Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMPreMiningFiltersController>, Triple<IMLog, IMLogInfo, Set<XEventClass>>> {
 
-	protected Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMFiltersController> generateInput(
+	protected Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMPreMiningFiltersController> generateInput(
 			InductiveVisualMinerState state) {
 		return Quintuple.of(state.getLog(), state.getLogInfo(), state.getActivitiesThreshold(),
-				state.getMiner().getLog2logInfo(), state.getFiltersController());
+				state.getMiner().getLog2logInfo(), state.getPreMiningFiltersController());
 	}
 
 	protected Triple<IMLog, IMLogInfo, Set<XEventClass>> executeLink(
-			Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMFiltersController> input, IvMCanceller canceller) {
+			Quintuple<IMLog, IMLogInfo, Double, IMLog2IMLogInfo, IvMPreMiningFiltersController> input,
+			IvMCanceller canceller) {
 		if (input.getE().isAPreMiningFilterEnabled() || input.getC() < 1.0) {
 			IMLog newLog = input.getA().clone();
 			Set<XEventClass> removedActivities = new HashSet<>();

@@ -61,7 +61,7 @@ public class TraceColourMapAttributeDuration implements TraceColourMap {
 
 	public String getValue(IvMTrace trace) {
 		long value = attribute.getDuration(trace);
-		if (value != Long.MIN_VALUE) {
+		if (value == Long.MIN_VALUE) {
 			return "";
 		}
 		return "\u2588 " + ResourceTimeUtils.getDuration(value);
@@ -69,7 +69,7 @@ public class TraceColourMapAttributeDuration implements TraceColourMap {
 
 	public String getValue(IMTrace trace) {
 		long value = attribute.getDuration(trace);
-		if (value != Long.MIN_VALUE) {
+		if (value == Long.MIN_VALUE) {
 			return "";
 		}
 		return "\u2588 " + ResourceTimeUtils.getDuration(value);

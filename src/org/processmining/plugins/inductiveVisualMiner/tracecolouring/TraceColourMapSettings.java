@@ -45,7 +45,7 @@ public class TraceColourMapSettings {
 	}
 
 	public static TraceColourMapSettings duration(Attribute attribute, ColourMap colourMap, long min, long max) {
-		return new TraceColourMapSettings(Type.attributeDuration, null, colourMap, null, min, max);
+		return new TraceColourMapSettings(Type.attributeDuration, attribute, colourMap, null, min, max);
 	}
 
 	private TraceColourMapSettings(Type type, Attribute attribute, ColourMap colourMap, Map<String, Color> value2colour,

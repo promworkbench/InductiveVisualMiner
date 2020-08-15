@@ -2,27 +2,27 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class Cl16DataAnalysisEvent extends
-		IvMChainLink<Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, AttributesInfo>, EventAttributeAnalysis> {
+		IvMChainLink<Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, IvMAttributesInfo>, EventAttributeAnalysis> {
 
 	public String getName() {
 		return "data analysis - events";
 	}
 
-	protected Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, AttributesInfo> generateInput(
+	protected Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, IvMAttributesInfo> generateInput(
 			InductiveVisualMinerState state) {
 		return Quadruple.of(state.getModel(), state.getIvMLog(), (IvMLogFiltered) state.getIvMLogFiltered(),
-				state.getAttributesInfo());
+				state.getAttributesInfoIvM());
 	}
 
 	protected EventAttributeAnalysis executeLink(
-			Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, AttributesInfo> input, IvMCanceller canceller)
+			Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, IvMAttributesInfo> input, IvMCanceller canceller)
 			throws Exception {
 		return new EventAttributeAnalysis(input.getA(), input.getB(), input.getC(), input.getD(), canceller);
 	}

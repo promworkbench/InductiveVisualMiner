@@ -71,9 +71,6 @@ class TraceBuilderIvMLog extends TraceBuilderWrapper {
 		}
 
 		public String getInfo() {
-			if (traceColourMap == null) {
-				return "";
-			}
 			String s = traceColourMap.getValue((trace));
 			if (s.length() > 9) {
 				return s.substring(0, 7) + "..";

@@ -5,8 +5,8 @@ import java.awt.Component;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 
 import gnu.trove.iterator.TIntIterator;
 
@@ -30,7 +30,7 @@ public class HighlightingFiltersView extends IvMFiltersView {
 	 * @param numberOfTraces
 	 */
 	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Selection selection,
-			IvMFiltersController filters, IvMModel model) {
+			IvMHighlightingFiltersController filters, IvMModel model) {
 		//show the user which traces are shown
 
 		StringBuilder result = new StringBuilder();

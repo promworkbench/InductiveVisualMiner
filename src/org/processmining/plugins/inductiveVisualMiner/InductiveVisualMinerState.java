@@ -29,7 +29,8 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattribut
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -89,11 +90,7 @@ public class InductiveVisualMinerState {
 	private AttributeClassifier[] classifiers;
 
 	public AttributesInfo getAttributesInfo() {
-		if (attributesInfoIvM != null) {
-			return attributesInfoIvM;
-		} else {
-			return attributesInfo;
-		}
+		return attributesInfo;
 	}
 
 	public AttributeClassifier getInitialClassifier() {
@@ -111,8 +108,14 @@ public class InductiveVisualMinerState {
 		this.classifiers = classifiers;
 	}
 
-	public AttributesInfo getAttributesInfoNonIvM() {
-		return attributesInfo;
+	/**
+	 * The IvM attributes may include virtual attributes that are only defined
+	 * on an IvMLog (=aligned log).
+	 * 
+	 * @return
+	 */
+	public IvMAttributesInfo getAttributesInfoIvM() {
+		return attributesInfoIvM;
 	}
 
 	public void setAttributesInfoIvM(IvMAttributesInfo attributesInfoIvM) {
@@ -202,14 +205,23 @@ public class InductiveVisualMinerState {
 	}
 
 	//==filters==
-	private IvMFiltersController filtersController;
+	private IvMPreMiningFiltersController preMiningFiltersController;
+	private IvMHighlightingFiltersController highlightingFiltersController;
 
-	public IvMFiltersController getFiltersController() {
-		return filtersController;
+	public IvMPreMiningFiltersController getPreMiningFiltersController() {
+		return preMiningFiltersController;
 	}
 
-	public void setFiltersController(IvMFiltersController filtersController) {
-		this.filtersController = filtersController;
+	public void setPreMiningFiltersController(IvMPreMiningFiltersController filtersController) {
+		this.preMiningFiltersController = filtersController;
+	}
+
+	public IvMHighlightingFiltersController getHighlightingFiltersController() {
+		return highlightingFiltersController;
+	}
+
+	public void setHighlightingFiltersController(IvMHighlightingFiltersController filtersController) {
+		this.highlightingFiltersController = filtersController;
 	}
 
 	//==activity-filtered log==
