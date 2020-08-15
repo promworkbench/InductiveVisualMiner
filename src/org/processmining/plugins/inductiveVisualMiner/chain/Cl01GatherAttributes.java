@@ -24,7 +24,9 @@ public class Cl01GatherAttributes extends
 			Pair<XLog, AttributeVirtualFactory> input, IvMCanceller canceller) throws Exception {
 		XLog log = input.getA();
 		AttributeVirtualFactory virtualAttributes = input.getB();
-		AttributesInfo info = new AttributesInfo(log, virtualAttributes);
+		//TODO: re-enable
+		//AttributesInfo info = new AttributesInfo(log, virtualAttributes);
+		AttributesInfo info = null;
 		Collection<Attribute> attributes = info.getEventAttributes();
 
 		String[] names = new String[attributes.size()];
