@@ -15,7 +15,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.deckfour.xes.model.XAttribute;
 import org.math.plot.utils.Array;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
@@ -127,8 +126,22 @@ public class EventAttributeAnalysis {
 				new ThreadFactoryBuilder().setNameFormat("ivm-thread-eventdataanalysis-%d").build());
 		try {
 			for (Attribute attribute : attributes.getEventAttributes()) {
-				if (isSupported(attribute)) {
-					final Attribute attribute2 = attribute;
+				final Attribute attribute2 = attribute;
+				executor.execute(new Runnable() {
+					public void run() {
+
+						if (canceller.isCancelled()) {
+							return;
+						}
+
+						EnumMap<Field, DisplayType> data = createAttributeData(logFiltered, attribute2, canceller);
+						if (data != null) {
+							attribute2dataC.put(attribute2, data);
+						}
+					}
+				});
+
+				if (isSomethingFiltered) {
 					executor.execute(new Runnable() {
 						public void run() {
 
@@ -136,29 +149,13 @@ public class EventAttributeAnalysis {
 								return;
 							}
 
-							EnumMap<Field, DisplayType> data = createAttributeData(logFiltered, attribute2, canceller);
-							if (data != null) {
-								attribute2dataC.put(attribute2, data);
+							EnumMap<Field, DisplayType> dataNegative = createAttributeData(logFilteredNegative,
+									attribute2, canceller);
+							if (dataNegative != null) {
+								attribute2dataNegativeC.put(attribute2, dataNegative);
 							}
 						}
 					});
-
-					if (isSomethingFiltered) {
-						executor.execute(new Runnable() {
-							public void run() {
-
-								if (canceller.isCancelled()) {
-									return;
-								}
-
-								EnumMap<Field, DisplayType> dataNegative = createAttributeData(logFilteredNegative,
-										attribute2, canceller);
-								if (dataNegative != null) {
-									attribute2dataNegativeC.put(attribute2, dataNegative);
-								}
-							}
-						});
-					}
 				}
 			}
 
@@ -201,6 +198,8 @@ public class EventAttributeAnalysis {
 			createAttributeDataTime(result, logFiltered, attribute, canceller);
 		} else if (attribute.isLiteral()) {
 			createAttributeDataLiteral(result, logFiltered, attribute, canceller);
+		} else if (attribute.isDuration()) {
+			createAttributeDataDuration(result, logFiltered, attribute, canceller);
 		}
 
 		if (canceller.isCancelled()) {
@@ -300,7 +299,7 @@ public class EventAttributeAnalysis {
 
 				for (IvMMove move : trace) {
 					if (move.getAttributes() != null) {
-						long value = getLongValue(attribute, move);
+						long value = AttributeUtils.valueLong(attribute, move);
 						if (value != Long.MIN_VALUE) {
 							values.add(value);
 							traceHasEvent = true;
@@ -375,7 +374,7 @@ public class EventAttributeAnalysis {
 
 			if (result.get(Field.min).getValue() != result.get(Field.max).getValue()) {
 				double standardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
-				result.put(Field.standardDeviation, DisplayType.duration(standardDeviation));
+				result.put(Field.standardDeviation, DisplayType.duration(Math.round(standardDeviation)));
 			} else {
 				result.put(Field.standardDeviation, DisplayType.NA());
 			}
@@ -401,7 +400,7 @@ public class EventAttributeAnalysis {
 
 				for (IvMMove move : trace) {
 					if (move.getAttributes() != null) {
-						double value = getDoubleValue(attribute, move);
+						double value = AttributeUtils.valueDouble(attribute, move);
 						if (value != -Double.MAX_VALUE) {
 							values.add(value);
 							traceHasEvent = true;
@@ -484,38 +483,104 @@ public class EventAttributeAnalysis {
 		}
 	}
 
-	private static boolean isSupported(Attribute attribute) {
-		return attribute.isNumeric() || attribute.isTime() || attribute.isLiteral();
-	}
+	private void createAttributeDataDuration(EnumMap<Field, DisplayType> result, IvMLogFiltered logFiltered,
+			Attribute attribute, IvMCanceller canceller) {
+		Type attributeType = Type.duration;
 
-	public static double getDoubleValue(Attribute attribute, IvMMove move) {
-		if (attribute.isNumeric() || attribute.isTime()) {
-			XAttribute xAttribute = move.getAttributes().get(attribute.getName());
-			if (xAttribute == null) {
-				return -Double.MAX_VALUE;
+		//gather values
+		long[] valuesFiltered;
+		int numberOfTracesWithEventWithAttribute = 0;
+		int numberOfEventsWithoutAttribute = 0;
+		int numberOfTracesWithoutEventWithAttribute = 0;
+		{
+			TLongArrayList values = new TLongArrayList();
+			for (IteratorWithPosition<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
+				IvMTrace trace = it.next();
+
+				boolean traceHasEvent = false;
+				boolean traceHasEventWithout = false;
+
+				for (IvMMove move : trace) {
+					if (move.getAttributes() != null) {
+						long value = AttributeUtils.valueLong(attribute, move);
+						if (value != Long.MIN_VALUE) {
+							values.add(value);
+							traceHasEvent = true;
+						} else {
+							traceHasEventWithout = true;
+							numberOfEventsWithoutAttribute++;
+						}
+					}
+				}
+
+				if (traceHasEvent) {
+					numberOfTracesWithEventWithAttribute++;
+				}
+				if (traceHasEventWithout) {
+					numberOfTracesWithoutEventWithAttribute++;
+				}
 			}
-			if (attribute.isNumeric()) {
-				return AttributeUtils.parseDoubleFast(xAttribute);
-			} else if (attribute.isTime()) {
-				return AttributeUtils.parseTimeFast(xAttribute);
+
+			if (canceller.isCancelled()) {
+				return;
+			}
+
+			valuesFiltered = values.toArray();
+		}
+
+		if (canceller.isCancelled()) {
+			return;
+		}
+
+		result.put(Field.numberOfEventsWithAttribute, DisplayType.numeric(valuesFiltered.length));
+
+		result.put(Field.numberOfTracesWithEventWithAttribute,
+				DisplayType.numeric(numberOfTracesWithEventWithAttribute));
+
+		result.put(Field.numberOfEventsWithoutAttribute, DisplayType.numeric(numberOfEventsWithoutAttribute));
+
+		result.put(Field.numberOfTracesWithEventWithoutAttribute,
+				DisplayType.numeric(numberOfTracesWithoutEventWithAttribute));
+
+		//if the list is empty, better fail now and do not attempt the rest
+		if (valuesFiltered.length == 0) {
+			result.put(Field.min, DisplayType.NA());
+			result.put(Field.average, DisplayType.NA());
+			result.put(Field.median, DisplayType.NA());
+			result.put(Field.max, DisplayType.NA());
+			result.put(Field.standardDeviation, DisplayType.NA());
+		} else {
+			result.put(Field.min, DisplayType.create(attributeType, NumberUtils.min(valuesFiltered)));
+
+			if (canceller.isCancelled()) {
+				return;
+			}
+
+			BigDecimal valuesAverage = Correlation.mean(valuesFiltered);
+			result.put(Field.average, DisplayType.create(attributeType, Math.round(valuesAverage.doubleValue())));
+
+			if (canceller.isCancelled()) {
+				return;
+			}
+
+			result.put(Field.median, DisplayType.create(attributeType, Math.round(Correlation.median(valuesFiltered))));
+
+			if (canceller.isCancelled()) {
+				return;
+			}
+
+			result.put(Field.max, DisplayType.create(attributeType, NumberUtils.max(valuesFiltered)));
+
+			if (canceller.isCancelled()) {
+				return;
+			}
+
+			if (result.get(Field.min).getValue() != result.get(Field.max).getValue()) {
+				double standardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
+				result.put(Field.standardDeviation, DisplayType.create(attributeType, Math.round(standardDeviation)));
+			} else {
+				result.put(Field.standardDeviation, DisplayType.NA());
 			}
 		}
-		return -Double.MAX_VALUE;
 	}
-
-	public static long getLongValue(Attribute attribute, IvMMove move) {
-		if (attribute.isNumeric() || attribute.isTime()) {
-			XAttribute xAttribute = move.getAttributes().get(attribute.getName());
-			if (xAttribute == null) {
-				return Long.MIN_VALUE;
-			}
-			if (attribute.isNumeric()) {
-				return AttributeUtils.parseLongFast(xAttribute);
-			} else if (attribute.isTime()) {
-				return AttributeUtils.parseTimeFast(xAttribute);
-			}
-		}
-		return Long.MIN_VALUE;
-	}
-
 }

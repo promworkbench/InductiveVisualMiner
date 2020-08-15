@@ -44,12 +44,10 @@ public abstract class DisplayType {
 			return NA();
 		}
 		switch (type) {
-			case duration :
-				return duration(value);
 			case numeric :
 				return numeric(value);
 			default :
-				assert false; //a double cannot represent time, as it is inaccurate
+				assert false; //a double cannot represent time or duration, as it is inaccurate
 				return null;
 		}
 	}
@@ -99,7 +97,7 @@ public abstract class DisplayType {
 		return new Numeric(value);
 	}
 
-	public static Duration duration(double value) {
+	public static Duration duration(long value) {
 		return new Duration(value);
 	}
 
@@ -231,9 +229,9 @@ public abstract class DisplayType {
 	}
 
 	public static class Duration extends DisplayType {
-		double value;
+		long value;
 
-		private Duration(double value) {
+		private Duration(long value) {
 			this.value = value;
 		}
 
@@ -242,6 +240,10 @@ public abstract class DisplayType {
 		}
 
 		public double getValue() {
+			return value;
+		}
+
+		public long getValueLong() {
 			return value;
 		}
 

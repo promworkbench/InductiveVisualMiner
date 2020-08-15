@@ -46,11 +46,11 @@ public class ResourceTimeUtils {
 		return String.format("%.0f", d) + "d";
 	}
 
-	public static final String getDurationPadded(double ms) {
-		if (ms / 1000 < 1) {
+	public static final String getDurationPadded(long ms) {
+		if (ms / 1000.0 < 1) {
 			return String.format("%.2f", ms) + " ms  ";
 		}
-		double s = ms / 1000;
+		double s = ms / 1000.0;
 		if (s / 60 < 1) {
 			return String.format("%.2f", s) + " s   ";
 		}

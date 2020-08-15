@@ -485,7 +485,7 @@ public class TraceAttributeAnalysis {
 				result.put(Field.correlationPlot, DisplayType.NA());
 			} else {
 				double standardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
-				result.put(Field.standardDeviation, DisplayType.create(Type.duration, standardDeviation));
+				result.put(Field.standardDeviation, DisplayType.create(Type.duration, Math.round(standardDeviation)));
 
 				if (canceller.isCancelled()) {
 					return;
@@ -565,13 +565,13 @@ public class TraceAttributeAnalysis {
 
 		//compute correlation and plots
 		double[] fitnessFiltered;
-		double[] valuesFiltered;
+		long[] valuesFiltered;
 		{
-			double[] values = new double[logData.numberOfTraces];
+			long[] values = new long[logData.numberOfTraces];
 			int i = 0;
 			for (Iterator<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
 				IvMTrace trace = it.next();
-				double value = AttributeUtils.valueDouble(attribute, trace);
+				long value = AttributeUtils.valueLong(attribute, trace);
 
 				//store the value
 				values[i] = value;
@@ -584,7 +584,7 @@ public class TraceAttributeAnalysis {
 			}
 
 			//filter missing values
-			Pair<double[], double[]> p = Correlation.filterMissingValues(values, logData.fitness);
+			Pair<long[], double[]> p = Correlation.filterMissingValues(values, logData.fitness);
 			valuesFiltered = p.getA();
 			fitnessFiltered = p.getB();
 		}
@@ -659,7 +659,7 @@ public class TraceAttributeAnalysis {
 				result.put(Field.correlationPlot, DisplayType.NA());
 			} else {
 				double standardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
-				result.put(Field.standardDeviation, DisplayType.create(attributeType, standardDeviation));
+				result.put(Field.standardDeviation, DisplayType.create(attributeType, Math.round(standardDeviation)));
 
 				if (canceller.isCancelled()) {
 					return;
@@ -683,9 +683,10 @@ public class TraceAttributeAnalysis {
 						}
 
 						BufferedImage plot = CorrelationDensityPlot.create(attribute.getName(), valuesFiltered,
-								((DisplayType.Duration) result.get(Field.min)).getValue(),
-								((DisplayType.Duration) result.get(Field.max)).getValue(), "fitness", fitnessFiltered,
-								result.get(Field.minFitness).getValue(), result.get(Field.maxFitness).getValue());
+								((DisplayType.Duration) result.get(Field.min)).getValueLong(),
+								((DisplayType.Duration) result.get(Field.max)).getValueLong(), "fitness",
+								fitnessFiltered, result.get(Field.minFitness).getValue(),
+								result.get(Field.maxFitness).getValue());
 						result.put(Field.correlationPlot, DisplayType.image(plot));
 					}
 				}

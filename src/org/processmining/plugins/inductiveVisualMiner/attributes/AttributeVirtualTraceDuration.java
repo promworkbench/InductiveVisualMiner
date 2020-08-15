@@ -13,7 +13,7 @@ public class AttributeVirtualTraceDuration extends AttributeVirtualTraceDuration
 	}
 
 	@Override
-	public double getDuration(XAttributable x) {
+	public long getDuration(XAttributable x) {
 		long durationStart = Long.MAX_VALUE;
 		long durationEnd = Long.MIN_VALUE;
 
@@ -28,13 +28,13 @@ public class AttributeVirtualTraceDuration extends AttributeVirtualTraceDuration
 				}
 			}
 		} else {
-			return -Double.MAX_VALUE;
+			return Long.MIN_VALUE;
 		}
 
 		if (durationStart != Long.MAX_VALUE) {
 			return durationEnd - durationStart;
 		}
-		return -Double.MAX_VALUE;
+		return Long.MIN_VALUE;
 	}
 
 	private static long getTimestamp(XAttributable x) {
