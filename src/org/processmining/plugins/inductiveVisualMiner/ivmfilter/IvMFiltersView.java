@@ -110,7 +110,7 @@ public abstract class IvMFiltersView extends SideWindow {
 				}
 
 				//filter sub-panel
-				SwitchPanel subPanel;
+				final SwitchPanel subPanel;
 				{
 					subPanel = new SwitchPanel() {
 						private static final long serialVersionUID = 132082897536007044L;
