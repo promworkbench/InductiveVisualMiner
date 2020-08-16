@@ -27,7 +27,7 @@ public class IvMAttributesInfo implements AttributesInfo {
 	 * @param factory
 	 * @param executor
 	 */
-	public IvMAttributesInfo(IvMLog log, AttributesInfo oldAttributes, IvMVirtualAttributeFactory factory,
+	public IvMAttributesInfo(final IvMLog log, AttributesInfo oldAttributes, IvMVirtualAttributeFactory factory,
 			ExecutorService executor) {
 		//copy old attributes
 		{
