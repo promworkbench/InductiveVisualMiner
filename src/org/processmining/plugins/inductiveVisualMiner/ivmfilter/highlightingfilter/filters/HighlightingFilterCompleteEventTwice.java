@@ -12,7 +12,7 @@ public class HighlightingFilterCompleteEventTwice extends HighlightingFilterEven
 	}
 
 	@Override
-	public boolean countInColouring(IvMTrace trace) {
+	public boolean staysInLog(IvMTrace trace) {
 		Attribute attribute = panel.getSelectedAttribute();
 		int count = 0;
 		if (attribute.isLiteral()) {

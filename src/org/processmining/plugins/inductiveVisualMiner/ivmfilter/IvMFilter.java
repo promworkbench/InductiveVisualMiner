@@ -1,17 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
-import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
-
-/**
- * Do not extend this class directly. Rather, use PreMiningEventFilter,
- * PreMiningTraceFilter or HighlightingFilter.
- * 
- * @author sleemans
- *
- */
 public abstract class IvMFilter implements Comparable<IvMFilter> {
 
 	/**
@@ -29,12 +17,11 @@ public abstract class IvMFilter implements Comparable<IvMFilter> {
 	public abstract String getName() throws Exception;
 
 	/**
-	 * Initialises the JPanel containing the filter settings. Called
-	 * asynchronously. changed.
+	 * Initialises the JPanel containing the filter settings.
 	 * 
 	 * @return
 	 */
-	public abstract IvMFilterGui createGui(AttributesInfo attributesInfo) throws Exception;
+	protected abstract IvMFilterGui createGui() throws Exception;
 
 	/**
 	 * Returns whether this filter is actually filtering something. If this
@@ -60,28 +47,16 @@ public abstract class IvMFilter implements Comparable<IvMFilter> {
 	private Runnable onUpdate = null;
 	private boolean enabledFilter = false;
 
-	/**
-	 * Called asynchronously: do not alter the gui directly. Return whether
-	 * something changed in the selection and an update is necessary (do not
-	 * call update() yourself). Notice that either a IMLog+XLog or a IvMLog will
-	 * be provided, never both.
-	 * 
-	 * @param log
-	 * @param ivmLog
-	 * @throws Exception
-	 */
-	protected abstract boolean fillGuiWithLog(IMLog log, XLog xLog, IvMLog ivmLog) throws Exception;
-
-	public final void createFilterGui(Runnable onUpdate, AttributesInfo attributesInfo) {
+	public final void createFilterGui(Runnable onUpdate) {
 		this.onUpdate = onUpdate;
 		try {
-			panel = createGui(attributesInfo);
+			panel = createGui();
 		} catch (Exception e) {
 			panel = null;
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void setEnabledFilter(boolean enabledFilter) {
 		this.enabledFilter = enabledFilter;
 	}

@@ -18,6 +18,7 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 	private JPanel offPanel = new JPanel();
 	private JLabel offMessage = new JLabel("off", SwingConstants.CENTER);
 	private X onPanel;
+	private boolean on = true;
 
 	public OnOffPanel(X onPanel) {
 		setLayout(new CardLayout());
@@ -37,10 +38,12 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 
 	public void on() {
 		((CardLayout) getLayout()).show(this, "on");
+		on = true;
 	}
 
 	public void off() {
 		((CardLayout) getLayout()).show(this, "off");
+		on = false;
 	}
 
 	public void set(boolean on) {
@@ -49,6 +52,10 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 		} else {
 			off();
 		}
+	}
+	
+	public boolean isOn() {
+		return on;
 	}
 
 	public String getOffMessage() {

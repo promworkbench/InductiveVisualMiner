@@ -11,7 +11,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentCompute
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLog;
@@ -42,8 +43,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<PopupItemModelMove> popupItemsModelMove;
 	private final List<PopupItemLog> popupItemsLog;
 	private final List<DataAnalysisTableFactory> dataAnalyses;
-	private final List<IvMFilter> preMiningFilters;
-	private final List<IvMFilter> highlightingFilters;
+	private final List<PreMiningFilter> preMiningFilters;
+	private final List<HighlightingFilter> highlightingFilters;
 	private final IvMVirtualAttributeFactory virtualAttributeFactory;
 
 	public InductiveVisualMinerConfigurationAbstract(XLog log, ProMCanceller canceller, Executor executor) {
@@ -65,9 +66,9 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		chain = createChain(state, panel, canceller, executor, preMiningFilters, highlightingFilters);
 	}
 
-	protected abstract List<IvMFilter> createPreMiningFilters();
+	protected abstract List<PreMiningFilter> createPreMiningFilters();
 
-	protected abstract List<IvMFilter> createHighlightingFilters();
+	protected abstract List<HighlightingFilter> createHighlightingFilters();
 
 	protected abstract List<VisualMinerWrapper> createDiscoveryTechniques();
 
@@ -93,8 +94,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	protected abstract Chain<InductiveVisualMinerState> createChain(InductiveVisualMinerState state,
 			InductiveVisualMinerPanel panel, ProMCanceller canceller, Executor executor,
-			List<IvMFilter> preMiningFilters, List<IvMFilter> highlightingFilters);
-	
+			List<PreMiningFilter> preMiningFilters, List<HighlightingFilter> highlightingFilters);
+
 	protected abstract IvMVirtualAttributeFactory createVirtualAttributes();
 
 	@Override
@@ -140,12 +141,12 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	}
 
 	@Override
-	public final List<IvMFilter> getPreMiningFilters() {
+	public final List<PreMiningFilter> getPreMiningFilters() {
 		return preMiningFilters;
 	}
 
 	@Override
-	public final List<IvMFilter> getHighlightingFilters() {
+	public final List<HighlightingFilter> getHighlightingFilters() {
 		return highlightingFilters;
 	}
 

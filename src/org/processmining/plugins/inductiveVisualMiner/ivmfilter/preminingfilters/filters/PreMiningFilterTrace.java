@@ -14,16 +14,21 @@ public class PreMiningFilterTrace extends PreMiningFilterTraceWithEvent {
 	}
 
 	@Override
-	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
-		panel = new AttributeFilterGui(getName(), attributesInfo.getTraceAttributes(), new Runnable() {
+	public IvMFilterGui createGui() {
+		panel = new AttributeFilterGui(getName(), new Runnable() {
 			public void run() {
 				update();
 				updateExplanation();
 			}
 		});
 
-		updateExplanation();
 		return panel;
+	}
+
+	@Override
+	public void setAttributesInfo(AttributesInfo attributesInfo) {
+		panel.setAttributes(attributesInfo.getTraceAttributes());
+		updateExplanation();
 	}
 
 	@Override

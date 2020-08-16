@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.attributes;
 
 import java.util.Collection;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
 
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
@@ -18,7 +19,16 @@ public class IvMAttributesInfo implements AttributesInfo {
 	private final THashMap<String, Attribute> traceAttributes;
 	private final THashMap<String, Attribute> eventAttributes;
 
-	public IvMAttributesInfo(IvMLog log, AttributesInfo oldAttributes, IvMVirtualAttributeFactory factory) {
+	/**
+	 * Caller has to ensure to wait for executor to finish.
+	 * 
+	 * @param log
+	 * @param oldAttributes
+	 * @param factory
+	 * @param executor
+	 */
+	public IvMAttributesInfo(IvMLog log, AttributesInfo oldAttributes, IvMVirtualAttributeFactory factory,
+			ExecutorService executor) {
 		//copy old attributes
 		{
 			traceAttributes = new THashMap<>();
@@ -64,16 +74,28 @@ public class IvMAttributesInfo implements AttributesInfo {
 
 		//initialise the IvM attributes
 		{
-			for (IvMTrace trace : log) {
-				for (AttributeVirtual traceAttribute : traceAttributesVirtual.values()) {
-					traceAttribute.add(trace);
-				}
-
-				for (IvMMove event : trace) {
-					for (AttributeVirtual eventAttribute : eventAttributesVirtual.values()) {
-						eventAttribute.add(event);
+			for (AttributeVirtual traceAttribute : traceAttributesVirtual.values()) {
+				final AttributeVirtual traceAttribute2 = traceAttribute;
+				executor.execute(new Runnable() {
+					public void run() {
+						for (IvMTrace trace : log) {
+							traceAttribute2.add(trace);
+						}
 					}
-				}
+				});
+			}
+
+			for (AttributeVirtual eventAttribute : eventAttributesVirtual.values()) {
+				final AttributeVirtual eventAttribute2 = eventAttribute;
+				executor.execute(new Runnable() {
+					public void run() {
+						for (IvMTrace trace : log) {
+							for (IvMMove event : trace) {
+								eventAttribute2.add(event);
+							}
+						}
+					}
+				});
 			}
 		}
 

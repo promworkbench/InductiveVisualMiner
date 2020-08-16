@@ -1,8 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters;
 
 import org.deckfour.xes.model.XEvent;
-import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
@@ -14,22 +12,30 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 
 	protected AttributeFilterGui panel = null;
 
+	@Override
 	public String getName() {
 		return "Trace with event filter";
 	}
 
-	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
-		panel = new AttributeFilterGui(getName(), attributesInfo.getEventAttributes(), new Runnable() {
+	@Override
+	public IvMFilterGui createGui() {
+		panel = new AttributeFilterGui(getName(), new Runnable() {
 			public void run() {
 				update();
 				updateExplanation();
 			}
 		});
 
-		updateExplanation();
 		return panel;
 	}
 
+	@Override
+	public void setAttributesInfo(AttributesInfo attributesInfo) {
+		panel.setAttributes(attributesInfo.getEventAttributes());
+		updateExplanation();
+	}
+
+	@Override
 	public boolean staysInLog(IMTrace trace) {
 		Attribute attribute = panel.getSelectedAttribute();
 		if (attribute.isLiteral()) {
@@ -67,6 +73,7 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 		return false;
 	}
 
+	@Override
 	public boolean isEnabled() {
 		return panel.isFiltering();
 	}
@@ -80,9 +87,4 @@ public class PreMiningFilterTraceWithEvent extends PreMiningTraceFilter {
 					.setText("Include only traces that have at least one event " + panel.getExplanation() + ".");
 		}
 	}
-
-	public boolean fillGuiWithLog(IMLog log, XLog xLog) throws Exception {
-		return false;
-	}
-
 }

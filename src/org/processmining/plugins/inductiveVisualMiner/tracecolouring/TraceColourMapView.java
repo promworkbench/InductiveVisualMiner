@@ -22,22 +22,23 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.OnOffPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.SwitchPanel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeKey;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 import gnu.trove.map.hash.THashMap;
 
 public class TraceColourMapView extends SideWindow {
 
 	private static final long serialVersionUID = -4833037956665918455L;
-	private final JComboBox<AttributeKey> keySelector;
-	private final DefaultComboBoxModel<AttributeKey> keySelectorModel;
+	private final OnOffPanel<IvMPanel> onOffPanel;
+	private final JComboBox<String> keySelector;
+	private final DefaultComboBoxModel<String> keySelectorModel;
 	private final JCheckBox enabled;
 	private final JTextArea status;
 	private final JTextArea explanation;
@@ -50,12 +51,22 @@ public class TraceColourMapView extends SideWindow {
 
 	private Function<TraceColourMapSettings, Object> onUpdate;
 
+	/**
+	 * 
+	 */
+	private String selectedAttributeName;
+	private AttributesInfo attributesInfo;
+
 	public TraceColourMapView(InductiveVisualMinerPanel parent) {
 		super(parent, "trace colouring - " + InductiveVisualMinerPanel.title);
 		setSize(300, 300);
 		setMinimumSize(new Dimension(300, 300));
-		JPanel content = new IvMPanel();
-		add(content);
+		IvMPanel content = new IvMPanel();
+
+		onOffPanel = new OnOffPanel<>(content);
+		onOffPanel.setOffMessage("Waiting for attributes..");
+		add(onOffPanel);
+		onOffPanel.off();
 
 		BorderLayout layout = new BorderLayout();
 		content.setLayout(layout);
@@ -101,12 +112,9 @@ public class TraceColourMapView extends SideWindow {
 			//key selector
 			{
 				keySelectorModel = new DefaultComboBoxModel<>();
-				keySelectorModel.addElement(AttributeKey.message("(initialising)"));
-				keySelector = new JComboBox<AttributeKey>(new AttributeKey[0]);
+				keySelector = new JComboBox<>();
 				IvMDecorator.decorate(keySelector);
 				keySelector.setModel(keySelectorModel);
-				keySelector.setSelectedIndex(0);
-				keySelector.setEnabled(false);
 
 				filterPanel.add(keySelector);
 				filterPanelLayout.putConstraint(SpringLayout.VERTICAL_CENTER, keySelector, 0,
@@ -136,7 +144,6 @@ public class TraceColourMapView extends SideWindow {
 				IvMDecorator.decorate(example);
 				example.setWrapStyleWord(true);
 				example.setLineWrap(true);
-				example.setEnabled(false);
 
 				filterPanel.add(example);
 				filterPanelLayout.putConstraint(SpringLayout.NORTH, example, 5, SpringLayout.SOUTH, status);
@@ -144,23 +151,14 @@ public class TraceColourMapView extends SideWindow {
 				filterPanelLayout.putConstraint(SpringLayout.EAST, example, -5, SpringLayout.EAST, filterPanel);
 			}
 		}
-	}
 
-	public void initialise(IvMAttributesInfo attributesInfo,
-			final Function<TraceColourMapSettings, Object> onUpdateTraceColourMap) {
-		onUpdate = onUpdateTraceColourMap;
-
-		//populate the combobox with the trace attributes
-		keySelectorModel.removeAllElements();
-		for (Attribute attribute : attributesInfo.getTraceAttributes()) {
-			keySelectorModel.addElement(AttributeKey.attribute(attribute));
-		}
-		keySelector.setSelectedIndex(0);
-		keySelector.setEnabled(true);
-
+		//set up the controller
 		keySelector.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				update();
+				if (onOffPanel.isOn()) {
+					selectedAttributeName = (String) keySelector.getSelectedItem();
+					update();
+				}
 			}
 		});
 
@@ -173,12 +171,58 @@ public class TraceColourMapView extends SideWindow {
 		});
 	}
 
+	public void setAttributes(AttributesInfo attributesInfo) {
+		this.attributesInfo = attributesInfo;
+
+		//populate the combobox with the trace attributes
+		{
+			keySelectorModel.removeAllElements();
+			for (Attribute attribute : attributesInfo.getTraceAttributes()) {
+				keySelectorModel.addElement(attribute.getName());
+			}
+		}
+
+		//keep the selection
+		{
+			boolean found = false;
+			if (selectedAttributeName != null
+					&& attributesInfo.getTraceAttributeValues(selectedAttributeName) != null) {
+				for (int i = 0; i < keySelector.getItemCount(); i++) {
+					String key = keySelector.getItemAt(i);
+					if (key.equals(selectedAttributeName)) {
+						keySelector.setSelectedItem(selectedAttributeName);
+						found = true;
+					}
+				}
+			}
+			if (!found) {
+				keySelector.setSelectedIndex(0);
+				selectedAttributeName = (String) keySelector.getSelectedItem();
+			}
+		}
+
+		//enable the gui
+		{
+			onOffPanel.on();
+		}
+
+		update();
+	}
+
+	public void invalidateAttributes() {
+		//disable the gui
+		{
+			onOffPanel.off();
+		}
+	}
+
 	public void update() {
 		try {
-			if (onUpdate != null) {
-				if (enabled.isSelected()) {
-					AttributeKey key = (AttributeKey) keySelector.getSelectedItem();
-					updateAttribute(key.getAttribute());
+			if (getOnUpdate() != null) {
+				if (enabled.isSelected() && onOffPanel.isOn()) {
+					String key = (String) keySelector.getSelectedItem();
+					Attribute attribute = attributesInfo.getTraceAttributeValues(key);
+					updateAttribute(attribute);
 				} else {
 					updateDisable();
 				}
@@ -214,31 +258,31 @@ public class TraceColourMapView extends SideWindow {
 				colourExample(colours);
 
 				status.setText("Currently colouring traces using " + numberOfColours + " colours:");
-				onUpdate.call(TraceColourMapSettings.string(attribute, value2colour));
+				getOnUpdate().call(TraceColourMapSettings.string(attribute, value2colour));
 			} else {
 				//too many colours
 				status.setText("The current attribute would yield " + attribute.getStringValues().size()
 						+ " colours. Inductive visual Miner supports up to " + maxColours + " colours.");
 				example.setText("");
-				onUpdate.call(TraceColourMapSettings.empty());
+				getOnUpdate().call(TraceColourMapSettings.empty());
 			}
 		} else if (attribute.isNumeric()) {
 			//this is a numeric attribute
 			ColourMap colourMap = TraceColourMapSettings.getColourMap();
 			updateProperty(colourMap, attribute.getNumericMin(), attribute.getNumericMax(), false, false);
-			onUpdate.call(TraceColourMapSettings.number(attribute, colourMap, attribute.getNumericMin(),
+			getOnUpdate().call(TraceColourMapSettings.number(attribute, colourMap, attribute.getNumericMin(),
 					attribute.getNumericMax()));
 		} else if (attribute.isTime()) {
 			//this is a time attribute; divide it in 7 parts
 			ColourMap colourMap = TraceColourMapSettings.getColourMap();
 			updateProperty(colourMap, attribute.getTimeMin(), attribute.getTimeMax(), false, true);
-			onUpdate.call(
+			getOnUpdate().call(
 					TraceColourMapSettings.time(attribute, colourMap, attribute.getTimeMin(), attribute.getTimeMax()));
 		} else if (attribute.isDuration()) {
 			//this is a time attribute; divide it in 7 parts
 			ColourMap colourMap = TraceColourMapSettings.getColourMap();
 			updateProperty(colourMap, attribute.getDurationMin(), attribute.getDurationMax(), true, false);
-			onUpdate.call(TraceColourMapSettings.duration(attribute, colourMap, attribute.getDurationMin(),
+			getOnUpdate().call(TraceColourMapSettings.duration(attribute, colourMap, attribute.getDurationMin(),
 					attribute.getDurationMax()));
 		}
 	}
@@ -289,7 +333,7 @@ public class TraceColourMapView extends SideWindow {
 		status.setText("Currently not colouring.");
 		example.setText("");
 		example.setColourMap(null);
-		onUpdate.call(TraceColourMapSettings.empty());
+		getOnUpdate().call(TraceColourMapSettings.empty());
 	}
 
 	private void colourExample(Color[] colours) throws BadLocationException {
@@ -304,6 +348,14 @@ public class TraceColourMapView extends SideWindow {
 	private void colourExample(ColourMap colourMap, int numberOfRows) {
 		example.setColourMap(colourMap);
 		example.setNumberOfRows(numberOfRows);
+	}
+
+	public Function<TraceColourMapSettings, Object> getOnUpdate() {
+		return onUpdate;
+	}
+
+	public void setOnUpdate(Function<TraceColourMapSettings, Object> onUpdate) {
+		this.onUpdate = onUpdate;
 	}
 
 	private static class TraceColourMapExample extends JTextArea {
@@ -334,7 +386,7 @@ public class TraceColourMapView extends SideWindow {
 				int y0 = (int) (rowHeight * 0.5);
 				int y1 = (int) (rowHeight * (numberOfRows + 0.5));
 				for (int y = y0; y < y1; y++) {
-					double v = (y - y0) / (y1 - y0);
+					//double v = (y - y0) / (y1 - y0);
 					Color c = colourMap.colour((y - y0) / (y1 - y0 * 1.0));
 					g.setColor(c);
 					g.drawLine(x0, y, x1, y);

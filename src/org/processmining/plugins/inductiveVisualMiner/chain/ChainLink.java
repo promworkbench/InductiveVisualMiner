@@ -75,6 +75,7 @@ public abstract class ChainLink<State, I, O> {
 	}
 
 	public void cancelAndInvalidateResult(State state) {
+		//System.out.println("invalidate " + this);
 		isComplete = false;
 		if (currentExecutionCanceller != null) {
 			currentExecutionCanceller.cancel();

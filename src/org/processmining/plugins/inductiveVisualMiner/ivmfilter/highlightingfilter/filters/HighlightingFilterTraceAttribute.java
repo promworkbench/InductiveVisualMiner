@@ -1,23 +1,28 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class HighlightingFilterTraceAttribute extends HighlightingFilterEvent {
 
 	@Override
-	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
-		panel = new AttributeFilterGui(getName(), attributesInfo.getTraceAttributes(), new Runnable() {
+	public IvMFilterGui createGui() {
+		panel = new AttributeFilterGui(getName(), new Runnable() {
 			public void run() {
 				updateExplanation();
 				update();
 			}
 		});
-		updateExplanation();
 		return panel;
+	}
+
+	@Override
+	public void setAttributesInfo(IvMAttributesInfo attributesInfo) {
+		panel.setAttributes(attributesInfo.getTraceAttributes());
+		updateExplanation();
 	}
 
 	@Override
@@ -26,7 +31,7 @@ public class HighlightingFilterTraceAttribute extends HighlightingFilterEvent {
 	}
 
 	@Override
-	public boolean countInColouring(IvMTrace trace) {
+	public boolean staysInLog(IvMTrace trace) {
 		Attribute attribute = panel.getSelectedAttribute();
 		if (attribute.isLiteral()) {
 			String value = attribute.getLiteral(trace);

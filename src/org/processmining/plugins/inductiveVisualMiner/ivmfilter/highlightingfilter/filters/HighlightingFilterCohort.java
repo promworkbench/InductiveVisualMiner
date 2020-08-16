@@ -4,20 +4,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
 
-import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.model.impl.XEventImpl;
 import org.deckfour.xes.model.impl.XTraceImpl;
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.cohortanalysis.feature.Feature;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class HighlightingFilterCohort extends HighlightingFilter {
 
@@ -26,7 +23,7 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 	private Cohort selectedCohort = null;
 	private boolean highlightInCohort = true;
 
-	public boolean countInColouring(IvMTrace trace) {
+	public boolean staysInLog(IvMTrace trace) {
 		if (selectedCohort == null) {
 			return true;
 		}
@@ -60,7 +57,8 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 		return "Cohort filter";
 	}
 
-	public IvMFilterGui createGui(AttributesInfo attributesInfo) throws Exception {
+	@Override
+	public IvMFilterGui createGui() throws Exception {
 		panel = new HighlightingFilterCohortPanel(getName());
 		updateExplanation();
 
@@ -83,12 +81,9 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 		}
 	}
 
+	@Override
 	protected boolean isEnabled() {
 		return selectedCohort != null;
-	}
-
-	protected boolean fillGuiWithLog(IMLog log, XLog xLog, IvMLog ivmLog) throws Exception {
-		return false;
 	}
 
 	public void updateExplanation() {
@@ -137,4 +132,7 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 		update();
 	}
 
+	public void setAttributesInfo(IvMAttributesInfo attributesInfo) {
+
+	}
 }

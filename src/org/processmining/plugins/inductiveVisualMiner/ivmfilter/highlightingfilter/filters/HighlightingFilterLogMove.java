@@ -12,7 +12,7 @@ public class HighlightingFilterLogMove extends HighlightingFilterEvent {
 	}
 
 	@Override
-	public boolean countInColouring(IvMTrace trace) {
+	public boolean staysInLog(IvMTrace trace) {
 		Attribute attribute = panel.getSelectedAttribute();
 		if (attribute.isLiteral()) {
 			for (IvMMove event : trace) {

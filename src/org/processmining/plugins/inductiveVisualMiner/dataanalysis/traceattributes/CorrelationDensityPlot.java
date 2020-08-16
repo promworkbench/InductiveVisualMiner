@@ -118,6 +118,12 @@ public class CorrelationDensityPlot {
 
 					if (x > -Double.MAX_VALUE) {
 						int indexX = (int) Math.round((sizeX - 1) * ((x - minX) / (maxX - minX)));
+
+						if (indexX >= counts.length || indexX < 0) {
+							System.out.println(
+									"indexX " + indexX + ", sizeX " + sizeX + ", minX " + minX + ", maxX " + maxX);
+						}
+
 						counts[indexX]++;
 					} else {
 						//non-present value

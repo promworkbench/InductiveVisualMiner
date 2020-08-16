@@ -14,18 +14,21 @@ public class PreMiningFrequentTracesFilter extends PreMiningTraceFilter {
 
 	private SliderGui panel = null;
 	private FrequencyLog fLog = null;
-	
+
+	@Override
 	public boolean staysInLog(IMTrace trace) {
 		return fLog.isFrequentEnough(trace, panel.getSlider().getValue() / 1000.0);
 	}
 
+	@Override
 	public String getName() {
 		return "Frequent traces filter";
 	}
 
-	public IvMFilterGui createGui(AttributesInfo attributeInfo) {
+	@Override
+	public IvMFilterGui createGui() {
 		panel = new SliderGui(getName());
-		
+
 		panel.getSlider().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				updateExplanation();
@@ -33,30 +36,37 @@ public class PreMiningFrequentTracesFilter extends PreMiningTraceFilter {
 			}
 		});
 		panel.getSlider().setEnabled(false);
-		
+
 		updateExplanation();
 		return panel;
 	}
 
+	@Override
 	protected boolean isEnabled() {
 		return getThreshold() < 1.0 && panel.getSlider().isEnabled() && fLog != null;
 	}
-	
+
 	private double getThreshold() {
 		return panel.getSlider().getValue() / 1000.0;
 	}
 
 	private void updateExplanation() {
-		panel.getExplanation().setText("Include " + String.format("%.1f", getThreshold() * 100) + "% of the most occurring traces.");
+		panel.getExplanation()
+				.setText("Include " + String.format("%.1f", getThreshold() * 100) + "% of the most occurring traces.");
+	}
+
+	@Override
+	public void setAttributesInfo(AttributesInfo attributesInfo) {
+		//TODO: fill in using attributes
 	}
 
 	public boolean fillGuiWithLog(IMLog log, XLog xLog) throws Exception {
 		fLog = null;
 		panel.getSlider().setEnabled(false);
 		panel.getExplanation().setText("Initialising...");
-		
+
 		fLog = new FrequencyLog(xLog, log.getClassifier());
-		
+
 		updateExplanation();
 		panel.getSlider().setEnabled(true);
 		return isEnabled();

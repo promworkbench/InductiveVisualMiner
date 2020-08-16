@@ -208,7 +208,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//pre-mining filters
 			{
-				preMiningFiltersView = new PreMiningFiltersView(this);
+				preMiningFiltersView = new PreMiningFiltersView(this, configuration.getPreMiningFilters());
 				preMiningFiltersButton = new JButton("pre-mining filters");
 				IvMDecorator.decorate(preMiningFiltersButton);
 				GridBagConstraints cTraceViewButton = new GridBagConstraints();
@@ -300,7 +300,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//highlighting filters view
 			{
-				highlightingFiltersView = new HighlightingFiltersView(this);
+				highlightingFiltersView = new HighlightingFiltersView(this, configuration.getHighlightingFilters());
 				highlightingFiltersViewButton = new JButton("highlighting filters");
 				IvMDecorator.decorate(highlightingFiltersViewButton);
 				GridBagConstraints cColouringFiltersViewButton = new GridBagConstraints();
@@ -670,7 +670,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return editModelButton;
 	}
 
-	public HighlightingFiltersView getColouringFiltersView() {
+	public HighlightingFiltersView getHighlightingFiltersView() {
 		return highlightingFiltersView;
 	}
 

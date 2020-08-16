@@ -18,7 +18,7 @@ public class Cl17DataAnalysisEvent extends
 	protected Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, IvMAttributesInfo> generateInput(
 			InductiveVisualMinerState state) {
 		return Quadruple.of(state.getModel(), state.getIvMLog(), (IvMLogFiltered) state.getIvMLogFiltered(),
-				state.getAttributesInfoIvM());
+				state.getIvMAttributesInfo());
 	}
 
 	protected EventAttributeAnalysis executeLink(

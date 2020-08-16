@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
@@ -31,7 +32,10 @@ import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 public class AttributeFilterGui extends IvMFilterGui {
 
 	private static final long serialVersionUID = -5662487261061931369L;
-	private final JComboBox<AttributeKey> keySelector;
+	private final JComboBox<String> keySelector;
+	private final DefaultComboBoxModel<String> keySelectorModel;
+	private String selectedAttributeName;
+	private Collection<Attribute> attributes;
 
 	private final JList<String> valueLiteralSelector;
 	private final DefaultListModel<String> valueLiteralSelectorListModel;
@@ -40,14 +44,12 @@ public class AttributeFilterGui extends IvMFilterGui {
 	public final int valueNumericRange = 1000;
 
 	private final JTextArea explanation;
-	private final boolean empty;
 	private final Runnable onUpdate;
 	private boolean block = false;
 
-	public AttributeFilterGui(String title, Collection<Attribute> attributes, Runnable onUpdate) {
+	public AttributeFilterGui(String title, Runnable onUpdate) {
 		super(title);
 		usesVerticalSpace = true;
-		empty = attributes.isEmpty();
 		this.onUpdate = onUpdate;
 
 		//explanation
@@ -66,17 +68,10 @@ public class AttributeFilterGui extends IvMFilterGui {
 
 		//key selector
 		{
-			keySelector = new JComboBox<>(new AttributeKey[0]);
+			keySelectorModel = new DefaultComboBoxModel<>();
+			keySelector = new JComboBox<>();
 			IvMDecorator.decorate(keySelector);
-			if (empty) {
-				keySelector.addItem(AttributeKey.message("(no attributes present)"));
-				keySelector.setEnabled(false);
-			} else {
-				for (Attribute attribute : attributes) {
-					keySelector.addItem(AttributeKey.attribute(attribute));
-				}
-			}
-			keySelector.setSelectedIndex(0);
+			keySelector.setModel(keySelectorModel);
 			add(keySelector);
 		}
 
@@ -119,7 +114,6 @@ public class AttributeFilterGui extends IvMFilterGui {
 			add(valueNumericSelector);
 		}
 
-		updateValues();
 		setController();
 	}
 
@@ -127,10 +121,13 @@ public class AttributeFilterGui extends IvMFilterGui {
 		// Key selector
 		keySelector.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				block = true;
-				updateValues();
-				onUpdate.run();
-				block = false;
+				if (!block) {
+					block = true;
+					updateValues();
+					onUpdate.run();
+					selectedAttributeName = (String) keySelectorModel.getSelectedItem();
+					block = false;
+				}
 			}
 		});
 
@@ -155,32 +152,71 @@ public class AttributeFilterGui extends IvMFilterGui {
 		block = false;
 	}
 
-	private void updateValues() {
-		if (!empty) {
-			if (getSelectedAttribute().isLiteral()) {
-				valueLiteralSelectorListModel.clear();
-				for (String a : getSelectedAttribute().getStringValues()) {
-					valueLiteralSelectorListModel.addElement(a);
-				}
-				//((CardLayout) valueLayout.getLayout()).show(valueLayout, "literal");
-				valueLiteralSelector.setVisible(true);
-				valueNumericSelector.setVisible(false);
-			} else if (getSelectedAttribute().isNumeric()) {
-				//((CardLayout) valueLayout.getLayout()).show(valueLayout, "numeric");
-				valueLiteralSelector.setVisible(false);
-				valueNumericSelector.setVisible(true);
-			} else if (getSelectedAttribute().isTime()) {
-				//((CardLayout) valueLayout.getLayout()).show(valueLayout, "numeric");
-				valueLiteralSelector.setVisible(false);
-				valueNumericSelector.setVisible(true);
-			} else if (getSelectedAttribute().isDuration()) {
-				valueLiteralSelector.setVisible(false);
-				valueNumericSelector.setVisible(true);
+	public void setAttributes(Collection<Attribute> attributes) {
+		this.attributes = attributes;
+
+		//populate the combobox with the trace attributes
+		{
+			block = true;
+			keySelectorModel.removeAllElements();
+			for (Attribute attribute : attributes) {
+				keySelectorModel.addElement(attribute.getName());
 			}
+			block = false;
+		}
+
+		//keep the selection
+		{
+			boolean found = false;
+			if (selectedAttributeName != null) {
+
+				boolean attributeIsPresent = false;
+				for (Attribute attribute : attributes) {
+					attributeIsPresent = attributeIsPresent || attribute.getName().equals(selectedAttributeName);
+				}
+				if (attributeIsPresent) {
+					for (int i = 0; i < keySelector.getItemCount(); i++) {
+						String key = keySelector.getItemAt(i);
+						if (key.equals(selectedAttributeName)) {
+							block = true;
+							keySelector.setSelectedItem(selectedAttributeName);
+							block = false;
+							found = true;
+						}
+					}
+				}
+			}
+			if (!found) {
+				keySelector.setSelectedIndex(0);
+				selectedAttributeName = (String) keySelector.getSelectedItem();
+			}
+		}
+
+		updateValues();
+	}
+
+	private void updateValues() {
+		Attribute attribute = getSelectedAttribute();
+		if (attribute.isLiteral()) {
+			valueLiteralSelectorListModel.clear();
+			for (String a : getSelectedAttribute().getStringValues()) {
+				valueLiteralSelectorListModel.addElement(a);
+			}
+			valueLiteralSelector.setVisible(true);
+			valueNumericSelector.setVisible(false);
+		} else if (attribute.isNumeric()) {
+			valueLiteralSelector.setVisible(false);
+			valueNumericSelector.setVisible(true);
+		} else if (attribute.isTime()) {
+			valueLiteralSelector.setVisible(false);
+			valueNumericSelector.setVisible(true);
+		} else if (attribute.isDuration()) {
+			valueLiteralSelector.setVisible(false);
+			valueNumericSelector.setVisible(true);
 		}
 	}
 
-	public JComboBox<AttributeKey> getKeySelector() {
+	public JComboBox<String> getKeySelector() {
 		return keySelector;
 	}
 
@@ -193,7 +229,17 @@ public class AttributeFilterGui extends IvMFilterGui {
 	}
 
 	public Attribute getSelectedAttribute() {
-		return ((AttributeKey) keySelector.getSelectedItem()).getAttribute();
+		if (attributes == null) {
+			return null;
+		}
+		String attributeName = (String) keySelector.getSelectedItem();
+		keySelectorModel.getSelectedItem();
+		for (Attribute attribute : attributes) {
+			if (attribute.getName().equals(attributeName)) {
+				return attribute;
+			}
+		}
+		return null;
 	}
 
 	public List<String> getSelectedLiterals() {
@@ -223,13 +269,13 @@ public class AttributeFilterGui extends IvMFilterGui {
 				+ (getSelectedAttribute().getTimeMax() - getSelectedAttribute().getTimeMin())
 						* (valueNumericSelector.getUpperValue() / (valueNumericRange * 1.0)));
 	}
-	
+
 	public long getSelectedDurationMin() {
 		return (long) (getSelectedAttribute().getDurationMin()
 				+ (getSelectedAttribute().getDurationMax() - getSelectedAttribute().getDurationMin())
 						* (valueNumericSelector.getValue() / (valueNumericRange * 1.0)));
 	}
-	
+
 	public long getSelectedDurationMax() {
 		return (long) (getSelectedAttribute().getDurationMin()
 				+ (getSelectedAttribute().getDurationMax() - getSelectedAttribute().getDurationMin())

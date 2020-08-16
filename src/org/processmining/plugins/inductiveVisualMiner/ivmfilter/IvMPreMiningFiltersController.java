@@ -3,62 +3,36 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Executor;
 
 import org.deckfour.xes.model.XEvent;
-import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningEventFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningTraceFilter;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class IvMPreMiningFiltersController {
 
-	private final List<IvMFilter> preMiningFilters;
+	private final List<PreMiningFilter> preMiningFilters;
+	private final IvMFiltersView filtersPanel;
 
-	/**
-	 * Stage 1: set up the list of filters.
-	 * 
-	 * @param context
-	 * @param panel
-	 * @param state
-	 * @param attributesInfo
-	 */
-	public IvMPreMiningFiltersController(List<IvMFilter> preMiningFilters, InductiveVisualMinerState state,
-			InductiveVisualMinerPanel panel, final Runnable onPreMiningUpdate) {
+	public IvMPreMiningFiltersController(List<PreMiningFilter> preMiningFilters, IvMFiltersView filtersPanel) {
 		this.preMiningFilters = preMiningFilters;
-		panel.getPreMiningFiltersView().initialise(preMiningFilters);
-		for (IvMFilter filter : preMiningFilters) {
-			filter.createFilterGui(onPreMiningUpdate, state.getAttributesInfo());
-			panel.getPreMiningFiltersView().setPanel(filter, onPreMiningUpdate);
-		}
+		this.filtersPanel = filtersPanel;
 	}
 
 	/**
-	 * Stage 2: update filters with an IMLog.
+	 * Add the attributes to the filters
 	 * 
-	 * @param panel
-	 * @param xLog
 	 * @param attributesInfo
-	 * @param executor
 	 */
-	public void updateFiltersWithIMLog(InductiveVisualMinerPanel panel, final IMLog log, final XLog xLog,
-			Executor executor) {
-		for (IvMFilter filter : preMiningFilters) {
-			final IvMFilter filter2 = filter;
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						filter2.fillGuiWithLog(log, xLog, null);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
+	public void setAttributesInfo(AttributesInfo attributesInfo) {
+		for (PreMiningFilter filter : preMiningFilters) {
+			filter.setAttributesInfo(attributesInfo);
 		}
+		filtersPanel.getOnOffPanel().set(attributesInfo != null);
 	}
 
 	public boolean isAPreMiningFilterEnabled() {

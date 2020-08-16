@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfil
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -9,13 +10,12 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class HighlightingFilterFollows extends HighlightingFilter {
 
 	private HighlightingFilterFollowsPanel panel;
 
-	public boolean countInColouring(IvMTrace trace) {
+	public boolean staysInLog(IvMTrace trace) {
 		return isTraceIncluded(trace, panel);
 	}
 
@@ -23,15 +23,22 @@ public class HighlightingFilterFollows extends HighlightingFilter {
 		return "Event-followed-by filter";
 	}
 
-	public IvMFilterGui createGui(AttributesInfo attributesInfo) throws Exception {
-		panel = new HighlightingFilterFollowsPanel(getName(), attributesInfo, new Runnable() {
+	@Override
+	public IvMFilterGui createGui() throws Exception {
+		panel = new HighlightingFilterFollowsPanel(getName(), new Runnable() {
 			public void run() {
 				updateExplanation();
 				update();
 			}
 		});
-		updateExplanation();
 		return panel;
+	}
+
+	@Override
+	public void setAttributesInfo(IvMAttributesInfo attributesInfo) {
+		panel.setAttributes(attributesInfo.getEventAttributes(),
+				(int) attributesInfo.getTraceAttributeValues("number of completion events").getNumericMax());
+		updateExplanation();
 	}
 
 	public void updateExplanation() {

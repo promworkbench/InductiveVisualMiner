@@ -18,10 +18,12 @@ import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
-import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceCompletionEvents;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceDuration;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceFitness;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceLength;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfCompleteEvents;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfLogMoves;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfModelMoves;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01GatherAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl02SortEvents;
@@ -48,9 +50,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.Cohor
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysisTableFactory;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCohort;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCompleteEventTwice;
@@ -62,11 +62,11 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilt
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceEndsWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceStartsWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterWithoutEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEventTwice;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFrequentTracesFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
@@ -94,7 +94,6 @@ import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStart
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndNumberOfTraces;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndPerformance;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndSpacer;
-import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.AllOperatorsMiner;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.DfgMiner;
@@ -133,19 +132,19 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	protected List<IvMFilter> createPreMiningFilters() {
-		return new ArrayList<>(Arrays.asList(new IvMFilter[] { //
+	protected List<PreMiningFilter> createPreMiningFilters() {
+		return new ArrayList<>(Arrays.asList(new PreMiningFilter[] { //
 				new PreMiningFilterEvent(), //
 				new PreMiningFilterTrace(), //
 				new PreMiningFilterTraceWithEvent(), //
 				new PreMiningFilterTraceWithEventTwice(), //
-				new PreMiningFrequentTracesFilter()//
+				//new PreMiningFrequentTracesFilter()//
 		}));
 	}
 
 	@Override
-	protected List<IvMFilter> createHighlightingFilters() {
-		return new ArrayList<>(Arrays.asList(new IvMFilter[] { //
+	protected List<HighlightingFilter> createHighlightingFilters() {
+		return new ArrayList<>(Arrays.asList(new HighlightingFilter[] { //
 				new HighlightingFilterTraceAttribute(), //
 				new HighlightingFilterEvent(), //
 				new HighlightingFilterWithoutEvent(), //
@@ -246,7 +245,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				return new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
 						new VirtualAttributeTraceDuration(), //
 						new VirtualAttributeTraceLength(), //
-						new VirtualAttributeTraceCompletionEvents(), //
 				}));
 			}
 
@@ -262,7 +260,10 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					THashMap<String, AttributeImpl> traceAttributesReal,
 					THashMap<String, AttributeImpl> eventAttributesReal) {
 				return new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
+						new VirtualAttributeTraceNumberOfCompleteEvents(), //
 						new VirtualAttributeTraceFitness(), //
+						new VirtualAttributeTraceNumberOfModelMoves(), //
+						new VirtualAttributeTraceNumberOfLogMoves(), //
 				}));
 			}
 
@@ -289,7 +290,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	@Override
 	public Chain<InductiveVisualMinerState> createChain(final InductiveVisualMinerState state,
 			final InductiveVisualMinerPanel panel, final ProMCanceller canceller, final Executor executor,
-			final List<IvMFilter> preMiningFilters, final List<IvMFilter> highlightingFilters) {
+			final List<PreMiningFilter> preMiningFilters, final List<HighlightingFilter> highlightingFilters) {
 		//set up the chain
 		final Chain<InductiveVisualMinerState> chain = new Chain<>(state, canceller, executor);
 
@@ -324,15 +325,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getClassifiers().replaceClassifiers(state.getClassifiers(), state.getInitialClassifier());
 
 					//initialise the filters
-					{
-						Runnable onUpdatePreMining = new Runnable() {
-							public void run() {
-								chain.execute(Cl04FilterLogOnActivities.class);
-							}
-						};
-						state.setPreMiningFiltersController(
-								new IvMPreMiningFiltersController(preMiningFilters, state, panel, onUpdatePreMining));
-					}
+					state.getPreMiningFiltersController().setAttributesInfo(state.getAttributesInfo());
 				}
 			});
 			gatherAttributes.setOnInvalidate(new Runnable() {
@@ -383,9 +376,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			makeLog.setOnComplete(new Runnable() {
 				public void run() {
 					panel.getTraceView().set(state.getLog(), state.getTraceColourMap());
-
-					state.getPreMiningFiltersController().updateFiltersWithIMLog(panel, state.getLog(),
-							state.getSortedXLog(), executor);
 				}
 			});
 
@@ -478,31 +468,16 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		{
 			ivmAttributes.setOnComplete(new Runnable() {
 				public void run() {
-					//initialise highlighting filters
-					{
-						Runnable onUpdateHighlighting = new Runnable() {
-							public void run() {
-								chain.execute(Cl13FilterNodeSelection.class);
-							}
-						};
+					//update highlighting filters
+					state.getHighlightingFiltersController().setAttributesInfo(state.getIvMAttributesInfo());
 
-						state.setHighlightingFiltersController(new IvMHighlightingFiltersController(highlightingFilters,
-								state, panel, onUpdateHighlighting));
-						state.getHighlightingFiltersController().updateFiltersWithIvMLog(panel, state.getIvMLog(),
-								executor);
-					}
-
-					//initialise trace colour map
-					{
-						Function<TraceColourMapSettings, Object> onUpdateTraceColourMap = new Function<TraceColourMapSettings, Object>() {
-							public Object call(TraceColourMapSettings input) throws Exception {
-								state.setTraceColourMapSettings(input);
-								chain.execute(Cl12TraceColouring.class);
-								return null;
-							}
-						};
-						panel.getTraceColourMapView().initialise(state.getAttributesInfoIvM(), onUpdateTraceColourMap);
-					}
+					//update trace colour window 
+					panel.getTraceColourMapView().setAttributes(state.getIvMAttributesInfo());
+				}
+			});
+			ivmAttributes.setOnInvalidate(new Runnable() {
+				public void run() {
+					panel.getTraceColourMapView().invalidateAttributes();
 				}
 			});
 			chain.addConnection(align, ivmAttributes);

@@ -1,41 +1,42 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
-import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class HighlightingFilterTraceEndsWithEvent extends HighlightingFilter {
 
 	AttributeFilterGui panel = null;
 	boolean block = true;
 
+	@Override
 	public String getName() {
 		return "Trace ends with event filter";
 	}
 
-	public IvMFilterGui createGui(final AttributesInfo attributesInfo) {
-		panel = new AttributeFilterGui(getName(), attributesInfo.getEventAttributes(), new Runnable() {
+	@Override
+	public IvMFilterGui createGui() {
+		panel = new AttributeFilterGui(getName(), new Runnable() {
 			public void run() {
 				updateExplanation();
 				update();
 			}
 		});
-		updateExplanation();
 		return panel;
 	}
 
-	protected boolean fillGuiWithLog(IMLog log, XLog xLog, IvMLog ivmLog) throws Exception {
-		return false;
+	@Override
+	public void setAttributesInfo(IvMAttributesInfo attributesInfo) {
+		panel.setAttributes(attributesInfo.getEventAttributes());
+		updateExplanation();
 	}
 
-	public boolean countInColouring(IvMTrace trace) {
+	@Override
+	public boolean staysInLog(IvMTrace trace) {
 		return isTraceIncluded(trace, panel);
 	}
 
@@ -77,6 +78,7 @@ public class HighlightingFilterTraceEndsWithEvent extends HighlightingFilter {
 		return false;
 	}
 
+	@Override
 	public boolean isEnabled() {
 		return panel.isFiltering();
 	}

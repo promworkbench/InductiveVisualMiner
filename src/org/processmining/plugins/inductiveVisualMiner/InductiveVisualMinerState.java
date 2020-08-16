@@ -114,7 +114,7 @@ public class InductiveVisualMinerState {
 	 * 
 	 * @return
 	 */
-	public IvMAttributesInfo getAttributesInfoIvM() {
+	public IvMAttributesInfo getIvMAttributesInfo() {
 		return attributesInfoIvM;
 	}
 

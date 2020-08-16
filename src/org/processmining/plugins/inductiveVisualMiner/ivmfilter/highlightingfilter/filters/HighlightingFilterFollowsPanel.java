@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
 import java.awt.Color;
+import java.util.Collection;
 
 import javax.swing.Box;
 import javax.swing.JTextArea;
@@ -11,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.RangeSlider;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
+import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
 public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 	private static final long serialVersionUID = 4742499018638960929L;
@@ -20,9 +21,9 @@ public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 	private final RangeSlider inBetweenSelector;
 	private final AttributeFilterGui panelFollow;
 
-	public HighlightingFilterFollowsPanel(String title, AttributesInfo attributesInfo, final Runnable onUpdate) {
+	public HighlightingFilterFollowsPanel(String title, final Runnable onUpdate) {
 		super(title);
-		panelBefore = new AttributeFilterGui(null, attributesInfo.getEventAttributes(), onUpdate);
+		panelBefore = new AttributeFilterGui(null, onUpdate);
 		add(panelBefore);
 
 		add(Box.createVerticalStrut(10));
@@ -40,10 +41,7 @@ public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 
 		add(Box.createVerticalStrut(5));
 
-		int maxTraceLength = (int) attributesInfo.getTraceAttributeValues("number of completion events").getNumericMax();
-		inBetweenSelector = new RangeSlider(0, maxTraceLength);
-		inBetweenSelector.setValue(0);
-		inBetweenSelector.setUpperValue(maxTraceLength);
+		inBetweenSelector = new RangeSlider(0, 1);
 		add(inBetweenSelector);
 		inBetweenSelector.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -53,7 +51,7 @@ public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 
 		add(Box.createVerticalStrut(10));
 
-		panelFollow = new AttributeFilterGui(null, attributesInfo.getEventAttributes(), onUpdate);
+		panelFollow = new AttributeFilterGui(null, onUpdate);
 		panelFollow.getExplanationLabel().setText("Followed by");
 		add(panelFollow);
 	}
@@ -81,5 +79,13 @@ public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 			panelFollow.setForegroundRecursively(colour);
 			inBetweenSelectorExplanation.setForeground(colour);
 		}
+	}
+
+	public void setAttributes(Collection<Attribute> attributes, int maxTraceLength) {
+		inBetweenSelector.setValue(0);
+		inBetweenSelector.setUpperValue(maxTraceLength);
+		inBetweenSelector.setMaximum(maxTraceLength);
+		panelBefore.setAttributes(attributes);
+		panelFollow.setAttributes(attributes);
 	}
 }

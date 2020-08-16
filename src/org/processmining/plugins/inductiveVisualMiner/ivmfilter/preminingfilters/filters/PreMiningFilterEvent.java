@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters;
 
 import org.deckfour.xes.model.XEvent;
-import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningEventFilter;
@@ -18,15 +17,14 @@ public class PreMiningFilterEvent extends PreMiningEventFilter {
 	}
 
 	@Override
-	public IvMFilterGui createGui(final AttributesInfo attributesInfo) throws Exception {
-		panel = new AttributeFilterGui(getName(), attributesInfo.getEventAttributes(), new Runnable() {
+	public IvMFilterGui createGui() throws Exception {
+		panel = new AttributeFilterGui(getName(), new Runnable() {
 			public void run() {
 				update();
 				updateExplanation();
 			}
 		});
 
-		updateExplanation();
 		return panel;
 	}
 
@@ -59,8 +57,9 @@ public class PreMiningFilterEvent extends PreMiningEventFilter {
 	}
 
 	@Override
-	public boolean fillGuiWithLog(IMLog log) throws Exception {
-		return false;
+	public void setAttributesInfo(AttributesInfo attributesInfo) {
+		panel.setAttributes(attributesInfo.getEventAttributes());
+		updateExplanation();
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
+import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
@@ -30,6 +31,7 @@ import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElement
 import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.ChainLink;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01GatherAttributes;
@@ -40,6 +42,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutModel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl07Align;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Animate;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl12TraceColouring;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
@@ -60,10 +63,14 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.UserStatus;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.LogPopupListener;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapFixed;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
@@ -188,6 +195,7 @@ public class InductiveVisualMinerController {
 		panel.getClassifiers().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				state.setClassifier(panel.getClassifiers().getSelectedClassifier());
+
 				chain.execute(Cl03MakeLog.class);
 			}
 		});
@@ -324,7 +332,8 @@ public class InductiveVisualMinerController {
 		panel.getGraph().setGetExporters(new GetExporters() {
 			public List<Exporter> getExporters(List<Exporter> exporters) {
 				exporters.add(new ExporterDataAnalyses(state));
-				if (state.getIvMLogFiltered() != null && state.isAlignmentReady()) {
+				if (state.getIvMLogFiltered() != null && state.isAlignmentReady()
+						&& state.getIvMAttributesInfo() != null) {
 					exporters.add(new ExporterTraceData(state));
 				}
 				if (state.isPerformanceReady()) {
@@ -403,6 +412,13 @@ public class InductiveVisualMinerController {
 				panel.getPreMiningFiltersView().enableAndShow();
 			}
 		});
+		panel.getPreMiningFiltersView().setOnUpdate(new Runnable() {
+			public void run() {
+				chain.execute(Cl04FilterLogOnActivities.class);
+			}
+		});
+		state.setPreMiningFiltersController(new IvMPreMiningFiltersController(
+				state.getConfiguration().getPreMiningFilters(), panel.getPreMiningFiltersView()));
 
 		//set edit model button
 		panel.getEditModelButton().addActionListener(new ActionListener() {
@@ -424,7 +440,7 @@ public class InductiveVisualMinerController {
 				panel.getDataAnalysesView().enableAndShow();
 			}
 		});
-		panel.getColouringFiltersView()
+		panel.getHighlightingFiltersView()
 				.setHighlightingFilter2CohortAnalysisHandler(new HighlightingFilter2CohortAnalysisHandler() {
 					public void showCohortAnalysis() {
 						panel.getDataAnalysesView().enableAndShow();
@@ -438,7 +454,8 @@ public class InductiveVisualMinerController {
 		panel.getDataAnalysesView()
 				.setCohortAnalysis2HighlightingFilterHandler(new CohortAnalysis2HighlightingFilterHandler() {
 					public void setSelectedCohort(Cohort cohort, boolean highlightInCohort) {
-						panel.getColouringFiltersView().setHighlightingFilterSelectedCohort(cohort, highlightInCohort);
+						panel.getHighlightingFiltersView().setHighlightingFilterSelectedCohort(cohort,
+								highlightInCohort);
 					}
 				});
 
@@ -448,13 +465,29 @@ public class InductiveVisualMinerController {
 				panel.getTraceColourMapView().enableAndShow();
 			}
 		});
+		state.setTraceColourMap(new TraceColourMapFixed(RendererFactory.defaultTokenFillColour));
+		panel.getGraph().setTraceColourMap(state.getTraceColourMap());
+		panel.getTraceColourMapView().setOnUpdate(new Function<TraceColourMapSettings, Object>() {
+			public Object call(TraceColourMapSettings input) throws Exception {
+				state.setTraceColourMapSettings(input);
+				chain.execute(Cl12TraceColouring.class);
+				return null;
+			}
+		});
 
 		//set highlighting filters button
 		panel.getHighlightingFiltersViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				panel.getColouringFiltersView().enableAndShow();
+				panel.getHighlightingFiltersView().enableAndShow();
 			}
 		});
+		panel.getHighlightingFiltersView().setOnUpdate(new Runnable() {
+			public void run() {
+				chain.execute(Cl13FilterNodeSelection.class);
+			}
+		});
+		state.setHighlightingFiltersController(new IvMHighlightingFiltersController(
+				state.getConfiguration().getHighlightingFilters(), panel.getHighlightingFiltersView()));
 
 		//set mouse-in-out node updater
 		panel.getGraph().addMouseInElementsChangedListener(new MouseInElementsChangedListener<DotElement>() {

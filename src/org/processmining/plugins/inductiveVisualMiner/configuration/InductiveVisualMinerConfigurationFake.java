@@ -12,7 +12,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentCompute
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLog;
@@ -50,11 +51,11 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return discoveryTechniques.toArray(result);
 	}
 
-	public List<IvMFilter> getPreMiningFilters() {
+	public List<PreMiningFilter> getPreMiningFilters() {
 		return phantom.getPreMiningFilters();
 	}
 
-	public List<IvMFilter> getHighlightingFilters() {
+	public List<HighlightingFilter> getHighlightingFilters() {
 		return phantom.getHighlightingFilters();
 	}
 
