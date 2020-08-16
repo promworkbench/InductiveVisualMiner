@@ -99,8 +99,10 @@ public abstract class IvMFiltersView extends SideWindow {
 				}
 			});
 
-			for (IvMFilter filter : filters) {
+			for (IvMFilter filter2 : filters) {
 
+				final IvMFilter filter = filter2;
+				
 				//special case: cohorts filter needs a special handler to communicate with cohort tab
 				if (filter instanceof HighlightingFilterCohort) {
 					((HighlightingFilterCohort) filter)
