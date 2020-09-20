@@ -25,7 +25,7 @@ import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 
 import gnu.trove.map.TObjectIntMap;
 
-public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNetAlignmentCallback {
+public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetriNetAlignmentCallback {
 
 	//input
 	private final XLog xLog;
@@ -42,8 +42,10 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 	//output
 	private final IvMLogNotFilteredImpl alignedLog;
 
-	public AcceptingPetriNetAlignmentCallbackImpl(XLog xLog, IvMModel model, IvMEventClasses activityEventClasses,
+	public AcceptingPetriNetAlignmentCallbackImplDfg(XLog xLog, IvMModel model, IvMEventClasses activityEventClasses,
 			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, Transition> p) {
+		assert model.isDfg();
+		
 		this.xLog = xLog;
 		this.model = model;
 		this.activityEventClasses = activityEventClasses;
@@ -159,8 +161,7 @@ public class AcceptingPetriNetAlignmentCallbackImpl implements AcceptingPetriNet
 					lifeCycleTransition = PerformanceTransition.start;
 					activityIndex = activity2skipStart.get(performanceUnode);
 				}
-				XEventClass activity = activityEventClasses
-						.getByIdentity(model.getDfg().getNodeOfIndex(activityIndex));
+				XEventClass activity = activityEventClasses.getByIdentity(model.getDfg().getNodeOfIndex(activityIndex));
 				XEventClass performanceActivity = performanceEventClasses
 						.getByIdentity(activity.getId() + "+" + lifeCycleTransition);
 				return Pair.of(new Move(model, Type.ignoredModelMove, previousModelNode, activityIndex, activity,

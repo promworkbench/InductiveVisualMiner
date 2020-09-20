@@ -23,11 +23,8 @@ public class AlignmentComputerImpl implements AlignmentComputer {
 			IvMEventClasses activityEventClasses2, IvMEventClasses performanceEventClasses2,
 			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, Transition> p)
 			throws InterruptedException, ExecutionException, AStarException {
-		AcceptingPetriNetAlignmentCallbackImpl callback = new AcceptingPetriNetAlignmentCallbackImpl(xLog, model,
+		AcceptingPetriNetAlignmentCallbackImplDfg callback = new AcceptingPetriNetAlignmentCallbackImplDfg(xLog, model,
 				activityEventClasses2, p);
-		//AlignmentsWithAlignmentPackageQualityInformed.align(p.getA(), xLog, performanceEventClasses2, callback,
-		//		canceller);
-		//AlignmentsWithAlignmentPackage.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
 		AcceptingPetriNetAlignment.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
 
 		if (!canceller.isCancelled()) {
@@ -47,6 +44,13 @@ public class AlignmentComputerImpl implements AlignmentComputer {
 		ETMAlignment alignment = new ETMAlignment(performanceTree.getDTree(), xLog, performanceEventClasses2, callback,
 				canceller);
 		alignment.alignLog();
+
+//		//test: alignment via accepting Petri nets
+//		Triple<AcceptingPetriNet, TObjectIntMap<Transition>, Set<Transition>> p = EfficientTree2AcceptingPetriNetPerformance
+//				.convert(model.getTree());
+//		AcceptingPetriNetAlignmentCallbackImplEfficientTree callback = new AcceptingPetriNetAlignmentCallbackImplEfficientTree(
+//				xLog, model, activityEventClasses2, p);
+//		AcceptingPetriNetAlignment.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
 
 		if (!canceller.isCancelled()) {
 			return callback.getAlignedLog();

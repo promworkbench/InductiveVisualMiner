@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.performance;
 
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.classification.XEventClasses;
+import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
 public class Performance {
@@ -16,6 +17,10 @@ public class Performance {
 
 	public static PerformanceTransition getLifeCycleTransition(UnfoldedNode performanceUnode) {
 		return getLifeCycleTransition(performanceUnode.getNode().getName());
+	}
+
+	public static PerformanceTransition getLifeCycleTransition(Transition performanceTransition) {
+		return getLifeCycleTransition(performanceTransition.getLabel());
 	}
 
 	public static PerformanceTransition getLifeCycleTransition(String performanceActivity) {

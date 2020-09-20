@@ -82,7 +82,7 @@ public class ImportAlignment {
 		Iterator<XTrace> xTraceIt = xLog.iterator(); //x prefix: xLog (i.e. without alignment)
 		int traceIndex = 0;
 		for (XTrace aTrace : aLog) { //a prefix: aligned log (as the XES-aligned log, the input)
-			String traceName = AcceptingPetriNetAlignmentCallbackImpl.getTraceName(aTrace);
+			String traceName = AcceptingPetriNetAlignmentCallbackImplDfg.getTraceName(aTrace);
 			XTrace xTrace = xTraceIt.next();
 
 			XAttributeMap xTraceAttributes = (XAttributeMap) xTrace.getAttributes().clone();
