@@ -17,6 +17,7 @@ import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNod
 import gnu.trove.map.TObjectIntMap;
 import nl.tue.astar.AStarException;
 
+@SuppressWarnings("deprecation")
 public class AlignmentComputerImpl implements AlignmentComputer {
 
 	public IvMLogNotFiltered computeAcceptingPetriNet(IvMModel model, XLog xLog, ProMCanceller canceller,
@@ -45,12 +46,12 @@ public class AlignmentComputerImpl implements AlignmentComputer {
 				canceller);
 		alignment.alignLog();
 
-//		//test: alignment via accepting Petri nets
-//		Triple<AcceptingPetriNet, TObjectIntMap<Transition>, Set<Transition>> p = EfficientTree2AcceptingPetriNetPerformance
-//				.convert(model.getTree());
-//		AcceptingPetriNetAlignmentCallbackImplEfficientTree callback = new AcceptingPetriNetAlignmentCallbackImplEfficientTree(
-//				xLog, model, activityEventClasses2, p);
-//		AcceptingPetriNetAlignment.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
+		//		//alternative: alignment via accepting Petri nets
+		//		Triple<AcceptingPetriNet, TObjectIntMap<Transition>, Set<Transition>> p = EfficientTree2AcceptingPetriNetPerformance
+		//				.convert(model.getTree());
+		//		AcceptingPetriNetAlignmentCallbackImplEfficientTree callback = new AcceptingPetriNetAlignmentCallbackImplEfficientTree(
+		//				xLog, model, activityEventClasses2, p);
+		//		AcceptingPetriNetAlignment.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
 
 		if (!canceller.isCancelled()) {
 			return callback.getAlignedLog();

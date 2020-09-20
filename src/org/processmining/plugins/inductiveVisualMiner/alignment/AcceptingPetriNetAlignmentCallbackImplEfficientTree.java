@@ -139,6 +139,11 @@ public class AcceptingPetriNetAlignmentCallbackImplEfficientTree implements Acce
 			unode = performanceTransition2node.get(performanceTransition);
 			lifeCycleTransition = Performance.getLifeCycleTransition(performanceTransition);
 
+			if (!model.isTau(unode) && !model.isActivity(unode)) {
+				//we are only interested in activity and tau moves; not in other model elements
+				return null;
+			}
+
 			if (performanceTransition.isInvisible() && model.isActivity(unode)) {
 				//this is a tau that represents that the start/enqueue of an activity is skipped
 				if (skipEnqueueTransitions.contains(performanceTransition)) {
