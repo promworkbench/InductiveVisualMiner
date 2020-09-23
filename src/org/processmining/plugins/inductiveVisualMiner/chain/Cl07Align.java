@@ -6,8 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.deckfour.xes.classification.XEventClasses;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Septuple;
-import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentPerformance;
 import org.processmining.plugins.inductiveVisualMiner.alignment.ImportAlignment;
@@ -21,7 +21,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerforma
 public class Cl07Align extends
 		IvMChainLink<Septuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment, InductiveVisualMinerConfiguration>, Pair<IvMLogNotFiltered, IvMLogInfo>> {
 
-	private static ConcurrentHashMap<Triple<IvMModel, XEventPerformanceClassifier, XLog>, SoftReference<IvMLogNotFiltered>> cache = new ConcurrentHashMap<>();
+	private static ConcurrentHashMap<Quadruple<IvMModel, XEventPerformanceClassifier, XLog, String>, SoftReference<IvMLogNotFiltered>> cache = new ConcurrentHashMap<>();
 
 	protected Septuple<IvMModel, XEventPerformanceClassifier, XLog, XEventClasses, XEventClasses, InductiveVisualMinerAlignment, InductiveVisualMinerConfiguration> generateInput(
 			InductiveVisualMinerState state) {
@@ -47,7 +47,8 @@ public class Cl07Align extends
 		}
 
 		//attempt to get the alignment from cache
-		Triple<IvMModel, XEventPerformanceClassifier, XLog> cacheKey = Triple.of(model, input.getB(), input.getC());
+		Quadruple<IvMModel, XEventPerformanceClassifier, XLog, String> cacheKey = Quadruple.of(model, input.getB(),
+				input.getC(), input.getG().getAlignmentComputer().getUniqueIdentifier());
 		SoftReference<IvMLogNotFiltered> fromCacheReference = cache.get(cacheKey);
 		if (fromCacheReference != null) {
 			IvMLogNotFiltered fromCache = fromCacheReference.get();

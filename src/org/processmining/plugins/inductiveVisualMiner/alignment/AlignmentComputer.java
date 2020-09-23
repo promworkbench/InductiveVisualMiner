@@ -28,4 +28,11 @@ public interface AlignmentComputer {
 			IvMEventClasses activityEventClasses2, IvMEventClasses performanceEventClasses2,
 			IvMEfficientTree performanceTree, Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping,
 			Set<UnfoldedNode> enqueueTaus, UnfoldedNode[] nodeId2performanceNode) throws Exception;
+
+	/**
+	 * 
+	 * @return A string that uniquely represent this alignment computer. Used
+	 *         for caching purposes.
+	 */
+	public String getUniqueIdentifier();
 }

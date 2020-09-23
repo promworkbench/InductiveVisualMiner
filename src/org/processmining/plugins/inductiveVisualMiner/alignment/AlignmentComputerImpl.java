@@ -60,4 +60,8 @@ public class AlignmentComputerImpl implements AlignmentComputer {
 		}
 	}
 
+	public String getUniqueIdentifier() {
+		return "default alignment";
+	}
+
 }
