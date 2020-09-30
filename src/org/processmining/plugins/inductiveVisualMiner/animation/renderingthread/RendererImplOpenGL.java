@@ -19,6 +19,7 @@ public class RendererImplOpenGL {
 	private OpenGLEventListener eventListener;
 
 	public RendererImplOpenGL(OpenGLEventListener eventListener) {
+		System.setProperty("jogl.disable.openglcore", "false");
 		GLProfile profile = GLProfile.get(GLProfile.GL2);
 		GLCapabilities capabilities = new GLCapabilities(profile);
 		capabilities.setDepthBits(24);
