@@ -24,7 +24,6 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 		IvMDecorator.decorate(this);
 		setHorizontalTextPosition(SwingConstants.LEADING);
 		setVerticalAlignment(JLabel.TOP);
-		setBackground(IvMDecorator.backGroundColour2); //background is for selection only
 	}
 
 	public Component getTableCellRendererComponent(JTable table, Object object, boolean isSelected, boolean hasFocus,
@@ -64,8 +63,11 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 		}
 
 		if (isSelected) {
+			setBackground(IvMDecorator.textColour);
+			setForeground(IvMDecorator.backGroundColour1);
 			setOpaque(true);
 		} else {
+			setForeground(IvMDecorator.textColour);
 			setOpaque(false);
 		}
 
