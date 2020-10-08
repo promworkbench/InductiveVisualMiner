@@ -11,6 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentCompute
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -46,6 +47,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<PreMiningFilter> preMiningFilters;
 	private final List<HighlightingFilter> highlightingFilters;
 	private final IvMVirtualAttributeFactory virtualAttributeFactory;
+	private final IvMDecoratorI decorator;
 
 	public InductiveVisualMinerConfigurationAbstract(XLog log, ProMCanceller canceller, Executor executor) {
 		discoveryTechniques = createDiscoveryTechniques();
@@ -60,6 +62,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		popupItemsLog = createPopupItemsLog();
 		dataAnalyses = createDataAnalysisTables();
 		virtualAttributeFactory = createVirtualAttributes();
+		decorator = createDecorator();
 
 		state = createState(log);
 		panel = createPanel(canceller);
@@ -91,6 +94,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract InductiveVisualMinerState createState(XLog log);
 
 	protected abstract InductiveVisualMinerPanel createPanel(ProMCanceller canceller);
+
+	protected abstract IvMDecoratorI createDecorator();
 
 	protected abstract Chain<InductiveVisualMinerState> createChain(InductiveVisualMinerState state,
 			InductiveVisualMinerPanel panel, ProMCanceller canceller, Executor executor,
@@ -183,5 +188,10 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	@Override
 	public IvMVirtualAttributeFactory getVirtualAttributes() {
 		return virtualAttributeFactory;
+	}
+
+	@Override
+	public IvMDecoratorI getDecorator() {
+		return decorator;
 	}
 }

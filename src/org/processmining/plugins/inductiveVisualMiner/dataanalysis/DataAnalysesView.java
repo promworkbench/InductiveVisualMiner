@@ -12,6 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 import gnu.trove.map.hash.THashMap;
 
@@ -33,7 +34,7 @@ public class DataAnalysesView extends SideWindow {
 			String analysisName = factory.getAnalysisName();
 			String explanation = factory.getExplanation();
 
-			OnOffPanel<?> onOffPanel = createView(table, explanation);
+			OnOffPanel<?> onOffPanel = createView(configuration.getDecorator(), table, explanation);
 			onOffPanel.setOffMessage("Computing..");
 			onOffPanel.off();
 			tabbedPane.addTab(analysisName, onOffPanel);
@@ -46,8 +47,9 @@ public class DataAnalysesView extends SideWindow {
 		add(tabbedPane, BorderLayout.CENTER);
 	}
 
-	private static OnOffPanel<DataAnalysisView> createView(DataAnalysisTable table, String explanation) {
-		return new OnOffPanel<>(new DataAnalysisView(table, explanation));
+	private static OnOffPanel<DataAnalysisView> createView(IvMDecoratorI decorator, DataAnalysisTable table,
+			String explanation) {
+		return new OnOffPanel<>(decorator, new DataAnalysisView(decorator, table, explanation));
 	}
 
 	/**

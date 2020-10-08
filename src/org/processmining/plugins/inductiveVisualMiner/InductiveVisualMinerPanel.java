@@ -34,8 +34,8 @@ import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ControllerView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMClassifierChooser;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapView;
@@ -115,6 +115,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	public static final String title = "visual Miner";
 
 	public InductiveVisualMinerPanel(InductiveVisualMinerConfiguration configuration, ProMCanceller canceller) {
+		super(configuration.getDecorator());
+		IvMDecoratorI decorator = configuration.getDecorator();
 		int gridy = 0;
 
 		setLayout(new BorderLayout());
@@ -162,7 +164,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			otherSettingsPanel.setLayout(new GridBagLayout());
 			{
 				classifierLabel = new JLabel("Classifier");
-				IvMDecorator.decorate(classifierLabel);
+				decorator.decorate(classifierLabel);
 				classifierLabel.setBorder(leftBorder);
 				GridBagConstraints cClassifierLabel = new GridBagConstraints();
 				cClassifierLabel.gridx = 0;
@@ -172,7 +174,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				otherSettingsPanel.add(classifierLabel, cClassifierLabel);
 
 				classifiersCombobox = new IvMClassifierChooser(null, null, false);
-				IvMDecorator.decorate(classifiersCombobox.getMultiComboBox());
+				decorator.decorate(classifiersCombobox.getMultiComboBox());
 				classifiersCombobox.setEnabled(false);
 				GridBagConstraints cClassifiers = new GridBagConstraints();
 				cClassifiers.gridx = 1;
@@ -208,9 +210,10 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//pre-mining filters
 			{
-				preMiningFiltersView = new PreMiningFiltersView(this, configuration.getPreMiningFilters());
+				preMiningFiltersView = new PreMiningFiltersView(this, configuration.getPreMiningFilters(),
+						configuration.getDecorator());
 				preMiningFiltersButton = new JButton("pre-mining filters");
-				IvMDecorator.decorate(preMiningFiltersButton);
+				decorator.decorate(preMiningFiltersButton);
 				GridBagConstraints cTraceViewButton = new GridBagConstraints();
 				cTraceViewButton.gridx = 1;
 				cTraceViewButton.gridy = gridy++;
@@ -223,7 +226,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			//miner
 			{
 				minerLabel = new JLabel("Miner");
-				IvMDecorator.decorate(minerLabel);
+				decorator.decorate(minerLabel);
 				minerLabel.setBorder(leftBorder);
 				GridBagConstraints cMinerLabel = new GridBagConstraints();
 				cMinerLabel.gridx = 0;
@@ -233,7 +236,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				otherSettingsPanel.add(minerLabel, cMinerLabel);
 
 				minerCombobox = new JComboBox<>(configuration.getDiscoveryTechniquesArray());
-				IvMDecorator.decorate(minerCombobox);
+				decorator.decorate(minerCombobox);
 				minerCombobox.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 				minerCombobox.setFocusable(false);
 				GridBagConstraints cMiners = new GridBagConstraints();
@@ -250,7 +253,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			{
 				editModelView = new EditModelView(this);
 				editModelButton = new JButton("edit model");
-				IvMDecorator.decorate(editModelButton);
+				decorator.decorate(editModelButton);
 				GridBagConstraints cEditModelButton = new GridBagConstraints();
 				cEditModelButton.gridx = 1;
 				cEditModelButton.gridy = gridy++;
@@ -262,7 +265,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			{
 				colourLabel = new JLabel("Show");
-				IvMDecorator.decorate(colourLabel);
+				decorator.decorate(colourLabel);
 				colourLabel.setBorder(leftBorder);
 				GridBagConstraints cColourLabel = new GridBagConstraints();
 				cColourLabel.gridx = 0;
@@ -272,7 +275,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				otherSettingsPanel.add(colourLabel, cColourLabel);
 
 				colourSelection = new JComboBox<>(configuration.getModesArray());
-				IvMDecorator.decorate(colourSelection);
+				decorator.decorate(colourSelection);
 				colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
 				colourSelection.setFocusable(false);
 				GridBagConstraints ccolourSelection = new GridBagConstraints();
@@ -286,9 +289,9 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//trace colouring view
 			{
-				traceColourMapView = new TraceColourMapView(this);
+				traceColourMapView = new TraceColourMapView(configuration.getDecorator(), this);
 				traceColourMapViewButton = new JButton("trace colouring");
-				IvMDecorator.decorate(traceColourMapViewButton);
+				decorator.decorate(traceColourMapViewButton);
 				GridBagConstraints cTraceColourMapViewButton = new GridBagConstraints();
 				cTraceColourMapViewButton.gridx = 1;
 				cTraceColourMapViewButton.gridy = gridy++;
@@ -300,9 +303,10 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//highlighting filters view
 			{
-				highlightingFiltersView = new HighlightingFiltersView(this, configuration.getHighlightingFilters());
+				highlightingFiltersView = new HighlightingFiltersView(this, configuration.getHighlightingFilters(),
+						configuration.getDecorator());
 				highlightingFiltersViewButton = new JButton("highlighting filters");
-				IvMDecorator.decorate(highlightingFiltersViewButton);
+				decorator.decorate(highlightingFiltersViewButton);
 				GridBagConstraints cColouringFiltersViewButton = new GridBagConstraints();
 				cColouringFiltersViewButton.gridx = 1;
 				cColouringFiltersViewButton.gridy = gridy++;
@@ -314,9 +318,9 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//trace view
 			{
-				traceView = new TraceView(this);
+				traceView = new TraceView(decorator, this);
 				traceViewButton = new JButton("traces");
-				IvMDecorator.decorate(traceViewButton);
+				decorator.decorate(traceViewButton);
 				GridBagConstraints cTraceViewButton = new GridBagConstraints();
 				cTraceViewButton.gridx = 1;
 				cTraceViewButton.gridy = gridy++;
@@ -330,7 +334,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			{
 				dataAnalysisView = new DataAnalysesView(this, configuration);
 				dataAnalysisViewButton = new JButton("data analysis");
-				IvMDecorator.decorate(dataAnalysisViewButton);
+				decorator.decorate(dataAnalysisViewButton);
 				GridBagConstraints cDataAnalysisViewButton = new GridBagConstraints();
 				cDataAnalysisViewButton.gridx = 1;
 				cDataAnalysisViewButton.gridy = gridy++;
@@ -348,7 +352,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			//save log button
 			{
 				saveLogButton = new JButton("export log");
-				IvMDecorator.decorate(saveLogButton);
+				decorator.decorate(saveLogButton);
 				GridBagConstraints cExitButton = new GridBagConstraints();
 				cExitButton.gridx = 1;
 				cExitButton.gridy = gridy++;
@@ -361,7 +365,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			//save model button
 			{
 				saveModelButton = new JButton("export model");
-				IvMDecorator.decorate(saveModelButton);
+				decorator.decorate(saveModelButton);
 				GridBagConstraints cExitButton = new GridBagConstraints();
 				cExitButton.gridx = 1;
 				cExitButton.gridy = gridy++;
@@ -374,7 +378,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			//save image button 
 			{
 				saveImageButton = new JButton("export ..");
-				IvMDecorator.decorate(saveImageButton);
+				decorator.decorate(saveImageButton);
 				GridBagConstraints cExitButton = new GridBagConstraints();
 				cExitButton.gridx = 1;
 				cExitButton.gridy = gridy++;

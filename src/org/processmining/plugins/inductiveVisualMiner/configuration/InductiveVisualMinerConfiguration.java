@@ -8,6 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentCompute
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -125,5 +126,7 @@ public interface InductiveVisualMinerConfiguration {
 	public Chain<InductiveVisualMinerState> getChain();
 
 	public AlignmentComputer getAlignmentComputer();
+
+	public IvMDecoratorI getDecorator();
 
 }

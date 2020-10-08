@@ -7,17 +7,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
 
 public class DataAnalysisView extends JPanel {
 
 	private static final long serialVersionUID = -5719337013697465055L;
 
-	public DataAnalysisView(DataAnalysisTable table, String explanation) {
+	public DataAnalysisView(IvMDecoratorI decorator, DataAnalysisTable table, String explanation) {
 		setLayout(new BorderLayout());
 
-		IvMPanel topPanel = new IvMPanel();
+		IvMPanel topPanel = new IvMPanel(decorator);
 		topPanel.setLayout(new BorderLayout());
 		add(topPanel, BorderLayout.CENTER);
 
@@ -27,12 +27,13 @@ public class DataAnalysisView extends JPanel {
 		explanationT.setEnabled(false);
 		explanationT.setText(explanation);
 		explanationT.setMargin(new Insets(5, 5, 5, 5));
-		IvMDecorator.decorate(explanationT);
+		decorator.decorate(explanationT);
 		topPanel.add(explanationT, BorderLayout.PAGE_START);
 
 		JScrollPane scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.getViewport().setBackground(IvMDecorator.backGroundColour1);
+		scrollPane.setOpaque(false);
+		scrollPane.getViewport().setOpaque(false);
 		topPanel.add(scrollPane, BorderLayout.CENTER);
 	}
 

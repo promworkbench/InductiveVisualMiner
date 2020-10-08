@@ -25,8 +25,8 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.OnOffPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.SwitchPanel;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
@@ -57,13 +57,13 @@ public class TraceColourMapView extends SideWindow {
 	private String selectedAttributeName;
 	private AttributesInfo attributesInfo;
 
-	public TraceColourMapView(InductiveVisualMinerPanel parent) {
+	public TraceColourMapView(IvMDecoratorI decorator, InductiveVisualMinerPanel parent) {
 		super(parent, "trace colouring - " + InductiveVisualMinerPanel.title);
 		setSize(300, 300);
 		setMinimumSize(new Dimension(300, 300));
-		IvMPanel content = new IvMPanel();
+		IvMPanel content = new IvMPanel(decorator);
 
-		onOffPanel = new OnOffPanel<>(content);
+		onOffPanel = new OnOffPanel<>(decorator, content);
 		onOffPanel.setOffMessage("Waiting for attributes..");
 		add(onOffPanel);
 		onOffPanel.off();
@@ -76,7 +76,7 @@ public class TraceColourMapView extends SideWindow {
 			explanation = new JTextArea(
 					"Trace colouring annotates the traces with a colour in the animation and the trace view, "
 							+ "based on a trace attribute or property.");
-			IvMDecorator.decorate(explanation);
+			decorator.decorate(explanation);
 			explanation.setWrapStyleWord(true);
 			explanation.setLineWrap(true);
 			explanation.setEnabled(false);
@@ -87,14 +87,14 @@ public class TraceColourMapView extends SideWindow {
 		//checkbox
 		{
 			enabled = new JCheckBox("", false);
-			IvMDecorator.decorate(enabled);
+			decorator.decorate(enabled);
 			content.add(enabled, BorderLayout.LINE_START);
 		}
 
 		//filter panel
 		{
 			SpringLayout filterPanelLayout = new SpringLayout();
-			filterPanel = new SwitchPanel();
+			filterPanel = new SwitchPanel(decorator);
 			filterPanel.setLayout(filterPanelLayout);
 			filterPanel.setEnabled(false);
 			content.add(filterPanel, BorderLayout.CENTER);
@@ -102,7 +102,7 @@ public class TraceColourMapView extends SideWindow {
 			//title
 			{
 				title = new JLabel("Trace attribute");
-				IvMDecorator.decorate(title);
+				decorator.decorate(title);
 
 				filterPanel.add(title);
 				filterPanelLayout.putConstraint(SpringLayout.NORTH, title, 10, SpringLayout.NORTH, filterPanel);
@@ -113,7 +113,7 @@ public class TraceColourMapView extends SideWindow {
 			{
 				keySelectorModel = new DefaultComboBoxModel<>();
 				keySelector = new JComboBox<>();
-				IvMDecorator.decorate(keySelector);
+				decorator.decorate(keySelector);
 				keySelector.setModel(keySelectorModel);
 
 				filterPanel.add(keySelector);
@@ -127,7 +127,7 @@ public class TraceColourMapView extends SideWindow {
 			//status
 			{
 				status = new JTextArea("Currently not colouring.");
-				IvMDecorator.decorate(status);
+				decorator.decorate(status);
 				status.setWrapStyleWord(true);
 				status.setLineWrap(true);
 				status.setEnabled(false);
@@ -141,7 +141,7 @@ public class TraceColourMapView extends SideWindow {
 			//example colours
 			{
 				example = new TraceColourMapExample(10, 10);
-				IvMDecorator.decorate(example);
+				decorator.decorate(example);
 				example.setWrapStyleWord(true);
 				example.setLineWrap(true);
 

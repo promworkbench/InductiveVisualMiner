@@ -6,16 +6,17 @@ import java.awt.Rectangle;
 import javax.swing.BoxLayout;
 import javax.swing.Scrollable;
 
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
 
 public class CohortsPanel extends IvMPanel implements Scrollable {
 
 	private static final long serialVersionUID = -7438236924200705368L;
 
-	public CohortsPanel() {
+	public CohortsPanel(IvMDecoratorI decorator) {
+		super(decorator);
 		setOpaque(true);
-		setBackground(IvMDecorator.backGroundColour1);
+		setBackground(decorator.backGroundColour1());
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 	}
 

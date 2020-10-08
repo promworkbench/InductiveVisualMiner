@@ -8,8 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator.IvMPanel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
 
 public class OnOffPanel<X extends JComponent> extends IvMPanel {
 
@@ -20,13 +20,14 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 	private X onPanel;
 	private boolean on = true;
 
-	public OnOffPanel(X onPanel) {
+	public OnOffPanel(IvMDecoratorI decorator, X onPanel) {
+		super(decorator);
 		setLayout(new CardLayout());
 		this.onPanel = onPanel;
 
 		offPanel.setLayout(new BorderLayout());
 		offPanel.setOpaque(false);
-		IvMDecorator.decorate(offMessage);
+		decorator.decorate(offMessage);
 		offMessage.setOpaque(false);
 		offPanel.add(offMessage, BorderLayout.CENTER);
 		add(offPanel, "off");
@@ -53,7 +54,7 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 			off();
 		}
 	}
-	
+
 	public boolean isOn() {
 		return on;
 	}

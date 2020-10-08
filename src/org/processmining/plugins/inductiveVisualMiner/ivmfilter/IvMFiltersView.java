@@ -22,7 +22,7 @@ import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.OnOffPanel;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.SwitchPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCohort;
 
@@ -62,7 +62,8 @@ public abstract class IvMFiltersView extends SideWindow {
 		}
 	}
 
-	public IvMFiltersView(Component parent, String title, String header, List<? extends IvMFilter> filters) {
+	public IvMFiltersView(Component parent, String title, String header, List<? extends IvMFilter> filters,
+			IvMDecoratorI decorator) {
 		super(parent, title);
 		setLayout(new BorderLayout());
 		filter2panel = new THashMap<>();
@@ -70,11 +71,11 @@ public abstract class IvMFiltersView extends SideWindow {
 
 		panel = new IvMFiltersViewPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		panel.setBackground(IvMDecorator.backGroundColour1);
-		panel.setOpaque(true);
+		//panel.setBackground(decorator.backGroundColour1);
+		panel.setOpaque(false);
 
 		JTextArea explanation = new JTextArea(header);
-		IvMDecorator.decorate(explanation);
+		decorator.decorate(explanation);
 		explanation.setWrapStyleWord(true);
 		explanation.setLineWrap(true);
 		explanation.setEnabled(false);
@@ -82,9 +83,10 @@ public abstract class IvMFiltersView extends SideWindow {
 
 		JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.getViewport().setBackground(IvMDecorator.backGroundColour1);
+		scrollPane.setOpaque(false);
+		scrollPane.getViewport().setOpaque(false);
 
-		onOffPanel = new OnOffPanel<>(scrollPane);
+		onOffPanel = new OnOffPanel<>(decorator, scrollPane);
 		onOffPanel.setOffMessage("Waiting for attributes..");
 		onOffPanel.off();
 
@@ -102,7 +104,7 @@ public abstract class IvMFiltersView extends SideWindow {
 			for (IvMFilter filter2 : filters) {
 
 				final IvMFilter filter = filter2;
-				
+
 				//special case: cohorts filter needs a special handler to communicate with cohort tab
 				if (filter instanceof HighlightingFilterCohort) {
 					((HighlightingFilterCohort) filter)
@@ -112,7 +114,7 @@ public abstract class IvMFiltersView extends SideWindow {
 				//filter sub-panel
 				final SwitchPanel subPanel;
 				{
-					subPanel = new SwitchPanel() {
+					subPanel = new SwitchPanel(decorator) {
 						private static final long serialVersionUID = 132082897536007044L;
 
 						@Override
@@ -121,7 +123,7 @@ public abstract class IvMFiltersView extends SideWindow {
 						};
 					};
 					subPanel.setEnabled(false);
-					subPanel.setBorder(2, 0, 0, 0, IvMDecorator.backGroundColour1);
+					subPanel.setBorder(2, 0, 0, 0, decorator.backGroundColour1());
 					subPanel.setLayout(new BorderLayout());
 					panel.add(subPanel);
 				}
@@ -139,7 +141,7 @@ public abstract class IvMFiltersView extends SideWindow {
 				//add checkbox
 				{
 					final JCheckBox checkBox = new JCheckBox();
-					IvMDecorator.decorate(checkBox);
+					decorator.decorate(checkBox);
 					subPanel.add(checkBox, BorderLayout.LINE_START);
 					checkBox.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0) {

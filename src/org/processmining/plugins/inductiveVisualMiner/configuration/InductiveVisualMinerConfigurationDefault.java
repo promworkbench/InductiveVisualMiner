@@ -50,6 +50,8 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.Cohor
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorDefault;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCohort;
@@ -702,5 +704,9 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 	protected AlignmentComputer createAlignmentComputer() {
 		return new AlignmentComputerImpl();
+	}
+
+	protected IvMDecoratorI createDecorator() {
+		return new IvMDecoratorDefault();
 	}
 }

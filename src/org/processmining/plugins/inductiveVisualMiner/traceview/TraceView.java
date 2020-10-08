@@ -2,9 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.traceview;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 
 import javax.swing.JScrollPane;
 
@@ -17,7 +14,8 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 
@@ -25,12 +23,16 @@ public class TraceView extends SideWindow {
 
 	private static final long serialVersionUID = 8386546677949149002L;
 	private final ProMTraceList<Object> traceView;
-	private TraceColourMap traceColourMap;
 
 	private Object showing = null;
 
-	public TraceView(Component parent) {
+	public TraceView(IvMDecoratorI decorator, Component parent) {
 		super(parent, "trace view - " + InductiveVisualMinerPanel.title);
+
+		IvMPanel panel = new IvMPanel(decorator);
+		BorderLayout layout = new BorderLayout();
+		panel.setLayout(layout);
+		add(panel);
 
 		TraceBuilder<Object> traceBuilder = new TraceBuilder<Object>() {
 			public Trace<? extends Event> build(Object element) {
@@ -39,30 +41,31 @@ public class TraceView extends SideWindow {
 		};
 
 		traceView = new ProMTraceList<>(traceBuilder);
-		add(traceView);
-		
+		panel.add(traceView, BorderLayout.CENTER);
+
 		//replace the scroll pane
 		traceView.remove(traceView.getScrollPane());
 		JScrollPane scrollPane = new JScrollPane(traceView.getList());
 		traceView.add(scrollPane, BorderLayout.CENTER);
 		scrollPane.setOpaque(false);
-		
-		traceView.getList().setOpaque(true);
-		traceView.getList().setBackground(IvMDecorator.backGroundColour1);
+		scrollPane.getViewport().setOpaque(false);
+
+		traceView.getList().setOpaque(false);
+		traceView.getList().setBackground(decorator.backGroundColour1());
 
 		traceView.setMaxWedgeWidth(130);
 		traceView.setFixedInfoWidth(50);
 		traceView.setOpaque(false);
 	}
-	
-	@Override
-	public void paintComponents(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setPaint(IvMDecorator.getGradient(getHeight()));
-		g2d.fillRect(0, 0, getWidth(), getHeight());
-		super.paintComponents(g);
-	}
+
+	//	@Override
+	//	public void paintComponents(Graphics g) {
+	//		Graphics2D g2d = (Graphics2D) g;
+	//		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	//		g2d.setPaint(decorator.getGradient(getHeight()));
+	//		g2d.fillRect(0, 0, getWidth(), getHeight());
+	//		super.paintComponents(g);
+	//	}
 
 	/**
 	 * update the trace view with an IM log
