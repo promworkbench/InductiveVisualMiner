@@ -91,10 +91,7 @@ public class CohortAnalysisTable extends DataAnalysisTable {
 		});
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				System.out.println("click");
-				System.out.println(e.getModifiers());
 				if (e.isShiftDown()) {
-					System.out.println("shift");
 					highlightInCohort = false;
 					((DataAnalysisTableCellRenderer) getCellRenderer(0, 0)).setSelectedBackgroundColour(Color.red);
 				} else {
