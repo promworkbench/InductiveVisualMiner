@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -16,7 +15,6 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableCellRenderer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 
 public class CohortAnalysisTable extends DataAnalysisTable {
 
@@ -93,13 +91,15 @@ public class CohortAnalysisTable extends DataAnalysisTable {
 		});
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK) {
+				System.out.println("click");
+				System.out.println(e.getModifiers());
+				if (e.isShiftDown()) {
+					System.out.println("shift");
 					highlightInCohort = false;
-					((DataAnalysisTableCellRenderer) getCellRenderer(0, 0)).setBackground(Color.red);
+					((DataAnalysisTableCellRenderer) getCellRenderer(0, 0)).setSelectedBackgroundColour(Color.red);
 				} else {
 					highlightInCohort = true;
-					((DataAnalysisTableCellRenderer) getCellRenderer(0, 0))
-							.setBackground(IvMDecorator.backGroundColour2);
+					((DataAnalysisTableCellRenderer) getCellRenderer(0, 0)).setSelectedBackgroundColour(null);
 				}
 				repaint();
 

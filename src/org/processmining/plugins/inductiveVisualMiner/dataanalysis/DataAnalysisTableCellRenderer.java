@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
@@ -19,6 +20,9 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 	private static final long serialVersionUID = -7148998664457522071L;
 
 	public final DecimalFormat numberFormat = new DecimalFormat("0.0000");
+
+	private Color selectedBackgroundColour = null;
+	private Color selectedForegroundColour = null;
 
 	public DataAnalysisTableCellRenderer() {
 		IvMDecorator.decorate(this);
@@ -63,8 +67,16 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 		}
 
 		if (isSelected) {
-			setBackground(IvMDecorator.textColour);
-			setForeground(IvMDecorator.backGroundColour1);
+			if (getSelectedBackgroundColour() != null) {
+				setBackground(getSelectedBackgroundColour());
+			} else {
+				setBackground(IvMDecorator.textColour);
+			}
+			if (getSelectedForegroundColour() != null) {
+				setForeground(getSelectedForegroundColour());
+			} else {
+				setForeground(IvMDecorator.backGroundColour1);
+			}
 			setOpaque(true);
 		} else {
 			setForeground(IvMDecorator.textColour);
@@ -72,5 +84,21 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 		}
 
 		return this;
+	}
+
+	public Color getSelectedBackgroundColour() {
+		return selectedBackgroundColour;
+	}
+
+	public void setSelectedBackgroundColour(Color selectedBackgroundColour) {
+		this.selectedBackgroundColour = selectedBackgroundColour;
+	}
+
+	public Color getSelectedForegroundColour() {
+		return selectedForegroundColour;
+	}
+
+	public void setSelectedForegroundColour(Color selectedForegroundColour) {
+		this.selectedForegroundColour = selectedForegroundColour;
 	}
 }

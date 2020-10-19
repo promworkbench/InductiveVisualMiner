@@ -137,6 +137,7 @@ public abstract class IvMFiltersView extends SideWindow {
 					}
 				});
 				subPanel.add(filter.getPanel(), BorderLayout.CENTER);
+				filter2panel.put(filter, filter.getPanel());
 
 				//add checkbox
 				{
