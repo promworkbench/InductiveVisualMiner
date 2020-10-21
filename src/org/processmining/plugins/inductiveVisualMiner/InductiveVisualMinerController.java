@@ -337,7 +337,7 @@ public class InductiveVisualMinerController {
 					exporters.add(new ExporterTraceData(state));
 				}
 				if (state.isPerformanceReady()) {
-					exporters.add(new ExporterModelStatistics(state));
+					exporters.add(new ExporterModelStatistics(state.getConfiguration()));
 				}
 				if (panel.getGraph().isAnimationEnabled()) {
 					exporters.add(new ExporterAvi(state));
