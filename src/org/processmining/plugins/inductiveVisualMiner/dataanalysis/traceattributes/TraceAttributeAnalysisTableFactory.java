@@ -20,4 +20,8 @@ public class TraceAttributeAnalysisTableFactory implements DataAnalysisTableFact
 		return explanation;
 	}
 
+	public boolean isSwitchable() {
+		return false;
+	}
+
 }

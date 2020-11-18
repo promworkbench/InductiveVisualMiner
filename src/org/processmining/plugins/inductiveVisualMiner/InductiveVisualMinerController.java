@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
@@ -45,6 +46,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Animate;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl12TraceColouring;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
@@ -435,29 +437,62 @@ public class InductiveVisualMinerController {
 		});
 
 		//set data analysis button
-		panel.getDataAnalysisViewButton().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				panel.getDataAnalysesView().enableAndShow();
-			}
-		});
-		panel.getHighlightingFiltersView()
-				.setHighlightingFilter2CohortAnalysisHandler(new HighlightingFilter2CohortAnalysisHandler() {
-					public void showCohortAnalysis() {
-						panel.getDataAnalysesView().enableAndShow();
-						panel.getDataAnalysesView().showAnalysis(CohortAnalysisTableFactory.name);
-					}
+		{
+			panel.getDataAnalysisViewButton().addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					panel.getDataAnalysesView().enableAndShow();
+				}
+			});
 
-					public void setEnabled(boolean enabled) {
-						//do nothing if the user disables the cohort
+			//link cohort data analysis view and cohort highlighting filter
+			panel.getHighlightingFiltersView()
+					.setHighlightingFilter2CohortAnalysisHandler(new HighlightingFilter2CohortAnalysisHandler() {
+						public void showCohortAnalysis() {
+							panel.getDataAnalysesView().enableAndShow();
+							panel.getDataAnalysesView().showAnalysis(CohortAnalysisTableFactory.name);
+						}
+
+						public void setEnabled(boolean enabled) {
+							//do nothing if the user disables the cohort
+						}
+					});
+			panel.getDataAnalysesView()
+					.setCohortAnalysis2HighlightingFilterHandler(new CohortAnalysis2HighlightingFilterHandler() {
+						public void setSelectedCohort(Cohort cohort, boolean highlightInCohort) {
+							panel.getHighlightingFiltersView().setHighlightingFilterSelectedCohort(cohort,
+									highlightInCohort);
+						}
+					});
+
+			//link cohort data analysis view switch and cohort computations
+			panel.getDataAnalysesView().setSwitcherEnabled(CohortAnalysisTableFactory.name,
+					state.isCohortAnalysisEnabled());
+			panel.getDataAnalysesView().addSwitcherListener(CohortAnalysisTableFactory.name, new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					boolean selected = ((AbstractButton) e.getSource()).getModel().isSelected();
+					if (selected) {
+						//start the computation
+						state.setCohortAnalysisEnabled(true);
+						chain.execute(Cl18DataAnalysisCohort.class);
+						panel.getDataAnalysesView().setSwitcherMessage(CohortAnalysisTableFactory.name,
+								"Compute " + CohortAnalysisTableFactory.name + " [computing..]");
+					} else {
+						//stop the computation
+						/*
+						 * It seems counter-intuitive, but we already have means
+						 * in place to stop running computations. That is, if we
+						 * start a new one [which will not compute anything due
+						 * the flag set], the old one will be stopped.
+						 * automatically.
+						 */
+						state.setCohortAnalysisEnabled(false);
+						chain.execute(Cl18DataAnalysisCohort.class);
+						panel.getDataAnalysesView().setSwitcherMessage(CohortAnalysisTableFactory.name,
+								"Compute " + CohortAnalysisTableFactory.name);
 					}
-				});
-		panel.getDataAnalysesView()
-				.setCohortAnalysis2HighlightingFilterHandler(new CohortAnalysis2HighlightingFilterHandler() {
-					public void setSelectedCohort(Cohort cohort, boolean highlightInCohort) {
-						panel.getHighlightingFiltersView().setHighlightingFilterSelectedCohort(cohort,
-								highlightInCohort);
-					}
-				});
+				}
+			});
+		}
 
 		//set trace colouring button
 		panel.getTraceColourMapViewButton().addActionListener(new ActionListener() {

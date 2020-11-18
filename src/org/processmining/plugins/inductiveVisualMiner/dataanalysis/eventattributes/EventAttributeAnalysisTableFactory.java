@@ -20,4 +20,8 @@ public class EventAttributeAnalysisTableFactory implements DataAnalysisTableFact
 		return explanation;
 	}
 
+	public boolean isSwitchable() {
+		return false;
+	}
+
 }

@@ -547,6 +547,7 @@ public class InductiveVisualMinerState {
 
 	//==cohort analysis
 	private Cohorts cohortAnalysis;
+	private boolean cohortAnalysisEnabled = false;
 
 	public void setCohortAnalysis(Cohorts result) {
 		this.cohortAnalysis = result;
@@ -554,5 +555,13 @@ public class InductiveVisualMinerState {
 
 	public Cohorts getCohortAnalysis() {
 		return cohortAnalysis;
+	}
+
+	public boolean isCohortAnalysisEnabled() {
+		return cohortAnalysisEnabled;
+	}
+
+	public void setCohortAnalysisEnabled(boolean cohortAnalysisEnabled) {
+		this.cohortAnalysisEnabled = cohortAnalysisEnabled;
 	}
 }

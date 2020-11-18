@@ -20,4 +20,10 @@ public class LogAttributeAnalysisTableFactory implements DataAnalysisTableFactor
 		return explanation;
 	}
 
+	public boolean isSwitchable() {
+		return false;
+	}
+	
+	
+
 }

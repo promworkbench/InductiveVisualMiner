@@ -22,4 +22,8 @@ public class CohortAnalysisTableFactory implements DataAnalysisTableFactory {
 		return explanation;
 	}
 
+	public boolean isSwitchable() {
+		return true;
+	}
+
 }

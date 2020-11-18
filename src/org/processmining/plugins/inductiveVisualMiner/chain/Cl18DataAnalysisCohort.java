@@ -2,26 +2,32 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.cohortanalysis.cohort.Cohorts;
-import org.processmining.plugins.InductiveMiner.Triple;
+import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class Cl18DataAnalysisCohort
-		extends IvMChainLink<Triple<AttributesInfo, XLog, XEventPerformanceClassifier>, Cohorts> {
+		extends IvMChainLink<Quadruple<AttributesInfo, XLog, XEventPerformanceClassifier, Boolean>, Cohorts> {
 
 	public String getName() {
 		return "cohort analysis";
 	}
 
-	protected Triple<AttributesInfo, XLog, XEventPerformanceClassifier> generateInput(InductiveVisualMinerState state) {
-		return Triple.of(state.getAttributesInfo(), state.getSortedXLog(), state.getPerformanceClassifier());
+	protected Quadruple<AttributesInfo, XLog, XEventPerformanceClassifier, Boolean> generateInput(
+			InductiveVisualMinerState state) {
+		return Quadruple.of(state.getAttributesInfo(), state.getSortedXLog(), state.getPerformanceClassifier(),
+				state.isCohortAnalysisEnabled());
 	}
 
-	protected Cohorts executeLink(Triple<AttributesInfo, XLog, XEventPerformanceClassifier> input,
+	protected Cohorts executeLink(Quadruple<AttributesInfo, XLog, XEventPerformanceClassifier, Boolean> input,
 			IvMCanceller canceller) throws Exception {
-		return CohortAnalysis.compute(input.getA(), input.getB(), input.getC(), canceller);
+		if (input.getD()) {
+			return CohortAnalysis.compute(input.getA(), input.getB(), input.getC(), canceller);
+		} else {
+			return null;
+		}
 	}
 
 	protected void processResult(Cohorts result, InductiveVisualMinerState state) {

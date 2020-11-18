@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.ActionListener;
 import java.util.Map;
 
 import javax.swing.JTabbedPane;
@@ -33,9 +34,10 @@ public class DataAnalysesView extends SideWindow {
 			DataAnalysisTable table = factory.create();
 			String analysisName = factory.getAnalysisName();
 			String explanation = factory.getExplanation();
+			boolean switchable = factory.isSwitchable();
 
-			OnOffPanel<?> onOffPanel = createView(configuration.getDecorator(), table, explanation);
-			onOffPanel.setOffMessage("Computing..");
+			OnOffPanel<?> onOffPanel = createView(configuration.getDecorator(), table, analysisName, explanation,
+					switchable);
 			onOffPanel.off();
 			tabbedPane.addTab(analysisName, onOffPanel);
 
@@ -48,8 +50,16 @@ public class DataAnalysesView extends SideWindow {
 	}
 
 	private static OnOffPanel<DataAnalysisView> createView(IvMDecoratorI decorator, DataAnalysisTable table,
-			String explanation) {
-		return new OnOffPanel<>(decorator, new DataAnalysisView(decorator, table, explanation));
+			String analysisName, String explanation, boolean switchable) {
+		OnOffPanel<DataAnalysisView> result = new OnOffPanel<>(decorator,
+				new DataAnalysisView(decorator, table, explanation), switchable);
+		if (switchable) {
+			result.setOffMessage("Compute " + analysisName);
+			result.getSwitch().setSelected(false);
+		} else {
+			result.setOffMessage("Computing " + analysisName);
+		}
+		return result;
 	}
 
 	/**
@@ -61,10 +71,12 @@ public class DataAnalysesView extends SideWindow {
 	public void setData(String analysisName, InductiveVisualMinerState state) {
 		if (tables.containsKey(analysisName)) {
 			DataAnalysisTable table = tables.get(analysisName);
-			table.setData(state);
+			boolean successful = table.setData(state);
 
 			OnOffPanel<?> onOffPanel = onOffPanels.get(analysisName);
-			onOffPanel.on();
+			if (!onOffPanel.isSwitchable() || successful) {
+				onOffPanel.on();
+			}
 		}
 	}
 
@@ -89,6 +101,27 @@ public class DataAnalysesView extends SideWindow {
 				((CohortAnalysisTable) table)
 						.setCohortAnalysis2HighlightingFilterHandler(showCohortHighlightingFilterHandler);
 			}
+		}
+	}
+
+	public void addSwitcherListener(String analysisName, ActionListener actionListener) {
+		if (onOffPanels.containsKey(analysisName)) {
+			OnOffPanel<?> onOffPanel = onOffPanels.get(analysisName);
+			onOffPanel.getSwitch().addActionListener(actionListener);
+		}
+	}
+
+	public void setSwitcherMessage(String analysisName, String message) {
+		if (onOffPanels.containsKey(analysisName)) {
+			OnOffPanel<?> onOffPanel = onOffPanels.get(analysisName);
+			onOffPanel.setOffMessage(message);
+		}
+	}
+
+	public void setSwitcherEnabled(String analysisName, boolean cohortAnalysisEnabled) {
+		if (onOffPanels.containsKey(analysisName)) {
+			OnOffPanel<?> onOffPanel = onOffPanels.get(analysisName);
+			onOffPanel.getSwitch().setSelected(cohortAnalysisEnabled);
 		}
 	}
 }

@@ -14,7 +14,6 @@ import org.deckfour.xes.model.XAttributeDiscrete;
 import org.deckfour.xes.model.XAttributeLiteral;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
-import org.deckfour.xes.model.impl.XAttributeDiscreteImpl;
 import org.processmining.earthmoversstochasticconformancechecking.parameters.EMSCParametersLogLogAbstract;
 import org.processmining.earthmoversstochasticconformancechecking.parameters.EMSCParametersLogLogDefault;
 import org.processmining.earthmoversstochasticconformancechecking.plugins.EarthMoversStochasticConformancePlugin;
@@ -48,8 +47,7 @@ public class LogAttributeAnalysis extends ArrayList<Pair<String, ? extends Displ
 		Collection<XAttribute> xAttributes = sortedXLog.getAttributes().values();
 		for (XAttribute xAttribute : xAttributes) {
 			if (xAttribute instanceof XAttributeDiscrete) {
-				add(Pair.of(xAttribute.getKey(),
-						DisplayType.numeric(((XAttributeDiscreteImpl) xAttribute).getValue())));
+				add(Pair.of(xAttribute.getKey(), DisplayType.numeric(((XAttributeDiscrete) xAttribute).getValue())));
 			} else if (xAttribute instanceof XAttributeContinuous) {
 				add(Pair.of(xAttribute.getKey(), DisplayType.numeric(((XAttributeContinuous) xAttribute).getValue())));
 			} else if (xAttribute instanceof XAttributeLiteral) {

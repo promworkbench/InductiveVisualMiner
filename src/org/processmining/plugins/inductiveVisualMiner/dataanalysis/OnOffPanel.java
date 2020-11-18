@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,20 +17,36 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 	private static final long serialVersionUID = -2730521457101145974L;
 
 	private JPanel offPanel = new JPanel();
-	private JLabel offMessage = new JLabel("off", SwingConstants.CENTER);
+	private final JLabel offMessage;
+	private final JCheckBox offCheckBox;
 	private X onPanel;
 	private boolean on = true;
 
 	public OnOffPanel(IvMDecoratorI decorator, X onPanel) {
+		this(decorator, onPanel, false);
+	}
+
+	public OnOffPanel(IvMDecoratorI decorator, X onPanel, boolean switchable) {
 		super(decorator);
 		setLayout(new CardLayout());
 		this.onPanel = onPanel;
 
 		offPanel.setLayout(new BorderLayout());
 		offPanel.setOpaque(false);
-		decorator.decorate(offMessage);
-		offMessage.setOpaque(false);
-		offPanel.add(offMessage, BorderLayout.CENTER);
+		if (switchable) {
+			offMessage = null;
+			offCheckBox = new JCheckBox("off");
+			offCheckBox.setHorizontalAlignment(SwingConstants.CENTER);
+			decorator.decorate(offCheckBox);
+			offCheckBox.setOpaque(false);
+			offPanel.add(offCheckBox, BorderLayout.CENTER);
+		} else {
+			offCheckBox = null;
+			offMessage = new JLabel("off", SwingConstants.CENTER);
+			decorator.decorate(offMessage);
+			offMessage.setOpaque(false);
+			offPanel.add(offMessage, BorderLayout.CENTER);
+		}
 		add(offPanel, "off");
 
 		add(onPanel, "on");
@@ -59,12 +76,24 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 		return on;
 	}
 
+	public boolean isSwitchable() {
+		return offCheckBox != null;
+	}
+
+	public JCheckBox getSwitch() {
+		return offCheckBox;
+	}
+
 	public String getOffMessage() {
 		return offMessage.getText();
 	}
 
 	public void setOffMessage(String message) {
-		offMessage.setText(message);
+		if (isSwitchable()) {
+			offCheckBox.setText(message);
+		} else {
+			offMessage.setText(message);
+		}
 	}
 
 	public X getOnPanel() {

@@ -12,5 +12,7 @@ public interface DataAnalysisTableFactory {
 	public String getAnalysisName();
 	
 	public String getExplanation();
+	
+	public boolean isSwitchable();
 
 }
