@@ -8,17 +8,20 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.Set;
+import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.std.XConceptExtension;
+import org.deckfour.xes.model.XLog;
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.framework.plugin.PluginContext;
@@ -33,21 +36,17 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualM
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
-import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
-import org.processmining.plugins.inductiveVisualMiner.chain.ChainLink;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl01GatherAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl03MakeLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActivities;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Mine;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutModel;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl07Align;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Animate;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl12TraceColouring;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputation;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
+import org.processmining.plugins.inductiveVisualMiner.chain.OnStatus;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
@@ -68,13 +67,12 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
-import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.LogPopupListener;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
+import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
@@ -82,11 +80,16 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 public class InductiveVisualMinerController {
 
 	private final InductiveVisualMinerPanel panel;
-	private final InductiveVisualMinerState state;
+	private final DataState state;
 
-	private final Chain<InductiveVisualMinerState> chain;
+	private final DataChain chain;
 	private final PluginContext context;
 	private final UserStatus userStatus;
+
+	//preferences
+	private static final Preferences preferences = Preferences.userRoot()
+			.node("org.processmining.inductivevisualminer");
+	public static final String playAnimationOnStartupKey = "playanimationonstartup";
 
 	public InductiveVisualMinerController(final PluginContext context,
 			final InductiveVisualMinerConfiguration configuration, final ProMCanceller canceller) {
@@ -97,61 +100,44 @@ public class InductiveVisualMinerController {
 		this.context = context;
 		chain = configuration.getChain();
 
-		state.setGraphUserSettings(panel.getGraph().getUserSettings());
-		state.getGraphUserSettings().setDirection(GraphDirection.leftRight);
-
 		//initialise gui handlers
-		initGui(canceller);
+		initGui(canceller, configuration);
 
 		//set up the controller view
 		chain.setOnChange(new Runnable() {
 			public void run() {
-				if (panel.getControllerView().isVisible()) {
-					panel.getControllerView().pushCompleteChainLinks(chain.getCompletedChainLinks());
-				}
+				panel.getControllerView().pushCompleteChainLinks(chain);
 			}
 		});
 
-		//set up the chain
-		{
-			//set up exception handling
-			{
-				final OnException onException = new OnException() {
-					public void onException(Exception e) {
-						setStatus("- error - aborted -", 0);
+		//set up exception handling
+		chain.setOnException(new OnException() {
+			public void onException(Exception e) {
+				setStatus("- error - aborted -", 0);
+			}
+		});
+
+		//set up status handling
+		chain.setOnStatus(new OnStatus() {
+			public void startComputation(DataChainLinkComputation chainLink) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						setStatus(chainLink.getStatusBusyMessage(), chainLink.hashCode());
 					}
-				};
-				for (ChainLink<InductiveVisualMinerState, ?, ?> chainLink : chain.getChainLinks()) {
-					chainLink.setOnException(onException);
-				}
+				});
 			}
 
-			//set up status handling
-			{
-				for (ChainLink<InductiveVisualMinerState, ?, ?> chainLink : chain.getChainLinks()) {
-					final ChainLink<InductiveVisualMinerState, ?, ?> chainLink2 = chainLink;
-
-					//on start, set the status
-					chainLink.setOnStartStatus(new Runnable() {
-						public void run() {
-							setStatus(chainLink2.getStatusBusyMessage(), chainLink2.hashCode());
-						}
-					});
-
-					//on completion, remove the status
-					chainLink.setOnCompleteStatus(new Runnable() {
-						public void run() {
-							setStatus(null, chainLink2.hashCode());
-						}
-					});
-				}
+			public void endComputation(DataChainLinkComputation chainLink) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						setStatus(null, chainLink.hashCode());
+					}
+				});
 			}
+		});
 
-			panel.getControllerView().setChain(chain);
-
-			//start the chain
-			chain.execute(Cl01GatherAttributes.class);
-		}
+		//start the chain
+		chain.setObject(DataState.input_log, state.getXLog());
 	}
 
 	/**
@@ -169,7 +155,7 @@ public class InductiveVisualMinerController {
 				canceller);
 	}
 
-	private void initGui(final ProMCanceller canceller) {
+	private void initGui(final ProMCanceller canceller, InductiveVisualMinerConfiguration configuration) {
 
 		//resize handler
 		panel.addComponentListener(new ComponentAdapter() {
@@ -180,7 +166,7 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		//noise filter
+		//noise filter slider
 		panel.getPathsSlider().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (!panel.getPathsSlider().getSlider().getValueIsAdjusting()) {
@@ -193,7 +179,7 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		//classifier
+		//classifier slider
 		panel.getClassifiers().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				state.setClassifier(panel.getClassifiers().getSelectedClassifier());
@@ -205,8 +191,7 @@ public class InductiveVisualMinerController {
 		//miner
 		panel.getMinerSelection().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				state.setMiner(((VisualMinerWrapper) panel.getMinerSelection().getSelectedItem()));
-				chain.execute(Cl03MakeLog.class);
+				chain.setObject(DataState.selected_miner, panel.getMinerSelection().getSelectedItem());
 			}
 		});
 
@@ -214,9 +199,7 @@ public class InductiveVisualMinerController {
 		panel.getEditModelView().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() instanceof IvMModel) {
-					state.setModel((IvMModel) e.getSource());
-					chain.execute(Cl06LayoutModel.class);
-					chain.execute(Cl07Align.class);
+					chain.setObject(DataState.model, e.getSource());
 				}
 			}
 		});
@@ -225,64 +208,68 @@ public class InductiveVisualMinerController {
 		panel.getActivitiesSlider().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (!panel.getActivitiesSlider().getSlider().getValueIsAdjusting()) {
-					state.setActivitiesThreshold(panel.getActivitiesSlider().getValue());
-					chain.execute(Cl04FilterLogOnActivities.class);
+					chain.setObject(DataState.selected_activities_threshold, panel.getActivitiesSlider().getValue());
 				}
-
-				//give the focus back to the graph panel
-				panel.getGraph().requestFocus(true);
 			}
 		});
 
 		//display mode
 		panel.getColourModeSelection().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				state.setMode((Mode) panel.getColourModeSelection().getSelectedItem());
-				chain.execute(Cl09LayoutAlignment.class);
+				chain.setObject(DataState.selected_visualisation_mode,
+						panel.getColourModeSelection().getSelectedItem());
 			}
 		});
 
 		//node selection changed
 		panel.setOnSelectionChanged(new InputFunction<Selection>() {
 			public void call(Selection input) throws Exception {
-				state.setSelection(input);
-				chain.execute(Cl13FilterNodeSelection.class);
+				chain.setObject(DataState.selected_model_selection, input);
 			}
 		});
 
 		//graph direction changed
 		panel.setOnGraphDirectionChanged(new Runnable() {
 			public void run() {
-				chain.execute(Cl09LayoutAlignment.class);
+				chain.setObject(DataState.selected_graph_user_settings, panel.getGraph().getUserSettings());
 			}
 		});
+		panel.getGraph().getUserSettings().setDirection(GraphDirection.leftRight);
+		chain.setObject(DataState.selected_graph_user_settings, panel.getGraph().getUserSettings());
 
+		//animation enabled/disabled
 		panel.setOnAnimationEnabledChanged(new AnimationEnabledChangedListener() {
 			public boolean animationEnabledChanged() {
-				if (state.isAnimationGlobalEnabled()) {
+				boolean enable = !state.hasObject(DataState.selected_animation_enabled);
+				state.putObject(DataState.selected_animation_enabled, enable);
+				preferences.putBoolean(playAnimationOnStartupKey, enable);
+
+				if (!enable) {
 					//animation gets disabled
-					state.setAnimationGlobalEnabled(false);
-					state.setAnimation(null);
 					panel.getGraph().setAnimationEnabled(false);
 					setAnimationStatus(panel, "animation disabled", true);
 					panel.repaint();
+					state.removeObject(DataState.selected_animation_enabled);
 					return false;
 				} else {
 					//animation gets enabled
-					state.setAnimationGlobalEnabled(true);
-					chain.execute(Cl11Animate.class);
+					state.putObject(DataState.selected_animation_enabled, true);
 					return true;
 				}
 			}
 		});
+		if (preferences.getBoolean(playAnimationOnStartupKey, true)) {
+			state.putObject(DataState.selected_animation_enabled, true);
+		}
 
 		//set model export button
 		panel.getSaveModelButton().addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent arg0) {
 
 				//store the resulting Process tree or Petri net
-				String name = XConceptExtension.instance().extractName(state.getSortedXLog());
-				IvMModel model = state.getModel();
+				String name = XConceptExtension.instance().extractName((XLog) state.getObject(DataState.sorted_log));
+				IvMModel model = (IvMModel) state.getObject(DataState.model);
 
 				Object[] options;
 				if (model.isTree()) {
@@ -419,8 +406,8 @@ public class InductiveVisualMinerController {
 				chain.execute(Cl04FilterLogOnActivities.class);
 			}
 		});
-		state.setPreMiningFiltersController(new IvMPreMiningFiltersController(
-				state.getConfiguration().getPreMiningFilters(), panel.getPreMiningFiltersView()));
+		state.setPreMiningFiltersController(new IvMPreMiningFiltersController(configuration.getPreMiningFilters(),
+				panel.getPreMiningFiltersView()));
 
 		//set edit model button
 		panel.getEditModelButton().addActionListener(new ActionListener() {
@@ -495,34 +482,38 @@ public class InductiveVisualMinerController {
 		}
 
 		//set trace colouring button
-		panel.getTraceColourMapViewButton().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				panel.getTraceColourMapView().enableAndShow();
-			}
-		});
-		state.setTraceColourMap(new TraceColourMapFixed(RendererFactory.defaultTokenFillColour));
-		panel.getGraph().setTraceColourMap(state.getTraceColourMap());
-		panel.getTraceColourMapView().setOnUpdate(new Function<TraceColourMapSettings, Object>() {
-			public Object call(TraceColourMapSettings input) throws Exception {
-				state.setTraceColourMapSettings(input);
-				chain.execute(Cl12TraceColouring.class);
-				return null;
-			}
-		});
+		{
+			panel.getTraceColourMapViewButton().addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					panel.getTraceColourMapView().enableAndShow();
+				}
+			});
+			TraceColourMap traceColourMap = new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
+			state.putObject(DataState.trace_colour_map, traceColourMap);
+			panel.getGraph().setTraceColourMap(traceColourMap);
+			panel.getTraceColourMapView().setOnUpdate(new Function<TraceColourMapSettings, Object>() {
+				public Object call(TraceColourMapSettings input) throws Exception {
+					chain.setObject(DataState.trace_colour_map_settings, input);
+					return null;
+				}
+			});
+		}
 
 		//set highlighting filters button
-		panel.getHighlightingFiltersViewButton().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				panel.getHighlightingFiltersView().enableAndShow();
-			}
-		});
-		panel.getHighlightingFiltersView().setOnUpdate(new Runnable() {
-			public void run() {
-				chain.execute(Cl13FilterNodeSelection.class);
-			}
-		});
-		state.setHighlightingFiltersController(new IvMHighlightingFiltersController(
-				state.getConfiguration().getHighlightingFilters(), panel.getHighlightingFiltersView()));
+		{
+			panel.getHighlightingFiltersViewButton().addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					panel.getHighlightingFiltersView().enableAndShow();
+				}
+			});
+			panel.getHighlightingFiltersView().setOnUpdate(new Runnable() {
+				public void run() {
+					chain.execute(Cl13FilterNodeSelection.class);
+				}
+			});
+			state.putObject(DataState.highlighting_filters_controller, new IvMHighlightingFiltersController(
+					configuration.getHighlightingFilters(), panel.getHighlightingFiltersView()));
+		}
 
 		//set mouse-in-out node updater
 		panel.getGraph().addMouseInElementsChangedListener(new MouseInElementsChangedListener<DotElement>() {

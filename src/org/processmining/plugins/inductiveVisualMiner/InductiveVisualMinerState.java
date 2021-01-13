@@ -52,6 +52,7 @@ import com.kitfox.svg.SVGDiagram;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
+@Deprecated
 public class InductiveVisualMinerState {
 
 	public InductiveVisualMinerState(XLog xLog) throws UnknownTreeNodeException {

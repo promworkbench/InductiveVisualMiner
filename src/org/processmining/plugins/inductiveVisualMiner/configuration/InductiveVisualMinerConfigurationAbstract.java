@@ -6,10 +6,10 @@ import java.util.concurrent.Executor;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
-import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -32,8 +32,8 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
  */
 public abstract class InductiveVisualMinerConfigurationAbstract implements InductiveVisualMinerConfiguration {
 
-	private final Chain<InductiveVisualMinerState> chain;
-	private final InductiveVisualMinerState state;
+	private final DataChain chain;
+	private final DataState state;
 	private final InductiveVisualMinerPanel panel;
 	private final List<VisualMinerWrapper> discoveryTechniques;
 	private final AlignmentComputer alignmentComputer;
@@ -91,25 +91,24 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	protected abstract List<DataAnalysisTableFactory> createDataAnalysisTables();
 
-	protected abstract InductiveVisualMinerState createState(XLog log);
+	protected abstract DataState createState(XLog log);
 
 	protected abstract InductiveVisualMinerPanel createPanel(ProMCanceller canceller);
 
 	protected abstract IvMDecoratorI createDecorator();
 
-	protected abstract Chain<InductiveVisualMinerState> createChain(InductiveVisualMinerState state,
-			InductiveVisualMinerPanel panel, ProMCanceller canceller, Executor executor,
-			List<PreMiningFilter> preMiningFilters, List<HighlightingFilter> highlightingFilters);
+	protected abstract DataChain createChain(DataState state, InductiveVisualMinerPanel panel, ProMCanceller canceller,
+			Executor executor, List<PreMiningFilter> preMiningFilters, List<HighlightingFilter> highlightingFilters);
 
 	protected abstract IvMVirtualAttributeFactory createVirtualAttributes();
 
 	@Override
-	public final Chain<InductiveVisualMinerState> getChain() {
+	public final DataChain getChain() {
 		return chain;
 	}
 
 	@Override
-	public final InductiveVisualMinerState getState() {
+	public final DataState getState() {
 		return state;
 	}
 

@@ -19,7 +19,6 @@ import javax.swing.JTextArea;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.BoundsPopupMenuListener;
 import org.processmining.plugins.graphviz.dot.DotElement;
@@ -28,7 +27,6 @@ import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedLi
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationFake;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ControllerView;
@@ -40,7 +38,6 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilt
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapView;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceView;
-import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 
@@ -93,21 +90,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private InputFunction<Selection> onSelectionChanged = null;
 	private Runnable onGraphDirectionChanged = null;
 	private AnimationEnabledChangedListener onAnimationEnabledChanged = null;
-
-	@Deprecated
-	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, boolean miningEnabled, ProMCanceller canceller) {
-		return panel(context, state, miners, canceller);
-	}
-
-	@Deprecated
-	public static InductiveVisualMinerPanel panel(final PluginContext context, InductiveVisualMinerState state,
-			VisualMinerWrapper[] miners, ProMCanceller canceller) {
-		InductiveVisualMinerConfigurationFake configuration = new InductiveVisualMinerConfigurationFake(state, null,
-				canceller, context.getExecutor());
-		configuration.setDiscoveryTechniques(miners);
-		return new InductiveVisualMinerPanel(configuration, canceller);
-	}
 
 	private static final Image logo = Toolkit.getDefaultToolkit().getImage(InductiveVisualMinerPanel.class
 			.getResource("/org/processmining/plugins/inductiveVisualMiner/inductive miner logo.png"));

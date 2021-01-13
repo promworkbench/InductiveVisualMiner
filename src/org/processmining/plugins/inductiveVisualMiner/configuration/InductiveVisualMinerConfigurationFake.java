@@ -7,10 +7,10 @@ import java.util.concurrent.Executor;
 
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
-import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -26,14 +26,14 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
 public class InductiveVisualMinerConfigurationFake implements InductiveVisualMinerConfiguration {
 
 	private InductiveVisualMinerConfigurationDefault phantom;
-	private Chain<InductiveVisualMinerState> chain;
-	private InductiveVisualMinerState state;
+	private DataChain chain;
+	private DataState state;
 	private InductiveVisualMinerPanel panel;
 	private ProMCanceller canceller;
 	private Executor executor;
 	private List<VisualMinerWrapper> discoveryTechniques;
 
-	public InductiveVisualMinerConfigurationFake(InductiveVisualMinerState state, InductiveVisualMinerPanel panel,
+	public InductiveVisualMinerConfigurationFake(DataState state, InductiveVisualMinerPanel panel,
 			ProMCanceller canceller, Executor executor) {
 		this.executor = executor;
 		this.canceller = canceller;
@@ -68,7 +68,7 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return phantom.getModesArray();
 	}
 
-	public InductiveVisualMinerState getState() {
+	public DataState getState() {
 		return state;
 	}
 
@@ -76,7 +76,7 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return panel;
 	}
 
-	public Chain<InductiveVisualMinerState> getChain() {
+	public DataChain getChain() {
 		if (chain == null) {
 			chain = phantom.createChain(state, panel, canceller, executor, getPreMiningFilters(),
 					getHighlightingFilters());

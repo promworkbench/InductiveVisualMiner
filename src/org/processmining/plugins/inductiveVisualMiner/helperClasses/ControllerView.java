@@ -1,49 +1,87 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
 import java.awt.Component;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
-import org.processmining.plugins.inductiveVisualMiner.chain.ChainLink;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLink;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputation;
+
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 
 public class ControllerView<State> extends SideWindow {
 
 	private static final long serialVersionUID = -7305901655789589843L;
 	private final DotPanel dotPanel;
-	private Map<ChainLink<State, ?, ?>, DotNode> map;
 
 	public ControllerView(Component parent) {
 		super(parent, "Controller view - " + InductiveVisualMinerPanel.title);
 
 		Dot dot = new Dot();
-		dot.addNode("waiting for controller view");
+		dot.addNode("Waiting for controller view");
 		dotPanel = new DotPanel(dot);
 		add(dotPanel);
 	}
 
-	public void setChain(Chain<State> chain) {
-		Pair<Dot, Map<ChainLink<State, ?, ?>, DotNode>> x = chain.toDot();
-		dotPanel.changeDot(x.getLeft(), true);
-		map = x.getB();
-	}
-
-	public void pushCompleteChainLinks(Set<ChainLink<State, ?, ?>> complete) {
+	public void pushCompleteChainLinks(DataChain chain) {
 		if (isVisible()) {
-			for (Entry<ChainLink<State, ?, ?>, DotNode> entry : map.entrySet()) {
-				if (complete.contains(entry.getKey())) {
-					entry.getValue().setOption("style", "filled");
-					entry.getValue().setOption("fillcolor", "cyan");
+			Dot dot = new Dot();
+
+			//add nodes (objects)
+			THashMap<String, DotNode> object2dotNode = new THashMap<>();
+			for (String object : chain.object2inputs.keySet()) {
+				DotNode dotNode = dot.addNode(object);
+				object2dotNode.put(object, dotNode);
+				if (chain.state.hasObject(object)) {
+					//complete
+					dotNode.setOption("style", "filled");
+					dotNode.setOption("fillcolor", "cyan");
 				} else {
-					entry.getValue().setOption("style", "");
+					dotNode.setOption("style", "");
 				}
 			}
+
+			//add nodes (chain links)
+			Set<DataChainLink> chainLinks = new THashSet<>();
+			for (Set<DataChainLink> entry : chain.object2inputs.values()) {
+				chainLinks.addAll(entry);
+			}
+			THashMap<DataChainLink, DotNode> link2dotNode = new THashMap<>();
+			for (DataChainLink x : chainLinks) {
+				DotNode dotNode = dot.addNode(x.getName());
+				link2dotNode.put(x, dotNode);
+				if (chain.executionCancellers.containsKey(x) && !chain.executionCancellers.get(x).isCancelled()) {
+					//busy
+					dotNode.setOption("style", "filled");
+					dotNode.setOption("fillcolor", "orange");
+				} else {
+					dotNode.setOption("style", "");
+				}
+			}
+
+			//edges (outputs)
+			for (DataChainLink chainLink : chainLinks) {
+				if (chainLink instanceof DataChainLinkComputation) {
+					for (String object : ((DataChainLinkComputation) chainLink).getOutputNames()) {
+						dot.addEdge(object2dotNode.get(object), link2dotNode.get(chainLink));
+					}
+				}
+			}
+
+			//edges (inputs)
+			for (Entry<String, Set<DataChainLink>> entry : chain.object2inputs.entrySet()) {
+				String object = entry.getKey();
+				for (DataChainLink chainLink : entry.getValue()) {
+					dot.addEdge(object2dotNode.get(object), link2dotNode.get(chainLink));
+				}
+			}
+
 			dotPanel.changeDot(dotPanel.getDot(), false);
 		}
 	}

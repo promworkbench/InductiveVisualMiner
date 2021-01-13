@@ -3,10 +3,10 @@ package org.processmining.plugins.inductiveVisualMiner.configuration;
 import java.util.List;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
-import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -99,7 +99,7 @@ public interface InductiveVisualMinerConfiguration {
 	 * @param log
 	 * @return
 	 */
-	public InductiveVisualMinerState getState();
+	public DataState getState();
 
 	/**
 	 * Set up the JComponent panel.
@@ -113,17 +113,12 @@ public interface InductiveVisualMinerConfiguration {
 	public InductiveVisualMinerPanel getPanel();
 
 	/**
-	 * Set up the chain (DAG) of steps that should be executed in the
-	 * background, concurrently with one another and with the gui.
-	 * 
-	 * - every path in the DAG should lead to the CLxxDone chainlink.
-	 * 
-	 * - the typical way to extend the visual Miner is to connect the input(s)
-	 * of your chainlink to your chainlink, and your chainlink to CLxxDone.
+	 * Set up the chain (DAG) of steps (chain links) that should be executed in
+	 * the background and to update the gui.
 	 * 
 	 * @return
 	 */
-	public Chain<InductiveVisualMinerState> getChain();
+	public DataChain getChain();
 
 	public AlignmentComputer getAlignmentComputer();
 

@@ -9,11 +9,11 @@ import javax.swing.JOptionPane;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.ProMCanceller;
+import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
@@ -24,7 +24,6 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttribut
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfCompleteEvents;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfLogMoves;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfModelMoves;
-import org.processmining.plugins.inductiveVisualMiner.chain.Chain;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01GatherAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl02SortEvents;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl03MakeLog;
@@ -45,6 +44,9 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl17DataAnalysisEven
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl20Done;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysisTableFactory;
@@ -280,8 +282,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	protected InductiveVisualMinerState createState(XLog log) {
-		return new InductiveVisualMinerState(log);
+	protected DataState createState(XLog log) {
+		return new DataState(log);
 	}
 
 	@Override
@@ -289,15 +291,43 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		return new InductiveVisualMinerPanel(this, canceller);
 	}
 
-	@Override
-	public Chain<InductiveVisualMinerState> createChain(final InductiveVisualMinerState state,
-			final InductiveVisualMinerPanel panel, final ProMCanceller canceller, final Executor executor,
-			final List<PreMiningFilter> preMiningFilters, final List<HighlightingFilter> highlightingFilters) {
-		//set up the chain
-		final Chain<InductiveVisualMinerState> chain = new Chain<>(state, canceller, executor);
+	public void initiateChain(DataChain chain) {
+		//attributes, classifiers
+		{
+			chain.register(new Cl01GatherAttributes());
+			chain.register(new DataChainLinkGui() {
 
-		gatherAttributes = new Cl01GatherAttributes();
-		sortEvents = new Cl02SortEvents();
+				public String[] getInputNames() {
+					return new String[] { DataState.classifiers, DataState.initial_classifier };
+				}
+
+				public void invalidate(InductiveVisualMinerPanel panel) {
+					panel.getClassifiers().setEnabled(false);
+				}
+
+				public void updateGui(InductiveVisualMinerPanel panel, Object[] inputs) throws Exception {
+					AttributeClassifier[] classifiers = (AttributeClassifier[]) inputs[0];
+					AttributeClassifier initialClassifier = (AttributeClassifier) inputs[1];
+					panel.getClassifiers().setEnabled(true);
+					panel.getClassifiers().replaceClassifiers(classifiers, initialClassifier);
+				}
+
+				public String getName() {
+					return "classifiers";
+				}
+			});
+		}
+	}
+
+	@Override
+	public DataChain createChain(final DataState state, final InductiveVisualMinerPanel panel,
+			final ProMCanceller canceller, final Executor executor, final List<PreMiningFilter> preMiningFilters,
+			final List<HighlightingFilter> highlightingFilters) {
+		//set up the chain
+		final DataChain chain = new DataChain(state, canceller, executor, this, panel);
+
+		initiateChain(chain);
+
 		makeLog = new Cl03MakeLog();
 		filterLogOnActivities = new Cl04FilterLogOnActivities();
 		mine = new Cl05Mine();
@@ -317,26 +347,16 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		dataAnalysisLog = new Cl19DataAnalysisLog();
 		done = new Cl20Done();
 
-		//gather attributes
-		{
-			gatherAttributes.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getClassifiers().setEnabled(true);
-
-					//update the classifier combobox
-					panel.getClassifiers().replaceClassifiers(state.getClassifiers(), state.getInitialClassifier());
-
-					//initialise the filters
-					state.getPreMiningFiltersController().setAttributesInfo(state.getAttributesInfo());
-				}
-			});
-			gatherAttributes.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getClassifiers().setEnabled(false);
-				}
-			});
-
-		}
+		//		//gather attributes
+		//		{
+		//			gatherAttributes.setOnComplete(new Runnable() {
+		//				public void run() {
+		//
+		//					//initialise the filters
+		//					state.getPreMiningFiltersController().setAttributesInfo(state.getAttributesInfo());
+		//				}
+		//			});
+		//		}
 
 		//reorder events
 		{
@@ -369,8 +389,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getDataAnalysesView().invalidate(LogAttributeAnalysisTableFactory.name);
 				}
 			});
-
-			chain.addConnection(gatherAttributes, sortEvents);
 		}
 
 		//make log
@@ -380,13 +398,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getTraceView().set(state.getLog(), state.getTraceColourMap());
 				}
 			});
-
-			chain.addConnection(sortEvents, makeLog);
-		}
-
-		//filter on activities
-		{
-			chain.addConnection(makeLog, filterLogOnActivities);
 		}
 
 		//mine a model
@@ -404,8 +415,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					state.setSelection(new Selection());
 				}
 			});
-
-			chain.addConnection(filterLogOnActivities, mine);
 		}
 
 		//layout
@@ -415,8 +424,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getGraph().changeDot(state.getDot(), state.getSVGDiagram(), true);
 				}
 			});
-
-			chain.addConnection(mine, layoutModel);
 		}
 
 		//align
@@ -436,8 +443,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					PopupPopulator.updatePopup(panel, state);
 				}
 			});
-
-			chain.addConnection(mine, align);
 		}
 
 		//layout with alignment
@@ -461,9 +466,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getTraceView().setEventColourMap(state.getTraceViewColourMap());
 				}
 			});
-
-			chain.addConnection(layoutModel, layoutAlignment);
-			chain.addConnection(align, layoutAlignment);
 		}
 
 		//ivm attributes
@@ -482,12 +484,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getTraceColourMapView().invalidateAttributes();
 				}
 			});
-			chain.addConnection(align, ivmAttributes);
-		}
-
-		//animation scaler
-		{
-			chain.addConnection(align, animationScaler);
 		}
 
 		//animate
@@ -526,9 +522,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					InductiveVisualMinerController.setAnimationStatus(panel, " ", false);
 				}
 			});
-
-			chain.addConnection(animationScaler, animate);
-			chain.addConnection(layoutAlignment, animate);
 		}
 
 		//colour traces
@@ -543,8 +536,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.repaint();
 				}
 			});
-
-			chain.addConnection(ivmAttributes, traceColouring);
 		}
 
 		//filter node selection
@@ -575,9 +566,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getGraph().repaint();
 				}
 			});
-
-			chain.addConnection(layoutAlignment, filterNodeSelection);
-			chain.addConnection(ivmAttributes, filterNodeSelection);
 		}
 
 		//mine performance
@@ -599,9 +587,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getGraph().repaint();
 				}
 			});
-
-			chain.addConnection(animationScaler, performance);
-			chain.addConnection(filterNodeSelection, performance);
 		}
 
 		//compute histogram
@@ -613,9 +598,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getGraph().repaint();
 				}
 			});
-
-			chain.addConnection(animationScaler, histogram);
-			chain.addConnection(filterNodeSelection, histogram);
 		}
 
 		//data analysis - trace
@@ -630,8 +612,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getDataAnalysesView().invalidate(TraceAttributeAnalysisTableFactory.name);
 				}
 			});
-
-			chain.addConnection(filterNodeSelection, dataAnalysisTrace);
 		}
 
 		//data analysis - event
@@ -646,8 +626,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getDataAnalysesView().invalidate(EventAttributeAnalysisTableFactory.name);
 				}
 			});
-
-			chain.addConnection(filterNodeSelection, dataAnalysisEvent);
 		}
 
 		//data analysis - cohort analysis
@@ -662,8 +640,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getDataAnalysesView().invalidate(CohortAnalysisTableFactory.name);
 				}
 			});
-
-			chain.addConnection(makeLog, dataAnalysisCohort);
 		}
 
 		//data analysis - log
@@ -683,20 +659,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getDataAnalysesView().setData(LogAttributeAnalysisTableFactory.name, state);
 				}
 			});
-
-			chain.addConnection(filterNodeSelection, dataAnalysisLog);
-		}
-
-		//done
-		{
-			chain.addConnection(histogram, done);
-			chain.addConnection(performance, done);
-			chain.addConnection(traceColouring, done);
-			chain.addConnection(animate, done);
-			chain.addConnection(dataAnalysisTrace, done);
-			chain.addConnection(dataAnalysisEvent, done);
-			chain.addConnection(dataAnalysisCohort, done);
-			chain.addConnection(dataAnalysisLog, done);
 		}
 
 		return chain;
