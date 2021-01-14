@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
@@ -16,26 +15,31 @@ import org.processmining.plugins.inductiveminer2.attributes.AttributesInfoImpl;
 
 public class Cl01GatherAttributes implements DataChainLinkComputation {
 
+	@Override
 	public String getName() {
 		return "gather attributes";
 	}
 
+	@Override
 	public String getStatusBusyMessage() {
 		return "Gathering attributes..";
 	}
 
-	public String[] getInputNames() {
-		return new String[] { DataState.input_log };
-	}
-
-	public String[] getOutputNames() {
-		return new String[] { DataState.log_info, DataState.initial_classifier, DataState.classifiers };
+	@Override
+	public IvMObject<?>[] getInputNames() {
+		return new IvMObject<?>[] { IvMObject.input_log };
 	}
 
 	@Override
-	public Object[] execute(InductiveVisualMinerConfiguration configuration, Object[] inputs, IvMCanceller canceller)
-			throws Exception {
-		XLog log = (XLog) inputs[0];
+	public IvMObject<?>[] getOutputNames() {
+		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.classifiers, IvMObject.selected_classifier };
+	}
+
+	@Override
+	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+			IvMCanceller canceller) throws Exception {
+		XLog log = inputs.get(IvMObject.input_log);
+
 		IvMVirtualAttributeFactory virtualAttributes = configuration.getVirtualAttributes();
 		AttributesInfo info = new AttributesInfoImpl(log, virtualAttributes);
 		Collection<Attribute> attributes = info.getEventAttributes();
@@ -48,12 +52,12 @@ public class Cl01GatherAttributes implements DataChainLinkComputation {
 		Pair<AttributeClassifier[], AttributeClassifier> p = AttributeClassifiers.getAttributeClassifiers(log, names,
 				true);
 		AttributeClassifier[] attributeClassifiers = p.getA();
+		AttributeClassifier[] firstClassifier = new AttributeClassifier[] { p.getB() };
 
-		//construct the initial classifier
-		AttributeClassifier firstClassifier = p.getB();
-		XEventClassifier initialClassifier = AttributeClassifiers.constructClassifier(firstClassifier);
-
-		return new Object[] { info, initialClassifier, attributeClassifiers };
+		return new IvMObjectValues().//
+				s(IvMObject.attributes_info, info).//
+				s(IvMObject.classifiers, attributeClassifiers).//
+				s(IvMObject.selected_classifier, firstClassifier);
 	}
 
 }

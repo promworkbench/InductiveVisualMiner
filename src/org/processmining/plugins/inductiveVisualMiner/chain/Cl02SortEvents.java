@@ -8,30 +8,50 @@ import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.model.impl.XLogImpl;
 import org.deckfour.xes.model.impl.XTraceImpl;
 import org.processmining.plugins.InductiveMiner.Function;
-import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.plugins.SortEventsPlugin.EventsComparator;
 
-public class Cl02SortEvents extends IvMChainLink<XLog, Pair<XLog, LogAttributeAnalysis>> {
+public class Cl02SortEvents implements DataChainLinkComputation {
 
 	private Function<Object, Boolean> onIllogicalTimeStamps;
 
-	protected XLog generateInput(InductiveVisualMinerState state) {
-		return state.getXLog();
+	@Override
+	public String getName() {
+		return "sort events";
 	}
 
-	protected Pair<XLog, LogAttributeAnalysis> executeLink(XLog input, IvMCanceller canceller) throws Exception {
-		if (hasIllogicalTimeStamps(input, canceller)) {
+	@Override
+	public String getStatusBusyMessage() {
+		return "Performing log analysis..";
+	}
+
+	@Override
+	public IvMObject<?>[] getInputNames() {
+		return new IvMObject<?>[] { IvMObject.input_log };
+	}
+
+	@Override
+	public IvMObject<?>[] getOutputNames() {
+		return new IvMObject<?>[] { IvMObject.sorted_log, IvMObject.log_timestamps_logical };
+	}
+
+	@Override
+	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+			IvMCanceller canceller) throws Exception {
+		XLog log = inputs.get(IvMObject.input_log);
+
+		IvMObjectValues result = new IvMObjectValues();
+
+		if (hasIllogicalTimeStamps(log, canceller)) {
 
 			//ask the user whether to fix it
 			if (onIllogicalTimeStamps.call(null)) {
 
-				System.out.println("fix log");
+				System.out.println("sort events in log");
 
-				XLog result = new XLogImpl(input.getAttributes());
-				for (XTrace trace : input) {
+				XLog sortedLog = new XLogImpl(log.getAttributes());
+				for (XTrace trace : log) {
 
 					if (canceller.isCancelled()) {
 						return null;
@@ -40,29 +60,22 @@ public class Cl02SortEvents extends IvMChainLink<XLog, Pair<XLog, LogAttributeAn
 					XTrace resultTrace = new XTraceImpl(trace.getAttributes());
 					resultTrace.addAll(trace);
 					Collections.sort(resultTrace, new EventsComparator());
-					result.add(resultTrace);
+					sortedLog.add(resultTrace);
 				}
-				return Pair.of(result, new LogAttributeAnalysis(result, canceller));
+				result.set(IvMObject.sorted_log, sortedLog);
+				result.set(IvMObject.log_timestamps_logical, true);
 			} else {
-				return null;
+				//not-logical timestamps, but don't fix them
+				result.set(IvMObject.sorted_log, log);
+				result.set(IvMObject.log_timestamps_logical, false);
 			}
-		}
-		return Pair.of(input, new LogAttributeAnalysis(input, canceller));
-	}
-
-	protected void processResult(Pair<XLog, LogAttributeAnalysis> result, InductiveVisualMinerState state) {
-		if (result != null) {
-			state.setSortedXLog(result.getA());
-			state.setIllogicalTimeStamps(false);
-			state.setLogAttributesAnalysis(result.getB());
 		} else {
-			state.setSortedXLog(state.getXLog());
-			state.setIllogicalTimeStamps(true);
+			//all good
+			result.set(IvMObject.sorted_log, log);
+			result.set(IvMObject.log_timestamps_logical, true);
 		}
-	}
 
-	protected void invalidateResult(InductiveVisualMinerState state) {
-		state.setSortedXLog(null);
+		return result;
 	}
 
 	public Function<Object, Boolean> getOnIllogicalTimeStamps() {
@@ -100,13 +113,5 @@ public class Cl02SortEvents extends IvMChainLink<XLog, Pair<XLog, LogAttributeAn
 			}
 		}
 		return false;
-	}
-
-	public String getName() {
-		return "sort events & log analysis";
-	}
-
-	public String getStatusBusyMessage() {
-		return "Performing log analysis..";
 	}
 }

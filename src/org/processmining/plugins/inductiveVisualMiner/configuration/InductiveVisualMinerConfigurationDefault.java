@@ -9,7 +9,6 @@ import javax.swing.JOptionPane;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.ProMCanceller;
-import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
@@ -44,8 +43,8 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl17DataAnalysisEven
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl20Done;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl21DataAnalysisLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
-import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
@@ -55,7 +54,6 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattribut
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorDefault;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCohort;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCompleteEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEvent;
@@ -84,7 +82,6 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLog;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
-import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityName;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrences;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrencesPerTrace;
@@ -291,34 +288,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		return new InductiveVisualMinerPanel(this, canceller);
 	}
 
-	public void initiateChain(DataChain chain) {
-		//attributes, classifiers
-		{
-			chain.register(new Cl01GatherAttributes());
-			chain.register(new DataChainLinkGui() {
-
-				public String[] getInputNames() {
-					return new String[] { DataState.classifiers, DataState.initial_classifier };
-				}
-
-				public void invalidate(InductiveVisualMinerPanel panel) {
-					panel.getClassifiers().setEnabled(false);
-				}
-
-				public void updateGui(InductiveVisualMinerPanel panel, Object[] inputs) throws Exception {
-					AttributeClassifier[] classifiers = (AttributeClassifier[]) inputs[0];
-					AttributeClassifier initialClassifier = (AttributeClassifier) inputs[1];
-					panel.getClassifiers().setEnabled(true);
-					panel.getClassifiers().replaceClassifiers(classifiers, initialClassifier);
-				}
-
-				public String getName() {
-					return "classifiers";
-				}
-			});
-		}
-	}
-
 	@Override
 	public DataChain createChain(final DataState state, final InductiveVisualMinerPanel panel,
 			final ProMCanceller canceller, final Executor executor, final List<PreMiningFilter> preMiningFilters,
@@ -326,10 +295,31 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		//set up the chain
 		final DataChain chain = new DataChain(state, canceller, executor, this, panel);
 
-		initiateChain(chain);
+		chain.register(new Cl01GatherAttributes());
 
-		makeLog = new Cl03MakeLog();
-		filterLogOnActivities = new Cl04FilterLogOnActivities();
+		sortEvents = new Cl02SortEvents();
+		chain.register(sortEvents);
+		sortEvents.setOnIllogicalTimeStamps(new Function<Object, Boolean>() {
+			public Boolean call(Object input) throws Exception {
+				String[] options = new String[] { "Continue with neither animation nor performance", "Reorder events" };
+				int n = JOptionPane.showOptionDialog(panel,
+						"The event log contains illogical time stamps,\n i.e. some time stamps contradict the order of events.\n\nInductive visual Miner can reorder the events and discover a new model.\nWould you like to do that?", //message
+						"Illogical Time Stamps", //title
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, //do not use a custom Icon
+						options, //the titles of buttons
+						options[0]); //default button title
+				if (n == 1) {
+					//the user requested to reorder the events
+					return true;
+				}
+				return false;
+			}
+		});
+
+		chain.register(new Cl21DataAnalysisLog());
+		chain.register(new Cl03MakeLog());
+		chain.register(new Cl04FilterLogOnActivities());
+
 		mine = new Cl05Mine();
 		layoutModel = new Cl06LayoutModel();
 		align = new Cl07Align();
@@ -346,59 +336,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		dataAnalysisCohort = new Cl18DataAnalysisCohort();
 		dataAnalysisLog = new Cl19DataAnalysisLog();
 		done = new Cl20Done();
-
-		//		//gather attributes
-		//		{
-		//			gatherAttributes.setOnComplete(new Runnable() {
-		//				public void run() {
-		//
-		//					//initialise the filters
-		//					state.getPreMiningFiltersController().setAttributesInfo(state.getAttributesInfo());
-		//				}
-		//			});
-		//		}
-
-		//reorder events
-		{
-			sortEvents.setOnIllogicalTimeStamps(new Function<Object, Boolean>() {
-				public Boolean call(Object input) throws Exception {
-					String[] options = new String[] { "Continue with neither animation nor performance",
-							"Reorder events" };
-					int n = JOptionPane.showOptionDialog(panel,
-							"The event log contains illogical time stamps,\n i.e. some time stamps contradict the order of events.\n\nInductive visual Miner can reorder the events and discover a new model.\nWould you like to do that?", //message
-							"Illogical Time Stamps", //title
-							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, //do not use a custom Icon
-							options, //the titles of buttons
-							options[0]); //default button title
-					if (n == 1) {
-						//the user requested to reorder the events
-						return true;
-					}
-					return false;
-				}
-			});
-
-			sortEvents.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getDataAnalysesView().setData(LogAttributeAnalysisTableFactory.name, state);
-				}
-			});
-
-			sortEvents.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getDataAnalysesView().invalidate(LogAttributeAnalysisTableFactory.name);
-				}
-			});
-		}
-
-		//make log
-		{
-			makeLog.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getTraceView().set(state.getLog(), state.getTraceColourMap());
-				}
-			});
-		}
 
 		//mine a model
 		{
@@ -434,13 +371,16 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					panel.getTraceView().set(state.getModel(), state.getIvMLog(), state.getSelection(),
 							state.getTraceColourMap());
 
-					PopupPopulator.updatePopup(panel, state);
+					//TODO: enable
+					//PopupPopulator.updatePopup(panel, state);
 				}
 			});
 			align.setOnInvalidate(new Runnable() {
 				public void run() {
 					panel.getSaveLogButton().setEnabled(false);
-					PopupPopulator.updatePopup(panel, state);
+
+					//TODO: enable
+					//PopupPopulator.updatePopup(panel, state);
 				}
 			});
 		}
@@ -540,39 +480,15 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 		//filter node selection
 		{
-			filterNodeSelection.setOnComplete(new Runnable() {
-				public void run() {
-					HighlightingFiltersView.updateSelectionDescription(panel, state.getSelection(),
-							state.getHighlightingFiltersController(), state.getModel());
 
-					//tell trace view the colour map and the selection
-					panel.getTraceView().set(state.getModel(), state.getIvMLogFiltered(), state.getSelection(),
-							state.getTraceColourMap());
-
-					PopupPopulator.updatePopup(panel, state);
-
-					//tell the animation the filtered log
-					panel.getGraph().setFilteredLog(state.getIvMLogFiltered());
-
-					panel.repaint();
-				}
-			});
-			filterNodeSelection.setOnInvalidate(new Runnable() {
-				public void run() {
-					//tell the animation the filtered log
-					panel.getGraph().setFilteredLog(null);
-					PopupPopulator.updatePopup(panel, state);
-
-					panel.getGraph().repaint();
-				}
-			});
 		}
 
 		//mine performance
 		{
 			performance.setOnComplete(new Runnable() {
 				public void run() {
-					PopupPopulator.updatePopup(panel, state);
+					//TODO: enable
+					//PopupPopulator.updatePopup(panel, state);
 					try {
 						InductiveVisualMinerController.updateHighlighting(panel, state);
 					} catch (UnknownTreeNodeException e) {
@@ -583,7 +499,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			});
 			performance.setOnInvalidate(new Runnable() {
 				public void run() {
-					PopupPopulator.updatePopup(panel, state);
+					//TODO: enable
+					//PopupPopulator.updatePopup(panel, state);
 					panel.getGraph().repaint();
 				}
 			});

@@ -1,7 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
 public interface DataChainLink {
-	public String[] getInputNames();
+	public IvMObject<?>[] getInputNames();
 
 	/**
 	 * 

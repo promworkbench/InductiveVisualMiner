@@ -3,11 +3,9 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import java.util.Iterator;
 import java.util.List;
 
-import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Quintuple;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -16,24 +14,32 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class Cl13FilterNodeSelection extends
-		IvMChainLink<Quintuple<IvMLogNotFiltered, Selection, IvMHighlightingFiltersController, IvMLogInfo, IvMModel>, Pair<IvMLogFilteredImpl, IvMLogInfo>> {
+public class Cl13FilterNodeSelection implements DataChainLinkComputation {
 
-	protected Quintuple<IvMLogNotFiltered, Selection, IvMHighlightingFiltersController, IvMLogInfo, IvMModel> generateInput(
-			InductiveVisualMinerState state) {
-		return Quintuple.of(state.getIvMLog(), state.getSelection(), state.getHighlightingFiltersController(),
-				state.getIvMLogInfo(), state.getModel());
+	public String getName() {
+		return "highlight selection";
 	}
 
-	protected Pair<IvMLogFilteredImpl, IvMLogInfo> executeLink(
-			Quintuple<IvMLogNotFiltered, Selection, IvMHighlightingFiltersController, IvMLogInfo, IvMModel> input,
-			IvMCanceller canceller) {
+	public String getStatusBusyMessage() {
+		return "Highlighting selection..";
+	}
 
-		IvMLogNotFiltered logBase = input.getA();
-		Selection selection = input.getB();
-		IvMHighlightingFiltersController highLightingFilters = input.getC();
-		IvMLogInfo oldLogInfo = input.getD();
-		IvMModel model = input.getE();
+	public IvMObject<?>[] getInputNames() {
+		return new IvMObject<?>[] { IvMObject.aligned_log, IvMObject.selected_model_selection,
+				IvMObject.controller_highlighting_filters, IvMObject.aligned_log_info, IvMObject.model };
+	}
+
+	public IvMObject<?>[] getOutputNames() {
+		return new IvMObject<?>[] { IvMObject.aligned_log_filtered, IvMObject.aligned_log_info_filtered };
+	}
+
+	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+			IvMCanceller canceller) throws Exception {
+		IvMLogNotFiltered logBase = inputs.get(IvMObject.aligned_log);
+		Selection selection = inputs.get(IvMObject.selected_model_selection);
+		IvMHighlightingFiltersController highLightingFilters = inputs.get(IvMObject.controller_highlighting_filters);
+		IvMLogInfo oldLogInfo = inputs.get(IvMObject.aligned_log_info);
+		IvMModel model = inputs.get(IvMObject.model);
 
 		IvMLogFilteredImpl logFiltered = new IvMLogFilteredImpl(logBase);
 
@@ -50,19 +56,10 @@ public class Cl13FilterNodeSelection extends
 		if (logFiltered.isSomethingFiltered()) {
 			resultLogInfo = new IvMLogInfo(logFiltered, model);
 		}
-		return Pair.of(logFiltered, resultLogInfo);
-	}
 
-	protected void processResult(Pair<IvMLogFilteredImpl, IvMLogInfo> result, InductiveVisualMinerState state) {
-		state.setIvMLogFiltered(result.getA(), result.getB());
-	}
-
-	protected void invalidateResult(InductiveVisualMinerState state) {
-		if (state.getIvMLog() != null) {
-			state.setIvMLogFiltered(new IvMLogFilteredImpl(state.getIvMLog()), state.getIvMLogInfo());
-		} else {
-			state.setIvMLogFiltered(null, null);
-		}
+		return new IvMObjectValues().//
+				s(IvMObject.aligned_log_filtered, logFiltered).//
+				s(IvMObject.aligned_log_info_filtered, resultLogInfo);
 	}
 
 	/**
@@ -91,13 +88,5 @@ public class Cl13FilterNodeSelection extends
 			}
 
 		}
-	}
-
-	public String getName() {
-		return "highlight selection";
-	}
-
-	public String getStatusBusyMessage() {
-		return "Highlighting selection..";
 	}
 }

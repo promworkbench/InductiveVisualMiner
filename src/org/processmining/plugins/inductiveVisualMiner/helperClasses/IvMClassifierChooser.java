@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 
-import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
@@ -67,7 +66,7 @@ public class IvMClassifierChooser extends JPanel {
 		if (log != null && eventAttributes != null) {
 			Pair<AttributeClassifier[], AttributeClassifier> p = AttributeClassifiers.getAttributeClassifiers(log,
 					eventAttributes, filterLifeCycleTransition);
-			replaceClassifiers(p.getA(), p.getB());
+			replaceClassifiers(p.getA(), new AttributeClassifier[] { p.getB() });
 		}
 	}
 
@@ -75,8 +74,8 @@ public class IvMClassifierChooser extends JPanel {
 		combobox.addActionListener(actionListener);
 	}
 
-	public XEventClassifier getSelectedClassifier() {
-		return AttributeClassifiers.constructClassifier(combobox.getSelectedObjects());
+	public AttributeClassifier[] getSelectedClassifier() {
+		return combobox.getSelectedObjects();
 	}
 
 	/**
@@ -85,12 +84,12 @@ public class IvMClassifierChooser extends JPanel {
 	 * @param attributeClassifiers
 	 * @param selectedClassifier
 	 */
-	public void replaceClassifiers(AttributeClassifier[] attributeClassifiers, AttributeClassifier selectedClassifier) {
+	public void replaceClassifiers(AttributeClassifier[] attributeClassifiers,
+			AttributeClassifier[] selectedClassifier) {
 		combobox.removeAllItems();
 		for (AttributeClassifier classifier : attributeClassifiers) {
 			combobox.addItem(classifier, classifier.isClassifier());
 		}
-		combobox.setSelectedItem(selectedClassifier);
 	}
 
 	public MultiComboBox<AttributeClassifier> getMultiComboBox() {

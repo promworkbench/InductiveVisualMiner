@@ -4,7 +4,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 
 public interface DataChainLinkComputation extends DataChainLink {
 
-	public String[] getOutputNames();
+	public IvMObject<?>[] getOutputNames();
 
 	/**
 	 * Performs the computation, given the input. Side-effects not allowed;
@@ -15,8 +15,8 @@ public interface DataChainLinkComputation extends DataChainLink {
 	 * @return
 	 * @throws Exception
 	 */
-	public Object[] execute(InductiveVisualMinerConfiguration configuration, Object[] inputs, IvMCanceller canceller)
-			throws Exception;
+	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+			IvMCanceller canceller) throws Exception;
 
 	/**
 	 * 

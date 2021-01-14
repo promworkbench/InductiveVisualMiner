@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.swing.JTabbedPane;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTable;
@@ -63,12 +63,13 @@ public class DataAnalysesView extends SideWindow {
 	}
 
 	/**
-	 * Sets the data and enables the table.
+	 * Sets the data and enables the table. As this is an extensible method, the
+	 * state is provided.
 	 * 
 	 * @param analysisName
 	 * @param state
 	 */
-	public void setData(String analysisName, InductiveVisualMinerState state) {
+	public void setData(String analysisName, DataState state) {
 		if (tables.containsKey(analysisName)) {
 			DataAnalysisTable table = tables.get(analysisName);
 			boolean successful = table.setData(state);

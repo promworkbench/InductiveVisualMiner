@@ -37,6 +37,11 @@ public class HighlightingFiltersView extends IvMFiltersView {
 			IvMHighlightingFiltersController filters, IvMModel model) {
 		//show the user which traces are shown
 
+		if (selection == null) {
+			panel.getSelectionLabel().setText("Highlighting..");
+			return;
+		}
+
 		StringBuilder result = new StringBuilder();
 
 		//selected nodes

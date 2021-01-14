@@ -7,15 +7,18 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.plugins.InductiveMiner.MultiSet;
-import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 public class PopupPopulator {
 
@@ -24,21 +27,37 @@ public class PopupPopulator {
 
 	public static final int maxCharactersPerLine = 43;
 
-	public static void updatePopup(InductiveVisualMinerPanel panel, InductiveVisualMinerState state)
-			throws UnknownTreeNodeException {
+	/**
+	 * This method is intended to be extensible, and thus needs the state. Only
+	 * the basic input requirements (model, aligned log etc) are declared.
+	 * 
+	 * @param state
+	 * @param configuration
+	 * @param panel
+	 * @param model
+	 * @param visualisationInfo
+	 * @param ivmLogInfoFiltered
+	 */
+	public static void updatePopup(DataState state, InductiveVisualMinerConfiguration configuration,
+			InductiveVisualMinerPanel panel, IvMModel model, ProcessTreeVisualisationInfo visualisationInfo,
+			IvMLogInfo ivmLogInfoFiltered) {
 		List<String> popup = new ArrayList<>();
 
-		if (panel.getGraph().isMouseInLogPopupButton()) {
+		if (model == null || visualisationInfo == null || ivmLogInfoFiltered == null) {
+			//data not ready
+			panel.getGraph().setShowPopup(false, 10);
+		} else if (panel.getGraph().isMouseInLogPopupButton()) {
 			//log popup
 
 			PopupItemInputLog input = new PopupItemInputLog();
-			List<PopupItemLog> items = state.getConfiguration().getPopupItemsLog();
+			List<PopupItemLog> items = configuration.getPopupItemsLog();
 			popupProcess(state, input, popup, items);
 
 			panel.getGraph().setPopupActivity(popup, -1);
 			panel.getGraph().setShowPopup(true, popupWidthNodes);
 			return;
 		} else if (panel.getGraph().getMouseInElements().isEmpty()) {
+			//not in any element
 			panel.getGraph().setShowPopup(false, 10);
 		} else {
 			//output the popup items about the particular node or edge
@@ -46,11 +65,11 @@ public class PopupPopulator {
 			if (element instanceof LocalDotNode) {
 				int unode = ((LocalDotNode) element).getUnode();
 
-				if (state.getModel().isActivity(unode)) {
+				if (model.isActivity(unode)) {
 					//popup of an activity
 
 					PopupItemInputActivity input = new PopupItemInputActivity(unode);
-					List<PopupItemActivity> items = state.getConfiguration().getPopupItemsActivity();
+					List<PopupItemActivity> items = configuration.getPopupItemsActivity();
 					popupProcess(state, input, popup, items);
 
 					panel.getGraph().setPopupActivity(popup, unode);
@@ -61,48 +80,43 @@ public class PopupPopulator {
 					//popup at the source or sink
 
 					PopupItemInputStartEnd input = new PopupItemInputStartEnd();
-					List<PopupItemStartEnd> items = state.getConfiguration().getPopupItemsStartEnd();
+					List<PopupItemStartEnd> items = configuration.getPopupItemsStartEnd();
 					popupProcess(state, input, popup, items);
 
 					panel.getGraph().setPopupStartEnd(popup);
 					panel.getGraph().setShowPopup(true, popupWidthSourceSink);
 					return;
 				}
-			} else if (state.getVisualisationInfo() != null && element instanceof LocalDotEdge
-					&& state.getVisualisationInfo().getAllLogMoveEdges().contains(element)) {
+			} else if (visualisationInfo != null && element instanceof LocalDotEdge
+					&& visualisationInfo.getAllLogMoveEdges().contains(element)) {
 				//log move edge
 				LocalDotEdge edge = (LocalDotEdge) element;
+				//gather input
+				LogMovePosition position = LogMovePosition.of(edge);
+				MultiSet<XEventClass> logMoves = IvMLogMetrics.getLogMoves(position, ivmLogInfoFiltered);
+				PopupItemInputLogMove input = new PopupItemInputLogMove(position, logMoves);
+				List<PopupItemLogMove> items = configuration.getPopupItemsLogMove();
 
-				if (state.isAlignmentReady()) {
-					//gather input
-					LogMovePosition position = LogMovePosition.of(edge);
-					MultiSet<XEventClass> logMoves = IvMLogMetrics.getLogMoves(position, state.getIvMLogInfoFiltered());
-					PopupItemInputLogMove input = new PopupItemInputLogMove(position, logMoves);
-					List<PopupItemLogMove> items = state.getConfiguration().getPopupItemsLogMove();
+				//get popup items
+				popupProcess(state, input, popup, items);
 
-					//get popup items
-					popupProcess(state, input, popup, items);
-
-					panel.getGraph().setPopupLogMove(popup, position);
-					panel.getGraph().setShowPopup(true, popupWidthNodes);
-					return;
-				}
-			} else if (state.getVisualisationInfo() != null && element instanceof LocalDotEdge
-					&& state.getVisualisationInfo().getAllModelMoveEdges().contains(element)) {
+				panel.getGraph().setPopupLogMove(popup, position);
+				panel.getGraph().setShowPopup(true, popupWidthNodes);
+				return;
+			} else if (visualisationInfo != null && element instanceof LocalDotEdge
+					&& visualisationInfo.getAllModelMoveEdges().contains(element)) {
 				//model move edge
-				if (state.isAlignmentReady()) {
-					LocalDotEdge edge = (LocalDotEdge) element;
-					int unode = edge.getUnode();
-					PopupItemInputModelMove input = new PopupItemInputModelMove(unode);
-					List<PopupItemModelMove> items = state.getConfiguration().getPopupItemsModelMove();
+				LocalDotEdge edge = (LocalDotEdge) element;
+				int unode = edge.getUnode();
+				PopupItemInputModelMove input = new PopupItemInputModelMove(unode);
+				List<PopupItemModelMove> items = configuration.getPopupItemsModelMove();
 
-					//get popup items
-					popupProcess(state, input, popup, items);
+				//get popup items
+				popupProcess(state, input, popup, items);
 
-					panel.getGraph().setPopupActivity(popup, -1);
-					panel.getGraph().setShowPopup(true, popupWidthNodes);
-					return;
-				}
+				panel.getGraph().setPopupActivity(popup, -1);
+				panel.getGraph().setShowPopup(true, popupWidthNodes);
+				return;
 			}
 		}
 
@@ -110,7 +124,7 @@ public class PopupPopulator {
 		return;
 	}
 
-	public static <T> void popupProcess(InductiveVisualMinerState state, PopupItemInput<T> input, List<String> popup,
+	public static <T> void popupProcess(DataState state, PopupItemInput<T> input, List<String> popup,
 			List<? extends PopupItem<T>> popupItems) {
 		//gather the values
 		String[][] items = new String[0][0];

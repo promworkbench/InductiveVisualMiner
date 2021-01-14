@@ -12,6 +12,6 @@ public interface DataChainLinkGui extends DataChainLink {
 	 */
 	public void invalidate(InductiveVisualMinerPanel panel);
 
-	public void updateGui(InductiveVisualMinerPanel panel, Object[] inputs) throws Exception;
+	public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception;
 
 }

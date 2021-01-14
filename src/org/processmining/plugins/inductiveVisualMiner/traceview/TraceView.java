@@ -74,6 +74,10 @@ public class TraceView extends SideWindow {
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public void set(IMLog log, TraceColourMap traceColourMap) {
+		if (log == null) {
+			traceView.clear();
+			return;
+		}
 		if (!log.equals(showing)) {
 			showing = log;
 			traceView.clear();
@@ -90,6 +94,10 @@ public class TraceView extends SideWindow {
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public void set(IvMModel model, IvMLog tlog, Selection selection, TraceColourMap traceColourMap) {
+		if (tlog == null) {
+			traceView.clear();
+			return;
+		}
 		if (!tlog.equals(showing)) {
 			showing = tlog;
 			traceView.clear();
