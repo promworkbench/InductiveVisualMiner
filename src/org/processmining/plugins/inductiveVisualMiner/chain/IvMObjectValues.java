@@ -8,6 +8,7 @@ public class IvMObjectValues {
 
 	@SuppressWarnings("unchecked")
 	public <C> C get(IvMObject<C> name) {
+		assert object2value.containsKey(name);
 		return (C) object2value.get(name);
 	}
 

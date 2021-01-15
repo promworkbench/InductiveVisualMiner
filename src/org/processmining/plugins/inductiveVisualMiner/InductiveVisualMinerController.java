@@ -29,6 +29,7 @@ import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeCl
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.export.Exporter;
@@ -79,10 +80,13 @@ import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColour
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
+import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.Miner;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
+
+import com.kitfox.svg.SVGDiagram;
 
 public class InductiveVisualMinerController {
 
@@ -178,40 +182,16 @@ public class InductiveVisualMinerController {
 		});
 		chain.setObject(IvMObject.histogram_width, (int) panel.getGraph().getControlsProgressLine().getWidth());
 
-		//noise filter slider
-		panel.getPathsSlider().addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (!panel.getPathsSlider().getSlider().getValueIsAdjusting()) {
-					chain.setObject(IvMObject.selected_noise_threshold, panel.getPathsSlider().getValue());
-				}
-			}
-		});
-
 		//classifier chooser
 		initGuiClassifiers();
 
-		//miner
-		panel.getMinerSelection().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				chain.setObject(IvMObject.selected_miner,
-						(VisualMinerWrapper) panel.getMinerSelection().getSelectedItem());
-			}
-		});
+		initGuiMiner();
 
 		//model editor
 		panel.getEditModelView().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() instanceof IvMModel) {
 					chain.setObject(IvMObject.model, (IvMModel) e.getSource());
-				}
-			}
-		});
-
-		//activities filter
-		panel.getActivitiesSlider().addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (!panel.getActivitiesSlider().getSlider().getValueIsAdjusting()) {
-					chain.setObject(IvMObject.selected_activities_threshold, panel.getActivitiesSlider().getValue());
 				}
 			}
 		});
@@ -391,6 +371,7 @@ public class InductiveVisualMinerController {
 
 				public void actionPerformed(ActionEvent arg0) {
 					panel.getControllerView().setVisible(true);
+					chain.getOnChange().run();
 				}
 
 			});
@@ -507,6 +488,74 @@ public class InductiveVisualMinerController {
 		});
 	}
 
+	private void initGuiMiner() {
+		//miner
+		chain.setObject(IvMObject.selected_miner, new Miner());
+		panel.getMinerSelection().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				chain.setObject(IvMObject.selected_miner,
+						(VisualMinerWrapper) panel.getMinerSelection().getSelectedItem());
+			}
+		});
+
+		//noise threshold
+		chain.setObject(IvMObject.selected_noise_threshold, 0.8);
+		panel.getPathsSlider().addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (!panel.getPathsSlider().getSlider().getValueIsAdjusting()) {
+					chain.setObject(IvMObject.selected_noise_threshold, panel.getPathsSlider().getValue());
+				}
+			}
+		});
+
+		//model-related buttons
+		chain.register(new DataChainLinkGui() {
+
+			public String getName() {
+				return "enable model-related buttons";
+			}
+
+			public IvMObject<?>[] getInputNames() {
+				return new IvMObject<?>[] { IvMObject.model };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				IvMModel model = inputs.get(IvMObject.model);
+
+				panel.getSaveModelButton().setEnabled(true);
+				panel.getEditModelView().setModel(model);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				panel.getSaveModelButton().setEnabled(false);
+				panel.getEditModelView().setMessage("Mining tree...");
+			}
+		});
+
+		//layout
+		chain.register(new DataChainLinkGui() {
+			public String getName() {
+				return "model dot";
+			}
+
+			public IvMObject<?>[] getInputNames() {
+				return new IvMObject<?>[] { IvMObject.graph_dot, IvMObject.graph_svg };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				Dot dot = inputs.get(IvMObject.graph_dot);
+				SVGDiagram svg = inputs.get(IvMObject.graph_svg);
+
+				panel.getGraph().changeDot(dot, svg, true);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				Dot dot = InductiveVisualMinerAnimationPanel.getSplashScreen();
+				panel.getGraph().changeDot(dot, true);
+			}
+		});
+	}
+
 	public void initGuiTraceView() {
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -563,7 +612,7 @@ public class InductiveVisualMinerController {
 		});
 	}
 
-	public void initGuiClassifiers() {
+	private void initGuiClassifiers() {
 		//update data on classifiers
 		panel.getClassifiers().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -601,13 +650,13 @@ public class InductiveVisualMinerController {
 			}
 
 			public IvMObject<?>[] getInputNames() {
-				return new IvMObject<?>[] { IvMObject.model, IvMObject.visualisation_info,
+				return new IvMObject<?>[] { IvMObject.model, IvMObject.graph_visualisation_info,
 						IvMObject.aligned_log_info_filtered };
 			}
 
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
 				IvMModel model = inputs.get(IvMObject.model);
-				ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.visualisation_info);
+				ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
 				IvMLogInfo ivmLogInfoFiltered = inputs.get(IvMObject.aligned_log_info_filtered);
 
 				PopupPopulator.updatePopup(state, configuration, panel, model, visualisationInfo, ivmLogInfoFiltered);
@@ -639,6 +688,15 @@ public class InductiveVisualMinerController {
 	}
 
 	public void initGuiPreMiningFilters() {
+		chain.setObject(IvMObject.selected_activities_threshold, 1.0);
+		panel.getActivitiesSlider().addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (!panel.getActivitiesSlider().getSlider().getValueIsAdjusting()) {
+					chain.setObject(IvMObject.selected_activities_threshold, panel.getActivitiesSlider().getValue());
+				}
+			}
+		});
+
 		chain.setObject(IvMObject.controller_premining_filters, new IvMPreMiningFiltersController(
 				configuration.getPreMiningFilters(), panel.getPreMiningFiltersView()));
 

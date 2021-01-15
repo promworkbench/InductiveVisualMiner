@@ -1,58 +1,51 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.plugins.InductiveMiner.Quintuple;
-import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
-public class Cl05Mine
-		extends IvMChainLink<Quintuple<IvMModel, IMLog, IMLogInfo, VisualMinerWrapper, VisualMinerParameters>, IvMModel> {
+public class Cl05Mine implements DataChainLinkComputation {
 
-	protected Quintuple<IvMModel, IMLog, IMLogInfo, VisualMinerWrapper, VisualMinerParameters> generateInput(
-			InductiveVisualMinerState state) {
-		VisualMinerParameters minerParameters = new VisualMinerParameters(state.getPaths());
-		return Quintuple.of(state.getPreMinedModel(), state.getActivityFilteredIMLog(),
-				state.getActivityFilteredIMLogInfo(), state.getMiner(), minerParameters);
-	}
-
-	protected IvMModel executeLink(
-			Quintuple<IvMModel, IMLog, IMLogInfo, VisualMinerWrapper, VisualMinerParameters> input,
-			IvMCanceller canceller) throws UnknownTreeNodeException {
-		if (input.getA() == null) {
-			//mine a new tree
-			IvMModel tree = input.getD().mine(input.getB(), input.getC(), input.getE(), canceller);
-			if (tree != null) {
-				return tree;
-			} else {
-				assert (canceller.isCancelled());
-				return null;
-			}
-		} else {
-			//use the existing tree
-			return input.getA();
-		}
-	}
-
-	protected void processResult(IvMModel result, InductiveVisualMinerState state) {
-		state.setModel(result);
-		state.setSelection(new Selection());
-	}
-
-	protected void invalidateResult(InductiveVisualMinerState state) {
-		state.setModel(null);
-		state.setSelection(new Selection());
-	}
-
+	@Override
 	public String getName() {
 		return "mine";
 	}
 
+	@Override
 	public String getStatusBusyMessage() {
 		return "Mining..";
+	}
+
+	@Override
+	public IvMObject<?>[] getInputNames() {
+		return new IvMObject<?>[] { IvMObject.imlog_activity_filtered, IvMObject.imlog_info_activity_filtered,
+				IvMObject.selected_miner, IvMObject.selected_noise_threshold };
+	}
+
+	@Override
+	public IvMObject<?>[] getOutputNames() {
+		return new IvMObject<?>[] { IvMObject.model, IvMObject.selected_model_selection };
+	}
+
+	@Override
+	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+			IvMCanceller canceller) throws Exception {
+		IMLog log = inputs.get(IvMObject.imlog_activity_filtered);
+		IMLogInfo logInfo = inputs.get(IvMObject.imlog_info_activity_filtered);
+		VisualMinerWrapper miner = inputs.get(IvMObject.selected_miner);
+		double noise_threshold = inputs.get(IvMObject.selected_noise_threshold);
+
+		VisualMinerParameters minerParameters = new VisualMinerParameters(noise_threshold);
+
+		IvMModel model = miner.mine(log, logInfo, minerParameters, canceller);
+		Selection selection = new Selection();
+
+		return new IvMObjectValues().//
+				s(IvMObject.model, model).//
+				s(IvMObject.selected_model_selection, selection);
 	}
 }

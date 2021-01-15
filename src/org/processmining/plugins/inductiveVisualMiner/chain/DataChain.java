@@ -94,8 +94,6 @@ public class DataChain {
 	}
 
 	public synchronized void executeLink(DataChainLink chainLink) {
-		System.out.println("  execute chain link " + chainLink.getName()
-				+ (chainLink instanceof DataChainLinkGui ? " (gui)" : ""));
 		if (chainLink instanceof DataChainLinkComputation) {
 			executeLinkComputation((DataChainLinkComputation) chainLink);
 		} else if (chainLink instanceof DataChainLinkGui) {
@@ -105,6 +103,8 @@ public class DataChain {
 	}
 
 	private synchronized void executeLinkGui(final DataChainLinkGui chainLink) {
+		System.out.println("  execute gui chain link `" + chainLink.getName() + "` " + chainLink.getClass());
+
 		final IvMObjectValues inputs = gatherInputs(chainLink);
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -132,6 +132,8 @@ public class DataChain {
 
 		//execute the link
 		if (canExecute(chainLink)) {
+
+			System.out.println("  execute computation chain link `" + chainLink.getName() + "` " + chainLink.getClass());
 
 			//set up the canceller for this job
 			assert !executionCancellers.containsKey(chainLink);
@@ -192,7 +194,7 @@ public class DataChain {
 		canceller.cancel();
 		executionCancellers.remove(chainLink);
 
-		System.out.println("  chain link " + chainLink.getName() + " completed");
+		System.out.println("  chain link `" + chainLink.getName() + "` completed");
 
 		for (int i = 0; i < chainLink.getOutputNames().length; i++) {
 			IvMObject<?> outputObjectName = chainLink.getOutputNames()[i];

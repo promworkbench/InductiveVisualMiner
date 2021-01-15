@@ -7,6 +7,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
@@ -19,9 +20,12 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
+import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
+
+import com.kitfox.svg.SVGDiagram;
 
 public class IvMObject<C> {
 	//inputs
@@ -36,6 +40,8 @@ public class IvMObject<C> {
 	public static final IvMObject<AttributesInfo> attributes_info = c("attributes info", AttributesInfo.class);
 	public static final IvMObject<AttributeClassifier[]> classifiers = c("classifiers", AttributeClassifier[].class);
 	public static final IvMObject<IvMModel> model = c("model", IvMModel.class);
+	public static final IvMObject<TraceViewEventColourMap> trace_view_event_colour_map = c(
+			"trace view event colour map", TraceViewEventColourMap.class);
 	public static final IvMObject<TraceColourMap> trace_colour_map = c("trace colour map", TraceColourMap.class);
 	public static final IvMObject<TraceColourMapSettings> trace_colour_map_settings = c("trace colour map settings",
 			TraceColourMapSettings.class);
@@ -54,7 +60,11 @@ public class IvMObject<C> {
 			IvMLogFilteredImpl.class);
 	public static final IvMObject<IvMLogInfo> aligned_log_info_filtered = c("aligned log info filtered",
 			IvMLogInfo.class);
-	public static final IvMObject<ProcessTreeVisualisationInfo> visualisation_info = c("visualisation info",
+
+	//graph objects
+	public static final IvMObject<Dot> graph_dot = c("graph dot", Dot.class);
+	public static final IvMObject<SVGDiagram> graph_svg = c("graph svg", SVGDiagram.class);
+	public static final IvMObject<ProcessTreeVisualisationInfo> graph_visualisation_info = c("graph visualisation info",
 			ProcessTreeVisualisationInfo.class);
 
 	//controllers

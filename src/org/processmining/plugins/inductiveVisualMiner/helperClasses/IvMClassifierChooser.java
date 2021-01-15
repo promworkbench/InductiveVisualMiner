@@ -66,7 +66,7 @@ public class IvMClassifierChooser extends JPanel {
 		if (log != null && eventAttributes != null) {
 			Pair<AttributeClassifier[], AttributeClassifier> p = AttributeClassifiers.getAttributeClassifiers(log,
 					eventAttributes, filterLifeCycleTransition);
-			replaceClassifiers(p.getA(), new AttributeClassifier[] { p.getB() });
+			replaceClassifiers(p.getA());
 		}
 	}
 
@@ -84,8 +84,7 @@ public class IvMClassifierChooser extends JPanel {
 	 * @param attributeClassifiers
 	 * @param selectedClassifier
 	 */
-	public void replaceClassifiers(AttributeClassifier[] attributeClassifiers,
-			AttributeClassifier[] selectedClassifier) {
+	public void replaceClassifiers(AttributeClassifier[] attributeClassifiers) {
 		combobox.removeAllItems();
 		for (AttributeClassifier classifier : attributeClassifiers) {
 			combobox.addItem(classifier, classifier.isClassifier());

@@ -13,7 +13,6 @@ import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
@@ -107,12 +106,8 @@ import gnu.trove.map.hash.THashMap;
 
 public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMinerConfigurationAbstract {
 
-	protected Cl01GatherAttributes gatherAttributes;
 	protected Cl02SortEvents sortEvents;
-	protected Cl03MakeLog makeLog;
-	protected Cl04FilterLogOnActivities filterLogOnActivities;
-	protected Cl05Mine mine;
-	protected Cl06LayoutModel layoutModel;
+
 	protected Cl07Align align;
 	protected Cl08UpdateIvMAttributes ivmAttributes;
 	protected Cl09LayoutAlignment layoutAlignment;
@@ -319,9 +314,9 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl21DataAnalysisLog());
 		chain.register(new Cl03MakeLog());
 		chain.register(new Cl04FilterLogOnActivities());
+		chain.register(new Cl05Mine());
+		chain.register(new Cl06LayoutModel());
 
-		mine = new Cl05Mine();
-		layoutModel = new Cl06LayoutModel();
 		align = new Cl07Align();
 		ivmAttributes = new Cl08UpdateIvMAttributes();
 		layoutAlignment = new Cl09LayoutAlignment();
@@ -336,32 +331,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		dataAnalysisCohort = new Cl18DataAnalysisCohort();
 		dataAnalysisLog = new Cl19DataAnalysisLog();
 		done = new Cl20Done();
-
-		//mine a model
-		{
-			mine.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getSaveModelButton().setEnabled(true);
-					panel.getEditModelView().setModel(state.getModel());
-				}
-			});
-			mine.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getSaveModelButton().setEnabled(false);
-					panel.getEditModelView().setMessage("Mining tree...");
-					state.setSelection(new Selection());
-				}
-			});
-		}
-
-		//layout
-		{
-			layoutModel.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getGraph().changeDot(state.getDot(), state.getSVGDiagram(), true);
-				}
-			});
-		}
 
 		//align
 		{

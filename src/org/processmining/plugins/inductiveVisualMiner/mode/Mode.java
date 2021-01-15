@@ -39,10 +39,11 @@ public abstract class Mode {
 		withoutAlignment.setColourNodes(new ColourMapFixed(Color.white));
 	}
 
+	public ProcessTreeVisualisationParameters getVisualisationParametersWithoutAlignments() {
+		return withoutAlignment;
+	}
+
 	public ProcessTreeVisualisationParameters getVisualisationParameters(InductiveVisualMinerState state) {
-		if (!state.isAlignmentReady()) {
-			return withoutAlignment;
-		}
 		return getFinalVisualisationParameters(state);
 	}
 
