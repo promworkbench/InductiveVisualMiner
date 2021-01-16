@@ -30,7 +30,6 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Mine;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutModel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl07Align;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl08UpdateIvMAttributes;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl10AnimationScaler;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Animate;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl12TraceColouring;
@@ -108,9 +107,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 	protected Cl02SortEvents sortEvents;
 
-	protected Cl07Align align;
 	protected Cl08UpdateIvMAttributes ivmAttributes;
-	protected Cl09LayoutAlignment layoutAlignment;
 	protected Cl10AnimationScaler animationScaler;
 	protected Cl11Animate animate;
 	protected Cl12TraceColouring traceColouring;
@@ -120,7 +117,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	protected Cl16DataAnalysisTrace dataAnalysisTrace;
 	protected Cl17DataAnalysisEvent dataAnalysisEvent;
 	protected Cl18DataAnalysisCohort dataAnalysisCohort;
-	protected Cl19DataAnalysisLog dataAnalysisLog;
 	protected Cl20Done done;
 
 	public InductiveVisualMinerConfigurationDefault(XLog log, ProMCanceller canceller, Executor executor) {
@@ -316,10 +312,9 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl04FilterLogOnActivities());
 		chain.register(new Cl05Mine());
 		chain.register(new Cl06LayoutModel());
+		chain.register(new Cl07Align());
 
-		align = new Cl07Align();
 		ivmAttributes = new Cl08UpdateIvMAttributes();
-		layoutAlignment = new Cl09LayoutAlignment();
 		animationScaler = new Cl10AnimationScaler();
 		animate = new Cl11Animate();
 		traceColouring = new Cl12TraceColouring();
@@ -329,53 +324,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		dataAnalysisTrace = new Cl16DataAnalysisTrace();
 		dataAnalysisEvent = new Cl17DataAnalysisEvent();
 		dataAnalysisCohort = new Cl18DataAnalysisCohort();
-		dataAnalysisLog = new Cl19DataAnalysisLog();
+		chain.register(new Cl19DataAnalysisLog());
 		done = new Cl20Done();
-
-		//align
-		{
-			align.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getSaveLogButton().setEnabled(true);
-					panel.getTraceView().set(state.getModel(), state.getIvMLog(), state.getSelection(),
-							state.getTraceColourMap());
-
-					//TODO: enable
-					//PopupPopulator.updatePopup(panel, state);
-				}
-			});
-			align.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getSaveLogButton().setEnabled(false);
-
-					//TODO: enable
-					//PopupPopulator.updatePopup(panel, state);
-				}
-			});
-		}
-
-		//layout with alignment
-		{
-			layoutAlignment.setOnStart(new Runnable() {
-				public void run() {
-					//if the view does not show deviations, do not select any log moves
-					if (!state.getMode().isShowDeviations()) {
-						state.removeModelAndLogMovesSelection();
-					}
-				}
-			});
-			layoutAlignment.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getGraph().changeDot(state.getDot(), state.getSVGDiagram(), true);
-
-					InductiveVisualMinerController.makeElementsSelectable(state.getVisualisationInfo(), panel,
-							state.getSelection());
-
-					//tell the trace view the colours of activities
-					panel.getTraceView().setEventColourMap(state.getTraceViewColourMap());
-				}
-			});
-		}
 
 		//ivm attributes
 		{
@@ -456,20 +406,11 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		{
 			performance.setOnComplete(new Runnable() {
 				public void run() {
-					//TODO: enable
-					//PopupPopulator.updatePopup(panel, state);
 					try {
 						InductiveVisualMinerController.updateHighlighting(panel, state);
 					} catch (UnknownTreeNodeException e) {
 						e.printStackTrace();
 					}
-					panel.getGraph().repaint();
-				}
-			});
-			performance.setOnInvalidate(new Runnable() {
-				public void run() {
-					//TODO: enable
-					//PopupPopulator.updatePopup(panel, state);
 					panel.getGraph().repaint();
 				}
 			});
@@ -510,39 +451,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			dataAnalysisEvent.setOnInvalidate(new Runnable() {
 				public void run() {
 					panel.getDataAnalysesView().invalidate(EventAttributeAnalysisTableFactory.name);
-				}
-			});
-		}
-
-		//data analysis - cohort analysis
-		{
-			dataAnalysisCohort.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getDataAnalysesView().setData(CohortAnalysisTableFactory.name, state);
-				}
-			});
-			dataAnalysisCohort.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getDataAnalysesView().invalidate(CohortAnalysisTableFactory.name);
-				}
-			});
-		}
-
-		//data analysis - log
-		{
-			dataAnalysisLog.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getDataAnalysesView().setData(LogAttributeAnalysisTableFactory.name, state);
-				}
-			});
-			dataAnalysisLog.setOnInvalidate(new Runnable() {
-				public void run() {
-					/*
-					 * The bulk of the work is performed in Cl02SortEvents.
-					 * Therefore, we do not invalidate the result but rather
-					 * update it.
-					 */
-					panel.getDataAnalysesView().setData(LogAttributeAnalysisTableFactory.name, state);
 				}
 			});
 		}

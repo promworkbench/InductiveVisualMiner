@@ -20,4 +20,8 @@ public class IvMObjectValues {
 		set(name, object);
 		return this;
 	}
+
+	public <C> boolean has(IvMObject<C> name) {
+		return object2value.containsKey(name);
+	}
 }

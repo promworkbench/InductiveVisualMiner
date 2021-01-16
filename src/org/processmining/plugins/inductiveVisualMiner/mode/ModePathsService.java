@@ -4,9 +4,10 @@ import java.awt.Color;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapRed;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplService;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -37,8 +38,12 @@ public class ModePathsService extends Mode {
 		visualisationParametersBeforeQueues.setColourNodes(new ColourMapFixed(Color.white));
 	}
 
-	public ProcessTreeVisualisationParameters getFinalVisualisationParameters(InductiveVisualMinerState state) {
-		if (!state.isPerformanceReady()) {
+	public IvMObject<?>[] inputsRequested() {
+		return new IvMObject<?>[] { IvMObject.performance };
+	}
+
+	public ProcessTreeVisualisationParameters getVisualisationParametersWithAlignments(IvMObjectValues inputs) {
+		if (!inputs.has(IvMObject.performance)) {
 			return visualisationParametersBeforeQueues;
 		}
 		return visualisationParameters;
@@ -49,15 +54,13 @@ public class ModePathsService extends Mode {
 		return "paths and service times";
 	}
 
+	@Override
 	public boolean isShowDeviations() {
 		return false;
 	}
 
-	public boolean isShowPerformance() {
-		return true;
-	}
-
-	public boolean isUpdateWithTimeStep(InductiveVisualMinerState state) {
+	@Override
+	public boolean isUpdateWithTimeStep() {
 		return false;
 	}
 

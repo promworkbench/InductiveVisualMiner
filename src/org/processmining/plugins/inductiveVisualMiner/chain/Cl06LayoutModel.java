@@ -37,7 +37,8 @@ public class Cl06LayoutModel implements DataChainLinkComputation {
 
 	@Override
 	public IvMObject<?>[] getOutputNames() {
-		return new IvMObject<?>[] {};
+		return new IvMObject<?>[] { IvMObject.graph_dot, IvMObject.graph_svg, IvMObject.graph_visualisation_info,
+				IvMObject.trace_view_event_colour_map };
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class Cl06LayoutModel implements DataChainLinkComputation {
 
 		//compute dot
 		AlignedLogVisualisationData data = new AlignedLogVisualisationDataImplEmpty();
-		ProcessTreeVisualisationParameters parameters = mode.getVisualisationParametersWithoutAlignments();
+		ProcessTreeVisualisationParameters parameters = mode.getParametersWithoutAlignments();
 
 		Triple<Dot, ProcessTreeVisualisationInfo, TraceViewEventColourMap> p;
 		if (model.isTree()) {

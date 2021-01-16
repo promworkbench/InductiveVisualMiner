@@ -3,8 +3,9 @@ package org.processmining.plugins.inductiveVisualMiner.mode;
 import java.awt.Color;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -15,36 +16,36 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import gnu.trove.map.TIntObjectMap;
 
+/**
+ * Class to set the visualisation parameters of the layout of the model.
+ * Determines whether deviations, colours and what data are shown on the model.
+ * There is a possibility to use any object from the state, however their
+ * presence is not guaranteed if requested.
+ * 
+ * Modes will be automatically triggered if any requested object becomes
+ * available (thus, ensure that inputsRequested() always returns the same
+ * objects).
+ * 
+ * VisualisationParameters should work when the unfiltered aligned log is
+ * available. The filtered log (and thus, the highlighting) must be taken care
+ * of using getVisualisationData.
+ * 
+ * @author sander
+ *
+ */
 public abstract class Mode {
 
-	protected abstract ProcessTreeVisualisationParameters getFinalVisualisationParameters(
-			InductiveVisualMinerState state);
-
-	public abstract boolean isShowDeviations();
-
-	public abstract boolean isShowPerformance();
-
-	public abstract boolean isUpdateWithTimeStep(InductiveVisualMinerState state);
-
-	private static ProcessTreeVisualisationParameters withoutAlignment = new ProcessTreeVisualisationParameters();
+	private final ProcessTreeVisualisationParameters parametersWithoutAlignments = new ProcessTreeVisualisationParameters();
 
 	public Mode() {
-		withoutAlignment.setColourModelEdges(null);
-		withoutAlignment.setShowFrequenciesOnModelEdges(false);
-		withoutAlignment.setShowFrequenciesOnMoveEdges(false);
-		withoutAlignment.setShowFrequenciesOnNodes(false);
-		withoutAlignment.setModelEdgesWidth(new SizeMapFixed(1));
-		withoutAlignment.setShowLogMoves(false);
-		withoutAlignment.setShowModelMoves(false);
-		withoutAlignment.setColourNodes(new ColourMapFixed(Color.white));
-	}
-
-	public ProcessTreeVisualisationParameters getVisualisationParametersWithoutAlignments() {
-		return withoutAlignment;
-	}
-
-	public ProcessTreeVisualisationParameters getVisualisationParameters(InductiveVisualMinerState state) {
-		return getFinalVisualisationParameters(state);
+		parametersWithoutAlignments.setColourModelEdges(null);
+		parametersWithoutAlignments.setShowFrequenciesOnModelEdges(false);
+		parametersWithoutAlignments.setShowFrequenciesOnMoveEdges(false);
+		parametersWithoutAlignments.setShowFrequenciesOnNodes(false);
+		parametersWithoutAlignments.setModelEdgesWidth(new SizeMapFixed(1));
+		parametersWithoutAlignments.setShowLogMoves(false);
+		parametersWithoutAlignments.setShowModelMoves(false);
+		parametersWithoutAlignments.setColourNodes(new ColourMapFixed(Color.white));
 	}
 
 	/**
@@ -62,4 +63,28 @@ public abstract class Mode {
 	 */
 	public abstract AlignedLogVisualisationData getVisualisationData(IvMModel model, IvMLogFiltered log,
 			IvMLogInfo logInfo, TIntObjectMap<QueueActivityLog> queueActivityLogs, PerformanceWrapper performance);
+
+	public ProcessTreeVisualisationParameters getParametersWithoutAlignments() {
+		return parametersWithoutAlignments;
+	}
+
+	/**
+	 * 
+	 * @return The objects that would be handy for this mode. A mode must be
+	 *         always available, so there is no guarantee that the objects will
+	 *         be provided.
+	 */
+	public abstract IvMObject<?>[] inputsRequested();
+
+	public abstract boolean isShowDeviations();
+
+	public abstract boolean isUpdateWithTimeStep();
+
+	/**
+	 * Note that there is no guarantee that the requested objects will be
+	 * provided.
+	 * 
+	 * @return
+	 */
+	public abstract ProcessTreeVisualisationParameters getVisualisationParametersWithAlignments(IvMObjectValues inputs);
 }

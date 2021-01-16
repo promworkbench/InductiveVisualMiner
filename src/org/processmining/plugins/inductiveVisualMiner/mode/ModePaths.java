@@ -1,9 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.mode;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMapBlue;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapLinear;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -16,7 +17,7 @@ import gnu.trove.map.TIntObjectMap;
 
 public class ModePaths extends Mode {
 
-	public ProcessTreeVisualisationParameters visualisationParameters = new ProcessTreeVisualisationParameters();
+	private ProcessTreeVisualisationParameters visualisationParameters = new ProcessTreeVisualisationParameters();
 
 	public ModePaths() {
 		visualisationParameters.setShowFrequenciesOnModelEdges(true);
@@ -27,7 +28,13 @@ public class ModePaths extends Mode {
 		visualisationParameters.setShowModelMoves(false);
 	}
 
-	public ProcessTreeVisualisationParameters getFinalVisualisationParameters(InductiveVisualMinerState state) {
+	@Override
+	public IvMObject<?>[] inputsRequested() {
+		return new IvMObject<?>[] {};
+	}
+
+	@Override
+	public ProcessTreeVisualisationParameters getVisualisationParametersWithAlignments(IvMObjectValues inputs) {
 		return visualisationParameters;
 	}
 
@@ -36,15 +43,13 @@ public class ModePaths extends Mode {
 		return "paths";
 	}
 
+	@Override
 	public boolean isShowDeviations() {
 		return false;
 	}
 
-	public boolean isShowPerformance() {
-		return false;
-	}
-
-	public boolean isUpdateWithTimeStep(InductiveVisualMinerState state) {
+	@Override
+	public boolean isUpdateWithTimeStep() {
 		return false;
 	}
 

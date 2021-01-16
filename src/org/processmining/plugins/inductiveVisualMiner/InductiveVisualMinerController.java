@@ -27,6 +27,7 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.Function;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -39,20 +40,24 @@ import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabled
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActivities;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputation;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectCarteBlanche;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnStatus;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
@@ -73,6 +78,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.popup.LogPopupListener;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
@@ -113,6 +119,8 @@ public class InductiveVisualMinerController {
 		this.userStatus = new UserStatus();
 		this.context = context;
 		chain = configuration.getChain();
+
+		chain.setObject(IvMObject.carte_blanche, new IvMObjectCarteBlanche(state)); //carte blanche allows requests for objects without blocking execution
 
 		//initialise gui handlers
 		initGui(canceller, configuration);
@@ -187,6 +195,8 @@ public class InductiveVisualMinerController {
 
 		initGuiMiner();
 
+		initGuiAlignment();
+
 		//model editor
 		panel.getEditModelView().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -197,12 +207,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//display mode
-		panel.getColourModeSelection().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				chain.setObject(IvMObject.selected_visualisation_mode,
-						(Mode) panel.getColourModeSelection().getSelectedItem());
-			}
-		});
+		initGuiGraph();
 
 		//node selection changed
 		panel.setOnSelectionChanged(new InputFunction<Selection>() {
@@ -387,6 +392,9 @@ public class InductiveVisualMinerController {
 			}
 		});
 
+		//set graph handlers
+		initGuiGraph();
+
 		//set trace view button
 		initGuiTraceView();
 
@@ -474,7 +482,7 @@ public class InductiveVisualMinerController {
 					}
 
 					//draw queues
-					if (state.getMode().isUpdateWithTimeStep(state)) {
+					if (state.getMode().isUpdateWithTimeStep()) {
 						state.getVisualisationData().setTime(logTime);
 						try {
 							updateHighlighting(panel, state);
@@ -531,7 +539,9 @@ public class InductiveVisualMinerController {
 				panel.getEditModelView().setMessage("Mining tree...");
 			}
 		});
+	}
 
+	private void initGuiGraph() {
 		//layout
 		chain.register(new DataChainLinkGui() {
 			public String getName() {
@@ -550,20 +560,75 @@ public class InductiveVisualMinerController {
 			}
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
-				Dot dot = InductiveVisualMinerAnimationPanel.getSplashScreen();
+				Dot dot = new Dot();
 				panel.getGraph().changeDot(dot, true);
 			}
 		});
+
+		final Cl09LayoutAlignment layoutAlignment = new Cl09LayoutAlignment();
+		chain.register(layoutAlignment);
+
+		//mode switch
+		chain.setObject(IvMObject.selected_visualisation_mode, new ModePaths());
+		panel.getColourModeSelection().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				chain.setObject(IvMObject.selected_visualisation_mode,
+						(Mode) panel.getColourModeSelection().getSelectedItem());
+			}
+		});
+
+		//register the requirements of the modes
+		registerModeRequests(layoutAlignment);
+
+		//trace view event colour map
+		chain.register(new DataChainLinkGui() {
+
+			public String getName() {
+				return "trace view event colour map";
+			}
+
+			public IvMObject<?>[] getInputNames() {
+				return new IvMObject<?>[] { IvMObject.trace_view_event_colour_map };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				TraceViewEventColourMap traceViewEventColourMap = inputs.get(IvMObject.trace_view_event_colour_map);
+
+				panel.getTraceView().setEventColourMap(traceViewEventColourMap);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				// TODO no action taken?
+			}
+		});
+
+		//layout with alignment
+		{
+			layoutAlignment.setOnStart(new Runnable() {
+				public void run() {
+					//if the view does not show deviations, do not select any log moves
+					if (!state.getMode().isShowDeviations()) {
+						state.removeModelAndLogMovesSelection();
+					}
+				}
+			});
+			layoutAlignment.setOnComplete(new Runnable() {
+				public void run() {
+					makeElementsSelectable(state.getVisualisationInfo(), panel, state.getSelection());
+				}
+			});
+		}
 	}
 
-	public void initGuiTraceView() {
+	protected void initGuiTraceView() {
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				panel.getTraceView().enableAndShow();
 			}
 		});
 
-		chain.register(new DataChainLinkGui() {
+		//trace view (IM log)
+		DataChainLinkGui traceViewIMLog = new DataChainLinkGui() {
 
 			public String getName() {
 				return "trace view (IMLog)";
@@ -583,16 +648,44 @@ public class InductiveVisualMinerController {
 			public void invalidate(InductiveVisualMinerPanel panel) {
 				panel.getTraceView().set(null, null);
 			}
+		};
+		chain.register(traceViewIMLog);
+
+		//chain.register (aligned log)
+		chain.register(new DataChainLinkGui() {
+
+			public String getName() {
+				return "trace view (IvMLog)";
+			}
+
+			public IvMObject<?>[] getInputNames() {
+				return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered,
+						IvMObject.selected_model_selection, IvMObject.trace_colour_map };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				IvMModel model = inputs.get(IvMObject.model);
+				IvMLogFilteredImpl aLog = inputs.get(IvMObject.aligned_log_filtered);
+				Selection selection = inputs.get(IvMObject.selected_model_selection);
+				TraceColourMap traceColourMap = inputs.get(IvMObject.trace_colour_map);
+
+				panel.getTraceView().set(model, aLog, selection, traceColourMap);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				//do nothing to prevent the IM log to be overruled
+			}
 		});
 	}
 
-	public void initGuiDataAnalyses() {
+	protected void initGuiDataAnalyses() {
 		panel.getDataAnalysisViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.getDataAnalysesView().enableAndShow();
 			}
 		});
 
+		//log data analysis
 		chain.register(new DataChainLinkGui() {
 			public String getName() {
 				return "update log data analysis";
@@ -610,9 +703,58 @@ public class InductiveVisualMinerController {
 				panel.getDataAnalysesView().invalidate(LogAttributeAnalysisTableFactory.name);
 			}
 		});
+
+		//log data analysis with virtual attributes
+		chain.register(new DataChainLinkGui() {
+			public String getName() {
+				return "update log data analysis (+virtual)";
+			}
+
+			public IvMObject<?>[] getInputNames() {
+				return new IvMObject<?>[] { IvMObject.data_analysis_log,
+						IvMObject.data_analysis_log_virtual_attributes };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				LogAttributeAnalysis attributeAnalysis = inputs.get(IvMObject.data_analysis_log);
+				@SuppressWarnings("unchecked")
+				List<Pair<String, DisplayType>> virtualAttributes = inputs
+						.get(IvMObject.data_analysis_log_virtual_attributes);
+
+				attributeAnalysis.addVirtualAttributes(virtualAttributes);
+				panel.getDataAnalysesView().setData(LogAttributeAnalysisTableFactory.name, state);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				LogAttributeAnalysis dataAnalysis = state.getObject(IvMObject.data_analysis_log);
+				if (dataAnalysis != null) {
+					dataAnalysis.setVirtualAttributesToPlaceholders();
+				}
+				panel.getDataAnalysesView().setData(LogAttributeAnalysisTableFactory.name, state);
+			}
+		});
+
+		//data analysis - cohort analysis
+		chain.register(new DataChainLinkGui() {
+			public String getName() {
+				return "update log data analysis";
+			}
+
+			public IvMObject<?>[] getInputNames() {
+				return new IvMObject<?>[] { IvMObject.data_analysis_cohort };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				panel.getDataAnalysesView().setData(CohortAnalysisTableFactory.name, state);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				panel.getDataAnalysesView().invalidate(CohortAnalysisTableFactory.name);
+			}
+		});
 	}
 
-	private void initGuiClassifiers() {
+	protected void initGuiClassifiers() {
 		//update data on classifiers
 		panel.getClassifiers().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -642,7 +784,7 @@ public class InductiveVisualMinerController {
 		});
 	}
 
-	public void initGuiPopups() {
+	protected void initGuiPopups() {
 		updatePopups = new DataChainLinkGui() {
 
 			public String getName() {
@@ -687,7 +829,7 @@ public class InductiveVisualMinerController {
 		}
 	}
 
-	public void initGuiPreMiningFilters() {
+	protected void initGuiPreMiningFilters() {
 		chain.setObject(IvMObject.selected_activities_threshold, 1.0);
 		panel.getActivitiesSlider().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -736,7 +878,30 @@ public class InductiveVisualMinerController {
 		});
 	}
 
-	public void initGuiHighlightingFilters() {
+	protected void initGuiAlignment() {
+
+		//save log button
+		chain.register(new DataChainLinkGui() {
+
+			public String getName() {
+				return "save aligned log";
+			}
+
+			public IvMObject<?>[] getInputNames() {
+				return new IvMObject<?>[] { IvMObject.aligned_log_filtered };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				panel.getSaveLogButton().setEnabled(true);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				panel.getSaveLogButton().setEnabled(false);
+			}
+		});
+	}
+
+	protected void initGuiHighlightingFilters() {
 
 		panel.getHighlightingFiltersViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -865,6 +1030,40 @@ public class InductiveVisualMinerController {
 		} else {
 			panel.getAnimationTimeLabel().setFont(panel.getStatusLabel().getFont());
 			panel.getAnimationTimeLabel().setText(s);
+		}
+	}
+
+	public void registerModeRequests(final Cl09LayoutAlignment layoutAlignment) {
+		for (Mode mode : configuration.getModes()) {
+			final Mode mode2 = mode;
+			if (mode2.inputsRequested().length > 0) {
+				for (IvMObject<?> object : mode2.inputsRequested()) {
+					final IvMObject<?> object2 = object;
+					chain.register(new DataChainLinkGui() {
+
+						public String getName() {
+							return "mode " + mode2 + ": " + object.getName();
+						}
+
+						public IvMObject<?>[] getInputNames() {
+							return new IvMObject<?>[] { IvMObject.selected_visualisation_mode,
+									IvMObject.aligned_log_info, object2 };
+						}
+
+						public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs)
+								throws Exception {
+							Mode mode3 = inputs.get(IvMObject.selected_visualisation_mode);
+							if (mode2 == mode3) {
+								chain.executeLink(layoutAlignment);
+							}
+						}
+
+						public void invalidate(InductiveVisualMinerPanel panel) {
+							//no action taken
+						}
+					});
+				}
+			}
 		}
 	}
 

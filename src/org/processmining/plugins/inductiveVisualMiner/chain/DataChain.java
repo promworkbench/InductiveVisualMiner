@@ -241,7 +241,7 @@ public class DataChain {
 	 * @param chainLink
 	 */
 	private void cancelLinkAndInvalidateResult(DataChainLink chainLink) {
-		System.out.println("   invalidate chain link " + chainLink.getName());
+		//System.out.println("   invalidate chain link " + chainLink.getName());
 		if (chainLink instanceof DataChainLinkComputation) {
 			//cancel the ongoing execution
 			IvMCanceller canceller = executionCancellers.get(chainLink);

@@ -3,9 +3,10 @@ package org.processmining.plugins.inductiveVisualMiner.mode;
 import java.awt.Color;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
@@ -26,7 +27,13 @@ public class ModePathsDeviations extends Mode {
 		visualisationParameters.setColourMoves(new ColourMapFixed(new Color(255, 0, 0)));
 	}
 
-	public ProcessTreeVisualisationParameters getFinalVisualisationParameters(InductiveVisualMinerState state) {
+	@Override
+	public IvMObject<?>[] inputsRequested() {
+		return new IvMObject<?>[] {};
+	}
+
+	@Override
+	public ProcessTreeVisualisationParameters getVisualisationParametersWithAlignments(IvMObjectValues inputs) {
 		return visualisationParameters;
 	}
 
@@ -35,15 +42,13 @@ public class ModePathsDeviations extends Mode {
 		return "paths and deviations";
 	}
 
+	@Override
 	public boolean isShowDeviations() {
 		return true;
 	}
 
-	public boolean isShowPerformance() {
-		return false;
-	}
-
-	public boolean isUpdateWithTimeStep(InductiveVisualMinerState state) {
+	@Override
+	public boolean isUpdateWithTimeStep() {
 		return false;
 	}
 

@@ -1,9 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import java.util.List;
 import java.util.Set;
 
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XLog;
+import org.processmining.cohortanalysis.cohort.Cohorts;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
@@ -18,6 +20,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
@@ -34,8 +37,6 @@ public class IvMObject<C> {
 
 	//computed objects
 	public static final IvMObject<XLog> sorted_log = c("sorted log", XLog.class);
-	public static final IvMObject<LogAttributeAnalysis> data_analysis_log = c("data analysis log",
-			LogAttributeAnalysis.class);
 	public static final IvMObject<Boolean> log_timestamps_logical = c("log timestamps logical", boolean.class);
 	public static final IvMObject<AttributesInfo> attributes_info = c("attributes info", AttributesInfo.class);
 	public static final IvMObject<AttributeClassifier[]> classifiers = c("classifiers", AttributeClassifier[].class);
@@ -54,6 +55,8 @@ public class IvMObject<C> {
 			IMLogInfo.class);
 	@SuppressWarnings("rawtypes")
 	public static final IvMObject<Set> filtered_activities = c("filtered activities", Set.class);
+
+	//alignments
 	public static final IvMObject<IvMLogNotFiltered> aligned_log = c("aligned log", IvMLogNotFiltered.class);
 	public static final IvMObject<IvMLogInfo> aligned_log_info = c("aligned log info", IvMLogInfo.class);
 	public static final IvMObject<IvMLogFilteredImpl> aligned_log_filtered = c("aligned log filtered",
@@ -61,17 +64,34 @@ public class IvMObject<C> {
 	public static final IvMObject<IvMLogInfo> aligned_log_info_filtered = c("aligned log info filtered",
 			IvMLogInfo.class);
 
+	//performance
+	public static final IvMObject<PerformanceWrapper> performance = c("performance", PerformanceWrapper.class);
+
+	//data analyses
+	public static final IvMObject<LogAttributeAnalysis> data_analysis_log = c("data analysis log",
+			LogAttributeAnalysis.class);
+	@SuppressWarnings("rawtypes")
+	public static final IvMObject<List> data_analysis_log_virtual_attributes = c("data analysis log virtual attributes",
+			List.class);
+	public static final IvMObject<Cohorts> data_analysis_cohort = c("data analysis cohort", Cohorts.class);
+
 	//graph objects
 	public static final IvMObject<Dot> graph_dot = c("graph dot", Dot.class);
 	public static final IvMObject<SVGDiagram> graph_svg = c("graph svg", SVGDiagram.class);
 	public static final IvMObject<ProcessTreeVisualisationInfo> graph_visualisation_info = c("graph visualisation info",
 			ProcessTreeVisualisationInfo.class);
 
-	//controllers
+	//controllers & IvM-stuff
 	public static final IvMObject<IvMHighlightingFiltersController> controller_highlighting_filters = c(
 			"highlighting filters controller", IvMHighlightingFiltersController.class);
 	public static final IvMObject<IvMPreMiningFiltersController> controller_premining_filters = c(
 			"pre-mining filters controller", IvMPreMiningFiltersController.class);
+	/**
+	 * A carte-blanche gives read-access to the entire state. Used for optional
+	 * objects on the chain. Please note that thread-safety is not guaranteed.
+	 */
+	public static final IvMObject<IvMObjectCarteBlanche> carte_blanche = c("carte blanche",
+			IvMObjectCarteBlanche.class);
 
 	//user selections
 	public static final IvMObject<Double> selected_activities_threshold = c("selected activities threshold",
