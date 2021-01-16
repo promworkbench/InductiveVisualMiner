@@ -13,7 +13,7 @@ import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfoImpl;
 
-public class Cl01GatherAttributes implements DataChainLinkComputation {
+public class Cl01GatherAttributes extends DataChainLinkAbstract implements DataChainLinkComputation {
 
 	@Override
 	public String getName() {
@@ -26,7 +26,7 @@ public class Cl01GatherAttributes implements DataChainLinkComputation {
 	}
 
 	@Override
-	public IvMObject<?>[] getInputNames() {
+	public IvMObject<?>[] getInputObjects() {
 		return new IvMObject<?>[] { IvMObject.input_log };
 	}
 

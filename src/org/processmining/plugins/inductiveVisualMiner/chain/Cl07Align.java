@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
-public class Cl07Align implements DataChainLinkComputation {
+public class Cl07Align extends DataChainLinkAbstract implements DataChainLinkComputation {
 
 	private static ConcurrentHashMap<Quadruple<IvMModel, XEventPerformanceClassifier, XLog, String>, SoftReference<IvMLogNotFiltered>> cache = new ConcurrentHashMap<>();
 
@@ -29,7 +29,7 @@ public class Cl07Align implements DataChainLinkComputation {
 	}
 
 	@Override
-	public IvMObject<?>[] getInputNames() {
+	public IvMObject<?>[] getInputObjects() {
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.selected_classifier, IvMObject.sorted_log,
 				IvMObject.xlog_info, IvMObject.xlog_info_performance };
 		//TODO: handle imported alignments

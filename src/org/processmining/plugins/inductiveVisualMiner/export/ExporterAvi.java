@@ -8,11 +8,12 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimationPanel;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -24,9 +25,9 @@ import com.kitfox.svg.SVGDiagram;
 
 public class ExporterAvi extends Exporter {
 
-	private final InductiveVisualMinerState state;
+	private final DataState state;
 
-	public ExporterAvi(InductiveVisualMinerState state) {
+	public ExporterAvi(DataState state) {
 		this.state = state;
 	}
 
@@ -51,10 +52,12 @@ public class ExporterAvi extends Exporter {
 		final ProcessTreeVisualisationInfo info = state.getVisualisationInfo();
 		final IvMLogFiltered filteredLog = state.getIvMLogFiltered();
 		final TraceColourMap trace2colour = state.getTraceColourMap();
-		final boolean updateWithTimeStep = state.getMode().isUpdateWithTimeStep(state);
+		final boolean updateWithTimeStep = state.getMode().isUpdateWithTimeStep();
 		final AlignedLogVisualisationData visualisationData = state.getVisualisationData().clone();
-		final ProcessTreeVisualisationParameters visualisationParameters = state.getMode()
-				.getVisualisationParameters(state);
+		Mode mode = state.getMode();
+		final ProcessTreeVisualisationParameters visualisationParameters = mode
+				.getVisualisationParametersWithAlignments(
+						state.getObject(IvMObject.carte_blanche).getIfPresent(mode.inputsRequested()));
 		final ProcessTreeVisualisationInfo visualisationInfo = state.getVisualisationInfo();
 		final IvMModel model = state.getModel();
 		final Selection selection = state.getSelection();

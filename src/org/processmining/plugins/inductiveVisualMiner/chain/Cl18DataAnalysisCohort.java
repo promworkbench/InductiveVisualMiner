@@ -2,44 +2,51 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.cohortanalysis.cohort.Cohorts;
-import org.processmining.plugins.InductiveMiner.Quadruple;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class Cl18DataAnalysisCohort
-		extends IvMChainLink<Quadruple<AttributesInfo, XLog, XEventPerformanceClassifier, Boolean>, Cohorts> {
+public class Cl18DataAnalysisCohort implements DataChainLinkComputation {
 
+	@Override
 	public String getName() {
 		return "cohort analysis";
 	}
 
-	protected Quadruple<AttributesInfo, XLog, XEventPerformanceClassifier, Boolean> generateInput(
-			InductiveVisualMinerState state) {
-		return Quadruple.of(state.getAttributesInfo(), state.getSortedXLog(), state.getPerformanceClassifier(),
-				state.isCohortAnalysisEnabled());
+	@Override
+	public String getStatusBusyMessage() {
+		return "Performing cohort analysis";
 	}
 
-	protected Cohorts executeLink(Quadruple<AttributesInfo, XLog, XEventPerformanceClassifier, Boolean> input,
+	@Override
+	public IvMObject<?>[] getInputObjects() {
+		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.sorted_log, IvMObject.selected_classifier,
+				IvMObject.selected_cohort_analysis_enabled };
+	}
+
+	@Override
+	public IvMObject<?>[] getOutputNames() {
+		return new IvMObject<?>[] { IvMObject.data_analysis_cohort };
+	}
+
+	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
 			IvMCanceller canceller) throws Exception {
-		if (input.getD()) {
-			return CohortAnalysis.compute(input.getA(), input.getB(), input.getC(), canceller);
+		if (inputs.get(IvMObject.selected_cohort_analysis_enabled)) {
+
+			AttributesInfo attributesInfo = inputs.get(IvMObject.attributes_info);
+			XLog log = inputs.get(IvMObject.sorted_log);
+			XEventPerformanceClassifier classifier = new XEventPerformanceClassifier(
+					AttributeClassifiers.constructClassifier(inputs.get(IvMObject.classifiers)));
+
+			Cohorts cohorts = CohortAnalysis.compute(attributesInfo, log, classifier, canceller);
+
+			return new IvMObjectValues().//
+					s(IvMObject.data_analysis_cohort, cohorts);
 		} else {
 			return null;
 		}
-	}
-
-	protected void processResult(Cohorts result, InductiveVisualMinerState state) {
-		state.setCohortAnalysis(result);
-	}
-
-	protected void invalidateResult(InductiveVisualMinerState state) {
-		state.setCohortAnalysis(null);
-	}
-
-	public String getStatusBusyMessage() {
-		return "Performing cohort analysis";
 	}
 
 }

@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
 import javax.swing.SwingUtilities;
@@ -9,7 +10,6 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 
-import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
 /**
@@ -30,13 +30,13 @@ public class DataChain {
 	/*
 	 * Which object is required by which chain link?
 	 */
-	public final THashMap<IvMObject<?>, Set<DataChainLink>> object2inputs = new THashMap<>(); //public for debug purposes
+	public final ConcurrentHashMap<IvMObject<?>, Set<DataChainLink>> object2inputs = new ConcurrentHashMap<>(); //public for debug purposes
 
 	/**
 	 * Idea: each execution of a chain link has its own canceller. As long as
 	 * this canceller is not cancelled, the job is still valid.
 	 */
-	public final THashMap<DataChainLinkComputation, IvMCanceller> executionCancellers = new THashMap<>(); //public for debug purposes
+	public final ConcurrentHashMap<DataChainLinkComputation, IvMCanceller> executionCancellers = new ConcurrentHashMap<>(); //public for debug purposes
 
 	public final DataState state; //public for debug purposes
 	private final ProMCanceller globalCanceller;
@@ -62,8 +62,8 @@ public class DataChain {
 	 * 
 	 * @param chainLink
 	 */
-	public synchronized void register(DataChainLink chainLink) {
-		for (IvMObject<?> input : chainLink.getInputNames()) {
+	public void register(DataChainLink chainLink) {
+		for (IvMObject<?> input : chainLink.getInputObjects()) {
 			object2inputs.putIfAbsent(input, new THashSet<>());
 			object2inputs.get(input).add(chainLink);
 		}
@@ -77,14 +77,14 @@ public class DataChain {
 	 * @param inputLog
 	 * @param xLog
 	 */
-	public synchronized <C> void setObject(IvMObject<C> objectName, C object) {
+	public <C> void setObject(IvMObject<C> objectName, C object) {
 		state.putObject(objectName, object);
 
 		//start the chain (this will cancel appropriately)
 		executeNext(objectName);
 	}
 
-	public synchronized void executeLink(Class<? extends DataChainLink> clazz) {
+	public void executeLink(Class<? extends DataChainLink> clazz) {
 		//locate the chain link
 		DataChainLink chainLink = getChainLink(clazz);
 		if (chainLink == null) {
@@ -93,7 +93,7 @@ public class DataChain {
 		executeLink(chainLink);
 	}
 
-	public synchronized void executeLink(DataChainLink chainLink) {
+	public void executeLink(DataChainLink chainLink) {
 		if (chainLink instanceof DataChainLinkComputation) {
 			executeLinkComputation((DataChainLinkComputation) chainLink);
 		} else if (chainLink instanceof DataChainLinkGui) {
@@ -102,8 +102,8 @@ public class DataChain {
 		onChange.run();
 	}
 
-	private synchronized void executeLinkGui(final DataChainLinkGui chainLink) {
-		System.out.println("  execute gui chain link `" + chainLink.getName() + "` " + chainLink.getClass());
+	private void executeLinkGui(final DataChainLinkGui chainLink) {
+		//System.out.println("  execute gui chain link `" + chainLink.getName() + "` " + chainLink.getClass());
 
 		final IvMObjectValues inputs = gatherInputs(chainLink);
 
@@ -126,14 +126,15 @@ public class DataChain {
 		});
 	}
 
-	private synchronized void executeLinkComputation(DataChainLinkComputation chainLink) {
+	private void executeLinkComputation(DataChainLinkComputation chainLink) {
 		//invalidate this link and all links that depend on this link
 		cancelLinkAndInvalidateResult(chainLink);
 
 		//execute the link
 		if (canExecute(chainLink)) {
 
-			System.out.println("  execute computation chain link `" + chainLink.getName() + "` " + chainLink.getClass());
+			System.out
+					.println("  execute computation chain link `" + chainLink.getName() + "` " + chainLink.getClass());
 
 			//set up the canceller for this job
 			assert !executionCancellers.containsKey(chainLink);
@@ -179,7 +180,9 @@ public class DataChain {
 						onStatus.endComputation(chainLink);
 					}
 
-					processOutputsOfChainLink(canceller, chainLink, outputs);
+					if (outputs != null) {
+						processOutputsOfChainLink(canceller, chainLink, outputs);
+					}
 				}
 			});
 		}
@@ -199,7 +202,7 @@ public class DataChain {
 		for (int i = 0; i < chainLink.getOutputNames().length; i++) {
 			IvMObject<?> outputObjectName = chainLink.getOutputNames()[i];
 			processOutput(outputObjectName, outputs);
-			executeNext(outputObjectName);
+			executeNext(outputObjectName, chainLink); //trigger chainlinks that have this object as input, but not the chainlink that produced it itself to prevent loops
 		}
 
 		onChange.run();
@@ -210,21 +213,30 @@ public class DataChain {
 		state.putObject(outputObjectName, outputs.get(outputObjectName));
 	}
 
-	private synchronized <C> void executeNext(IvMObject<C> objectBecameAvailable) {
+	private synchronized <C> void executeNext(IvMObject<C> objectBecameAvailable, DataChainLink... exclude) {
 		//execute next computation links
 		if (object2inputs.containsKey(objectBecameAvailable)) {
 			for (DataChainLink chainLink : object2inputs.get(objectBecameAvailable)) {
-				if (canExecute(chainLink)) {
+				if (canExecute(chainLink) && !contains(exclude, chainLink)) {
 					executeLink(chainLink);
 				}
 			}
 		}
 	}
 
+	private boolean contains(DataChainLink[] haystack, DataChainLink needle) {
+		for (DataChainLink link : haystack) {
+			if (link == needle) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private IvMObjectValues gatherInputs(DataChainLink chainLink) {
 		IvMObjectValues result = new IvMObjectValues();
-		for (int i = 0; i < chainLink.getInputNames().length; i++) {
-			IvMObject<?> object = chainLink.getInputNames()[i];
+		for (int i = 0; i < chainLink.getInputObjects().length; i++) {
+			IvMObject<?> object = chainLink.getInputObjects()[i];
 			gatherInput(object, result);
 		}
 		return result;
@@ -252,12 +264,14 @@ public class DataChain {
 
 			//consider all output objects of this computation
 			for (IvMObject<?> outputObject : ((DataChainLinkComputation) chainLink).getOutputNames()) {
-				state.removeObject(outputObject);
+				if (state.hasObject(outputObject)) {
+					state.removeObject(outputObject);
 
-				//recurse on all chain links that use this output object as an input
-				if (object2inputs.containsKey(outputObject)) {
-					for (DataChainLink chainLink2 : object2inputs.get(outputObject)) {
-						cancelLinkAndInvalidateResult(chainLink2);
+					//recurse on all chain links that use this output object as an input
+					if (object2inputs.containsKey(outputObject)) {
+						for (DataChainLink chainLink2 : object2inputs.get(outputObject)) {
+							cancelLinkAndInvalidateResult(chainLink2);
+						}
 					}
 				}
 			}
@@ -276,7 +290,7 @@ public class DataChain {
 	 * @return whether all the inputs are present
 	 */
 	private boolean canExecute(DataChainLink chainLink) {
-		for (IvMObject<?> inputObject : chainLink.getInputNames()) {
+		for (IvMObject<?> inputObject : chainLink.getInputObjects()) {
 			if (!state.hasObject(inputObject)) {
 				return false;
 			}

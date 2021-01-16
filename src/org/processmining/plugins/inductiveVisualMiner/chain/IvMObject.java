@@ -12,7 +12,11 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
@@ -55,6 +59,9 @@ public class IvMObject<C> {
 			IMLogInfo.class);
 	@SuppressWarnings("rawtypes")
 	public static final IvMObject<Set> filtered_activities = c("filtered activities", Set.class);
+	public static final IvMObject<AlignedLogVisualisationData> visualisation_data = c("visualisation data",
+			AlignedLogVisualisationData.class);
+	public static final IvMObject<IvMAttributesInfo> ivm_attributes_info = c("attributes info", IvMAttributesInfo.class);
 
 	//alignments
 	public static final IvMObject<IvMLogNotFiltered> aligned_log = c("aligned log", IvMLogNotFiltered.class);
@@ -74,6 +81,10 @@ public class IvMObject<C> {
 	public static final IvMObject<List> data_analysis_log_virtual_attributes = c("data analysis log virtual attributes",
 			List.class);
 	public static final IvMObject<Cohorts> data_analysis_cohort = c("data analysis cohort", Cohorts.class);
+	public static final IvMObject<EventAttributeAnalysis> data_analysis_event = c("data analysis event",
+			EventAttributeAnalysis.class);
+	public static final IvMObject<TraceAttributeAnalysis> data_analysis_trace = c("data analysis trace",
+			TraceAttributeAnalysis.class);
 
 	//graph objects
 	public static final IvMObject<Dot> graph_dot = c("graph dot", Dot.class);

@@ -10,7 +10,6 @@ import javax.swing.JOptionPane;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
-import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
@@ -42,6 +41,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCoho
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl20Done;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl21DataAnalysisLog;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl22TraceViewEventColourMapFiltered;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
@@ -111,12 +111,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	protected Cl10AnimationScaler animationScaler;
 	protected Cl11Animate animate;
 	protected Cl12TraceColouring traceColouring;
-	protected Cl13FilterNodeSelection filterNodeSelection;
-	protected Cl14Performance performance;
 	protected Cl15Histogram histogram;
-	protected Cl16DataAnalysisTrace dataAnalysisTrace;
-	protected Cl17DataAnalysisEvent dataAnalysisEvent;
-	protected Cl18DataAnalysisCohort dataAnalysisCohort;
 	protected Cl20Done done;
 
 	public InductiveVisualMinerConfigurationDefault(XLog log, ProMCanceller canceller, Executor executor) {
@@ -313,18 +308,18 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl05Mine());
 		chain.register(new Cl06LayoutModel());
 		chain.register(new Cl07Align());
-
 		ivmAttributes = new Cl08UpdateIvMAttributes();
 		animationScaler = new Cl10AnimationScaler();
 		animate = new Cl11Animate();
 		traceColouring = new Cl12TraceColouring();
-		filterNodeSelection = new Cl13FilterNodeSelection();
-		performance = new Cl14Performance();
+		chain.register(new Cl13FilterNodeSelection());
+		chain.register(new Cl14Performance());
 		histogram = new Cl15Histogram();
-		dataAnalysisTrace = new Cl16DataAnalysisTrace();
-		dataAnalysisEvent = new Cl17DataAnalysisEvent();
-		dataAnalysisCohort = new Cl18DataAnalysisCohort();
+		chain.register(new Cl16DataAnalysisTrace());
+		chain.register(new Cl17DataAnalysisEvent());
+		chain.register(new Cl18DataAnalysisCohort());
 		chain.register(new Cl19DataAnalysisLog());
+		chain.register(new Cl22TraceViewEventColourMapFiltered());
 		done = new Cl20Done();
 
 		//ivm attributes
@@ -397,24 +392,20 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			});
 		}
 
-		//filter node selection
-		{
-
-		}
-
-		//mine performance
-		{
-			performance.setOnComplete(new Runnable() {
-				public void run() {
-					try {
-						InductiveVisualMinerController.updateHighlighting(panel, state);
-					} catch (UnknownTreeNodeException e) {
-						e.printStackTrace();
-					}
-					panel.getGraph().repaint();
-				}
-			});
-		}
+		//TODO: re-enable?
+		//		//mine performance
+		//		{
+		//			performance.setOnComplete(new Runnable() {
+		//				public void run() {
+		//					try {
+		//						InductiveVisualMinerController.updateHighlighting(panel, state);
+		//					} catch (UnknownTreeNodeException e) {
+		//						e.printStackTrace();
+		//					}
+		//					panel.getGraph().repaint();
+		//				}
+		//			});
+		//		}
 
 		//compute histogram
 		{
@@ -423,34 +414,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					//pass the histogram data to the panel
 					panel.getGraph().setHistogramData(state.getHistogramData());
 					panel.getGraph().repaint();
-				}
-			});
-		}
-
-		//data analysis - trace
-		{
-			dataAnalysisTrace.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getDataAnalysesView().setData(TraceAttributeAnalysisTableFactory.name, state);
-				}
-			});
-			dataAnalysisTrace.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getDataAnalysesView().invalidate(TraceAttributeAnalysisTableFactory.name);
-				}
-			});
-		}
-
-		//data analysis - event
-		{
-			dataAnalysisEvent.setOnComplete(new Runnable() {
-				public void run() {
-					panel.getDataAnalysesView().setData(EventAttributeAnalysisTableFactory.name, state);
-				}
-			});
-			dataAnalysisEvent.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getDataAnalysesView().invalidate(EventAttributeAnalysisTableFactory.name);
 				}
 			});
 		}

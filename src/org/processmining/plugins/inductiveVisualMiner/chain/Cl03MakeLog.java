@@ -12,7 +12,7 @@ import org.processmining.plugins.InductiveMiner.mining.logs.XLifeCycleClassifier
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
-public class Cl03MakeLog implements DataChainLinkComputation {
+public class Cl03MakeLog extends DataChainLinkAbstract implements DataChainLinkComputation {
 
 	public String getName() {
 		return "make log";
@@ -22,7 +22,7 @@ public class Cl03MakeLog implements DataChainLinkComputation {
 		return "Making log..";
 	}
 
-	public IvMObject<?>[] getInputNames() {
+	public IvMObject<?>[] getInputObjects() {
 		return new IvMObject<?>[] { IvMObject.sorted_log, IvMObject.selected_classifier, IvMObject.selected_miner };
 	}
 

@@ -8,7 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
-public class Cl05Mine implements DataChainLinkComputation {
+public class Cl05Mine extends DataChainLinkAbstract implements DataChainLinkComputation {
 
 	@Override
 	public String getName() {
@@ -21,7 +21,7 @@ public class Cl05Mine implements DataChainLinkComputation {
 	}
 
 	@Override
-	public IvMObject<?>[] getInputNames() {
+	public IvMObject<?>[] getInputObjects() {
 		return new IvMObject<?>[] { IvMObject.imlog_activity_filtered, IvMObject.imlog_info_activity_filtered,
 				IvMObject.selected_miner, IvMObject.selected_noise_threshold };
 	}

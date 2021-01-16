@@ -4,7 +4,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
 
-public class Cl21DataAnalysisLog implements DataChainLinkComputation {
+public class Cl21DataAnalysisLog extends DataChainLinkAbstract implements DataChainLinkComputation {
 
 	public String getName() {
 		return "data analysis log";
@@ -14,7 +14,7 @@ public class Cl21DataAnalysisLog implements DataChainLinkComputation {
 		return "Performing log analysis..";
 	}
 
-	public IvMObject<?>[] getInputNames() {
+	public IvMObject<?>[] getInputObjects() {
 		return new IvMObject<?>[] { IvMObject.input_log };
 	}
 

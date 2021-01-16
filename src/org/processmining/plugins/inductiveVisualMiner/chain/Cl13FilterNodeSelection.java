@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class Cl13FilterNodeSelection implements DataChainLinkComputation {
+public class Cl13FilterNodeSelection extends DataChainLinkAbstract implements DataChainLinkComputation {
 
 	public String getName() {
 		return "highlight selection";
@@ -24,7 +24,7 @@ public class Cl13FilterNodeSelection implements DataChainLinkComputation {
 		return "Highlighting selection..";
 	}
 
-	public IvMObject<?>[] getInputNames() {
+	public IvMObject<?>[] getInputObjects() {
 		return new IvMObject<?>[] { IvMObject.aligned_log, IvMObject.selected_model_selection,
 				IvMObject.controller_highlighting_filters, IvMObject.aligned_log_info, IvMObject.model };
 	}

@@ -1,42 +1,48 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.plugins.InductiveMiner.Quadruple;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 
-public class Cl17DataAnalysisEvent extends
-		IvMChainLink<Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, IvMAttributesInfo>, EventAttributeAnalysis> {
+public class Cl17DataAnalysisEvent implements DataChainLinkComputation {
 
+	@Override
 	public String getName() {
 		return "data analysis - events";
 	}
 
-	protected Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, IvMAttributesInfo> generateInput(
-			InductiveVisualMinerState state) {
-		return Quadruple.of(state.getModel(), state.getIvMLog(), (IvMLogFiltered) state.getIvMLogFiltered(),
-				state.getIvMAttributesInfo());
-	}
-
-	protected EventAttributeAnalysis executeLink(
-			Quadruple<IvMModel, IvMLogNotFiltered, IvMLogFiltered, IvMAttributesInfo> input, IvMCanceller canceller)
-			throws Exception {
-		return new EventAttributeAnalysis(input.getA(), input.getB(), input.getC(), input.getD(), canceller);
-	}
-
-	protected void processResult(EventAttributeAnalysis result, InductiveVisualMinerState state) {
-		state.setEventAttributesAnalysis(result);
-	}
-
-	protected void invalidateResult(InductiveVisualMinerState state) {
-		state.setTraceAttributesAnalysis(null);
-	}
-
+	@Override
 	public String getStatusBusyMessage() {
 		return "Performing event analysis..";
+	}
+
+	@Override
+	public IvMObject<?>[] getInputObjects() {
+		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log, IvMObject.aligned_log_filtered,
+				IvMObject.ivm_attributes_info };
+	}
+
+	@Override
+	public IvMObject<?>[] getOutputNames() {
+		return new IvMObject<?>[] { IvMObject.data_analysis_event };
+	}
+
+	@Override
+	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+			IvMCanceller canceller) throws Exception {
+		IvMModel model = inputs.get(IvMObject.model);
+		IvMLogNotFiltered aLog = inputs.get(IvMObject.aligned_log);
+		IvMLogFiltered aLogFiltered = inputs.get(IvMObject.aligned_log_filtered);
+		IvMAttributesInfo attributesInfo = inputs.get(IvMObject.ivm_attributes_info);
+
+		EventAttributeAnalysis result = new EventAttributeAnalysis(model, aLog, aLogFiltered, attributesInfo,
+				canceller);
+
+		return new IvMObjectValues().//
+				s(IvMObject.data_analysis_event, result);
 	}
 
 }

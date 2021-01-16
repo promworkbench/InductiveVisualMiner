@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
@@ -17,7 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
  * @author sander
  *
  */
-public class Cl19DataAnalysisLog implements DataChainLinkComputation {
+public class Cl19DataAnalysisLog extends DataChainLinkAbstract implements DataChainLinkComputation {
 
 	@Override
 	public String getName() {
@@ -30,8 +29,8 @@ public class Cl19DataAnalysisLog implements DataChainLinkComputation {
 	}
 
 	@Override
-	public IvMObject<?>[] getInputNames() {
-		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered, IvMObject.data_analysis_log };
+	public IvMObject<?>[] getInputObjects() {
+		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered };
 	}
 
 	@Override
@@ -44,7 +43,6 @@ public class Cl19DataAnalysisLog implements DataChainLinkComputation {
 			IvMCanceller canceller) throws Exception {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogFilteredImpl log = inputs.get(IvMObject.aligned_log_filtered);
-		LogAttributeAnalysis dataAnalysis = inputs.get(IvMObject.data_analysis_log);
 
 		List<Pair<String, DisplayType>> virtualAttributes = LogAttributeAnalysis.computeVirtualAttributes(model, log,
 				canceller);
@@ -52,17 +50,4 @@ public class Cl19DataAnalysisLog implements DataChainLinkComputation {
 		return new IvMObjectValues().//
 				s(IvMObject.data_analysis_log_virtual_attributes, virtualAttributes);
 	}
-
-	protected void processResult(List<Pair<String, DisplayType>> result, InductiveVisualMinerState state) {
-		LogAttributeAnalysis attributes = state.getLogAttributesAnalysis();
-		attributes.addVirtualAttributes(result);
-	}
-
-	protected void invalidateResult(InductiveVisualMinerState state) {
-		LogAttributeAnalysis attributes = state.getLogAttributesAnalysis();
-		if (attributes != null) {
-			attributes.setVirtualAttributesToPlaceholders();
-		}
-	}
-
 }

@@ -8,7 +8,7 @@ public class IvMObjectValues {
 
 	@SuppressWarnings("unchecked")
 	public <C> C get(IvMObject<C> name) {
-		assert object2value.containsKey(name);
+		assert object2value.containsKey(name); //check whether the required object is present
 		return (C) object2value.get(name);
 	}
 
