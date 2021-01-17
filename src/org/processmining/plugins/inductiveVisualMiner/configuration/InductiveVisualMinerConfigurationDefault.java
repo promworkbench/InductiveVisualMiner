@@ -43,6 +43,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl20Done;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl21DataAnalysisLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl22TraceViewEventColourMapFiltered;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
@@ -279,7 +280,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			final ProMCanceller canceller, final Executor executor, final List<PreMiningFilter> preMiningFilters,
 			final List<HighlightingFilter> highlightingFilters) {
 		//set up the chain
-		final DataChain chain = new DataChain(state, canceller, executor, this, panel);
+		final DataChainImplNonBlocking chain = new DataChainImplNonBlocking(state, canceller, executor, this, panel);
 
 		chain.register(new Cl01GatherAttributes());
 
