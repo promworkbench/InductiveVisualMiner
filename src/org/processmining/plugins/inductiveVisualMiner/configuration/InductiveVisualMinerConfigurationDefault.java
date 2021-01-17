@@ -10,7 +10,6 @@ import javax.swing.JOptionPane;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
@@ -108,9 +107,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 	protected Cl02SortEvents sortEvents;
 
-	protected Cl08UpdateIvMAttributes ivmAttributes;
-	protected Cl10AnimationScaler animationScaler;
-	protected Cl11Animate animate;
 	protected Cl12TraceColouring traceColouring;
 	protected Cl15Histogram histogram;
 	protected Cl20Done done;
@@ -309,9 +305,9 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl05Mine());
 		chain.register(new Cl06LayoutModel());
 		chain.register(new Cl07Align());
-		ivmAttributes = new Cl08UpdateIvMAttributes();
-		animationScaler = new Cl10AnimationScaler();
-		animate = new Cl11Animate();
+		chain.register(new Cl08UpdateIvMAttributes());
+		chain.register(new Cl10AnimationScaler());
+		chain.register(new Cl11Animate());
 		traceColouring = new Cl12TraceColouring();
 		chain.register(new Cl13FilterNodeSelection());
 		chain.register(new Cl14Performance());
@@ -322,62 +318,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl19DataAnalysisLog());
 		chain.register(new Cl22TraceViewEventColourMapFiltered());
 		done = new Cl20Done();
-
-		//ivm attributes
-		{
-			ivmAttributes.setOnComplete(new Runnable() {
-				public void run() {
-					//update highlighting filters
-					state.getHighlightingFiltersController().setAttributesInfo(state.getIvMAttributesInfo());
-
-					//update trace colour window 
-					panel.getTraceColourMapView().setAttributes(state.getIvMAttributesInfo());
-				}
-			});
-			ivmAttributes.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getTraceColourMapView().invalidateAttributes();
-				}
-			});
-		}
-
-		//animate
-		{
-			animate.setOnStart(new Runnable() {
-				public void run() {
-					InductiveVisualMinerController.setAnimationStatus(panel, " ", false);
-				}
-			});
-
-			animate.setOnComplete(new Runnable() {
-				public void run() {
-					if (state.getAnimationGraphVizTokens() != null) {
-						//animation enabled; store the result
-						panel.getGraph().setTokens(state.getAnimationGraphVizTokens());
-						panel.getGraph().setAnimationExtremeTimes(state.getAnimationScaler().getMinInUserTime(),
-								state.getAnimationScaler().getMaxInUserTime());
-						panel.getGraph().setFilteredLog(state.getIvMLogFiltered());
-						panel.getGraph().setAnimationEnabled(true);
-					} else {
-						//animation disabled
-						System.out.println("animation disabled");
-						InductiveVisualMinerController.setAnimationStatus(panel, "animation disabled", true);
-						panel.getGraph().setAnimationEnabled(false);
-					}
-					panel.repaint();
-
-					//record the width of the panel (necessary for histogram later)
-					state.setHistogramWidth((int) panel.getGraph().getControlsProgressLine().getWidth());
-				}
-			});
-
-			animate.setOnInvalidate(new Runnable() {
-				public void run() {
-					panel.getGraph().setAnimationEnabled(false);
-					InductiveVisualMinerController.setAnimationStatus(panel, " ", false);
-				}
-			});
-		}
 
 		//colour traces
 		{

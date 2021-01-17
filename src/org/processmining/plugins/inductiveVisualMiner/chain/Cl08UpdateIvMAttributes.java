@@ -4,10 +4,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.processmining.plugins.InductiveMiner.Triple;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
@@ -21,8 +20,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * @author sander
  *
  */
-public class Cl08UpdateIvMAttributes extends
-		ChainLink<InductiveVisualMinerState, Triple<IvMLogNotFiltered, AttributesInfo, IvMVirtualAttributeFactory>, IvMAttributesInfo> {
+public class Cl08UpdateIvMAttributes implements DataChainLinkComputation {
 
 	public String getName() {
 		return "update IvM attributes";
@@ -32,33 +30,33 @@ public class Cl08UpdateIvMAttributes extends
 		return "updating attributes";
 	}
 
-	protected Triple<IvMLogNotFiltered, AttributesInfo, IvMVirtualAttributeFactory> generateInput(
-			InductiveVisualMinerState state) {
-		return Triple.of(state.getIvMLog(), state.getAttributesInfo(), state.getConfiguration().getVirtualAttributes());
+	public IvMObject<?>[] getInputObjects() {
+		return new IvMObject<?>[] { IvMObject.aligned_log, IvMObject.attributes_info };
 	}
 
-	protected IvMAttributesInfo executeLink(Triple<IvMLogNotFiltered, AttributesInfo, IvMVirtualAttributeFactory> input,
+	public IvMObject<?>[] getOutputNames() {
+		return new IvMObject<?>[] { IvMObject.ivm_attributes_info };
+	}
+
+	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
 			IvMCanceller canceller) throws Exception {
+		IvMLogNotFiltered aLog = inputs.get(IvMObject.aligned_log);
+		AttributesInfo attributesInfo = inputs.get(IvMObject.attributes_info);
+		IvMVirtualAttributeFactory virtualAttributes = configuration.getVirtualAttributes();
+
 		ExecutorService executor = Executors.newFixedThreadPool(
 				Math.max(Runtime.getRuntime().availableProcessors() - 1, 1),
 				new ThreadFactoryBuilder().setNameFormat("ivm-thread-ivmattributes-%d").build());
 		IvMAttributesInfo result;
 		try {
-			result = new IvMAttributesInfo(input.getA(), input.getB(), input.getC(), executor);
+			result = new IvMAttributesInfo(aLog, attributesInfo, virtualAttributes, executor);
 			executor.shutdown();
 			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} finally {
 			executor.shutdownNow();
 		}
-		return result;
-	}
 
-	protected void processResult(IvMAttributesInfo result, InductiveVisualMinerState state) {
-		state.setAttributesInfoIvM(result);
+		return new IvMObjectValues().//
+				s(IvMObject.ivm_attributes_info, result);
 	}
-
-	protected void invalidateResult(InductiveVisualMinerState state) {
-		state.setAttributesInfoIvM(null);
-	}
-
 }

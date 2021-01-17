@@ -35,10 +35,14 @@ import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActivities;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
@@ -106,6 +110,10 @@ public class InductiveVisualMinerController {
 	private final UserStatus userStatus;
 
 	private DataChainLinkGui updatePopups;
+	//these fields are time critical and should not go via the state
+	private Scaler animationScaler = null;
+	private Mode animationMode = null;
+	private AlignedLogVisualisationData animationVisualisationData = null;
 
 	//preferences
 	private static final Preferences preferences = Preferences.userRoot()
@@ -179,25 +187,19 @@ public class InductiveVisualMinerController {
 				canceller);
 	}
 
-	private void initGui(final ProMCanceller canceller, InductiveVisualMinerConfiguration configuration) {
+	protected void initGui(final ProMCanceller canceller, InductiveVisualMinerConfiguration configuration) {
 
 		initGuiPopups();
 
-		//resize handler
-		panel.addComponentListener(new ComponentAdapter() {
-			public void componentResized(ComponentEvent e) {
-				//on resize, we have to resize the histogram as well
-				chain.setObject(IvMObject.histogram_width, (int) panel.getGraph().getControlsProgressLine().getWidth());
-			}
-		});
-		chain.setObject(IvMObject.histogram_width, (int) panel.getGraph().getControlsProgressLine().getWidth());
-
-		//classifier chooser
 		initGuiClassifiers();
 
 		initGuiMiner();
 
 		initGuiAlignment();
+
+		initGuiAnimation();
+
+		initGuiHistogram();
 
 		//model editor
 		panel.getEditModelView().addActionListener(new ActionListener() {
@@ -207,9 +209,6 @@ public class InductiveVisualMinerController {
 				}
 			}
 		});
-
-		//display mode
-		initGuiGraph();
 
 		//node selection changed
 		panel.setOnSelectionChanged(new InputFunction<Selection>() {
@@ -472,34 +471,9 @@ public class InductiveVisualMinerController {
 		//set highlighting filters button
 		initGuiHighlightingFilters();
 
-		//set animation time updater
-		panel.getGraph().setAnimationTimeChangedListener(new AnimationTimeChangedListener() {
-			public void timeStepTaken(double userTime) {
-				if (panel.getGraph().isAnimationEnabled()) {
-					long logTime = Math.round(state.getAnimationScaler().userTime2LogTime(userTime));
-					if (state.getAnimationScaler().isCorrectTime()) {
-						setAnimationStatus(panel, ResourceTimeUtils.timeToString(logTime), true);
-					} else {
-						setAnimationStatus(panel, "random", true);
-					}
-
-					//draw queues
-					if (state.getMode().isUpdateWithTimeStep()) {
-						state.getVisualisationData().setTime(logTime);
-						try {
-							//TODO: re-enable
-							//updateHighlighting(panel, state);
-						} catch (UnknownTreeNodeException e) {
-							e.printStackTrace();
-						}
-						panel.getTraceView().repaint();
-					}
-				}
-			}
-		});
 	}
 
-	private void initGuiMiner() {
+	protected void initGuiMiner() {
 		//miner
 		chain.setObject(IvMObject.selected_miner, new Miner());
 		panel.getMinerSelection().addActionListener(new ActionListener() {
@@ -544,7 +518,7 @@ public class InductiveVisualMinerController {
 		});
 	}
 
-	private void initGuiGraph() {
+	protected void initGuiGraph() {
 		//layout
 		chain.register(new DataChainLinkGui() {
 			public String getName() {
@@ -953,6 +927,31 @@ public class InductiveVisualMinerController {
 		state.putObject(IvMObject.controller_highlighting_filters, new IvMHighlightingFiltersController(
 				configuration.getHighlightingFilters(), panel.getHighlightingFiltersView()));
 
+		//initialise filters
+		chain.register(new DataChainLinkGui() {
+
+			public String getName() {
+				return "initialise highlighting filters";
+			}
+
+			public IvMObject<?>[] getInputObjects() {
+				return new IvMObject<?>[] { IvMObject.ivm_attributes_info, IvMObject.controller_highlighting_filters };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				IvMAttributesInfo attributesInfo = inputs.get(IvMObject.ivm_attributes_info);
+				IvMHighlightingFiltersController controller = inputs.get(IvMObject.controller_highlighting_filters);
+
+				controller.setAttributesInfo(attributesInfo);
+
+				panel.getTraceColourMapView().setAttributes(attributesInfo);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				panel.getTraceColourMapView().invalidateAttributes();
+			}
+		});
+
 		//filtering description
 		chain.register(new DataChainLinkGui() {
 			public String getName() {
@@ -1005,6 +1004,63 @@ public class InductiveVisualMinerController {
 				//TODO: no action necessary?
 			}
 		});
+	}
+
+	protected void initGuiAnimation() {
+		//enable animation
+		chain.register(new DataChainLinkGui() {
+
+			public String getName() {
+				return "animation enabled";
+			}
+
+			public IvMObject<?>[] getInputObjects() {
+				return new IvMObject<?>[] { IvMObject.selected_animation_enabled };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				boolean enabled = inputs.get(IvMObject.selected_animation_enabled);
+				if (!enabled) {
+					System.out.println("animation disabled");
+					InductiveVisualMinerController.setAnimationStatus(panel, "animation disabled", true);
+					panel.getGraph().setAnimationEnabled(false);
+				} else {
+					//this is taken care of by the animation handler
+				}
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				//no action necessary
+			}
+		});
+
+		//animation to panel
+		chain.register(new DataChainLinkGui() {
+
+			public String getName() {
+				return "update animation";
+			}
+
+			public IvMObject<?>[] getInputObjects() {
+				return new IvMObject<?>[] { IvMObject.animation, IvMObject.animation_scaler };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				GraphVizTokens animation = inputs.get(IvMObject.animation);
+				Scaler scaler = inputs.get(IvMObject.animation_scaler);
+
+				panel.getGraph().setTokens(animation);
+				panel.getGraph().setAnimationExtremeTimes(scaler.getMinInUserTime(), scaler.getMaxInUserTime());
+				panel.getGraph().setAnimationEnabled(true);
+
+				panel.repaint();
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				panel.getGraph().setAnimationEnabled(false);
+				InductiveVisualMinerController.setAnimationStatus(panel, " ", false);
+			}
+		});
 
 		//filtered log to animation
 		chain.register(new DataChainLinkGui() {
@@ -1027,6 +1083,93 @@ public class InductiveVisualMinerController {
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
 				panel.getGraph().setFilteredLog(null);
+			}
+		});
+
+		//
+		/**
+		 * Set animation time updater. Naturally, this does not go via the
+		 * chain, and we cache the scaler
+		 */
+		chain.register(new DataChainLinkGui() {
+			public String getName() {
+				return "catch animation objects";
+			}
+
+			public IvMObject<?>[] getInputObjects() {
+				return new IvMObject<?>[] { IvMObject.animation_scaler, IvMObject.selected_visualisation_mode,
+						IvMObject.visualisation_data };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				animationScaler = inputs.get(IvMObject.animation_scaler);
+				animationMode = inputs.get(IvMObject.selected_visualisation_mode);
+				animationVisualisationData = inputs.get(IvMObject.visualisation_data);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				animationScaler = null;
+			}
+		});
+
+		panel.getGraph().setAnimationTimeChangedListener(new AnimationTimeChangedListener() {
+			public void timeStepTaken(double userTime) {
+				if (panel.getGraph().isAnimationEnabled()) {
+					Scaler scaler = animationScaler;
+					if (scaler != null) {
+						long logTime = Math.round(scaler.userTime2LogTime(userTime));
+						if (scaler.isCorrectTime()) {
+							setAnimationStatus(panel, ResourceTimeUtils.timeToString(logTime), true);
+						} else {
+							setAnimationStatus(panel, "random", true);
+						}
+
+						//draw modes that require an update with each time step
+						if (animationMode != null && animationVisualisationData != null) {
+							if (animationMode.isUpdateWithTimeStep()) {
+								animationVisualisationData.setTime(logTime);
+								try {
+									//TODO: re-enable
+									//updateHighlighting(panel, state);
+								} catch (UnknownTreeNodeException e) {
+									e.printStackTrace();
+								}
+								panel.getTraceView().repaint();
+							}
+						}
+					}
+				}
+			}
+		});
+	}
+
+	protected void initGuiHistogram() {
+		//resize handler
+		panel.addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				//on resize, we have to resize the histogram as well
+				chain.setObject(IvMObject.histogram_width, (int) panel.getGraph().getControlsProgressLine().getWidth());
+			}
+		});
+
+		//Update the width once the dot is ready. We cannot initialise the width as long as the window has not been drawn yet. Once the dot is computed, this should be fine. 
+		chain.register(new DataChainLinkGui() {
+
+			public String getName() {
+				return "histogram width";
+			}
+
+			public IvMObject<?>[] getInputObjects() {
+				return new IvMObject<?>[] { IvMObject.graph_dot };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				int width = (int) panel.getGraph().getControlsProgressLine().getWidth();
+				chain.setObject(IvMObject.histogram_width, width);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				//no action necessary				
 			}
 		});
 	}

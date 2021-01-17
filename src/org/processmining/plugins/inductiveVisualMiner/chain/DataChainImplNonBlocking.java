@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -118,23 +119,24 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 
 				//wait for a signal on the queue
 				try {
-					semaphore.acquire();
+					semaphore.tryAcquire(1, TimeUnit.SECONDS);
 				} catch (InterruptedException e) {
 					return;
 				}
 
-				assert !queue.isEmpty();
-				QueueItem item = queue.poll();
+				if (!queue.isEmpty()) {
+					QueueItem item = queue.poll();
 
-				if (item instanceof QueueItemSetObject<?>) {
-					chainThreadSetObject((QueueItemSetObject<?>) item);
-				} else if (item instanceof QueueItemExecuteLink) {
-					chainInternal.executeLink(((QueueItemExecuteLink) item).chainLink);
-				} else if (item instanceof QueueItemResults) {
-					chainInternal.processOutputsOfChainLink(((QueueItemResults) item).canceller,
-							((QueueItemResults) item).chainLink, ((QueueItemResults) item).outputs);
-				} else if (item instanceof QueueItemRegister) {
-					chainInternal.register(((QueueItemRegister) item).chainLink);
+					if (item instanceof QueueItemSetObject<?>) {
+						chainThreadSetObject((QueueItemSetObject<?>) item);
+					} else if (item instanceof QueueItemExecuteLink) {
+						chainInternal.executeLink(((QueueItemExecuteLink) item).chainLink);
+					} else if (item instanceof QueueItemResults) {
+						chainInternal.processOutputsOfChainLink(((QueueItemResults) item).canceller,
+								((QueueItemResults) item).chainLink, ((QueueItemResults) item).outputs);
+					} else if (item instanceof QueueItemRegister) {
+						chainInternal.register(((QueueItemRegister) item).chainLink);
+					}
 				}
 			}
 		}
@@ -149,4 +151,5 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 	public Dot toDot() {
 		return chainInternal.toDot();
 	}
+
 }

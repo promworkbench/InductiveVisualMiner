@@ -13,6 +13,8 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
+import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
@@ -61,7 +63,8 @@ public class IvMObject<C> {
 	public static final IvMObject<Set> filtered_activities = c("filtered activities", Set.class);
 	public static final IvMObject<AlignedLogVisualisationData> visualisation_data = c("visualisation data",
 			AlignedLogVisualisationData.class);
-	public static final IvMObject<IvMAttributesInfo> ivm_attributes_info = c("attributes info", IvMAttributesInfo.class);
+	public static final IvMObject<IvMAttributesInfo> ivm_attributes_info = c("attributes info",
+			IvMAttributesInfo.class);
 
 	//alignments
 	public static final IvMObject<IvMLogNotFiltered> aligned_log = c("aligned log", IvMLogNotFiltered.class);
@@ -91,6 +94,8 @@ public class IvMObject<C> {
 	public static final IvMObject<SVGDiagram> graph_svg = c("graph svg", SVGDiagram.class);
 	public static final IvMObject<ProcessTreeVisualisationInfo> graph_visualisation_info = c("graph visualisation info",
 			ProcessTreeVisualisationInfo.class);
+	public static final IvMObject<Scaler> animation_scaler = c("animation scaler", Scaler.class);
+	public static final IvMObject<GraphVizTokens> animation = c("animation", GraphVizTokens.class);
 
 	//controllers & IvM-stuff
 	public static final IvMObject<IvMHighlightingFiltersController> controller_highlighting_filters = c(

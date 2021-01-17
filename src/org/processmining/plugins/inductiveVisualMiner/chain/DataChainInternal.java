@@ -54,6 +54,8 @@ public class DataChainInternal {
 	}
 
 	public void register(DataChainLink chainLink) {
+		assert !chainLinks.contains(chainLink);
+
 		chainLinks.add(chainLink);
 
 		for (IvMObject<?> object : chainLink.getInputObjects()) {

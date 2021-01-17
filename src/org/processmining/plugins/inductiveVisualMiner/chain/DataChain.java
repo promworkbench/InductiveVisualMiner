@@ -34,8 +34,18 @@ public interface DataChain {
 	 */
 	public <C> void setObject(IvMObject<C> objectName, C object);
 
+	/**
+	 * Execute an arbitrary chain link of the given class
+	 * 
+	 * @param clazz
+	 */
 	public void executeLink(Class<? extends DataChainLink> clazz);
 
+	/**
+	 * Invalidate and execute the given chain link.
+	 * 
+	 * @param chainLink
+	 */
 	public void executeLink(DataChainLink chainLink);
 
 	public OnException getOnException();
