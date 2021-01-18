@@ -14,9 +14,8 @@ public interface PopupItem<T> {
 	public IvMObject<?>[] inputObjects();
 
 	/**
-	 * Returns zero or more popup items. This will be called throughout the
-	 * chain, so make sure that you test whether the data you need is available
-	 * in the state.
+	 * Returns zero or more popup items. The requested input objects are
+	 * guaranteed to be available.
 	 * 
 	 * @param state
 	 * @param input

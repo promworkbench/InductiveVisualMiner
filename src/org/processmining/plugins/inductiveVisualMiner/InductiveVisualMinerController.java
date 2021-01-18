@@ -81,12 +81,11 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFilt
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.popup.LogPopupListener;
-import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupController;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
@@ -108,7 +107,7 @@ public class InductiveVisualMinerController {
 	private final PluginContext context;
 	private final UserStatus userStatus;
 
-	private DataChainLinkGui updatePopups;
+	private PopupController popupController;
 	//these fields are time critical and should not go via the state
 	private Scaler animationScaler = null;
 	private Mode animationMode = null;
@@ -823,37 +822,12 @@ public class InductiveVisualMinerController {
 	}
 
 	protected void initGuiPopups() {
-		updatePopups = new DataChainLinkGui() {
-
-			public String getName() {
-				return "update popup (basic)";
-			}
-
-			public IvMObject<?>[] getInputObjects() {
-				return new IvMObject<?>[] { IvMObject.model, IvMObject.graph_visualisation_info,
-						IvMObject.aligned_log_info_filtered };
-			}
-
-			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				IvMModel model = inputs.get(IvMObject.model);
-				ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
-				IvMLogInfo ivmLogInfoFiltered = inputs.get(IvMObject.aligned_log_info_filtered);
-
-				PopupPopulator.updatePopup(state, configuration, panel, model, visualisationInfo, ivmLogInfoFiltered);
-				panel.repaint();
-			}
-
-			public void invalidate(InductiveVisualMinerPanel panel) {
-				PopupPopulator.updatePopup(state, configuration, panel, null, null, null);
-				panel.repaint();
-			}
-		};
-		chain.register(updatePopups);
+		popupController = new PopupController(chain, configuration);
 
 		//set mouse-in-out node updater
 		panel.getGraph().addMouseInElementsChangedListener(new MouseInElementsChangedListener<DotElement>() {
 			public void mouseInElementsChanged(Set<DotElement> mouseInElements) {
-				chain.executeLink(updatePopups);
+				popupController.showPopup(panel, state);
 			}
 		});
 
@@ -861,7 +835,7 @@ public class InductiveVisualMinerController {
 		if (!configuration.getPopupItemsLog().isEmpty()) {
 			panel.getGraph().addLogPopupListener(new LogPopupListener() {
 				public void isMouseInButton(boolean isIn) {
-					chain.executeLink(updatePopups);
+					popupController.showPopup(panel, state);
 				}
 			});
 		}

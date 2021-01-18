@@ -10,6 +10,7 @@ import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
 import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplFrequencies;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
@@ -92,6 +93,7 @@ public class ExporterModelStatistics extends Exporter {
 
 		//popups
 		{
+			IvMObjectValues inputs = null; //TODO: do something sensible here
 			{
 				w.println();
 				w.println("-- activity pop-ups --");
@@ -99,8 +101,8 @@ public class ExporterModelStatistics extends Exporter {
 				for (LocalDotNode activityNode : visualisationInfo.getAllActivityNodes()) {
 					int node = activityNode.getUnode();
 					w.print(configuration.getState().getModel().getActivityName(node));
-					PopupItemInputActivity input = new PopupItemInputActivity(node);
-					printPopupItems(w, configuration.getPopupItemsActivity(), input, sep);
+					PopupItemInputActivity itemInput = new PopupItemInputActivity(node);
+					printPopupItems(w, configuration.getPopupItemsActivity(), itemInput, sep, inputs);
 				}
 			}
 
@@ -108,26 +110,26 @@ public class ExporterModelStatistics extends Exporter {
 			{
 				w.println();
 				w.println("-- log pop-up --");
-				PopupItemInputLog input = new PopupItemInputLog();
-				printPopupItems(w, configuration.getPopupItemsLog(), input, sep);
+				PopupItemInputLog itemInput = new PopupItemInputLog();
+				printPopupItems(w, configuration.getPopupItemsLog(), itemInput, sep, inputs);
 			}
 
 			//start-end pop-up
 			{
 				w.println();
 				w.println("-- start-end pop-up --");
-				PopupItemInputStartEnd input = new PopupItemInputStartEnd();
-				printPopupItems(w, configuration.getPopupItemsStartEnd(), input, sep);
+				PopupItemInputStartEnd itemInput = new PopupItemInputStartEnd();
+				printPopupItems(w, configuration.getPopupItemsStartEnd(), itemInput, sep, inputs);
 			}
 		}
 
 		w.close();
 	}
 
-	public <T> void printPopupItems(PrintWriter w, List<? extends PopupItem<T>> popupItems, PopupItemInput<T> input,
-			char sep) {
+	public <T> void printPopupItems(PrintWriter w, List<? extends PopupItem<T>> popupItems, PopupItemInput<T> itemInput,
+			char sep, IvMObjectValues inputs) {
 		for (PopupItem<T> popupItem : popupItems) {
-			String[][] rows = popupItem.get(configuration.getState(), input);
+			String[][] rows = popupItem.get(inputs, itemInput);
 			for (String[] row : rows) {
 				if (row != null && row.length > 0 && row[0] != null) {
 					w.print(sep);

@@ -66,6 +66,10 @@ public class DataChainInternal {
 			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputNames()) {
 				object2inputs.putIfAbsent(object, new THashSet<>());
 			}
+			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getTriggerObjects()) {
+				object2inputs.putIfAbsent(object, new THashSet<>());
+				object2inputs.get(object).add(chainLink);
+			}
 		}
 	}
 
@@ -214,7 +218,7 @@ public class DataChainInternal {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					
+
 					final IvMObjectValues outputs;
 					try {
 						outputs = chainLink.execute(configuration, inputs, canceller);

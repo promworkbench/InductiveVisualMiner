@@ -9,14 +9,16 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInputActivi
 
 public class PopupItemActivityName implements PopupItemActivity {
 
-	public String[][] get(IvMObjectValues inputs, PopupItemInput<PopupItemInputActivity> input) {
-		IvMModel model = inputs.get(IvMObject.model);
-		int unode = input.get().getUnode();
-		return new String[][] { { "Activity " + model.getActivityName(unode) } };
-	}
-
 	public IvMObject<?>[] inputObjects() {
 		return new IvMObject<?>[] { IvMObject.model };
+	}
+
+	public String[][] get(IvMObjectValues inputs, PopupItemInput<PopupItemInputActivity> input) {
+		IvMModel model = inputs.get(IvMObject.model);
+
+		int unode = input.get().getUnode();
+
+		return new String[][] { { "Activity " + model.getActivityName(unode) } };
 	}
 
 }

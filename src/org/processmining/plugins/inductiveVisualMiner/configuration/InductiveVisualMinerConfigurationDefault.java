@@ -88,6 +88,9 @@ import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActiv
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveActivities;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveSpacer;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogMoveTitle;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogName;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogSpacer;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemLogTitle;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemModelMoveOccurrences;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndName;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemStartEndNumberOfTraces;
@@ -204,7 +207,9 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	@Override
 	protected List<PopupItemLog> createPopupItemsLog() {
 		return new ArrayList<>(Arrays.asList(new PopupItemLog[] { //
-
+				new PopupItemLogTitle(), //
+				new PopupItemLogSpacer(), //
+				new PopupItemLogName() //
 		}));
 	}
 

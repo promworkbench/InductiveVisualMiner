@@ -5,7 +5,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
-import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
+import org.processmining.plugins.inductiveVisualMiner.popup.PopupController;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
 public class Cl15Histogram extends DataChainLinkComputationAbstract {
@@ -43,8 +43,8 @@ public class Cl15Histogram extends DataChainLinkComputationAbstract {
 		if (width <= 0) {
 			return null;
 		}
-		HistogramData data = new HistogramData(model, info, aLog, scaler, width, PopupPopulator.popupWidthNodes,
-				PopupPopulator.popupWidthSourceSink, canceller);
+		HistogramData data = new HistogramData(model, info, aLog, scaler, width, PopupController.popupWidthNodes,
+				PopupController.popupWidthSourceSink, canceller);
 
 		return new IvMObjectValues().//
 				s(IvMObject.histogram_data, data);

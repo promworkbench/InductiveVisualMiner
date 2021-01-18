@@ -5,24 +5,21 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.deckfour.xes.classification.XEventClass;
-import org.processmining.plugins.InductiveMiner.MultiSet;
 import org.processmining.plugins.graphviz.dot.DotElement;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputationAbstract;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogMetrics;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode.NodeType;
@@ -51,7 +48,7 @@ public class PopupController {
 
 		@Override
 		public String getName() {
-			return "popup recomputer";
+			return "popup computer";
 		}
 
 		@Override
@@ -104,10 +101,8 @@ public class PopupController {
 				if (inputs.has(IvMObject.aligned_log_info_filtered)) {
 					IvMLogInfo ivmLogInfoFiltered = inputs.get(IvMObject.aligned_log_info_filtered);
 					//log moves
-					for (Entry<LogMovePosition, MultiSet<XEventClass>> logMove : ivmLogInfoFiltered.getLogMoves()
-							.entrySet()) {
-						PopupItemInputLogMove itemInput = new PopupItemInputLogMove(logMove.getKey(),
-								logMove.getValue());
+					for (LogMovePosition position : ivmLogInfoFiltered.getLogMoves().keySet()) {
+						PopupItemInputLogMove itemInput = new PopupItemInputLogMove(position);
 						List<PopupItemLogMove> items = configuration.getPopupItemsLogMove();
 						popups.put(itemInput, popupProcess(inputs, itemInput, items));
 					}
@@ -151,6 +146,12 @@ public class PopupController {
 
 		//set up a chain link computer
 		chain.register(new ClPopups(inputs));
+	}
+
+	public void showPopup(InductiveVisualMinerPanel panel, DataState state) {
+		IvMObjectValues inputs = state.getObject(IvMObject.carte_blanche).getIfPresent(IvMObject.popups,
+				IvMObject.model, IvMObject.graph_visualisation_info, IvMObject.aligned_log_info_filtered);
+		showPopup(panel, inputs);
 	}
 
 	public void showPopup(InductiveVisualMinerPanel panel, IvMObjectValues inputs) {
@@ -200,23 +201,17 @@ public class PopupController {
 					if (inputs.has(IvMObject.graph_visualisation_info)) {
 						ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
 
-						if (inputs.has(IvMObject.aligned_log_info_filtered)) {
-							IvMLogInfo ivmLogInfoFiltered = inputs.get(IvMObject.aligned_log_info_filtered);
+						if (element instanceof LocalDotEdge
+								&& visualisationInfo.getAllLogMoveEdges().contains(element)) {
+							//log move edge
+							LocalDotEdge edge = (LocalDotEdge) element;
+							//gather input
+							LogMovePosition position = LogMovePosition.of(edge);
+							PopupItemInputLogMove input = new PopupItemInputLogMove(position);
 
-							if (element instanceof LocalDotEdge
-									&& visualisationInfo.getAllLogMoveEdges().contains(element)) {
-								//log move edge
-								LocalDotEdge edge = (LocalDotEdge) element;
-								//gather input
-								LogMovePosition position = LogMovePosition.of(edge);
-								MultiSet<XEventClass> logMoves = IvMLogMetrics.getLogMoves(position,
-										ivmLogInfoFiltered);
-								PopupItemInputLogMove input = new PopupItemInputLogMove(position, logMoves);
-
-								panel.getGraph().setPopupLogMove(popups.get(input), position);
-								panel.getGraph().setShowPopup(true, popupWidthNodes);
-								return;
-							}
+							panel.getGraph().setPopupLogMove(popups.get(input), position);
+							panel.getGraph().setShowPopup(true, popupWidthNodes);
+							return;
 						}
 
 						if (element instanceof LocalDotEdge
@@ -248,13 +243,16 @@ public class PopupController {
 		//gather the values
 		String[][] items = new String[0][0];
 		for (PopupItem<T> item : popupItems) {
-			String[][] newItems = item.get(inputs, itemInput);
+			if (inputs.has(item.inputObjects())) {
+				IvMObjectValues subInputs = inputs.getIfPresent(item.inputObjects());
+				String[][] newItems = item.get(subInputs, itemInput);
 
-			//merge arrays
-			String[][] result2 = new String[items.length + newItems.length][];
-			System.arraycopy(items, 0, result2, 0, items.length);
-			System.arraycopy(newItems, 0, result2, items.length, newItems.length);
-			items = result2;
+				//merge arrays
+				String[][] result2 = new String[items.length + newItems.length][];
+				System.arraycopy(items, 0, result2, 0, items.length);
+				System.arraycopy(newItems, 0, result2, items.length, newItems.length);
+				items = result2;
+			}
 		}
 
 		//gather the width of the first column

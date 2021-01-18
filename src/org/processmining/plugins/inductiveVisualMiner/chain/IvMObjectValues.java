@@ -6,6 +6,13 @@ public class IvMObjectValues {
 
 	private THashMap<IvMObject<?>, Object> object2value = new THashMap<>();
 
+	/**
+	 * Ensure that the object is available before calling.
+	 * 
+	 * @param <C>
+	 * @param name
+	 * @return the requested object
+	 */
 	@SuppressWarnings("unchecked")
 	public <C> C get(IvMObject<C> name) {
 		assert object2value.containsKey(name); //check whether the required object is present
@@ -21,7 +28,37 @@ public class IvMObjectValues {
 		return this;
 	}
 
-	public <C> boolean has(IvMObject<C> name) {
-		return object2value.containsKey(name);
+	/**
+	 * 
+	 * @param objects
+	 * @return whether all objects are available
+	 */
+	public boolean has(IvMObject<?>... objects) {
+		for (IvMObject<?> object : objects) {
+			if (!object2value.containsKey(object)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * 
+	 * @param inputObjects
+	 * @return A sub-set of this object, that has the requested objects. The
+	 *         objects are not required to be present.
+	 */
+	public IvMObjectValues getIfPresent(IvMObject<?>... objects) {
+		IvMObjectValues result = new IvMObjectValues();
+		for (IvMObject<?> object : objects) {
+			if (has(object)) {
+				getIfPresent2(result, object);
+			}
+		}
+		return result;
+	}
+
+	private <C> void getIfPresent2(IvMObjectValues result, IvMObject<C> object) {
+		result.set(object, get(object));
 	}
 }
