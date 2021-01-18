@@ -41,7 +41,6 @@ import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabled
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActivities;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
@@ -85,10 +84,10 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
+import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.popup.LogPopupListener;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupPopulator;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
-import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
@@ -450,27 +449,31 @@ public class InductiveVisualMinerController {
 			});
 		}
 
-		//set trace colouring button
-		{
-			panel.getTraceColourMapViewButton().addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					panel.getTraceColourMapView().enableAndShow();
-				}
-			});
-			TraceColourMap traceColourMap = new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
-			state.putObject(IvMObject.trace_colour_map, traceColourMap);
-			panel.getGraph().setTraceColourMap(traceColourMap);
-			panel.getTraceColourMapView().setOnUpdate(new Function<TraceColourMapSettings, Object>() {
-				public Object call(TraceColourMapSettings input) throws Exception {
-					chain.setObject(IvMObject.trace_colour_map_settings, input);
-					return null;
-				}
-			});
-		}
+		initGuiTraceColouring();
 
 		//set highlighting filters button
 		initGuiHighlightingFilters();
 
+	}
+
+	protected void initGuiTraceColouring() {
+		//set trace colouring button to open the trace colouring window
+		panel.getTraceColourMapViewButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				panel.getTraceColourMapView().enableAndShow();
+			}
+		});
+
+		//
+		//		TraceColourMap traceColourMap = new TraceColourMapFixed(RendererFactory.defaultTokenFillColour);
+		//		state.putObject(IvMObject.trace_colour_map, traceColourMap);
+		//panel.getGraph().setTraceColourMap(traceColourMap);
+		panel.getTraceColourMapView().setOnUpdate(new Function<TraceColourMapSettings, Object>() {
+			public Object call(TraceColourMapSettings input) throws Exception {
+				chain.setObject(IvMObject.trace_colour_map_settings, input);
+				return null;
+			}
+		});
 	}
 
 	protected void initGuiMiner() {
@@ -643,10 +646,34 @@ public class InductiveVisualMinerController {
 				TraceColourMap traceColourMap = inputs.get(IvMObject.trace_colour_map);
 
 				panel.getTraceView().set(model, aLog, selection, traceColourMap);
+				panel.getTraceView().repaint();
 			}
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
 				//do nothing to prevent the IM log to be overruled
+			}
+		});
+
+		chain.register(new DataChainLinkGui() {
+			public String getName() {
+				return "trace colour map";
+			}
+
+			public IvMObject<?>[] getInputObjects() {
+				return new IvMObject<?>[] { IvMObject.trace_colour_map };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				TraceColourMap traceColourMap = inputs.get(IvMObject.trace_colour_map);
+				panel.getGraph().setTraceColourMap(traceColourMap);
+				panel.repaint();
+
+				panel.getTraceView().setTraceColourMap(traceColourMap);
+				panel.getTraceView().repaint();
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+
 			}
 		});
 	}
@@ -977,33 +1004,6 @@ public class InductiveVisualMinerController {
 				panel.repaint();
 			}
 		});
-
-		//tell trace view the colour map and the selection
-		chain.register(new DataChainLinkGui() {
-
-			public String getName() {
-				return "trace colour map";
-			}
-
-			public IvMObject<?>[] getInputObjects() {
-				return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered,
-						IvMObject.selected_model_selection, IvMObject.trace_colour_map };
-			}
-
-			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				IvMModel model = inputs.get(IvMObject.model);
-				IvMLogFilteredImpl ivmLogFiltered = inputs.get(IvMObject.aligned_log_filtered);
-				Selection selection = inputs.get(IvMObject.selected_model_selection);
-				TraceColourMap traceColourMap = inputs.get(IvMObject.trace_colour_map);
-
-				panel.getTraceView().set(model, ivmLogFiltered, selection, traceColourMap);
-				panel.getTraceView().repaint();
-			}
-
-			public void invalidate(InductiveVisualMinerPanel panel) {
-				//TODO: no action necessary?
-			}
-		});
 	}
 
 	protected void initGuiAnimation() {
@@ -1139,6 +1139,29 @@ public class InductiveVisualMinerController {
 						}
 					}
 				}
+			}
+		});
+
+		//show histogram
+		chain.register(new DataChainLinkGui() {
+
+			public String getName() {
+				return "show histogram";
+			}
+
+			public IvMObject<?>[] getInputObjects() {
+				return new IvMObject<?>[] { IvMObject.histogram_data };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				HistogramData histogramData = inputs.get(IvMObject.histogram_data);
+
+				panel.getGraph().setHistogramData(histogramData);
+				panel.getGraph().repaint();
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				panel.getGraph().setHistogramData(null);
 			}
 		});
 	}

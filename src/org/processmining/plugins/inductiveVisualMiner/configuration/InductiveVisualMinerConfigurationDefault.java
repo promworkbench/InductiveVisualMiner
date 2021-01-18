@@ -107,8 +107,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 	protected Cl02SortEvents sortEvents;
 
-	protected Cl12TraceColouring traceColouring;
-	protected Cl15Histogram histogram;
 	protected Cl20Done done;
 
 	public InductiveVisualMinerConfigurationDefault(XLog log, ProMCanceller canceller, Executor executor) {
@@ -308,30 +306,16 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl08UpdateIvMAttributes());
 		chain.register(new Cl10AnimationScaler());
 		chain.register(new Cl11Animate());
-		traceColouring = new Cl12TraceColouring();
+		chain.register(new Cl12TraceColouring());
 		chain.register(new Cl13FilterNodeSelection());
 		chain.register(new Cl14Performance());
-		histogram = new Cl15Histogram();
+		chain.register(new Cl15Histogram());
 		chain.register(new Cl16DataAnalysisTrace());
 		chain.register(new Cl17DataAnalysisEvent());
 		chain.register(new Cl18DataAnalysisCohort());
 		chain.register(new Cl19DataAnalysisLog());
 		chain.register(new Cl22TraceViewEventColourMapFiltered());
 		done = new Cl20Done();
-
-		//colour traces
-		{
-			traceColouring.setOnComplete(new Runnable() {
-				public void run() {
-					//tell the animation and the trace view the trace colour map
-					panel.getGraph().setTraceColourMap(state.getTraceColourMap());
-					panel.getTraceView().setTraceColourMap(state.getTraceColourMap());
-					panel.getTraceView().repaint();
-
-					panel.repaint();
-				}
-			});
-		}
 
 		//TODO: re-enable?
 		//		//mine performance
@@ -347,17 +331,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		//				}
 		//			});
 		//		}
-
-		//compute histogram
-		{
-			histogram.setOnComplete(new Runnable() {
-				public void run() {
-					//pass the histogram data to the panel
-					panel.getGraph().setHistogramData(state.getHistogramData());
-					panel.getGraph().repaint();
-				}
-			});
-		}
 
 		return chain;
 	}

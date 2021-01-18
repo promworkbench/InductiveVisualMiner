@@ -20,7 +20,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * @author sander
  *
  */
-public class Cl08UpdateIvMAttributes implements DataChainLinkComputation {
+public class Cl08UpdateIvMAttributes extends DataChainLinkComputationAbstract {
 
 	public String getName() {
 		return "update IvM attributes";
@@ -30,11 +30,11 @@ public class Cl08UpdateIvMAttributes implements DataChainLinkComputation {
 		return "updating attributes";
 	}
 
-	public IvMObject<?>[] getInputObjects() {
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.aligned_log, IvMObject.attributes_info };
 	}
 
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.ivm_attributes_info };
 	}
 

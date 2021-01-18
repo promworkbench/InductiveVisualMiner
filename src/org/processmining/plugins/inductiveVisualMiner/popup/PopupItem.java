@@ -1,8 +1,17 @@
 package org.processmining.plugins.inductiveVisualMiner.popup;
 
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 
 public interface PopupItem<T> {
+
+	/**
+	 * Request inputs. The get method will only be called when these are
+	 * available.
+	 * 
+	 * @return
+	 */
+	public IvMObject<?>[] inputObjects();
 
 	/**
 	 * Returns zero or more popup items. This will be called throughout the
@@ -13,7 +22,7 @@ public interface PopupItem<T> {
 	 * @param input
 	 * @return String[items][columns], where there can be 1 or 2 columns.
 	 */
-	public String[][] get(InductiveVisualMinerState state, PopupItemInput<T> input);
+	public String[][] get(IvMObjectValues inputs, PopupItemInput<T> input);
 
 	public static String[][] nothing = new String[0][0];
 

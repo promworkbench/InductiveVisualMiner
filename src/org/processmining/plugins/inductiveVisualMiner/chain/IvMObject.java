@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.deckfour.xes.info.XLogInfo;
@@ -27,6 +28,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
@@ -65,6 +67,11 @@ public class IvMObject<C> {
 			AlignedLogVisualisationData.class);
 	public static final IvMObject<IvMAttributesInfo> ivm_attributes_info = c("attributes info",
 			IvMAttributesInfo.class);
+	public static final IvMObject<HistogramData> histogram_data = c("histogram data", HistogramData.class);
+
+	//popups
+	@SuppressWarnings("rawtypes")
+	public static final IvMObject<Map> popups = c("popups", Map.class);
 
 	//alignments
 	public static final IvMObject<IvMLogNotFiltered> aligned_log = c("aligned log", IvMLogNotFiltered.class);

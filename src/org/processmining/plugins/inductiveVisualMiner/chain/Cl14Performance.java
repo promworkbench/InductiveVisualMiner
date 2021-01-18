@@ -25,7 +25,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActiv
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 
-public class Cl14Performance extends DataChainLinkAbstract implements DataChainLinkComputation {
+public class Cl14Performance extends DataChainLinkComputationAbstract {
 
 	@Override
 	public String getName() {
@@ -38,13 +38,13 @@ public class Cl14Performance extends DataChainLinkAbstract implements DataChainL
 	}
 
 	@Override
-	public IvMObject<?>[] getInputObjects() {
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.log_timestamps_logical, IvMObject.model, IvMObject.aligned_log_filtered,
 				IvMObject.aligned_log_info_filtered, IvMObject.selected_visualisation_mode };
 	}
 
 	@Override
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.performance, IvMObject.visualisation_data };
 	}
 

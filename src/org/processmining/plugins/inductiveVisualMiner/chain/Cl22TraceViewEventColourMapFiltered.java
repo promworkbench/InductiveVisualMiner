@@ -12,26 +12,31 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl22TraceViewEventColourMapFiltered extends DataChainLinkAbstract implements DataChainLinkComputation {
+public class Cl22TraceViewEventColourMapFiltered extends DataChainLinkComputationAbstract {
 
+	@Override
 	public String getName() {
 		return "trace view event colour map";
 	}
 
+	@Override
 	public String getStatusBusyMessage() {
 		return "Colouring events..";
 	}
 
-	public IvMObject<?>[] getInputObjects() {
+	@Override
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.graph_svg, IvMObject.selected_model_selection,
 				IvMObject.selected_visualisation_mode, IvMObject.graph_visualisation_info, IvMObject.carte_blanche,
 				IvMObject.visualisation_data };
 	}
 
-	public IvMObject<?>[] getOutputNames() {
+	@Override
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.trace_view_event_colour_map };
 	}
 
+	@Override
 	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
 			IvMCanceller canceller) throws Exception {
 		SVGDiagram svg = inputs.get(IvMObject.graph_svg);

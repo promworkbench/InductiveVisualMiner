@@ -5,7 +5,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 
-public class Cl10AnimationScaler implements DataChainLinkComputation {
+public class Cl10AnimationScaler extends DataChainLinkComputationAbstract {
 
 	@Override
 	public String getName() {
@@ -18,12 +18,12 @@ public class Cl10AnimationScaler implements DataChainLinkComputation {
 	}
 
 	@Override
-	public IvMObject<?>[] getInputObjects() {
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.aligned_log };
 	}
 
 	@Override
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.animation_scaler };
 	}
 

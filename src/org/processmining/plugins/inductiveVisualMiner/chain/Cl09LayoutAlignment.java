@@ -18,7 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl09LayoutAlignment extends DataChainLinkAbstract implements DataChainLinkComputation {
+public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
 
 	@Override
 	public String getName() {
@@ -31,13 +31,13 @@ public class Cl09LayoutAlignment extends DataChainLinkAbstract implements DataCh
 	}
 
 	@Override
-	public IvMObject<?>[] getInputObjects() {
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_info, IvMObject.selected_visualisation_mode,
 				IvMObject.selected_graph_user_settings, IvMObject.carte_blanche };
 	}
 
 	@Override
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.graph_dot, IvMObject.graph_svg, IvMObject.graph_visualisation_info,
 				IvMObject.trace_view_event_colour_map };
 	}

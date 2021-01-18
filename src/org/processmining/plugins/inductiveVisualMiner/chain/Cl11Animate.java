@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl11Animate implements DataChainLinkComputation {
+public class Cl11Animate extends DataChainLinkComputationAbstract {
 
 	@Override
 	public String getName() {
@@ -24,14 +24,14 @@ public class Cl11Animate implements DataChainLinkComputation {
 	}
 
 	@Override
-	public IvMObject<?>[] getInputObjects() {
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.selected_animation_enabled, IvMObject.aligned_log,
 				IvMObject.log_timestamps_logical, IvMObject.selected_visualisation_mode,
 				IvMObject.graph_visualisation_info, IvMObject.graph_svg, IvMObject.animation_scaler, IvMObject.model };
 	}
 
 	@Override
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.animation };
 	}
 

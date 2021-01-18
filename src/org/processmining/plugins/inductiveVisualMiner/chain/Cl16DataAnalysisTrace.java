@@ -7,7 +7,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 
-public class Cl16DataAnalysisTrace implements DataChainLinkComputation {
+public class Cl16DataAnalysisTrace extends DataChainLinkComputationAbstract {
 
 	@Override
 	public String getName() {
@@ -20,13 +20,13 @@ public class Cl16DataAnalysisTrace implements DataChainLinkComputation {
 	}
 
 	@Override
-	public IvMObject<?>[] getInputObjects() {
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log, IvMObject.aligned_log_filtered,
 				IvMObject.ivm_attributes_info };
 	}
 
 	@Override
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.data_analysis_trace };
 	}
 

@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
 
-public class Cl04FilterLogOnActivities extends DataChainLinkAbstract implements DataChainLinkComputation {
+public class Cl04FilterLogOnActivities extends DataChainLinkComputationAbstract {
 
 	public String getName() {
 		return "filter log";
@@ -21,12 +21,12 @@ public class Cl04FilterLogOnActivities extends DataChainLinkAbstract implements 
 		return "Filtering activities..";
 	}
 
-	public IvMObject<?>[] getInputObjects() {
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.imlog, IvMObject.imlog_info, IvMObject.selected_activities_threshold,
 				IvMObject.selected_miner, IvMObject.controller_premining_filters };
 	}
 
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.imlog_activity_filtered, IvMObject.imlog_info_activity_filtered,
 				IvMObject.filtered_activities };
 	}

@@ -16,7 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
  * @author sander
  *
  */
-public class Cl19DataAnalysisLog extends DataChainLinkAbstract implements DataChainLinkComputation {
+public class Cl19DataAnalysisLog extends DataChainLinkComputationAbstract {
 
 	@Override
 	public String getName() {
@@ -29,12 +29,12 @@ public class Cl19DataAnalysisLog extends DataChainLinkAbstract implements DataCh
 	}
 
 	@Override
-	public IvMObject<?>[] getInputObjects() {
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered };
 	}
 
 	@Override
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.data_analysis_log_virtual_attributes };
 	}
 

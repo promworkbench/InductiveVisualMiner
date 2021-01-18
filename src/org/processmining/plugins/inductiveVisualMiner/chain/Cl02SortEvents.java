@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.plugins.SortEventsPlugin.EventsComparator;
 
-public class Cl02SortEvents extends DataChainLinkAbstract implements DataChainLinkComputation {
+public class Cl02SortEvents extends DataChainLinkComputationAbstract {
 
 	private Function<Object, Boolean> onIllogicalTimeStamps;
 
@@ -27,12 +27,12 @@ public class Cl02SortEvents extends DataChainLinkAbstract implements DataChainLi
 	}
 
 	@Override
-	public IvMObject<?>[] getInputObjects() {
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.input_log };
 	}
 
 	@Override
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.sorted_log, IvMObject.log_timestamps_logical };
 	}
 

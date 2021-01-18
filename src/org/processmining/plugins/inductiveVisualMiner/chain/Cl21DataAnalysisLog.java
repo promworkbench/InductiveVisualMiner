@@ -4,24 +4,29 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
 
-public class Cl21DataAnalysisLog extends DataChainLinkAbstract implements DataChainLinkComputation {
+public class Cl21DataAnalysisLog extends DataChainLinkComputationAbstract {
 
+	@Override
 	public String getName() {
 		return "data analysis log";
 	}
 
+	@Override
 	public String getStatusBusyMessage() {
 		return "Performing log analysis..";
 	}
 
-	public IvMObject<?>[] getInputObjects() {
+	@Override
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.input_log };
 	}
 
-	public IvMObject<?>[] getOutputNames() {
+	@Override
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.data_analysis_log };
 	}
 
+	@Override
 	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
 			IvMCanceller canceller) throws Exception {
 		XLog log = inputs.get(IvMObject.input_log);

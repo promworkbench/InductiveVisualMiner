@@ -2,6 +2,17 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 public abstract class DataChainLinkAbstract implements DataChainLink {
 
+	private IvMObject<?>[] inputObjects;
+
+	public IvMObject<?>[] getInputObjects() {
+		if (inputObjects == null) {
+			inputObjects = createInputObjects();
+		}
+		return inputObjects;
+	}
+
+	public abstract IvMObject<?>[] createInputObjects();
+
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

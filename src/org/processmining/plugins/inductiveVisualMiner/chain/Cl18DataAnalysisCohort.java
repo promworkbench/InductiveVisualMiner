@@ -8,7 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.Cohor
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class Cl18DataAnalysisCohort implements DataChainLinkComputation {
+public class Cl18DataAnalysisCohort extends DataChainLinkComputationAbstract {
 
 	@Override
 	public String getName() {
@@ -21,13 +21,13 @@ public class Cl18DataAnalysisCohort implements DataChainLinkComputation {
 	}
 
 	@Override
-	public IvMObject<?>[] getInputObjects() {
+	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.sorted_log, IvMObject.selected_classifier,
 				IvMObject.selected_cohort_analysis_enabled };
 	}
 
 	@Override
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.data_analysis_cohort };
 	}
 

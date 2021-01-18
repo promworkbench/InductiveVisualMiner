@@ -208,6 +208,13 @@ public class DataChainInternal {
 						return;
 					}
 
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
 					final IvMObjectValues outputs;
 					try {
 						outputs = chainLink.execute(configuration, inputs, canceller);
