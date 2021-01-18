@@ -39,11 +39,12 @@ public class PopupController {
 
 		private final IvMObject<?>[] triggers;
 
-		public ClPopups(IvMObject<?>[] triggers) {
-			this.triggers = new IvMObject<?>[triggers.length + 2];
-			System.arraycopy(triggers, 0, this.triggers, 2, triggers.length);
-			this.triggers[0] = IvMObject.model;
-			this.triggers[1] = IvMObject.aligned_log_info_filtered;
+		public ClPopups(Set<IvMObject<?>> triggers) {
+			triggers.add(IvMObject.model);
+			triggers.add(IvMObject.aligned_log_info_filtered);
+
+			this.triggers = new IvMObject<?>[triggers.size()];
+			triggers.toArray(this.triggers);
 		}
 
 		@Override
@@ -121,31 +122,28 @@ public class PopupController {
 	}
 
 	public PopupController(DataChain chain, InductiveVisualMinerConfiguration configuration) {
-		//gather the required inputs
-		final IvMObject<?>[] inputs;
+		//gather the required triggers
+		Set<IvMObject<?>> triggers = new THashSet<>();
 		{
-			Set<IvMObject<?>> inputSet = new THashSet<>();
 			for (PopupItem<?> item : configuration.getPopupItemsLog()) {
-				inputSet.addAll(Arrays.asList(item.inputObjects()));
+				triggers.addAll(Arrays.asList(item.inputObjects()));
 			}
 			for (PopupItem<?> item : configuration.getPopupItemsActivity()) {
-				inputSet.addAll(Arrays.asList(item.inputObjects()));
+				triggers.addAll(Arrays.asList(item.inputObjects()));
 			}
 			for (PopupItem<?> item : configuration.getPopupItemsLogMove()) {
-				inputSet.addAll(Arrays.asList(item.inputObjects()));
+				triggers.addAll(Arrays.asList(item.inputObjects()));
 			}
 			for (PopupItem<?> item : configuration.getPopupItemsModelMove()) {
-				inputSet.addAll(Arrays.asList(item.inputObjects()));
+				triggers.addAll(Arrays.asList(item.inputObjects()));
 			}
 			for (PopupItem<?> item : configuration.getPopupItemsStartEnd()) {
-				inputSet.addAll(Arrays.asList(item.inputObjects()));
+				triggers.addAll(Arrays.asList(item.inputObjects()));
 			}
-			inputs = new IvMObject<?>[inputSet.size()];
-			inputSet.toArray(inputs);
 		}
 
 		//set up a chain link computer
-		chain.register(new ClPopups(inputs));
+		chain.register(new ClPopups(triggers));
 	}
 
 	public void showPopup(InductiveVisualMinerPanel panel, DataState state) {
@@ -162,21 +160,21 @@ public class PopupController {
 			@SuppressWarnings("unchecked")
 			Map<PopupItemInput<?>, List<String>> popups = inputs.get(IvMObject.popups);
 
+			if (panel.getGraph().isMouseInLogPopupButton()) {
+				//log popup
+				panel.getGraph().setPopupActivity(popups.get(new PopupItemInputLog()), -1);
+				panel.getGraph().setShowPopup(true, popupWidthNodes);
+				return;
+			}
+
 			if (!panel.getGraph().getMouseInElements().isEmpty()) {
 				//in an element
-
-				if (panel.getGraph().isMouseInLogPopupButton()) {
-					//log popup
-					panel.getGraph().setPopupActivity(popups.get(new PopupItemInputLog()), -1);
-					panel.getGraph().setShowPopup(true, popupWidthNodes);
-					return;
-				}
 
 				//output the popup items about the particular node or edge
 				DotElement element = panel.getGraph().getMouseInElements().iterator().next();
 
-				if (((LocalDotNode) element).getType() == NodeType.source
-						|| ((LocalDotNode) element).getType() == NodeType.sink) {
+				if (element instanceof LocalDotNode && (((LocalDotNode) element).getType() == NodeType.source
+						|| ((LocalDotNode) element).getType() == NodeType.sink)) {
 					//popup at the source or sink
 					panel.getGraph().setPopupStartEnd(popups.get(new PopupItemInputStartEnd()));
 					panel.getGraph().setShowPopup(true, popupWidthSourceSink);
@@ -187,8 +185,11 @@ public class PopupController {
 					//model ready
 					IvMModel model = inputs.get(IvMObject.model);
 
+					System.out.println("model ready");
+
 					if (element instanceof LocalDotNode && model.isActivity(((LocalDotNode) element).getUnode())) {
 						//popup of an activity
+
 						int unode = ((LocalDotNode) element).getUnode();
 						PopupItemInputActivity input = new PopupItemInputActivity(unode);
 						if (popups.containsKey(input)) {

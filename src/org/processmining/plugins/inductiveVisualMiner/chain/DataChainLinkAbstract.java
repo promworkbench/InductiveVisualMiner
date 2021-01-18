@@ -2,6 +2,10 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 public abstract class DataChainLinkAbstract implements DataChainLink {
 
+	public IvMObject<?>[] getTriggerObjects() {
+		return new IvMObject<?>[] {};
+	}
+
 	private IvMObject<?>[] inputObjects;
 
 	public IvMObject<?>[] getInputObjects() {

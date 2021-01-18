@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Map;
 
 import javax.swing.DefaultComboBoxModel;
@@ -153,11 +155,13 @@ public class TraceColourMapView extends SideWindow {
 		}
 
 		//set up the controller
-		keySelector.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (onOffPanel.isOn()) {
-					selectedAttributeName = (String) keySelector.getSelectedItem();
-					update();
+		keySelector.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					if (onOffPanel.isOn()) {
+						selectedAttributeName = (String) keySelector.getSelectedItem();
+						update();
+					}
 				}
 			}
 		});

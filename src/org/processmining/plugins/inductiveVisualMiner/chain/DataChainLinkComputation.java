@@ -4,15 +4,6 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 
 public interface DataChainLinkComputation extends DataChainLink {
 
-	/**
-	 * If any of the trigger objects becomes available, the computation is
-	 * executed (provided all input objects are available as well). Thus, not
-	 * all trigger objects are guaranteed to be available on execution.
-	 * 
-	 * @return
-	 */
-	public IvMObject<?>[] getTriggerObjects();
-
 	public IvMObject<?>[] getOutputNames();
 
 	/**

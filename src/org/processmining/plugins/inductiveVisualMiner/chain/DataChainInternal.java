@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
@@ -11,6 +10,7 @@ import javax.swing.SwingUtilities;
 
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.graphviz.dot.Dot;
+import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
@@ -96,7 +96,9 @@ public class DataChainInternal {
 	private <C> void executeNext(IvMObject<C> objectBecameAvailable, DataChainLink... exclude) {
 		//execute next computation links
 		for (DataChainLink chainLink : chainLinks) {
-			if (canExecute(chainLink) && contains(chainLink.getInputObjects(), objectBecameAvailable)
+			if (canExecute(chainLink)
+					&& (contains(chainLink.getInputObjects(), objectBecameAvailable)
+							|| contains(chainLink.getTriggerObjects(), objectBecameAvailable))
 					&& !contains(exclude, chainLink)) {
 				executeLink(chainLink);
 			}
@@ -173,6 +175,12 @@ public class DataChainInternal {
 		for (int i = 0; i < chainLink.getInputObjects().length; i++) {
 			IvMObject<?> object = chainLink.getInputObjects()[i];
 			gatherInput(object, result);
+		}
+		for (int i = 0; i < chainLink.getTriggerObjects().length; i++) {
+			IvMObject<?> object = chainLink.getTriggerObjects()[i];
+			if (state.hasObject(object)) {
+				gatherInput(object, result);
+			}
 		}
 		return result;
 	}
@@ -290,7 +298,7 @@ public class DataChainInternal {
 
 	private void getDownstream(IvMObject<?> object, THashSet<DataChainLink> chainLinksToInvalidate,
 			THashSet<IvMObject<?>> objectsToInvalidate) {
-		for (DataChainLink chainLink : object2inputs.get(object)) {
+		for (DataChainLink chainLink : object2inputs.get(object)) { //includes triggers
 			//this chainLink needs this object as its input
 			if (chainLinksToInvalidate.add(chainLink)) {
 				getDownstream(chainLink, chainLinksToInvalidate, objectsToInvalidate);
@@ -325,7 +333,7 @@ public class DataChainInternal {
 		for (int i = 0; i < chainLink.getOutputNames().length; i++) {
 			IvMObject<?> outputObjectName = chainLink.getOutputNames()[i];
 			processOutput(outputObjectName, outputs);
-			executeNext(outputObjectName, chainLink); //trigger chainlinks that have this object as input, but not the chainlink that produced it itself to prevent loops
+			executeNext(outputObjectName, chainLink); //trigger chainlinks that have this object as input or trigger, but not the chainlink that produced it itself to prevent loops
 		}
 
 		parentChain.getOnChange().run();
@@ -373,20 +381,23 @@ public class DataChainInternal {
 			}
 		}
 
-		//edges (outputs)
 		for (DataChainLink chainLink : chainLinks) {
+			//inputs
+			for (IvMObject<?> object : chainLink.getInputObjects()) {
+				dot.addEdge(object2dotNode.get(object), link2dotNode.get(chainLink));
+			}
+
 			if (chainLink instanceof DataChainLinkComputation) {
+				//outputs
 				for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputNames()) {
 					dot.addEdge(link2dotNode.get(chainLink), object2dotNode.get(object));
 				}
-			}
-		}
 
-		//edges (inputs)
-		for (Entry<IvMObject<?>, Set<DataChainLink>> entry : object2inputs.entrySet()) {
-			IvMObject<?> object = entry.getKey();
-			for (DataChainLink chainLink : entry.getValue()) {
-				dot.addEdge(object2dotNode.get(object), link2dotNode.get(chainLink));
+				//triggers
+				for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getTriggerObjects()) {
+					DotEdge edge = dot.addEdge(object2dotNode.get(object), link2dotNode.get(chainLink));
+					edge.setOption("style", "dashed");
+				}
 			}
 		}
 

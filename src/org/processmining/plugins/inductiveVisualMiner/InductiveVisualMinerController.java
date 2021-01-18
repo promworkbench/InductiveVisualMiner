@@ -48,6 +48,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelect
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputation;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGuiAbstract;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectCarteBlanche;
@@ -496,13 +497,13 @@ public class InductiveVisualMinerController {
 		});
 
 		//model-related buttons
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "enable model-related buttons";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.model };
 			}
 
@@ -522,12 +523,12 @@ public class InductiveVisualMinerController {
 
 	protected void initGuiGraph() {
 		//layout
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "model dot";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.graph_dot, IvMObject.graph_svg };
 			}
 
@@ -563,13 +564,13 @@ public class InductiveVisualMinerController {
 		registerModeRequests(layoutAlignment);
 
 		//trace view event colour map & model node selection
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "trace view event colour map";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.trace_view_event_colour_map, IvMObject.carte_blanche,
 						IvMObject.graph_visualisation_info };
 			}
@@ -603,13 +604,13 @@ public class InductiveVisualMinerController {
 		});
 
 		//trace view (IM log)
-		DataChainLinkGui traceViewIMLog = new DataChainLinkGui() {
+		DataChainLinkGui traceViewIMLog = new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "trace view (IMLog)";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.imlog, IvMObject.trace_colour_map };
 			}
 
@@ -627,13 +628,13 @@ public class InductiveVisualMinerController {
 		chain.register(traceViewIMLog);
 
 		//chain.register (aligned log)
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "trace view (IvMLog)";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered,
 						IvMObject.selected_model_selection, IvMObject.trace_colour_map };
 			}
@@ -653,12 +654,12 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "trace colour map";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.trace_colour_map };
 			}
 
@@ -685,12 +686,12 @@ public class InductiveVisualMinerController {
 		});
 
 		//log data analysis
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "update log data analysis";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.data_analysis_log };
 			}
 
@@ -704,12 +705,12 @@ public class InductiveVisualMinerController {
 		});
 
 		//log data analysis with virtual attributes
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "update log data analysis (+virtual)";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.data_analysis_log,
 						IvMObject.data_analysis_log_virtual_attributes };
 			}
@@ -734,12 +735,12 @@ public class InductiveVisualMinerController {
 		});
 
 		//data analysis - cohort analysis
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "show cohorts";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.data_analysis_cohort };
 			}
 
@@ -753,12 +754,12 @@ public class InductiveVisualMinerController {
 		});
 
 		//data analysis - event analysis
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "show event data analysis";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.data_analysis_event };
 			}
 
@@ -772,12 +773,12 @@ public class InductiveVisualMinerController {
 		});
 
 		//data analysis - trace analysis
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "show trace data analysis";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.data_analysis_trace };
 			}
 
@@ -800,12 +801,12 @@ public class InductiveVisualMinerController {
 		});
 
 		//update classifiers on data
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "set classifiers";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.classifiers };
 			}
 
@@ -867,13 +868,13 @@ public class InductiveVisualMinerController {
 		});
 
 		//initialise filters
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "initialise pre-mining filters";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.controller_premining_filters };
 			}
 
@@ -893,13 +894,13 @@ public class InductiveVisualMinerController {
 	protected void initGuiAlignment() {
 
 		//save log button
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "save aligned log";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.aligned_log_filtered };
 			}
 
@@ -929,13 +930,13 @@ public class InductiveVisualMinerController {
 				configuration.getHighlightingFilters(), panel.getHighlightingFiltersView()));
 
 		//initialise filters
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "initialise highlighting filters";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.ivm_attributes_info, IvMObject.controller_highlighting_filters };
 			}
 
@@ -954,12 +955,12 @@ public class InductiveVisualMinerController {
 		});
 
 		//filtering description
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "selection description";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.selected_model_selection,
 						IvMObject.controller_highlighting_filters, IvMObject.model };
 			}
@@ -982,13 +983,13 @@ public class InductiveVisualMinerController {
 
 	protected void initGuiAnimation() {
 		//enable animation
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "animation enabled";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.selected_animation_enabled };
 			}
 
@@ -1009,13 +1010,13 @@ public class InductiveVisualMinerController {
 		});
 
 		//animation to panel
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "update animation";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.animation, IvMObject.animation_scaler };
 			}
 
@@ -1037,13 +1038,13 @@ public class InductiveVisualMinerController {
 		});
 
 		//filtered log to animation
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "filtered log to animation";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.aligned_log_filtered };
 			}
 
@@ -1065,12 +1066,12 @@ public class InductiveVisualMinerController {
 		 * Set animation time updater. Naturally, this does not go via the
 		 * chain, and we cache the scaler
 		 */
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "catch animation objects";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.animation_scaler, IvMObject.selected_visualisation_mode,
 						IvMObject.visualisation_data };
 			}
@@ -1117,13 +1118,13 @@ public class InductiveVisualMinerController {
 		});
 
 		//show histogram
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "show histogram";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.histogram_data };
 			}
 
@@ -1150,13 +1151,13 @@ public class InductiveVisualMinerController {
 		});
 
 		//Update the width once the dot is ready. We cannot initialise the width as long as the window has not been drawn yet. Once the dot is computed, this should be fine. 
-		chain.register(new DataChainLinkGui() {
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "histogram width";
 			}
 
-			public IvMObject<?>[] getInputObjects() {
+			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.graph_dot };
 			}
 
@@ -1216,13 +1217,13 @@ public class InductiveVisualMinerController {
 			if (mode2.inputsRequested().length > 0) {
 				for (IvMObject<?> object : mode2.inputsRequested()) {
 					final IvMObject<?> object2 = object;
-					chain.register(new DataChainLinkGui() {
+					chain.register(new DataChainLinkGuiAbstract() {
 
 						public String getName() {
 							return "mode " + mode2 + ": " + object.getName();
 						}
 
-						public IvMObject<?>[] getInputObjects() {
+						public IvMObject<?>[] createInputObjects() {
 							return new IvMObject<?>[] { IvMObject.carte_blanche, object2 };
 						}
 
