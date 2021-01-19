@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.plugins;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
@@ -12,10 +11,12 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
+import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerController;
 import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -32,20 +33,21 @@ public class InductiveVisualMinerAlignmentVisualisation {
 
 		XLog xLog = ivmAlignment.getXLog();
 		IvMModel model = ivmAlignment.getModel();
-		XEventClassifier classifier = ivmAlignment.getClassifier();
+		AttributeClassifier[] classifier = ivmAlignment.getClassifier();
 
 		if (xLog == null || model == null || classifier == null) {
 			return new JLabel(
 					" Unfortunately, this Inductive visual Miner alignment does not have the fields necessary to be visualised.");
 		}
 
-		InductiveVisualMinerConfiguration configuration = new InductiveVisualMinerConfigurationDefault(xLog, canceller,
+		InductiveVisualMinerConfiguration configuration = new InductiveVisualMinerConfigurationDefault(canceller,
 				context.getExecutor());
-		configuration.getState().setPreMinedModel(model);
-		configuration.getState().setPreMinedClassifier(classifier);
-		configuration.getState().setPreMinedAlignment(ivmAlignment);
+		InductiveVisualMinerController controller = new InductiveVisualMinerController(context, configuration, xLog,
+				canceller);
 
-		new InductiveVisualMinerController(context, configuration, canceller);
+		controller.setFixedObject(IvMObject.model, model);
+		controller.setFixedObject(IvMObject.selected_classifier, classifier);
+		controller.setFixedObject(IvMObject.imported_alignment, ivmAlignment);
 
 		return configuration.getPanel();
 	}

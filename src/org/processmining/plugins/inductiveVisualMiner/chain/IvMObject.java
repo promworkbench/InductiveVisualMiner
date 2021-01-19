@@ -14,6 +14,7 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
@@ -80,6 +81,8 @@ public class IvMObject<C> {
 			IvMLogFilteredImpl.class);
 	public static final IvMObject<IvMLogInfo> aligned_log_info_filtered = c("aligned log info filtered",
 			IvMLogInfo.class);
+	public static final IvMObject<InductiveVisualMinerAlignment> imported_alignment = c("imported alignment",
+			InductiveVisualMinerAlignment.class);
 
 	//performance
 	public static final IvMObject<PerformanceWrapper> performance = c("performance", PerformanceWrapper.class);

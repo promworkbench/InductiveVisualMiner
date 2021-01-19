@@ -1,7 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.export;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.table.TableModel;
@@ -15,6 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 
+import gnu.trove.set.hash.THashSet;
 import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.WritableSheet;
@@ -42,14 +45,17 @@ public class ExporterDataAnalyses extends IvMExporter {
 
 	@Override
 	protected IvMObject<?>[] createInputObjects() {
-		// TODO Auto-generated method stub
-		return null;
+		return new IvMObject<?>[] {};
 	}
 
 	@Override
 	protected IvMObject<?>[] createTriggerObjects() {
-		// TODO Auto-generated method stub
-		return null;
+		Set<IvMObject<?>> result = new THashSet<>();
+		for (DataAnalysisTableFactory analysis : configuration.getDataAnalysisTables()) {
+			result.addAll(Arrays.asList(analysis.getTriggerObjects()));
+		}
+		IvMObject<?>[] arr = new IvMObject<?>[result.size()];
+		return result.toArray(arr);
 	}
 
 	@Override
@@ -58,30 +64,35 @@ public class ExporterDataAnalyses extends IvMExporter {
 
 		int sheetIndex = 0;
 		for (DataAnalysisTableFactory analysis : configuration.getDataAnalysisTables()) {
-			String name = analysis.getAnalysisName();
-			WritableSheet sheet = workbook.createSheet(name, sheetIndex);
+			if (inputs.has(analysis.getInputObjects())) {
+				String name = analysis.getAnalysisName();
+				WritableSheet sheet = workbook.createSheet(name, sheetIndex);
 
-			DataAnalysisTable analysisTable = analysis.create();
-			if (!analysisTable.setData(state)) {
-				sheet.addCell(new Label(0, 0, "Still computing at time of export.."));
-			} else {
-				TableModel model = analysisTable.getModel();
+				DataAnalysisTable analysisTable = analysis.create();
+				IvMObjectValues subInputs = inputs.getIfPresent(analysis.getInputObjects(),
+						analysis.getTriggerObjects());
 
-				//write header
-				for (int column = 0; column < model.getColumnCount(); column++) {
-					sheet.addCell(new Label(column, 0, model.getColumnName(column)));
-				}
+				if (!analysisTable.setData(subInputs)) {
+					sheet.addCell(new Label(0, 0, "Still computing at time of export.."));
+				} else {
+					TableModel model = analysisTable.getModel();
 
-				//write body
-				for (int column = 0; column < model.getColumnCount(); column++) {
-					for (int row = 0; row < model.getRowCount(); row++) {
-						Object value = model.getValueAt(row, column);
-						write(sheet, column, row + 1, value);
+					//write header
+					for (int column = 0; column < model.getColumnCount(); column++) {
+						sheet.addCell(new Label(column, 0, model.getColumnName(column)));
+					}
+
+					//write body
+					for (int column = 0; column < model.getColumnCount(); column++) {
+						for (int row = 0; row < model.getRowCount(); row++) {
+							Object value = model.getValueAt(row, column);
+							write(sheet, column, row + 1, value);
+						}
 					}
 				}
-			}
 
-			sheetIndex++;
+				sheetIndex++;
+			}
 		}
 
 		workbook.write();

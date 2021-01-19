@@ -13,7 +13,6 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputationAbstract;
-import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
@@ -146,14 +145,18 @@ public class PopupController {
 		chain.register(new ClPopups(triggers));
 	}
 
-	public void showPopup(InductiveVisualMinerPanel panel, DataState state) {
-		IvMObjectValues inputs = state.getObject(IvMObject.carte_blanche).getIfPresent(IvMObject.popups,
-				IvMObject.model, IvMObject.graph_visualisation_info, IvMObject.aligned_log_info_filtered);
-		showPopup(panel, inputs);
+	public void showPopup(InductiveVisualMinerPanel panel, DataChain chain) {
+		IvMObjectValues inputs;
+		try {
+			inputs = chain.getObjectValues(IvMObject.popups, IvMObject.model, IvMObject.graph_visualisation_info,
+					IvMObject.aligned_log_info_filtered).get();
+			showPopup(panel, inputs);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void showPopup(InductiveVisualMinerPanel panel, IvMObjectValues inputs) {
-
 		if (inputs.has(IvMObject.popups)) {
 			//data ready
 

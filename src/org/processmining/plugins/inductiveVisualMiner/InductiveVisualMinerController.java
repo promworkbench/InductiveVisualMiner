@@ -713,7 +713,7 @@ public class InductiveVisualMinerController {
 		//set mouse-in-out node updater
 		panel.getGraph().addMouseInElementsChangedListener(new MouseInElementsChangedListener<DotElement>() {
 			public void mouseInElementsChanged(Set<DotElement> mouseInElements) {
-				popupController.showPopup(panel, state);
+				popupController.showPopup(panel, chain);
 				panel.getGraph().repaint();
 			}
 		});
@@ -722,7 +722,7 @@ public class InductiveVisualMinerController {
 		if (!configuration.getPopupItemsLog().isEmpty()) {
 			panel.getGraph().addLogPopupListener(new LogPopupListener() {
 				public void isMouseInButton(boolean isIn) {
-					popupController.showPopup(panel, state);
+					popupController.showPopup(panel, chain);
 					panel.getGraph().repaint();
 				}
 			});
@@ -813,7 +813,7 @@ public class InductiveVisualMinerController {
 				chain.executeLink(Cl13FilterNodeSelection.class);
 			}
 		});
-		state.putObject(IvMObject.controller_highlighting_filters, new IvMHighlightingFiltersController(
+		setObject(IvMObject.controller_highlighting_filters, new IvMHighlightingFiltersController(
 				configuration.getHighlightingFilters(), panel.getHighlightingFiltersView()));
 
 		//initialise filters

@@ -8,6 +8,8 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentPerformance;
+import org.processmining.plugins.inductiveVisualMiner.alignment.ImportAlignment;
+import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
@@ -32,7 +34,11 @@ public class Cl07Align extends DataChainLinkComputationAbstract {
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.selected_classifier, IvMObject.sorted_log,
 				IvMObject.xlog_info, IvMObject.xlog_info_performance };
-		//TODO: handle imported alignments
+	}
+
+	@Override
+	public IvMObject<?>[] getTriggerObjects() {
+		return new IvMObject<?>[] { IvMObject.imported_alignment };
 	}
 
 	@Override
@@ -61,18 +67,19 @@ public class Cl07Align extends DataChainLinkComputationAbstract {
 		XEventClasses eventClasses = inputs.get(IvMObject.xlog_info).getEventClasses();
 		XEventClasses eventClassesPerformance = inputs.get(IvMObject.xlog_info_performance).getEventClasses();
 
-		//TODO: enable pre-mined alignments
-		//		//see whether the alignment was pre-mined
-		//		InductiveVisualMinerAlignment preMinedAlignment = input.getF();
-		//		if (preMinedAlignment != null) {
-		//			IvMLogNotFiltered ivmLog = ImportAlignment.getIvMLog(preMinedAlignment, eventClasses,
-		//					eventClassesPerformance);
-		//			if (ivmLog != null) {
-		//				System.out.println("Alignment imported");
-		//				return Pair.of(ivmLog, new IvMLogInfo(ivmLog, model));
-		//			}
-		//			System.out.println("Alignment importing failed. Recomputing...");
-		//		}
+		if (inputs.has(IvMObject.imported_alignment)) {
+			//see whether the alignment was pre-mined
+			InductiveVisualMinerAlignment preMinedAlignment = inputs.get(IvMObject.imported_alignment);
+			IvMLogNotFiltered ivmLog = ImportAlignment.getIvMLog(preMinedAlignment, eventClasses,
+					eventClassesPerformance);
+			if (ivmLog != null) {
+				System.out.println("Alignment imported");
+				return new IvMObjectValues().//
+						s(IvMObject.aligned_log, ivmLog).//
+						s(IvMObject.aligned_log_info, new IvMLogInfo(ivmLog, model));
+			}
+			System.out.println("Alignment importing failed. Recomputing...");
+		}
 
 		//attempt to get the alignment from cache
 		Quadruple<IvMModel, XEventPerformanceClassifier, XLog, String> cacheKey = Quadruple.of(model,

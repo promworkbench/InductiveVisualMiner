@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.alignment;
 
 import java.util.List;
 
-import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.factory.XFactory;
 import org.deckfour.xes.factory.XFactoryRegistry;
 import org.deckfour.xes.model.XAttribute;
@@ -11,7 +10,6 @@ import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
-import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.export.XDFMExtension;
@@ -70,7 +68,7 @@ public class InductiveVisualMinerAlignment {
 		return null;
 	}
 
-	public XEventClassifier getClassifier() {
+	public AttributeClassifier[] getClassifier() {
 		String[] fields = XModelAlignmentExtension.instance().extractClassifier(alignedLog);
 
 		AttributeClassifier[] x = new AttributeClassifier[fields.length];
@@ -80,7 +78,7 @@ public class InductiveVisualMinerAlignment {
 			i++;
 		}
 
-		return AttributeClassifiers.constructClassifier(x);
+		return x;
 	}
 
 	/**

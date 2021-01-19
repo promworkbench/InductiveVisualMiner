@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.export;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.inductiveVisualMiner.GetExporters;
@@ -39,7 +38,7 @@ public class ExportController {
 				IvMObjectValues inputs = null;
 				try {
 					inputs = chain.getObjectValues(objects).get();
-				} catch (InterruptedException | ExecutionException e) {
+				} catch (InterruptedException e) {
 					e.printStackTrace();
 					return null;
 				}
