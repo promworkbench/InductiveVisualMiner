@@ -16,7 +16,7 @@ public abstract class IvMExporter extends Exporter {
 
 	protected abstract IvMObject<?>[] createInputObjects();
 
-	protected abstract IvMObject<?>[] createTriggerObjects();
+	protected abstract IvMObject<?>[] createNonTriggerObjects();
 
 	public abstract void export(IvMObjectValues inputs, InductiveVisualMinerAnimationPanel panel, File file)
 			throws Exception;
@@ -40,7 +40,7 @@ public abstract class IvMExporter extends Exporter {
 
 	public IvMObject<?>[] getTriggerObjects() {
 		if (triggerObjects == null) {
-			triggerObjects = createTriggerObjects();
+			triggerObjects = createNonTriggerObjects();
 		}
 		return triggerObjects;
 	}

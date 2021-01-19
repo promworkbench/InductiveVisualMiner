@@ -2,26 +2,38 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 public abstract class DataChainLinkAbstract implements DataChainLink {
 
-	private IvMObject<?>[] inputObjects;
-	private IvMObject<?>[] triggerObjects;
+	private IvMObject<?>[] requiredObjects;
+	private IvMObject<?>[] optionalObjects;
+	private IvMObject<?>[] nonTriggerObjects;
 
-	public IvMObject<?>[] getInputObjects() {
-		if (inputObjects == null) {
-			inputObjects = createInputObjects();
+	public IvMObject<?>[] getRequiredObjects() {
+		if (requiredObjects == null) {
+			requiredObjects = createInputObjects();
 		}
-		return inputObjects;
+		return requiredObjects;
 	}
 
-	public IvMObject<?>[] getTriggerObjects() {
-		if (triggerObjects == null) {
-			triggerObjects = createTriggerObjects();
+	public IvMObject<?>[] getOptionalObjects() {
+		if (optionalObjects == null) {
+			optionalObjects = createOptionalObjects();
 		}
-		return triggerObjects;
+		return optionalObjects;
+	}
+
+	public IvMObject<?>[] getNonTriggerObjects() {
+		if (nonTriggerObjects == null) {
+			nonTriggerObjects = createNonTriggerObjects();
+		}
+		return nonTriggerObjects;
 	}
 
 	public abstract IvMObject<?>[] createInputObjects();
 
-	public IvMObject<?>[] createTriggerObjects() {
+	public IvMObject<?>[] createOptionalObjects() {
+		return new IvMObject<?>[] {};
+	}
+
+	public IvMObject<?>[] createNonTriggerObjects() {
 		return new IvMObject<?>[] {};
 	}
 

@@ -51,7 +51,7 @@ public class ExporterModelStatistics extends IvMExporter {
 	}
 
 	@Override
-	protected IvMObject<?>[] createTriggerObjects() {
+	protected IvMObject<?>[] createNonTriggerObjects() {
 		return new IvMObject<?>[] {};
 	}
 

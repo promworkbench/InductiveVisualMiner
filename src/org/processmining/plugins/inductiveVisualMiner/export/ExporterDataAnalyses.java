@@ -49,7 +49,7 @@ public class ExporterDataAnalyses extends IvMExporter {
 	}
 
 	@Override
-	protected IvMObject<?>[] createTriggerObjects() {
+	protected IvMObject<?>[] createNonTriggerObjects() {
 		Set<IvMObject<?>> result = new THashSet<>();
 		for (DataAnalysisTableFactory analysis : configuration.getDataAnalysisTables()) {
 			result.addAll(Arrays.asList(analysis.getTriggerObjects()));

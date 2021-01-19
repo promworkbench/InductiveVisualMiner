@@ -24,14 +24,18 @@ import com.kitfox.svg.SVGDiagram;
  * @author sander
  *
  */
-public abstract class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
+public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
+
+	private final InductiveVisualMinerConfiguration configuration;
+
+	public Cl09LayoutAlignment(InductiveVisualMinerConfiguration configuration) {
+		this.configuration = configuration;
+	}
 
 	@Override
 	public String getName() {
-		return "layout alignment " + getModeName();
+		return "layout alignment";
 	}
-
-	protected abstract String getModeName();
 
 	@Override
 	public String getStatusBusyMessage() {
@@ -42,6 +46,10 @@ public abstract class Cl09LayoutAlignment extends DataChainLinkComputationAbstra
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_info, IvMObject.selected_visualisation_mode,
 				IvMObject.selected_graph_user_settings };
+	}
+
+	public IvMObject<?>[] createNonTriggerObjects() {
+		return Mode.gatherInputsRequested(configuration);
 	}
 
 	@Override

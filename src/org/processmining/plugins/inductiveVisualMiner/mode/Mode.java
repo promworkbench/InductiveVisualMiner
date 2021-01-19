@@ -1,11 +1,14 @@
 package org.processmining.plugins.inductiveVisualMiner.mode;
 
 import java.awt.Color;
+import java.util.Arrays;
+import java.util.Set;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -15,6 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityL
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
 
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.set.hash.THashSet;
 
 /**
  * Class to set the visualisation parameters of the layout of the model.
@@ -87,4 +91,15 @@ public abstract class Mode {
 	 * @return
 	 */
 	public abstract ProcessTreeVisualisationParameters getVisualisationParametersWithAlignments(IvMObjectValues inputs);
+
+	public static IvMObject<?>[] gatherInputsRequested(InductiveVisualMinerConfiguration configuration) {
+		Set<IvMObject<?>> result = new THashSet<>();
+
+		for (Mode mode : configuration.getModes()) {
+			result.addAll(Arrays.asList(mode.inputsRequested()));
+		}
+
+		IvMObject<?>[] arr = new IvMObject<?>[result.size()];
+		return result.toArray(arr);
+	}
 }

@@ -22,7 +22,7 @@ public class DataAnalysisController {
 					return analysis.getInputObjects();
 				}
 
-				public IvMObject<?>[] createTriggerObjects() {
+				public IvMObject<?>[] createOptionalObjects() {
 					return analysis.getTriggerObjects();
 				}
 

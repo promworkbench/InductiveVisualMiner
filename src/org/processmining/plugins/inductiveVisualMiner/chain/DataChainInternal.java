@@ -60,7 +60,7 @@ public class DataChainInternal {
 
 		chainLinks.add(chainLink);
 
-		for (IvMObject<?> object : chainLink.getInputObjects()) {
+		for (IvMObject<?> object : chainLink.getRequiredObjects()) {
 			object2inputs.putIfAbsent(object, new THashSet<>());
 			object2inputs.get(object).add(chainLink);
 		}
@@ -68,7 +68,7 @@ public class DataChainInternal {
 			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputNames()) {
 				object2inputs.putIfAbsent(object, new THashSet<>());
 			}
-			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getTriggerObjects()) {
+			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOptionalObjects()) {
 				object2inputs.putIfAbsent(object, new THashSet<>());
 				object2inputs.get(object).add(chainLink);
 			}
@@ -121,8 +121,8 @@ public class DataChainInternal {
 		//execute next computation links
 		for (DataChainLink chainLink : chainLinks) {
 			if (canExecute(chainLink)
-					&& (contains(chainLink.getInputObjects(), objectBecameAvailable)
-							|| contains(chainLink.getTriggerObjects(), objectBecameAvailable))
+					&& (contains(chainLink.getRequiredObjects(), objectBecameAvailable)
+							|| contains(chainLink.getOptionalObjects(), objectBecameAvailable))
 					&& !contains(exclude, chainLink)) {
 				executeLink(chainLink);
 			}
@@ -153,7 +153,7 @@ public class DataChainInternal {
 	 * @return whether all the inputs are present
 	 */
 	private boolean canExecute(DataChainLink chainLink) {
-		for (IvMObject<?> inputObject : chainLink.getInputObjects()) {
+		for (IvMObject<?> inputObject : chainLink.getRequiredObjects()) {
 			if (!state.hasObject(inputObject)) {
 				return false;
 			}
@@ -175,7 +175,9 @@ public class DataChainInternal {
 		} else if (chainLink instanceof DataChainLinkGui) {
 			executeLinkGui((DataChainLinkGui) chainLink);
 		}
-		parentChain.getOnChange().run();
+		if (parentChain.getOnChange() != null) {
+			parentChain.getOnChange().run();
+		}
 	}
 
 	private void executeLinkGui(final DataChainLinkGui chainLink) {
@@ -205,12 +207,18 @@ public class DataChainInternal {
 
 	private IvMObjectValues gatherInputs(DataChainLink chainLink) {
 		IvMObjectValues result = new IvMObjectValues();
-		for (int i = 0; i < chainLink.getInputObjects().length; i++) {
-			IvMObject<?> object = chainLink.getInputObjects()[i];
+		for (int i = 0; i < chainLink.getRequiredObjects().length; i++) {
+			IvMObject<?> object = chainLink.getRequiredObjects()[i];
 			gatherInput(object, result);
 		}
-		for (int i = 0; i < chainLink.getTriggerObjects().length; i++) {
-			IvMObject<?> object = chainLink.getTriggerObjects()[i];
+		for (int i = 0; i < chainLink.getOptionalObjects().length; i++) {
+			IvMObject<?> object = chainLink.getOptionalObjects()[i];
+			if (state.hasObject(object)) {
+				gatherInput(object, result);
+			}
+		}
+		for (int i = 0; i < chainLink.getNonTriggerObjects().length; i++) {
+			IvMObject<?> object = chainLink.getNonTriggerObjects()[i];
 			if (state.hasObject(object)) {
 				gatherInput(object, result);
 			}
@@ -253,13 +261,6 @@ public class DataChainInternal {
 						return;
 					}
 
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-
 					final IvMObjectValues outputs;
 					try {
 						outputs = chainLink.execute(configuration, inputs, canceller);
@@ -284,10 +285,8 @@ public class DataChainInternal {
 						parentChain.getOnStatus().endComputation(chainLink);
 					}
 
-					if (outputs != null) {
-						//to process the outputs thread-safely, put them through the parent chain
-						parentChain.processOutputsOfChainLink(canceller, chainLink, outputs);
-					}
+					//to process the outputs thread-safely, put them through the parent chain
+					parentChain.processOutputsOfChainLink(canceller, chainLink, outputs);
 				}
 			});
 		}
@@ -363,11 +362,13 @@ public class DataChainInternal {
 
 		System.out.println("  chain link `" + chainLink.getName() + "` completed");
 
-		for (int i = 0; i < chainLink.getOutputNames().length; i++) {
-			IvMObject<?> outputObjectName = chainLink.getOutputNames()[i];
-			if (!fixedObjects.contains(outputObjectName)) {//if the output object is blocked, do not update it
-				processOutput(outputObjectName, outputs);
-				executeNext(outputObjectName, chainLink); //trigger chainlinks that have this object as input or trigger, but not the chainlink that produced it itself to prevent loops
+		if (outputs != null) {
+			for (int i = 0; i < chainLink.getOutputNames().length; i++) {
+				IvMObject<?> outputObjectName = chainLink.getOutputNames()[i];
+				if (!fixedObjects.contains(outputObjectName)) {//if the output object is blocked, do not update it
+					processOutput(outputObjectName, outputs);
+					executeNext(outputObjectName, chainLink); //trigger chainlinks that have this object as input or trigger, but not the chainlink that produced it itself to prevent loops
+				}
 			}
 		}
 
@@ -418,7 +419,7 @@ public class DataChainInternal {
 
 		for (DataChainLink chainLink : chainLinks) {
 			//inputs
-			for (IvMObject<?> object : chainLink.getInputObjects()) {
+			for (IvMObject<?> object : chainLink.getRequiredObjects()) {
 				dot.addEdge(object2dotNode.get(object), link2dotNode.get(chainLink));
 			}
 
@@ -429,7 +430,7 @@ public class DataChainInternal {
 				}
 
 				//triggers
-				for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getTriggerObjects()) {
+				for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOptionalObjects()) {
 					DotEdge edge = dot.addEdge(object2dotNode.get(object), link2dotNode.get(chainLink));
 					edge.setOption("style", "dashed");
 				}

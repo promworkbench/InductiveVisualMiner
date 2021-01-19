@@ -7,7 +7,7 @@ public interface DataChainLink {
 	 * 
 	 * @return
 	 */
-	public IvMObject<?>[] getInputObjects();
+	public IvMObject<?>[] getRequiredObjects();
 
 	/**
 	 * If any of the trigger objects becomes available, the computation is
@@ -16,7 +16,16 @@ public interface DataChainLink {
 	 * 
 	 * @return
 	 */
-	public IvMObject<?>[] getTriggerObjects();
+	public IvMObject<?>[] getOptionalObjects();
+
+	/**
+	 * If any of the non-trigger objects is available when the computation is
+	 * executed, it will be provided. However, the computation will not be
+	 * triggered by the object.
+	 * 
+	 * @return
+	 */
+	public IvMObject<?>[] getNonTriggerObjects();
 
 	/**
 	 * 

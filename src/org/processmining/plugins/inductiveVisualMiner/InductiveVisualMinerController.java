@@ -43,15 +43,12 @@ import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActivities;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl22TraceViewEventColourMapFiltered;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputation;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGuiAbstract;
 import org.processmining.plugins.inductiveVisualMiner.chain.FutureImpl;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
@@ -417,7 +414,7 @@ public class InductiveVisualMinerController {
 					boolean selected = ((AbstractButton) e.getSource()).getModel().isSelected();
 					if (selected) {
 						//start the computation
-						chain.setObject(IvMObject.selected_cohort_analysis_enabled, false);
+						chain.setObject(IvMObject.selected_cohort_analysis_enabled, true);
 						panel.getDataAnalysesView().setSwitcherMessage(CohortAnalysisTableFactory.name,
 								"Compute " + CohortAnalysisTableFactory.name + " [computing..]");
 					} else {
@@ -559,6 +556,10 @@ public class InductiveVisualMinerController {
 				return new IvMObject<?>[] { IvMObject.trace_view_event_colour_map, IvMObject.graph_visualisation_info };
 			}
 
+			public IvMObject<?>[] createNonTriggerObjects() {
+				return new IvMObject<?>[] { IvMObject.selected_model_selection };
+			}
+
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
 				TraceViewEventColourMap traceViewEventColourMap = inputs.get(IvMObject.trace_view_event_colour_map);
 
@@ -566,10 +567,11 @@ public class InductiveVisualMinerController {
 
 				/**
 				 * We don't want to be triggered by a change in selection, so we
-				 * get it in this way.
+				 * get it as a non-trigger. This is a bit risky, as we have to
+				 * assume it is always available.
 				 */
-				Selection selection = chain.getObjectValues(IvMObject.selected_model_selection).get()
-						.get(IvMObject.selected_model_selection);
+				assert inputs.has(IvMObject.selected_model_selection);
+				Selection selection = inputs.get(IvMObject.selected_model_selection);
 				ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
 				makeElementsSelectable(visualisationInfo, panel, selection);
 			}
@@ -1094,77 +1096,79 @@ public class InductiveVisualMinerController {
 	}
 
 	public void registerModeRequests() {
+		//TODO: now if there is one mode with a certain trigger, then all modes will update with that trigger.
+
 		//for each mode, register a separate layout chain link
-		for (Mode mode : configuration.getModes()) {
-			final Mode mode2 = mode;
-
-			//register one for layouting the graph
-			chain.register(new Cl09LayoutAlignment() {
-				@Override
-				public IvMObject<?>[] createInputObjects() {
-					IvMObject<?>[] basic = super.createInputObjects();
-					IvMObject<?>[] result = new IvMObject<?>[basic.length + 1];
-					System.arraycopy(basic, 0, result, 0, basic.length);
-					result[result.length - 1] = IvMObject.selected_visualisation_mode;
-					return result;
-				}
-
-				@Override
-				public IvMObject<?>[] createTriggerObjects() {
-					return mode2.inputsRequested();
-				}
-
-				@Override
-				public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-						IvMCanceller canceller) throws Exception {
-					Mode mode3 = inputs.get(IvMObject.selected_visualisation_mode);
-					if (mode3 != null && mode2 == mode3) {
-						return super.execute(configuration, inputs, canceller);
-					} else {
-						return null;
-					}
-				}
-
-				@Override
-				protected String getModeName() {
-					return mode.toString();
-				}
-			});
-
-			//register one for updating the trace view event colour map
-			chain.register(new Cl22TraceViewEventColourMapFiltered() {
-
-				@Override
-				public IvMObject<?>[] createInputObjects() {
-					IvMObject<?>[] basic = super.createInputObjects();
-					IvMObject<?>[] result = new IvMObject<?>[basic.length + 1];
-					System.arraycopy(basic, 0, result, 0, basic.length);
-					result[result.length - 1] = IvMObject.selected_visualisation_mode;
-					return result;
-				}
-
-				@Override
-				public IvMObject<?>[] createTriggerObjects() {
-					return mode2.inputsRequested();
-				}
-
-				@Override
-				public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-						IvMCanceller canceller) throws Exception {
-					Mode mode3 = inputs.get(IvMObject.selected_visualisation_mode);
-					if (mode3 != null && mode2 == mode3) {
-						return super.execute(configuration, inputs, canceller);
-					} else {
-						return null;
-					}
-				}
-
-				@Override
-				protected String getModeName() {
-					return mode.toString();
-				}
-			});
-		}
+		//		for (Mode mode : configuration.getModes()) {
+		//			final Mode mode2 = mode;
+		//
+		//			//register one for layouting the graph
+		//			chain.register(new Cl09LayoutAlignment() {
+		//				@Override
+		//				public IvMObject<?>[] createInputObjects() {
+		//					IvMObject<?>[] basic = super.createInputObjects();
+		//					IvMObject<?>[] result = new IvMObject<?>[basic.length + 1];
+		//					System.arraycopy(basic, 0, result, 0, basic.length);
+		//					result[result.length - 1] = IvMObject.selected_visualisation_mode;
+		//					return result;
+		//				}
+		//
+		//				@Override
+		//				public IvMObject<?>[] createOptionalObjects() {
+		//					return mode2.inputsRequested();
+		//				}
+		//
+		//				@Override
+		//				public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+		//						IvMCanceller canceller) throws Exception {
+		//					Mode mode3 = inputs.get(IvMObject.selected_visualisation_mode);
+		//					if (mode3 != null && mode2 == mode3) {
+		//						return super.execute(configuration, inputs, canceller);
+		//					} else {
+		//						return null;
+		//					}
+		//				}
+		//
+		//				@Override
+		//				protected String getModeName() {
+		//					return mode.toString();
+		//				}
+		//			});
+		//
+		//			//register one for updating the trace view event colour map
+		//			chain.register(new Cl22TraceViewEventColourMapFiltered() {
+		//
+		//				@Override
+		//				public IvMObject<?>[] createInputObjects() {
+		//					IvMObject<?>[] basic = super.createInputObjects();
+		//					IvMObject<?>[] result = new IvMObject<?>[basic.length + 1];
+		//					System.arraycopy(basic, 0, result, 0, basic.length);
+		//					result[result.length - 1] = IvMObject.selected_visualisation_mode;
+		//					return result;
+		//				}
+		//
+		//				@Override
+		//				public IvMObject<?>[] createOptionalObjects() {
+		//					return mode2.inputsRequested();
+		//				}
+		//
+		//				@Override
+		//				public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+		//						IvMCanceller canceller) throws Exception {
+		//					Mode mode3 = inputs.get(IvMObject.selected_visualisation_mode);
+		//					if (mode3 != null && mode2 == mode3) {
+		//						return super.execute(configuration, inputs, canceller);
+		//					} else {
+		//						return null;
+		//					}
+		//				}
+		//
+		//				@Override
+		//				protected String getModeName() {
+		//					return mode.toString();
+		//				}
+		//			});
+		//		}
 	}
 
 	private <C> void updateObjectInGui(final IvMObject<C> object, final C value, final boolean fixed) {

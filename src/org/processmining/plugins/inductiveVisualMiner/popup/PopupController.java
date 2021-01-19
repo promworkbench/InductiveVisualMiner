@@ -57,7 +57,7 @@ public class PopupController {
 		}
 
 		@Override
-		public IvMObject<?>[] getTriggerObjects() {
+		public IvMObject<?>[] getOptionalObjects() {
 			return triggers;
 		}
 

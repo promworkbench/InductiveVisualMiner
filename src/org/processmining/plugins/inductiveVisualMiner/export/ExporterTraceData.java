@@ -31,7 +31,7 @@ public class ExporterTraceData extends IvMExporter {
 	}
 
 	@Override
-	protected IvMObject<?>[] createTriggerObjects() {
+	protected IvMObject<?>[] createNonTriggerObjects() {
 		return new IvMObject<?>[] {};
 	}
 

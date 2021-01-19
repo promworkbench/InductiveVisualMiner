@@ -3,8 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.export;
 import java.awt.geom.NoninvertibleTransformException;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Set;
 
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimationPanel;
@@ -24,8 +22,6 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-import gnu.trove.set.hash.THashSet;
-
 public class ExporterAvi extends IvMExporter {
 
 	private final InductiveVisualMinerConfiguration configuration;
@@ -43,15 +39,8 @@ public class ExporterAvi extends IvMExporter {
 	}
 
 	@Override
-	protected IvMObject<?>[] createTriggerObjects() {
-		Set<IvMObject<?>> result = new THashSet<>();
-
-		for (Mode mode : configuration.getModes()) {
-			result.addAll(Arrays.asList(mode.inputsRequested()));
-		}
-
-		IvMObject<?>[] arr = new IvMObject<?>[result.size()];
-		return result.toArray(arr);
+	protected IvMObject<?>[] createNonTriggerObjects() {
+		return Mode.gatherInputsRequested(configuration);
 	}
 
 	@Override

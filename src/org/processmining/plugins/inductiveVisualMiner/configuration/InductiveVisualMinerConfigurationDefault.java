@@ -27,6 +27,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl05Mine;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl06LayoutModel;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl07Align;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl08UpdateIvMAttributes;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl10AnimationScaler;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Animate;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl12TraceColouring;
@@ -38,6 +39,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl17DataAnalysisEven
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl21DataAnalysisLog;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl22TraceViewEventColourMapFiltered;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
@@ -317,6 +319,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl06LayoutModel());
 		chain.register(new Cl07Align());
 		chain.register(new Cl08UpdateIvMAttributes());
+		chain.register(new Cl09LayoutAlignment(this));
 		chain.register(new Cl10AnimationScaler());
 		chain.register(new Cl11Animate());
 		chain.register(new Cl12TraceColouring());
@@ -327,6 +330,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl17DataAnalysisEvent());
 		chain.register(new Cl18DataAnalysisCohort());
 		chain.register(new Cl19DataAnalysisLog());
+		chain.register(new Cl22TraceViewEventColourMapFiltered(this));
 
 		//TODO: re-enable?
 		//		//mine performance

@@ -34,11 +34,10 @@ public class Cl18DataAnalysisCohort extends DataChainLinkComputationAbstract {
 	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
 			IvMCanceller canceller) throws Exception {
 		if (inputs.get(IvMObject.selected_cohort_analysis_enabled)) {
-
 			AttributesInfo attributesInfo = inputs.get(IvMObject.attributes_info);
 			XLog log = inputs.get(IvMObject.sorted_log);
 			XEventPerformanceClassifier classifier = new XEventPerformanceClassifier(
-					AttributeClassifiers.constructClassifier(inputs.get(IvMObject.classifiers)));
+					AttributeClassifiers.constructClassifier(inputs.get(IvMObject.selected_classifier)));
 
 			Cohorts cohorts = CohortAnalysis.compute(attributesInfo, log, classifier, canceller);
 

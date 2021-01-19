@@ -18,14 +18,18 @@ import com.kitfox.svg.SVGDiagram;
  * @author sander
  *
  */
-public abstract class Cl22TraceViewEventColourMapFiltered extends DataChainLinkComputationAbstract {
+public class Cl22TraceViewEventColourMapFiltered extends DataChainLinkComputationAbstract {
+
+	private final InductiveVisualMinerConfiguration configuration;
+
+	public Cl22TraceViewEventColourMapFiltered(InductiveVisualMinerConfiguration configuration) {
+		this.configuration = configuration;
+	}
 
 	@Override
 	public String getName() {
-		return "trace view event colour map " + getModeName();
+		return "trace view event colour map";
 	}
-
-	protected abstract String getModeName();
 
 	@Override
 	public String getStatusBusyMessage() {
@@ -37,6 +41,10 @@ public abstract class Cl22TraceViewEventColourMapFiltered extends DataChainLinkC
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.graph_svg, IvMObject.selected_model_selection,
 				IvMObject.selected_visualisation_mode, IvMObject.graph_visualisation_info,
 				IvMObject.visualisation_data };
+	}
+
+	public IvMObject<?>[] createNonTriggerObjects() {
+		return Mode.gatherInputsRequested(configuration);
 	}
 
 	@Override

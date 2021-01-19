@@ -37,7 +37,7 @@ public class Cl07Align extends DataChainLinkComputationAbstract {
 	}
 
 	@Override
-	public IvMObject<?>[] getTriggerObjects() {
+	public IvMObject<?>[] createOptionalObjects() {
 		return new IvMObject<?>[] { IvMObject.imported_alignment };
 	}
 
