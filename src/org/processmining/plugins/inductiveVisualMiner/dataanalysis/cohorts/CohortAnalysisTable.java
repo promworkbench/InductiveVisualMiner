@@ -11,7 +11,8 @@ import javax.swing.table.AbstractTableModel;
 
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.cohortanalysis.cohort.Cohorts;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableCellRenderer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
@@ -118,8 +119,8 @@ public class CohortAnalysisTable extends DataAnalysisTable {
 		}
 	}
 
-	public boolean setData(InductiveVisualMinerState state) {
-		cohorts = state.getCohortAnalysis();
+	public boolean setData(IvMObjectValues inputs) {
+		cohorts = inputs.get(IvMObject.data_analysis_cohort);
 		model.fireTableStructureChanged();
 		return cohorts != null;
 	}

@@ -2,7 +2,8 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattribute
 
 import javax.swing.table.AbstractTableModel;
 
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 
 public class LogAttributeAnalysisTable extends DataAnalysisTable {
@@ -58,8 +59,16 @@ public class LogAttributeAnalysisTable extends DataAnalysisTable {
 		setModel(model);
 	}
 
-	public boolean setData(InductiveVisualMinerState state) {
-		dataAnalysis = state.getLogAttributesAnalysis();
+	@SuppressWarnings("unchecked")
+	public boolean setData(IvMObjectValues inputs) {
+		dataAnalysis = inputs.get(IvMObject.data_analysis_log);
+
+		if (inputs.has(IvMObject.data_analysis_log_virtual_attributes)) {
+			dataAnalysis.addVirtualAttributes(inputs.get(IvMObject.data_analysis_log_virtual_attributes));
+		} else {
+			dataAnalysis.setVirtualAttributesToPlaceholders();
+		}
+
 		model.fireTableStructureChanged();
 		return dataAnalysis != null;
 	}

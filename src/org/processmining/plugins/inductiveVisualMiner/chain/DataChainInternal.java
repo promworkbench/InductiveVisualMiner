@@ -34,6 +34,8 @@ public class DataChainInternal {
 	private final InductiveVisualMinerPanel panel;
 	private final DataChainImplNonBlocking parentChain;
 
+	private final Set<IvMObject<?>> fixedObjects = new THashSet<>();
+
 	private final List<DataChainLink> chainLinks = new ArrayList<>();
 	private final Map<IvMObject<?>, Set<DataChainLink>> object2inputs = new THashMap<>();
 
@@ -87,10 +89,32 @@ public class DataChainInternal {
 	 * Sets an object and starts executing the chain accordingly.
 	 */
 	public <C> void setObject(IvMObject<C> objectName, C object) {
-		state.putObject(objectName, object);
+		if (!fixedObjects.contains(objectName)) {
+			state.putObject(objectName, object);
+
+			//start the chain (this will cancel appropriately)
+			executeNext(objectName);
+		} else {
+			System.out.println("attempt to set a fixed object: rejected");
+		}
+	}
+
+	/**
+	 * Sets an object such that it cannot be changed anymore. It will execute
+	 * the chain for this call, but afterwards this object will not trigger
+	 * anything anymore. Chain link computations that have this object as an
+	 * output will not be executed.
+	 * 
+	 * @param object
+	 * @param value
+	 */
+	public <C> void setFixedObject(IvMObject<C> object, C value) {
+		state.putObject(object, value);
 
 		//start the chain (this will cancel appropriately)
-		executeNext(objectName);
+		executeNext(object);
+
+		fixedObjects.add(object);
 	}
 
 	private <C> void executeNext(IvMObject<C> objectBecameAvailable, DataChainLink... exclude) {
@@ -134,6 +158,14 @@ public class DataChainInternal {
 				return false;
 			}
 		}
+		if (chainLink instanceof DataChainLinkComputation) {
+			for (IvMObject<?> outputObject : ((DataChainLinkComputation) chainLink).getOutputNames()) {
+				if (fixedObjects.contains(outputObject)) {
+					System.out.println("computation not started as it would produce a fixed object");
+					return false;
+				}
+			}
+		}
 		return true;
 	}
 
@@ -150,24 +182,25 @@ public class DataChainInternal {
 		//System.out.println("  execute gui chain link `" + chainLink.getName() + "` " + chainLink.getClass());
 
 		final IvMObjectValues inputs = gatherInputs(chainLink);
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					chainLink.updateGui(panel, inputs);
-				} catch (final Exception e) {
-					if (parentChain.getOnException() != null) {
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								parentChain.getOnException().onException(e);
-							}
-						});
+		if (canExecute(chainLink)) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						chainLink.updateGui(panel, inputs);
+					} catch (final Exception e) {
+						if (parentChain.getOnException() != null) {
+							SwingUtilities.invokeLater(new Runnable() {
+								public void run() {
+									parentChain.getOnException().onException(e);
+								}
+							});
+						}
+						e.printStackTrace();
+						return;
 					}
-					e.printStackTrace();
-					return;
 				}
-			}
-		});
+			});
+		}
 	}
 
 	private IvMObjectValues gatherInputs(DataChainLink chainLink) {
@@ -332,8 +365,10 @@ public class DataChainInternal {
 
 		for (int i = 0; i < chainLink.getOutputNames().length; i++) {
 			IvMObject<?> outputObjectName = chainLink.getOutputNames()[i];
-			processOutput(outputObjectName, outputs);
-			executeNext(outputObjectName, chainLink); //trigger chainlinks that have this object as input or trigger, but not the chainlink that produced it itself to prevent loops
+			if (!fixedObjects.contains(outputObjectName)) {//if the output object is blocked, do not update it
+				processOutput(outputObjectName, outputs);
+				executeNext(outputObjectName, chainLink); //trigger chainlinks that have this object as input or trigger, but not the chainlink that produced it itself to prevent loops
+			}
 		}
 
 		parentChain.getOnChange().run();
@@ -404,13 +439,16 @@ public class DataChainInternal {
 		return dot;
 	}
 
-	public void getObjectValues(IvMObject<?>[] objects, FutureImpl<IvMObjectValues> values) {
+	public void getObjectValues(IvMObject<?>[] objects, FutureImpl values) {
 		IvMObjectValues result = new IvMObjectValues();
+		boolean allPresent = true;
 		for (IvMObject<?> object : objects) {
 			if (state.hasObject(object)) {
 				gatherInput(object, result);
+			} else {
+				allPresent = false;
 			}
 		}
-		values.set(result);
+		values.set(result, allPresent);
 	}
 }

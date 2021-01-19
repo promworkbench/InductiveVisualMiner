@@ -6,7 +6,8 @@ import java.util.Iterator;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis.Field;
@@ -93,8 +94,8 @@ public class EventAttributeAnalysisTable extends DataAnalysisTable {
 		setModel(model);
 	}
 
-	public boolean setData(InductiveVisualMinerState state) {
-		dataAnalysis = state.getEventAttributesAnalysis();
+	public boolean setData(IvMObjectValues inputs) {
+		dataAnalysis = inputs.get(IvMObject.data_analysis_event);
 
 		if (dataAnalysis == null) {
 			return false;

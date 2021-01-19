@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import java.util.concurrent.Future;
-
 import org.processmining.plugins.graphviz.dot.Dot;
 
 /**
@@ -57,7 +55,19 @@ public interface DataChain {
 	 * @param objects
 	 * @return the requested values that are available
 	 */
-	public Future<IvMObjectValues> getObjectValues(IvMObject<?>[] objects);
+	public FutureImpl getObjectValues(IvMObject<?>... objects);
+
+	/**
+	 * Set an object that cannot be changed by the chain. Any attempt to do so
+	 * will be ignored silently. Triggers will be suppressed after this call
+	 * (the call itself will trigger for the object).
+	 * 
+	 * @param <C>
+	 * 
+	 * @param object
+	 * @param value
+	 */
+	public <C> void setFixedObject(IvMObject<C> object, C value);
 
 	public OnException getOnException();
 
@@ -72,5 +82,4 @@ public interface DataChain {
 	public void setOnChange(Runnable onChange);
 
 	public Dot toDot();
-
 }

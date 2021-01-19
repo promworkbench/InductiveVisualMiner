@@ -2,7 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import javax.swing.JTable;
 
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 
 public abstract class DataAnalysisTable extends JTable {
 
@@ -26,10 +26,10 @@ public abstract class DataAnalysisTable extends JTable {
 	 * Set the data of this data analysis. Returns whether all necessary data
 	 * was present in the state (which is used in file-export).
 	 * 
-	 * @param state
+	 * @param inputs
 	 * @return
 	 */
-	public abstract boolean setData(InductiveVisualMinerState state);
+	public abstract boolean setData(IvMObjectValues inputs);
 
 	public abstract void invalidateData();
 }

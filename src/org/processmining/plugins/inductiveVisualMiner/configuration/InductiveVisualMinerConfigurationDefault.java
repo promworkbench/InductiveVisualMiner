@@ -276,19 +276,17 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	protected DataState createState() {
-		return new DataState();
-	}
-
-	@Override
 	protected InductiveVisualMinerPanel createPanel(ProMCanceller canceller) {
 		return new InductiveVisualMinerPanel(this, canceller);
 	}
 
 	@Override
-	public DataChain createChain(final DataState state, final InductiveVisualMinerPanel panel,
-			final ProMCanceller canceller, final Executor executor, final List<PreMiningFilter> preMiningFilters,
+	public DataChain createChain(final InductiveVisualMinerPanel panel, final ProMCanceller canceller,
+			final Executor executor, final List<PreMiningFilter> preMiningFilters,
 			final List<HighlightingFilter> highlightingFilters) {
+		//set up the state
+		DataState state = new DataState();
+
 		//set up the chain
 		final DataChainImplNonBlocking chain = new DataChainImplNonBlocking(state, canceller, executor, this, panel);
 

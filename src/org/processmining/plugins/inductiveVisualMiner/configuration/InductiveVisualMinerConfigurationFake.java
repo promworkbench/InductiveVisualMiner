@@ -28,7 +28,6 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 
 	private InductiveVisualMinerConfigurationDefault phantom;
 	private DataChain chain;
-	private DataState state;
 	private InductiveVisualMinerPanel panel;
 	private ProMCanceller canceller;
 	private Executor executor;
@@ -38,7 +37,6 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 			ProMCanceller canceller, Executor executor) {
 		this.executor = executor;
 		this.canceller = canceller;
-		this.state = state;
 		this.panel = panel;
 		phantom = new InductiveVisualMinerConfigurationDefault(canceller, executor);
 		this.discoveryTechniques = phantom.getDiscoveryTechniques();
@@ -69,18 +67,13 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return phantom.getModesArray();
 	}
 
-	public DataState getState() {
-		return state;
-	}
-
 	public InductiveVisualMinerPanel getPanel() {
 		return panel;
 	}
 
 	public DataChain getChain() {
 		if (chain == null) {
-			chain = phantom.createChain(state, panel, canceller, executor, getPreMiningFilters(),
-					getHighlightingFilters());
+			chain = phantom.createChain(panel, canceller, executor, getPreMiningFilters(), getHighlightingFilters());
 		}
 		return chain;
 	}

@@ -1,12 +1,12 @@
 package org.processmining.plugins.inductiveVisualMiner;
 
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.List;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
@@ -21,13 +21,14 @@ import javax.swing.event.ChangeListener;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.std.XConceptExtension;
+import org.deckfour.xes.model.XLog;
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.ProMCanceller;
+import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.Function;
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -48,7 +49,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputation;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGuiAbstract;
-import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
+import org.processmining.plugins.inductiveVisualMiner.chain.FutureImpl;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectCarteBlanche;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
@@ -56,14 +57,10 @@ import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnStatus;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisController;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysisTableFactory;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysisTableFactory;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportController;
@@ -98,16 +95,17 @@ import com.kitfox.svg.SVGDiagram;
 public class InductiveVisualMinerController {
 
 	private final InductiveVisualMinerPanel panel;
-	private final DataState state;
 	private final InductiveVisualMinerConfiguration configuration;
 	private final DataChain chain;
 	private final PluginContext context;
 	private final UserStatus userStatus;
 
 	private PopupController popupController;
-	//these fields are time critical and should not go via the state
+
+	//the following fields are time critical and should not go via the state
 	private Scaler animationScaler = null;
 	private Mode animationMode = null;
+	private boolean animationEnabled;
 	private AlignedLogVisualisationData animationVisualisationData = null;
 
 	//preferences
@@ -116,16 +114,14 @@ public class InductiveVisualMinerController {
 	public static final String playAnimationOnStartupKey = "playanimationonstartup";
 
 	public InductiveVisualMinerController(final PluginContext context,
-			final InductiveVisualMinerConfiguration configuration, final ProMCanceller canceller) {
-		this.state = configuration.getState();
-		state.setConfiguration(configuration);
+			final InductiveVisualMinerConfiguration configuration, final XLog log, final ProMCanceller canceller) {
 		this.configuration = configuration;
 		this.panel = configuration.getPanel();
 		this.userStatus = new UserStatus();
 		this.context = context;
 		chain = configuration.getChain();
 
-		chain.setObject(IvMObject.carte_blanche, new IvMObjectCarteBlanche(state)); //carte blanche allows requests for objects without blocking execution
+		setObject(IvMObject.carte_blanche, new IvMObjectCarteBlanche(state)); //carte blanche allows requests for objects without blocking execution
 
 		//initialise gui handlers
 		initGui(canceller, configuration);
@@ -164,7 +160,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//start the chain
-		chain.setObject(IvMObject.input_log, state.getXLog());
+		chain.setFixedObject(IvMObject.input_log, log);
 	}
 
 	/**
@@ -178,7 +174,7 @@ public class InductiveVisualMinerController {
 	@Deprecated
 	public InductiveVisualMinerController(final PluginContext context, final InductiveVisualMinerPanel panel,
 			final InductiveVisualMinerState state, ProMCanceller canceller) {
-		this(context, new InductiveVisualMinerConfigurationDefault(state.getXLog(), canceller, context.getExecutor()),
+		this(context, new InductiveVisualMinerConfigurationDefault(canceller, context.getExecutor()), state.getXLog(),
 				canceller);
 	}
 
@@ -221,79 +217,84 @@ public class InductiveVisualMinerController {
 			}
 		});
 		panel.getGraph().getUserSettings().setDirection(GraphDirection.leftRight);
-		chain.setObject(IvMObject.selected_graph_user_settings, panel.getGraph().getUserSettings());
+		setObject(IvMObject.selected_graph_user_settings, panel.getGraph().getUserSettings());
 
 		//animation enabled/disabled
+		animationEnabled = preferences.getBoolean(playAnimationOnStartupKey, true);
+		setObject(IvMObject.selected_animation_enabled, animationEnabled);
 		panel.setOnAnimationEnabledChanged(new AnimationEnabledChangedListener() {
 			public boolean animationEnabledChanged() {
-				boolean enable = !state.hasObject(IvMObject.selected_animation_enabled);
-				chain.setObject(IvMObject.selected_animation_enabled, enable);
-				preferences.putBoolean(playAnimationOnStartupKey, enable);
-
-				if (!enable) {
+				animationEnabled = !animationEnabled;
+				chain.setObject(IvMObject.selected_animation_enabled, animationEnabled);
+				preferences.putBoolean(playAnimationOnStartupKey, animationEnabled);
+				if (!animationEnabled) {
 					//animation gets disabled
 					panel.getGraph().setAnimationEnabled(false);
 					setAnimationStatus(panel, "animation disabled", true);
 					panel.repaint();
-					return false;
-				} else {
-					//animation gets enabled
-					return true;
 				}
+				return animationEnabled;
 			}
 		});
-		state.putObject(IvMObject.selected_animation_enabled, preferences.getBoolean(playAnimationOnStartupKey, true));
 
 		//set model export button
 		panel.getSaveModelButton().addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent arg0) {
+				try {
+					FutureImpl f = chain.getObjectValues(IvMObject.input_log, IvMObject.model);
+					IvMObjectValues inputs = f.get();
 
-				//store the resulting Process tree or Petri net
-				String name = XConceptExtension.instance().extractName(state.getObject(IvMObject.sorted_log));
-				IvMModel model = state.getObject(IvMObject.model);
+					if (f.isAllObjectsPresent()) {
+						//store the resulting Process tree or Petri net
+						String name = XConceptExtension.instance().extractName(inputs.get(IvMObject.sorted_log));
+						IvMModel model = inputs.get(IvMObject.model);
 
-				Object[] options;
-				if (model.isTree()) {
-					options = new Object[5];
-					options[0] = "Petri net";
-					options[1] = "Accepting Petri net";
-					options[2] = "Expanded accepting Petri net";
-					options[3] = "Process Tree";
-					options[4] = "Efficient tree";
-				} else {
-					options = new Object[4];
-					options[0] = "Petri net";
-					options[1] = "Accepting Petri net";
-					options[2] = "Expanded accepting Petri net";
-					options[3] = "Directly follows model";
-				}
-
-				int n = JOptionPane.showOptionDialog(panel,
-						"As what would you like to save the model?\nIt will become available in ProM.", "Save",
-						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-
-				switch (n) {
-					case 0 :
-						//store as Petri net
-						ExportModel.exportPetrinet(context, model, name, canceller);
-						break;
-					case 1 :
-						ExportModel.exportAcceptingPetriNet(context, model, name, canceller);
-						break;
-					case 2 :
-						ExportModel.exportExpandedAcceptingPetriNet(context, model, name, canceller);
-						break;
-					case 3 :
+						Object[] options;
 						if (model.isTree()) {
-							ExportModel.exportProcessTree(context, model.getTree().getDTree(), name);
+							options = new Object[5];
+							options[0] = "Petri net";
+							options[1] = "Accepting Petri net";
+							options[2] = "Expanded accepting Petri net";
+							options[3] = "Process Tree";
+							options[4] = "Efficient tree";
 						} else {
-							ExportModel.exportDirectlyFollowsModel(context, model, name);
+							options = new Object[4];
+							options[0] = "Petri net";
+							options[1] = "Accepting Petri net";
+							options[2] = "Expanded accepting Petri net";
+							options[3] = "Directly follows model";
 						}
-						break;
-					case 4 :
-						ExportModel.exportEfficientTree(context, model.getTree(), name);
-						break;
+
+						int n = JOptionPane.showOptionDialog(panel,
+								"As what would you like to save the model?\nIt will become available in ProM.", "Save",
+								JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
+								options[0]);
+
+						switch (n) {
+							case 0 :
+								//store as Petri net
+								ExportModel.exportPetrinet(context, model, name, canceller);
+								break;
+							case 1 :
+								ExportModel.exportAcceptingPetriNet(context, model, name, canceller);
+								break;
+							case 2 :
+								ExportModel.exportExpandedAcceptingPetriNet(context, model, name, canceller);
+								break;
+							case 3 :
+								if (model.isTree()) {
+									ExportModel.exportProcessTree(context, model.getTree().getDTree(), name);
+								} else {
+									ExportModel.exportDirectlyFollowsModel(context, model, name);
+								}
+								break;
+							case 4 :
+								ExportModel.exportEfficientTree(context, model.getTree(), name);
+								break;
+						}
+					}
+				} catch (HeadlessException | InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		});
@@ -310,10 +311,20 @@ public class InductiveVisualMinerController {
 		panel.getSaveLogButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				String name = XConceptExtension.instance().extractName(state.getSortedXLog());
-				IvMLog log = state.getIvMLogFiltered();
-				IvMModel model = state.getModel();
-				XEventClassifier classifier = state.getActivityClassifier();
+				IvMObjectValues inputs;
+				try {
+					inputs = chain.getObjectValues(IvMObject.input_log, IvMObject.aligned_log_filtered, IvMObject.model,
+							IvMObject.selected_classifier).get();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+					return;
+				}
+
+				String name = XConceptExtension.instance().extractName(inputs.get(IvMObject.input_log));
+				IvMLog log = inputs.get(IvMObject.aligned_log_filtered);
+				IvMModel model = inputs.get(IvMObject.model);
+				XEventClassifier classifier = AttributeClassifiers
+						.constructClassifier(inputs.get(IvMObject.selected_classifier));
 
 				Object[] options = { "Just the log (log & sync moves)", "Aligned log (all moves)",
 						"Model view (model & sync moves)" };
@@ -401,7 +412,7 @@ public class InductiveVisualMinerController {
 					});
 
 			//link cohort data analysis view switch and cohort computations
-			chain.setObject(IvMObject.selected_cohort_analysis_enabled, false);
+			setObject(IvMObject.selected_cohort_analysis_enabled, false);
 			panel.getDataAnalysesView().addSwitcherListener(CohortAnalysisTableFactory.name, new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					boolean selected = ((AbstractButton) e.getSource()).getModel().isSelected();
@@ -456,7 +467,7 @@ public class InductiveVisualMinerController {
 
 	protected void initGuiMiner() {
 		//miner
-		chain.setObject(IvMObject.selected_miner, new Miner());
+		setObject(IvMObject.selected_miner, new Miner());
 		panel.getMinerSelection().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				chain.setObject(IvMObject.selected_miner,
@@ -465,7 +476,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//noise threshold
-		chain.setObject(IvMObject.selected_noise_threshold, 0.8);
+		setObject(IvMObject.selected_noise_threshold, 0.8);
 		panel.getPathsSlider().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (!panel.getPathsSlider().getSlider().getValueIsAdjusting()) {
@@ -530,11 +541,11 @@ public class InductiveVisualMinerController {
 		chain.register(layoutAlignment);
 
 		//mode switch
-		chain.setObject(IvMObject.selected_visualisation_mode, new ModePaths());
-		panel.getColourModeSelection().addActionListener(new ActionListener() {
+		setObject(IvMObject.selected_visualisation_mode, new ModePaths());
+		panel.getVisualisationModeSelector().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				chain.setObject(IvMObject.selected_visualisation_mode,
-						(Mode) panel.getColourModeSelection().getSelectedItem());
+						(Mode) panel.getVisualisationModeSelector().getSelectedItem());
 			}
 		});
 
@@ -663,111 +674,7 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		//log data analysis
-		chain.register(new DataChainLinkGuiAbstract() {
-			public String getName() {
-				return "update log data analysis";
-			}
-
-			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.data_analysis_log };
-			}
-
-			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				panel.getDataAnalysesView().setData(LogAttributeAnalysisTableFactory.name, state);
-			}
-
-			public void invalidate(InductiveVisualMinerPanel panel) {
-				panel.getDataAnalysesView().invalidate(LogAttributeAnalysisTableFactory.name);
-			}
-		});
-
-		//log data analysis with virtual attributes
-		chain.register(new DataChainLinkGuiAbstract() {
-			public String getName() {
-				return "update log data analysis (+virtual)";
-			}
-
-			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.data_analysis_log,
-						IvMObject.data_analysis_log_virtual_attributes };
-			}
-
-			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				LogAttributeAnalysis attributeAnalysis = inputs.get(IvMObject.data_analysis_log);
-				@SuppressWarnings("unchecked")
-				List<Pair<String, DisplayType>> virtualAttributes = inputs
-						.get(IvMObject.data_analysis_log_virtual_attributes);
-
-				attributeAnalysis.addVirtualAttributes(virtualAttributes);
-				panel.getDataAnalysesView().setData(LogAttributeAnalysisTableFactory.name, state);
-			}
-
-			public void invalidate(InductiveVisualMinerPanel panel) {
-				LogAttributeAnalysis dataAnalysis = state.getObject(IvMObject.data_analysis_log);
-				if (dataAnalysis != null) {
-					dataAnalysis.setVirtualAttributesToPlaceholders();
-				}
-				panel.getDataAnalysesView().setData(LogAttributeAnalysisTableFactory.name, state);
-			}
-		});
-
-		//data analysis - cohort analysis
-		chain.register(new DataChainLinkGuiAbstract() {
-			public String getName() {
-				return "show cohorts";
-			}
-
-			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.data_analysis_cohort };
-			}
-
-			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				panel.getDataAnalysesView().setData(CohortAnalysisTableFactory.name, state);
-			}
-
-			public void invalidate(InductiveVisualMinerPanel panel) {
-				panel.getDataAnalysesView().invalidate(CohortAnalysisTableFactory.name);
-			}
-		});
-
-		//data analysis - event analysis
-		chain.register(new DataChainLinkGuiAbstract() {
-			public String getName() {
-				return "show event data analysis";
-			}
-
-			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.data_analysis_event };
-			}
-
-			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				panel.getDataAnalysesView().setData(EventAttributeAnalysisTableFactory.name, state);
-			}
-
-			public void invalidate(InductiveVisualMinerPanel panel) {
-				panel.getDataAnalysesView().invalidate(EventAttributeAnalysisTableFactory.name);
-			}
-		});
-
-		//data analysis - trace analysis
-		chain.register(new DataChainLinkGuiAbstract() {
-			public String getName() {
-				return "show trace data analysis";
-			}
-
-			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.data_analysis_trace };
-			}
-
-			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				panel.getDataAnalysesView().setData(TraceAttributeAnalysisTableFactory.name, state);
-			}
-
-			public void invalidate(InductiveVisualMinerPanel panel) {
-				panel.getDataAnalysesView().invalidate(TraceAttributeAnalysisTableFactory.name);
-			}
-		});
+		DataAnalysisController.initialise(configuration, chain);
 	}
 
 	protected void initGuiClassifiers() {
@@ -823,7 +730,7 @@ public class InductiveVisualMinerController {
 	}
 
 	protected void initGuiPreMiningFilters() {
-		chain.setObject(IvMObject.selected_activities_threshold, 1.0);
+		setObject(IvMObject.selected_activities_threshold, 1.0);
 		panel.getActivitiesSlider().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (!panel.getActivitiesSlider().getSlider().getValueIsAdjusting()) {
@@ -832,7 +739,7 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		chain.setObject(IvMObject.controller_premining_filters, new IvMPreMiningFiltersController(
+		setObject(IvMObject.controller_premining_filters, new IvMPreMiningFiltersController(
 				configuration.getPreMiningFilters(), panel.getPreMiningFiltersView()));
 
 		panel.getPreMiningFiltersButton().addActionListener(new ActionListener() {
@@ -1225,6 +1132,30 @@ public class InductiveVisualMinerController {
 		}
 	}
 
+	private <C> void updateObjectInGui(final IvMObject<C> object, final C value, final boolean fixed) {
+		if (object.equals(IvMObject.selected_miner)) {
+			panel.getMinerSelection().setSelectedItem(value);
+		} else if (object.equals(IvMObject.model) && fixed) {
+			panel.getActivitiesSlider().setVisible(false);
+			panel.getPathsSlider().setVisible(false);
+			panel.getPreMiningFiltersButton().setVisible(false);
+			panel.getMinerLabel().setVisible(false);
+			panel.getMinerSelection().setVisible(false);
+		} else if (object.equals(IvMObject.selected_classifier) && fixed) {
+			panel.getEditModelButton().setVisible(false);
+			panel.getClassifierLabel().setVisible(false);
+			panel.getClassifiers().setVisible(false);
+		} else if (object.equals(IvMObject.selected_noise_threshold)) {
+			panel.getPathsSlider().setValue((double) value);
+		} else if (object.equals(IvMObject.selected_activities_threshold)) {
+			panel.getActivitiesSlider().setValue((double) value);
+		} else if (object.equals(IvMObject.selected_visualisation_mode)) {
+			panel.getVisualisationModeSelector().setSelectedItem(value);
+		} else if (object.equals(IvMObject.selected_animation_enabled)) {
+			panel.getGraph().setAnimationEnabled((boolean) value);
+		}
+	}
+
 	public static void debug(Object s) {
 		System.out.println(s);
 	}
@@ -1233,7 +1164,13 @@ public class InductiveVisualMinerController {
 		return panel;
 	}
 
-	public InductiveVisualMinerState getState() {
-		return state;
+	public <C> void setObject(IvMObject<C> object, C value) {
+		updateObjectInGui(object, value, false);
+		chain.setObject(object, value);
+	}
+
+	public <C> void setFixedObject(IvMObject<C> object, C value) {
+		updateObjectInGui(object, value, true);
+		chain.setFixedObject(object, value);
 	}
 }

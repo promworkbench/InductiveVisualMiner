@@ -26,6 +26,7 @@ import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSele
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.animation.AnimationEnabledChangedListener;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
 import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
@@ -36,6 +37,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapView;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceView;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
@@ -57,8 +59,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	//gui elements
 	private final InductiveVisualMinerAnimationPanel graphPanel;
-	private final JComboBox<?> colourSelection;
-	private final JLabel colourLabel;
+	private final JComboBox<Mode> modeSelection;
+	private final JLabel modeLabel;
 	private final JLabel statusLabel;
 	private final JLabel animationTimeLabel;
 	private final JTextArea selectionLabel;
@@ -66,8 +68,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final NiceDoubleSlider pathsSlider;
 	private final JLabel classifierLabel;
 	private IvMClassifierChooser classifiersCombobox;
-	//private final JLabel classifierSecondLabel;
-	//private IvMClassifierChooser classifiersSecondCombobox;
 	private final JButton preMiningFiltersButton;
 	private final PreMiningFiltersView preMiningFiltersView;
 	private final JButton editModelButton;
@@ -85,7 +85,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final TraceColourMapView traceColourMapView;
 	private final JButton highlightingFiltersViewButton;
 	private final HighlightingFiltersView highlightingFiltersView;
-	private final ControllerView<InductiveVisualMinerState> controllerView;
+	private final ControllerView<DataState> controllerView;
 
 	private InputFunction<Selection> onSelectionChanged = null;
 	private Runnable onGraphDirectionChanged = null;
@@ -132,8 +132,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//paths slider
 			{
-				pathsSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0,
-						configuration.getState().getPaths(), Orientation.VERTICAL);
+				pathsSlider = SlickerFactory.instance().createNiceDoubleSlider("paths", 0, 1.0, 1,
+						Orientation.VERTICAL);
 				slidersPanel.add(pathsSlider);
 			}
 		}
@@ -146,14 +146,14 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			otherSettingsPanel.setLayout(new GridBagLayout());
 			{
 				classifierLabel = new JLabel("Classifier");
-				decorator.decorate(classifierLabel);
-				classifierLabel.setBorder(leftBorder);
+				decorator.decorate(getClassifierLabel());
+				getClassifierLabel().setBorder(leftBorder);
 				GridBagConstraints cClassifierLabel = new GridBagConstraints();
 				cClassifierLabel.gridx = 0;
 				cClassifierLabel.gridy = gridy;
 				cClassifierLabel.gridwidth = 1;
 				cClassifierLabel.anchor = GridBagConstraints.WEST;
-				otherSettingsPanel.add(classifierLabel, cClassifierLabel);
+				otherSettingsPanel.add(getClassifierLabel(), cClassifierLabel);
 
 				classifiersCombobox = new IvMClassifierChooser(null, null, false);
 				decorator.decorate(classifiersCombobox.getMultiComboBox());
@@ -166,29 +166,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cClassifiers.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(classifiersCombobox, cClassifiers);
 			}
-
-			//secondary classifiers
-			/*
-			 * { classifierSecondLabel = new JLabel("2nd Classifier");
-			 * IvMDecorator.decorate(classifierSecondLabel);
-			 * classifierSecondLabel.setBorder(leftBorder); GridBagConstraints
-			 * cClassifierLabel = new GridBagConstraints();
-			 * cClassifierLabel.gridx = 0; cClassifierLabel.gridy = gridy;
-			 * cClassifierLabel.gridwidth = 1; cClassifierLabel.anchor =
-			 * GridBagConstraints.WEST;
-			 * otherSettingsPanel.add(classifierSecondLabel, cClassifierLabel);
-			 * 
-			 * classifiersSecondCombobox = new IvMClassifierChooser(null, null,
-			 * false);
-			 * IvMDecorator.decorate(classifiersSecondCombobox.getMultiComboBox(
-			 * )); classifiersSecondCombobox.setEnabled(false);
-			 * GridBagConstraints cClassifiers = new GridBagConstraints();
-			 * cClassifiers.gridx = 1; cClassifiers.gridy = gridy++;
-			 * cClassifiers.gridwidth = 1; cClassifiers.insets = margins;
-			 * cClassifiers.fill = GridBagConstraints.HORIZONTAL;
-			 * otherSettingsPanel.add(classifiersSecondCombobox, cClassifiers);
-			 * }
-			 */
 
 			//pre-mining filters
 			{
@@ -208,14 +185,14 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			//miner
 			{
 				minerLabel = new JLabel("Miner");
-				decorator.decorate(minerLabel);
-				minerLabel.setBorder(leftBorder);
+				decorator.decorate(getMinerLabel());
+				getMinerLabel().setBorder(leftBorder);
 				GridBagConstraints cMinerLabel = new GridBagConstraints();
 				cMinerLabel.gridx = 0;
 				cMinerLabel.gridy = gridy;
 				cMinerLabel.gridwidth = 1;
 				cMinerLabel.anchor = GridBagConstraints.WEST;
-				otherSettingsPanel.add(minerLabel, cMinerLabel);
+				otherSettingsPanel.add(getMinerLabel(), cMinerLabel);
 
 				minerCombobox = new JComboBox<>(configuration.getDiscoveryTechniquesArray());
 				decorator.decorate(minerCombobox);
@@ -228,7 +205,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				cMiners.insets = margins;
 				cMiners.fill = GridBagConstraints.HORIZONTAL;
 				otherSettingsPanel.add(minerCombobox, cMiners);
-				minerCombobox.setSelectedItem(configuration.getState().getMiner());
 			}
 
 			//edit model view
@@ -246,27 +222,27 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			}
 
 			{
-				colourLabel = new JLabel("Show");
-				decorator.decorate(colourLabel);
-				colourLabel.setBorder(leftBorder);
+				modeLabel = new JLabel("Show");
+				decorator.decorate(modeLabel);
+				modeLabel.setBorder(leftBorder);
 				GridBagConstraints cColourLabel = new GridBagConstraints();
 				cColourLabel.gridx = 0;
 				cColourLabel.gridy = gridy;
 				cColourLabel.gridwidth = 1;
 				cColourLabel.anchor = GridBagConstraints.WEST;
-				otherSettingsPanel.add(colourLabel, cColourLabel);
+				otherSettingsPanel.add(modeLabel, cColourLabel);
 
-				colourSelection = new JComboBox<>(configuration.getModesArray());
-				decorator.decorate(colourSelection);
-				colourSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
-				colourSelection.setFocusable(false);
+				modeSelection = new JComboBox<>(configuration.getModesArray());
+				decorator.decorate(modeSelection);
+				modeSelection.addPopupMenuListener(new BoundsPopupMenuListener(true, false));
+				modeSelection.setFocusable(false);
 				GridBagConstraints ccolourSelection = new GridBagConstraints();
 				ccolourSelection.gridx = 1;
 				ccolourSelection.gridy = gridy++;
 				ccolourSelection.gridwidth = 1;
 				ccolourSelection.insets = margins;
 				ccolourSelection.fill = GridBagConstraints.HORIZONTAL;
-				otherSettingsPanel.add(colourSelection, ccolourSelection);
+				otherSettingsPanel.add(modeSelection, ccolourSelection);
 			}
 
 			//trace colouring view
@@ -428,8 +404,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 		//graph panel
 		{
-			graphPanel = new InductiveVisualMinerAnimationPanel(canceller,
-					configuration.getState().isAnimationGlobalEnabled());
+			graphPanel = new InductiveVisualMinerAnimationPanel(canceller, false);
 			graphPanel.setFocusable(true);
 
 			//set the graph changed listener
@@ -474,23 +449,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			});
 
 			add(graphPanel, BorderLayout.CENTER);
-		}
-
-		//handle pre-mined tree case
-		if (configuration.getState().getPreMinedModel() != null) {
-			activitiesSlider.setVisible(false);
-			pathsSlider.setVisible(false);
-			preMiningFiltersButton.setVisible(false);
-			minerLabel.setVisible(false);
-			minerCombobox.setVisible(false);
-		}
-
-		//handle pre-mined classifier case
-		if (configuration.getState().getPreMinedPerformanceClassifier() != null) {
-			editModelButton.setVisible(false);
-			classifierLabel.setVisible(false);
-			classifiersCombobox.setVisible(false);
-			//classifiersSecondCombobox.setVisible(false);
 		}
 	}
 
@@ -564,8 +522,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return minerCombobox;
 	}
 
-	public JComboBox<?> getColourModeSelection() {
-		return colourSelection;
+	public JComboBox<Mode> getVisualisationModeSelector() {
+		return modeSelection;
 	}
 
 	public JLabel getStatusLabel() {
@@ -576,12 +534,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return classifiersCombobox;
 	}
 
-	//	public IvMClassifierChooser getSecondClassifiers() {
-	//		return classifiersSecondCombobox;
-	//	}
-
 	public JComboBox<?> getColourSelection() {
-		return colourSelection;
+		return modeSelection;
 	}
 
 	public JButton getPreMiningFiltersButton() {
@@ -644,7 +598,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return dataAnalysisViewButton;
 	}
 
-	public ControllerView<InductiveVisualMinerState> getControllerView() {
+	public ControllerView<DataState> getControllerView() {
 		return controllerView;
 	}
 
@@ -674,6 +628,14 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	public JLabel getAnimationTimeLabel() {
 		return animationTimeLabel;
+	}
+
+	public JLabel getMinerLabel() {
+		return minerLabel;
+	}
+
+	public JLabel getClassifierLabel() {
+		return classifierLabel;
 	}
 
 }

@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +41,16 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 		}
 	}
 
+	protected static class QueueItemSetFixedObject<C> extends QueueItem {
+		public final IvMObject<C> object;
+		public final C value;
+
+		public QueueItemSetFixedObject(IvMObject<C> object, C value) {
+			this.object = object;
+			this.value = value;
+		}
+	}
+
 	protected static class QueueItemResults extends QueueItem {
 		public final IvMCanceller canceller;
 		public final DataChainLinkComputation chainLink;
@@ -64,11 +73,11 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 
 	protected static class QueueItemGetObjectValues extends QueueItem {
 		public final IvMObject<?>[] objects;
-		public final FutureImpl<IvMObjectValues> values;
+		public final FutureImpl values;
 
 		public QueueItemGetObjectValues(IvMObject<?>[] objects) {
 			this.objects = objects;
-			values = new FutureImpl<>();
+			values = new FutureImpl();
 		}
 	}
 
@@ -116,10 +125,15 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 	}
 
 	@Override
-	public Future<IvMObjectValues> getObjectValues(IvMObject<?>[] objects) {
+	public FutureImpl getObjectValues(IvMObject<?>... objects) {
 		QueueItemGetObjectValues queueItem = new QueueItemGetObjectValues(objects);
 		addQueueItem(queueItem);
 		return queueItem.values;
+	}
+
+	@Override
+	public <C> void setFixedObject(IvMObject<C> object, C value) {
+		addQueueItem(new QueueItemSetFixedObject<C>(object, value));
 	}
 
 	private void addQueueItem(QueueItem queueItem) {
@@ -159,12 +173,18 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 					} else if (item instanceof QueueItemGetObjectValues) {
 						chainInternal.getObjectValues(((QueueItemGetObjectValues) item).objects,
 								((QueueItemGetObjectValues) item).values);
+					} else if (item instanceof QueueItemSetFixedObject<?>) {
+						chainThreadSetFixedObject((QueueItemSetFixedObject<?>) item);
 					}
 				}
 			}
 		}
 
 		private <C> void chainThreadSetObject(QueueItemSetObject<C> item) {
+			chainInternal.setObject(item.object, item.value);
+		}
+
+		private <C> void chainThreadSetFixedObject(QueueItemSetFixedObject<C> item) {
 			chainInternal.setObject(item.object, item.value);
 		}
 

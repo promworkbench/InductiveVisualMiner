@@ -1,9 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes;
 
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactoryAbstract;
 
-public class LogAttributeAnalysisTableFactory implements DataAnalysisTableFactory {
+public class LogAttributeAnalysisTableFactory extends DataAnalysisTableFactoryAbstract {
 
 	public static final String name = "Log attributes";
 	public static final String explanation = "Attributes at the log level.";
@@ -23,7 +24,13 @@ public class LogAttributeAnalysisTableFactory implements DataAnalysisTableFactor
 	public boolean isSwitchable() {
 		return false;
 	}
-	
-	
+
+	public IvMObject<?>[] createTriggerObjects() {
+		return new IvMObject<?>[] { IvMObject.data_analysis_log_virtual_attributes };
+	}
+
+	public IvMObject<?>[] createInputObjects() {
+		return new IvMObject<?>[] { IvMObject.data_analysis_log };
+	}
 
 }

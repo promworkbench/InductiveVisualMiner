@@ -1,29 +1,29 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class FutureImpl<C> implements Future<C> {
+public class FutureImpl implements Future<IvMObjectValues> {
 
 	private boolean done = false;
-	private C result = null;
+	private IvMObjectValues result = null;
 	private Semaphore semaphore = new Semaphore(0);
+	private boolean allObjectsPresent;
 
 	public boolean cancel(boolean mayInterruptIfRunning) {
 		return false;
 	}
 
-	public C get() throws InterruptedException, ExecutionException {
+	public IvMObjectValues get() throws InterruptedException {
 		if (!isDone()) {
 			semaphore.acquire();
 		}
 		return result;
 	}
 
-	public C get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+	public IvMObjectValues get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
 		if (!isDone()) {
 			semaphore.tryAcquire(timeout, unit);
 		}
@@ -41,8 +41,16 @@ public class FutureImpl<C> implements Future<C> {
 		return done;
 	}
 
-	public void set(C result) {
+	public boolean isAllObjectsPresent() throws InterruptedException {
+		if (!isDone()) {
+			semaphore.acquire();
+		}
+		return allObjectsPresent;
+	}
+
+	public void set(IvMObjectValues result, boolean allObjectsPresent) {
 		this.result = result;
+		this.allObjectsPresent = allObjectsPresent;
 		done = true;
 		semaphore.release(Integer.MAX_VALUE);
 	}

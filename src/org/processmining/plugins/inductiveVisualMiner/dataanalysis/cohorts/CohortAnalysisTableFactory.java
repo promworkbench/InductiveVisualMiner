@@ -1,9 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts;
 
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactoryAbstract;
 
-public class CohortAnalysisTableFactory implements DataAnalysisTableFactory {
+public class CohortAnalysisTableFactory extends DataAnalysisTableFactoryAbstract {
 
 	public static final String name = "Cohort analysis";
 	public static final String explanation = "Study influence of trace attributes on process behaviour.\n"
@@ -26,4 +27,7 @@ public class CohortAnalysisTableFactory implements DataAnalysisTableFactory {
 		return true;
 	}
 
+	public IvMObject<?>[] createInputObjects() {
+		return new IvMObject<?>[] { IvMObject.data_analysis_cohort };
+	}
 }
