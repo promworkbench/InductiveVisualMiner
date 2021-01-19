@@ -4,37 +4,41 @@ import java.io.File;
 import java.io.PrintWriter;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
-import org.processmining.plugins.graphviz.visualisation.export.Exporter;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimationPanel;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
-public class ExporterTraceData extends Exporter {
-
-	private final InductiveVisualMinerState state;
-
-	public ExporterTraceData(InductiveVisualMinerState state) {
-		this.state = state;
-	}
+public class ExporterTraceData extends IvMExporter {
 
 	@Override
 	public String getDescription() {
 		return "csv (trace attributes)";
 	}
 
+	@Override
 	protected String getExtension() {
 		return "csv";
 	}
 
-	public void export(NavigableSVGPanel panel, File file) throws Exception {
-		assert state.getIvMLogFiltered() != null && state.isAlignmentReady();
-		final IvMLogFilteredImpl log = state.getIvMLogFiltered();
-		final IvMAttributesInfo attributes = state.getIvMAttributesInfo();
-		assert attributes != null;
+	@Override
+	protected IvMObject<?>[] createInputObjects() {
+		return new IvMObject<?>[] { IvMObject.aligned_log_filtered, IvMObject.ivm_attributes_info };
+	}
+
+	@Override
+	protected IvMObject<?>[] createTriggerObjects() {
+		return new IvMObject<?>[] {};
+	}
+
+	@Override
+	public void export(IvMObjectValues inputs, InductiveVisualMinerAnimationPanel panel, File file) throws Exception {
+		final IvMLogFilteredImpl log = inputs.get(IvMObject.aligned_log_filtered);
+		final IvMAttributesInfo attributes = inputs.get(IvMObject.ivm_attributes_info);
 
 		PrintWriter w = new PrintWriter(file, "UTF-8");
 		char fieldSeparator = ',';
@@ -86,5 +90,4 @@ public class ExporterTraceData extends Exporter {
 	public static String escape(String s) {
 		return StringEscapeUtils.escapeCsv(s);
 	}
-
 }

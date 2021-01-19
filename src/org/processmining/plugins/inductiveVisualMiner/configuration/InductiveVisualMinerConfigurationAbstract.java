@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.configuration;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
@@ -11,6 +10,7 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttri
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
@@ -46,10 +46,11 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<DataAnalysisTableFactory> dataAnalyses;
 	private final List<PreMiningFilter> preMiningFilters;
 	private final List<HighlightingFilter> highlightingFilters;
+	private final List<IvMExporter> exporters;
 	private final IvMVirtualAttributeFactory virtualAttributeFactory;
 	private final IvMDecoratorI decorator;
 
-	public InductiveVisualMinerConfigurationAbstract(XLog log, ProMCanceller canceller, Executor executor) {
+	public InductiveVisualMinerConfigurationAbstract(ProMCanceller canceller, Executor executor) {
 		discoveryTechniques = createDiscoveryTechniques();
 		preMiningFilters = createPreMiningFilters();
 		highlightingFilters = createHighlightingFilters();
@@ -62,9 +63,10 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		popupItemsLog = createPopupItemsLog();
 		dataAnalyses = createDataAnalysisTables();
 		virtualAttributeFactory = createVirtualAttributes();
+		exporters = createExporters();
 		decorator = createDecorator();
 
-		state = createState(log);
+		state = createState();
 		panel = createPanel(canceller);
 		chain = createChain(state, panel, canceller, executor, preMiningFilters, highlightingFilters);
 	}
@@ -91,7 +93,9 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	protected abstract List<DataAnalysisTableFactory> createDataAnalysisTables();
 
-	protected abstract DataState createState(XLog log);
+	protected abstract List<IvMExporter> createExporters();
+
+	protected abstract DataState createState();
 
 	protected abstract InductiveVisualMinerPanel createPanel(ProMCanceller canceller);
 
@@ -182,6 +186,11 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	@Override
 	public List<DataAnalysisTableFactory> getDataAnalysisTables() {
 		return dataAnalyses;
+	}
+
+	@Override
+	public List<IvMExporter> getExporters() {
+		return exporters;
 	}
 
 	@Override

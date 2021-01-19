@@ -7,7 +7,6 @@ import java.util.concurrent.Executor;
 
 import javax.swing.JOptionPane;
 
-import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
@@ -38,7 +37,6 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl16DataAnalysisTrac
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl17DataAnalysisEvent;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisLog;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl20Done;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl21DataAnalysisLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl22TraceViewEventColourMapFiltered;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
@@ -49,6 +47,11 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.Cohor
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
+import org.processmining.plugins.inductiveVisualMiner.export.ExporterDataAnalyses;
+import org.processmining.plugins.inductiveVisualMiner.export.ExporterModelStatistics;
+import org.processmining.plugins.inductiveVisualMiner.export.ExporterTraceData;
+import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorDefault;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -110,10 +113,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 	protected Cl02SortEvents sortEvents;
 
-	protected Cl20Done done;
-
-	public InductiveVisualMinerConfigurationDefault(XLog log, ProMCanceller canceller, Executor executor) {
-		super(log, canceller, executor);
+	public InductiveVisualMinerConfigurationDefault(ProMCanceller canceller, Executor executor) {
+		super(canceller, executor);
 	}
 
 	@Override
@@ -265,8 +266,18 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	protected DataState createState(XLog log) {
-		return new DataState(log);
+	protected List<IvMExporter> createExporters() {
+		return new ArrayList<>(Arrays.asList(new IvMExporter[] { //
+				new ExporterDataAnalyses(this), //
+				new ExporterTraceData(), //
+				new ExporterModelStatistics(this), //
+				new ExporterAvi(), //
+		}));
+	}
+
+	@Override
+	protected DataState createState() {
+		return new DataState();
 	}
 
 	@Override
@@ -320,7 +331,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl18DataAnalysisCohort());
 		chain.register(new Cl19DataAnalysisLog());
 		chain.register(new Cl22TraceViewEventColourMapFiltered());
-		done = new Cl20Done();
 
 		//TODO: re-enable?
 		//		//mine performance

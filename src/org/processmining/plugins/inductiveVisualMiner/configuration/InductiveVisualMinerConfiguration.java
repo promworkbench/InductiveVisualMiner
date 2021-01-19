@@ -8,6 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttri
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
@@ -92,6 +93,8 @@ public interface InductiveVisualMinerConfiguration {
 	public List<DataAnalysisTableFactory> getDataAnalysisTables();
 
 	public IvMVirtualAttributeFactory getVirtualAttributes();
+
+	public List<IvMExporter> getExporters();
 
 	/**
 	 * Set up the state that keeps the data related to the visual Miner.

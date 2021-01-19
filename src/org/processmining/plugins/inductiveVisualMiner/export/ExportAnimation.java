@@ -180,9 +180,10 @@ public class ExportAnimation {
 	}
 
 	public static boolean saveAVItoFileUpdating(IvMLogFiltered filteredLog, TraceColourMap trace2colour,
-			GraphVizTokens tokens, ProcessTreeVisualisationInfo info, Mode colourMode, SVGDiagram svg, Dot dot,
-			File file, InductiveVisualMinerAnimationPanel panel, Scaler scaler,
-			AlignedLogVisualisationData visualisationData, ProcessTreeVisualisationParameters visualisationParameters, ProcessTreeVisualisationInfo visualisationInfo, IvMModel model, Selection selection)
+			GraphVizTokens tokens, ProcessTreeVisualisationInfo visualisationInfo, Mode colourMode, SVGDiagram svg,
+			Dot dot, File file, InductiveVisualMinerAnimationPanel panel, Scaler scaler,
+			AlignedLogVisualisationData visualisationData, ProcessTreeVisualisationParameters visualisationParameters,
+			IvMModel model, Selection selection)
 			throws FileNotFoundException, IOException, NoninvertibleTransformException {
 		final GuaranteedProgressMonitor progressMonitor = new GuaranteedProgressMonitor(panel, "",
 				"Preparing animation", 0, 100);
@@ -249,7 +250,8 @@ public class ExportAnimation {
 
 				//draw the background
 				visualisationData.setTime((long) ((double) scaler.userTime2LogTime(time)));
-				InductiveVisualMinerSelectionColourer.colourHighlighting(svg, visualisationInfo, model, visualisationData, visualisationParameters);
+				InductiveVisualMinerSelectionColourer.colourHighlighting(svg, visualisationInfo, model,
+						visualisationData, visualisationParameters);
 				NavigableSVGPanel.drawSVG(g, svg, 0, 0, width, height);
 
 				//transform

@@ -33,7 +33,6 @@ import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
-import org.processmining.plugins.graphviz.visualisation.export.Exporter;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualMinerAlignment;
@@ -67,11 +66,8 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
+import org.processmining.plugins.inductiveVisualMiner.export.ExportController;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
-import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
-import org.processmining.plugins.inductiveVisualMiner.export.ExporterDataAnalyses;
-import org.processmining.plugins.inductiveVisualMiner.export.ExporterModelStatistics;
-import org.processmining.plugins.inductiveVisualMiner.export.ExporterTraceData;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
@@ -200,6 +196,8 @@ public class InductiveVisualMinerController {
 
 		initGuiHistogram();
 
+		ExportController.initialise(chain, configuration, panel);
+
 		//model editor
 		panel.getEditModelView().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -244,9 +242,7 @@ public class InductiveVisualMinerController {
 				}
 			}
 		});
-		if (preferences.getBoolean(playAnimationOnStartupKey, true)) {
-			state.putObject(IvMObject.selected_animation_enabled, true);
-		}
+		state.putObject(IvMObject.selected_animation_enabled, preferences.getBoolean(playAnimationOnStartupKey, true));
 
 		//set model export button
 		panel.getSaveModelButton().addActionListener(new ActionListener() {
@@ -302,24 +298,6 @@ public class InductiveVisualMinerController {
 			}
 		});
 		panel.getSaveModelButton().setEnabled(false);
-
-		//add animation and statistics to export
-		panel.getGraph().setGetExporters(new GetExporters() {
-			public List<Exporter> getExporters(List<Exporter> exporters) {
-				exporters.add(new ExporterDataAnalyses(state));
-				if (state.getIvMLogFiltered() != null && state.isAlignmentReady()
-						&& state.getIvMAttributesInfo() != null) {
-					exporters.add(new ExporterTraceData(state));
-				}
-				if (state.isPerformanceReady()) {
-					exporters.add(new ExporterModelStatistics(state.getConfiguration()));
-				}
-				if (panel.getGraph().isAnimationEnabled()) {
-					exporters.add(new ExporterAvi(state));
-				}
-				return exporters;
-			}
-		});
 
 		//set image/animation export button
 		panel.getSaveImageButton().addActionListener(new ActionListener() {
@@ -829,6 +807,7 @@ public class InductiveVisualMinerController {
 		panel.getGraph().addMouseInElementsChangedListener(new MouseInElementsChangedListener<DotElement>() {
 			public void mouseInElementsChanged(Set<DotElement> mouseInElements) {
 				popupController.showPopup(panel, state);
+				panel.getGraph().repaint();
 			}
 		});
 
@@ -837,6 +816,7 @@ public class InductiveVisualMinerController {
 			panel.getGraph().addLogPopupListener(new LogPopupListener() {
 				public void isMouseInButton(boolean isIn) {
 					popupController.showPopup(panel, state);
+					panel.getGraph().repaint();
 				}
 			});
 		}

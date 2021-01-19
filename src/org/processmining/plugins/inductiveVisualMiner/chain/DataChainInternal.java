@@ -220,12 +220,12 @@ public class DataChainInternal {
 						return;
 					}
 
-//					try {
-//						Thread.sleep(1000);
-//					} catch (InterruptedException e1) {
-//						// TODO Auto-generated catch block
-//						e1.printStackTrace();
-//					}
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 
 					final IvMObjectValues outputs;
 					try {
@@ -404,4 +404,13 @@ public class DataChainInternal {
 		return dot;
 	}
 
+	public void getObjectValues(IvMObject<?>[] objects, FutureImpl<IvMObjectValues> values) {
+		IvMObjectValues result = new IvMObjectValues();
+		for (IvMObject<?> object : objects) {
+			if (state.hasObject(object)) {
+				gatherInput(object, result);
+			}
+		}
+		values.set(result);
+	}
 }

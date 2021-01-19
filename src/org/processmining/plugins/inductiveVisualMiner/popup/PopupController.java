@@ -75,7 +75,7 @@ public class PopupController {
 		@Override
 		public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
 				IvMCanceller canceller) throws Exception {
-			Map<PopupItemInput<?>, List<String>> popups = new THashMap<>();
+			Map<PopupItemInput<?>, List<String[]>> popups = new THashMap<>();
 
 			//log
 			{
@@ -158,11 +158,11 @@ public class PopupController {
 			//data ready
 
 			@SuppressWarnings("unchecked")
-			Map<PopupItemInput<?>, List<String>> popups = inputs.get(IvMObject.popups);
+			Map<PopupItemInput<?>, List<String[]>> popups = inputs.get(IvMObject.popups);
 
 			if (panel.getGraph().isMouseInLogPopupButton()) {
 				//log popup
-				panel.getGraph().setPopupActivity(popups.get(new PopupItemInputLog()), -1);
+				panel.getGraph().setPopupActivity(prettyPrint(popups.get(new PopupItemInputLog())), -1);
 				panel.getGraph().setShowPopup(true, popupWidthNodes);
 				return;
 			}
@@ -176,7 +176,7 @@ public class PopupController {
 				if (element instanceof LocalDotNode && (((LocalDotNode) element).getType() == NodeType.source
 						|| ((LocalDotNode) element).getType() == NodeType.sink)) {
 					//popup at the source or sink
-					panel.getGraph().setPopupStartEnd(popups.get(new PopupItemInputStartEnd()));
+					panel.getGraph().setPopupStartEnd(prettyPrint(popups.get(new PopupItemInputStartEnd())));
 					panel.getGraph().setShowPopup(true, popupWidthSourceSink);
 					return;
 				}
@@ -185,15 +185,13 @@ public class PopupController {
 					//model ready
 					IvMModel model = inputs.get(IvMObject.model);
 
-					System.out.println("model ready");
-
 					if (element instanceof LocalDotNode && model.isActivity(((LocalDotNode) element).getUnode())) {
 						//popup of an activity
 
 						int unode = ((LocalDotNode) element).getUnode();
 						PopupItemInputActivity input = new PopupItemInputActivity(unode);
 						if (popups.containsKey(input)) {
-							panel.getGraph().setPopupActivity(popups.get(input), unode);
+							panel.getGraph().setPopupActivity(prettyPrint(popups.get(input)), unode);
 							panel.getGraph().setShowPopup(true, popupWidthNodes);
 							return;
 						}
@@ -210,7 +208,7 @@ public class PopupController {
 							LogMovePosition position = LogMovePosition.of(edge);
 							PopupItemInputLogMove input = new PopupItemInputLogMove(position);
 
-							panel.getGraph().setPopupLogMove(popups.get(input), position);
+							panel.getGraph().setPopupLogMove(prettyPrint(popups.get(input)), position);
 							panel.getGraph().setShowPopup(true, popupWidthNodes);
 							return;
 						}
@@ -222,7 +220,7 @@ public class PopupController {
 							int unode = edge.getUnode();
 							PopupItemInputModelMove input = new PopupItemInputModelMove(unode);
 
-							panel.getGraph().setPopupActivity(popups.get(input), -1);
+							panel.getGraph().setPopupActivity(prettyPrint(popups.get(input)), -1);
 							panel.getGraph().setShowPopup(true, popupWidthNodes);
 							return;
 						}
@@ -237,9 +235,48 @@ public class PopupController {
 		return;
 	}
 
-	public static <T> List<String> popupProcess(IvMObjectValues inputs, PopupItemInput<T> itemInput,
+	public static List<String> prettyPrint(List<String[]> items) {
+		//gather the width of the first column
+		int widthColumnA = 0;
+		{
+			for (String[] item : items) {
+				if (item != null && item.length == 2) {
+					if (item[0] != null && item[1] != null) {
+						widthColumnA = Math.max(widthColumnA, item[0].length());
+					}
+				}
+			}
+		}
+
+		List<String> result = new ArrayList<>();
+		for (String[] item : items) {
+			if (item != null) {
+				if (item.length == 0) {
+					//no columns (spacer)
+					result.add(null);
+				} else if (item.length == 1) {
+					//one column
+					if (item[0] != null) {
+						result.add(StringUtils.abbreviate(item[0], maxCharactersPerLine));
+					}
+				} else {
+					//two columns
+					if (item[0] != null && item[1] != null) {
+						result.add(//
+								padRight(item[0], widthColumnA) + //
+										" " + //
+										StringUtils.abbreviate(item[1], maxCharactersPerLine - widthColumnA - 1));
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	public static <T> List<String[]> popupProcess(IvMObjectValues inputs, PopupItemInput<T> itemInput,
 			List<? extends PopupItem<T>> popupItems) {
-		List<String> popup = new ArrayList<>();
+		List<String[]> popup = new ArrayList<>();
 
 		//gather the values
 		String[][] items = new String[0][0];
@@ -256,48 +293,15 @@ public class PopupController {
 			}
 		}
 
-		//gather the width of the first column
-		int widthColumnA = 0;
-		{
-			for (String[] item : items) {
-				if (item != null && item.length == 2) {
-					if (item[0] != null && item[1] != null) {
-						widthColumnA = Math.max(widthColumnA, item[0].length());
-					}
-				}
-			}
-		}
-
-		for (String[] item : items) {
-			if (item != null) {
-				if (item.length == 0) {
-					//no columns (spacer)
-					popup.add(null);
-				} else if (item.length == 1) {
-					//one column
-					if (item[0] != null) {
-						popup.add(StringUtils.abbreviate(item[0], maxCharactersPerLine));
-					}
-				} else {
-					//two columns
-					if (item[0] != null && item[1] != null) {
-						popup.add(//
-								padRight(item[0], widthColumnA) + //
-										" " + //
-										StringUtils.abbreviate(item[1], maxCharactersPerLine - widthColumnA - 1));
-					}
-				}
-			}
-		}
 		removeDoubleEmpty(popup);
 		return popup;
 	}
 
-	public static void removeDoubleEmpty(List<String> popup) {
+	public static void removeDoubleEmpty(List<String[]> popup) {
 		//post-process: remove double empty lines, and the last one
 		{
 			boolean seenNull = false;
-			for (Iterator<String> it = popup.iterator(); it.hasNext();) {
+			for (Iterator<String[]> it = popup.iterator(); it.hasNext();) {
 				if (it.next() == null) {
 					if (seenNull || !it.hasNext()) {
 						it.remove();

@@ -12,6 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttri
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
@@ -39,7 +40,7 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		this.canceller = canceller;
 		this.state = state;
 		this.panel = panel;
-		phantom = new InductiveVisualMinerConfigurationDefault(state.getXLog(), canceller, executor);
+		phantom = new InductiveVisualMinerConfigurationDefault(canceller, executor);
 		this.discoveryTechniques = phantom.getDiscoveryTechniques();
 	}
 
@@ -118,6 +119,10 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 
 	public List<DataAnalysisTableFactory> getDataAnalysisTables() {
 		return phantom.getDataAnalysisTables();
+	}
+
+	public List<IvMExporter> getExporters() {
+		return phantom.getExporters();
 	}
 
 	public IvMVirtualAttributeFactory getVirtualAttributes() {

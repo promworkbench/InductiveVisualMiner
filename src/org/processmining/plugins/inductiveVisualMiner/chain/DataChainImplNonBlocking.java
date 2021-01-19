@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -61,6 +62,16 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 		}
 	}
 
+	protected static class QueueItemGetObjectValues extends QueueItem {
+		public final IvMObject<?>[] objects;
+		public final FutureImpl<IvMObjectValues> values;
+
+		public QueueItemGetObjectValues(IvMObject<?>[] objects) {
+			this.objects = objects;
+			values = new FutureImpl<>();
+		}
+	}
+
 	/**
 	 * The threading works using a queue (to hold what is in the elements), and
 	 * a semaphore (to wake up the processing thread). This avoids locks in the
@@ -83,14 +94,12 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 
 	@Override
 	public void register(DataChainLink chainLink) {
-		queue.add(new QueueItemRegister(chainLink));
-		semaphore.release();
+		addQueueItem(new QueueItemRegister(chainLink));
 	}
 
 	@Override
 	public <C> void setObject(IvMObject<C> objectName, C object) {
-		queue.add(new QueueItemSetObject<C>(objectName, object));
-		semaphore.release();
+		addQueueItem(new QueueItemSetObject<C>(objectName, object));
 	}
 
 	@Override
@@ -103,7 +112,18 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 
 	@Override
 	public void executeLink(DataChainLink chainLink) {
-		queue.add(new QueueItemExecuteLink(chainLink));
+		addQueueItem(new QueueItemExecuteLink(chainLink));
+	}
+
+	@Override
+	public Future<IvMObjectValues> getObjectValues(IvMObject<?>[] objects) {
+		QueueItemGetObjectValues queueItem = new QueueItemGetObjectValues(objects);
+		addQueueItem(queueItem);
+		return queueItem.values;
+	}
+
+	private void addQueueItem(QueueItem queueItem) {
+		queue.add(queueItem);
 		semaphore.release();
 	}
 
@@ -136,6 +156,9 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 								((QueueItemResults) item).chainLink, ((QueueItemResults) item).outputs);
 					} else if (item instanceof QueueItemRegister) {
 						chainInternal.register(((QueueItemRegister) item).chainLink);
+					} else if (item instanceof QueueItemGetObjectValues) {
+						chainInternal.getObjectValues(((QueueItemGetObjectValues) item).objects,
+								((QueueItemGetObjectValues) item).values);
 					}
 				}
 			}

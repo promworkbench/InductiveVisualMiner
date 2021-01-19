@@ -7,9 +7,10 @@ import javax.swing.ImageIcon;
 import javax.swing.table.TableModel;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.graphviz.visualisation.NavigableSVGPanel;
-import org.processmining.plugins.graphviz.visualisation.export.Exporter;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerState;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimationPanel;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
@@ -21,12 +22,12 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
-public class ExporterDataAnalyses extends Exporter {
+public class ExporterDataAnalyses extends IvMExporter {
 
-	private InductiveVisualMinerState state;
+	protected final InductiveVisualMinerConfiguration configuration;
 
-	public ExporterDataAnalyses(InductiveVisualMinerState state) {
-		this.state = state;
+	public ExporterDataAnalyses(InductiveVisualMinerConfiguration configuration) {
+		this.configuration = configuration;
 	}
 
 	@Override
@@ -34,15 +35,29 @@ public class ExporterDataAnalyses extends Exporter {
 		return "xlsx (data analyses)";
 	}
 
+	@Override
 	protected String getExtension() {
 		return "xlsx";
 	}
 
-	public void export(NavigableSVGPanel panel, File file) throws Exception {
+	@Override
+	protected IvMObject<?>[] createInputObjects() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected IvMObject<?>[] createTriggerObjects() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void export(IvMObjectValues inputs, InductiveVisualMinerAnimationPanel panel, File file) throws Exception {
 		WritableWorkbook workbook = Workbook.createWorkbook(file);
 
 		int sheetIndex = 0;
-		for (DataAnalysisTableFactory analysis : state.getConfiguration().getDataAnalysisTables()) {
+		for (DataAnalysisTableFactory analysis : configuration.getDataAnalysisTables()) {
 			String name = analysis.getAnalysisName();
 			WritableSheet sheet = workbook.createSheet(name, sheetIndex);
 
@@ -110,4 +125,5 @@ public class ExporterDataAnalyses extends Exporter {
 			sheet.addCell(new Label(column, row, value.toString()));
 		}
 	}
+
 }

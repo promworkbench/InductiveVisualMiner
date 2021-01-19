@@ -61,4 +61,17 @@ public class IvMObjectValues {
 	private <C> void getIfPresent2(IvMObjectValues result, IvMObject<C> object) {
 		result.set(object, get(object));
 	}
+
+	public IvMObjectValues getIfPresent(IvMObject<?>[] inputObjects, IvMObject<?>... triggerObjects) {
+		IvMObjectValues result = new IvMObjectValues();
+		for (IvMObject<?> object : inputObjects) {
+			getIfPresent2(result, object);
+		}
+		for (IvMObject<?> object : triggerObjects) {
+			if (has(object)) {
+				getIfPresent2(result, object);
+			}
+		}
+		return result;
+	}
 }

@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import java.util.concurrent.Future;
+
 import org.processmining.plugins.graphviz.dot.Dot;
 
 /**
@@ -47,6 +49,15 @@ public interface DataChain {
 	 * @param chainLink
 	 */
 	public void executeLink(DataChainLink chainLink);
+
+	/**
+	 * Get values from the state if they are available. Objects do not need to
+	 * be available before calling this method.
+	 * 
+	 * @param objects
+	 * @return the requested values that are available
+	 */
+	public Future<IvMObjectValues> getObjectValues(IvMObject<?>[] objects);
 
 	public OnException getOnException();
 
