@@ -3,6 +3,8 @@ package org.processmining.plugins.inductiveVisualMiner.export;
 import java.awt.geom.NoninvertibleTransformException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Set;
 
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimationPanel;
@@ -12,6 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
+import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -21,19 +24,34 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
+import gnu.trove.set.hash.THashSet;
+
 public class ExporterAvi extends IvMExporter {
+
+	private final InductiveVisualMinerConfiguration configuration;
+
+	public ExporterAvi(InductiveVisualMinerConfiguration configuration) {
+		this.configuration = configuration;
+	}
 
 	@Override
 	protected IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.graph_svg, IvMObject.selected_visualisation_mode, IvMObject.graph_dot,
 				IvMObject.animation, IvMObject.animation_scaler, IvMObject.graph_visualisation_info,
 				IvMObject.aligned_log_filtered, IvMObject.trace_colour_map, IvMObject.visualisation_data,
-				IvMObject.carte_blanche, IvMObject.model, IvMObject.selected_model_selection };
+				IvMObject.model, IvMObject.selected_model_selection };
 	}
 
 	@Override
 	protected IvMObject<?>[] createTriggerObjects() {
-		return new IvMObject<?>[] {};
+		Set<IvMObject<?>> result = new THashSet<>();
+
+		for (Mode mode : configuration.getModes()) {
+			result.addAll(Arrays.asList(mode.inputsRequested()));
+		}
+
+		IvMObject<?>[] arr = new IvMObject<?>[result.size()];
+		return result.toArray(arr);
 	}
 
 	@Override
@@ -61,9 +79,10 @@ public class ExporterAvi extends IvMExporter {
 		final AlignedLogVisualisationData visualisationData = inputs.get(IvMObject.visualisation_data);
 
 		final boolean updateWithTimeStep = mode.isUpdateWithTimeStep();
+
+		IvMObjectValues subInputs = inputs.getIfPresent(mode.inputsRequested());
 		final ProcessTreeVisualisationParameters visualisationParameters = mode
-				.getVisualisationParametersWithAlignments(
-						inputs.get(IvMObject.carte_blanche).getIfPresent(mode.inputsRequested()));
+				.getVisualisationParametersWithAlignments(subInputs);
 		final IvMModel model = inputs.get(IvMObject.model);
 		final Selection selection = inputs.get(IvMObject.selected_model_selection);
 

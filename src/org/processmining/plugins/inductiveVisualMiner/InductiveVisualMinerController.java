@@ -45,13 +45,14 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesIn
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActivities;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl09LayoutAlignment;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl22TraceViewEventColourMapFiltered;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputation;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGuiAbstract;
 import org.processmining.plugins.inductiveVisualMiner.chain.FutureImpl;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectCarteBlanche;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnStatus;
@@ -120,8 +121,6 @@ public class InductiveVisualMinerController {
 		this.userStatus = new UserStatus();
 		this.context = context;
 		chain = configuration.getChain();
-
-		setObject(IvMObject.carte_blanche, new IvMObjectCarteBlanche(state)); //carte blanche allows requests for objects without blocking execution
 
 		//initialise gui handlers
 		initGui(canceller, configuration);
@@ -511,7 +510,7 @@ public class InductiveVisualMinerController {
 	}
 
 	protected void initGuiGraph() {
-		//layout
+		//update layout
 		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "model dot";
@@ -537,9 +536,6 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		final Cl09LayoutAlignment layoutAlignment = new Cl09LayoutAlignment();
-		chain.register(layoutAlignment);
-
 		//mode switch
 		setObject(IvMObject.selected_visualisation_mode, new ModePaths());
 		panel.getVisualisationModeSelector().addActionListener(new ActionListener() {
@@ -550,7 +546,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//register the requirements of the modes
-		registerModeRequests(layoutAlignment);
+		registerModeRequests();
 
 		//trace view event colour map & model node selection
 		chain.register(new DataChainLinkGuiAbstract() {
@@ -560,8 +556,7 @@ public class InductiveVisualMinerController {
 			}
 
 			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.trace_view_event_colour_map, IvMObject.carte_blanche,
-						IvMObject.graph_visualisation_info };
+				return new IvMObject<?>[] { IvMObject.trace_view_event_colour_map, IvMObject.graph_visualisation_info };
 			}
 
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
@@ -570,11 +565,11 @@ public class InductiveVisualMinerController {
 				panel.getTraceView().setEventColourMap(traceViewEventColourMap);
 
 				/**
-				 * We don't want to be triggered by a change in selection, thus
-				 * we get it from the carte-blanche
+				 * We don't want to be triggered by a change in selection, so we
+				 * get it in this way.
 				 */
-				Selection selection = inputs.get(IvMObject.carte_blanche)
-						.getDirectIfPresent(IvMObject.selected_model_selection);
+				Selection selection = chain.getObjectValues(IvMObject.selected_model_selection).get()
+						.get(IvMObject.selected_model_selection);
 				ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
 				makeElementsSelectable(visualisationInfo, panel, selection);
 			}
@@ -1098,37 +1093,77 @@ public class InductiveVisualMinerController {
 		}
 	}
 
-	public void registerModeRequests(final Cl09LayoutAlignment layoutAlignment) {
+	public void registerModeRequests() {
+		//for each mode, register a separate layout chain link
 		for (Mode mode : configuration.getModes()) {
 			final Mode mode2 = mode;
-			if (mode2.inputsRequested().length > 0) {
-				for (IvMObject<?> object : mode2.inputsRequested()) {
-					final IvMObject<?> object2 = object;
-					chain.register(new DataChainLinkGuiAbstract() {
 
-						public String getName() {
-							return "mode " + mode2 + ": " + object.getName();
-						}
-
-						public IvMObject<?>[] createInputObjects() {
-							return new IvMObject<?>[] { IvMObject.carte_blanche, object2 };
-						}
-
-						public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs)
-								throws Exception {
-							Mode mode3 = inputs.get(IvMObject.carte_blanche)
-									.getDirectIfPresent(IvMObject.selected_visualisation_mode);
-							if (mode3 != null && mode2 == mode3) { //if this is the selected mode
-								chain.executeLink(layoutAlignment);
-							}
-						}
-
-						public void invalidate(InductiveVisualMinerPanel panel) {
-							//no action taken
-						}
-					});
+			//register one for layouting the graph
+			chain.register(new Cl09LayoutAlignment() {
+				@Override
+				public IvMObject<?>[] createInputObjects() {
+					IvMObject<?>[] basic = super.createInputObjects();
+					IvMObject<?>[] result = new IvMObject<?>[basic.length + 1];
+					System.arraycopy(basic, 0, result, 0, basic.length);
+					result[result.length - 1] = IvMObject.selected_visualisation_mode;
+					return result;
 				}
-			}
+
+				@Override
+				public IvMObject<?>[] createTriggerObjects() {
+					return mode2.inputsRequested();
+				}
+
+				@Override
+				public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+						IvMCanceller canceller) throws Exception {
+					Mode mode3 = inputs.get(IvMObject.selected_visualisation_mode);
+					if (mode3 != null && mode2 == mode3) {
+						return super.execute(configuration, inputs, canceller);
+					} else {
+						return null;
+					}
+				}
+
+				@Override
+				protected String getModeName() {
+					return mode.toString();
+				}
+			});
+
+			//register one for updating the trace view event colour map
+			chain.register(new Cl22TraceViewEventColourMapFiltered() {
+
+				@Override
+				public IvMObject<?>[] createInputObjects() {
+					IvMObject<?>[] basic = super.createInputObjects();
+					IvMObject<?>[] result = new IvMObject<?>[basic.length + 1];
+					System.arraycopy(basic, 0, result, 0, basic.length);
+					result[result.length - 1] = IvMObject.selected_visualisation_mode;
+					return result;
+				}
+
+				@Override
+				public IvMObject<?>[] createTriggerObjects() {
+					return mode2.inputsRequested();
+				}
+
+				@Override
+				public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+						IvMCanceller canceller) throws Exception {
+					Mode mode3 = inputs.get(IvMObject.selected_visualisation_mode);
+					if (mode3 != null && mode2 == mode3) {
+						return super.execute(configuration, inputs, canceller);
+					} else {
+						return null;
+					}
+				}
+
+				@Override
+				protected String getModeName() {
+					return mode.toString();
+				}
+			});
 		}
 	}
 

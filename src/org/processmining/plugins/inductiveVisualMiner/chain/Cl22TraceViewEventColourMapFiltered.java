@@ -12,12 +12,20 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl22TraceViewEventColourMapFiltered extends DataChainLinkComputationAbstract {
+/**
+ * This class is to be instantiated once for every mode.
+ * 
+ * @author sander
+ *
+ */
+public abstract class Cl22TraceViewEventColourMapFiltered extends DataChainLinkComputationAbstract {
 
 	@Override
 	public String getName() {
-		return "trace view event colour map";
+		return "trace view event colour map " + getModeName();
 	}
+
+	protected abstract String getModeName();
 
 	@Override
 	public String getStatusBusyMessage() {
@@ -27,7 +35,7 @@ public class Cl22TraceViewEventColourMapFiltered extends DataChainLinkComputatio
 	@Override
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.graph_svg, IvMObject.selected_model_selection,
-				IvMObject.selected_visualisation_mode, IvMObject.graph_visualisation_info, IvMObject.carte_blanche,
+				IvMObject.selected_visualisation_mode, IvMObject.graph_visualisation_info,
 				IvMObject.visualisation_data };
 	}
 
@@ -43,12 +51,12 @@ public class Cl22TraceViewEventColourMapFiltered extends DataChainLinkComputatio
 		IvMModel model = inputs.get(IvMObject.model);
 		Mode mode = inputs.get(IvMObject.selected_visualisation_mode);
 		Selection selection = inputs.get(IvMObject.selected_model_selection);
-		IvMObjectCarteBlanche carteBlanche = inputs.get(IvMObject.carte_blanche);
 		ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
 		AlignedLogVisualisationData visualisationData = inputs.get(IvMObject.visualisation_data);
 
+		IvMObjectValues subInputs = inputs.getIfPresent(mode.inputsRequested());
 		ProcessTreeVisualisationParameters visualisationParameters = mode
-				.getVisualisationParametersWithAlignments(carteBlanche.getIfPresent(mode.inputsRequested()));
+				.getVisualisationParametersWithAlignments(subInputs);
 
 		TraceViewEventColourMap colourMap = InductiveVisualMinerSelectionColourer.colourHighlighting(svg,
 				visualisationInfo, model, visualisationData, visualisationParameters);

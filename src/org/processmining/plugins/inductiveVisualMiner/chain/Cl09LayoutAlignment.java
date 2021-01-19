@@ -18,12 +18,20 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
+/**
+ * This class is to be instantiated once for every mode.
+ * 
+ * @author sander
+ *
+ */
+public abstract class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
 
 	@Override
 	public String getName() {
-		return "layout alignment";
+		return "layout alignment " + getModeName();
 	}
+
+	protected abstract String getModeName();
 
 	@Override
 	public String getStatusBusyMessage() {
@@ -33,7 +41,7 @@ public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
 	@Override
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_info, IvMObject.selected_visualisation_mode,
-				IvMObject.selected_graph_user_settings, IvMObject.carte_blanche };
+				IvMObject.selected_graph_user_settings };
 	}
 
 	@Override
@@ -42,15 +50,15 @@ public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
 				IvMObject.trace_view_event_colour_map };
 	}
 
+	@Override
 	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
 			IvMCanceller canceller) throws Exception {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info);
 		Mode mode = inputs.get(IvMObject.selected_visualisation_mode);
 		DotPanelUserSettings settings = inputs.get(IvMObject.selected_graph_user_settings);
-		IvMObjectCarteBlanche carteBlanche = inputs.get(IvMObject.carte_blanche);
 
-		IvMObjectValues modeInputs = carteBlanche.getIfPresent(mode.inputsRequested());
+		IvMObjectValues modeInputs = inputs.getIfPresent(mode.inputsRequested());
 		ProcessTreeVisualisationParameters visualisationParameters = mode
 				.getVisualisationParametersWithAlignments(modeInputs);
 

@@ -112,12 +112,6 @@ public class IvMObject<C> {
 			"highlighting filters controller", IvMHighlightingFiltersController.class);
 	public static final IvMObject<IvMPreMiningFiltersController> controller_premining_filters = c(
 			"pre-mining filters controller", IvMPreMiningFiltersController.class);
-	/**
-	 * A carte-blanche gives read-access to the entire state. Used for optional
-	 * objects on the chain. Please note that thread-safety is not guaranteed.
-	 */
-	public static final IvMObject<IvMObjectCarteBlanche> carte_blanche = c("carte blanche",
-			IvMObjectCarteBlanche.class);
 
 	//user selections
 	public static final IvMObject<Double> selected_activities_threshold = c("selected activities threshold",
