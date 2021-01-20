@@ -243,7 +243,7 @@ public class InductiveVisualMinerController {
 		panel.getSaveModelButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					FutureImpl f = chain.getObjectValues(IvMObject.input_log, IvMObject.model);
+					FutureImpl f = chain.getObjectValues(IvMObject.input_log, IvMObject.model, IvMObject.sorted_log);
 					IvMObjectValues inputs = f.get();
 
 					if (f.isAllObjectsPresent()) {
