@@ -211,9 +211,11 @@ public class PopupController {
 							LogMovePosition position = LogMovePosition.of(edge);
 							PopupItemInputLogMove input = new PopupItemInputLogMove(position);
 
-							panel.getGraph().setPopupLogMove(prettyPrint(popups.get(input)), position);
-							panel.getGraph().setShowPopup(true, popupWidthNodes);
-							return;
+							if (popups.containsKey(input)) {
+								panel.getGraph().setPopupLogMove(prettyPrint(popups.get(input)), position);
+								panel.getGraph().setShowPopup(true, popupWidthNodes);
+								return;
+							}
 						}
 
 						if (element instanceof LocalDotEdge
@@ -223,9 +225,11 @@ public class PopupController {
 							int unode = edge.getUnode();
 							PopupItemInputModelMove input = new PopupItemInputModelMove(unode);
 
-							panel.getGraph().setPopupActivity(prettyPrint(popups.get(input)), -1);
-							panel.getGraph().setShowPopup(true, popupWidthNodes);
-							return;
+							if (popups.containsKey(input)) {
+								panel.getGraph().setPopupActivity(prettyPrint(popups.get(input)), -1);
+								panel.getGraph().setShowPopup(true, popupWidthNodes);
+								return;
+							}
 						}
 					}
 				}
