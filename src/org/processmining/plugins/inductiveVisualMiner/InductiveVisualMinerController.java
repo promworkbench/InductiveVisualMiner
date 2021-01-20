@@ -218,6 +218,7 @@ public class InductiveVisualMinerController {
 		//animation enabled/disabled
 		animationEnabled = preferences.getBoolean(playAnimationOnStartupKey, true);
 		setObject(IvMObject.selected_animation_enabled, animationEnabled);
+		panel.getGraph().setAnimationGlobalEnabled(animationEnabled);
 		panel.setOnAnimationEnabledChanged(new AnimationEnabledChangedListener() {
 			public boolean animationEnabledChanged() {
 				animationEnabled = !animationEnabled;

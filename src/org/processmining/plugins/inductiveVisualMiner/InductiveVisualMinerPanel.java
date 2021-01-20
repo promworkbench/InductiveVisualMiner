@@ -302,11 +302,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 				otherSettingsPanel.add(dataAnalysisViewButton, cDataAnalysisViewButton);
 			}
 
-			//controller view
-			{
-				controllerView = new ControllerView<>(this);
-			}
-
 			//save log button
 			{
 				saveLogButton = new JButton("export log");
@@ -404,7 +399,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 		//graph panel
 		{
-			graphPanel = new InductiveVisualMinerAnimationPanel(canceller, false);
+			graphPanel = new InductiveVisualMinerAnimationPanel(canceller);
 			graphPanel.setFocusable(true);
 
 			//set the graph changed listener
@@ -449,6 +444,13 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			});
 
 			add(graphPanel, BorderLayout.CENTER);
+		}
+
+		//controller view
+		{
+			controllerView = new ControllerView<>(this);
+			graphPanel.getHelperControlsShortcuts().add("ctrl c");
+			graphPanel.getHelperControlsExplanations().add("show controller");
 		}
 	}
 

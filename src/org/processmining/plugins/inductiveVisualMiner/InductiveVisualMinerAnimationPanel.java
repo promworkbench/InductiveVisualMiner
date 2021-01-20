@@ -86,7 +86,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	//exporters
 	private GetExporters getExporters = null;
 
-	public InductiveVisualMinerAnimationPanel(ProMCanceller canceller, boolean animationGlobalEnabled) {
+	public InductiveVisualMinerAnimationPanel(ProMCanceller canceller) {
 		super(getSplashScreen());
 
 		setOpaque(true);
@@ -115,27 +115,12 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				if (animationEnabledChangedListener != null) {
-					if (animationEnabledChangedListener.animationEnabledChanged()) {
-						for (ListIterator<String> it = helperControlsExplanations.listIterator(); it.hasNext();) {
-							if (it.next().equals(animationGlobalEnabledFalse)) {
-								it.remove();
-								it.add(animationGlobalEnabledTrue);
-							}
-						}
-					} else {
-						for (ListIterator<String> it = helperControlsExplanations.listIterator(); it.hasNext();) {
-							if (it.next().equals(animationGlobalEnabledTrue)) {
-								it.remove();
-								it.add(animationGlobalEnabledFalse);
-							}
-						}
-					}
+					setAnimationGlobalEnabled(animationEnabledChangedListener.animationEnabledChanged());
 				}
 			}
 		};
 		helperControlsShortcuts.add("ctrl e");
-		helperControlsExplanations
-				.add(animationGlobalEnabled ? animationGlobalEnabledTrue : animationGlobalEnabledFalse);
+		helperControlsExplanations.add(animationGlobalEnabledTrue); //it is expected that setAnimationGlobalEnabled() is called.
 		getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK),
 				"changeInitialAnimation");
 		getActionMap().put("changeInitialAnimation", animationEnabledChanged);
@@ -483,6 +468,30 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	 */
 	public void setAnimationEnabled(boolean enabled) {
 		animationEnabled = enabled;
+	}
+
+	/**
+	 * Sets the message of the helper items popup to enable or disable the
+	 * animation. Does not influence anything else.
+	 * 
+	 * @param animationGlobalEnabled
+	 */
+	public void setAnimationGlobalEnabled(boolean animationGlobalEnabled) {
+		if (animationGlobalEnabled) {
+			for (ListIterator<String> it = helperControlsExplanations.listIterator(); it.hasNext();) {
+				if (it.next().equals(animationGlobalEnabledFalse)) {
+					it.remove();
+					it.add(animationGlobalEnabledTrue);
+				}
+			}
+		} else {
+			for (ListIterator<String> it = helperControlsExplanations.listIterator(); it.hasNext();) {
+				if (it.next().equals(animationGlobalEnabledTrue)) {
+					it.remove();
+					it.add(animationGlobalEnabledFalse);
+				}
+			}
+		}
 	}
 
 	/**
