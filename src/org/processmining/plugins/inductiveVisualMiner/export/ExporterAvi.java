@@ -67,9 +67,9 @@ public class ExporterAvi extends IvMExporter {
 		final TraceColourMap trace2colour = inputs.get(IvMObject.trace_colour_map);
 		final AlignedLogVisualisationData visualisationData = inputs.get(IvMObject.visualisation_data);
 
-		final boolean updateWithTimeStep = mode.isUpdateWithTimeStep();
+		final boolean updateWithTimeStep = mode.isVisualisationDataUpdateWithTimeStep();
 
-		IvMObjectValues subInputs = inputs.getIfPresent(mode.inputsRequested());
+		IvMObjectValues subInputs = inputs.getIfPresent(mode.getOptionalObjects());
 		final ProcessTreeVisualisationParameters visualisationParameters = mode
 				.getVisualisationParametersWithAlignments(subInputs);
 		final IvMModel model = inputs.get(IvMObject.model);

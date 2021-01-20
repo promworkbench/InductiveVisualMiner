@@ -66,7 +66,7 @@ public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
 		Mode mode = inputs.get(IvMObject.selected_visualisation_mode);
 		DotPanelUserSettings settings = inputs.get(IvMObject.selected_graph_user_settings);
 
-		IvMObjectValues modeInputs = inputs.getIfPresent(mode.inputsRequested());
+		IvMObjectValues modeInputs = inputs.getIfPresent(mode.getOptionalObjects());
 		ProcessTreeVisualisationParameters visualisationParameters = mode
 				.getVisualisationParametersWithAlignments(modeInputs);
 

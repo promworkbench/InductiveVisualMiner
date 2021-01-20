@@ -1,13 +1,10 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
-import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeGlobal;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeNode;
@@ -35,13 +32,13 @@ public class Cl14Performance extends DataChainLinkComputationAbstract {
 
 	@Override
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.log_timestamps_logical, IvMObject.model, IvMObject.aligned_log_filtered,
-				IvMObject.aligned_log_info_filtered, IvMObject.selected_visualisation_mode };
+		return new IvMObject<?>[] { IvMObject.log_timestamps_logical, IvMObject.model,
+				IvMObject.aligned_log_filtered, };
 	}
 
 	@Override
 	public IvMObject<?>[] createOutputObjects() {
-		return new IvMObject<?>[] { IvMObject.performance, IvMObject.visualisation_data };
+		return new IvMObject<?>[] { IvMObject.performance };
 	}
 
 	@Override
@@ -54,8 +51,6 @@ public class Cl14Performance extends DataChainLinkComputationAbstract {
 		}
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogFiltered log = inputs.get(IvMObject.aligned_log_filtered);
-		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
-		Mode mode = inputs.get(IvMObject.selected_visualisation_mode);
 
 		TIntObjectMap<QueueActivityLog> queueActivityLogs = QueueMineActivityLog.mine(model, log);
 
@@ -68,18 +63,18 @@ public class Cl14Performance extends DataChainLinkComputationAbstract {
 		for (TIntIterator it = queueActivityLogs.keySet().iterator(); it.hasNext();) {
 			int unode = it.next();
 
-//			PrintWriter writerSojourn = null;
-//			PrintWriter writerService = null;
-//			if (model.isActivity(unode)) {
-//				File fileSojourn = new File("/home/sander/Desktop/sojournTime" + model.getActivityName(unode) + ".csv");
-//				File fileService = new File("/home/sander/Desktop/serviceTime" + model.getActivityName(unode) + ".csv");
-//				try {
-//					writerSojourn = new PrintWriter(fileSojourn);
-//					writerService = new PrintWriter(fileService);
-//				} catch (FileNotFoundException e) {
-//					e.printStackTrace();
-//				}
-//			}
+			//			PrintWriter writerSojourn = null;
+			//			PrintWriter writerService = null;
+			//			if (model.isActivity(unode)) {
+			//				File fileSojourn = new File("/home/sander/Desktop/sojournTime" + model.getActivityName(unode) + ".csv");
+			//				File fileService = new File("/home/sander/Desktop/serviceTime" + model.getActivityName(unode) + ".csv");
+			//				try {
+			//					writerSojourn = new PrintWriter(fileSojourn);
+			//					writerService = new PrintWriter(fileService);
+			//				} catch (FileNotFoundException e) {
+			//					e.printStackTrace();
+			//				}
+			//			}
 
 			QueueActivityLog activityLog = queueActivityLogs.get(unode);
 			for (int i = 0; i < activityLog.size(); i++) {
@@ -104,14 +99,14 @@ public class Cl14Performance extends DataChainLinkComputationAbstract {
 					performance.addNodeValue(TypeNode.service, unode, service);
 					resultTraces.addValue(Type.service, activityLog.getTraceIndex(i), service);
 
-//					writerService.println(service);
+					//					writerService.println(service);
 				}
 
 				//sojourn time
 				if (activityLog.hasInitiate(i) && activityLog.hasComplete(i)) {
 					long sojourn = activityLog.getComplete(i) - activityLog.getInitiate(i);
 					performance.addNodeValue(TypeNode.sojourn, unode, sojourn);
-//					writerSojourn.println(sojourn);
+					//					writerSojourn.println(sojourn);
 
 					/**
 					 * We could technically show trace sojourn time, but this
@@ -156,12 +151,7 @@ public class Cl14Performance extends DataChainLinkComputationAbstract {
 
 		performance.finalise();
 
-		//compute model visualisation data
-		AlignedLogVisualisationData visualisationData = mode.getVisualisationData(model, log, logInfo,
-				queueActivityLogs, performance);
-
 		return new IvMObjectValues().//
-				s(IvMObject.performance, performance).//
-				s(IvMObject.visualisation_data, visualisationData);
+				s(IvMObject.performance, performance);
 	}
 }

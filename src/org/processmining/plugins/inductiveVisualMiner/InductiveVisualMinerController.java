@@ -7,6 +7,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
@@ -46,9 +47,11 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActiv
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputation;
+import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputationAbstract;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGuiAbstract;
 import org.processmining.plugins.inductiveVisualMiner.chain.FutureImpl;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
@@ -89,6 +92,8 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 import com.kitfox.svg.SVGDiagram;
+
+import gnu.trove.set.hash.THashSet;
 
 public class InductiveVisualMinerController {
 
@@ -969,12 +974,12 @@ public class InductiveVisualMinerController {
 
 		//
 		/**
-		 * Set animation time updater. Naturally, this does not go via the
-		 * chain, and we cache the scaler
+		 * Set animation time updater. Naturally, this does not go via the chain
+		 * for performance reasons, and we cache the scaler
 		 */
 		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
-				return "catch animation objects";
+				return "cache animation objects";
 			}
 
 			public IvMObject<?>[] createInputObjects() {
@@ -1007,7 +1012,7 @@ public class InductiveVisualMinerController {
 
 						//draw modes that require an update with each time step
 						if (animationMode != null && animationVisualisationData != null) {
-							if (animationMode.isUpdateWithTimeStep()) {
+							if (animationMode.isVisualisationDataUpdateWithTimeStep()) {
 								animationVisualisationData.setTime(logTime);
 								try {
 									//TODO: re-enable
@@ -1119,6 +1124,67 @@ public class InductiveVisualMinerController {
 
 	public void registerModeRequests() {
 		//TODO: now if there is one mode with a certain trigger, then all modes will update with that trigger.
+
+		//repaint on availability of visualisation data
+		chain.register(new DataChainLinkGuiAbstract() {
+
+			public String getName() {
+				return "repaint after visualisation data";
+			}
+
+			public IvMObject<?>[] createInputObjects() {
+				return new IvMObject<?>[] { IvMObject.visualisation_data };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				panel.getGraph().repaint();
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				panel.getGraph().repaint();
+			}
+		});
+
+		//create model visualisation data
+		chain.register(new DataChainLinkComputationAbstract() {
+			public String getName() {
+				return "visualisation data";
+			}
+
+			public String getStatusBusyMessage() {
+				return "Visualising on model";
+			}
+
+			public IvMObject<?>[] createInputObjects() {
+				return new IvMObject<?>[] { IvMObject.selected_visualisation_mode, IvMObject.model,
+						IvMObject.aligned_log_info_filtered };
+			}
+
+			public IvMObject<?>[] getOptionalObjects() {
+				Set<IvMObject<?>> result = new THashSet<>();
+				for (Mode mode : configuration.getModes()) {
+					result.addAll(Arrays.asList(mode.getVisualisationDataOptionalObjects()));
+				}
+
+				IvMObject<?>[] arr = new IvMObject<?>[result.size()];
+				return result.toArray(arr);
+			}
+
+			public IvMObject<?>[] createOutputObjects() {
+				return new IvMObject<?>[] { IvMObject.visualisation_data };
+			}
+
+			public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+					IvMCanceller canceller) throws Exception {
+				Mode mode = inputs.get(IvMObject.selected_visualisation_mode);
+
+				IvMObjectValues subInputs = inputs.getIfPresent(mode.getVisualisationDataOptionalObjects());
+				AlignedLogVisualisationData visualisationData = mode.getVisualisationData(subInputs);
+
+				return new IvMObjectValues().//
+				s(IvMObject.visualisation_data, visualisationData);
+			}
+		});
 	}
 
 	private <C> void updateObjectInGui(final IvMObject<C> object, final C value, final boolean fixed) {

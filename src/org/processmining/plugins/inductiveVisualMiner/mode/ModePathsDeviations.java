@@ -8,13 +8,8 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
-
-import gnu.trove.map.TIntObjectMap;
 
 public class ModePathsDeviations extends Mode {
 
@@ -28,7 +23,7 @@ public class ModePathsDeviations extends Mode {
 	}
 
 	@Override
-	public IvMObject<?>[] inputsRequested() {
+	public IvMObject<?>[] createOptionalObjects() {
 		return new IvMObject<?>[] {};
 	}
 
@@ -48,13 +43,20 @@ public class ModePathsDeviations extends Mode {
 	}
 
 	@Override
-	public boolean isUpdateWithTimeStep() {
-		return false;
+	protected IvMObject<?>[] createVisualisationDataOptionalObjects() {
+		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_info_filtered };
 	}
 
 	@Override
-	public AlignedLogVisualisationData getVisualisationData(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfo,
-			TIntObjectMap<QueueActivityLog> queueActivityLogs, PerformanceWrapper performance) {
+	public AlignedLogVisualisationData getVisualisationData(IvMObjectValues inputs) {
+		IvMModel model = inputs.get(IvMObject.model);
+		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
+
 		return new AlignedLogVisualisationDataImplFrequencies(model, logInfo);
+	}
+
+	@Override
+	public boolean isVisualisationDataUpdateWithTimeStep() {
+		return false;
 	}
 }

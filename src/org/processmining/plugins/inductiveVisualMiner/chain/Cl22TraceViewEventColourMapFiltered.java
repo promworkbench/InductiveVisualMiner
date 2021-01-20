@@ -62,7 +62,7 @@ public class Cl22TraceViewEventColourMapFiltered extends DataChainLinkComputatio
 		ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
 		AlignedLogVisualisationData visualisationData = inputs.get(IvMObject.visualisation_data);
 
-		IvMObjectValues subInputs = inputs.getIfPresent(mode.inputsRequested());
+		IvMObjectValues subInputs = inputs.getIfPresent(mode.getOptionalObjects());
 		ProcessTreeVisualisationParameters visualisationParameters = mode
 				.getVisualisationParametersWithAlignments(subInputs);
 

@@ -5,18 +5,15 @@ import java.awt.Color;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapRed;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
+import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplPlaceholder;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplWaiting;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
-
-import gnu.trove.map.TIntObjectMap;
 
 public class ModePathsWaiting extends Mode {
 
@@ -39,7 +36,7 @@ public class ModePathsWaiting extends Mode {
 	}
 
 	@Override
-	public IvMObject<?>[] inputsRequested() {
+	public IvMObject<?>[] createOptionalObjects() {
 		return new IvMObject<?>[] { IvMObject.performance };
 	}
 
@@ -61,14 +58,25 @@ public class ModePathsWaiting extends Mode {
 	}
 
 	@Override
-	public boolean isUpdateWithTimeStep() {
-		return false;
+	protected IvMObject<?>[] createVisualisationDataOptionalObjects() {
+		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_info_filtered, IvMObject.performance };
 	}
 
 	@Override
-	public AlignedLogVisualisationData getVisualisationData(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfo,
-			TIntObjectMap<QueueActivityLog> queueActivityLogs, PerformanceWrapper performance) {
-		return new AlignedLogVisualisationDataImplWaiting(model, performance, logInfo);
+	public AlignedLogVisualisationData getVisualisationData(IvMObjectValues inputs) {
+		IvMModel model = inputs.get(IvMObject.model);
+		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
+		if (inputs.has(IvMObject.performance)) {
+			PerformanceWrapper performance = inputs.get(IvMObject.performance);
+
+			return new AlignedLogVisualisationDataImplWaiting(model, performance, logInfo);
+		} else {
+			return new AlignedLogVisualisationDataImplPlaceholder(model, logInfo);
+		}
 	}
 
+	@Override
+	public boolean isVisualisationDataUpdateWithTimeStep() {
+		return false;
+	}
 }

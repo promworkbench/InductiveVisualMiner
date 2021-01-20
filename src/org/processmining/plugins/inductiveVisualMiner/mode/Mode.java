@@ -9,15 +9,9 @@ import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.da
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
-import org.processmining.plugins.inductiveVisualMiner.performance.QueueActivityLog;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
 
-import gnu.trove.map.TIntObjectMap;
 import gnu.trove.set.hash.THashSet;
 
 /**
@@ -41,6 +35,10 @@ public abstract class Mode {
 
 	private final ProcessTreeVisualisationParameters parametersWithoutAlignments = new ProcessTreeVisualisationParameters();
 
+	private IvMObject<?>[] visualisationDataOptionalObjects;
+
+	private IvMObject<?>[] optionalObjects;
+
 	public Mode() {
 		parametersWithoutAlignments.setColourModelEdges(null);
 		parametersWithoutAlignments.setShowFrequenciesOnModelEdges(false);
@@ -52,22 +50,6 @@ public abstract class Mode {
 		parametersWithoutAlignments.setColourNodes(new ColourMapFixed(Color.white));
 	}
 
-	/**
-	 * Perform the computations necessary to visualise something on the model.
-	 * Will be called asynchronously, and the result must not be cached.
-	 * 
-	 * @param model
-	 * @param log
-	 * @param logInfo
-	 * @param queueActivityLogs
-	 *            Gives access to activity instance executions and their
-	 *            events/moves
-	 * @param performance
-	 * @return
-	 */
-	public abstract AlignedLogVisualisationData getVisualisationData(IvMModel model, IvMLogFiltered log,
-			IvMLogInfo logInfo, TIntObjectMap<QueueActivityLog> queueActivityLogs, PerformanceWrapper performance);
-
 	public ProcessTreeVisualisationParameters getParametersWithoutAlignments() {
 		return parametersWithoutAlignments;
 	}
@@ -78,15 +60,29 @@ public abstract class Mode {
 	 *         always available, so there is no guarantee that the objects will
 	 *         be provided.
 	 */
-	public abstract IvMObject<?>[] inputsRequested();
+	public final IvMObject<?>[] getOptionalObjects() {
+		if (optionalObjects == null) {
+			optionalObjects = createOptionalObjects();
+		}
+		return optionalObjects;
+	}
+
+	/**
+	 * 
+	 * @return The objects that would be handy for this mode. A mode must be
+	 *         always available, so there is no guarantee that the objects will
+	 *         be provided.
+	 */
+	protected abstract IvMObject<?>[] createOptionalObjects();
 
 	public abstract boolean isShowDeviations();
 
-	public abstract boolean isUpdateWithTimeStep();
-
 	/**
 	 * Note that there is no guarantee that the requested objects will be
-	 * provided.
+	 * provided: a mode has to always work. However, alignments can be assumed
+	 * to have finished. That is, IvMObject.model and
+	 * IvMObject.aligned_log_info_filtered will be available (though not the
+	 * filtered variants).
 	 * 
 	 * @return
 	 */
@@ -96,10 +92,56 @@ public abstract class Mode {
 		Set<IvMObject<?>> result = new THashSet<>();
 
 		for (Mode mode : configuration.getModes()) {
-			result.addAll(Arrays.asList(mode.inputsRequested()));
+			result.addAll(Arrays.asList(mode.getOptionalObjects()));
 		}
 
 		IvMObject<?>[] arr = new IvMObject<?>[result.size()];
 		return result.toArray(arr);
 	}
+
+	/**
+	 * Perform the computations necessary to visualise something on the model.
+	 * Will be called asynchronously, and the result must not be cached. There
+	 * is no guarantee that the requested inputs will be available: the
+	 * visualisation data has to always work. However, IvMObject.model and
+	 * IvMObject.aligned_log_info_filtered will be available but must still be
+	 * requested.
+	 * 
+	 * 
+	 * @param inputs
+	 * @return
+	 */
+	public abstract AlignedLogVisualisationData getVisualisationData(IvMObjectValues inputs);
+
+	/**
+	 * @return Whether the visualisation data should be updated every time the
+	 *         animation takes a time step.
+	 */
+	public abstract boolean isVisualisationDataUpdateWithTimeStep();
+
+	/**
+	 * 
+	 * @return The objects that would be handy for this visualisation data.
+	 *         Visualisation data must be always available, so there is no
+	 *         guarantee that the objects will be provided. However,
+	 *         IvMObject.model and IvMObject.aligned_log_info_filtered will be
+	 *         available but must still be requested.
+	 */
+	protected abstract IvMObject<?>[] createVisualisationDataOptionalObjects();
+
+	/**
+	 * 
+	 * @return The objects that would be handy for this visualisation data.
+	 *         Visualisation data must be always available, so there is no
+	 *         guarantee that the objects will be provided. However,
+	 *         IvMObject.model and IvMObject.aligned_log_info_filtered will be
+	 *         available but must still be requested.
+	 */
+	public final IvMObject<?>[] getVisualisationDataOptionalObjects() {
+		if (visualisationDataOptionalObjects == null) {
+			visualisationDataOptionalObjects = createVisualisationDataOptionalObjects();
+		}
+		return visualisationDataOptionalObjects;
+	}
+
 }
