@@ -675,6 +675,27 @@ public class InductiveVisualMinerController {
 	}
 
 	protected void initGuiClassifiers() {
+		//get the selected classifier to the gui
+		chain.register(new DataChainLinkGuiAbstract() {
+
+			public String getName() {
+				return "classifier to gui";
+			}
+
+			public IvMObject<?>[] createInputObjects() {
+				return new IvMObject<?>[] { IvMObject.classifier_for_gui };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				AttributeClassifier[] value = inputs.get(IvMObject.classifier_for_gui);
+				panel.getClassifiers().getMultiComboBox().setSelectedItems(value);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				//no action necessary (combobox will be disabled until new classifiers are computed)
+			}
+		});
+
 		//update data on classifiers
 		panel.getClassifiers().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -916,7 +937,6 @@ public class InductiveVisualMinerController {
 			}
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
-				System.out.println("=== invalidate animation ===");
 				panel.getGraph().setAnimationEnabled(false);
 				InductiveVisualMinerController.setAnimationStatus(panel, " ", false);
 			}
@@ -1098,78 +1118,6 @@ public class InductiveVisualMinerController {
 
 	public void registerModeRequests() {
 		//TODO: now if there is one mode with a certain trigger, then all modes will update with that trigger.
-
-		//for each mode, register a separate layout chain link
-		//		for (Mode mode : configuration.getModes()) {
-		//			final Mode mode2 = mode;
-		//
-		//			//register one for layouting the graph
-		//			chain.register(new Cl09LayoutAlignment() {
-		//				@Override
-		//				public IvMObject<?>[] createInputObjects() {
-		//					IvMObject<?>[] basic = super.createInputObjects();
-		//					IvMObject<?>[] result = new IvMObject<?>[basic.length + 1];
-		//					System.arraycopy(basic, 0, result, 0, basic.length);
-		//					result[result.length - 1] = IvMObject.selected_visualisation_mode;
-		//					return result;
-		//				}
-		//
-		//				@Override
-		//				public IvMObject<?>[] createOptionalObjects() {
-		//					return mode2.inputsRequested();
-		//				}
-		//
-		//				@Override
-		//				public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-		//						IvMCanceller canceller) throws Exception {
-		//					Mode mode3 = inputs.get(IvMObject.selected_visualisation_mode);
-		//					if (mode3 != null && mode2 == mode3) {
-		//						return super.execute(configuration, inputs, canceller);
-		//					} else {
-		//						return null;
-		//					}
-		//				}
-		//
-		//				@Override
-		//				protected String getModeName() {
-		//					return mode.toString();
-		//				}
-		//			});
-		//
-		//			//register one for updating the trace view event colour map
-		//			chain.register(new Cl22TraceViewEventColourMapFiltered() {
-		//
-		//				@Override
-		//				public IvMObject<?>[] createInputObjects() {
-		//					IvMObject<?>[] basic = super.createInputObjects();
-		//					IvMObject<?>[] result = new IvMObject<?>[basic.length + 1];
-		//					System.arraycopy(basic, 0, result, 0, basic.length);
-		//					result[result.length - 1] = IvMObject.selected_visualisation_mode;
-		//					return result;
-		//				}
-		//
-		//				@Override
-		//				public IvMObject<?>[] createOptionalObjects() {
-		//					return mode2.inputsRequested();
-		//				}
-		//
-		//				@Override
-		//				public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-		//						IvMCanceller canceller) throws Exception {
-		//					Mode mode3 = inputs.get(IvMObject.selected_visualisation_mode);
-		//					if (mode3 != null && mode2 == mode3) {
-		//						return super.execute(configuration, inputs, canceller);
-		//					} else {
-		//						return null;
-		//					}
-		//				}
-		//
-		//				@Override
-		//				protected String getModeName() {
-		//					return mode.toString();
-		//				}
-		//			});
-		//		}
 	}
 
 	private <C> void updateObjectInGui(final IvMObject<C> object, final C value, final boolean fixed) {
@@ -1185,6 +1133,8 @@ public class InductiveVisualMinerController {
 			panel.getEditModelButton().setVisible(false);
 			panel.getClassifierLabel().setVisible(false);
 			panel.getClassifiers().setVisible(false);
+		} else if (object.equals(IvMObject.selected_classifier) || object.equals(IvMObject.classifier_for_gui)) {
+			panel.getClassifiers().getMultiComboBox().setSelectedItems((AttributeClassifier[]) value);
 		} else if (object.equals(IvMObject.selected_noise_threshold)) {
 			panel.getPathsSlider().setValue((double) value);
 		} else if (object.equals(IvMObject.selected_activities_threshold)) {

@@ -69,6 +69,8 @@ public class IvMObject<C> {
 	public static final IvMObject<IvMAttributesInfo> ivm_attributes_info = c("attributes info",
 			IvMAttributesInfo.class);
 	public static final IvMObject<HistogramData> histogram_data = c("histogram data", HistogramData.class);
+	public static final IvMObject<AttributeClassifier[]> classifier_for_gui = c("classifier for gui",
+			AttributeClassifier[].class);
 
 	//popups
 	@SuppressWarnings("rawtypes")

@@ -28,6 +28,7 @@ import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.basic.BasicComboPopup;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.processmining.plugins.InductiveMiner.BoundsPopupMenuListener;
 
 public class MultiComboBox<E> extends JComboBox<E> {
@@ -142,6 +143,19 @@ public class MultiComboBox<E> extends JComboBox<E> {
 			ListModel<E> model = getList().getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				if (model.getElementAt(i).equals(anObject)) {
+					selected.set(i);
+					return;
+				}
+			}
+		}
+	};
+
+	public void setSelectedItems(E[] objects) {
+		if (!preventSelectionChange) {
+			selected.clear();
+			ListModel<E> model = getList().getModel();
+			for (int i = 0; i < model.getSize(); i++) {
+				if (ArrayUtils.contains(objects, model.getElementAt(i))) {
 					selected.set(i);
 					return;
 				}

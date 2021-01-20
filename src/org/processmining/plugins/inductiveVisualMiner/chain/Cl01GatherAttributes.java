@@ -32,7 +32,8 @@ public class Cl01GatherAttributes extends DataChainLinkComputationAbstract {
 
 	@Override
 	public IvMObject<?>[] createOutputObjects() {
-		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.classifiers, IvMObject.selected_classifier };
+		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.classifiers, IvMObject.selected_classifier,
+				IvMObject.classifier_for_gui };
 	}
 
 	@Override
@@ -57,7 +58,8 @@ public class Cl01GatherAttributes extends DataChainLinkComputationAbstract {
 		return new IvMObjectValues().//
 				s(IvMObject.attributes_info, info).//
 				s(IvMObject.classifiers, attributeClassifiers).//
-				s(IvMObject.selected_classifier, firstClassifier);
+				s(IvMObject.selected_classifier, firstClassifier).//
+				s(IvMObject.classifier_for_gui, firstClassifier);
 	}
 
 }

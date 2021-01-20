@@ -147,13 +147,13 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			{
 				classifierLabel = new JLabel("Classifier");
 				decorator.decorate(getClassifierLabel());
-				getClassifierLabel().setBorder(leftBorder);
+				classifierLabel.setBorder(leftBorder);
 				GridBagConstraints cClassifierLabel = new GridBagConstraints();
 				cClassifierLabel.gridx = 0;
 				cClassifierLabel.gridy = gridy;
 				cClassifierLabel.gridwidth = 1;
 				cClassifierLabel.anchor = GridBagConstraints.WEST;
-				otherSettingsPanel.add(getClassifierLabel(), cClassifierLabel);
+				otherSettingsPanel.add(classifierLabel, cClassifierLabel);
 
 				classifiersCombobox = new IvMClassifierChooser(null, null, false);
 				decorator.decorate(classifiersCombobox.getMultiComboBox());
