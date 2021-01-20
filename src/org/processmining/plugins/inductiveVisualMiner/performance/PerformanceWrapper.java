@@ -148,6 +148,7 @@ public class PerformanceWrapper {
 	}
 
 	public void addNodeValue(TypeNode type, int unode, long value) {
+		assert value >= 0;
 		int t = type.ordinal();
 		for (Gather gather : Gather.values()) {
 			int g = gather.ordinal();
