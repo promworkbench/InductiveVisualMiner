@@ -282,17 +282,12 @@ public class PopupController {
 		List<String[]> popup = new ArrayList<>();
 
 		//gather the values
-		String[][] items = new String[0][0];
 		for (PopupItem<T> item : popupItems) {
 			if (inputs.has(item.inputObjects())) {
 				IvMObjectValues subInputs = inputs.getIfPresent(item.inputObjects());
 				String[][] newItems = item.get(subInputs, itemInput);
 
-				//merge arrays
-				String[][] result2 = new String[items.length + newItems.length][];
-				System.arraycopy(items, 0, result2, 0, items.length);
-				System.arraycopy(newItems, 0, result2, items.length, newItems.length);
-				items = result2;
+				popup.addAll(Arrays.asList(newItems));
 			}
 		}
 
@@ -305,7 +300,8 @@ public class PopupController {
 		{
 			boolean seenNull = false;
 			for (Iterator<String[]> it = popup.iterator(); it.hasNext();) {
-				if (it.next() == null) {
+				String[] row = it.next();
+				if (row == null || row.length == 0) {
 					if (seenNull || !it.hasNext()) {
 						it.remove();
 					} else {
