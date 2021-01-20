@@ -9,26 +9,32 @@ public class LogAttributeAnalysisTableFactory extends DataAnalysisTableFactoryAb
 	public static final String name = "Log attributes";
 	public static final String explanation = "Attributes at the log level.";
 
+	@Override
 	public DataAnalysisTable create() {
 		return new LogAttributeAnalysisTable();
 	}
 
+	@Override
 	public String getAnalysisName() {
 		return name;
 	}
 
+	@Override
 	public String getExplanation() {
 		return explanation;
 	}
 
+	@Override
 	public boolean isSwitchable() {
 		return false;
 	}
 
-	public IvMObject<?>[] createTriggerObjects() {
+	@Override
+	public IvMObject<?>[] createOptionalObjects() {
 		return new IvMObject<?>[] { IvMObject.data_analysis_log_virtual_attributes };
 	}
 
+	@Override
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.data_analysis_log };
 	}

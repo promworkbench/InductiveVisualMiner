@@ -57,7 +57,7 @@ public class DataAnalysesView extends SideWindow {
 			result.setOffMessage("Compute " + analysisName);
 			result.getSwitch().setSelected(false);
 		} else {
-			result.setOffMessage("Computing " + analysisName);
+			result.setOffMessage("Computing " + analysisName + "..");
 		}
 		return result;
 	}

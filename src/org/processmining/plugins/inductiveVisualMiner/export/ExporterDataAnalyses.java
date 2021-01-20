@@ -52,7 +52,7 @@ public class ExporterDataAnalyses extends IvMExporter {
 	protected IvMObject<?>[] createNonTriggerObjects() {
 		Set<IvMObject<?>> result = new THashSet<>();
 		for (DataAnalysisTableFactory analysis : configuration.getDataAnalysisTables()) {
-			result.addAll(Arrays.asList(analysis.getTriggerObjects()));
+			result.addAll(Arrays.asList(analysis.getOptionalObjects()));
 		}
 		IvMObject<?>[] arr = new IvMObject<?>[result.size()];
 		return result.toArray(arr);
@@ -70,7 +70,7 @@ public class ExporterDataAnalyses extends IvMExporter {
 
 				DataAnalysisTable analysisTable = analysis.create();
 				IvMObjectValues subInputs = inputs.getIfPresent(analysis.getInputObjects(),
-						analysis.getTriggerObjects());
+						analysis.getOptionalObjects());
 
 				if (!analysisTable.setData(subInputs)) {
 					sheet.addCell(new Label(0, 0, "Still computing at time of export.."));

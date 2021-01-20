@@ -6,7 +6,7 @@ public interface DataAnalysisTableFactory {
 
 	public IvMObject<?>[] getInputObjects();
 
-	public IvMObject<?>[] getTriggerObjects();
+	public IvMObject<?>[] getOptionalObjects();
 
 	public DataAnalysisTable create();
 

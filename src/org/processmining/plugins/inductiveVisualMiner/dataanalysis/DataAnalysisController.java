@@ -23,7 +23,7 @@ public class DataAnalysisController {
 				}
 
 				public IvMObject<?>[] createOptionalObjects() {
-					return analysis.getTriggerObjects();
+					return analysis.getOptionalObjects();
 				}
 
 				public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {

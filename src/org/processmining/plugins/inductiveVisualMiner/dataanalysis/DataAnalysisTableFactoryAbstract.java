@@ -5,14 +5,15 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 public abstract class DataAnalysisTableFactoryAbstract implements DataAnalysisTableFactory {
 
 	public IvMObject<?>[] inputObjects;
-	public IvMObject<?>[] triggerObjects;
+	public IvMObject<?>[] optionalObjects;
 
 	protected abstract IvMObject<?>[] createInputObjects();
 
-	protected IvMObject<?>[] createTriggerObjects() {
+	protected IvMObject<?>[] createOptionalObjects() {
 		return new IvMObject<?>[] {};
 	}
 
+	@Override
 	public IvMObject<?>[] getInputObjects() {
 		if (inputObjects == null) {
 			inputObjects = createInputObjects();
@@ -20,10 +21,11 @@ public abstract class DataAnalysisTableFactoryAbstract implements DataAnalysisTa
 		return inputObjects;
 	}
 
-	public IvMObject<?>[] getTriggerObjects() {
-		if (triggerObjects == null) {
-			triggerObjects = createInputObjects();
+	@Override
+	public IvMObject<?>[] getOptionalObjects() {
+		if (optionalObjects == null) {
+			optionalObjects = createOptionalObjects();
 		}
-		return triggerObjects;
+		return optionalObjects;
 	}
 }
