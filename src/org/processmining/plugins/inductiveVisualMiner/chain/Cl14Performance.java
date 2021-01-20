@@ -1,9 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
@@ -72,18 +68,18 @@ public class Cl14Performance extends DataChainLinkComputationAbstract {
 		for (TIntIterator it = queueActivityLogs.keySet().iterator(); it.hasNext();) {
 			int unode = it.next();
 
-			PrintWriter writerSojourn = null;
-			PrintWriter writerService = null;
-			if (model.isActivity(unode)) {
-				File fileSojourn = new File("/home/sander/Desktop/sojournTime" + model.getActivityName(unode) + ".csv");
-				File fileService = new File("/home/sander/Desktop/serviceTime" + model.getActivityName(unode) + ".csv");
-				try {
-					writerSojourn = new PrintWriter(fileSojourn);
-					writerService = new PrintWriter(fileService);
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-			}
+//			PrintWriter writerSojourn = null;
+//			PrintWriter writerService = null;
+//			if (model.isActivity(unode)) {
+//				File fileSojourn = new File("/home/sander/Desktop/sojournTime" + model.getActivityName(unode) + ".csv");
+//				File fileService = new File("/home/sander/Desktop/serviceTime" + model.getActivityName(unode) + ".csv");
+//				try {
+//					writerSojourn = new PrintWriter(fileSojourn);
+//					writerService = new PrintWriter(fileService);
+//				} catch (FileNotFoundException e) {
+//					e.printStackTrace();
+//				}
+//			}
 
 			QueueActivityLog activityLog = queueActivityLogs.get(unode);
 			for (int i = 0; i < activityLog.size(); i++) {
@@ -108,14 +104,14 @@ public class Cl14Performance extends DataChainLinkComputationAbstract {
 					performance.addNodeValue(TypeNode.service, unode, service);
 					resultTraces.addValue(Type.service, activityLog.getTraceIndex(i), service);
 
-					writerService.println(service);
+//					writerService.println(service);
 				}
 
 				//sojourn time
 				if (activityLog.hasInitiate(i) && activityLog.hasComplete(i)) {
 					long sojourn = activityLog.getComplete(i) - activityLog.getInitiate(i);
 					performance.addNodeValue(TypeNode.sojourn, unode, sojourn);
-					writerSojourn.println(sojourn);
+//					writerSojourn.println(sojourn);
 
 					/**
 					 * We could technically show trace sojourn time, but this
@@ -142,10 +138,10 @@ public class Cl14Performance extends DataChainLinkComputationAbstract {
 							activityLog.getEndTrace(i) - activityLog.getStart(i));
 				}
 			}
-			if (model.isActivity(unode)) {
-				writerSojourn.close();
-				writerService.close();
-			}
+			//			if (model.isActivity(unode)) {
+			//				writerSojourn.close();
+			//				writerService.close();
+			//			}
 		}
 
 		resultTraces.finalise(performance);
