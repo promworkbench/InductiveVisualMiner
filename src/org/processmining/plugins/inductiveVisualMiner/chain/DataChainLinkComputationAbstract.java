@@ -8,7 +8,7 @@ public abstract class DataChainLinkComputationAbstract extends DataChainLinkAbst
 	public abstract IvMObject<?>[] createOutputObjects();
 
 	@Override
-	public IvMObject<?>[] getOutputNames() {
+	public IvMObject<?>[] getOutputObjects() {
 		if (outputObjects == null) {
 			outputObjects = createOutputObjects();
 		}

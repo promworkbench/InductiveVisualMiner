@@ -55,6 +55,7 @@ public class PreMiningFilterTrace extends PreMiningFilterTraceWithEvent {
 			if (value != Long.MIN_VALUE && value >= panel.getSelectedTimeMin() && value <= panel.getSelectedTimeMax()) {
 				return true;
 			}
+
 		}
 		return false;
 	}

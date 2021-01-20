@@ -4,7 +4,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 
 public interface DataChainLinkComputation extends DataChainLink {
 
-	public IvMObject<?>[] getOutputNames();
+	public IvMObject<?>[] getOutputObjects();
 
 	/**
 	 * Performs the computation, given the input. Side-effects not allowed;

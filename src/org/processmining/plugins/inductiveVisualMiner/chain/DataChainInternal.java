@@ -64,13 +64,13 @@ public class DataChainInternal {
 			object2inputs.putIfAbsent(object, new THashSet<>());
 			object2inputs.get(object).add(chainLink);
 		}
+		for (IvMObject<?> object : chainLink.getOptionalObjects()) {
+			object2inputs.putIfAbsent(object, new THashSet<>());
+			object2inputs.get(object).add(chainLink);
+		}
 		if (chainLink instanceof DataChainLinkComputation) {
-			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputNames()) {
+			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputObjects()) {
 				object2inputs.putIfAbsent(object, new THashSet<>());
-			}
-			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOptionalObjects()) {
-				object2inputs.putIfAbsent(object, new THashSet<>());
-				object2inputs.get(object).add(chainLink);
 			}
 		}
 	}
@@ -159,7 +159,7 @@ public class DataChainInternal {
 			}
 		}
 		if (chainLink instanceof DataChainLinkComputation) {
-			for (IvMObject<?> outputObject : ((DataChainLinkComputation) chainLink).getOutputNames()) {
+			for (IvMObject<?> outputObject : ((DataChainLinkComputation) chainLink).getOutputObjects()) {
 				if (fixedObjects.contains(outputObject)) {
 					System.out.println("computation not started as it would produce a fixed object");
 					return false;
@@ -314,7 +314,7 @@ public class DataChainInternal {
 					canceller.cancel();
 					executionCancellers.remove(chainLink2);
 				}
-			} else if (chainLink instanceof DataChainLinkGui) {
+			} else if (chainLink2 instanceof DataChainLinkGui) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						((DataChainLinkGui) chainLink2).invalidate(panel);
@@ -341,7 +341,7 @@ public class DataChainInternal {
 	private void getDownstream(DataChainLink chainLink, THashSet<DataChainLink> chainLinksToInvalidate,
 			THashSet<IvMObject<?>> objectsToInvalidate) {
 		if (chainLink instanceof DataChainLinkComputation) {
-			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputNames()) {
+			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputObjects()) {
 				if (state.hasObject(object)) {
 					if (objectsToInvalidate.add(object)) {
 						getDownstream(object, chainLinksToInvalidate, objectsToInvalidate);
@@ -363,8 +363,8 @@ public class DataChainInternal {
 		System.out.println("  chain link `" + chainLink.getName() + "` completed");
 
 		if (outputs != null) {
-			for (int i = 0; i < chainLink.getOutputNames().length; i++) {
-				IvMObject<?> outputObjectName = chainLink.getOutputNames()[i];
+			for (int i = 0; i < chainLink.getOutputObjects().length; i++) {
+				IvMObject<?> outputObjectName = chainLink.getOutputObjects()[i];
 				if (!fixedObjects.contains(outputObjectName)) {//if the output object is blocked, do not update it
 					processOutput(outputObjectName, outputs);
 					executeNext(outputObjectName, chainLink); //trigger chainlinks that have this object as input or trigger, but not the chainlink that produced it itself to prevent loops
@@ -425,7 +425,7 @@ public class DataChainInternal {
 
 			if (chainLink instanceof DataChainLinkComputation) {
 				//outputs
-				for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputNames()) {
+				for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputObjects()) {
 					dot.addEdge(link2dotNode.get(chainLink), object2dotNode.get(object));
 				}
 

@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.attributes;
 import java.util.Collection;
 
 import org.deckfour.xes.model.XAttributable;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeVirtualTraceNumericAbstract;
@@ -23,6 +24,9 @@ public class VirtualAttributeTraceLength extends AttributeVirtualTraceNumericAbs
 				}
 			}
 			return result;
+		}
+		if (x instanceof IMTrace) {
+			return ((IMTrace) x).size();
 		}
 		if (x instanceof Collection<?>) {
 			return ((Collection<?>) x).size();

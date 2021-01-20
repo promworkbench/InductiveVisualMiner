@@ -916,6 +916,7 @@ public class InductiveVisualMinerController {
 			}
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
+				System.out.println("=== invalidate animation ===");
 				panel.getGraph().setAnimationEnabled(false);
 				InductiveVisualMinerController.setAnimationStatus(panel, " ", false);
 			}
