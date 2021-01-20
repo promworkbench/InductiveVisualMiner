@@ -27,6 +27,8 @@ import gnu.trove.set.hash.THashSet;
  *
  */
 public class DataChainInternal {
+	private boolean debug = false;
+
 	public final DataState state; //public for debug purposes
 	private final ProMCanceller globalCanceller;
 	private final Executor executor;
@@ -95,7 +97,9 @@ public class DataChainInternal {
 			//start the chain (this will cancel appropriately)
 			executeNext(objectName);
 		} else {
-			System.out.println("attempt to set a fixed object: rejected");
+			if (debug) {
+				System.out.println("attempt to set a fixed object: rejected");
+			}
 		}
 	}
 
@@ -161,7 +165,9 @@ public class DataChainInternal {
 		if (chainLink instanceof DataChainLinkComputation) {
 			for (IvMObject<?> outputObject : ((DataChainLinkComputation) chainLink).getOutputObjects()) {
 				if (fixedObjects.contains(outputObject)) {
-					System.out.println("computation not started as it would produce a fixed object");
+					if (debug) {
+						System.out.println("computation not started as it would produce a fixed object");
+					}
 					return false;
 				}
 			}
@@ -238,8 +244,10 @@ public class DataChainInternal {
 		//execute the link
 		if (canExecute(chainLink)) {
 
-			System.out
-					.println("  execute computation chain link `" + chainLink.getName() + "` " + chainLink.getClass());
+			if (debug) {
+				System.out.println(
+						"  execute computation chain link `" + chainLink.getName() + "` " + chainLink.getClass());
+			}
 
 			//set up the canceller for this job
 			assert !executionCancellers.containsKey(chainLink);
@@ -360,7 +368,9 @@ public class DataChainInternal {
 		canceller.cancel();
 		executionCancellers.remove(chainLink);
 
-		System.out.println("  chain link `" + chainLink.getName() + "` completed");
+		if (debug) {
+			System.out.println("  chain link `" + chainLink.getName() + "` completed");
+		}
 
 		if (outputs != null) {
 			for (int i = 0; i < chainLink.getOutputObjects().length; i++) {
