@@ -25,6 +25,7 @@ public class TraceView extends SideWindow {
 	private final ProMTraceList<Object> traceView;
 
 	private Object showing = null;
+	private TraceViewEventColourMap eventColourMap;
 
 	public TraceView(IvMDecoratorI decorator, Component parent) {
 		super(parent, "trace view - " + InductiveVisualMinerPanel.title);
@@ -106,8 +107,13 @@ public class TraceView extends SideWindow {
 		}
 	}
 
-	public void setEventColourMap(TraceViewEventColourMap colourMap) {
-		traceView.setWedgeBuilder(colourMap);
+	public void setEventColourMap(TraceViewEventColourMap eventColourMap) {
+		this.eventColourMap = eventColourMap;
+		traceView.setWedgeBuilder(eventColourMap);
+	}
+
+	public TraceViewEventColourMap getEventColourMap() {
+		return eventColourMap;
 	}
 
 	public void setTraceColourMap(TraceColourMap traceColourMap) {

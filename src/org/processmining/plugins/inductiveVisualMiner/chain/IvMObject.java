@@ -32,7 +32,6 @@ import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWra
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
-import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
@@ -50,8 +49,8 @@ public class IvMObject<C> {
 	public static final IvMObject<AttributesInfo> attributes_info = c("attributes info", AttributesInfo.class);
 	public static final IvMObject<AttributeClassifier[]> classifiers = c("classifiers", AttributeClassifier[].class);
 	public static final IvMObject<IvMModel> model = c("model", IvMModel.class);
-	public static final IvMObject<TraceViewEventColourMap> trace_view_event_colour_map = c(
-			"trace view event colour map", TraceViewEventColourMap.class);
+	//	public static final IvMObject<TraceViewEventColourMap> trace_view_event_colour_map = c(
+	//			"trace view event colour map", TraceViewEventColourMap.class);
 	public static final IvMObject<TraceColourMap> trace_colour_map = c("trace colour map", TraceColourMap.class);
 	public static final IvMObject<TraceColourMapSettings> trace_colour_map_settings = c("trace colour map settings",
 			TraceColourMapSettings.class);

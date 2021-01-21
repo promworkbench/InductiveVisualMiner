@@ -48,7 +48,6 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelect
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputation;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputationAbstract;
-import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGuiAbstract;
 import org.processmining.plugins.inductiveVisualMiner.chain.FutureImpl;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
@@ -89,6 +88,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.miners.
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
+import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 import com.kitfox.svg.SVGDiagram;
@@ -193,6 +193,8 @@ public class InductiveVisualMinerController {
 
 		initGuiHistogram();
 
+		initGuiHighlighting();
+
 		ExportController.initialise(chain, configuration, panel);
 
 		//model editor
@@ -205,6 +207,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//node selection changed
+		chain.setObject(IvMObject.selected_model_selection, new Selection());
 		panel.setOnSelectionChanged(new InputFunction<Selection>() {
 			public void call(Selection input) throws Exception {
 				chain.setObject(IvMObject.selected_model_selection, input);
@@ -549,7 +552,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//register the requirements of the modes
-		registerModeRequests();
+		initGuiMode();
 
 		//trace view event colour map & model node selection
 		chain.register(new DataChainLinkGuiAbstract() {
@@ -559,7 +562,7 @@ public class InductiveVisualMinerController {
 			}
 
 			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.trace_view_event_colour_map, IvMObject.graph_visualisation_info };
+				return new IvMObject<?>[] { IvMObject.graph_visualisation_info };
 			}
 
 			public IvMObject<?>[] createNonTriggerObjects() {
@@ -567,19 +570,16 @@ public class InductiveVisualMinerController {
 			}
 
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				TraceViewEventColourMap traceViewEventColourMap = inputs.get(IvMObject.trace_view_event_colour_map);
-
-				panel.getTraceView().setEventColourMap(traceViewEventColourMap);
-
 				/**
 				 * We don't want to be triggered by a change in selection, so we
 				 * get it as a non-trigger. This is a bit risky, as we have to
 				 * assume it is always available.
 				 */
-				assert inputs.has(IvMObject.selected_model_selection);
-				Selection selection = inputs.get(IvMObject.selected_model_selection);
-				ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
-				makeElementsSelectable(visualisationInfo, panel, selection);
+				if (inputs.has(IvMObject.selected_model_selection)) {
+					Selection selection = inputs.get(IvMObject.selected_model_selection);
+					ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
+					makeElementsSelectable(visualisationInfo, panel, selection);
+				}
 			}
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
@@ -588,15 +588,55 @@ public class InductiveVisualMinerController {
 		});
 	}
 
+	protected void initGuiHighlighting() {
+		//highlighting => panel
+		chain.register(new DataChainLinkGuiAbstract() {
+
+			public String getName() {
+				return "highlighting => panel";
+			}
+
+			public IvMObject<?>[] createInputObjects() {
+				return new IvMObject<?>[] { IvMObject.model, IvMObject.graph_svg, IvMObject.selected_visualisation_mode,
+						IvMObject.graph_visualisation_info, IvMObject.visualisation_data };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				SVGDiagram svg = inputs.get(IvMObject.graph_svg);
+				IvMModel model = inputs.get(IvMObject.model);
+				Mode mode = inputs.get(IvMObject.selected_visualisation_mode);
+				ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
+				AlignedLogVisualisationData visualisationData = inputs.get(IvMObject.visualisation_data);
+
+				IvMObjectValues subInputs = inputs.getIfPresent(mode.getOptionalObjects());
+				ProcessTreeVisualisationParameters visualisationParameters = mode
+						.getVisualisationParametersWithAlignments(subInputs);
+
+				TraceViewEventColourMap colourMap = panel.getTraceView().getEventColourMap(); //this might theoretically not be available yet.
+
+				if (colourMap != null) {
+					InductiveVisualMinerSelectionColourer.colourHighlighting(svg, visualisationInfo, model,
+							visualisationData, visualisationParameters, colourMap);
+				}
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+	}
+
 	protected void initGuiTraceView() {
+		//button => show trace view
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				panel.getTraceView().enableAndShow();
 			}
 		});
 
-		//trace view (IM log)
-		DataChainLinkGui traceViewIMLog = new DataChainLinkGuiAbstract() {
+		//IM log => trace view
+		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
 				return "trace view (IMLog)";
@@ -616,14 +656,13 @@ public class InductiveVisualMinerController {
 			public void invalidate(InductiveVisualMinerPanel panel) {
 				panel.getTraceView().set(null, null);
 			}
-		};
-		chain.register(traceViewIMLog);
+		});
 
-		//chain.register (aligned log)
+		//aligned log => trace view
 		chain.register(new DataChainLinkGuiAbstract() {
 
 			public String getName() {
-				return "trace view (IvMLog)";
+				return "trace view (aligned log)";
 			}
 
 			public IvMObject<?>[] createInputObjects() {
@@ -646,6 +685,7 @@ public class InductiveVisualMinerController {
 			}
 		});
 
+		//trace colouring => trace view
 		chain.register(new DataChainLinkGuiAbstract() {
 			public String getName() {
 				return "trace colour map";
@@ -666,6 +706,31 @@ public class InductiveVisualMinerController {
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
 
+			}
+		});
+
+		//selection => trace view
+		chain.register(new DataChainLinkGuiAbstract() {
+
+			public String getName() {
+				return "selection => trace view";
+			}
+
+			public IvMObject<?>[] createInputObjects() {
+				return new IvMObject<?>[] { IvMObject.selected_model_selection };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				Selection selection = inputs.get(IvMObject.selected_model_selection);
+
+				TraceViewEventColourMap eventTraceViewColourMap = panel.getTraceView().getEventColourMap();
+				if (eventTraceViewColourMap != null) {
+					eventTraceViewColourMap.setSelectedNodes(selection);
+				}
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				// no action necessary
 			}
 		});
 	}
@@ -1099,30 +1164,7 @@ public class InductiveVisualMinerController {
 		}
 	}
 
-	/**
-	 * Sets the status message of number. The status message stays in view until
-	 * it is reset using NULL for that number.
-	 * 
-	 * @param message
-	 * @param number
-	 */
-	public void setStatus(String message, int number) {
-		userStatus.setStatus(message, number);
-		panel.getStatusLabel().setText(userStatus.getText());
-		panel.getStatusLabel().repaint();
-	}
-
-	public static void setAnimationStatus(InductiveVisualMinerPanel panel, String s, boolean isTime) {
-		if (isTime) {
-			panel.getAnimationTimeLabel().setFont(IvMDecorator.fontMonoSpace);
-			panel.getAnimationTimeLabel().setText("time: " + s);
-		} else {
-			panel.getAnimationTimeLabel().setFont(panel.getStatusLabel().getFont());
-			panel.getAnimationTimeLabel().setText(s);
-		}
-	}
-
-	public void registerModeRequests() {
+	protected void initGuiMode() {
 		//TODO: now if there is one mode with a certain trigger, then all modes will update with that trigger.
 
 		//repaint on availability of visualisation data
@@ -1185,6 +1227,51 @@ public class InductiveVisualMinerController {
 				s(IvMObject.visualisation_data, visualisationData);
 			}
 		});
+
+		chain.register(new DataChainLinkGuiAbstract() {
+
+			public String getName() {
+				return "set trace view colour map";
+			}
+
+			public IvMObject<?>[] createInputObjects() {
+				return new IvMObject<?>[] { IvMObject.model };
+			}
+
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				IvMModel model = inputs.get(IvMObject.model);
+
+				TraceViewEventColourMap traceViewEventColourMap = new TraceViewEventColourMap(model);
+				panel.getTraceView().setEventColourMap(traceViewEventColourMap);
+			}
+
+			public void invalidate(InductiveVisualMinerPanel panel) {
+				panel.getTraceView().setEventColourMap(null);
+			}
+		});
+	}
+
+	/**
+	 * Sets the status message of number. The status message stays in view until
+	 * it is reset using NULL for that number.
+	 * 
+	 * @param message
+	 * @param number
+	 */
+	public void setStatus(String message, int number) {
+		userStatus.setStatus(message, number);
+		panel.getStatusLabel().setText(userStatus.getText());
+		panel.getStatusLabel().repaint();
+	}
+
+	public static void setAnimationStatus(InductiveVisualMinerPanel panel, String s, boolean isTime) {
+		if (isTime) {
+			panel.getAnimationTimeLabel().setFont(IvMDecorator.fontMonoSpace);
+			panel.getAnimationTimeLabel().setText("time: " + s);
+		} else {
+			panel.getAnimationTimeLabel().setFont(panel.getStatusLabel().getFont());
+			panel.getAnimationTimeLabel().setText(s);
+		}
 	}
 
 	private <C> void updateObjectInGui(final IvMObject<C> object, final C value, final boolean fixed) {

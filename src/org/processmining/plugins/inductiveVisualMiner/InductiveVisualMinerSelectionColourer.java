@@ -93,9 +93,8 @@ public class InductiveVisualMinerSelectionColourer {
 
 	public static TraceViewEventColourMap colourHighlighting(SVGDiagram svg, ProcessTreeVisualisationInfo info,
 			IvMModel model, AlignedLogVisualisationData data,
-			ProcessTreeVisualisationParameters visualisationParameters) throws UnknownTreeNodeException {
-
-		TraceViewEventColourMap traceViewColourMap = new TraceViewEventColourMap(model);
+			ProcessTreeVisualisationParameters visualisationParameters, TraceViewEventColourMap traceViewColourMap)
+			throws UnknownTreeNodeException {
 
 		//compute extreme cardinalities
 		Pair<Long, Long> extremes = data.getExtremeCardinalities();
@@ -212,9 +211,11 @@ public class InductiveVisualMinerSelectionColourer {
 			} else {
 				//DFM model
 				if (dotEdge.getDfmType() != DFMEdgeType.modelIntraActivity) {
-					cardinality = data.getEdgeLabel(dotEdge.getLookupNode1(), dotEdge.getLookupNode2(), dotEdge.getDfmType().isFrequencyIncludesModelMoves());
+					cardinality = data.getEdgeLabel(dotEdge.getLookupNode1(), dotEdge.getLookupNode2(),
+							dotEdge.getDfmType().isFrequencyIncludesModelMoves());
 				} else {
-					cardinality = data.getEdgeLabel(dotEdge.getLookupNode1(), dotEdge.getDfmType().isFrequencyIncludesModelMoves());
+					cardinality = data.getEdgeLabel(dotEdge.getLookupNode1(),
+							dotEdge.getDfmType().isFrequencyIncludesModelMoves());
 				}
 			}
 			Color edgeColour = styleEdge(dotEdge, svg, cardinality, minCardinality, maxCardinality,

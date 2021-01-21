@@ -39,7 +39,6 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl17DataAnalysisEven
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl21DataAnalysisLog;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl22TraceViewEventColourMapFiltered;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
@@ -330,7 +329,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl17DataAnalysisEvent());
 		chain.register(new Cl18DataAnalysisCohort());
 		chain.register(new Cl19DataAnalysisLog());
-		chain.register(new Cl22TraceViewEventColourMapFiltered(this));
 
 		//TODO: re-enable?
 		//		//mine performance

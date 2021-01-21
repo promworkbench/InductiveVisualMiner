@@ -390,6 +390,19 @@ public class DataChainInternal {
 		state.putObject(outputObjectName, outputs.get(outputObjectName));
 	}
 
+	public void getObjectValues(IvMObject<?>[] objects, FutureImpl values) {
+		IvMObjectValues result = new IvMObjectValues();
+		boolean allPresent = true;
+		for (IvMObject<?> object : objects) {
+			if (state.hasObject(object)) {
+				gatherInput(object, result);
+			} else {
+				allPresent = false;
+			}
+		}
+		values.set(result, allPresent);
+	}
+
 	public Dot toDot() {
 		Dot dot = new Dot();
 
@@ -398,7 +411,11 @@ public class DataChainInternal {
 		for (IvMObject<?> object : object2inputs.keySet()) {
 			DotNode dotNode = dot.addNode(object.getName());
 			object2dotNode.put(object, dotNode);
-			if (state.hasObject(object)) {
+			if (fixedObjects.contains(object)) {
+				//fixed object
+				dotNode.setOption("style", "filled");
+				dotNode.setOption("fillcolor", "deepskyblue");
+			} else if (state.hasObject(object)) {
 				//complete
 				dotNode.setOption("style", "filled");
 				dotNode.setOption("fillcolor", "aquamarine");
@@ -448,18 +465,5 @@ public class DataChainInternal {
 		}
 
 		return dot;
-	}
-
-	public void getObjectValues(IvMObject<?>[] objects, FutureImpl values) {
-		IvMObjectValues result = new IvMObjectValues();
-		boolean allPresent = true;
-		for (IvMObject<?> object : objects) {
-			if (state.hasObject(object)) {
-				gatherInput(object, result);
-			} else {
-				allPresent = false;
-			}
-		}
-		values.set(result, allPresent);
 	}
 }

@@ -147,7 +147,7 @@ public class ImportAlignment {
 							activityEventClass = Performance.getActivity(performanceEventClass, activityEventClasses2);
 							xEventIndex++;
 						} else {
-							activityEventClass = activityEventClasses2.getByIdentity(model.getActivityName(node));
+							activityEventClass = null;
 						}
 						break;
 					}

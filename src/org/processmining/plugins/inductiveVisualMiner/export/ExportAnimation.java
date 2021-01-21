@@ -38,6 +38,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
+import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
 
@@ -250,8 +251,9 @@ public class ExportAnimation {
 
 				//draw the background
 				visualisationData.setTime((long) ((double) scaler.userTime2LogTime(time)));
+				TraceViewEventColourMap traceViewEventColourMap = new TraceViewEventColourMap(model);
 				InductiveVisualMinerSelectionColourer.colourHighlighting(svg, visualisationInfo, model,
-						visualisationData, visualisationParameters);
+						visualisationData, visualisationParameters, traceViewEventColourMap);
 				NavigableSVGPanel.drawSVG(g, svg, 0, 0, width, height);
 
 				//transform

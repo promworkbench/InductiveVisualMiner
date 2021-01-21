@@ -33,7 +33,6 @@ public class TraceViewEventColourMap implements WedgeBuilder {
 	}
 
 	public void setSelectedNodes(Selection selection) {
-		System.out.println("set selection");
 		this.selection = selection;
 	}
 

@@ -185,7 +185,7 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 		}
 
 		private <C> void chainThreadSetFixedObject(QueueItemSetFixedObject<C> item) {
-			chainInternal.setObject(item.object, item.value);
+			chainInternal.setFixedObject(item.object, item.value);
 		}
 
 	};
