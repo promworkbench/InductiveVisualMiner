@@ -1290,13 +1290,13 @@ public class InductiveVisualMinerController {
 		} else if (object.equals(IvMObject.selected_classifier) || object.equals(IvMObject.classifier_for_gui)) {
 			panel.getClassifiers().getMultiComboBox().setSelectedItems((AttributeClassifier[]) value);
 		} else if (object.equals(IvMObject.selected_noise_threshold)) {
-			panel.getPathsSlider().setValue((double) value);
+			panel.getPathsSlider().setValue((Double) value);
 		} else if (object.equals(IvMObject.selected_activities_threshold)) {
-			panel.getActivitiesSlider().setValue((double) value);
+			panel.getActivitiesSlider().setValue((Double) value);
 		} else if (object.equals(IvMObject.selected_visualisation_mode)) {
 			panel.getVisualisationModeSelector().setSelectedItem(value);
 		} else if (object.equals(IvMObject.selected_animation_enabled)) {
-			panel.getGraph().setAnimationEnabled((boolean) value);
+			panel.getGraph().setAnimationEnabled((Boolean) value);
 		}
 	}
 
