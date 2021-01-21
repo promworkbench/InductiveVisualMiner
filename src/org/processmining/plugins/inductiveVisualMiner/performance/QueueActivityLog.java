@@ -14,7 +14,12 @@ public class QueueActivityLog {
 	private final List<IvMMove> enqueueMoves = new ArrayList<>();
 	private final List<IvMMove> startMoves = new ArrayList<>();
 	private final List<IvMMove> completeMoves = new ArrayList<>();
-	private final TLongArrayList moves = new TLongArrayList();
+	private final TLongArrayList initiates = new TLongArrayList();
+	private final TLongArrayList enqueues = new TLongArrayList();
+	private final TLongArrayList starts = new TLongArrayList();
+	private final TLongArrayList completes = new TLongArrayList();
+	private final TLongArrayList startTraces = new TLongArrayList();
+	private final TLongArrayList endTraces = new TLongArrayList();
 	private final List<String> resources = new ArrayList<>();
 	private final TIntArrayList traceIndices = new TIntArrayList();
 
@@ -28,34 +33,34 @@ public class QueueActivityLog {
 		startMoves.add(startMove);
 		completeMoves.add(completeMove);
 		if (initiate != null) {
-			moves.add(initiate);
+			initiates.add(initiate);
 		} else {
-			moves.add(-1);
+			initiates.add(-1);
 		}
 		if (enqueue != null) {
-			moves.add(enqueue);
+			enqueues.add(enqueue);
 		} else {
-			moves.add(-1);
+			enqueues.add(-1);
 		}
 		if (start != null) {
-			moves.add(start);
+			starts.add(start);
 		} else {
-			moves.add(-1);
+			starts.add(-1);
 		}
 		if (complete != null) {
-			moves.add(complete);
+			completes.add(complete);
 		} else {
-			moves.add(-1);
+			completes.add(-1);
 		}
 		if (startTrace != null) {
-			moves.add(startTrace);
+			startTraces.add(startTrace);
 		} else {
-			moves.add(-1);
+			startTraces.add(-1);
 		}
 		if (endTrace != null) {
-			moves.add(endTrace);
+			endTraces.add(endTrace);
 		} else {
-			moves.add(-1);
+			endTraces.add(-1);
 		}
 	}
 
@@ -68,31 +73,31 @@ public class QueueActivityLog {
 	}
 
 	public boolean hasInitiate(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6) != -1;
+		return initiates.get(activityInstanceIndex) != -1;
 	}
 
 	public boolean hasEnqueue(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6 + 1) != -1;
+		return enqueues.get(activityInstanceIndex) != -1;
 	}
 
 	public boolean hasStart(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6 + 2) != -1;
+		return starts.get(activityInstanceIndex) != -1;
 	}
 
 	public boolean hasComplete(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6 + 3) != -1;
+		return completes.get(activityInstanceIndex) != -1;
 	}
 
 	public boolean hasStartTrace(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6 + 4) != -1;
+		return startTraces.get(activityInstanceIndex) != -1;
 	}
 
 	public boolean hasEndTrace(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6 + 5) != -1;
+		return endTraces.get(activityInstanceIndex) != -1;
 	}
 
 	public long getInitiate(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6);
+		return initiates.get(activityInstanceIndex);
 	}
 
 	public IvMMove getInitiateMove(int activityInstanceIndex) {
@@ -100,7 +105,7 @@ public class QueueActivityLog {
 	}
 
 	public long getEnqueue(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6 + 1);
+		return enqueues.get(activityInstanceIndex);
 	}
 
 	public IvMMove getEnqueueMove(int activityInstanceIndex) {
@@ -108,7 +113,7 @@ public class QueueActivityLog {
 	}
 
 	public long getStart(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6 + 2);
+		return starts.get(activityInstanceIndex);
 	}
 
 	public IvMMove getStartMove(int activityInstanceIndex) {
@@ -116,7 +121,7 @@ public class QueueActivityLog {
 	}
 
 	public long getComplete(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6 + 3);
+		return completes.get(activityInstanceIndex);
 	}
 
 	public IvMMove getCompleteMove(int activityInstanceIndex) {
@@ -124,11 +129,11 @@ public class QueueActivityLog {
 	}
 
 	public long getStartTrace(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6 + 4);
+		return startTraces.get(activityInstanceIndex);
 	}
 
 	public long getEndTrace(int activityInstanceIndex) {
-		return moves.get(activityInstanceIndex * 6 + 5);
+		return endTraces.get(activityInstanceIndex);
 	}
 
 	public int getTraceIndex(int activityInstanceIndex) {
