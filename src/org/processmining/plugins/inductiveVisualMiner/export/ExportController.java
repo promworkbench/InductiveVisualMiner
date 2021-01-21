@@ -15,7 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 import gnu.trove.set.hash.THashSet;
 
 public class ExportController {
-	public static void initialise(final DataChain chain, InductiveVisualMinerConfiguration configuration,
+	public static void initialise(final DataChain chain, final InductiveVisualMinerConfiguration configuration,
 			InductiveVisualMinerPanel panel) {
 
 		//compile a list of input objects

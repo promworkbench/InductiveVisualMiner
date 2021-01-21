@@ -143,7 +143,7 @@ public class InductiveVisualMinerController {
 
 		//set up status handling
 		chain.setOnStatus(new OnStatus() {
-			public void startComputation(DataChainLinkComputation chainLink) {
+			public void startComputation(final DataChainLinkComputation chainLink) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						setStatus(chainLink.getStatusBusyMessage(), chainLink.hashCode());
@@ -151,7 +151,7 @@ public class InductiveVisualMinerController {
 				});
 			}
 
-			public void endComputation(DataChainLinkComputation chainLink) {
+			public void endComputation(final DataChainLinkComputation chainLink) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						setStatus(null, chainLink.hashCode());

@@ -63,16 +63,16 @@ public class DataChainInternal {
 		chainLinks.add(chainLink);
 
 		for (IvMObject<?> object : chainLink.getRequiredObjects()) {
-			object2inputs.putIfAbsent(object, new THashSet<>());
+			object2inputs.putIfAbsent(object, new THashSet<DataChainLink>());
 			object2inputs.get(object).add(chainLink);
 		}
 		for (IvMObject<?> object : chainLink.getOptionalObjects()) {
-			object2inputs.putIfAbsent(object, new THashSet<>());
+			object2inputs.putIfAbsent(object, new THashSet<DataChainLink>());
 			object2inputs.get(object).add(chainLink);
 		}
 		if (chainLink instanceof DataChainLinkComputation) {
 			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputObjects()) {
-				object2inputs.putIfAbsent(object, new THashSet<>());
+				object2inputs.putIfAbsent(object, new THashSet<DataChainLink>());
 			}
 		}
 	}
@@ -237,7 +237,7 @@ public class DataChainInternal {
 		values.set(object, value);
 	}
 
-	private void executeLinkComputation(DataChainLinkComputation chainLink) {
+	private void executeLinkComputation(final DataChainLinkComputation chainLink) {
 		//invalidate this link and all links that depend on this link
 		cancelLinkAndInvalidateResult(chainLink);
 
@@ -313,7 +313,9 @@ public class DataChainInternal {
 		getDownstream(chainLink, chainLinksToInvalidate, objectsToInvalidate);
 
 		//second, invalidate them
-		for (DataChainLink chainLink2 : chainLinksToInvalidate) {
+		for (DataChainLink chainLink3 : chainLinksToInvalidate) {
+			final DataChainLink chainLink2 = chainLink3;
+
 			//cancel the ongoing execution
 			if (chainLink2 instanceof DataChainLinkComputation) {
 				//cancel the ongoing execution

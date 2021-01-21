@@ -10,7 +10,9 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 public class DataAnalysisController {
 	public static void initialise(InductiveVisualMinerConfiguration configuration, DataChain chain) {
 
-		for (DataAnalysisTableFactory analysis : configuration.getDataAnalysisTables()) {
+		for (DataAnalysisTableFactory analysis2 : configuration.getDataAnalysisTables()) {
+
+			final DataAnalysisTableFactory analysis = analysis2;
 
 			//update the analysis view when its inputs are available
 			chain.register(new DataChainLinkGuiAbstract() {

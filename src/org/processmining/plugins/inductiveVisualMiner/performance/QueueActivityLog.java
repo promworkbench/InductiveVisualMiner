@@ -26,6 +26,10 @@ public class QueueActivityLog {
 	public void add(String resource, Long startTrace, Long initiate, IvMMove initiateMove, Long enqueue,
 			IvMMove enqueueMove, Long start, IvMMove startMove, Long complete, IvMMove completeMove, Long endTrace,
 			int traceIndex) {
+
+		assert endTrace == null || complete == null || complete <= endTrace;
+		assert initiate == null || complete == null || initiate <= complete;
+
 		resources.add(resource);
 		traceIndices.add(traceIndex);
 		initiateMoves.add(initiateMove);
