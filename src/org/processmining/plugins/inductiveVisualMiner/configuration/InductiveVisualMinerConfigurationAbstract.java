@@ -102,94 +102,94 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract IvMVirtualAttributeFactory createVirtualAttributes();
 
 	@Override
-	public final DataChain getChain() {
+	final public DataChain getChain() {
 		return chain;
 	}
 
 	@Override
-	public final InductiveVisualMinerPanel getPanel() {
+	final public InductiveVisualMinerPanel getPanel() {
 		return panel;
 	}
 
 	@Override
-	public final List<VisualMinerWrapper> getDiscoveryTechniques() {
+	final public List<VisualMinerWrapper> getDiscoveryTechniques() {
 		return discoveryTechniques;
 	}
 
 	@Override
-	public VisualMinerWrapper[] getDiscoveryTechniquesArray() {
+	final public VisualMinerWrapper[] getDiscoveryTechniquesArray() {
 		VisualMinerWrapper[] result = new VisualMinerWrapper[discoveryTechniques.size()];
 		return discoveryTechniques.toArray(result);
 	}
 
 	@Override
-	public AlignmentComputer getAlignmentComputer() {
+	final public AlignmentComputer getAlignmentComputer() {
 		return alignmentComputer;
 	}
 
 	@Override
-	public final List<Mode> getModes() {
+	final public List<Mode> getModes() {
 		return modes;
 	}
 
 	@Override
-	public Mode[] getModesArray() {
+	final public Mode[] getModesArray() {
 		Mode[] result = new Mode[modes.size()];
 		return modes.toArray(result);
 	}
 
 	@Override
-	public final List<PreMiningFilter> getPreMiningFilters() {
+	final public List<PreMiningFilter> getPreMiningFilters() {
 		return preMiningFilters;
 	}
 
 	@Override
-	public final List<HighlightingFilter> getHighlightingFilters() {
+	final public List<HighlightingFilter> getHighlightingFilters() {
 		return highlightingFilters;
 	}
 
 	@Override
-	public List<PopupItemActivity> getPopupItemsActivity() {
+	final public List<PopupItemActivity> getPopupItemsActivity() {
 		return popupItemsActivity;
 	}
 
 	@Override
-	public List<PopupItemStartEnd> getPopupItemsStartEnd() {
+	final public List<PopupItemStartEnd> getPopupItemsStartEnd() {
 		return popupItemsStartEnd;
 	}
 
 	@Override
-	public List<PopupItemLogMove> getPopupItemsLogMove() {
+	final public List<PopupItemLogMove> getPopupItemsLogMove() {
 		return popupItemsLogMove;
 	}
 
 	@Override
-	public List<PopupItemModelMove> getPopupItemsModelMove() {
+	final public List<PopupItemModelMove> getPopupItemsModelMove() {
 		return popupItemsModelMove;
 	}
 
 	@Override
-	public List<PopupItemLog> getPopupItemsLog() {
+	final public List<PopupItemLog> getPopupItemsLog() {
 		return popupItemsLog;
 	}
 
 	@Override
-	public List<DataAnalysisTableFactory> getDataAnalysisTables() {
+	final public List<DataAnalysisTableFactory> getDataAnalysisTables() {
 		return dataAnalyses;
 	}
 
 	@Override
-	public List<IvMExporter> getExporters() {
+	final public List<IvMExporter> getExporters() {
 		return exporters;
 	}
 
 	@Override
-	public IvMVirtualAttributeFactory getVirtualAttributes() {
+	final public IvMVirtualAttributeFactory getVirtualAttributes() {
 		return virtualAttributeFactory;
 	}
 
 	@Override
-	public IvMDecoratorI getDecorator() {
+	final public IvMDecoratorI getDecorator() {
 		return decorator;
 	}
 }

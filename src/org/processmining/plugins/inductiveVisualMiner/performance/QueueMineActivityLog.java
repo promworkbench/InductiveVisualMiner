@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.performance;
 
-import java.util.Collections;
-
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -30,24 +28,21 @@ public class QueueMineActivityLog {
 		ActivityInstanceIterator it = tTrace.activityInstanceIterator(model);
 
 		//find the start timestamp of the trace
-		Long startTrace = null;
+		Long startTrace = Long.MAX_VALUE;
+		Long endTrace = Long.MIN_VALUE;
 		for (IvMMove move : tTrace) {
 			if (move.getLogTimestamp() != null) {
-				startTrace = move.getLogTimestamp();
-				break;
+				startTrace = Math.min(startTrace, move.getLogTimestamp());
+				endTrace = Math.max(endTrace, move.getLogTimestamp());
 			}
 		}
-
-		//find the end timestamp of the trace
-		Long endTrace = null;
-		Collections.reverse(tTrace);
-		for (IvMMove move : tTrace) {
-			if (move.getLogTimestamp() != null) {
-				endTrace = move.getLogTimestamp();
-				break;
-			}
+		
+		if (startTrace == Long.MAX_VALUE) {
+			startTrace = null;
 		}
-		Collections.reverse(tTrace);
+		if (endTrace == Long.MIN_VALUE) {
+			endTrace = null;
+		}
 
 		while (it.hasNext()) {
 			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> activityInstance = it.next();

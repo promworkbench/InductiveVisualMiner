@@ -132,10 +132,14 @@ public class IvMObject<C> {
 		return new IvMObject<C>(name, clazz);
 	}
 
+	public static <C> IvMObject<C> create(String name, Class<C> clazz) {
+		return new IvMObject<C>(name, clazz);
+	}
+
 	private final String name;
 	private final Class<C> clazz;
 
-	protected IvMObject(String name, Class<C> clazz) {
+	public IvMObject(String name, Class<C> clazz) {
 		this.name = name;
 		this.clazz = clazz;
 	}
