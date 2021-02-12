@@ -89,13 +89,13 @@ public class DataChainImplNonBlocking<P> extends DataChainAbstract {
 	private final ConcurrentLinkedQueue<QueueItem> queue = new ConcurrentLinkedQueue<>();
 	private final Semaphore semaphore = new Semaphore(0);
 
-	private final DataChainInternal chainInternal;
+	private final DataChainInternal<P> chainInternal;
 	private final ProMCanceller globalCanceller;
 
 	public DataChainImplNonBlocking(DataState state, ProMCanceller canceller, Executor executor,
 			InductiveVisualMinerConfiguration configuration, P panel) {
 		this.globalCanceller = canceller;
-		chainInternal = new DataChainInternal(this, state, canceller, executor, configuration, panel);
+		chainInternal = new DataChainInternal<>(this, state, canceller, executor, configuration, panel);
 
 		Thread thread = new Thread(chainThread, "IvM chain thread");
 		thread.start();
