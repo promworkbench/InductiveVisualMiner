@@ -1,5 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-public abstract class DataChainLinkGuiAbstract extends DataChainLinkAbstract implements DataChainLinkGui {
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
+
+public abstract class DataChainLinkGuiAbstract extends DataChainLinkAbstract
+		implements DataChainLinkGui<InductiveVisualMinerPanel> {
 
 }

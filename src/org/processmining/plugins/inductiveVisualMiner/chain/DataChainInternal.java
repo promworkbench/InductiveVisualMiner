@@ -12,7 +12,6 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.dot.DotNode;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 
 import gnu.trove.map.hash.THashMap;
@@ -24,17 +23,18 @@ import gnu.trove.set.hash.THashSet;
  * this class is not thread safe.
  * 
  * @author sander
+ * @param <P>
  *
  */
-public class DataChainInternal {
+public class DataChainInternal<P> {
 	private boolean debug = false;
 
 	public final DataState state; //public for debug purposes
 	private final ProMCanceller globalCanceller;
 	private final Executor executor;
 	private final InductiveVisualMinerConfiguration configuration;
-	private final InductiveVisualMinerPanel panel;
-	private final DataChainImplNonBlocking parentChain;
+	private final P panel;
+	private final DataChainImplNonBlocking<P> parentChain;
 
 	private final Set<IvMObject<?>> fixedObjects = new THashSet<>();
 
@@ -47,8 +47,8 @@ public class DataChainInternal {
 	 */
 	public final THashMap<DataChainLinkComputation, IvMCanceller> executionCancellers = new THashMap<>(); //public for debug purposes
 
-	public DataChainInternal(DataChainImplNonBlocking parentChain, DataState state, ProMCanceller canceller,
-			Executor executor, InductiveVisualMinerConfiguration configuration, InductiveVisualMinerPanel panel) {
+	public DataChainInternal(DataChainImplNonBlocking<P> parentChain, DataState state, ProMCanceller canceller,
+			Executor executor, InductiveVisualMinerConfiguration configuration, P panel) {
 		this.state = state;
 		this.globalCanceller = canceller;
 		this.executor = executor;
@@ -175,18 +175,19 @@ public class DataChainInternal {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void executeLink(DataChainLink chainLink) {
 		if (chainLink instanceof DataChainLinkComputation) {
 			executeLinkComputation((DataChainLinkComputation) chainLink);
 		} else if (chainLink instanceof DataChainLinkGui) {
-			executeLinkGui((DataChainLinkGui) chainLink);
+			executeLinkGui((DataChainLinkGui<P>) chainLink);
 		}
 		if (parentChain.getOnChange() != null) {
 			parentChain.getOnChange().run();
 		}
 	}
 
-	private void executeLinkGui(final DataChainLinkGui chainLink) {
+	private void executeLinkGui(final DataChainLinkGui<P> chainLink) {
 		//System.out.println("  execute gui chain link `" + chainLink.getName() + "` " + chainLink.getClass());
 
 		final IvMObjectValues inputs = gatherInputs(chainLink);
@@ -326,8 +327,9 @@ public class DataChainInternal {
 				}
 			} else if (chainLink2 instanceof DataChainLinkGui) {
 				SwingUtilities.invokeLater(new Runnable() {
+					@SuppressWarnings("unchecked")
 					public void run() {
-						((DataChainLinkGui) chainLink2).invalidate(panel);
+						((DataChainLinkGui<P>) chainLink2).invalidate(panel);
 					}
 				});
 			}

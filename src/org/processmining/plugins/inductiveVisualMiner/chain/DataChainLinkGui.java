@@ -1,8 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-
-public interface DataChainLinkGui extends DataChainLink {
+public interface DataChainLinkGui<P> extends DataChainLink {
 
 	/**
 	 * Updates the gui by invalidation. (e.g. one of the inputs got replaced).
@@ -10,8 +8,8 @@ public interface DataChainLinkGui extends DataChainLink {
 	 * 
 	 * @param panel
 	 */
-	public void invalidate(InductiveVisualMinerPanel panel);
+	public void invalidate(P panel);
 
-	public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception;
+	public void updateGui(P panel, IvMObjectValues inputs) throws Exception;
 
 }

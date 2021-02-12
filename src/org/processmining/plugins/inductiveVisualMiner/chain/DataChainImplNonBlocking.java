@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.graphviz.dot.Dot;
-import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 
 /**
@@ -15,9 +14,10 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
  * process them.
  * 
  * @author sander
+ * @param <P>
  *
  */
-public class DataChainImplNonBlocking extends DataChainAbstract {
+public class DataChainImplNonBlocking<P> extends DataChainAbstract {
 
 	protected static class QueueItem {
 
@@ -93,7 +93,7 @@ public class DataChainImplNonBlocking extends DataChainAbstract {
 	private final ProMCanceller globalCanceller;
 
 	public DataChainImplNonBlocking(DataState state, ProMCanceller canceller, Executor executor,
-			InductiveVisualMinerConfiguration configuration, InductiveVisualMinerPanel panel) {
+			InductiveVisualMinerConfiguration configuration, P panel) {
 		this.globalCanceller = canceller;
 		chainInternal = new DataChainInternal(this, state, canceller, executor, configuration, panel);
 
