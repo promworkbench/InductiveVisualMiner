@@ -526,11 +526,20 @@ public class InductiveVisualMinerController {
 				return new IvMObject<?>[] { IvMObject.graph_dot, IvMObject.graph_svg };
 			}
 
-			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				Dot dot = inputs.get(IvMObject.graph_dot);
-				SVGDiagram svg = inputs.get(IvMObject.graph_svg);
+			public IvMObject<?>[] createOptionalObjects() {
+				return new IvMObject<?>[] { IvMObject.graph_dot_aligned, IvMObject.graph_svg_aligned };
+			}
 
-				panel.getGraph().changeDot(dot, svg, true);
+			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
+				if (inputs.has(IvMObject.graph_svg_aligned) && inputs.has(IvMObject.graph_dot_aligned)) {
+					Dot dot = inputs.get(IvMObject.graph_dot_aligned);
+					SVGDiagram svg = inputs.get(IvMObject.graph_svg_aligned);
+					panel.getGraph().changeDot(dot, svg, true);
+				} else {
+					Dot dot = inputs.get(IvMObject.graph_dot);
+					SVGDiagram svg = inputs.get(IvMObject.graph_svg);
+					panel.getGraph().changeDot(dot, svg, true);
+				}
 			}
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
@@ -597,12 +606,13 @@ public class InductiveVisualMinerController {
 			}
 
 			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.model, IvMObject.graph_svg, IvMObject.selected_visualisation_mode,
-						IvMObject.graph_visualisation_info, IvMObject.visualisation_data };
+				return new IvMObject<?>[] { IvMObject.model, IvMObject.graph_svg_aligned,
+						IvMObject.selected_visualisation_mode, IvMObject.graph_visualisation_info,
+						IvMObject.visualisation_data };
 			}
 
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				SVGDiagram svg = inputs.get(IvMObject.graph_svg);
+				SVGDiagram svg = inputs.get(IvMObject.graph_svg_aligned);
 				IvMModel model = inputs.get(IvMObject.model);
 				Mode mode = inputs.get(IvMObject.selected_visualisation_mode);
 				ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);

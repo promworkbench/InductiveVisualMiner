@@ -27,7 +27,8 @@ public class Cl11Animate extends DataChainLinkComputationAbstract {
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.selected_animation_enabled, IvMObject.aligned_log,
 				IvMObject.log_timestamps_logical, IvMObject.selected_visualisation_mode,
-				IvMObject.graph_visualisation_info, IvMObject.graph_svg, IvMObject.animation_scaler, IvMObject.model };
+				IvMObject.graph_visualisation_info, IvMObject.graph_svg_aligned, IvMObject.animation_scaler,
+				IvMObject.model };
 	}
 
 	@Override
@@ -43,7 +44,7 @@ public class Cl11Animate extends DataChainLinkComputationAbstract {
 		Boolean timestampsLogical = inputs.get(IvMObject.log_timestamps_logical);
 		Mode mode = inputs.get(IvMObject.selected_visualisation_mode);
 		ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
-		SVGDiagram svg = inputs.get(IvMObject.graph_svg);
+		SVGDiagram svg = inputs.get(IvMObject.graph_svg_aligned);
 		Scaler scaler = inputs.get(IvMObject.animation_scaler);
 		IvMModel model = inputs.get(IvMObject.model);
 

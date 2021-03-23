@@ -100,7 +100,9 @@ public class IvMObject<C> {
 
 	//graph objects
 	public static final IvMObject<Dot> graph_dot = c("graph dot", Dot.class);
+	public static final IvMObject<Dot> graph_dot_aligned = c("graph dot aligned", Dot.class);
 	public static final IvMObject<SVGDiagram> graph_svg = c("graph svg", SVGDiagram.class);
+	public static final IvMObject<SVGDiagram> graph_svg_aligned = c("graph svg aligned", SVGDiagram.class);
 	public static final IvMObject<ProcessTreeVisualisationInfo> graph_visualisation_info = c("graph visualisation info",
 			ProcessTreeVisualisationInfo.class);
 	public static final IvMObject<Scaler> animation_scaler = c("animation scaler", Scaler.class);

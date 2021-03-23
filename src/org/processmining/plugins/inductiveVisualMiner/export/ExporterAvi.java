@@ -32,10 +32,10 @@ public class ExporterAvi extends IvMExporter {
 
 	@Override
 	protected IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.graph_svg, IvMObject.selected_visualisation_mode, IvMObject.graph_dot,
-				IvMObject.animation, IvMObject.animation_scaler, IvMObject.graph_visualisation_info,
-				IvMObject.aligned_log_filtered, IvMObject.trace_colour_map, IvMObject.visualisation_data,
-				IvMObject.model, IvMObject.selected_model_selection };
+		return new IvMObject<?>[] { IvMObject.graph_svg_aligned, IvMObject.selected_visualisation_mode,
+				IvMObject.graph_dot_aligned, IvMObject.animation, IvMObject.animation_scaler,
+				IvMObject.graph_visualisation_info, IvMObject.aligned_log_filtered, IvMObject.trace_colour_map,
+				IvMObject.visualisation_data, IvMObject.model, IvMObject.selected_model_selection };
 	}
 
 	@Override
@@ -57,9 +57,9 @@ public class ExporterAvi extends IvMExporter {
 			throws Exception {
 
 		//save avi asynchronously
-		final SVGDiagram svg = inputs.get(IvMObject.graph_svg);
+		final SVGDiagram svg = inputs.get(IvMObject.graph_svg_aligned);
 		final Mode mode = inputs.get(IvMObject.selected_visualisation_mode);
-		final Dot dot = inputs.get(IvMObject.graph_dot);
+		final Dot dot = inputs.get(IvMObject.graph_dot_aligned);
 		final GraphVizTokens tokens = inputs.get(IvMObject.animation);
 		final Scaler scaler = inputs.get(IvMObject.animation_scaler);
 		final ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
