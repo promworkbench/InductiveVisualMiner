@@ -611,6 +611,16 @@ public class InductiveVisualMinerController {
 						IvMObject.selected_visualisation_mode, IvMObject.graph_visualisation_info_aligned,
 						IvMObject.visualisation_data };
 			}
+			
+			public IvMObject<?>[] getOptionalObjects() {
+				Set<IvMObject<?>> result = new THashSet<>();
+				for (Mode mode : configuration.getModes()) {
+					result.addAll(Arrays.asList(mode.getVisualisationDataOptionalObjects()));
+				}
+
+				IvMObject<?>[] arr = new IvMObject<?>[result.size()];
+				return result.toArray(arr);
+			}
 
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
 				SVGDiagram svg = inputs.get(IvMObject.graph_svg_aligned);
