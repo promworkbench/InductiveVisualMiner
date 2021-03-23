@@ -456,6 +456,7 @@ public class EventAttributeAnalysis {
 			}
 
 			BigDecimal valuesAverage = Correlation.mean(valuesFiltered);
+			assert valuesAverage != null;
 			result.put(Field.average, DisplayType.create(attributeType, valuesAverage.doubleValue()));
 
 			if (canceller.isCancelled()) {

@@ -159,6 +159,15 @@ public class Correlation {
 		return partitionIterative(arr, left, right);
 	}
 
+	/**
+	 * 
+	 * @param valuesX
+	 * @param valuesY
+	 * @param meanY
+	 * @param standardDeviationYd
+	 * @return the correlation, or BigDecimal.valueOf(-Double.MAX_VALUE) if it
+	 *         does not exist
+	 */
 	public static BigDecimal correlation(double[] valuesX, double[] valuesY, BigDecimal meanY,
 			double standardDeviationYd) {
 		if (valuesX.length <= 1) {
@@ -166,6 +175,9 @@ public class Correlation {
 		}
 
 		BigDecimal meanX = mean(valuesX);
+		if (meanX == null) {
+			return BigDecimal.valueOf(-Double.MAX_VALUE);
+		}
 		BigDecimal standardDeviationX = new BigDecimal(standardDeviation(valuesX, meanX));
 		BigDecimal standardDeviationY = BigDecimal.valueOf(standardDeviationYd);
 
@@ -184,6 +196,15 @@ public class Correlation {
 		return sum.divide(BigDecimal.valueOf(valuesX.length - 1), 10, RoundingMode.HALF_UP);
 	}
 
+	/**
+	 * 
+	 * @param valuesX
+	 * @param valuesY
+	 * @param meanY
+	 * @param standardDeviationYd
+	 * @return correlation or BigDecimal.valueOf(-Double.MAX_VALUE) if it does
+	 *         not exist
+	 */
 	public static BigDecimal correlation(double[] valuesX, long[] valuesY, BigDecimal meanY,
 			double standardDeviationYd) {
 		if (valuesX.length <= 1) {
@@ -191,6 +212,9 @@ public class Correlation {
 		}
 
 		BigDecimal meanX = mean(valuesX);
+		if (meanX == null) {
+			return BigDecimal.valueOf(-Double.MAX_VALUE);
+		}
 		BigDecimal standardDeviationX = new BigDecimal(standardDeviation(valuesX, meanX));
 		BigDecimal standardDeviationY = BigDecimal.valueOf(standardDeviationYd);
 
@@ -209,15 +233,30 @@ public class Correlation {
 		return sum.divide(BigDecimal.valueOf(valuesX.length - 1), 10, RoundingMode.HALF_UP);
 	}
 
+	/**
+	 * 
+	 * @param values
+	 * @return the mean, or null if there is no average.
+	 */
 	public static BigDecimal mean(double[] values) {
 		if (values.length > 0) {
 			BigDecimal sum = BigDecimal.ZERO;
+			int count = 0;
 			for (double value : values) {
-				sum = sum.add(BigDecimal.valueOf(value));
+				if (Double.isInfinite(value)) {
+					return null;
+				}
+				if (isValid(value)) {
+					sum = sum.add(BigDecimal.valueOf(value));
+					count++;
+				}
 			}
-			return sum.divide(BigDecimal.valueOf(values.length), 10, RoundingMode.HALF_UP);
+			if (count == 0) {
+				return null;
+			}
+			return sum.divide(BigDecimal.valueOf(count), 10, RoundingMode.HALF_UP);
 		} else {
-			return BigDecimal.ZERO;
+			return null;
 		}
 	}
 
@@ -233,14 +272,32 @@ public class Correlation {
 		}
 	}
 
+	/**
+	 * 
+	 * @param values
+	 * @param mean
+	 * @return standard deviation, or -Double.MAX_VALUE if it does not exist
+	 */
 	public static double standardDeviation(double[] values, BigDecimal mean) {
 		if (values.length > 1) {
 			BigDecimal sum = BigDecimal.ZERO;
+			int count = 0;
 			for (double value : values) {
-				BigDecimal p = BigDecimal.valueOf(value).subtract(mean).pow(2);
-				sum = sum.add(p);
+				if (Double.isInfinite(value)) {
+					return -Double.MAX_VALUE;
+				}
+				if (isValid(value)) {
+					BigDecimal p = BigDecimal.valueOf(value).subtract(mean).pow(2);
+					sum = sum.add(p);
+					count++;
+				}
 			}
-			BigDecimal d = sum.divide(BigDecimal.valueOf(values.length - 1), 10, RoundingMode.HALF_UP);
+
+			if (count <= 1) {
+				return -Double.MAX_VALUE;
+			}
+
+			BigDecimal d = sum.divide(BigDecimal.valueOf(count - 1), 10, RoundingMode.HALF_UP);
 
 			return Math.sqrt(d.doubleValue());
 		} else if (values.length == 1) {
@@ -265,5 +322,9 @@ public class Correlation {
 		} else {
 			return -Double.MAX_VALUE;
 		}
+	}
+
+	public static boolean isValid(double value) {
+		return value != -Double.MAX_VALUE && !Double.isNaN(value);
 	}
 }

@@ -310,6 +310,7 @@ public class TraceAttributeAnalysis {
 			}
 
 			BigDecimal valuesAverage = Correlation.mean(valuesFiltered);
+			assert valuesAverage != null;
 			result.put(Field.average, DisplayType.create(attributeType, valuesAverage.doubleValue()));
 
 			if (canceller.isCancelled()) {
@@ -467,7 +468,8 @@ public class TraceAttributeAnalysis {
 				return;
 			}
 
-			result.put(Field.averageFitness, DisplayType.numeric(Correlation.mean(fitnessFiltered).doubleValue()));
+			BigDecimal meanFitness = Correlation.mean(fitnessFiltered);
+			result.put(Field.averageFitness, DisplayType.numeric(meanFitness.doubleValue()));
 
 			if (canceller.isCancelled()) {
 				return;
@@ -641,7 +643,9 @@ public class TraceAttributeAnalysis {
 				return;
 			}
 
-			result.put(Field.averageFitness, DisplayType.numeric(Correlation.mean(fitnessFiltered).doubleValue()));
+			BigDecimal meanFitness = Correlation.mean(fitnessFiltered);
+			assert meanFitness != null;
+			result.put(Field.averageFitness, DisplayType.numeric(meanFitness.doubleValue()));
 
 			if (canceller.isCancelled()) {
 				return;
