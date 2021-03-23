@@ -28,6 +28,7 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel.Source;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.DfmVisualisationSimple;
 
 import gnu.trove.map.TIntObjectMap;
@@ -196,6 +197,7 @@ public class DfgEditor extends JPanel {
 							setErrorMessage(-1, null);
 
 							IvMModel newTree = new IvMModel(result.getA());
+							newTree.setSource(Source.user);
 							final ActionEvent e2 = new ActionEvent(newTree, 0, "");
 							SwingUtilities.invokeLater(new Runnable() {
 								public void run() {

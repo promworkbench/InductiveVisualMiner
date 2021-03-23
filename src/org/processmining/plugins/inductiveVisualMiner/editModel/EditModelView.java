@@ -16,6 +16,7 @@ import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeEdito
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel.Source;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 
@@ -47,18 +48,20 @@ public class EditModelView extends SideWindow {
 	}
 
 	public void setModel(IvMModel model) {
-		if (model.isTree()) {
-			treeEditor.setTree(model.getTree());
+		if (model.getSource() != Source.user) {
+			if (model.isTree()) {
+				treeEditor.setTree(model.getTree());
 
-			//show the tree editor
-			CardLayout cl = (CardLayout) panel.getLayout();
-			cl.show(panel, TREEPANEL);
-		} else {
-			dfgEditor.setDfg(model.getDfg());
+				//show the tree editor
+				CardLayout cl = (CardLayout) panel.getLayout();
+				cl.show(panel, TREEPANEL);
+			} else {
+				dfgEditor.setDfg(model.getDfg());
 
-			//show the dfg editor
-			CardLayout cl = (CardLayout) panel.getLayout();
-			cl.show(panel, DFGPANEL);
+				//show the dfg editor
+				CardLayout cl = (CardLayout) panel.getLayout();
+				cl.show(panel, DFGPANEL);
+			}
 		}
 	}
 
@@ -160,7 +163,9 @@ public class EditModelView extends SideWindow {
 		treeEditor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() instanceof EfficientTree) {
-					e.setSource(new IvMModel(new IvMEfficientTree((EfficientTree) e.getSource())));
+					IvMModel model = new IvMModel(new IvMEfficientTree((EfficientTree) e.getSource()));
+					model.setSource(Source.user);
+					e.setSource(model);
 				}
 				actionListener.actionPerformed(e);
 			}
@@ -168,7 +173,9 @@ public class EditModelView extends SideWindow {
 		dfgEditor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() instanceof Dfg) {
-					e.setSource(new IvMModel((DirectlyFollowsModel) e.getSource()));
+					IvMModel model = new IvMModel((DirectlyFollowsModel) e.getSource());
+					model.setSource(Source.user);
+					e.setSource(model);
 				}
 				actionListener.actionPerformed(e);
 			}

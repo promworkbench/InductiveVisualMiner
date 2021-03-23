@@ -8,6 +8,11 @@ public class IvMModel {
 
 	private final IvMEfficientTree tree;
 	private final DirectlyFollowsModel dfg;
+	private Source source;
+
+	public static enum Source {
+		mined, user
+	}
 
 	public IvMModel(EfficientTree tree) {
 		this.tree = new IvMEfficientTree(tree);
@@ -109,5 +114,21 @@ public class IvMModel {
 			return this.tree.getMaxNumberOfNodes();
 		}
 		return this.dfg.getAllNodeNames().length;
+	}
+
+	/**
+	 * Get the one who constructed this model. Default is "mined"
+	 * 
+	 * @return
+	 */
+	public Source getSource() {
+		if (source == null) {
+			return Source.mined;
+		}
+		return source;
+	}
+
+	public void setSource(Source source) {
+		this.source = source;
 	}
 }
