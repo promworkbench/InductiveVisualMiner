@@ -55,7 +55,7 @@ public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
 	@Override
 	public IvMObject<?>[] createOutputObjects() {
 		return new IvMObject<?>[] { IvMObject.graph_dot_aligned, IvMObject.graph_svg_aligned,
-				IvMObject.graph_visualisation_info };
+				IvMObject.graph_visualisation_info_aligned };
 	}
 
 	@Override
@@ -96,6 +96,6 @@ public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
 		return new IvMObjectValues().//
 				s(IvMObject.graph_dot_aligned, p.getA()).//
 				s(IvMObject.graph_svg_aligned, diagram).//
-				s(IvMObject.graph_visualisation_info, p.getB());
+				s(IvMObject.graph_visualisation_info_aligned, p.getB());
 	}
 }

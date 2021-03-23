@@ -46,7 +46,7 @@ public class ExporterModelStatistics extends IvMExporter {
 
 	@Override
 	protected IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.performance, IvMObject.graph_visualisation_info, IvMObject.model,
+		return new IvMObject<?>[] { IvMObject.performance, IvMObject.graph_visualisation_info_aligned, IvMObject.model,
 				IvMObject.aligned_log_info_filtered, IvMObject.popups };
 	}
 
@@ -58,7 +58,7 @@ public class ExporterModelStatistics extends IvMExporter {
 	@Override
 	public void export(IvMObjectValues inputs, InductiveVisualMinerAnimationPanel panel, File file) throws Exception {
 		PerformanceWrapper performance = inputs.get(IvMObject.performance);
-		ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
+		ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info_aligned);
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
 		@SuppressWarnings("unchecked")

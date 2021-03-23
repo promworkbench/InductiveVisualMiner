@@ -34,7 +34,7 @@ public class ExporterAvi extends IvMExporter {
 	protected IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.graph_svg_aligned, IvMObject.selected_visualisation_mode,
 				IvMObject.graph_dot_aligned, IvMObject.animation, IvMObject.animation_scaler,
-				IvMObject.graph_visualisation_info, IvMObject.aligned_log_filtered, IvMObject.trace_colour_map,
+				IvMObject.graph_visualisation_info_aligned, IvMObject.aligned_log_filtered, IvMObject.trace_colour_map,
 				IvMObject.visualisation_data, IvMObject.model, IvMObject.selected_model_selection };
 	}
 
@@ -62,7 +62,7 @@ public class ExporterAvi extends IvMExporter {
 		final Dot dot = inputs.get(IvMObject.graph_dot_aligned);
 		final GraphVizTokens tokens = inputs.get(IvMObject.animation);
 		final Scaler scaler = inputs.get(IvMObject.animation_scaler);
-		final ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
+		final ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info_aligned);
 		final IvMLogFiltered filteredLog = inputs.get(IvMObject.aligned_log_filtered);
 		final TraceColourMap trace2colour = inputs.get(IvMObject.trace_colour_map);
 		final AlignedLogVisualisationData visualisationData = inputs.get(IvMObject.visualisation_data);

@@ -148,7 +148,7 @@ public class PopupController {
 	public void showPopup(InductiveVisualMinerPanel panel, DataChain chain) {
 		IvMObjectValues inputs;
 		try {
-			inputs = chain.getObjectValues(IvMObject.popups, IvMObject.model, IvMObject.graph_visualisation_info,
+			inputs = chain.getObjectValues(IvMObject.popups, IvMObject.model, IvMObject.graph_visualisation_info_aligned,
 					IvMObject.aligned_log_info_filtered).get();
 			showPopup(panel, inputs);
 		} catch (InterruptedException e) {
@@ -200,8 +200,8 @@ public class PopupController {
 						}
 					}
 
-					if (inputs.has(IvMObject.graph_visualisation_info)) {
-						ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
+					if (inputs.has(IvMObject.graph_visualisation_info_aligned)) {
+						ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info_aligned);
 
 						if (element instanceof LocalDotEdge
 								&& visualisationInfo.getAllLogMoveEdges().contains(element)) {

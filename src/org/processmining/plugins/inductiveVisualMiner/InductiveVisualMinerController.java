@@ -571,7 +571,7 @@ public class InductiveVisualMinerController {
 			}
 
 			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.graph_visualisation_info };
+				return new IvMObject<?>[] { IvMObject.graph_visualisation_info_aligned };
 			}
 
 			public IvMObject<?>[] createNonTriggerObjects() {
@@ -586,7 +586,8 @@ public class InductiveVisualMinerController {
 				 */
 				if (inputs.has(IvMObject.selected_model_selection)) {
 					Selection selection = inputs.get(IvMObject.selected_model_selection);
-					ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
+					ProcessTreeVisualisationInfo visualisationInfo = inputs
+							.get(IvMObject.graph_visualisation_info_aligned);
 					makeElementsSelectable(visualisationInfo, panel, selection);
 				}
 			}
@@ -607,7 +608,7 @@ public class InductiveVisualMinerController {
 
 			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.model, IvMObject.graph_svg_aligned,
-						IvMObject.selected_visualisation_mode, IvMObject.graph_visualisation_info,
+						IvMObject.selected_visualisation_mode, IvMObject.graph_visualisation_info_aligned,
 						IvMObject.visualisation_data };
 			}
 
@@ -615,7 +616,7 @@ public class InductiveVisualMinerController {
 				SVGDiagram svg = inputs.get(IvMObject.graph_svg_aligned);
 				IvMModel model = inputs.get(IvMObject.model);
 				Mode mode = inputs.get(IvMObject.selected_visualisation_mode);
-				ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info);
+				ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info_aligned);
 				AlignedLogVisualisationData visualisationData = inputs.get(IvMObject.visualisation_data);
 
 				IvMObjectValues subInputs = inputs.getIfPresent(mode.getOptionalObjects());

@@ -23,7 +23,7 @@ public class Cl15Histogram extends DataChainLinkComputationAbstract {
 	@Override
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered, IvMObject.animation_scaler,
-				IvMObject.histogram_width, IvMObject.graph_visualisation_info };
+				IvMObject.histogram_width, IvMObject.graph_visualisation_info_aligned };
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class Cl15Histogram extends DataChainLinkComputationAbstract {
 		IvMLogFilteredImpl aLog = inputs.get(IvMObject.aligned_log_filtered);
 		Scaler scaler = inputs.get(IvMObject.animation_scaler);
 		int width = inputs.get(IvMObject.histogram_width);
-		ProcessTreeVisualisationInfo info = inputs.get(IvMObject.graph_visualisation_info);
+		ProcessTreeVisualisationInfo info = inputs.get(IvMObject.graph_visualisation_info_aligned);
 
 		if (width <= 0) {
 			return null;

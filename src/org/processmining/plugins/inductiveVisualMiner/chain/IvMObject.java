@@ -103,8 +103,8 @@ public class IvMObject<C> {
 	public static final IvMObject<Dot> graph_dot_aligned = c("graph dot aligned", Dot.class);
 	public static final IvMObject<SVGDiagram> graph_svg = c("graph svg", SVGDiagram.class);
 	public static final IvMObject<SVGDiagram> graph_svg_aligned = c("graph svg aligned", SVGDiagram.class);
-	public static final IvMObject<ProcessTreeVisualisationInfo> graph_visualisation_info = c("graph visualisation info",
-			ProcessTreeVisualisationInfo.class);
+	public static final IvMObject<ProcessTreeVisualisationInfo> graph_visualisation_info_aligned = c(
+			"graph visualisation info aligned", ProcessTreeVisualisationInfo.class);
 	public static final IvMObject<Scaler> animation_scaler = c("animation scaler", Scaler.class);
 	public static final IvMObject<GraphVizTokens> animation = c("animation", GraphVizTokens.class);
 
