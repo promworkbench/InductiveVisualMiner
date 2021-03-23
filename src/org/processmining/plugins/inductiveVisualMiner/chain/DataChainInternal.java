@@ -27,7 +27,7 @@ import gnu.trove.set.hash.THashSet;
  *
  */
 public class DataChainInternal<P> {
-	private boolean debug = false;
+	private boolean debug = true;
 
 	public final DataState state; //public for debug purposes
 	private final ProMCanceller globalCanceller;
