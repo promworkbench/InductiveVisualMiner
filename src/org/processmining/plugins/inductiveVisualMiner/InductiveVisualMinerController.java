@@ -491,7 +491,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//model-related buttons
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "enable model-related buttons";
@@ -517,7 +517,7 @@ public class InductiveVisualMinerController {
 
 	protected void initGuiGraph() {
 		//update layout
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 			public String getName() {
 				return "model dot";
 			}
@@ -564,7 +564,7 @@ public class InductiveVisualMinerController {
 		initGuiMode();
 
 		//trace view event colour map & model node selection
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "trace view event colour map";
@@ -600,7 +600,7 @@ public class InductiveVisualMinerController {
 
 	protected void initGuiHighlighting() {
 		//highlighting => panel
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "highlighting => panel";
@@ -641,6 +641,7 @@ public class InductiveVisualMinerController {
 				}
 			}
 
+			@Override
 			public void invalidate(InductiveVisualMinerPanel panel) {
 				// TODO Auto-generated method stub
 
@@ -657,7 +658,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//IM log => trace view
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "trace view (IMLog)";
@@ -680,7 +681,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//aligned log => trace view
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "trace view (aligned log)";
@@ -707,7 +708,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//trace colouring => trace view
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 			public String getName() {
 				return "trace colour map";
 			}
@@ -731,7 +732,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//selection => trace view
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "selection => trace view";
@@ -768,7 +769,7 @@ public class InductiveVisualMinerController {
 
 	protected void initGuiClassifiers() {
 		//get the selected classifier to the gui
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "classifier to gui";
@@ -796,7 +797,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//update classifiers on data
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 			public String getName() {
 				return "set classifiers";
 			}
@@ -865,7 +866,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//initialise filters
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "initialise pre-mining filters";
@@ -891,7 +892,7 @@ public class InductiveVisualMinerController {
 	protected void initGuiAlignment() {
 
 		//save log button
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "save aligned log";
@@ -927,7 +928,7 @@ public class InductiveVisualMinerController {
 				configuration.getHighlightingFilters(), panel.getHighlightingFiltersView()));
 
 		//initialise filters
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "initialise highlighting filters";
@@ -952,7 +953,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//filtering description
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 			public String getName() {
 				return "selection description";
 			}
@@ -980,7 +981,7 @@ public class InductiveVisualMinerController {
 
 	protected void initGuiAnimation() {
 		//enable animation
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "animation enabled";
@@ -1007,7 +1008,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//animation to panel
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "update animation";
@@ -1035,7 +1036,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//filtered log to animation
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "filtered log to animation";
@@ -1063,7 +1064,7 @@ public class InductiveVisualMinerController {
 		 * Set animation time updater. Naturally, this does not go via the chain
 		 * for performance reasons, and we cache the scaler
 		 */
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 			public String getName() {
 				return "cache animation objects";
 			}
@@ -1115,7 +1116,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//show histogram
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "show histogram";
@@ -1148,7 +1149,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//Update the width once the dot is ready. We cannot initialise the width as long as the window has not been drawn yet. Once the dot is computed, this should be fine. 
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "histogram width";
@@ -1189,7 +1190,7 @@ public class InductiveVisualMinerController {
 		//TODO: now if there is one mode with a certain trigger, then all modes will update with that trigger.
 
 		//repaint on availability of visualisation data
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "repaint after visualisation data";
@@ -1249,7 +1250,7 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		chain.register(new DataChainLinkGuiAbstract() {
+		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
 
 			public String getName() {
 				return "set trace view colour map";

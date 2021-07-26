@@ -48,6 +48,7 @@ public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract<Induct
 				IvMObject.selected_graph_user_settings };
 	}
 
+	@Override
 	public IvMObject<?>[] createNonTriggerObjects() {
 		return Mode.gatherInputsRequested(configuration);
 	}
