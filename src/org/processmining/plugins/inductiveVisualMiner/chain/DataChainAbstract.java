@@ -1,9 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-public abstract class DataChainAbstract implements DataChain {
+public abstract class DataChainAbstract<C> implements DataChain<C> {
 	protected OnException onException;
 	protected Runnable onChange;
-	protected OnStatus onStatus;
+	protected OnStatus<C> onStatus;
 
 	@Override
 	public OnException getOnException() {
@@ -16,12 +16,12 @@ public abstract class DataChainAbstract implements DataChain {
 	}
 
 	@Override
-	public OnStatus getOnStatus() {
+	public OnStatus<C> getOnStatus() {
 		return onStatus;
 	}
 
 	@Override
-	public void setOnStatus(OnStatus onStatus) {
+	public void setOnStatus(OnStatus<C> onStatus) {
 		this.onStatus = onStatus;
 	}
 

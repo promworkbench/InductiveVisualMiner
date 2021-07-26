@@ -2,10 +2,9 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 
-public class Cl10AnimationScaler extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl10AnimationScaler<C> extends DataChainLinkComputationAbstract<C> {
 
 	@Override
 	public String getName() {
@@ -28,7 +27,7 @@ public class Cl10AnimationScaler extends DataChainLinkComputationAbstract<Induct
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs,
 			IvMCanceller canceller) throws Exception {
 		IvMLogNotFiltered aLog = inputs.get(IvMObject.aligned_log);
 

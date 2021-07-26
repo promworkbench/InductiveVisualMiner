@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -18,7 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActiv
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 
-public class Cl14Performance extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl14Performance<C> extends DataChainLinkComputationAbstract<C> {
 
 	@Override
 	public String getName() {
@@ -42,8 +41,7 @@ public class Cl14Performance extends DataChainLinkComputationAbstract<InductiveV
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception {
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
 		boolean timestampsLogical = inputs.get(IvMObject.log_timestamps_logical);
 
 		if (!timestampsLogical) {

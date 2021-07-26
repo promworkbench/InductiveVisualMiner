@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-public abstract class DataChainLinkComputationAbstract<C> extends DataChainLinkAbstract
+public abstract class DataChainLinkComputationAbstract<C> extends DataChainLinkAbstract<C>
 		implements DataChainLinkComputation<C> {
 
 	private IvMObject<?>[] outputObjects;

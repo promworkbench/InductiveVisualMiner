@@ -11,7 +11,7 @@ import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.plugins.SortEventsPlugin.EventsComparator;
 
-public class Cl02SortEvents extends DataChainLinkComputationAbstract<Object> {
+public class Cl02SortEvents<C> extends DataChainLinkComputationAbstract<C> {
 
 	private Function<Object, Boolean> onIllogicalTimeStamps;
 
@@ -36,8 +36,7 @@ public class Cl02SortEvents extends DataChainLinkComputationAbstract<Object> {
 	}
 
 	@Override
-	public IvMObjectValues execute(Object configuration, IvMObjectValues inputs, IvMCanceller canceller)
-			throws Exception {
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
 		XLog log = inputs.get(IvMObject.input_log);
 
 		IvMObjectValues result = new IvMObjectValues();

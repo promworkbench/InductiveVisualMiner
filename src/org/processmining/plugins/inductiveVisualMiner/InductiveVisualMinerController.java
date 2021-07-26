@@ -99,7 +99,7 @@ public class InductiveVisualMinerController {
 
 	private final InductiveVisualMinerPanel panel;
 	private final InductiveVisualMinerConfiguration configuration;
-	private final DataChain chain;
+	private final DataChain<InductiveVisualMinerConfiguration> chain;
 	private final PluginContext context;
 	private final UserStatus userStatus;
 

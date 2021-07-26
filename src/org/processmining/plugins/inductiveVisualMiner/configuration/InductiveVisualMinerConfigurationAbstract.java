@@ -31,7 +31,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
  */
 public abstract class InductiveVisualMinerConfigurationAbstract implements InductiveVisualMinerConfiguration {
 
-	private final DataChain chain;
+	private final DataChain<InductiveVisualMinerConfiguration> chain;
 	private final InductiveVisualMinerPanel panel;
 	private final List<VisualMinerWrapper> discoveryTechniques;
 	private final AlignmentComputer alignmentComputer;
@@ -96,13 +96,13 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	protected abstract IvMDecoratorI createDecorator();
 
-	protected abstract DataChain createChain(InductiveVisualMinerPanel panel, ProMCanceller canceller,
+	protected abstract DataChain<InductiveVisualMinerConfiguration> createChain(InductiveVisualMinerPanel panel, ProMCanceller canceller,
 			Executor executor, List<PreMiningFilter> preMiningFilters, List<HighlightingFilter> highlightingFilters);
 
 	protected abstract IvMVirtualAttributeFactory createVirtualAttributes();
 
 	@Override
-	final public DataChain getChain() {
+	final public DataChain<InductiveVisualMinerConfiguration> getChain() {
 		return chain;
 	}
 

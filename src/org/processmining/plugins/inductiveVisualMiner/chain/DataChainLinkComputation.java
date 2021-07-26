@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-public interface DataChainLinkComputation<C> extends DataChainLink {
+public interface DataChainLinkComputation<C> extends DataChainLink<C> {
 
 	public IvMObject<?>[] getOutputObjects();
 

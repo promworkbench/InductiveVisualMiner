@@ -182,11 +182,6 @@ public class IvMLogInfo {
 		return !tree.isConcurrent(lowestCommonParent) && !tree.isOr(lowestCommonParent);
 	}
 
-	private static void debug(Object s) {
-		//System.out.println(s);
-		//InductiveVisualMinerController.debug(s.toString().replaceAll("\\n", " "));
-	}
-
 	public long getModelEdgeExecutions(int from, int to) {
 		return modelEdgeExecutions.get(Pair.of(from, to));
 	}

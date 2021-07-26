@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import org.processmining.plugins.inductiveVisualMiner.animation.ComputeAnimation;
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -11,7 +10,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl11Animate extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl11Animate<C> extends DataChainLinkComputationAbstract<C> {
 
 	@Override
 	public String getName() {
@@ -37,7 +36,7 @@ public class Cl11Animate extends DataChainLinkComputationAbstract<InductiveVisua
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs,
 			IvMCanceller canceller) throws Exception {
 		boolean animationEnabled = inputs.get(IvMObject.selected_animation_enabled);
 		IvMLogNotFiltered aLog = inputs.get(IvMObject.aligned_log);

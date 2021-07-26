@@ -111,7 +111,7 @@ import gnu.trove.map.hash.THashMap;
 
 public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMinerConfigurationAbstract {
 
-	protected Cl02SortEvents sortEvents;
+	protected Cl02SortEvents<InductiveVisualMinerConfiguration> sortEvents;
 
 	public InductiveVisualMinerConfigurationDefault(ProMCanceller canceller, Executor executor) {
 		super(canceller, executor);
@@ -281,8 +281,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	public DataChain createChain(final InductiveVisualMinerPanel panel, final ProMCanceller canceller,
-			final Executor executor, final List<PreMiningFilter> preMiningFilters,
+	public DataChain<InductiveVisualMinerConfiguration> createChain(final InductiveVisualMinerPanel panel,
+			final ProMCanceller canceller, final Executor executor, final List<PreMiningFilter> preMiningFilters,
 			final List<HighlightingFilter> highlightingFilters) {
 		//set up the state
 		DataState state = new DataState();
@@ -293,7 +293,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 		chain.register(new Cl01GatherAttributes());
 
-		sortEvents = new Cl02SortEvents();
+		sortEvents = new Cl02SortEvents<>();
 		chain.register(sortEvents);
 		sortEvents.setOnIllogicalTimeStamps(new Function<Object, Boolean>() {
 			public Boolean call(Object input) throws Exception {
@@ -312,24 +312,24 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			}
 		});
 
-		chain.register(new Cl21DataAnalysisLog());
-		chain.register(new Cl03MakeLog());
+		chain.register(new Cl21DataAnalysisLog<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl03MakeLog<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl04FilterLogOnActivities());
-		chain.register(new Cl05Mine());
-		chain.register(new Cl06LayoutModel());
+		chain.register(new Cl05Mine<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl06LayoutModel<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl07Align());
 		chain.register(new Cl08UpdateIvMAttributes());
 		chain.register(new Cl09LayoutAlignment(this));
-		chain.register(new Cl10AnimationScaler());
-		chain.register(new Cl11Animate());
-		chain.register(new Cl12TraceColouring());
+		chain.register(new Cl10AnimationScaler<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl11Animate<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl12TraceColouring<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl13FilterNodeSelection());
-		chain.register(new Cl14Performance());
-		chain.register(new Cl15Histogram());
-		chain.register(new Cl16DataAnalysisTrace());
-		chain.register(new Cl17DataAnalysisEvent());
-		chain.register(new Cl18DataAnalysisCohort());
-		chain.register(new Cl19DataAnalysisLog());
+		chain.register(new Cl14Performance<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl15Histogram<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl16DataAnalysisTrace<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl17DataAnalysisEvent<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl18DataAnalysisCohort<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl19DataAnalysisLog<InductiveVisualMinerConfiguration>());
 
 		//TODO: re-enable?
 		//		//mine performance

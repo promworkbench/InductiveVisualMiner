@@ -22,7 +22,7 @@ public class ControllerView<State> extends SideWindow {
 		add(dotPanel);
 	}
 
-	public void pushCompleteChainLinks(DataChain chain) {
+	public <C> void pushCompleteChainLinks(DataChain<C> chain) {
 		if (isVisible() || !initialised) {
 			initialised = true;
 			dotPanel.changeDot(chain.toDot(), false);

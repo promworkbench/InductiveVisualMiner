@@ -6,7 +6,6 @@ import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplEmpty;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceViewEventColourMap;
@@ -17,7 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl06LayoutModel extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl06LayoutModel<C> extends DataChainLinkComputationAbstract<C> {
 
 	@Override
 	public String getName() {
@@ -41,7 +40,7 @@ public class Cl06LayoutModel extends DataChainLinkComputationAbstract<InductiveV
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs,
 			IvMCanceller canceller) throws Exception {
 		IvMModel model = inputs.get(IvMObject.model);
 		Mode mode = inputs.get(IvMObject.selected_visualisation_mode);

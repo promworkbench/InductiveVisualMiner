@@ -1,13 +1,12 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 
-public class Cl17DataAnalysisEvent extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl17DataAnalysisEvent<C> extends DataChainLinkComputationAbstract<C> {
 
 	@Override
 	public String getName() {
@@ -31,8 +30,7 @@ public class Cl17DataAnalysisEvent extends DataChainLinkComputationAbstract<Indu
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception {
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogNotFiltered aLog = inputs.get(IvMObject.aligned_log);
 		IvMLogFiltered aLogFiltered = inputs.get(IvMObject.aligned_log_filtered);

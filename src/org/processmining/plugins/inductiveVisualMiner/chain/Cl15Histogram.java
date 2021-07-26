@@ -1,14 +1,13 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupController;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
-public class Cl15Histogram extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl15Histogram<C> extends DataChainLinkComputationAbstract<C> {
 
 	@Override
 	public String getName() {
@@ -32,8 +31,7 @@ public class Cl15Histogram extends DataChainLinkComputationAbstract<InductiveVis
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception {
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogFilteredImpl aLog = inputs.get(IvMObject.aligned_log_filtered);
 		Scaler scaler = inputs.get(IvMObject.animation_scaler);

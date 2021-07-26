@@ -120,7 +120,8 @@ public class PopupController {
 		}
 	}
 
-	public PopupController(DataChain chain, InductiveVisualMinerConfiguration configuration) {
+	public PopupController(DataChain<InductiveVisualMinerConfiguration> chain,
+			InductiveVisualMinerConfiguration configuration) {
 		//gather the required triggers
 		Set<IvMObject<?>> triggers = new THashSet<>();
 		{
@@ -145,11 +146,11 @@ public class PopupController {
 		chain.register(new ClPopups(triggers));
 	}
 
-	public void showPopup(InductiveVisualMinerPanel panel, DataChain chain) {
+	public void showPopup(InductiveVisualMinerPanel panel, DataChain<InductiveVisualMinerConfiguration> chain) {
 		IvMObjectValues inputs;
 		try {
-			inputs = chain.getObjectValues(IvMObject.popups, IvMObject.model, IvMObject.graph_visualisation_info_aligned,
-					IvMObject.aligned_log_info_filtered).get();
+			inputs = chain.getObjectValues(IvMObject.popups, IvMObject.model,
+					IvMObject.graph_visualisation_info_aligned, IvMObject.aligned_log_info_filtered).get();
 			showPopup(panel, inputs);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -201,7 +202,8 @@ public class PopupController {
 					}
 
 					if (inputs.has(IvMObject.graph_visualisation_info_aligned)) {
-						ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info_aligned);
+						ProcessTreeVisualisationInfo visualisationInfo = inputs
+								.get(IvMObject.graph_visualisation_info_aligned);
 
 						if (element instanceof LocalDotEdge
 								&& visualisationInfo.getAllLogMoveEdges().contains(element)) {

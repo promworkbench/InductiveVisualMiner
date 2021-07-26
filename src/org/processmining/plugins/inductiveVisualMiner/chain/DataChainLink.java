@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-public interface DataChainLink {
+public interface DataChainLink<C> {
 
 	/**
 	 * If all of the inputs are available, the computation is executed.

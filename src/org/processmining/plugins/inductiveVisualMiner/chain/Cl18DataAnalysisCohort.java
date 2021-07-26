@@ -3,12 +3,11 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import org.deckfour.xes.model.XLog;
 import org.processmining.cohortanalysis.cohort.Cohorts;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class Cl18DataAnalysisCohort extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl18DataAnalysisCohort<C> extends DataChainLinkComputationAbstract<C> {
 
 	@Override
 	public String getName() {
@@ -31,8 +30,7 @@ public class Cl18DataAnalysisCohort extends DataChainLinkComputationAbstract<Ind
 		return new IvMObject<?>[] { IvMObject.data_analysis_cohort };
 	}
 
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception {
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
 		if (inputs.get(IvMObject.selected_cohort_analysis_enabled)) {
 			AttributesInfo attributesInfo = inputs.get(IvMObject.attributes_info);
 			XLog log = inputs.get(IvMObject.sorted_log);

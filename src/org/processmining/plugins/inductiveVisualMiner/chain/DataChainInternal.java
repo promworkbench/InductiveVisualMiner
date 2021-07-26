@@ -40,8 +40,8 @@ public class DataChainInternal<C, P> {
 
 	private final Set<IvMObject<?>> fixedObjects = new THashSet<>();
 
-	private final List<DataChainLink> chainLinks = new ArrayList<>();
-	private final Map<IvMObject<?>, Set<DataChainLink>> object2inputs = new THashMap<>();
+	private final List<DataChainLink<C>> chainLinks = new ArrayList<>();
+	private final Map<IvMObject<?>, Set<DataChainLink<C>>> object2inputs = new THashMap<>();
 
 	/**
 	 * Idea: each execution of a chain link has its own canceller. As long as
@@ -59,28 +59,28 @@ public class DataChainInternal<C, P> {
 		this.parentChain = parentChain;
 	}
 
-	public void register(DataChainLink chainLink) {
+	public void register(DataChainLink<C> chainLink) {
 		assert !chainLinks.contains(chainLink);
 
 		chainLinks.add(chainLink);
 
 		for (IvMObject<?> object : chainLink.getRequiredObjects()) {
-			object2inputs.putIfAbsent(object, new THashSet<DataChainLink>());
+			object2inputs.putIfAbsent(object, new THashSet<DataChainLink<C>>());
 			object2inputs.get(object).add(chainLink);
 		}
 		for (IvMObject<?> object : chainLink.getOptionalObjects()) {
-			object2inputs.putIfAbsent(object, new THashSet<DataChainLink>());
+			object2inputs.putIfAbsent(object, new THashSet<DataChainLink<C>>());
 			object2inputs.get(object).add(chainLink);
 		}
 		if (chainLink instanceof DataChainLinkComputation) {
 			for (IvMObject<?> object : ((DataChainLinkComputation<?>) chainLink).getOutputObjects()) {
-				object2inputs.putIfAbsent(object, new THashSet<DataChainLink>());
+				object2inputs.putIfAbsent(object, new THashSet<DataChainLink<C>>());
 			}
 		}
 	}
 
-	public DataChainLink getChainLink(Class<? extends DataChainLink> clazz) {
-		for (DataChainLink chainLink : chainLinks) {
+	public DataChainLink<C> getChainLink(Class<? extends DataChainLink<C>> clazz) {
+		for (DataChainLink<C> chainLink : chainLinks) {
 			if (clazz.isInstance(chainLink)) {
 				return chainLink;
 			}
@@ -123,9 +123,9 @@ public class DataChainInternal<C, P> {
 		fixedObjects.add(object);
 	}
 
-	private <O> void executeNext(IvMObject<O> objectBecameAvailable, DataChainLink... exclude) {
+	private <O> void executeNext(IvMObject<O> objectBecameAvailable, DataChainLink<?>... exclude) {
 		//execute next computation links
-		for (DataChainLink chainLink : chainLinks) {
+		for (DataChainLink<C> chainLink : chainLinks) {
 			if (canExecute(chainLink)
 					&& (contains(chainLink.getRequiredObjects(), objectBecameAvailable)
 							|| contains(chainLink.getOptionalObjects(), objectBecameAvailable))
@@ -135,8 +135,8 @@ public class DataChainInternal<C, P> {
 		}
 	}
 
-	public static boolean contains(DataChainLink[] haystack, DataChainLink needle) {
-		for (DataChainLink link : haystack) {
+	public static boolean contains(DataChainLink<?>[] haystack, DataChainLink<?> needle) {
+		for (DataChainLink<?> link : haystack) {
 			if (link.getName().equals(needle.getName())) {
 				return true;
 			}
@@ -158,7 +158,7 @@ public class DataChainInternal<C, P> {
 	 * @param chainLink
 	 * @return whether all the inputs are present
 	 */
-	private boolean canExecute(DataChainLink chainLink) {
+	private boolean canExecute(DataChainLink<C> chainLink) {
 		for (IvMObject<?> inputObject : chainLink.getRequiredObjects()) {
 			if (!state.hasObject(inputObject)) {
 				return false;
@@ -178,18 +178,18 @@ public class DataChainInternal<C, P> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void executeLink(DataChainLink chainLink) {
+	public void executeLink(DataChainLink<C> chainLink) {
 		if (chainLink instanceof DataChainLinkComputation) {
 			executeLinkComputation((DataChainLinkComputation<C>) chainLink);
 		} else if (chainLink instanceof DataChainLinkGui) {
-			executeLinkGui((DataChainLinkGui<P>) chainLink);
+			executeLinkGui((DataChainLinkGui<C, P>) chainLink);
 		}
 		if (parentChain.getOnChange() != null) {
 			parentChain.getOnChange().run();
 		}
 	}
 
-	private void executeLinkGui(final DataChainLinkGui<P> chainLink) {
+	private void executeLinkGui(final DataChainLinkGui<C, P> chainLink) {
 		//System.out.println("  execute gui chain link `" + chainLink.getName() + "` " + chainLink.getClass());
 
 		final IvMObjectValues inputs = gatherInputs(chainLink);
@@ -214,7 +214,7 @@ public class DataChainInternal<C, P> {
 		}
 	}
 
-	private IvMObjectValues gatherInputs(DataChainLink chainLink) {
+	private IvMObjectValues gatherInputs(DataChainLink<C> chainLink) {
 		IvMObjectValues result = new IvMObjectValues();
 		for (int i = 0; i < chainLink.getRequiredObjects().length; i++) {
 			IvMObject<?> object = chainLink.getRequiredObjects()[i];
@@ -308,16 +308,16 @@ public class DataChainInternal<C, P> {
 	 * 
 	 * @param chainLink
 	 */
-	private void cancelLinkAndInvalidateResult(DataChainLink chainLink) {
+	private void cancelLinkAndInvalidateResult(DataChainLink<C> chainLink) {
 		//first, gather things that need to be invalidated
-		THashSet<DataChainLink> chainLinksToInvalidate = new THashSet<>();
+		THashSet<DataChainLink<C>> chainLinksToInvalidate = new THashSet<>();
 		THashSet<IvMObject<?>> objectsToInvalidate = new THashSet<>();
 		chainLinksToInvalidate.add(chainLink);
 		getDownstream(chainLink, chainLinksToInvalidate, objectsToInvalidate);
 
 		//second, invalidate them
-		for (DataChainLink chainLink3 : chainLinksToInvalidate) {
-			final DataChainLink chainLink2 = chainLink3;
+		for (DataChainLink<C> chainLink3 : chainLinksToInvalidate) {
+			final DataChainLink<C> chainLink2 = chainLink3;
 
 			//cancel the ongoing execution
 			if (chainLink2 instanceof DataChainLinkComputation) {
@@ -331,7 +331,7 @@ public class DataChainInternal<C, P> {
 				SwingUtilities.invokeLater(new Runnable() {
 					@SuppressWarnings("unchecked")
 					public void run() {
-						((DataChainLinkGui<P>) chainLink2).invalidate(panel);
+						((DataChainLinkGui<C, P>) chainLink2).invalidate(panel);
 					}
 				});
 			}
@@ -342,9 +342,9 @@ public class DataChainInternal<C, P> {
 		}
 	}
 
-	private void getDownstream(IvMObject<?> object, THashSet<DataChainLink> chainLinksToInvalidate,
+	private void getDownstream(IvMObject<?> object, THashSet<DataChainLink<C>> chainLinksToInvalidate,
 			THashSet<IvMObject<?>> objectsToInvalidate) {
-		for (DataChainLink chainLink : object2inputs.get(object)) { //includes triggers
+		for (DataChainLink<C> chainLink : object2inputs.get(object)) { //includes triggers
 			//this chainLink needs this object as its input
 			if (chainLinksToInvalidate.add(chainLink)) {
 				getDownstream(chainLink, chainLinksToInvalidate, objectsToInvalidate);
@@ -352,7 +352,7 @@ public class DataChainInternal<C, P> {
 		}
 	}
 
-	private void getDownstream(DataChainLink chainLink, THashSet<DataChainLink> chainLinksToInvalidate,
+	private void getDownstream(DataChainLink<C> chainLink, THashSet<DataChainLink<C>> chainLinksToInvalidate,
 			THashSet<IvMObject<?>> objectsToInvalidate) {
 		if (chainLink instanceof DataChainLinkComputation) {
 			for (IvMObject<?> object : ((DataChainLinkComputation<?>) chainLink).getOutputObjects()) {
@@ -431,8 +431,8 @@ public class DataChainInternal<C, P> {
 		}
 
 		//add nodes (chain links)
-		THashMap<DataChainLink, DotNode> link2dotNode = new THashMap<>();
-		for (DataChainLink chainLink : chainLinks) {
+		THashMap<DataChainLink<C>, DotNode> link2dotNode = new THashMap<>();
+		for (DataChainLink<C> chainLink : chainLinks) {
 			DotNode dotNode = dot.addNode(chainLink.getName());
 			link2dotNode.put(chainLink, dotNode);
 			if (executionCancellers.containsKey(chainLink) && !executionCancellers.get(chainLink).isCancelled()) {
@@ -450,7 +450,7 @@ public class DataChainInternal<C, P> {
 			}
 		}
 
-		for (DataChainLink chainLink : chainLinks) {
+		for (DataChainLink<C> chainLink : chainLinks) {
 			//inputs
 			for (IvMObject<?> object : chainLink.getRequiredObjects()) {
 				dot.addEdge(object2dotNode.get(object), link2dotNode.get(chainLink));

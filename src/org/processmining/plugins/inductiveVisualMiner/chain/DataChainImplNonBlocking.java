@@ -19,41 +19,41 @@ import org.processmining.plugins.graphviz.dot.Dot;
  *            panel
  *
  */
-public class DataChainImplNonBlocking<C, P> extends DataChainAbstract {
+public class DataChainImplNonBlocking<C, P> extends DataChainAbstract<C> {
 
-	protected static class QueueItem {
+	protected static class QueueItem<C> {
 
 	}
 
-	protected static class QueueItemExecuteLink extends QueueItem {
-		protected final DataChainLink chainLink;
+	protected static class QueueItemExecuteLink<C> extends QueueItem<C> {
+		protected final DataChainLink<C> chainLink;
 
-		public QueueItemExecuteLink(DataChainLink chainLink) {
+		public QueueItemExecuteLink(DataChainLink<C> chainLink) {
 			this.chainLink = chainLink;
 		}
 	}
 
-	protected static class QueueItemSetObject<C> extends QueueItem {
-		public final IvMObject<C> object;
-		public final C value;
+	protected static class QueueItemSetObject<C, O> extends QueueItem<C> {
+		public final IvMObject<O> object;
+		public final O value;
 
-		public QueueItemSetObject(IvMObject<C> object, C value) {
+		public QueueItemSetObject(IvMObject<O> object, O value) {
 			this.object = object;
 			this.value = value;
 		}
 	}
 
-	protected static class QueueItemSetFixedObject<C> extends QueueItem {
-		public final IvMObject<C> object;
-		public final C value;
+	protected static class QueueItemSetFixedObject<C, O> extends QueueItem<C> {
+		public final IvMObject<O> object;
+		public final O value;
 
-		public QueueItemSetFixedObject(IvMObject<C> object, C value) {
+		public QueueItemSetFixedObject(IvMObject<O> object, O value) {
 			this.object = object;
 			this.value = value;
 		}
 	}
 
-	protected static class QueueItemResults<C> extends QueueItem {
+	protected static class QueueItemResults<C> extends QueueItem<C> {
 		public final IvMCanceller canceller;
 		public final DataChainLinkComputation<C> chainLink;
 		public final IvMObjectValues outputs;
@@ -66,15 +66,15 @@ public class DataChainImplNonBlocking<C, P> extends DataChainAbstract {
 		}
 	}
 
-	protected static class QueueItemRegister extends QueueItem {
-		public final DataChainLink chainLink;
+	protected static class QueueItemRegister<C> extends QueueItem<C> {
+		public final DataChainLink<C> chainLink;
 
-		public QueueItemRegister(DataChainLink chainLink) {
+		public QueueItemRegister(DataChainLink<C> chainLink) {
 			this.chainLink = chainLink;
 		}
 	}
 
-	protected static class QueueItemGetObjectValues extends QueueItem {
+	protected static class QueueItemGetObjectValues<C> extends QueueItem<C> {
 		public final IvMObject<?>[] objects;
 		public final FutureImpl values;
 
@@ -89,7 +89,7 @@ public class DataChainImplNonBlocking<C, P> extends DataChainAbstract {
 	 * a semaphore (to wake up the processing thread). This avoids locks in the
 	 * methods, such that the gui remains responsive.
 	 */
-	private final ConcurrentLinkedQueue<QueueItem> queue = new ConcurrentLinkedQueue<>();
+	private final ConcurrentLinkedQueue<QueueItem<C>> queue = new ConcurrentLinkedQueue<>();
 	private final Semaphore semaphore = new Semaphore(0);
 
 	private final DataChainInternal<C, P> chainInternal;
@@ -105,41 +105,41 @@ public class DataChainImplNonBlocking<C, P> extends DataChainAbstract {
 	}
 
 	@Override
-	public void register(DataChainLink chainLink) {
-		addQueueItem(new QueueItemRegister(chainLink));
+	public void register(DataChainLink<C> chainLink) {
+		addQueueItem(new QueueItemRegister<>(chainLink));
 	}
 
 	@Override
 	public <O> void setObject(IvMObject<O> objectName, O object) {
-		addQueueItem(new QueueItemSetObject<O>(objectName, object));
+		addQueueItem(new QueueItemSetObject<C, O>(objectName, object));
 	}
 
 	@Override
-	public void executeLink(Class<? extends DataChainLink> clazz) {
-		DataChainLink chainLink = chainInternal.getChainLink(clazz);
+	public void executeLink(Class<? extends DataChainLink<C>> clazz) {
+		DataChainLink<C> chainLink = chainInternal.getChainLink(clazz);
 		if (chainLink != null) {
 			executeLink(chainLink);
 		}
 	}
 
 	@Override
-	public void executeLink(DataChainLink chainLink) {
-		addQueueItem(new QueueItemExecuteLink(chainLink));
+	public void executeLink(DataChainLink<C> chainLink) {
+		addQueueItem(new QueueItemExecuteLink<>(chainLink));
 	}
 
 	@Override
 	public FutureImpl getObjectValues(IvMObject<?>... objects) {
-		QueueItemGetObjectValues queueItem = new QueueItemGetObjectValues(objects);
+		QueueItemGetObjectValues<C> queueItem = new QueueItemGetObjectValues<>(objects);
 		addQueueItem(queueItem);
 		return queueItem.values;
 	}
 
 	@Override
 	public <O> void setFixedObject(IvMObject<O> object, O value) {
-		addQueueItem(new QueueItemSetFixedObject<O>(object, value));
+		addQueueItem(new QueueItemSetFixedObject<C, O>(object, value));
 	}
 
-	private void addQueueItem(QueueItem queueItem) {
+	private void addQueueItem(QueueItem<C> queueItem) {
 		queue.add(queueItem);
 		semaphore.release();
 	}
@@ -151,6 +151,7 @@ public class DataChainImplNonBlocking<C, P> extends DataChainAbstract {
 	}
 
 	private Runnable chainThread = new Runnable() {
+		@SuppressWarnings("unchecked")
 		public void run() {
 			while (!globalCanceller.isCancelled()) { //loop until IvM closes
 
@@ -162,32 +163,32 @@ public class DataChainImplNonBlocking<C, P> extends DataChainAbstract {
 				}
 
 				if (!queue.isEmpty()) {
-					QueueItem item = queue.poll();
+					QueueItem<C> item = queue.poll();
 
-					if (item instanceof QueueItemSetObject<?>) {
-						chainThreadSetObject((QueueItemSetObject<?>) item);
+					if (item instanceof QueueItemSetObject) {
+						chainThreadSetObject((QueueItemSetObject<C, ?>) item);
 					} else if (item instanceof QueueItemExecuteLink) {
-						chainInternal.executeLink(((QueueItemExecuteLink) item).chainLink);
+						chainInternal.executeLink(((QueueItemExecuteLink<C>) item).chainLink);
 					} else if (item instanceof QueueItemResults) {
-						chainInternal.processOutputsOfChainLink(((QueueItemResults<?>) item).canceller,
-								((QueueItemResults<?>) item).chainLink, ((QueueItemResults<?>) item).outputs);
+						chainInternal.processOutputsOfChainLink(((QueueItemResults<C>) item).canceller,
+								((QueueItemResults<C>) item).chainLink, ((QueueItemResults<C>) item).outputs);
 					} else if (item instanceof QueueItemRegister) {
-						chainInternal.register(((QueueItemRegister) item).chainLink);
+						chainInternal.register(((QueueItemRegister<C>) item).chainLink);
 					} else if (item instanceof QueueItemGetObjectValues) {
-						chainInternal.getObjectValues(((QueueItemGetObjectValues) item).objects,
-								((QueueItemGetObjectValues) item).values);
-					} else if (item instanceof QueueItemSetFixedObject<?>) {
-						chainThreadSetFixedObject((QueueItemSetFixedObject<?>) item);
+						chainInternal.getObjectValues(((QueueItemGetObjectValues<C>) item).objects,
+								((QueueItemGetObjectValues<C>) item).values);
+					} else if (item instanceof QueueItemSetFixedObject) {
+						chainThreadSetFixedObject(((QueueItemSetFixedObject<C, ?>) item));
 					}
 				}
 			}
 		}
 
-		private <O> void chainThreadSetObject(QueueItemSetObject<O> item) {
+		private <O> void chainThreadSetObject(QueueItemSetObject<C, O> item) {
 			chainInternal.setObject(item.object, item.value);
 		}
 
-		private <O> void chainThreadSetFixedObject(QueueItemSetFixedObject<O> item) {
+		private <O> void chainThreadSetFixedObject(QueueItemSetFixedObject<C, O> item) {
 			chainInternal.setFixedObject(item.object, item.value);
 		}
 

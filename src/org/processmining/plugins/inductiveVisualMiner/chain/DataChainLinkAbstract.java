@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-public abstract class DataChainLinkAbstract implements DataChainLink {
+public abstract class DataChainLinkAbstract<C> implements DataChainLink<C> {
 
 	private IvMObject<?>[] requiredObjects;
 	private IvMObject<?>[] optionalObjects;
@@ -54,7 +54,7 @@ public abstract class DataChainLinkAbstract implements DataChainLink {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		DataChainLinkAbstract other = (DataChainLinkAbstract) obj;
+		DataChainLinkAbstract<?> other = (DataChainLinkAbstract<?>) obj;
 		if (getName() == null) {
 			if (other.getName() != null) {
 				return false;

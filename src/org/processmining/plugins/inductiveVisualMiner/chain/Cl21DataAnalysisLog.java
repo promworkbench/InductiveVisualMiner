@@ -1,10 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.deckfour.xes.model.XLog;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
 
-public class Cl21DataAnalysisLog extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl21DataAnalysisLog<C> extends DataChainLinkComputationAbstract<C> {
 
 	@Override
 	public String getName() {
@@ -27,8 +26,7 @@ public class Cl21DataAnalysisLog extends DataChainLinkComputationAbstract<Induct
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception {
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
 		XLog log = inputs.get(IvMObject.input_log);
 
 		LogAttributeAnalysis logAttributeAnalysis = new LogAttributeAnalysis(log, canceller);

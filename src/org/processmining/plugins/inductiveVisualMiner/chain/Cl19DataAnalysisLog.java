@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -16,7 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
  * @author sander
  *
  */
-public class Cl19DataAnalysisLog extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl19DataAnalysisLog<C> extends DataChainLinkComputationAbstract<C> {
 
 	@Override
 	public String getName() {
@@ -39,8 +38,7 @@ public class Cl19DataAnalysisLog extends DataChainLinkComputationAbstract<Induct
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception {
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogFilteredImpl log = inputs.get(IvMObject.aligned_log_filtered);
 

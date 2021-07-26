@@ -8,7 +8,8 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 
 public class DataAnalysisController {
-	public static void initialise(InductiveVisualMinerConfiguration configuration, DataChain chain) {
+	public static void initialise(InductiveVisualMinerConfiguration configuration,
+			DataChain<InductiveVisualMinerConfiguration> chain) {
 
 		for (DataAnalysisTableFactory analysis2 : configuration.getDataAnalysisTables()) {
 

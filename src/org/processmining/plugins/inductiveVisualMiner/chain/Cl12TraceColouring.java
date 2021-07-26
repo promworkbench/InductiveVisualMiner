@@ -1,12 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
 
-public class Cl12TraceColouring extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl12TraceColouring<C> extends DataChainLinkComputationAbstract<C> {
 
 	@Override
 	public String getName() {
@@ -29,8 +28,7 @@ public class Cl12TraceColouring extends DataChainLinkComputationAbstract<Inducti
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception {
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogNotFiltered aLog = inputs.get(IvMObject.aligned_log);
 		TraceColourMapSettings settings = inputs.get(IvMObject.trace_colour_map_settings);

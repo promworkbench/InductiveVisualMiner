@@ -1,6 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-public interface DataChainLinkGui<P> extends DataChainLink {
+public interface DataChainLinkGui<C, P> extends DataChainLink<C> {
 
 	/**
 	 * Updates the gui by invalidation. (e.g. one of the inputs got replaced).
