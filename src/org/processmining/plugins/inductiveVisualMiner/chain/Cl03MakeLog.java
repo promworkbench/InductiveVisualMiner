@@ -9,10 +9,9 @@ import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLogImpl;
 import org.processmining.plugins.InductiveMiner.mining.logs.XLifeCycleClassifier;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
-public class Cl03MakeLog extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl03MakeLog extends DataChainLinkComputationAbstract<Object> {
 
 	public String getName() {
 		return "make log";
@@ -31,8 +30,8 @@ public class Cl03MakeLog extends DataChainLinkComputationAbstract<InductiveVisua
 				IvMObject.xlog_info_performance };
 	}
 
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception {
+	public IvMObjectValues execute(Object configuration, IvMObjectValues inputs, IvMCanceller canceller)
+			throws Exception {
 		XLog log = inputs.get(IvMObject.sorted_log);
 		XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(
 				AttributeClassifiers.constructClassifier(inputs.get(IvMObject.selected_classifier)));

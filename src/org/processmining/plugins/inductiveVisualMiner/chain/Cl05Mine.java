@@ -3,12 +3,11 @@ package org.processmining.plugins.inductiveVisualMiner.chain;
 import org.processmining.plugins.InductiveMiner.mining.IMLogInfo;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerParameters;
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 
-public class Cl05Mine extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl05Mine extends DataChainLinkComputationAbstract<Object> {
 
 	@Override
 	public String getName() {
@@ -32,8 +31,8 @@ public class Cl05Mine extends DataChainLinkComputationAbstract<InductiveVisualMi
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception {
+	public IvMObjectValues execute(Object configuration, IvMObjectValues inputs, IvMCanceller canceller)
+			throws Exception {
 		IMLog log = inputs.get(IvMObject.imlog_activity_filtered);
 		IMLogInfo logInfo = inputs.get(IvMObject.imlog_info_activity_filtered);
 		VisualMinerWrapper miner = inputs.get(IvMObject.selected_miner);

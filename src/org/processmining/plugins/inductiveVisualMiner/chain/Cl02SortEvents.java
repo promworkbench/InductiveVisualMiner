@@ -8,11 +8,10 @@ import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.model.impl.XLogImpl;
 import org.deckfour.xes.model.impl.XTraceImpl;
 import org.processmining.plugins.InductiveMiner.Function;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.plugins.SortEventsPlugin.EventsComparator;
 
-public class Cl02SortEvents extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
+public class Cl02SortEvents extends DataChainLinkComputationAbstract<Object> {
 
 	private Function<Object, Boolean> onIllogicalTimeStamps;
 
@@ -37,8 +36,8 @@ public class Cl02SortEvents extends DataChainLinkComputationAbstract<InductiveVi
 	}
 
 	@Override
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception {
+	public IvMObjectValues execute(Object configuration, IvMObjectValues inputs, IvMCanceller canceller)
+			throws Exception {
 		XLog log = inputs.get(IvMObject.input_log);
 
 		IvMObjectValues result = new IvMObjectValues();
