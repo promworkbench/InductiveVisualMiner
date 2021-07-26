@@ -288,7 +288,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		DataState state = new DataState();
 
 		//set up the chain
-		final DataChainImplNonBlocking<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> chain = new DataChainImplNonBlocking<>(
+		final DataChainImplNonBlocking<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> chain = new DataChainImplNonBlocking<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(
 				state, canceller, executor, this, panel);
 
 		chain.register(new Cl01GatherAttributes());
