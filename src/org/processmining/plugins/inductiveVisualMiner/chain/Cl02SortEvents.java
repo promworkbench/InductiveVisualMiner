@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.plugins.SortEventsPlugin.EventsComparator;
 
-public class Cl02SortEvents extends DataChainLinkComputationAbstract {
+public class Cl02SortEvents extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	private Function<Object, Boolean> onIllogicalTimeStamps;
 

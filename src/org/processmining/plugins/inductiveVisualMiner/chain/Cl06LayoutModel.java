@@ -17,7 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 import com.kitfox.svg.SVGDiagram;
 
-public class Cl06LayoutModel extends DataChainLinkComputationAbstract {
+public class Cl06LayoutModel extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	@Override
 	public String getName() {

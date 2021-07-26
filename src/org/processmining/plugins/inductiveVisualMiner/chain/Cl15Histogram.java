@@ -8,7 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupController;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 
-public class Cl15Histogram extends DataChainLinkComputationAbstract {
+public class Cl15Histogram extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	@Override
 	public String getName() {

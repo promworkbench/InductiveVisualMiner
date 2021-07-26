@@ -7,7 +7,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 
-public class Cl16DataAnalysisTrace extends DataChainLinkComputationAbstract {
+public class Cl16DataAnalysisTrace extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	@Override
 	public String getName() {

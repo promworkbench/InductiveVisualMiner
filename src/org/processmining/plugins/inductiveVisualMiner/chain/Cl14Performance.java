@@ -18,7 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.performance.QueueMineActiv
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 
-public class Cl14Performance extends DataChainLinkComputationAbstract {
+public class Cl14Performance extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	@Override
 	public String getName() {

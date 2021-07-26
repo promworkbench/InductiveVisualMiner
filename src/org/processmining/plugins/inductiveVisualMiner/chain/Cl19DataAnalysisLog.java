@@ -16,7 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
  * @author sander
  *
  */
-public class Cl19DataAnalysisLog extends DataChainLinkComputationAbstract {
+public class Cl19DataAnalysisLog extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	@Override
 	public String getName() {

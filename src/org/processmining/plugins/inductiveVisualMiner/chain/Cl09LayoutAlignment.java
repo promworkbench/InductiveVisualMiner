@@ -24,7 +24,7 @@ import com.kitfox.svg.SVGDiagram;
  * @author sander
  *
  */
-public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract {
+public class Cl09LayoutAlignment extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	private final InductiveVisualMinerConfiguration configuration;
 

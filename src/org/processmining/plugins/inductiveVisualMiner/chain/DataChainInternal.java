@@ -12,7 +12,6 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.dot.DotNode;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -24,17 +23,20 @@ import gnu.trove.set.hash.THashSet;
  * 
  * @author sander
  * @param <P>
+ *            panel
+ * @param <C>
+ *            configuration
  *
  */
-public class DataChainInternal<P> {
+public class DataChainInternal<C, P> {
 	private boolean debug = false;
 
 	public final DataState state; //public for debug purposes
 	private final ProMCanceller globalCanceller;
 	private final Executor executor;
-	private final InductiveVisualMinerConfiguration configuration;
+	private final C configuration;
 	private final P panel;
-	private final DataChainImplNonBlocking<P> parentChain;
+	private final DataChainImplNonBlocking<C, P> parentChain;
 
 	private final Set<IvMObject<?>> fixedObjects = new THashSet<>();
 
@@ -45,10 +47,10 @@ public class DataChainInternal<P> {
 	 * Idea: each execution of a chain link has its own canceller. As long as
 	 * this canceller is not cancelled, the job is still valid.
 	 */
-	public final THashMap<DataChainLinkComputation, IvMCanceller> executionCancellers = new THashMap<>(); //public for debug purposes
+	public final THashMap<DataChainLinkComputation<C>, IvMCanceller> executionCancellers = new THashMap<>(); //public for debug purposes
 
-	public DataChainInternal(DataChainImplNonBlocking<P> parentChain, DataState state, ProMCanceller canceller,
-			Executor executor, InductiveVisualMinerConfiguration configuration, P panel) {
+	public DataChainInternal(DataChainImplNonBlocking<C, P> parentChain, DataState state, ProMCanceller canceller,
+			Executor executor, C configuration, P panel) {
 		this.state = state;
 		this.globalCanceller = canceller;
 		this.executor = executor;
@@ -71,7 +73,7 @@ public class DataChainInternal<P> {
 			object2inputs.get(object).add(chainLink);
 		}
 		if (chainLink instanceof DataChainLinkComputation) {
-			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputObjects()) {
+			for (IvMObject<?> object : ((DataChainLinkComputation<?>) chainLink).getOutputObjects()) {
 				object2inputs.putIfAbsent(object, new THashSet<DataChainLink>());
 			}
 		}
@@ -90,7 +92,7 @@ public class DataChainInternal<P> {
 	/**
 	 * Sets an object and starts executing the chain accordingly.
 	 */
-	public <C> void setObject(IvMObject<C> objectName, C object) {
+	public <O> void setObject(IvMObject<O> objectName, O object) {
 		if (!fixedObjects.contains(objectName)) {
 			state.putObject(objectName, object);
 
@@ -112,7 +114,7 @@ public class DataChainInternal<P> {
 	 * @param object
 	 * @param value
 	 */
-	public <C> void setFixedObject(IvMObject<C> object, C value) {
+	public <O> void setFixedObject(IvMObject<O> object, O value) {
 		state.putObject(object, value);
 
 		//start the chain (this will cancel appropriately)
@@ -121,7 +123,7 @@ public class DataChainInternal<P> {
 		fixedObjects.add(object);
 	}
 
-	private <C> void executeNext(IvMObject<C> objectBecameAvailable, DataChainLink... exclude) {
+	private <O> void executeNext(IvMObject<O> objectBecameAvailable, DataChainLink... exclude) {
 		//execute next computation links
 		for (DataChainLink chainLink : chainLinks) {
 			if (canExecute(chainLink)
@@ -163,7 +165,7 @@ public class DataChainInternal<P> {
 			}
 		}
 		if (chainLink instanceof DataChainLinkComputation) {
-			for (IvMObject<?> outputObject : ((DataChainLinkComputation) chainLink).getOutputObjects()) {
+			for (IvMObject<?> outputObject : ((DataChainLinkComputation<?>) chainLink).getOutputObjects()) {
 				if (fixedObjects.contains(outputObject)) {
 					if (debug) {
 						System.out.println("computation not started as it would produce a fixed object");
@@ -178,7 +180,7 @@ public class DataChainInternal<P> {
 	@SuppressWarnings("unchecked")
 	public void executeLink(DataChainLink chainLink) {
 		if (chainLink instanceof DataChainLinkComputation) {
-			executeLinkComputation((DataChainLinkComputation) chainLink);
+			executeLinkComputation((DataChainLinkComputation<C>) chainLink);
 		} else if (chainLink instanceof DataChainLinkGui) {
 			executeLinkGui((DataChainLinkGui<P>) chainLink);
 		}
@@ -233,12 +235,12 @@ public class DataChainInternal<P> {
 		return result;
 	}
 
-	private <C> void gatherInput(IvMObject<C> object, IvMObjectValues values) {
-		C value = state.getObject(object);
+	private <O> void gatherInput(IvMObject<O> object, IvMObjectValues values) {
+		O value = state.getObject(object);
 		values.set(object, value);
 	}
 
-	private void executeLinkComputation(final DataChainLinkComputation chainLink) {
+	private void executeLinkComputation(final DataChainLinkComputation<C> chainLink) {
 		//invalidate this link and all links that depend on this link
 		cancelLinkAndInvalidateResult(chainLink);
 
@@ -353,7 +355,7 @@ public class DataChainInternal<P> {
 	private void getDownstream(DataChainLink chainLink, THashSet<DataChainLink> chainLinksToInvalidate,
 			THashSet<IvMObject<?>> objectsToInvalidate) {
 		if (chainLink instanceof DataChainLinkComputation) {
-			for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputObjects()) {
+			for (IvMObject<?> object : ((DataChainLinkComputation<?>) chainLink).getOutputObjects()) {
 				if (state.hasObject(object)) {
 					if (objectsToInvalidate.add(object)) {
 						getDownstream(object, chainLinksToInvalidate, objectsToInvalidate);
@@ -363,7 +365,7 @@ public class DataChainInternal<P> {
 		}
 	}
 
-	public void processOutputsOfChainLink(IvMCanceller canceller, DataChainLinkComputation chainLink,
+	public void processOutputsOfChainLink(IvMCanceller canceller, DataChainLinkComputation<?> chainLink,
 			IvMObjectValues outputs) {
 		//make sure this computation was not cancelled, and cancel it
 		if (canceller.isCancelled()) {
@@ -389,7 +391,7 @@ public class DataChainInternal<P> {
 		parentChain.getOnChange().run();
 	}
 
-	private <C> void processOutput(IvMObject<C> outputObjectName, IvMObjectValues outputs) {
+	private <O> void processOutput(IvMObject<O> outputObjectName, IvMObjectValues outputs) {
 		assert outputs.get(outputObjectName) != null; //check that the declared output is actually present
 		state.putObject(outputObjectName, outputs.get(outputObjectName));
 	}
@@ -456,12 +458,12 @@ public class DataChainInternal<P> {
 
 			if (chainLink instanceof DataChainLinkComputation) {
 				//outputs
-				for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOutputObjects()) {
+				for (IvMObject<?> object : ((DataChainLinkComputation<?>) chainLink).getOutputObjects()) {
 					dot.addEdge(link2dotNode.get(chainLink), object2dotNode.get(object));
 				}
 
 				//triggers
-				for (IvMObject<?> object : ((DataChainLinkComputation) chainLink).getOptionalObjects()) {
+				for (IvMObject<?> object : ((DataChainLinkComputation<?>) chainLink).getOptionalObjects()) {
 					DotEdge edge = dot.addEdge(object2dotNode.get(object), link2dotNode.get(chainLink));
 					edge.setOption("style", "dashed");
 				}

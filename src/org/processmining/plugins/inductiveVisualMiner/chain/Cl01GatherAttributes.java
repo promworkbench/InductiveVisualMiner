@@ -13,7 +13,7 @@ import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfoImpl;
 
-public class Cl01GatherAttributes extends DataChainLinkComputationAbstract {
+public class Cl01GatherAttributes extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	@Override
 	public String getName() {

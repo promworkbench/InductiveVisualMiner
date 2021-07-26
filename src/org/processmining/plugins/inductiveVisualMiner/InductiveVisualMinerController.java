@@ -142,8 +142,8 @@ public class InductiveVisualMinerController {
 		});
 
 		//set up status handling
-		chain.setOnStatus(new OnStatus() {
-			public void startComputation(final DataChainLinkComputation chainLink) {
+		chain.setOnStatus(new OnStatus<InductiveVisualMinerConfiguration>() {
+			public void startComputation(final DataChainLinkComputation<InductiveVisualMinerConfiguration> chainLink) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						setStatus(chainLink.getStatusBusyMessage(), chainLink.hashCode());
@@ -151,7 +151,7 @@ public class InductiveVisualMinerController {
 				});
 			}
 
-			public void endComputation(final DataChainLinkComputation chainLink) {
+			public void endComputation(final DataChainLinkComputation<InductiveVisualMinerConfiguration> chainLink) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						setStatus(null, chainLink.hashCode());
@@ -611,7 +611,7 @@ public class InductiveVisualMinerController {
 						IvMObject.selected_visualisation_mode, IvMObject.graph_visualisation_info_aligned,
 						IvMObject.visualisation_data };
 			}
-			
+
 			public IvMObject<?>[] getOptionalObjects() {
 				Set<IvMObject<?>> result = new THashSet<>();
 				for (Mode mode : configuration.getModes()) {
@@ -1209,7 +1209,7 @@ public class InductiveVisualMinerController {
 		});
 
 		//create model visualisation data
-		chain.register(new DataChainLinkComputationAbstract() {
+		chain.register(new DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration>() {
 			public String getName() {
 				return "visualisation data";
 			}

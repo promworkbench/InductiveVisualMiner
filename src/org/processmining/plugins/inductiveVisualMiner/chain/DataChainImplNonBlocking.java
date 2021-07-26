@@ -7,17 +7,19 @@ import java.util.concurrent.TimeUnit;
 
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.graphviz.dot.Dot;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 
 /**
  * Idea: keep the requests in a non-blocking queue, and have a separate thread
  * process them.
  * 
  * @author sander
+ * @param <C>
+ *            configuration
  * @param <P>
+ *            panel
  *
  */
-public class DataChainImplNonBlocking<P> extends DataChainAbstract {
+public class DataChainImplNonBlocking<C, P> extends DataChainAbstract {
 
 	protected static class QueueItem {
 
@@ -51,12 +53,13 @@ public class DataChainImplNonBlocking<P> extends DataChainAbstract {
 		}
 	}
 
-	protected static class QueueItemResults extends QueueItem {
+	protected static class QueueItemResults<C> extends QueueItem {
 		public final IvMCanceller canceller;
-		public final DataChainLinkComputation chainLink;
+		public final DataChainLinkComputation<C> chainLink;
 		public final IvMObjectValues outputs;
 
-		public QueueItemResults(IvMCanceller canceller, DataChainLinkComputation chainLink, IvMObjectValues outputs) {
+		public QueueItemResults(IvMCanceller canceller, DataChainLinkComputation<C> chainLink,
+				IvMObjectValues outputs) {
 			this.canceller = canceller;
 			this.chainLink = chainLink;
 			this.outputs = outputs;
@@ -89,11 +92,11 @@ public class DataChainImplNonBlocking<P> extends DataChainAbstract {
 	private final ConcurrentLinkedQueue<QueueItem> queue = new ConcurrentLinkedQueue<>();
 	private final Semaphore semaphore = new Semaphore(0);
 
-	private final DataChainInternal<P> chainInternal;
+	private final DataChainInternal<C, P> chainInternal;
 	private final ProMCanceller globalCanceller;
 
-	public DataChainImplNonBlocking(DataState state, ProMCanceller canceller, Executor executor,
-			InductiveVisualMinerConfiguration configuration, P panel) {
+	public DataChainImplNonBlocking(DataState state, ProMCanceller canceller, Executor executor, C configuration,
+			P panel) {
 		this.globalCanceller = canceller;
 		chainInternal = new DataChainInternal<>(this, state, canceller, executor, configuration, panel);
 
@@ -107,8 +110,8 @@ public class DataChainImplNonBlocking<P> extends DataChainAbstract {
 	}
 
 	@Override
-	public <C> void setObject(IvMObject<C> objectName, C object) {
-		addQueueItem(new QueueItemSetObject<C>(objectName, object));
+	public <O> void setObject(IvMObject<O> objectName, O object) {
+		addQueueItem(new QueueItemSetObject<O>(objectName, object));
 	}
 
 	@Override
@@ -132,8 +135,8 @@ public class DataChainImplNonBlocking<P> extends DataChainAbstract {
 	}
 
 	@Override
-	public <C> void setFixedObject(IvMObject<C> object, C value) {
-		addQueueItem(new QueueItemSetFixedObject<C>(object, value));
+	public <O> void setFixedObject(IvMObject<O> object, O value) {
+		addQueueItem(new QueueItemSetFixedObject<O>(object, value));
 	}
 
 	private void addQueueItem(QueueItem queueItem) {
@@ -141,9 +144,9 @@ public class DataChainImplNonBlocking<P> extends DataChainAbstract {
 		semaphore.release();
 	}
 
-	public void processOutputsOfChainLink(IvMCanceller canceller, DataChainLinkComputation chainLink,
+	public void processOutputsOfChainLink(IvMCanceller canceller, DataChainLinkComputation<C> chainLink,
 			IvMObjectValues outputs) {
-		queue.add(new QueueItemResults(canceller, chainLink, outputs));
+		queue.add(new QueueItemResults<>(canceller, chainLink, outputs));
 		semaphore.release();
 	}
 
@@ -166,8 +169,8 @@ public class DataChainImplNonBlocking<P> extends DataChainAbstract {
 					} else if (item instanceof QueueItemExecuteLink) {
 						chainInternal.executeLink(((QueueItemExecuteLink) item).chainLink);
 					} else if (item instanceof QueueItemResults) {
-						chainInternal.processOutputsOfChainLink(((QueueItemResults) item).canceller,
-								((QueueItemResults) item).chainLink, ((QueueItemResults) item).outputs);
+						chainInternal.processOutputsOfChainLink(((QueueItemResults<?>) item).canceller,
+								((QueueItemResults<?>) item).chainLink, ((QueueItemResults<?>) item).outputs);
 					} else if (item instanceof QueueItemRegister) {
 						chainInternal.register(((QueueItemRegister) item).chainLink);
 					} else if (item instanceof QueueItemGetObjectValues) {
@@ -180,11 +183,11 @@ public class DataChainImplNonBlocking<P> extends DataChainAbstract {
 			}
 		}
 
-		private <C> void chainThreadSetObject(QueueItemSetObject<C> item) {
+		private <O> void chainThreadSetObject(QueueItemSetObject<O> item) {
 			chainInternal.setObject(item.object, item.value);
 		}
 
-		private <C> void chainThreadSetFixedObject(QueueItemSetFixedObject<C> item) {
+		private <O> void chainThreadSetFixedObject(QueueItemSetFixedObject<O> item) {
 			chainInternal.setFixedObject(item.object, item.value);
 		}
 

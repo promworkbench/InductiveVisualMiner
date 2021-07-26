@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVis
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.logFiltering.FilterLeastOccurringActivities;
 
-public class Cl04FilterLogOnActivities extends DataChainLinkComputationAbstract {
+public class Cl04FilterLogOnActivities extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	public String getName() {
 		return "filter log";

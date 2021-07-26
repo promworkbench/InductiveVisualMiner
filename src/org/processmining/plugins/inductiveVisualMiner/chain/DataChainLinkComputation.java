@@ -1,8 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
-
-public interface DataChainLinkComputation extends DataChainLink {
+public interface DataChainLinkComputation<C> extends DataChainLink {
 
 	public IvMObject<?>[] getOutputObjects();
 
@@ -15,8 +13,7 @@ public interface DataChainLinkComputation extends DataChainLink {
 	 * @return
 	 * @throws Exception
 	 */
-	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
-			IvMCanceller canceller) throws Exception;
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception;
 
 	/**
 	 * 

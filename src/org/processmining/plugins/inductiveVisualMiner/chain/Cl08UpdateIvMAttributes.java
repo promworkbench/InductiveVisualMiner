@@ -20,7 +20,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * @author sander
  *
  */
-public class Cl08UpdateIvMAttributes extends DataChainLinkComputationAbstract {
+public class Cl08UpdateIvMAttributes extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	public String getName() {
 		return "update IvM attributes";

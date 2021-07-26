@@ -12,7 +12,7 @@ import org.processmining.plugins.InductiveMiner.mining.logs.XLifeCycleClassifier
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
-public class Cl03MakeLog extends DataChainLinkComputationAbstract {
+public class Cl03MakeLog extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	public String getName() {
 		return "make log";

@@ -34,7 +34,7 @@ public class PopupController {
 
 	public static final int maxCharactersPerLine = 43;
 
-	public static class ClPopups extends DataChainLinkComputationAbstract {
+	public static class ClPopups extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 		private final IvMObject<?>[] triggers;
 

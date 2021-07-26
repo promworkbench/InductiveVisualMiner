@@ -4,7 +4,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
 
-public class Cl21DataAnalysisLog extends DataChainLinkComputationAbstract {
+public class Cl21DataAnalysisLog extends DataChainLinkComputationAbstract<InductiveVisualMinerConfiguration> {
 
 	@Override
 	public String getName() {
