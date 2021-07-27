@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeV
 
 public class ModePaths extends Mode {
 
-	private ProcessTreeVisualisationParameters visualisationParameters = new ProcessTreeVisualisationParameters();
+	protected ProcessTreeVisualisationParameters visualisationParameters = new ProcessTreeVisualisationParameters();
 
 	public ModePaths() {
 		visualisationParameters.setShowFrequenciesOnModelEdges(true);

@@ -2,7 +2,11 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Toolkit;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -17,7 +21,7 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 	private static final long serialVersionUID = -2730521457101145974L;
 
 	private JPanel offPanel = new JPanel();
-	private final JLabel offMessage;
+	private JLabel offMessage;
 	private final JCheckBox offCheckBox;
 	private X onPanel;
 	private boolean on = true;
@@ -42,7 +46,14 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 			offPanel.add(offCheckBox, BorderLayout.CENTER);
 		} else {
 			offCheckBox = null;
-			offMessage = new JLabel("off", SwingConstants.CENTER);
+			try {
+				InputStream in = getClass().getResourceAsStream("loading.gif");
+				ImageIcon loading = new ImageIcon(
+						Toolkit.getDefaultToolkit().createImage(org.apache.commons.io.IOUtils.toByteArray(in)));
+				offMessage = new JLabel("off", loading, SwingConstants.CENTER);
+			} catch (IOException e) {
+				offMessage = new JLabel("off", SwingConstants.CENTER);
+			}
 			decorator.decorate(offMessage);
 			offMessage.setOpaque(false);
 			offPanel.add(offMessage, BorderLayout.CENTER);
