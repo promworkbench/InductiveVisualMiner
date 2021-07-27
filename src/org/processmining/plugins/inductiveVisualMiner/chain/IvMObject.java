@@ -130,7 +130,7 @@ public class IvMObject<C> {
 			boolean.class);
 
 	//skeleton
-	protected static <C> IvMObject<C> c(String name, Class<C> clazz) {
+	public static <C> IvMObject<C> c(String name, Class<C> clazz) {
 		return new IvMObject<C>(name, clazz);
 	}
 
