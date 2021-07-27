@@ -109,7 +109,9 @@ public class InductiveVisualMinerSelectionColourer {
 						maxCardinality, visualisationParameters);
 
 				if (model.isActivity(unode)) {
-					traceViewColourMap.set(unode, colour.getA(), colour.getB());
+					if (traceViewColourMap != null) {
+						traceViewColourMap.set(unode, colour.getA(), colour.getB());
+					}
 				}
 			}
 
@@ -222,7 +224,9 @@ public class InductiveVisualMinerSelectionColourer {
 					parameters.getColourModelEdges(), parameters.isShowFrequenciesOnModelEdges(),
 					parameters.getModelEdgesWidth());
 			if (model.isTau(dotEdge.getUnode())) {
-				traceViewColourMap.set(dotEdge.getUnode(), edgeColour, edgeColour);
+				if (traceViewColourMap != null) {
+					traceViewColourMap.set(dotEdge.getUnode(), edgeColour, edgeColour);
+				}
 			}
 		}
 	}
