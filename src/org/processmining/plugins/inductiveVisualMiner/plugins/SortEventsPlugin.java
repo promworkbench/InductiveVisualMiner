@@ -16,8 +16,9 @@ import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.InductiveMiner.plugins.dialogs.IMMiningDialog;
 
 public class SortEventsPlugin {
-	@Plugin(name = "Sort events in traces, based on time stamp (in place)", returnLabels = { "Log" }, returnTypes = { XLog.class }, parameterLabels = { "Log with sorted events" }, userAccessible = true,
-			categories = { PluginCategory.Filtering}, help = "Sort events in traces, based on time stamp (in place).")
+	@Plugin(name = "Sort events in traces, based on time stamp (in place)", returnLabels = { "Log" }, returnTypes = {
+			XLog.class }, parameterLabels = { "Log with sorted events" }, userAccessible = true, categories = {
+					PluginCategory.Filtering }, help = "Sort events in traces, based on time stamp (in place).")
 	@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)
 	@PluginVariant(variantLabel = "Mine a Process Tree, dialog", requiredParameterLabels = { 0 })
 	public XLog sort(PluginContext context, XLog log) {
@@ -26,14 +27,19 @@ public class SortEventsPlugin {
 		}
 		return log;
 	}
-	
-	
-	public static class EventsComparator implements Comparator<XEvent>{
+
+	public static class EventsComparator implements Comparator<XEvent> {
 		public int compare(XEvent o1, XEvent o2) {
 			Date time1 = XTimeExtension.instance().extractTimestamp(o1);
 			Date time2 = XTimeExtension.instance().extractTimestamp(o2);
-			if (time1 == null || time2 == null) {
+			if (time1 == null && time2 == null) {
 				return 0;
+			}
+			if (time1 == null) {
+				return 1;
+			}
+			if (time2 == null) {
+				return -1;
 			}
 			return time1.compareTo(time2);
 		}
