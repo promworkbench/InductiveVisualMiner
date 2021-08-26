@@ -56,8 +56,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnStatus;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfigurationDefault;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisController;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesController;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
@@ -162,21 +161,6 @@ public class InductiveVisualMinerController {
 
 		//start the chain
 		chain.setFixedObject(IvMObject.input_log, log);
-	}
-
-	/**
-	 * Given panel and state are ignored.
-	 * 
-	 * @param context
-	 * @param panel
-	 * @param state
-	 * @param canceller
-	 */
-	@Deprecated
-	public InductiveVisualMinerController(final PluginContext context, final InductiveVisualMinerPanel panel,
-			final InductiveVisualMinerState state, ProMCanceller canceller) {
-		this(context, new InductiveVisualMinerConfigurationDefault(canceller, context.getExecutor()), state.getXLog(),
-				canceller);
 	}
 
 	protected void initGui(final ProMCanceller canceller, InductiveVisualMinerConfiguration configuration) {
@@ -764,7 +748,7 @@ public class InductiveVisualMinerController {
 			}
 		});
 
-		DataAnalysisController.initialise(configuration, chain);
+		DataAnalysesController.init(chain, panel.getDataAnalysesView());
 	}
 
 	protected void initGuiClassifiers() {

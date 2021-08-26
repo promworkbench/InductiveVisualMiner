@@ -8,7 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -41,7 +41,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<PopupItemLogMove> popupItemsLogMove;
 	private final List<PopupItemModelMove> popupItemsModelMove;
 	private final List<PopupItemLog> popupItemsLog;
-	private final List<DataAnalysisTableFactory> dataAnalyses;
+	private final List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> dataAnalyses;
 	private final List<PreMiningFilter> preMiningFilters;
 	private final List<HighlightingFilter> highlightingFilters;
 	private final List<IvMExporter> exporters;
@@ -88,7 +88,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	protected abstract List<PopupItemLog> createPopupItemsLog();
 
-	protected abstract List<DataAnalysisTableFactory> createDataAnalysisTables();
+	protected abstract List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables();
 
 	protected abstract List<IvMExporter> createExporters();
 
@@ -96,8 +96,9 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	protected abstract IvMDecoratorI createDecorator();
 
-	protected abstract DataChain<InductiveVisualMinerConfiguration> createChain(InductiveVisualMinerPanel panel, ProMCanceller canceller,
-			Executor executor, List<PreMiningFilter> preMiningFilters, List<HighlightingFilter> highlightingFilters);
+	protected abstract DataChain<InductiveVisualMinerConfiguration> createChain(InductiveVisualMinerPanel panel,
+			ProMCanceller canceller, Executor executor, List<PreMiningFilter> preMiningFilters,
+			List<HighlightingFilter> highlightingFilters);
 
 	protected abstract IvMVirtualAttributeFactory createVirtualAttributes();
 
@@ -174,7 +175,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	}
 
 	@Override
-	final public List<DataAnalysisTableFactory> getDataAnalysisTables() {
+	final public List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables() {
 		return dataAnalyses;
 	}
 

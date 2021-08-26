@@ -3,41 +3,40 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JTabbedPane;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
-import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 import gnu.trove.map.hash.THashMap;
 
-public class DataAnalysesView extends SideWindow {
+public class DataAnalysesView<C, P> extends SideWindow {
 
 	private static final long serialVersionUID = -1113805892324898124L;
 
-	private final Map<String, DataAnalysisTable> tables = new THashMap<>();
+	private final Map<String, DataTable<C, P>> tables = new THashMap<>();
 	private final Map<String, OnOffPanel<?>> onOffPanels = new THashMap<>();
 	private final JTabbedPane tabbedPane;
 
-	public DataAnalysesView(Component parent, InductiveVisualMinerConfiguration configuration) {
+	public DataAnalysesView(Component parent, List<DataTab<C, P>> factories, IvMDecoratorI decorator) {
 		super(parent, "Data analysis - " + InductiveVisualMinerPanel.title);
 
 		tabbedPane = new JTabbedPane();
 
-		for (DataAnalysisTableFactory factory : configuration.getDataAnalysisTables()) {
-			DataAnalysisTable table = factory.create();
+		for (DataTab<C, P> factory : factories) {
+			DataTable<C, P> table = createTable(factory);
+
 			String analysisName = factory.getAnalysisName();
 			String explanation = factory.getExplanation();
 			boolean switchable = factory.isSwitchable();
 
-			OnOffPanel<?> onOffPanel = createView(configuration.getDecorator(), table, analysisName, explanation,
-					switchable);
+			OnOffPanel<?> onOffPanel = createView(decorator, table, analysisName, explanation, switchable);
 			onOffPanel.off();
 			tabbedPane.addTab(analysisName, onOffPanel);
 
@@ -49,7 +48,19 @@ public class DataAnalysesView extends SideWindow {
 		add(tabbedPane, BorderLayout.CENTER);
 	}
 
-	private static OnOffPanel<DataAnalysisView> createView(IvMDecoratorI decorator, DataAnalysisTable table,
+	private DataTable<C, P> createTable(DataTab<C, P> factory) {
+		DataTable<C, P> table = factory.createTable(this);
+		List<DataRowBlock<C, P>> blocks = factory.createRowBlocks(table);
+		for (DataRowBlockComputer<C, P> rowBlockComputer : factory.createRowBlockComputers()) {
+			blocks.add(rowBlockComputer.createDataRowBlock(table));
+		}
+
+		table.getModel().setBlocks(blocks);
+
+		return table;
+	}
+
+	private static OnOffPanel<DataAnalysisView> createView(IvMDecoratorI decorator, DataTable<?, ?> table,
 			String analysisName, String explanation, boolean switchable) {
 		OnOffPanel<DataAnalysisView> result = new OnOffPanel<>(decorator,
 				new DataAnalysisView(decorator, table, explanation), switchable);
@@ -62,29 +73,8 @@ public class DataAnalysesView extends SideWindow {
 		return result;
 	}
 
-	/**
-	 * Sets the data and enables the table.
-	 * 
-	 * @param analysisName
-	 * @param state
-	 */
-	public void setData(String analysisName, IvMObjectValues inputs) {
-		if (tables.containsKey(analysisName)) {
-			DataAnalysisTable table = tables.get(analysisName);
-			boolean successful = table.setData(inputs);
-
-			OnOffPanel<?> onOffPanel = onOffPanels.get(analysisName);
-			if (!onOffPanel.isSwitchable() || successful) {
-				onOffPanel.on();
-			}
-		}
-	}
-
-	public void invalidate(String analysisName) {
-		if (onOffPanels.containsKey(analysisName)) {
-			onOffPanels.get(analysisName).off();
-			tables.get(analysisName).invalidateData();
-		}
+	public Collection<DataTable<C, P>> getAnalyses() {
+		return tables.values();
 	}
 
 	public void showAnalysis(String name) {
@@ -94,13 +84,17 @@ public class DataAnalysesView extends SideWindow {
 		}
 	}
 
+	public OnOffPanel<?> getOnOffPanel(String name) {
+		return onOffPanels.get(name);
+	}
+
 	public void setCohortAnalysis2HighlightingFilterHandler(
 			CohortAnalysis2HighlightingFilterHandler showCohortHighlightingFilterHandler) {
-		for (DataAnalysisTable table : tables.values()) {
-			if (table instanceof CohortAnalysisTable) {
-				((CohortAnalysisTable) table)
-						.setCohortAnalysis2HighlightingFilterHandler(showCohortHighlightingFilterHandler);
-			}
+		for (DataTable<C, P> table : tables.values()) {
+			//			if (table instanceof CohortAnalysisTable) {
+			//				((CohortAnalysisTable) table)
+			//						.setCohortAnalysis2HighlightingFilterHandler(showCohortHighlightingFilterHandler);
+			//			}
 		}
 	}
 

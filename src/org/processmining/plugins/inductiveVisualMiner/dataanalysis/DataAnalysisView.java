@@ -5,6 +5,7 @@ import java.awt.Insets;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -14,7 +15,7 @@ public class DataAnalysisView extends JPanel {
 
 	private static final long serialVersionUID = -5719337013697465055L;
 
-	public DataAnalysisView(IvMDecoratorI decorator, DataAnalysisTable table, String explanation) {
+	public DataAnalysisView(IvMDecoratorI decorator, JTable table, String explanation) {
 		setLayout(new BorderLayout());
 
 		IvMPanel topPanel = new IvMPanel(decorator);

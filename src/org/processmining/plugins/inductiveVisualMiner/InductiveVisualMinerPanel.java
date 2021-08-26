@@ -80,7 +80,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final JButton traceViewButton;
 	private final TraceView traceView;
 	private final JButton dataAnalysisViewButton;
-	private final DataAnalysesView dataAnalysisView;
+	private final DataAnalysesView<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> dataAnalysisView;
 	private final JButton traceColourMapViewButton;
 	private final TraceColourMapView traceColourMapView;
 	private final JButton highlightingFiltersViewButton;
@@ -290,7 +290,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//data analysis view
 			{
-				dataAnalysisView = new DataAnalysesView(this, configuration);
+				dataAnalysisView = new DataAnalysesView<>(this, configuration.getDataAnalysisTables(),
+						configuration.getDecorator());
 				dataAnalysisViewButton = new JButton("data analysis");
 				decorator.decorate(dataAnalysisViewButton);
 				GridBagConstraints cDataAnalysisViewButton = new GridBagConstraints();
@@ -592,7 +593,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return traceViewButton;
 	}
 
-	public DataAnalysesView getDataAnalysesView() {
+	public DataAnalysesView<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> getDataAnalysesView() {
 		return dataAnalysisView;
 	}
 

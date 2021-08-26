@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,8 +17,6 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualM
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
@@ -87,14 +84,7 @@ public class IvMObject<C> {
 	public static final IvMObject<PerformanceWrapper> performance = c("performance", PerformanceWrapper.class);
 
 	//data analyses
-	public static final IvMObject<LogAttributeAnalysis> data_analysis_log = c("data analysis log",
-			LogAttributeAnalysis.class);
-	@SuppressWarnings("rawtypes")
-	public static final IvMObject<List> data_analysis_log_virtual_attributes = c("data analysis log virtual attributes",
-			List.class);
 	public static final IvMObject<Cohorts> data_analysis_cohort = c("data analysis cohort", Cohorts.class);
-	public static final IvMObject<EventAttributeAnalysis> data_analysis_event = c("data analysis event",
-			EventAttributeAnalysis.class);
 	public static final IvMObject<TraceAttributeAnalysis> data_analysis_trace = c("data analysis trace",
 			TraceAttributeAnalysis.class);
 

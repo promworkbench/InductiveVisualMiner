@@ -6,7 +6,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -89,7 +89,7 @@ public interface InductiveVisualMinerConfiguration {
 
 	public List<PopupItemLog> getPopupItemsLog();
 
-	public List<DataAnalysisTableFactory> getDataAnalysisTables();
+	public List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables();
 
 	public IvMVirtualAttributeFactory getVirtualAttributes();
 

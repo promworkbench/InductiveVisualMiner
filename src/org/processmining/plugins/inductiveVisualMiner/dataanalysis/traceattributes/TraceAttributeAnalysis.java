@@ -8,7 +8,6 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +22,6 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesIn
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -34,6 +32,8 @@ import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import gnu.trove.map.hash.THashMap;
 
 /**
  * Performs the data analysis and stores it.
@@ -126,10 +126,8 @@ public class TraceAttributeAnalysis {
 		public double[] fitness;
 	}
 
-	private Map<Attribute, EnumMap<Field, DisplayType>> attribute2data = new TreeMap<>(
-			EventAttributeAnalysis.attributeNameComparator);
-	private Map<Attribute, EnumMap<Field, DisplayType>> attribute2dataNegative = new TreeMap<>(
-			EventAttributeAnalysis.attributeNameComparator);
+	private Map<Attribute, EnumMap<Field, DisplayType>> attribute2data = new THashMap<>();
+	private Map<Attribute, EnumMap<Field, DisplayType>> attribute2dataNegative = new THashMap<>();
 
 	private LogData logData;
 	private LogData logDataNegative;

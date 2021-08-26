@@ -10,11 +10,13 @@ import javax.swing.table.TableModel;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerAnimationPanel;
+import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 
 import gnu.trove.set.hash.THashSet;
@@ -51,8 +53,13 @@ public class ExporterDataAnalyses extends IvMExporter {
 	@Override
 	protected IvMObject<?>[] createNonTriggerObjects() {
 		Set<IvMObject<?>> result = new THashSet<>();
-		for (DataAnalysisTableFactory analysis : configuration.getDataAnalysisTables()) {
-			result.addAll(Arrays.asList(analysis.getOptionalObjects()));
+		for (DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysis : configuration
+				.getDataAnalysisTables()) {
+			DataTable<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> table = analysis.createTable(null);
+			for (DataRowBlock<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> block : analysis
+					.createRowBlocks(table)) {
+				result.addAll(Arrays.asList(block.getOptionalObjects()));
+			}
 		}
 		IvMObject<?>[] arr = new IvMObject<?>[result.size()];
 		return result.toArray(arr);
@@ -63,36 +70,41 @@ public class ExporterDataAnalyses extends IvMExporter {
 		WritableWorkbook workbook = Workbook.createWorkbook(file);
 
 		int sheetIndex = 0;
-		for (DataAnalysisTableFactory analysis : configuration.getDataAnalysisTables()) {
-			if (inputs.has(analysis.getInputObjects())) {
-				String name = analysis.getAnalysisName();
-				WritableSheet sheet = workbook.createSheet(name, sheetIndex);
+		for (DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysis : configuration
+				.getDataAnalysisTables()) {
 
-				DataAnalysisTable analysisTable = analysis.create();
-				IvMObjectValues subInputs = inputs.getIfPresent(analysis.getInputObjects(),
-						analysis.getOptionalObjects());
+			String name = analysis.getAnalysisName();
+			WritableSheet sheet = workbook.createSheet(name, sheetIndex);
 
-				if (!analysisTable.setData(subInputs)) {
-					sheet.addCell(new Label(0, 0, "Still computing at time of export.."));
-				} else {
-					TableModel model = analysisTable.getModel();
-
-					//write header
-					for (int column = 0; column < model.getColumnCount(); column++) {
-						sheet.addCell(new Label(column, 0, model.getColumnName(column)));
-					}
-
-					//write body
-					for (int column = 0; column < model.getColumnCount(); column++) {
-						for (int row = 0; row < model.getRowCount(); row++) {
-							Object value = model.getValueAt(row, column);
-							write(sheet, column, row + 1, value);
-						}
-					}
+			//initialise the table
+			DataTable<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysisTable = analysis
+					.createTable(null);
+			analysisTable.getModel().setBlocks(analysis.createRowBlocks(analysisTable));
+			for (DataRowBlock<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> block : analysisTable
+					.getModel().getBlocks()) {
+				if (inputs.has(block.getRequiredObjects())) {
+					IvMObjectValues subInputs = inputs.getIfPresent(block.getRequiredObjects(),
+							block.getOptionalObjects());
+					block.updateGui(null, subInputs);
 				}
-
-				sheetIndex++;
 			}
+
+			TableModel model = analysisTable.getModel();
+
+			//write header
+			for (int column = 0; column < model.getColumnCount(); column++) {
+				sheet.addCell(new Label(column, 0, model.getColumnName(column)));
+			}
+
+			//write body
+			for (int column = 0; column < model.getColumnCount(); column++) {
+				for (int row = 0; row < model.getRowCount(); row++) {
+					Object value = model.getValueAt(row, column);
+					write(sheet, column, row + 1, value);
+				}
+			}
+
+			sheetIndex++;
 		}
 
 		workbook.write();

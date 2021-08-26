@@ -35,18 +35,13 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelect
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl16DataAnalysisTrace;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl17DataAnalysisEvent;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisLog;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl21DataAnalysisLog;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableFactory;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventAttributeAnalysisTableFactory;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.LogAttributeAnalysisTableFactory;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceAttributeAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventDataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataTabLog;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterDataAnalyses;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterModelStatistics;
@@ -215,13 +210,17 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	protected List<DataAnalysisTableFactory> createDataAnalysisTables() {
-		return new ArrayList<>(Arrays.asList(new DataAnalysisTableFactory[] { //
-				new LogAttributeAnalysisTableFactory(), //
-				new TraceAttributeAnalysisTableFactory(), //
-				new EventAttributeAnalysisTableFactory(), //
-				new CohortAnalysisTableFactory(), //
-		}));
+	protected List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables() {
+		List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> result = new ArrayList<>();
+		result.add(new DataTabLog<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+		result.add(new EventDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+		return result;
+		//		return new ArrayList<>(Arrays.asList(new DataAnalysisTableFactory[] { //
+		//				new LogAttributeAnalysisTableFactory(), //
+		//				new TraceAttributeAnalysisTableFactory(), //
+		//				new EventAttributeAnalysisTableFactory(), //
+		//				new CohortAnalysisTableFactory(), //
+		//		}));
 	}
 
 	@Override
@@ -312,7 +311,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			}
 		});
 
-		chain.register(new Cl21DataAnalysisLog<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl03MakeLog<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl04FilterLogOnActivities());
 		chain.register(new Cl05Mine<InductiveVisualMinerConfiguration>());
@@ -327,9 +325,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl14Performance<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl15Histogram<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl16DataAnalysisTrace<InductiveVisualMinerConfiguration>());
-		chain.register(new Cl17DataAnalysisEvent<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl18DataAnalysisCohort<InductiveVisualMinerConfiguration>());
-		chain.register(new Cl19DataAnalysisLog<InductiveVisualMinerConfiguration>());
 
 		//TODO: re-enable?
 		//		//mine performance
