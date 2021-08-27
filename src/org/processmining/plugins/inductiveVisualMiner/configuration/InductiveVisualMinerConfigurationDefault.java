@@ -34,7 +34,6 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl12TraceColouring;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl16DataAnalysisTrace;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
@@ -42,6 +41,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventDataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataTabLog;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataTab;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterDataAnalyses;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterModelStatistics;
@@ -213,6 +213,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	protected List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables() {
 		List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> result = new ArrayList<>();
 		result.add(new DataTabLog<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+		result.add(new TraceDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		result.add(new EventDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		return result;
 		//		return new ArrayList<>(Arrays.asList(new DataAnalysisTableFactory[] { //
@@ -324,7 +325,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl13FilterNodeSelection());
 		chain.register(new Cl14Performance<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl15Histogram<InductiveVisualMinerConfiguration>());
-		chain.register(new Cl16DataAnalysisTrace<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl18DataAnalysisCohort<InductiveVisualMinerConfiguration>());
 
 		//TODO: re-enable?

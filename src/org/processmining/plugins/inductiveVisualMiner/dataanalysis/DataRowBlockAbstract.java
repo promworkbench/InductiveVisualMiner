@@ -42,7 +42,7 @@ public abstract class DataRowBlockAbstract<C, P> extends DataChainLinkGuiAbstrac
 		for (DataRow row : rows) {
 			row.setAllValues(computing);
 		}
-		table.getModel().rowsChanged();
+		table.rowsChanged();
 	}
 
 	@Override
@@ -54,10 +54,9 @@ public abstract class DataRowBlockAbstract<C, P> extends DataChainLinkGuiAbstrac
 		rows = gather(inputs);
 		
 		if (namesOld == getMaxNumberOfNames() && valuesOld == getMaxNumberOfValues()) {
-			table.getModel().rowsChanged();
+			table.rowsChanged();
 		} else {
-			table.getModel().columnsChanged();
-			table.setSorting();
+			table.columnsChanged();
 		}
 	}
 

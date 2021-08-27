@@ -105,28 +105,11 @@ public class DataTableModel<C, P> extends AbstractTableModel {
 		fireTableStructureChanged();
 	}
 
-	/**
-	 * Notify the table model that the rows might have changed.
-	 */
-	public void rowsChanged() {
-		mightEnable();
-		fireTableDataChanged();
-	}
-
-	/**
-	 * Notify the table model that the columns might have changed. The caller
-	 * must re-enable sorting on the table by calling setSorting().
-	 */
-	public void columnsChanged() {
-		mightEnable();
-		fireTableStructureChanged();
-	}
-
 	/*
 	 * We might need to tell the dataAnalysesView that we are not empty anymore
 	 * (this is a violation of the separation of concerns).
 	 */
-	private void mightEnable() {
+	public void mightEnable() {
 		if (blocks != null && dataAnalysesView != null) {
 			for (DataRowBlock<C, P> block : getBlocks()) {
 				if (block.showsSomething()) {
