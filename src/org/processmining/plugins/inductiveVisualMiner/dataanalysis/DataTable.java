@@ -68,6 +68,11 @@ public class DataTable<C, P> extends JTable {
 			sortKeys.add(new RowSorter.SortKey(column, SortOrder.ASCENDING));
 		}
 
+		//value columns should not be selectable
+		for (int column = getModel().getNumberOfNameColumns(); column < getModel().getColumnCount(); column++) {
+			sorter.setSortable(column, false);
+		}
+
 		sorter.setSortsOnUpdates(true);
 		sorter.setSortKeys(sortKeys);
 		setRowSorter(sorter);

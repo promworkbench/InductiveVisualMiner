@@ -5,10 +5,13 @@ import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.TableCellRenderer;
 
 import org.processmining.plugins.InductiveMiner.Pair;
@@ -24,6 +27,9 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 	private Color selectedBackgroundColour = null;
 	private Color selectedForegroundColour = null;
 
+	private static Border emptyBorder = BorderFactory.createEmptyBorder();
+	private static Border firstRowOfGroupBorder = new MatteBorder(1, 0, 0, 0, Color.white);
+
 	public DataAnalysisTableCellRenderer() {
 		IvMDecorator.decorate(this);
 		setHorizontalTextPosition(SwingConstants.LEADING);
@@ -32,6 +38,16 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 
 	public Component getTableCellRendererComponent(JTable table, Object object, boolean isSelected, boolean hasFocus,
 			int row, int column) {
+
+		//find out if we are in the first row of a group (of at least 2)
+		int firstModelColumn = table.convertColumnIndexToView(0);
+		boolean firstRowOfGroup = getPreviousRowValue(table, row, firstModelColumn) != getRowValue(table, row,
+				firstModelColumn)
+				&& getRowValue(table, row, firstModelColumn) == getNextRowValue(table, row, firstModelColumn);
+
+		//find out if we are different than the row before
+		boolean sameAsPreviousRow = getPreviousRowValue(table, row, column) == getRowValue(table, row, column)
+				&& !(object instanceof DisplayType);
 
 		//default properties
 		setHorizontalAlignment(JLabel.LEFT);
@@ -62,10 +78,23 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 			setText(p.getA() + " ");
 			setIcon(p.getB());
 		} else {
-			setText(object.toString());
+			if (sameAsPreviousRow) {
+				//in the first column, do not repeat values
+				setText("   \"");
+			} else {
+				setText(object.toString());
+			}
 			setIcon(null);
 		}
 
+		//set border
+		if (firstRowOfGroup && row > 0) {
+			setBorder(firstRowOfGroupBorder);
+		} else {
+			setBorder(emptyBorder);
+		}
+
+		//set colour
 		if (isSelected) {
 			if (getSelectedBackgroundColour() != null) {
 				setBackground(getSelectedBackgroundColour());
@@ -79,11 +108,43 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 			}
 			setOpaque(true);
 		} else {
-			setForeground(IvMDecorator.textColour);
+			if (sameAsPreviousRow) {
+				//do not repeat values
+				setForeground(Color.white);
+			} else {
+				setForeground(IvMDecorator.textColour);
+			}
 			setOpaque(false);
 		}
 
 		return this;
+	}
+
+	private String getRowValue(JTable table, int row, int column) {
+		int modelRow = table.convertRowIndexToModel(row);
+		int modelColumn = table.convertColumnIndexToModel(column);
+
+		return table.getModel().getValueAt(modelRow, modelColumn).toString();
+	}
+
+	private String getPreviousRowValue(JTable table, int row, int column) {
+		if (row <= 0) {
+			return null;
+		}
+		int modelRow = table.convertRowIndexToModel(row - 1);
+		int modelColumn = table.convertColumnIndexToModel(column);
+
+		return table.getModel().getValueAt(modelRow, modelColumn).toString();
+	}
+
+	private String getNextRowValue(JTable table, int row, int column) {
+		if (row >= table.getModel().getRowCount() - 1) {
+			return null;
+		}
+		int modelRow = table.convertRowIndexToModel(row + 1);
+		int modelColumn = table.convertColumnIndexToModel(column);
+
+		return table.getModel().getValueAt(modelRow, modelColumn).toString();
 	}
 
 	public Color getSelectedBackgroundColour() {
