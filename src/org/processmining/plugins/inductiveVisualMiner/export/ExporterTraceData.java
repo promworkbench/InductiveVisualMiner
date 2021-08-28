@@ -27,7 +27,7 @@ public class ExporterTraceData extends IvMExporter {
 
 	@Override
 	protected IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.aligned_log_filtered, IvMObject.ivm_attributes_info };
+		return new IvMObject<?>[] { IvMObject.aligned_log_filtered, IvMObject.ivm_attributes_info_merged };
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class ExporterTraceData extends IvMExporter {
 	@Override
 	public void export(IvMObjectValues inputs, InductiveVisualMinerAnimationPanel panel, File file) throws Exception {
 		final IvMLogFilteredImpl log = inputs.get(IvMObject.aligned_log_filtered);
-		final IvMAttributesInfo attributes = inputs.get(IvMObject.ivm_attributes_info);
+		final IvMAttributesInfo attributes = inputs.get(IvMObject.ivm_attributes_info_merged);
 
 		PrintWriter w = new PrintWriter(file, "UTF-8");
 		char fieldSeparator = ',';

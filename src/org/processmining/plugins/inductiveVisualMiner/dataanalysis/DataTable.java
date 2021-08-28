@@ -54,7 +54,7 @@ public class DataTable<C, P> extends JTable {
 		setRowHeights();
 	}
 
-	private void setSorting() {
+	protected void setSorting() {
 		TableRowSorter<DataTableModel<C, P>> sorter = new TableRowSorter<>(getModel());
 		List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
 
@@ -65,17 +65,47 @@ public class DataTable<C, P> extends JTable {
 					return o1.toLowerCase().compareTo(o2.toLowerCase());
 				}
 			});
-			sortKeys.add(new RowSorter.SortKey(column, SortOrder.ASCENDING));
+		}
+		//set how value columns should be sorted
+		for (int column = getModel().getNumberOfNameColumns(); column < getModel().getColumnCount(); column++) {
+			sorter.setComparator(column, new Comparator<DisplayType>() {
+				public int compare(DisplayType o1, DisplayType o2) {
+					if (o1.getType() != o2.getType()) {
+						return o1.getType().compareTo(o2.getType());
+					}
+					
+					if (o1.getType() == Type.duration) {
+						Long.compare(((DisplayType.Duration) o1).getValueLong(),
+								((DisplayType.Duration) o2).getValueLong());
+					}
+					
+					if (o1.getType() == Type.time) {
+						Long.compare(((DisplayType.Time) o1).getValueLong(),
+								((DisplayType.Time) o2).getValueLong());
+					}
+					
+					if (o1.getType() == Type.numeric) {
+						Double.compare(((DisplayType.Numeric) o1).getValue(),
+								((DisplayType.Numeric) o2).getValue());
+					}
+					
+					return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
+				}
+			});
 		}
 
-		//value columns should not be selectable
-		for (int column = getModel().getNumberOfNameColumns(); column < getModel().getColumnCount(); column++) {
-			sorter.setSortable(column, false);
-		}
+		//set default sorting
+		setDefaultSorting(sorter, sortKeys);
 
 		sorter.setSortsOnUpdates(true);
 		sorter.setSortKeys(sortKeys);
 		setRowSorter(sorter);
+	}
+
+	protected void setDefaultSorting(TableRowSorter<DataTableModel<C, P>> sorter, List<RowSorter.SortKey> sortKeys) {
+		for (int column = 0; column < getModel().getNumberOfNameColumns(); column++) {
+			sortKeys.add(new RowSorter.SortKey(column, SortOrder.ASCENDING));
+		}
 	}
 
 	private void setRowHeights() {

@@ -919,11 +919,11 @@ public class InductiveVisualMinerController {
 			}
 
 			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.ivm_attributes_info, IvMObject.controller_highlighting_filters };
+				return new IvMObject<?>[] { IvMObject.ivm_attributes_info_merged, IvMObject.controller_highlighting_filters };
 			}
 
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
-				IvMAttributesInfo attributesInfo = inputs.get(IvMObject.ivm_attributes_info);
+				IvMAttributesInfo attributesInfo = inputs.get(IvMObject.ivm_attributes_info_merged);
 				IvMHighlightingFiltersController controller = inputs.get(IvMObject.controller_highlighting_filters);
 
 				controller.setAttributesInfo(attributesInfo);

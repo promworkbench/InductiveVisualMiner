@@ -35,7 +35,7 @@ public class Cl08UpdateIvMAttributes extends DataChainLinkComputationAbstract<In
 	}
 
 	public IvMObject<?>[] createOutputObjects() {
-		return new IvMObject<?>[] { IvMObject.ivm_attributes_info };
+		return new IvMObject<?>[] { IvMObject.ivm_attributes_info, IvMObject.ivm_attributes_info_merged };
 	}
 
 	public IvMObjectValues execute(InductiveVisualMinerConfiguration configuration, IvMObjectValues inputs,
@@ -48,15 +48,18 @@ public class Cl08UpdateIvMAttributes extends DataChainLinkComputationAbstract<In
 				Math.max(Runtime.getRuntime().availableProcessors() - 1, 1),
 				new ThreadFactoryBuilder().setNameFormat("ivm-thread-ivmattributes-%d").build());
 		IvMAttributesInfo result;
+		IvMAttributesInfo resultMerged;
 		try {
 			result = new IvMAttributesInfo(aLog, attributesInfo, virtualAttributes, executor);
 			executor.shutdown();
 			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			resultMerged = new IvMAttributesInfo(attributesInfo, result);
 		} finally {
 			executor.shutdownNow();
 		}
 
 		return new IvMObjectValues().//
-				s(IvMObject.ivm_attributes_info, result);
+				s(IvMObject.ivm_attributes_info, result).//
+				s(IvMObject.ivm_attributes_info_merged, resultMerged);
 	}
 }

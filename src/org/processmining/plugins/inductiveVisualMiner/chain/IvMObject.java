@@ -59,7 +59,9 @@ public class IvMObject<C> {
 	public static final IvMObject<Set> filtered_activities = c("filtered activities", Set.class);
 	public static final IvMObject<AlignedLogVisualisationData> visualisation_data = c("visualisation data",
 			AlignedLogVisualisationData.class);
-	public static final IvMObject<IvMAttributesInfo> ivm_attributes_info = c("attributes info",
+	public static final IvMObject<IvMAttributesInfo> ivm_attributes_info = c("ivm attributes info",
+			IvMAttributesInfo.class);
+	public static final IvMObject<IvMAttributesInfo> ivm_attributes_info_merged = c("ivm attributes info merged",
 			IvMAttributesInfo.class);
 	public static final IvMObject<HistogramData> histogram_data = c("histogram data", HistogramData.class);
 	public static final IvMObject<AttributeClassifier[]> classifier_for_gui = c("classifier for gui",

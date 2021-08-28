@@ -29,29 +29,29 @@ public class IvMAttributesInfo implements AttributesInfo {
 	 */
 	public IvMAttributesInfo(final IvMLog log, AttributesInfo oldAttributes, IvMVirtualAttributeFactory factory,
 			ExecutorService executor) {
-		//copy old attributes
-		{
-			traceAttributes = new THashMap<>();
-			for (Attribute attribute : oldAttributes.getTraceAttributes()) {
-				traceAttributes.put(attribute.getName(), attribute);
-			}
-
-			eventAttributes = new THashMap<>();
-			for (Attribute attribute : oldAttributes.getEventAttributes()) {
-				eventAttributes.put(attribute.getName(), attribute);
-			}
-		}
+		//		//copy old attributes
+		//		{
+		traceAttributes = new THashMap<>();
+		//			for (Attribute attribute : oldAttributes.getTraceAttributes()) {
+		//				traceAttributes.put(attribute.getName(), attribute);
+		//			}
+		//
+		eventAttributes = new THashMap<>();
+		//			for (Attribute attribute : oldAttributes.getEventAttributes()) {
+		//				eventAttributes.put(attribute.getName(), attribute);
+		//			}
+		//		}
 
 		//filter the real attributes
 		THashMap<String, AttributeImpl> traceAttributesReal = new THashMap<>();
 		THashMap<String, AttributeImpl> eventAttributesReal = new THashMap<>();
 		{
-			for (Attribute attribute : traceAttributes.values()) {
+			for (Attribute attribute : oldAttributes.getTraceAttributes()) {
 				if (attribute instanceof AttributeImpl) {
 					traceAttributesReal.put(attribute.getName(), (AttributeImpl) attribute);
 				}
 			}
-			for (Attribute attribute : eventAttributes.values()) {
+			for (Attribute attribute : oldAttributes.getEventAttributes()) {
 				if (attribute instanceof AttributeImpl) {
 					eventAttributesReal.put(attribute.getName(), (AttributeImpl) attribute);
 				}
@@ -103,6 +103,23 @@ public class IvMAttributesInfo implements AttributesInfo {
 		{
 			traceAttributes.putAll(traceAttributesVirtual);
 			eventAttributes.putAll(eventAttributesVirtual);
+		}
+	}
+
+	public IvMAttributesInfo(AttributesInfo oldAttributes, IvMAttributesInfo merge) {
+		//		//copy old attributes
+		{
+			traceAttributes = new THashMap<>();
+			for (Attribute attribute : oldAttributes.getTraceAttributes()) {
+				traceAttributes.put(attribute.getName(), attribute);
+			}
+			traceAttributes.putAll(merge.traceAttributes);
+
+			eventAttributes = new THashMap<>();
+			for (Attribute attribute : oldAttributes.getEventAttributes()) {
+				eventAttributes.put(attribute.getName(), attribute);
+			}
+			eventAttributes.putAll(merge.eventAttributes);
 		}
 	}
 

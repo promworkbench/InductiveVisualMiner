@@ -16,6 +16,11 @@ public class DataRow {
 		this.values = values;
 	}
 
+	public DataRow(String name, DisplayType... values) {
+		this.names = new String[] { name };
+		this.values = values;
+	}
+
 	public int getNumberOfNames() {
 		return names.length;
 	}
