@@ -32,7 +32,9 @@ public class EventDataTab<C, P> implements DataTab<C, P> {
 	public List<DataRowBlockComputer<C, P>> createRowBlockComputers() {
 		List<DataRowBlockComputer<C, P>> result = new ArrayList<>();
 		result.add(new EventDataRowBlock<C, P>());
+		result.add(new EventDataRowBlockVirtual<C, P>());
 		result.add(new EventDataRowBlockType<C, P>());
+		result.add(new EventDataRowBlockTypeVirtual<C, P>());
 		return result;
 	}
 

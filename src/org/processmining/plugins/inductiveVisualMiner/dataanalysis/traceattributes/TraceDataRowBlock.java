@@ -11,7 +11,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.math.plot.utils.Array;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
@@ -25,6 +24,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 
@@ -33,12 +33,12 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 	}
 
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.ivm_attributes_info, IvMObject.aligned_log_filtered };
+		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.aligned_log_filtered };
 	}
 
 	public List<DataRow> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
 		IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
-		IvMAttributesInfo attributes = inputs.get(IvMObject.ivm_attributes_info);
+		AttributesInfo attributes = inputs.get(IvMObject.attributes_info);
 
 		//count number of traces
 		int numberOfTraces = getNumberOfTraces(logFiltered);
@@ -68,7 +68,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private int getNumberOfTraces(IvMLogFiltered log) {
+	public static int getNumberOfTraces(IvMLogFiltered log) {
 		int numberOfTraces = 0;
 		for (Iterator<IvMTrace> it = log.iterator(); it.hasNext();) {
 			it.next();
@@ -77,7 +77,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return numberOfTraces;
 	}
 
-	private double[] getTrace2fitness(IvMLogFiltered log, int numberOfTraces) {
+	public static double[] getTrace2fitness(IvMLogFiltered log, int numberOfTraces) {
 		//compute fitness
 		double[] result = new double[numberOfTraces];
 		int i = 0;
@@ -98,7 +98,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 	 * @param b
 	 * @return
 	 */
-	private List<DataRow> merge(List<DataRow> a, List<DataRow> b, IvMCanceller canceller) {
+	public static List<DataRow> merge(List<DataRow> a, List<DataRow> b, IvMCanceller canceller) {
 		for (DataRow dataRowA : a) {
 
 			if (canceller.isCancelled()) {
@@ -122,7 +122,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return a;
 	}
 
-	private List<DataRow> createAttributeData(IvMLogFiltered logFiltered, Attribute attribute, int numberOfTraces,
+	public static List<DataRow> createAttributeData(IvMLogFiltered logFiltered, Attribute attribute, int numberOfTraces,
 			double[] trace2fitness, IvMCanceller canceller) {
 		if (attribute.isNumeric()) {
 			return createAttributeDataNumeric(logFiltered, attribute, numberOfTraces, trace2fitness, canceller);
@@ -139,7 +139,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private List<DataRow> createAttributeDataNumeric(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow> createAttributeDataNumeric(IvMLogFiltered logFiltered, Attribute attribute,
 			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
 		Type attributeType = DisplayType.fromAttribute(attribute);
 
@@ -283,7 +283,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private List<DataRow> createAttributeDataTime(IvMLogFiltered logFiltered, Attribute attribute, int numberOfTraces,
+	private static List<DataRow> createAttributeDataTime(IvMLogFiltered logFiltered, Attribute attribute, int numberOfTraces,
 			double[] trace2fitness, IvMCanceller canceller) {
 		Type attributeType = Type.time;
 
@@ -426,7 +426,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private List<DataRow> createAttributeDataLiteral(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow> createAttributeDataLiteral(IvMLogFiltered logFiltered, Attribute attribute,
 			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
 		assert !attribute.isVirtual();
 
@@ -472,7 +472,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private List<DataRow> createAttributeDataDuration(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow> createAttributeDataDuration(IvMLogFiltered logFiltered, Attribute attribute,
 			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
 		List<DataRow> result = new ArrayList<>();
 

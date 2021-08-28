@@ -1,8 +1,9 @@
-package org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes;
+package org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
@@ -10,24 +11,23 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class TraceDataRowBlockType<C, P> extends DataRowBlockComputer<C, P> {
+public class EventDataRowBlockTypeVirtual<C, P> extends DataRowBlockComputer<C, P> {
 
 	public String getName() {
-		return "trace-att-type";
+		return "event-att-type-virt";
 	}
 
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.attributes_info };
+		return new IvMObject<?>[] { IvMObject.ivm_attributes_info };
 	}
 
 	public List<DataRow> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
-		AttributesInfo attributes = inputs.get(IvMObject.attributes_info);
+		IvMAttributesInfo attributes = inputs.get(IvMObject.ivm_attributes_info);
 
 		List<DataRow> result = new ArrayList<>();
 
-		for (Attribute attribute : attributes.getTraceAttributes()) {
+		for (Attribute attribute : attributes.getEventAttributes()) {
 			String type = "";
 			if (attribute.isNumeric()) {
 				type += "numeric";

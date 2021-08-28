@@ -2,12 +2,10 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattribu
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.math.plot.utils.Array;
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
@@ -16,6 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockC
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.Correlation;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -23,6 +22,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TLongArrayList;
@@ -34,12 +34,12 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 	}
 
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.ivm_attributes_info, IvMObject.aligned_log_filtered };
+		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.aligned_log_filtered };
 	}
 
 	public List<DataRow> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
 		IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
-		IvMAttributesInfo attributes = inputs.get(IvMObject.ivm_attributes_info);
+		AttributesInfo attributes = inputs.get(IvMObject.attributes_info);
 
 		List<DataRow> result = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 			negativeLog.invert();
 
 			for (Attribute attribute : attributes.getEventAttributes()) {
-				result.addAll(merge(createAttributeData(logFiltered, attribute, canceller),
+				result.addAll(TraceDataRowBlock.merge(createAttributeData(logFiltered, attribute, canceller),
 						createAttributeData(negativeLog, attribute, canceller), canceller));
 			}
 		} else {
@@ -60,39 +60,7 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	/**
-	 * Merges a datarow from each if their names match. Assumption: each input
-	 * datarow has only one value. In-place.
-	 * 
-	 * @param a
-	 * @param b
-	 * @return
-	 */
-	private List<DataRow> merge(List<DataRow> a, List<DataRow> b, IvMCanceller canceller) {
-		for (DataRow dataRowA : a) {
-
-			if (canceller.isCancelled()) {
-				return a;
-			}
-
-			DataRow dataRowB = null;
-			for (DataRow drB : b) {
-				if (Arrays.equals(dataRowA.getNames(), drB.getNames())) {
-					dataRowB = drB;
-					break;
-				}
-			}
-
-			if (dataRowB == null) {
-				dataRowA.setValues(dataRowA.getValue(0), DisplayType.NA());
-			} else {
-				dataRowA.setValues(dataRowA.getValue(0), dataRowB.getValue(0));
-			}
-		}
-		return a;
-	}
-
-	private List<DataRow> createAttributeData(IvMLogFiltered logFiltered, Attribute attribute, IvMCanceller canceller) {
+	public static List<DataRow> createAttributeData(IvMLogFiltered logFiltered, Attribute attribute, IvMCanceller canceller) {
 		if (attribute.isNumeric()) {
 			return createAttributeDataNumeric(logFiltered, attribute, canceller);
 		} else if (attribute.isTime()) {
@@ -108,7 +76,7 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private List<DataRow> createAttributeDataNumeric(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow> createAttributeDataNumeric(IvMLogFiltered logFiltered, Attribute attribute,
 			IvMCanceller canceller) {
 		Type attributeType = DisplayType.fromAttribute(attribute);
 
@@ -219,7 +187,7 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private List<DataRow> createAttributeDataTime(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow> createAttributeDataTime(IvMLogFiltered logFiltered, Attribute attribute,
 			IvMCanceller canceller) {
 		Type attributeType = Type.time;
 
@@ -329,7 +297,7 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private List<DataRow> createAttributeDataLiteral(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow> createAttributeDataLiteral(IvMLogFiltered logFiltered, Attribute attribute,
 			IvMCanceller canceller) {
 		assert !attribute.isVirtual();
 
@@ -405,7 +373,7 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private List<DataRow> createAttributeDataDuration(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow> createAttributeDataDuration(IvMLogFiltered logFiltered, Attribute attribute,
 			IvMCanceller canceller) {
 		Type attributeType = Type.duration;
 

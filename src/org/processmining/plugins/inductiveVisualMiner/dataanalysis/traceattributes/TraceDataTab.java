@@ -32,7 +32,9 @@ public class TraceDataTab<C, P> implements DataTab<C, P> {
 	public List<DataRowBlockComputer<C, P>> createRowBlockComputers() {
 		List<DataRowBlockComputer<C, P>> result = new ArrayList<>();
 		result.add(new TraceDataRowBlock<C, P>());
+		result.add(new TraceDataRowBlockVirtual<C, P>());
 		result.add(new TraceDataRowBlockType<C, P>());
+		result.add(new TraceDataRowBlockTypeVirtual<C, P>());
 		return result;
 	}
 
