@@ -32,7 +32,7 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		tabbedPane = new JTabbedPane();
 
 		for (DataTab<?, C, P> factory : factories) {
-			DataTable<?, C, P> table = createTable(factory);
+			DataTable<?, C, P> table = createAndFillTable(factory, this);
 
 			String analysisName = factory.getAnalysisName();
 			String explanation = factory.getExplanation();
@@ -50,8 +50,9 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		add(tabbedPane, BorderLayout.CENTER);
 	}
 
-	private <O> DataTable<O, C, P> createTable(DataTab<O, C, P> factory) {
-		DataTable<O, C, P> table = factory.createTable(this);
+	public static <O, C, P> DataTable<O, C, P> createAndFillTable(DataTab<O, C, P> factory,
+			DataAnalysesView<C, P> dataAnalysesView) {
+		DataTable<O, C, P> table = factory.createTable(dataAnalysesView);
 		List<DataRowBlock<O, C, P>> blocks = factory.createRowBlocks(table);
 		for (DataRowBlockComputer<O, C, P> rowBlockComputer : factory.createRowBlockComputers()) {
 			blocks.add(rowBlockComputer.createDataRowBlock(table));
