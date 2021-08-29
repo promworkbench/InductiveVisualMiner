@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
-public class EventDataRowBlockVirtual<C, P> extends DataRowBlockComputer<C, P> {
+public class EventDataRowBlockVirtual<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "event-att-virt";
@@ -24,11 +24,12 @@ public class EventDataRowBlockVirtual<C, P> extends DataRowBlockComputer<C, P> {
 		return new IvMObject<?>[] { IvMObject.ivm_attributes_info, IvMObject.aligned_log_filtered };
 	}
 
-	public List<DataRow> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
+	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
+			throws Exception {
 		IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 		IvMAttributesInfo attributes = inputs.get(IvMObject.ivm_attributes_info);
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		if (logFiltered.isSomethingFiltered()) {
 			IvMLogFilteredImpl negativeLog = logFiltered.clone();

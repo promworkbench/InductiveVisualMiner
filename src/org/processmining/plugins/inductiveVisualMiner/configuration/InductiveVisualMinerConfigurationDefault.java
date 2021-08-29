@@ -211,8 +211,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	protected List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables() {
-		List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> result = new ArrayList<>();
+	protected List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables() {
+		List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> result = new ArrayList<>();
 		result.add(new DataTabLog<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		result.add(new TraceDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		result.add(new EventDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());

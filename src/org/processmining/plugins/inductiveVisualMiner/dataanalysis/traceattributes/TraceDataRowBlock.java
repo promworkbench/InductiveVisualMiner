@@ -26,7 +26,7 @@ import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
+public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "trace-att";
@@ -36,7 +36,8 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.aligned_log_filtered };
 	}
 
-	public List<DataRow> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
+	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
+			throws Exception {
 		IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 		AttributesInfo attributes = inputs.get(IvMObject.attributes_info);
 
@@ -44,7 +45,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		int numberOfTraces = getNumberOfTraces(logFiltered);
 		double[] trace2fitness = getTrace2fitness(logFiltered, numberOfTraces);
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		if (logFiltered.isSomethingFiltered()) {
 			IvMLogFilteredImpl negativeLog = logFiltered.clone();
@@ -94,19 +95,21 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 	 * Merges a datarow from each if their names match. Assumption: each input
 	 * datarow has only one value. In-place.
 	 * 
+	 * @param <O>
+	 * 
 	 * @param a
 	 * @param b
 	 * @return
 	 */
-	public static List<DataRow> merge(List<DataRow> a, List<DataRow> b, IvMCanceller canceller) {
-		for (DataRow dataRowA : a) {
+	public static <O> List<DataRow<O>> merge(List<DataRow<O>> a, List<DataRow<O>> b, IvMCanceller canceller) {
+		for (DataRow<O> dataRowA : a) {
 
 			if (canceller.isCancelled()) {
 				return a;
 			}
 
-			DataRow dataRowB = null;
-			for (DataRow drB : b) {
+			DataRow<O> dataRowB = null;
+			for (DataRow<O> drB : b) {
 				if (Arrays.equals(dataRowA.getNames(), drB.getNames())) {
 					dataRowB = drB;
 					break;
@@ -122,8 +125,8 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return a;
 	}
 
-	public static List<DataRow> createAttributeData(IvMLogFiltered logFiltered, Attribute attribute, int numberOfTraces,
-			double[] trace2fitness, IvMCanceller canceller) {
+	public static List<DataRow<Object>> createAttributeData(IvMLogFiltered logFiltered, Attribute attribute,
+			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
 		if (attribute.isNumeric()) {
 			return createAttributeDataNumeric(logFiltered, attribute, numberOfTraces, trace2fitness, canceller);
 		} else if (attribute.isTime()) {
@@ -134,16 +137,16 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 			return createAttributeDataDuration(logFiltered, attribute, numberOfTraces, trace2fitness, canceller);
 		}
 
-		List<DataRow> result = new ArrayList<>();
-		result.add(new DataRow(DisplayType.literal("[not supported]"), attribute.getName(), ""));
+		List<DataRow<Object>> result = new ArrayList<>();
+		result.add(new DataRow<Object>(DisplayType.literal("[not supported]"), attribute.getName(), ""));
 		return result;
 	}
 
-	private static List<DataRow> createAttributeDataNumeric(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow<Object>> createAttributeDataNumeric(IvMLogFiltered logFiltered, Attribute attribute,
 			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
 		Type attributeType = DisplayType.fromAttribute(attribute);
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		//compute correlation and plots
 		double[] fitnessFiltered;
@@ -283,11 +286,11 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private static List<DataRow> createAttributeDataTime(IvMLogFiltered logFiltered, Attribute attribute, int numberOfTraces,
-			double[] trace2fitness, IvMCanceller canceller) {
+	private static List<DataRow<Object>> createAttributeDataTime(IvMLogFiltered logFiltered, Attribute attribute,
+			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
 		Type attributeType = Type.time;
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		//compute correlation and plots
 		double[] fitnessFiltered;
@@ -426,11 +429,11 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private static List<DataRow> createAttributeDataLiteral(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow<Object>> createAttributeDataLiteral(IvMLogFiltered logFiltered, Attribute attribute,
 			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
 		assert !attribute.isVirtual();
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		int numberOfTracesWithAttribute = 0;
 		{
@@ -472,9 +475,9 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private static List<DataRow> createAttributeDataDuration(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow<Object>> createAttributeDataDuration(IvMLogFiltered logFiltered, Attribute attribute,
 			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		Type attributeType = Type.duration;
 
@@ -616,8 +619,8 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private static DataRow c(Attribute attribute, Field field, DisplayType value) {
-		return new DataRow(value, attribute.getName(), field.toString());
+	private static DataRow<Object> c(Attribute attribute, Field field, DisplayType value) {
+		return new DataRow<Object>(value, attribute.getName(), field.toString());
 	}
 
 	public static enum Field {

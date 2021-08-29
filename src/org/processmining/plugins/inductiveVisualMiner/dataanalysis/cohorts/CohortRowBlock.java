@@ -12,9 +12,9 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockA
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 
-public class CohortRowBlock<C, P> extends DataRowBlockAbstract<C, P> {
+public class CohortRowBlock<C, P> extends DataRowBlockAbstract<Cohort, C, P> {
 
-	public CohortRowBlock(DataTable<C, P> table) {
+	public CohortRowBlock(DataTable<Cohort, C, P> table) {
 		super(table);
 	}
 
@@ -26,14 +26,15 @@ public class CohortRowBlock<C, P> extends DataRowBlockAbstract<C, P> {
 		return new IvMObject<?>[] { IvMObject.data_analysis_cohort };
 	}
 
-	public List<DataRow> gather(IvMObjectValues inputs) {
+	public List<DataRow<Cohort>> gather(IvMObjectValues inputs) {
 		Cohorts cohorts = inputs.get(IvMObject.data_analysis_cohort);
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Cohort>> result = new ArrayList<>();
 
 		for (Cohort cohort : cohorts) {
-			result.add(new DataRow(//
+			result.add(new DataRow<>(//
 					cohort.getFeatures().iterator().next().getDescriptionField(), //
+					cohort, //
 					DisplayType.html(cohort.getFeatures().iterator().next().getDescriptionSelector()), //
 					DisplayType.numericUnpadded(cohort.getSize()), //
 					DisplayType.numeric(cohort.getDistance())));

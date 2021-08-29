@@ -6,14 +6,15 @@ import java.util.List;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGuiAbstract;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 
-public abstract class DataRowBlockAbstract<C, P> extends DataChainLinkGuiAbstract<C, P> implements DataRowBlock<C, P> {
+public abstract class DataRowBlockAbstract<O, C, P> extends DataChainLinkGuiAbstract<C, P>
+		implements DataRowBlock<O, C, P> {
 
 	private static final DisplayType computing = DisplayType.literal("[computing..]");
 
-	private final DataTable<C, P> table;
-	private List<DataRow> rows;
+	private final DataTable<O, C, P> table;
+	private List<DataRow<O>> rows;
 
-	public DataRowBlockAbstract(DataTable<C, P> table) {
+	public DataRowBlockAbstract(DataTable<O, C, P> table) {
 		this.table = table;
 		rows = new ArrayList<>();
 	}
@@ -25,10 +26,10 @@ public abstract class DataRowBlockAbstract<C, P> extends DataChainLinkGuiAbstrac
 	 * @param inputs
 	 * @return
 	 */
-	public abstract List<DataRow> gather(IvMObjectValues inputs);
+	public abstract List<DataRow<O>> gather(IvMObjectValues inputs);
 
 	@Override
-	public DataRow getRow(int row) {
+	public DataRow<O> getRow(int row) {
 		return rows.get(row);
 	}
 
@@ -39,8 +40,9 @@ public abstract class DataRowBlockAbstract<C, P> extends DataChainLinkGuiAbstrac
 
 	@Override
 	public void invalidate(P panel) {
-		for (DataRow row : rows) {
+		for (DataRow<O> row : rows) {
 			row.setAllValues(computing);
+			row.setPayload(null);
 		}
 		table.rowsChanged();
 	}
@@ -49,10 +51,10 @@ public abstract class DataRowBlockAbstract<C, P> extends DataChainLinkGuiAbstrac
 	public void updateGui(P panel, IvMObjectValues inputs) throws Exception {
 		int namesOld = getMaxNumberOfNames();
 		int valuesOld = getMaxNumberOfValues();
-		
+
 		//update
 		rows = gather(inputs);
-		
+
 		if (namesOld == getMaxNumberOfNames() && valuesOld == getMaxNumberOfValues()) {
 			table.rowsChanged();
 		} else {
@@ -65,7 +67,7 @@ public abstract class DataRowBlockAbstract<C, P> extends DataChainLinkGuiAbstrac
 			return 0;
 		}
 		int result = 0;
-		for (DataRow row : rows) {
+		for (DataRow<O> row : rows) {
 			result = Math.max(result, row.getNumberOfNames());
 		}
 		return result;
@@ -76,14 +78,14 @@ public abstract class DataRowBlockAbstract<C, P> extends DataChainLinkGuiAbstrac
 			return 0;
 		}
 		int result = 0;
-		for (DataRow row : rows) {
+		for (DataRow<O> row : rows) {
 			result = Math.max(result, row.getNumberOfValues());
 		}
 		return result;
 	}
 
 	public boolean showsSomething() {
-		for (DataRow row : rows) {
+		for (DataRow<O> row : rows) {
 			for (DisplayType value : row.getValues()) {
 				if (!value.equals(computing)) {
 					return true;

@@ -110,7 +110,7 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return phantom.getAlignmentComputer();
 	}
 
-	public List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables() {
+	public List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables() {
 		return phantom.getDataAnalysisTables();
 	}
 

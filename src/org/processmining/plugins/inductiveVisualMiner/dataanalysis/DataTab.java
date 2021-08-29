@@ -2,7 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.util.List;
 
-public interface DataTab<C, P> {
+public interface DataTab<O, C, P> {
 
 	/**
 	 * 
@@ -10,11 +10,11 @@ public interface DataTab<C, P> {
 	 *            May be null.
 	 * @return
 	 */
-	public DataTable<C, P> createTable(DataAnalysesView<C, P> dataAnalysesView);
+	public DataTable<O, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView);
 
-	public List<DataRowBlock<C, P>> createRowBlocks(DataTable<C, P> table);
+	public List<DataRowBlock<O, C, P>> createRowBlocks(DataTable<O, C, P> table);
 
-	public List<DataRowBlockComputer<C, P>> createRowBlockComputers();
+	public List<DataRowBlockComputer<O, C, P>> createRowBlockComputers();
 
 	public String getAnalysisName();
 

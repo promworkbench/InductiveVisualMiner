@@ -41,7 +41,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<PopupItemLogMove> popupItemsLogMove;
 	private final List<PopupItemModelMove> popupItemsModelMove;
 	private final List<PopupItemLog> popupItemsLog;
-	private final List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> dataAnalyses;
+	private final List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> dataAnalyses;
 	private final List<PreMiningFilter> preMiningFilters;
 	private final List<HighlightingFilter> highlightingFilters;
 	private final List<IvMExporter> exporters;
@@ -88,7 +88,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	protected abstract List<PopupItemLog> createPopupItemsLog();
 
-	protected abstract List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables();
+	protected abstract List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables();
 
 	protected abstract List<IvMExporter> createExporters();
 
@@ -175,7 +175,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	}
 
 	@Override
-	final public List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables() {
+	final public List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables() {
 		return dataAnalyses;
 	}
 

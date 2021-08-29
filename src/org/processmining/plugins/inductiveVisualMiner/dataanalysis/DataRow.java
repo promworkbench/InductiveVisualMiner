@@ -2,9 +2,10 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.util.Arrays;
 
-public class DataRow {
+public class DataRow<O> {
 	private String[] names;
 	private DisplayType[] values;
+	private O payload;
 
 	public DataRow(DisplayType value, String... names) {
 		this.names = names;
@@ -18,6 +19,12 @@ public class DataRow {
 
 	public DataRow(String name, DisplayType... values) {
 		this.names = new String[] { name };
+		this.values = values;
+	}
+
+	public DataRow(String name, O payload, DisplayType... values) {
+		this.names = new String[] { name };
+		this.payload = payload;
 		this.values = values;
 	}
 
@@ -55,6 +62,14 @@ public class DataRow {
 
 	public void setAllValues(DisplayType value) {
 		Arrays.fill(values, value);
+	}
+
+	public O getPayload() {
+		return payload;
+	}
+
+	public void setPayload(O payload) {
+		this.payload = payload;
 	}
 
 }

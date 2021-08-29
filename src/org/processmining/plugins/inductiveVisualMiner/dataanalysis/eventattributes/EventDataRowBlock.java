@@ -27,7 +27,7 @@ import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TLongArrayList;
 
-public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
+public class EventDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "event-att";
@@ -37,11 +37,12 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.aligned_log_filtered };
 	}
 
-	public List<DataRow> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
+	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
+			throws Exception {
 		IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 		AttributesInfo attributes = inputs.get(IvMObject.attributes_info);
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		if (logFiltered.isSomethingFiltered()) {
 			IvMLogFilteredImpl negativeLog = logFiltered.clone();
@@ -60,7 +61,8 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	public static List<DataRow> createAttributeData(IvMLogFiltered logFiltered, Attribute attribute, IvMCanceller canceller) {
+	public static List<DataRow<Object>> createAttributeData(IvMLogFiltered logFiltered, Attribute attribute,
+			IvMCanceller canceller) {
 		if (attribute.isNumeric()) {
 			return createAttributeDataNumeric(logFiltered, attribute, canceller);
 		} else if (attribute.isTime()) {
@@ -71,16 +73,16 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 			return createAttributeDataDuration(logFiltered, attribute, canceller);
 		}
 
-		List<DataRow> result = new ArrayList<>();
-		result.add(new DataRow(DisplayType.literal("[not supported]"), attribute.getName(), ""));
+		List<DataRow<Object>> result = new ArrayList<>();
+		result.add(new DataRow<Object>(DisplayType.literal("[not supported]"), attribute.getName(), ""));
 		return result;
 	}
 
-	private static List<DataRow> createAttributeDataNumeric(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow<Object>> createAttributeDataNumeric(IvMLogFiltered logFiltered, Attribute attribute,
 			IvMCanceller canceller) {
 		Type attributeType = DisplayType.fromAttribute(attribute);
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		//gather values
 		double[] valuesFiltered;
@@ -187,11 +189,11 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private static List<DataRow> createAttributeDataTime(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow<Object>> createAttributeDataTime(IvMLogFiltered logFiltered, Attribute attribute,
 			IvMCanceller canceller) {
 		Type attributeType = Type.time;
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		//gather values
 		long[] valuesFiltered;
@@ -297,11 +299,11 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private static List<DataRow> createAttributeDataLiteral(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow<Object>> createAttributeDataLiteral(IvMLogFiltered logFiltered, Attribute attribute,
 			IvMCanceller canceller) {
 		assert !attribute.isVirtual();
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		int numberOfEventsWithAttribute = 0;
 		int numberOfTracesWithEventWithAttribute = 0;
@@ -373,11 +375,11 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private static List<DataRow> createAttributeDataDuration(IvMLogFiltered logFiltered, Attribute attribute,
+	private static List<DataRow<Object>> createAttributeDataDuration(IvMLogFiltered logFiltered, Attribute attribute,
 			IvMCanceller canceller) {
 		Type attributeType = Type.duration;
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		//gather values
 		long[] valuesFiltered;
@@ -484,8 +486,8 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<C, P> {
 		return result;
 	}
 
-	private static DataRow c(Attribute attribute, Field field, DisplayType value) {
-		return new DataRow(value, attribute.getName(), field.toString());
+	private static DataRow<Object> c(Attribute attribute, Field field, DisplayType value) {
+		return new DataRow<Object>(value, attribute.getName(), field.toString());
 	}
 
 	public static enum Field {

@@ -16,7 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class DataRowBlockLogAttributesHighlighted<C, P> extends DataRowBlockComputer<C, P> {
+public class DataRowBlockLogAttributesHighlighted<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "log-vir-att";
@@ -26,11 +26,12 @@ public class DataRowBlockLogAttributesHighlighted<C, P> extends DataRowBlockComp
 		return new IvMObject<?>[] { IvMObject.aligned_log_filtered, IvMObject.aligned_log };
 	}
 
-	public List<DataRow> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
+	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
+			throws Exception {
 		IvMLogNotFiltered log = inputs.get(IvMObject.aligned_log);
 		IvMLogFilteredImpl logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 
-		ArrayList<DataRow> result = new ArrayList<>();
+		ArrayList<DataRow<Object>> result = new ArrayList<>();
 
 		//non-filtered log
 		{
@@ -52,13 +53,13 @@ public class DataRowBlockLogAttributesHighlighted<C, P> extends DataRowBlockComp
 			}
 
 			DisplayType x = DisplayType.numeric(numberOfTraces);
-			result.add(new DataRow(x, "number of traces"));
+			result.add(new DataRow<Object>(x, "number of traces"));
 
 			DisplayType y = DisplayType.numeric(numberOfEvents);
-			result.add(new DataRow(y, "number of events"));
+			result.add(new DataRow<Object>(y, "number of events"));
 
 			DisplayType z = DisplayType.numeric(Fitness.compute(log));
-			result.add(new DataRow(z, "fitness"));
+			result.add(new DataRow<Object>(z, "fitness"));
 		}
 
 		if (logFiltered.isSomethingFiltered()) {
@@ -82,14 +83,14 @@ public class DataRowBlockLogAttributesHighlighted<C, P> extends DataRowBlockComp
 				}
 
 				DisplayType x = DisplayType.numeric(numberOfTraces);
-				result.add(new DataRow(x, "number of traces (highlighted traces)"));
+				result.add(new DataRow<Object>(x, "number of traces (highlighted traces)"));
 
 				DisplayType y = DisplayType.numeric(numberOfEvents);
-				result.add(new DataRow(y, "number of events (highlighted traces)"));
+				result.add(new DataRow<Object>(y, "number of events (highlighted traces)"));
 
 				//fitness (highlighted)
 				DisplayType z = DisplayType.numeric(Fitness.compute(logFiltered));
-				result.add(new DataRow(z, "fitness (highlighted traces)"));
+				result.add(new DataRow<Object>(z, "fitness (highlighted traces)"));
 			}
 
 			//not-highlighted
@@ -115,13 +116,13 @@ public class DataRowBlockLogAttributesHighlighted<C, P> extends DataRowBlockComp
 				}
 
 				DisplayType x = DisplayType.numeric(numberOfTraces);
-				result.add(new DataRow(x, "number of traces (not-highlighted traces)"));
+				result.add(new DataRow<Object>(x, "number of traces (not-highlighted traces)"));
 
 				DisplayType y = DisplayType.numeric(numberOfEvents);
-				result.add(new DataRow(y, "number of events (not-highlighted traces)"));
+				result.add(new DataRow<Object>(y, "number of events (not-highlighted traces)"));
 
 				DisplayType z = DisplayType.numeric(Fitness.compute(negativeLog));
-				result.add(new DataRow(z, "fitness (not-highlighted traces)"));
+				result.add(new DataRow<Object>(z, "fitness (not-highlighted traces)"));
 
 				if (canceller.isCancelled()) {
 					return null;

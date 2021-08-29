@@ -53,16 +53,21 @@ public class ExporterDataAnalyses extends IvMExporter {
 	@Override
 	protected IvMObject<?>[] createNonTriggerObjects() {
 		Set<IvMObject<?>> result = new THashSet<>();
-		for (DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysis : configuration
+		for (DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysis : configuration
 				.getDataAnalysisTables()) {
-			DataTable<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> table = analysis.createTable(null);
-			for (DataRowBlock<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> block : analysis
-					.createRowBlocks(table)) {
-				result.addAll(Arrays.asList(block.getOptionalObjects()));
-			}
+			createBlocks(result, analysis);
 		}
 		IvMObject<?>[] arr = new IvMObject<?>[result.size()];
 		return result.toArray(arr);
+	}
+
+	public <O> void createBlocks(Set<IvMObject<?>> result,
+			DataTab<O, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysis) {
+		DataTable<O, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> table = analysis.createTable(null);
+		for (DataRowBlock<O, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> block : analysis
+				.createRowBlocks(table)) {
+			result.addAll(Arrays.asList(block.getOptionalObjects()));
+		}
 	}
 
 	@Override
@@ -70,24 +75,15 @@ public class ExporterDataAnalyses extends IvMExporter {
 		WritableWorkbook workbook = Workbook.createWorkbook(file);
 
 		int sheetIndex = 0;
-		for (DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysis : configuration
+		for (DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysis : configuration
 				.getDataAnalysisTables()) {
 
 			String name = analysis.getAnalysisName();
 			WritableSheet sheet = workbook.createSheet(name, sheetIndex);
 
 			//initialise the table
-			DataTable<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysisTable = analysis
-					.createTable(null);
-			analysisTable.getModel().setBlocks(analysis.createRowBlocks(analysisTable));
-			for (DataRowBlock<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> block : analysisTable
-					.getModel().getBlocks()) {
-				if (inputs.has(block.getRequiredObjects())) {
-					IvMObjectValues subInputs = inputs.getIfPresent(block.getRequiredObjects(),
-							block.getOptionalObjects());
-					block.updateGui(null, subInputs);
-				}
-			}
+			DataTable<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysisTable = createTable(
+					inputs, analysis);
 
 			TableModel model = analysisTable.getModel();
 
@@ -109,6 +105,22 @@ public class ExporterDataAnalyses extends IvMExporter {
 
 		workbook.write();
 		workbook.close();
+	}
+
+	public <O> DataTable<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> createTable(
+			IvMObjectValues inputs, DataTab<O, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysis)
+			throws Exception {
+		DataTable<O, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysisTable = analysis
+				.createTable(null);
+		analysisTable.getModel().setBlocks(analysis.createRowBlocks(analysisTable));
+		for (DataRowBlock<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> block : analysisTable
+				.getModel().getBlocks()) {
+			if (inputs.has(block.getRequiredObjects())) {
+				IvMObjectValues subInputs = inputs.getIfPresent(block.getRequiredObjects(), block.getOptionalObjects());
+				block.updateGui(null, subInputs);
+			}
+		}
+		return analysisTable;
 	}
 
 	private void write(WritableSheet sheet, int column, int row, Object value)

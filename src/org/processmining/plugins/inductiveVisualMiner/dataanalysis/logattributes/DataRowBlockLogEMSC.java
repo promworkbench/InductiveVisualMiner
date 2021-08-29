@@ -18,7 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog2XLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 
-public class DataRowBlockLogEMSC<C, P> extends DataRowBlockComputer<C, P> {
+public class DataRowBlockLogEMSC<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "log-att-emsc";
@@ -28,11 +28,12 @@ public class DataRowBlockLogEMSC<C, P> extends DataRowBlockComputer<C, P> {
 		return new IvMObject<?>[] { IvMObject.aligned_log_filtered, IvMObject.model };
 	}
 
-	public List<DataRow> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
+	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
+			throws Exception {
 		IvMLogFilteredImpl logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 		IvMModel model = inputs.get(IvMObject.model);
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		if (logFiltered.isSomethingFiltered()) {
 			IvMLogFilteredImpl negativeLog = logFiltered.clone();
@@ -52,7 +53,7 @@ public class DataRowBlockLogEMSC<C, P> extends DataRowBlockComputer<C, P> {
 			}
 
 			DisplayType zz = DisplayType.numeric(alignments.getSimilarity());
-			result.add(new DataRow(zz, "stochastic similarity between highlighted and non-highlighted traces"));
+			result.add(new DataRow<Object>(zz, "stochastic similarity between highlighted and non-highlighted traces"));
 		}
 
 		return result;

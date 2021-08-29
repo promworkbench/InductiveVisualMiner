@@ -12,7 +12,7 @@ import javax.swing.table.TableRowSorter;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.CorrelationDensityPlot;
 
-public class DataTable<C, P> extends JTable {
+public class DataTable<O, C, P> extends JTable {
 
 	private static final long serialVersionUID = -237386992048858811L;
 	public static final int rowHeight = 22;
@@ -21,7 +21,7 @@ public class DataTable<C, P> extends JTable {
 	public static final int columnMargin = 5;
 
 	public DataTable(String tabName, DataAnalysesView<C, P> dataAnalysesView) {
-		super(new DataTableModel<C, P>(tabName, dataAnalysesView));
+		super(new DataTableModel<O, C, P>(tabName, dataAnalysesView));
 
 		setOpaque(false);
 		setShowGrid(false);
@@ -55,7 +55,7 @@ public class DataTable<C, P> extends JTable {
 	}
 
 	protected void setSorting() {
-		TableRowSorter<DataTableModel<C, P>> sorter = new TableRowSorter<>(getModel());
+		TableRowSorter<DataTableModel<O, C, P>> sorter = new TableRowSorter<>(getModel());
 		List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
 
 		for (int column = 0; column < getModel().getNumberOfNameColumns(); column++) {
@@ -73,22 +73,20 @@ public class DataTable<C, P> extends JTable {
 					if (o1.getType() != o2.getType()) {
 						return o1.getType().compareTo(o2.getType());
 					}
-					
+
 					if (o1.getType() == Type.duration) {
 						Long.compare(((DisplayType.Duration) o1).getValueLong(),
 								((DisplayType.Duration) o2).getValueLong());
 					}
-					
+
 					if (o1.getType() == Type.time) {
-						Long.compare(((DisplayType.Time) o1).getValueLong(),
-								((DisplayType.Time) o2).getValueLong());
+						Long.compare(((DisplayType.Time) o1).getValueLong(), ((DisplayType.Time) o2).getValueLong());
 					}
-					
+
 					if (o1.getType() == Type.numeric) {
-						Double.compare(((DisplayType.Numeric) o1).getValue(),
-								((DisplayType.Numeric) o2).getValue());
+						Double.compare(o1.getValue(), o2.getValue());
 					}
-					
+
 					return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
 				}
 			});
@@ -102,7 +100,7 @@ public class DataTable<C, P> extends JTable {
 		setRowSorter(sorter);
 	}
 
-	protected void setDefaultSorting(TableRowSorter<DataTableModel<C, P>> sorter, List<RowSorter.SortKey> sortKeys) {
+	protected void setDefaultSorting(TableRowSorter<DataTableModel<O, C, P>> sorter, List<RowSorter.SortKey> sortKeys) {
 		for (int column = 0; column < getModel().getNumberOfNameColumns(); column++) {
 			sortKeys.add(new RowSorter.SortKey(column, SortOrder.ASCENDING));
 		}
@@ -130,8 +128,8 @@ public class DataTable<C, P> extends JTable {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public DataTableModel<C, P> getModel() {
-		return (DataTableModel<C, P>) super.getModel();
+	public DataTableModel<O, C, P> getModel() {
+		return (DataTableModel<O, C, P>) super.getModel();
 	}
 
 }

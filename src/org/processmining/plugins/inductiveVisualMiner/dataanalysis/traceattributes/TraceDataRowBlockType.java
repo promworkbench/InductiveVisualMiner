@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class TraceDataRowBlockType<C, P> extends DataRowBlockComputer<C, P> {
+public class TraceDataRowBlockType<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "trace-att-type";
@@ -22,10 +22,11 @@ public class TraceDataRowBlockType<C, P> extends DataRowBlockComputer<C, P> {
 		return new IvMObject<?>[] { IvMObject.attributes_info };
 	}
 
-	public List<DataRow> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
+	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
+			throws Exception {
 		AttributesInfo attributes = inputs.get(IvMObject.attributes_info);
 
-		List<DataRow> result = new ArrayList<>();
+		List<DataRow<Object>> result = new ArrayList<>();
 
 		for (Attribute attribute : attributes.getTraceAttributes()) {
 			String type = "";
@@ -41,7 +42,7 @@ public class TraceDataRowBlockType<C, P> extends DataRowBlockComputer<C, P> {
 				type += "other";
 			}
 
-			result.add(new DataRow(attribute.getName(), "data type", DisplayType.literal(type)));
+			result.add(new DataRow<Object>(attribute.getName(), "data type", DisplayType.literal(type)));
 		}
 
 		return result;

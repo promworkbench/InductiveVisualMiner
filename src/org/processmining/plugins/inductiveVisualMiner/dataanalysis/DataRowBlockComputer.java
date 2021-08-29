@@ -16,7 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
  * @param <C>
  * @param <P>
  */
-public abstract class DataRowBlockComputer<C, P> extends DataChainLinkComputationAbstract<C> {
+public abstract class DataRowBlockComputer<O, C, P> extends DataChainLinkComputationAbstract<C> {
 
 	@SuppressWarnings("rawtypes")
 	private final IvMObject<List> outputObject = new IvMObject<List>(getName(), List.class);
@@ -25,7 +25,7 @@ public abstract class DataRowBlockComputer<C, P> extends DataChainLinkComputatio
 		return "computing " + getName();
 	}
 
-	public abstract List<DataRow> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
+	public abstract List<DataRow<O>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
 			throws Exception;
 
 	public IvMObject<?>[] createOutputObjects() {
@@ -41,19 +41,19 @@ public abstract class DataRowBlockComputer<C, P> extends DataChainLinkComputatio
 		return outputObject;
 	}
 
-	public abstract class DataRowBlockComputerRowBlock extends DataRowBlockAbstract<C, P> {
+	public abstract class DataRowBlockComputerRowBlock extends DataRowBlockAbstract<O, C, P> {
 
-		public DataRowBlockComputerRowBlock(DataTable<C, P> table) {
+		public DataRowBlockComputerRowBlock(DataTable<O, C, P> table) {
 			super(table);
 		}
 
-		public DataRowBlockComputer<C, P> getComputer() {
+		public DataRowBlockComputer<O, C, P> getComputer() {
 			return DataRowBlockComputer.this;
 		}
 
 	}
 
-	public DataRowBlockComputerRowBlock createDataRowBlock(DataTable<C, P> table) {
+	public DataRowBlockComputerRowBlock createDataRowBlock(DataTable<O, C, P> table) {
 		return new DataRowBlockComputerRowBlock(table) {
 
 			public String getName() {
@@ -61,7 +61,7 @@ public abstract class DataRowBlockComputer<C, P> extends DataChainLinkComputatio
 			}
 
 			@SuppressWarnings("unchecked")
-			public List<DataRow> gather(IvMObjectValues inputs) {
+			public List<DataRow<O>> gather(IvMObjectValues inputs) {
 				return inputs.get(outputObject);
 			}
 

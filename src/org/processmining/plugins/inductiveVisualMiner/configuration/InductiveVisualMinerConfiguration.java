@@ -89,7 +89,7 @@ public interface InductiveVisualMinerConfiguration {
 
 	public List<PopupItemLog> getPopupItemsLog();
 
-	public List<DataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables();
+	public List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables();
 
 	public IvMVirtualAttributeFactory getVirtualAttributes();
 

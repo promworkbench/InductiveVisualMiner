@@ -11,16 +11,18 @@ import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
  * 
  * @author sander
  *
+ * @param <O>
+ *            row payload
  * @param <C>
  * @param <P>
  */
-public interface DataRowBlock<C, P> extends DataChainLinkGui<C, P> {
+public interface DataRowBlock<O, C, P> extends DataChainLinkGui<C, P> {
 
 	public boolean showsSomething();
 
 	public int getNumberOfRows();
 
-	public DataRow getRow(int row);
+	public DataRow<O> getRow(int row);
 
 	public int getMaxNumberOfNames();
 

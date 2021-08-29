@@ -4,11 +4,11 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-public class DataTableModel<C, P> extends AbstractTableModel {
+public class DataTableModel<O, C, P> extends AbstractTableModel {
 
 	private static final long serialVersionUID = -2757978513910385049L;
 
-	private List<DataRowBlock<C, P>> blocks;
+	private List<DataRowBlock<O, C, P>> blocks;
 	private String[][] columnNames;
 	private final String tabName;
 	private final DataAnalysesView<C, P> dataAnalysesView;
@@ -24,7 +24,7 @@ public class DataTableModel<C, P> extends AbstractTableModel {
 		}
 
 		int columnsNames = 0;
-		for (DataRowBlock<?, ?> block : getBlocks()) {
+		for (DataRowBlock<?, ?, ?> block : getBlocks()) {
 			columnsNames = Math.max(columnsNames, block.getMaxNumberOfNames());
 		}
 		return columnsNames;
@@ -38,7 +38,7 @@ public class DataTableModel<C, P> extends AbstractTableModel {
 
 		int columnsNames = 0;
 		int columnsValues = 0;
-		for (DataRowBlock<?, ?> block : getBlocks()) {
+		for (DataRowBlock<?, ?, ?> block : getBlocks()) {
 			for (int row = 0; row < block.getNumberOfRows(); row++) {
 				columnsNames = Math.max(columnsNames, block.getRow(row).getNumberOfNames());
 				columnsValues = Math.max(columnsValues, block.getRow(row).getNumberOfValues());
@@ -63,7 +63,7 @@ public class DataTableModel<C, P> extends AbstractTableModel {
 			return 0;
 		}
 		int rows = 0;
-		for (DataRowBlock<?, ?> block : getBlocks()) {
+		for (DataRowBlock<?, ?, ?> block : getBlocks()) {
 			rows += block.getNumberOfRows();
 		}
 		return rows;
@@ -77,7 +77,7 @@ public class DataTableModel<C, P> extends AbstractTableModel {
 			block++;
 		}
 
-		DataRow dataRow = getBlocks().get(block).getRow(row);
+		DataRow<?> dataRow = getBlocks().get(block).getRow(row);
 		int nameColumns = getNumberOfNameColumns();
 		if (column < nameColumns) {
 			//attribute name
@@ -96,11 +96,20 @@ public class DataTableModel<C, P> extends AbstractTableModel {
 		}
 	}
 
-	public List<DataRowBlock<C, P>> getBlocks() {
+	public DataRow<O> getRow(int row) {
+		int block = 0;
+		while (row >= getBlocks().get(block).getNumberOfRows()) {
+			row -= getBlocks().get(block).getNumberOfRows();
+			block++;
+		}
+		return getBlocks().get(block).getRow(row);
+	}
+
+	public List<DataRowBlock<O, C, P>> getBlocks() {
 		return blocks;
 	}
 
-	public void setBlocks(List<DataRowBlock<C, P>> blocks) {
+	public void setBlocks(List<DataRowBlock<O, C, P>> blocks) {
 		this.blocks = blocks;
 		fireTableStructureChanged();
 	}
@@ -111,7 +120,7 @@ public class DataTableModel<C, P> extends AbstractTableModel {
 	 */
 	public void mightEnable() {
 		if (blocks != null && dataAnalysesView != null) {
-			for (DataRowBlock<C, P> block : getBlocks()) {
+			for (DataRowBlock<?, C, P> block : getBlocks()) {
 				if (block.showsSomething()) {
 					dataAnalysesView.getOnOffPanel(tabName).on();
 					return;
