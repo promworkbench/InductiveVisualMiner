@@ -1,7 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
 import org.processmining.plugins.inductiveVisualMiner.cost.ComputeCostModel;
-import org.processmining.plugins.inductiveVisualMiner.cost.CostModelBasic;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
@@ -34,7 +34,7 @@ public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogFiltered log = inputs.get(IvMObject.aligned_log_filtered);
 
-		CostModelBasic costModel = ComputeCostModel.compute(model, log);
+		CostModel costModel = ComputeCostModel.compute(model, log, canceller);
 
 		return new IvMObjectValues().//
 				s(IvMObject.cost_model, costModel);

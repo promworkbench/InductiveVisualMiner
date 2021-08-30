@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.cost;
 
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public interface CostModel {
@@ -17,6 +16,12 @@ public interface CostModel {
 
 	public String[][] getNodeRepresentationPopup(int unode);
 
-	public double getCost(IvMModel model, IvMTrace trace);
+	/**
+	 * 
+	 * @param trace
+	 * @return the cost associated with the trace, or Double.NaN if it does not
+	 *         exist.
+	 */
+	public double getCost(IvMTrace trace);
 
 }
