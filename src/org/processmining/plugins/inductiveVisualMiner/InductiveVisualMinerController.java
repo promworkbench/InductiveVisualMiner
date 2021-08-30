@@ -58,7 +58,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.OnStatus;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesController;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysisTableFactory;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
@@ -385,7 +385,7 @@ public class InductiveVisualMinerController {
 					.setHighlightingFilter2CohortAnalysisHandler(new HighlightingFilter2CohortAnalysisHandler() {
 						public void showCohortAnalysis() {
 							panel.getDataAnalysesView().enableAndShow();
-							panel.getDataAnalysesView().showAnalysis(CohortAnalysisTableFactory.name);
+							panel.getDataAnalysesView().showAnalysis(CohortDataTab.name);
 						}
 
 						public void setEnabled(boolean enabled) {
@@ -402,14 +402,14 @@ public class InductiveVisualMinerController {
 
 			//link cohort data analysis view switch and cohort computations
 			setObject(IvMObject.selected_cohort_analysis_enabled, false);
-			panel.getDataAnalysesView().addSwitcherListener(CohortAnalysisTableFactory.name, new ActionListener() {
+			panel.getDataAnalysesView().addSwitcherListener(CohortDataTab.name, new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					boolean selected = ((AbstractButton) e.getSource()).getModel().isSelected();
 					if (selected) {
 						//start the computation
 						chain.setObject(IvMObject.selected_cohort_analysis_enabled, true);
-						panel.getDataAnalysesView().setSwitcherMessage(CohortAnalysisTableFactory.name,
-								"Compute " + CohortAnalysisTableFactory.name + " [computing..]");
+						panel.getDataAnalysesView().setSwitcherMessage(CohortDataTab.name,
+								"Compute " + CohortDataTab.name + " [computing..]");
 					} else {
 						//stop the computation
 						/*
@@ -420,8 +420,8 @@ public class InductiveVisualMinerController {
 						 * automatically.
 						 */
 						chain.setObject(IvMObject.selected_cohort_analysis_enabled, false);
-						panel.getDataAnalysesView().setSwitcherMessage(CohortAnalysisTableFactory.name,
-								"Compute " + CohortAnalysisTableFactory.name);
+						panel.getDataAnalysesView().setSwitcherMessage(CohortDataTab.name,
+								"Compute " + CohortDataTab.name);
 					}
 				}
 			});
@@ -919,7 +919,8 @@ public class InductiveVisualMinerController {
 			}
 
 			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.ivm_attributes_info_merged, IvMObject.controller_highlighting_filters };
+				return new IvMObject<?>[] { IvMObject.ivm_attributes_info_merged,
+						IvMObject.controller_highlighting_filters };
 			}
 
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {

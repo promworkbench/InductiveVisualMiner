@@ -35,6 +35,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelect
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl19Cost;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
@@ -67,6 +68,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
+import org.processmining.plugins.inductiveVisualMiner.mode.ModeCost;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsDeviations;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePathsQueueLengths;
@@ -79,6 +81,7 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLog;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLogMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemModelMove;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
+import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityCost;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityName;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrences;
 import org.processmining.plugins.inductiveVisualMiner.popup.items.PopupItemActivityOccurrencesPerTrace;
@@ -159,7 +162,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				new ModePathsSojourn(), //
 				new ModePathsWaiting(), //
 				new ModePathsService(), //
-				new ModeRelativePaths() }));
+				new ModeRelativePaths(), //
+				new ModeCost() }));
 	}
 
 	@Override
@@ -170,7 +174,9 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				new PopupItemActivityOccurrences(), //
 				new PopupItemActivityOccurrencesPerTrace(), //
 				new PopupItemActivitySpacer(), //
-				new PopupItemActivityPerformance(),//
+				new PopupItemActivityPerformance(), //
+				new PopupItemActivitySpacer(), //
+				new PopupItemActivityCost(), //
 		}));
 	}
 
@@ -328,21 +334,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl14Performance<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl15Histogram<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl18DataAnalysisCohort<InductiveVisualMinerConfiguration>());
-
-		//TODO: re-enable?
-		//		//mine performance
-		//		{
-		//			performance.setOnComplete(new Runnable() {
-		//				public void run() {
-		//					try {
-		//						InductiveVisualMinerController.updateHighlighting(panel, state);
-		//					} catch (UnknownTreeNodeException e) {
-		//						e.printStackTrace();
-		//					}
-		//					panel.getGraph().repaint();
-		//				}
-		//			});
-		//		}
+		chain.register(new Cl19Cost<InductiveVisualMinerConfiguration>());
 
 		return chain;
 	}
