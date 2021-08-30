@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -33,7 +34,7 @@ public abstract class CostModelAbstract implements CostModel {
 
 	public abstract int getNumberOfParameters();
 
-	public Pair<double[], Double> getInputsAndCost(IvMTrace trace) {
+	public Pair<double[], Double> getInputsAndCost(IvMTrace trace, IvMCanceller canceller) {
 		double[] inputs = new double[getNumberOfParameters()];
 
 		double traceCost = getCost(trace);
@@ -44,13 +45,25 @@ public abstract class CostModelAbstract implements CostModel {
 
 		List<IvMMove> seen = new ArrayList<>();
 
-		for (ActivityInstanceIterator it = trace.activityInstanceIterator(model); it.hasNext();) {
+		ActivityInstanceIterator it = trace.activityInstanceIterator(model);
+		while (it.hasNext()) {
+
+			if (canceller.isCancelled()) {
+				return null;
+			}
+
 			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> a = it.next();
 
-			seen.add(a.getF());
-			double[] inputsA = getInputs(a.getA(), a.getC(), a.getD(), a.getE(), a.getF());
+			if (a == null) {
+				if (trace.size() <= 9) {
+					//System.out.println("stop");
+				}
+			} else {
+				seen.add(a.getF());
+				double[] inputsA = getInputs(a.getA(), a.getC(), a.getD(), a.getE(), a.getF());
 
-			merge(inputs, inputsA);
+				merge(inputs, inputsA);
+			}
 		}
 
 		return Pair.of(inputs, traceCost);

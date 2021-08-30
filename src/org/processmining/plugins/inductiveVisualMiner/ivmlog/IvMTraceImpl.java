@@ -193,6 +193,7 @@ public class IvMTraceImpl extends ArrayList<IvMMove> implements IvMTrace {
 						}
 					}
 					//inconsistent trace, as this trace does not end with complete.
+					assert false;
 					return null;
 				}
 			}

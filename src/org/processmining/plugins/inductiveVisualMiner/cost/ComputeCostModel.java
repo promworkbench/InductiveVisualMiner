@@ -32,20 +32,21 @@ public class ComputeCostModel {
 				return null;
 			}
 
-			Pair<double[], Double> p = result.getInputsAndCost(trace);
+			Pair<double[], Double> p = result.getInputsAndCost(trace, canceller);
 
 			if (p != null) {
 				x.add(p.getA());
 				y.add(p.getB());
 			}
 		}
-		
+
 		if (canceller.isCancelled()) {
 			return null;
 		}
 
-		regression.newSampleData(y.toArray(), (double[][]) x.toArray());
-		
+		double[][] yy = new double[y.size()][];
+		regression.newSampleData(y.toArray(), x.toArray(yy));
+
 		if (canceller.isCancelled()) {
 			return null;
 		}
