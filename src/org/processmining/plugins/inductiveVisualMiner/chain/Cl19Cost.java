@@ -1,0 +1,43 @@
+package org.processmining.plugins.inductiveVisualMiner.chain;
+
+import org.processmining.plugins.inductiveVisualMiner.cost.ComputeCostModel;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelBasic;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+
+public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
+
+	public String getName() {
+		return "Cl19 cost";
+	}
+
+	public String getStatusBusyMessage() {
+		return "Computing cost";
+	}
+
+	public IvMObject<?>[] createInputObjects() {
+		return new IvMObject<?>[] { IvMObject.log_timestamps_logical, IvMObject.model,
+				IvMObject.aligned_log_filtered, };
+	}
+
+	public IvMObject<?>[] createOutputObjects() {
+		return new IvMObject<?>[] { IvMObject.cost_model };
+	}
+
+	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
+		boolean timestampsLogical = inputs.get(IvMObject.log_timestamps_logical);
+
+		if (!timestampsLogical) {
+			return null;
+		}
+
+		IvMModel model = inputs.get(IvMObject.model);
+		IvMLogFiltered log = inputs.get(IvMObject.aligned_log_filtered);
+
+		CostModelBasic costModel = ComputeCostModel.compute(model, log);
+
+		return new IvMObjectValues().//
+				s(IvMObject.cost_model, costModel);
+	}
+
+}
