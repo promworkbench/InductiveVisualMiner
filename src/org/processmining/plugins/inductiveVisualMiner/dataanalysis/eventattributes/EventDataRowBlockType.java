@@ -17,6 +17,10 @@ public class EventDataRowBlockType<C, P> extends DataRowBlockComputer<Object, C,
 	public String getName() {
 		return "event-att-type";
 	}
+	
+	public String getStatusBusyMessage() {
+		return "Gathering event attribute types..";
+	}
 
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.attributes_info };

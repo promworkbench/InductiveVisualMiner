@@ -153,7 +153,7 @@ public class InductiveVisualMinerSelectionColourer {
 		//recolour the polygon
 		Color fillColour;
 		Color fontColour = Color.black;
-		if (cardinality.getB() > 0) {
+		if (cardinality.getB() != 0) {
 			fillColour = visualisationParameters.getColourNodes().colour(cardinality.getB(), minCardinality,
 					maxCardinality);
 			if (ColourMaps.getLuma(fillColour) < 128) {
@@ -168,7 +168,7 @@ public class InductiveVisualMinerSelectionColourer {
 		DotPanel.setCSSAttributeOf(titleCount, "fill", fontColour);
 		DotPanel.setCSSAttributeOf(titleName, "fill", fontColour);
 
-		if (cardinality.getB() > 0) {
+		if (cardinality.getB() != 0) {
 			DotPanel.setCSSAttributeOf(group, "opacity", "1.0");
 		} else {
 			DotPanel.setCSSAttributeOf(group, "opacity", "0.2");

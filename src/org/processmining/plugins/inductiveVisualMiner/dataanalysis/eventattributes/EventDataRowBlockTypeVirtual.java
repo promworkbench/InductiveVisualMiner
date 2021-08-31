@@ -17,6 +17,10 @@ public class EventDataRowBlockTypeVirtual<C, P> extends DataRowBlockComputer<Obj
 	public String getName() {
 		return "event-att-type-virt";
 	}
+	
+	public String getStatusBusyMessage() {
+		return "Gathering virtual event attribute types..";
+	}
 
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.ivm_attributes_info };

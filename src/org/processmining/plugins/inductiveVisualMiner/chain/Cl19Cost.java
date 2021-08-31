@@ -12,7 +12,7 @@ public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
 	}
 
 	public String getStatusBusyMessage() {
-		return "Computing cost";
+		return "Fitting cost model";
 	}
 
 	public IvMObject<?>[] createInputObjects() {
@@ -35,6 +35,10 @@ public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
 		IvMLogFiltered log = inputs.get(IvMObject.aligned_log_filtered);
 
 		CostModel costModel = ComputeCostModel.compute(model, log, canceller);
+		
+		if (costModel == null) {
+			return null;
+		}
 
 		return new IvMObjectValues().//
 				s(IvMObject.cost_model, costModel);

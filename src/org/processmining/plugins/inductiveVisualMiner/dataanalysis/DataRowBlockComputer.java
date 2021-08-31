@@ -21,10 +21,6 @@ public abstract class DataRowBlockComputer<O, C, P> extends DataChainLinkComputa
 	@SuppressWarnings("rawtypes")
 	private final IvMObject<List> outputObject = new IvMObject<List>(getName(), List.class);
 
-	public String getStatusBusyMessage() {
-		return "computing " + getName();
-	}
-
 	public abstract List<DataRow<O>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
 			throws Exception;
 

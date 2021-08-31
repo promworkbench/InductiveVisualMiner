@@ -18,6 +18,10 @@ public class TraceDataRowBlockVirtual<C, P> extends DataRowBlockComputer<Object,
 	public String getName() {
 		return "trace-att-virt";
 	}
+	
+	public String getStatusBusyMessage() {
+		return "Gathering virtual trace attributes..";
+	}
 
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.ivm_attributes_info, IvMObject.aligned_log_filtered };

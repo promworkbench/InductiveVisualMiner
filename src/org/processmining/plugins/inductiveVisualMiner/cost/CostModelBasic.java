@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.cost;
 
+import java.text.DecimalFormat;
+
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -12,7 +14,7 @@ public class CostModelBasic extends CostModelAbstract {
 	private final int numberOfParameters;
 	private final int[] node2index;
 
-	public static final String attribute = "AMOUNT_REQ";
+	public static final String attribute = "cost";
 
 	public CostModelBasic(IvMModel model) {
 		super(model);
@@ -82,10 +84,23 @@ public class CostModelBasic extends CostModelAbstract {
 		return value;
 	}
 
+	public static final DecimalFormat formatE = new DecimalFormat("0.###E0");
+	public static final DecimalFormat format = new DecimalFormat("0.##");
+
+	public static final String format(double value) {
+		if (value == 0) {
+			return "0";
+		}
+		if (Math.abs(value) > 9999999 || Math.abs(value) < 0.01) {
+			return formatE.format(value);
+		}
+		return format.format(value);
+	}
+
 	public Pair<Long, String> getNodeRepresentationModel(int node) {
 		return Pair.of( //
 				(long) (parameters[node2index[node] + 2]), //
-				"sync move cost " + parameters[node2index[node] + 2]);
+				format(parameters[node2index[node] + 2]));
 	}
 
 	public String[][] getNodeRepresentationPopup(int node) {

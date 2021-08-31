@@ -17,6 +17,10 @@ public class TraceDataRowBlockType<C, P> extends DataRowBlockComputer<Object, C,
 	public String getName() {
 		return "trace-att-type";
 	}
+	
+	public String getStatusBusyMessage() {
+		return "Gathering trace attribute types..";
+	}
 
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.attributes_info };

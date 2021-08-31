@@ -3,7 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.mode;
 import java.awt.Color;
 
 import org.processmining.plugins.graphviz.colourMaps.ColourMapFixed;
-import org.processmining.plugins.graphviz.colourMaps.ColourMapRed;
+import org.processmining.plugins.graphviz.colourMaps.ColourMapPurple;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationData;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplCost;
 import org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.data.AlignedLogVisualisationDataImplPlaceholder;
@@ -25,7 +25,7 @@ public class ModeCost extends Mode {
 		visualisationParameters.setColourModelEdges(new ColourMapFixed(new Color(187, 187, 255)));
 		visualisationParameters.setShowLogMoves(false);
 		visualisationParameters.setShowModelMoves(false);
-		visualisationParameters.setColourNodes(new ColourMapRed());
+		visualisationParameters.setColourNodes(new ColourMapPurple());
 		visualisationParameters.setModelEdgesWidth(new SizeMapFixed(1));
 
 		visualisationParametersBeforeCost.setShowFrequenciesOnModelEdges(true);
@@ -66,7 +66,7 @@ public class ModeCost extends Mode {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
 
-		if (!inputs.has(IvMObject.performance)) {
+		if (inputs.has(IvMObject.cost_model)) {
 			CostModel costModel = inputs.get(IvMObject.cost_model);
 
 			return new AlignedLogVisualisationDataImplCost(model, costModel, logInfo);

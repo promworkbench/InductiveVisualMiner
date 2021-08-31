@@ -21,6 +21,10 @@ public class DataRowBlockLogAttributesHighlighted<C, P> extends DataRowBlockComp
 	public String getName() {
 		return "log-vir-att";
 	}
+	
+	public String getStatusBusyMessage() {
+		return "Gathering virtual log attributes..";
+	}
 
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.aligned_log_filtered, IvMObject.aligned_log };

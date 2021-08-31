@@ -32,6 +32,10 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 	public String getName() {
 		return "event-att";
 	}
+	
+	public String getStatusBusyMessage() {
+		return "Gathering event attributes..";
+	}
 
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.aligned_log_filtered };

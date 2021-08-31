@@ -22,6 +22,10 @@ public class DataRowBlockLogAttributes<C, P> extends DataRowBlockComputer<Object
 	public String getName() {
 		return "log-att";
 	}
+	
+	public String getStatusBusyMessage() {
+		return "Gathering log attributes..";
+	}
 
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.input_log };

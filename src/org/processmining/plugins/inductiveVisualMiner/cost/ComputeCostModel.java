@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.cost;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
@@ -19,8 +18,6 @@ public class ComputeCostModel {
 		CostModelAbstract result = new CostModelBasic(model);
 
 		int numberOfTraces = getNumberOfTraces(log);
-
-		OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
 
 		List<double[]> x = new ArrayList<>(numberOfTraces); //input
 		TDoubleList y = new TDoubleArrayList(numberOfTraces); //outcome
@@ -44,16 +41,11 @@ public class ComputeCostModel {
 			return null;
 		}
 
-		double[][] yy = new double[y.size()][];
-		regression.newSampleData(y.toArray(), x.toArray(yy));
+		double[][] xx = new double[x.size()][];
+		double[] coe = Regression.regress(x.toArray(xx), y.toArray());
 
-		if (canceller.isCancelled()) {
+		if (canceller.isCancelled() || coe == null) {
 			return null;
-		}
-
-		double[] coe = regression.estimateRegressionParameters();
-		for (double p : coe) {
-			System.out.println(p);
 		}
 
 		result.setParameters(coe);
