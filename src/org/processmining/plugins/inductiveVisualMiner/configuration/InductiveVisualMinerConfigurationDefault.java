@@ -41,6 +41,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBloc
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostDataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventDataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataTabLog;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataTab;
@@ -223,6 +224,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		result.add(new TraceDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		result.add(new EventDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		result.add(new CohortDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+		result.add(new CostDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		return result;
 		//		return new ArrayList<>(Arrays.asList(new DataAnalysisTableFactory[] { //
 		//				new LogAttributeAnalysisTableFactory(), //

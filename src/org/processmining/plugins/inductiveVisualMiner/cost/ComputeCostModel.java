@@ -15,7 +15,7 @@ import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
 
 public class ComputeCostModel {
-	public static CostModel compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfoFiltered,
+	public static Pair<CostModel, String> compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfoFiltered,
 			IvMCanceller canceller) {
 		CostModelAbstract result = new CostModelBasic(model, logInfoFiltered);
 
@@ -44,14 +44,20 @@ public class ComputeCostModel {
 		}
 
 		double[][] xx = new double[x.size()][];
-		double[] coe = Regression.regress(x.toArray(xx), y.toArray());
+		Regression regression = new Regression();
+		double[] coe = regression.regress(x.toArray(xx), y.toArray());
 
-		if (canceller.isCancelled() || coe == null) {
+		if (canceller.isCancelled()) {
 			return null;
 		}
 
+		if (coe == null) {
+			//something went wrong; get the error message
+			return Pair.of(null, regression.getMessage());
+		}
+
 		result.setParameters(coe);
-		return result;
+		return Pair.of((CostModel) result, null);
 	}
 
 	public static int getNumberOfTraces(IvMLogFiltered log) {

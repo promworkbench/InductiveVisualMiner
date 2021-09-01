@@ -17,7 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualM
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
-import org.processmining.plugins.inductiveVisualMiner.cost.CostModel;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModels;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
@@ -120,7 +120,7 @@ public class IvMObject<C> {
 			boolean.class);
 
 	//cost
-	public static final IvMObject<CostModel> cost_model = c("cost model", CostModel.class);
+	public static final IvMObject<CostModels> cost_models = c("cost models", CostModels.class);
 
 	//skeleton
 	public static <C> IvMObject<C> c(String name, Class<C> clazz) {

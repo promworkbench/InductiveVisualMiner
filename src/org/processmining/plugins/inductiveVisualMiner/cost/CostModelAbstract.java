@@ -1,8 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.cost;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
@@ -43,8 +40,16 @@ public abstract class CostModelAbstract implements CostModel {
 			return null;
 		}
 
-		List<IvMMove> seen = new ArrayList<>();
+		//capture log moves
+		for (IvMMove move : trace) {
+			if (move.isLogMove() && !move.isIgnoredLogMove()) {
+				double[] inputsA = getInputs(move.getLogMoveUnode(), null, null, null, move);
 
+				merge(inputs, inputsA);
+			}
+		}
+
+		//capture activity instances
 		ActivityInstanceIterator it = trace.activityInstanceIterator(model);
 		while (it.hasNext()) {
 
@@ -59,7 +64,6 @@ public abstract class CostModelAbstract implements CostModel {
 					//System.out.println("stop");
 				}
 			} else {
-				seen.add(a.getF());
 				double[] inputsA = getInputs(a.getA(), a.getC(), a.getD(), a.getE(), a.getF());
 
 				merge(inputs, inputsA);

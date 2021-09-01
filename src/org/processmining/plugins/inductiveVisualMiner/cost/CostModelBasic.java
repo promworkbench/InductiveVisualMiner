@@ -1,9 +1,14 @@
 package org.processmining.plugins.inductiveVisualMiner.cost;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
@@ -41,7 +46,8 @@ public class CostModelBasic extends CostModelAbstract {
 		//count nodes in model
 		int nodes = 0;
 		{
-			for (int node : model.getAllNodes()) {
+			for (Iterator<Integer> it = model.getAllNodes().iterator(); it.hasNext();) {
+				it.next();
 				nodes++;
 			}
 		}
@@ -132,5 +138,16 @@ public class CostModelBasic extends CostModelAbstract {
 				{ "cost                   " + parameters[node2index[node] + 1] }, //
 				{ "cost to skip           " + parameters[node2index[node]] }, //
 		};
+	}
+
+	public List<DataRow<Object>> getModelRepresentation() {
+		List<DataRow<Object>> result = new ArrayList<>();
+
+		for (String activity : logMove2index.keySet()) {
+			int index = logMove2index.get(activity);
+			result.add(new DataRow<Object>(DisplayType.numeric(parameters[index]), "log move on", activity));
+		}
+
+		return result;
 	}
 }

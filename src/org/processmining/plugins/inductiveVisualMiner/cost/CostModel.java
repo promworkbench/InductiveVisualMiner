@@ -1,6 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.cost;
 
+import java.util.List;
+
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public interface CostModel {
@@ -14,7 +17,21 @@ public interface CostModel {
 	 */
 	public Pair<Long, String> getNodeRepresentationModel(int node);
 
-	public String[][] getNodeRepresentationPopup(int unode);
+	/**
+	 * The representation of this model for this node (for the model-activity
+	 * node popups).
+	 * 
+	 * @param unode
+	 * @return
+	 */
+	public String[][] getNodeRepresentationPopup(int node);
+
+	/**
+	 * The representation of this model (for the data analysis cost tab)
+	 * 
+	 * @return
+	 */
+	public List<DataRow<Object>> getModelRepresentation();
 
 	/**
 	 * 
