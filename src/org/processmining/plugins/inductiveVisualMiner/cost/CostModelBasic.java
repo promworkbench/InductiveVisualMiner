@@ -5,40 +5,56 @@ import java.text.DecimalFormat;
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
+/**
+ * Parameter structure: [0,n-1] log move cost on per activity that has at least
+ * one log move; [n,n+m*2] per model node (0) move model cost and (1) move sync
+ * cost.
+ * 
+ * @author sander
+ *
+ */
 public class CostModelBasic extends CostModelAbstract {
 
 	private final int numberOfParameters;
 	private final int[] node2index;
+	private final TObjectIntMap<String> logMove2index = new TObjectIntHashMap<>();
 
 	public static final String attribute = "cost";
 
-	public CostModelBasic(IvMModel model) {
+	public CostModelBasic(IvMModel model, IvMLogInfo logInfoFiltered) {
 		super(model);
 
+		int index = 0;
+		for (String logMoveActivity : logInfoFiltered.getUnlabeledLogMoves()) {
+			logMove2index.put(logMoveActivity, index);
+			index++;
+		}
+
+		//count nodes in model
+		int nodes = 0;
 		{
-			int result = 0;
-			int nodes = 0;
 			for (int node : model.getAllNodes()) {
-				if (model.isActivity(node)) {
-					result++;
-				}
 				nodes++;
 			}
-			numberOfParameters = result * 3;
+		}
 
-			node2index = new int[nodes];
-			int index = 0;
-			for (int node : model.getAllNodes()) {
-				if (model.isActivity(node)) {
-					node2index[node] = index;
-					index++;
-				}
+		node2index = new int[nodes];
+		for (int node : model.getAllNodes()) {
+			if (model.isActivity(node)) {
+				node2index[node] = index;
+				index += 2;
 			}
 		}
+
+		numberOfParameters = index;
 	}
 
 	@Override
@@ -55,14 +71,20 @@ public class CostModelBasic extends CostModelAbstract {
 		}
 
 		if (complete.isLogMove()) {
-			result[node2index[node] * 3] += 1;
+			//result[node2index[node] * 2] += 1;
+			String activity = complete.getActivityEventClass().toString();
+			result[logMove2index.get(activity)]++;
 		} else if (complete.isModelMove()) {
-			result[node2index[node] * 3 + 1] += 1;
+			result[node2index[node]]++;
 		} else {
 			//sync
-			result[node2index[node] * 3 + 2] += 1;
+			result[node2index[node] + 1]++;
 		}
 		return result;
+	}
+
+	public double getParameterSync(int node) {
+		return parameters[node2index[node] + 1];
 	}
 
 	@Override
@@ -97,17 +119,18 @@ public class CostModelBasic extends CostModelAbstract {
 		return format.format(value);
 	}
 
+	@Override
 	public Pair<Long, String> getNodeRepresentationModel(int node) {
 		return Pair.of( //
-				(long) (parameters[node2index[node] + 2]), //
-				format(parameters[node2index[node] + 2]));
+				(long) (getParameterSync(node)), //
+				format(getParameterSync(node)));
 	}
 
+	@Override
 	public String[][] getNodeRepresentationPopup(int node) {
 		return new String[][] { //
-				{ "cost                   " + parameters[node2index[node] + 2] }, //
-				{ "cost skip model        " + parameters[node2index[node] + 1] }, //
-				{ "cost extra log event   " + parameters[node2index[node]] }, //
+				{ "cost                   " + parameters[node2index[node] + 1] }, //
+				{ "cost to skip           " + parameters[node2index[node]] }, //
 		};
 	}
 }

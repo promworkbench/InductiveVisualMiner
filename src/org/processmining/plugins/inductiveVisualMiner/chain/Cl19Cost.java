@@ -4,6 +4,7 @@ import org.processmining.plugins.inductiveVisualMiner.cost.ComputeCostModel;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 
 public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
 
@@ -16,8 +17,8 @@ public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
 	}
 
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.log_timestamps_logical, IvMObject.model,
-				IvMObject.aligned_log_filtered, };
+		return new IvMObject<?>[] { IvMObject.log_timestamps_logical, IvMObject.model, IvMObject.aligned_log_filtered,
+				IvMObject.aligned_log_info_filtered };
 	}
 
 	public IvMObject<?>[] createOutputObjects() {
@@ -33,9 +34,10 @@ public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
 
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogFiltered log = inputs.get(IvMObject.aligned_log_filtered);
+		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
 
-		CostModel costModel = ComputeCostModel.compute(model, log, canceller);
-		
+		CostModel costModel = ComputeCostModel.compute(model, log, logInfo, canceller);
+
 		if (costModel == null) {
 			return null;
 		}

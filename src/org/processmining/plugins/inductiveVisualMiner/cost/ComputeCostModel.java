@@ -8,14 +8,16 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
 
 public class ComputeCostModel {
-	public static CostModel compute(IvMModel model, IvMLogFiltered log, IvMCanceller canceller) {
-		CostModelAbstract result = new CostModelBasic(model);
+	public static CostModel compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfoFiltered,
+			IvMCanceller canceller) {
+		CostModelAbstract result = new CostModelBasic(model, logInfoFiltered);
 
 		int numberOfTraces = getNumberOfTraces(log);
 
