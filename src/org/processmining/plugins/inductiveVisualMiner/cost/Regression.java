@@ -11,7 +11,7 @@ public class Regression {
 
 	public double[] regress(double[][] inputs, double[] outputs) {
 		if (inputs.length == 0) {
-			message = "no cost data";
+			message = "no cost data available";
 			return null;
 		}
 

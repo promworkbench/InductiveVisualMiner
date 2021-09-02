@@ -70,7 +70,8 @@ public class CostRowBlock<C, P> extends DataRowBlockAbstract<Object, C, P> {
 				}
 			} else {
 				//neither: empty list
-				return new ArrayList<>();
+				a = new ArrayList<>();
+				b = new ArrayList<>();
 			}
 
 			List<DataRow<Object>> result = TraceDataRowBlock.merge(a, b, new IvMCanceller(null) {
