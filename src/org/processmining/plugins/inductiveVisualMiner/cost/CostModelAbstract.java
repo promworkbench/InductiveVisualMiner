@@ -1,8 +1,13 @@
 package org.processmining.plugins.inductiveVisualMiner.cost;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -12,6 +17,7 @@ public abstract class CostModelAbstract implements CostModel {
 
 	protected double[] parameters;
 	protected final IvMModel model;
+	private List<Pair<String, Double>> qualityMetrics;
 
 	public CostModelAbstract(IvMModel model) {
 		this.model = model;
@@ -85,5 +91,23 @@ public abstract class CostModelAbstract implements CostModel {
 
 	public void setParameters(double[] parameters) {
 		this.parameters = parameters;
+	}
+
+	public void setQualityMetrics(List<Pair<String, Double>> qualityMetrics) {
+		this.qualityMetrics = qualityMetrics;
+	}
+
+	public List<Pair<String, Double>> getQualityMetrics() {
+		return qualityMetrics;
+	}
+
+	public List<DataRow<Object>> getModelRepresentation() {
+		List<DataRow<Object>> result = new ArrayList<>();
+		for (Pair<String, Double> p : qualityMetrics) {
+			result.add(new DataRow<Object>("cost model property", p.getA(), DisplayType.numeric(p.getB())));
+		}
+		result.add(
+				new DataRow<Object>("cost model property", "number of parameters", DisplayType.numeric(parameters.length)));
+		return result;
 	}
 }

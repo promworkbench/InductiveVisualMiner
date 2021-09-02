@@ -1,15 +1,22 @@
 package org.processmining.plugins.inductiveVisualMiner.cost;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
+import org.processmining.plugins.InductiveMiner.Pair;
 
 public class Regression {
 
 	private String message;
+	private final List<Pair<String, Double>> qualityMetrics = new ArrayList<>();
 
 	public double[] regress(double[][] inputs, double[] outputs) {
+		message = null;
+		getQualityMetrics().clear();
+
 		if (inputs.length == 0) {
 			message = "no cost data available";
 			return null;
@@ -43,6 +50,10 @@ public class Regression {
 		regression.newSampleData(outputs, inputsF);
 		try {
 			double[] result = regression.estimateRegressionParameters();
+
+			getQualityMetrics().add(Pair.of("residual sum of squares", regression.calculateResidualSumOfSquares()));
+			getQualityMetrics().add(Pair.of("regression standard error", regression.estimateRegressionStandardError()));
+
 			return transformToOldColumns(result, oldColumn2newColumn, inputs[0].length);
 		} catch (SingularMatrixException e) {
 			message = "matrix is singular";
@@ -133,6 +144,10 @@ public class Regression {
 
 	public String getMessage() {
 		return message;
+	}
+
+	public List<Pair<String, Double>> getQualityMetrics() {
+		return qualityMetrics;
 	}
 
 }

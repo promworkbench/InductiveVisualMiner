@@ -140,13 +140,30 @@ public class CostModelBasic extends CostModelAbstract {
 		};
 	}
 
+	@Override
 	public List<DataRow<Object>> getModelRepresentation() {
 		List<DataRow<Object>> result = new ArrayList<>();
 
+		result.addAll(super.getModelRepresentation());
+
 		for (String activity : logMove2index.keySet()) {
 			int index = logMove2index.get(activity);
-			result.add(new DataRow<Object>(DisplayType.numeric(parameters[index]), "log move on", activity));
+			result.add(new DataRow<Object>(DisplayType.numeric(parameters[index]), "extra step in log (log move)",
+					activity));
 		}
+
+		for (int node = 0; node < node2index.length; node++) {
+			if (node2index[node] >= 0) {
+				result.add(new DataRow<Object>(DisplayType.numeric(parameters[node2index[node]]),
+						"skip step in model (model move)", model.getActivityName(node)));
+				result.add(new DataRow<Object>(DisplayType.numeric(getParameterSync(node)),
+						"synchronous step in log and model", model.getActivityName(node)));
+			}
+
+		}
+		
+		result.add(new DataRow<Object>(DisplayType.literal("OLS multiple linear regression"),
+				"cost model property", "type"));
 
 		return result;
 	}

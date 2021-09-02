@@ -57,6 +57,7 @@ public class ComputeCostModel {
 		}
 
 		result.setParameters(coe);
+		result.setQualityMetrics(new ArrayList<>(regression.getQualityMetrics()));
 		return Pair.of((CostModel) result, null);
 	}
 

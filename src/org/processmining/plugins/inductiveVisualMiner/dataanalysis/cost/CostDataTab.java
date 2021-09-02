@@ -17,8 +17,8 @@ public class CostDataTab<C, P> implements DataTab<Object, C, P> {
 	@Override
 	public DataTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
 		DataTable<Object, C, P> table = new DataTable<>(name, dataAnalysesView);
-		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "Move type", "activity", "cost" },
-				{ "Move type", "activity", "cost highlighted traces", "cost not-highlighted traces" } });
+		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "cost" },
+				{ "", "", "cost highlighted traces", "cost not-highlighted traces" } });
 		return table;
 	}
 
