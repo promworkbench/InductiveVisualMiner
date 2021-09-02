@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -37,6 +38,7 @@ public class AttributeFilterGui extends IvMFilterGui {
 	private String selectedAttributeName;
 	private Collection<Attribute> attributes;
 
+	private final JScrollPane valueLiteralScrollPane;
 	private final JList<String> valueLiteralSelector;
 	private final DefaultListModel<String> valueLiteralSelectorListModel;
 
@@ -98,12 +100,15 @@ public class AttributeFilterGui extends IvMFilterGui {
 				}
 			});
 			valueLiteralSelector.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-			JScrollPane scrollPane = new JScrollPane(valueLiteralSelector);
+			valueLiteralScrollPane = new JScrollPane(valueLiteralSelector);
 
-			scrollPane.getViewport().setOpaque(false);
+			valueLiteralScrollPane.getViewport().setOpaque(false);
 			valueLiteralSelector.setOpaque(false);
-			scrollPane.setOpaque(false);
-			add(valueLiteralSelector);
+			valueLiteralScrollPane.setOpaque(false);
+			//valueLiteralScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			valueLiteralScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+			valueLiteralScrollPane.setPreferredSize(new Dimension(0, 50));
+			add(valueLiteralScrollPane);
 		}
 
 		//numeric & times values panel
@@ -202,16 +207,16 @@ public class AttributeFilterGui extends IvMFilterGui {
 			for (String a : getSelectedAttribute().getStringValues()) {
 				valueLiteralSelectorListModel.addElement(a);
 			}
-			valueLiteralSelector.setVisible(true);
+			valueLiteralScrollPane.setVisible(true);
 			valueNumericSelector.setVisible(false);
 		} else if (attribute.isNumeric()) {
-			valueLiteralSelector.setVisible(false);
+			valueLiteralScrollPane.setVisible(false);
 			valueNumericSelector.setVisible(true);
 		} else if (attribute.isTime()) {
-			valueLiteralSelector.setVisible(false);
+			valueLiteralScrollPane.setVisible(false);
 			valueNumericSelector.setVisible(true);
 		} else if (attribute.isDuration()) {
-			valueLiteralSelector.setVisible(false);
+			valueLiteralScrollPane.setVisible(false);
 			valueNumericSelector.setVisible(true);
 		}
 	}

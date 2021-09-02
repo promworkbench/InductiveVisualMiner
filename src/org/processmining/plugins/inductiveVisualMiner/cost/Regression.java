@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.cost;
 
 import java.util.BitSet;
 
+import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 
 public class Regression {
@@ -10,6 +11,7 @@ public class Regression {
 
 	public double[] regress(double[][] inputs, double[] outputs) {
 		if (inputs.length == 0) {
+			message = "no cost data";
 			return null;
 		}
 
@@ -39,9 +41,14 @@ public class Regression {
 		//perform the regression
 		OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
 		regression.newSampleData(outputs, inputsF);
-		double[] result = regression.estimateRegressionParameters();
+		try {
+			double[] result = regression.estimateRegressionParameters();
+			return transformToOldColumns(result, oldColumn2newColumn, inputs[0].length);
+		} catch (SingularMatrixException e) {
+			message = "matrix is singular";
+			return null;
+		}
 
-		return transformToOldColumns(result, oldColumn2newColumn, inputs[0].length);
 	}
 
 	private static double[] transformToOldColumns(double[] array, int[] oldColumn2newColumn, int numberOfOldColumns) {
