@@ -24,7 +24,7 @@ public abstract class CostModelAbstract implements CostModel {
 	}
 
 	/**
-	 * No side effects allowed
+	 * No side effects allowed. Will only be called for non-silent activities. 
 	 * 
 	 * @param node
 	 * @param initiate
@@ -104,10 +104,10 @@ public abstract class CostModelAbstract implements CostModel {
 	public List<DataRow<Object>> getModelRepresentation() {
 		List<DataRow<Object>> result = new ArrayList<>();
 		for (Pair<String, Double> p : qualityMetrics) {
-			result.add(new DataRow<Object>("cost model property", p.getA(), DisplayType.numeric(p.getB())));
+			result.add(new DataRow<Object>("cost model", p.getA(), DisplayType.numeric(p.getB())));
 		}
 		result.add(
-				new DataRow<Object>("cost model property", "number of parameters", DisplayType.numeric(parameters.length)));
+				new DataRow<Object>("cost model", "number of parameters", DisplayType.numeric(parameters.length)));
 		return result;
 	}
 }

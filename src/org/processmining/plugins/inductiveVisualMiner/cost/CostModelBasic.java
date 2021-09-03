@@ -20,8 +20,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * Parameter structure: [0,n-1] log move cost on per activity that has at least
- * one log move; [n,n+m*2] per model node (0) move model cost and (1) move sync
- * cost.
+ * one log move; [n,n+m*x] per model node a few timing things cost.
  * 
  * @author sander
  *
@@ -34,13 +33,74 @@ public class CostModelBasic extends CostModelAbstract {
 
 	public static final String attribute = "cost";
 
+	private static final int ms2hr = 1000 * 60 * 60;
+
+	public static enum ParameterNodeType {
+		synchronousMove {
+			public String toString() {
+				return "step in log and model";
+			}
+
+			public double value2user(double value) {
+				return value;
+			};
+		},
+		modelMove {
+			public String toString() {
+				return "skip step in model";
+			}
+
+			public double value2user(double value) {
+				return value;
+			};
+		},
+		sojournTime {
+			public String toString() {
+				return "sojourn time (/hr)";
+			}
+
+			public double value2user(double value) {
+				return value / ms2hr;
+			};
+		},
+		waitingTime {
+			public String toString() {
+				return "waiting time (/hr)";
+			}
+
+			public double value2user(double value) {
+				return value / ms2hr;
+			};
+		},
+		queueingTime {
+			public String toString() {
+				return "queueing time (/hr)";
+			}
+
+			public double value2user(double value) {
+				return value / ms2hr;
+			};
+		},
+		serviceTime {
+			public String toString() {
+				return "service time (/hr)";
+			}
+
+			public double value2user(double value) {
+				return value / ms2hr;
+			};
+		};
+
+		public abstract double value2user(double value);
+	}
+
 	public CostModelBasic(IvMModel model, IvMLogInfo logInfoFiltered) {
 		super(model);
 
 		int index = 0;
 		for (String logMoveActivity : logInfoFiltered.getUnlabeledLogMoves()) {
 			logMove2index.put(logMoveActivity, index);
-			index++;
+			index += 1;
 		}
 
 		//count nodes in model
@@ -56,7 +116,7 @@ public class CostModelBasic extends CostModelAbstract {
 		for (int node : model.getAllNodes()) {
 			if (model.isActivity(node)) {
 				node2index[node] = index;
-				index += 2;
+				index += ParameterNodeType.values().length;
 			}
 		}
 
@@ -72,7 +132,7 @@ public class CostModelBasic extends CostModelAbstract {
 	public double[] getInputs(int node, IvMMove initiate, IvMMove enqueue, IvMMove start, IvMMove complete) {
 		double[] result = new double[numberOfParameters];
 
-		if (complete.isLogMove()) {
+		if (complete != null && complete.isLogMove()) {
 			//result[node2index[node] * 2] += 1;
 			String activity = complete.getActivityEventClass().toString();
 			result[logMove2index.get(activity)]++;
@@ -84,16 +144,56 @@ public class CostModelBasic extends CostModelAbstract {
 		}
 
 		if (complete.isModelMove()) {
-			result[node2index[node]]++;
+			//model move
+			result[node2index[node] + ParameterNodeType.modelMove.ordinal()]++;
 		} else {
 			//sync
-			result[node2index[node] + 1]++;
+			result[node2index[node] + ParameterNodeType.synchronousMove.ordinal()]++;
 		}
+
+		//timing parameters
+		{
+			//sojourn time
+			if (initiate != null && complete != null && initiate.getLogTimestamp() != null
+					&& complete.getLogTimestamp() != null) {
+				result[node2index[node] + ParameterNodeType.sojournTime.ordinal()] += complete.getLogTimestamp()
+						- initiate.getLogTimestamp();
+			}
+
+			//service time
+			if (start != null && complete != null && start.getLogTimestamp() != null
+					&& complete.getLogTimestamp() != null) {
+				result[node2index[node] + ParameterNodeType.serviceTime.ordinal()] += complete.getLogTimestamp()
+						- start.getLogTimestamp();
+			}
+
+			//waiting time
+			if (initiate != null && start != null && initiate.getLogTimestamp() != null
+					&& start.getLogTimestamp() != null) {
+				result[node2index[node] + ParameterNodeType.waitingTime.ordinal()] += start.getLogTimestamp()
+						- initiate.getLogTimestamp();
+			}
+
+			//queueing time
+			if (enqueue != null && start != null && enqueue.getLogTimestamp() != null
+					&& start.getLogTimestamp() != null) {
+				result[node2index[node] + ParameterNodeType.queueingTime.ordinal()] += start.getLogTimestamp()
+						- enqueue.getLogTimestamp();
+			}
+		}
+
 		return result;
 	}
 
-	public double getParameterSync(int node) {
-		return parameters[node2index[node] + 1];
+	/**
+	 * Times/durations will be in ms.
+	 * 
+	 * @param node
+	 * @param parameterType
+	 * @return
+	 */
+	public double getNodeParameter(int node, ParameterNodeType parameterType) {
+		return parameters[node2index[node] + parameterType.ordinal()];
 	}
 
 	@Override
@@ -131,16 +231,22 @@ public class CostModelBasic extends CostModelAbstract {
 	@Override
 	public Pair<Long, String> getNodeRepresentationModel(int node) {
 		return Pair.of( //
-				(long) (getParameterSync(node)), //
-				format(getParameterSync(node)));
+				(long) (getNodeParameter(node, ParameterNodeType.synchronousMove)), //
+				format(getNodeParameter(node, ParameterNodeType.synchronousMove)));
 	}
 
 	@Override
 	public String[][] getNodeRepresentationPopup(int node) {
-		return new String[][] { //
-				{ "cost                   " + parameters[node2index[node] + 1] }, //
-				{ "cost to skip           " + parameters[node2index[node]] }, //
-		};
+		List<String[]> result = new ArrayList<>();
+		for (ParameterNodeType parameterType : ParameterNodeType.values()) {
+			if (getNodeParameter(node, parameterType) != 0) {
+				result.add(new String[] { "cost " + parameterType.toString(),
+						format(parameterType.value2user(getNodeParameter(node, parameterType))) });
+			}
+		}
+
+		String[][] r = new String[result.size()][2];
+		return result.toArray(r);
 	}
 
 	@Override
@@ -151,22 +257,22 @@ public class CostModelBasic extends CostModelAbstract {
 
 		for (String activity : logMove2index.keySet()) {
 			int index = logMove2index.get(activity);
-			result.add(new DataRow<Object>(DisplayType.numeric(parameters[index]), "extra step in log (log move)",
-					activity));
+			result.add(
+					new DataRow<Object>(DisplayType.numeric(parameters[index]), "cost of extra step in log", activity));
 		}
 
 		for (int node = 0; node < node2index.length; node++) {
 			if (node2index[node] >= 0) {
-				result.add(new DataRow<Object>(DisplayType.numeric(parameters[node2index[node]]),
-						"skip step in model (model move)", model.getActivityName(node)));
-				result.add(new DataRow<Object>(DisplayType.numeric(getParameterSync(node)),
-						"synchronous step in log and model", model.getActivityName(node)));
+				for (ParameterNodeType parameterType : ParameterNodeType.values()) {
+					double value = parameterType.value2user(getNodeParameter(node, parameterType));
+					result.add(new DataRow<Object>(DisplayType.numeric(value), "cost of " + parameterType.toString(),
+							model.getActivityName(node)));
+				}
 			}
 
 		}
 
-		result.add(new DataRow<Object>(DisplayType.literal("OLS multiple linear regression"), "cost model property",
-				"type"));
+		result.add(new DataRow<Object>(DisplayType.literal("OLS multiple linear regression"), "cost model", "type"));
 
 		return result;
 	}

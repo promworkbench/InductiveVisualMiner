@@ -41,12 +41,12 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 
 		//find out if we are in the first row of a group (of at least 2)
 		int firstModelColumn = table.convertColumnIndexToView(0);
-		boolean firstRowOfGroup = getPreviousRowValue(table, row, firstModelColumn) != getRowValue(table, row,
-				firstModelColumn)
-				&& getRowValue(table, row, firstModelColumn) == getNextRowValue(table, row, firstModelColumn);
+		boolean firstRowOfGroup = !getPreviousRowValue(table, row, firstModelColumn)
+				.equals(getRowValue(table, row, firstModelColumn))
+				&& getRowValue(table, row, firstModelColumn).equals(getNextRowValue(table, row, firstModelColumn));
 
 		//find out if we are different than the row before
-		boolean sameAsPreviousRow = getPreviousRowValue(table, row, column) == getRowValue(table, row, column)
+		boolean sameAsPreviousRow = getPreviousRowValue(table, row, column).equals(getRowValue(table, row, column))
 				&& !(object instanceof DisplayType);
 
 		//default properties
@@ -129,7 +129,7 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 
 	private String getPreviousRowValue(JTable table, int row, int column) {
 		if (row <= 0) {
-			return null;
+			return "";
 		}
 		int modelRow = table.convertRowIndexToModel(row - 1);
 		int modelColumn = table.convertColumnIndexToModel(column);
@@ -139,7 +139,7 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 
 	private String getNextRowValue(JTable table, int row, int column) {
 		if (row >= table.getModel().getRowCount() - 1) {
-			return null;
+			return "";
 		}
 		int modelRow = table.convertRowIndexToModel(row + 1);
 		int modelColumn = table.convertColumnIndexToModel(column);

@@ -38,7 +38,7 @@ public class CostRowBlock<C, P> extends DataRowBlockAbstract<Object, C, P> {
 				return costModels.getCostModel().getModelRepresentation();
 			} else {
 				List<DataRow<Object>> result = new ArrayList<>();
-				result.add(new DataRow<Object>("cost model property", "was not computed because",
+				result.add(new DataRow<Object>("cost model", "was not computed because",
 						DisplayType.literal(costModels.getCostModelMessage())));
 				return result;
 			}
@@ -83,7 +83,7 @@ public class CostRowBlock<C, P> extends DataRowBlockAbstract<Object, C, P> {
 
 			if (costModels.getCostModelMessage() != null || costModels.getNegativeCostModelMessage() != null) {
 				//something went wrong somewhere
-				result.add(new DataRow<Object>("cost model property", "was not computed because",
+				result.add(new DataRow<Object>("cost model", "was not computed because",
 						DisplayType.literal(costModels.getCostModelMessage()),
 						DisplayType.literal(costModels.getNegativeCostModelMessage())));
 			}
