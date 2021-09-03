@@ -72,15 +72,18 @@ public class CostModelBasic extends CostModelAbstract {
 	public double[] getInputs(int node, IvMMove initiate, IvMMove enqueue, IvMMove start, IvMMove complete) {
 		double[] result = new double[numberOfParameters];
 
-		if (!model.isActivity(node)) {
-			return result;
-		}
-
 		if (complete.isLogMove()) {
 			//result[node2index[node] * 2] += 1;
 			String activity = complete.getActivityEventClass().toString();
 			result[logMove2index.get(activity)]++;
-		} else if (complete.isModelMove()) {
+			return result;
+		}
+
+		if (!model.isActivity(node)) {
+			return result;
+		}
+
+		if (complete.isModelMove()) {
 			result[node2index[node]]++;
 		} else {
 			//sync
@@ -161,9 +164,9 @@ public class CostModelBasic extends CostModelAbstract {
 			}
 
 		}
-		
-		result.add(new DataRow<Object>(DisplayType.literal("OLS multiple linear regression"),
-				"cost model property", "type"));
+
+		result.add(new DataRow<Object>(DisplayType.literal("OLS multiple linear regression"), "cost model property",
+				"type"));
 
 		return result;
 	}
