@@ -6,6 +6,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -115,6 +116,8 @@ public interface InductiveVisualMinerConfiguration {
 	public DataChain<InductiveVisualMinerConfiguration> getChain();
 
 	public AlignmentComputer getAlignmentComputer();
+
+	public List<CostModelFactory> getCostModelFactories();
 
 	public IvMDecoratorI getDecorator();
 

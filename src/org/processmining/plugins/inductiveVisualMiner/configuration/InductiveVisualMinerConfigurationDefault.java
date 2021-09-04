@@ -39,6 +39,9 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl19Cost;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplExecutionsLP;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplTimeLP;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostDataTab;
@@ -226,12 +229,14 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		result.add(new CohortDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		result.add(new CostDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		return result;
-		//		return new ArrayList<>(Arrays.asList(new DataAnalysisTableFactory[] { //
-		//				new LogAttributeAnalysisTableFactory(), //
-		//				new TraceAttributeAnalysisTableFactory(), //
-		//				new EventAttributeAnalysisTableFactory(), //
-		//				new CohortAnalysisTableFactory(), //
-		//		}));
+	}
+
+	@Override
+	protected List<CostModelFactory> createCostModelFactories() {
+		return new ArrayList<>(Arrays.asList(new CostModelFactory[] { //
+				new CostModelFactoryImplExecutionsLP(), //
+				new CostModelFactoryImplTimeLP(), //
+		}));
 	}
 
 	@Override

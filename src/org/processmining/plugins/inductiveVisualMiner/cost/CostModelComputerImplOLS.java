@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -16,13 +14,14 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
 
-public class ComputeCostModelOLS implements ComputeCostModel {
-	public Pair<CostModel, String> compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfoFiltered,
-			IvMCanceller canceller) {
-		CostModelAbstract result = new CostModelWithTime(model, logInfoFiltered);
+public class CostModelComputerImplOLS extends CostModelComputerAbstract {
 
-		result.getModelProperties()
-				.add(new DataRow<Object>(DisplayType.literal("OLS multiple linear regression"), "cost model", "type"));
+	public String getName() {
+		return "ordinary least squares linear regression";
+	}
+
+	public void compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfoFiltered, CostModelAbstract result,
+			IvMCanceller canceller) {
 
 		int numberOfTraces = getNumberOfTraces(log);
 
@@ -33,7 +32,7 @@ public class ComputeCostModelOLS implements ComputeCostModel {
 			IvMTrace trace = it.next();
 
 			if (canceller.isCancelled()) {
-				return null;
+				return;
 			}
 
 			Pair<double[], Double> p = result.getInputsAndCost(trace, canceller);
@@ -45,7 +44,7 @@ public class ComputeCostModelOLS implements ComputeCostModel {
 		}
 
 		if (canceller.isCancelled()) {
-			return null;
+			return;
 		}
 
 		double[][] xx = new double[x.size()][];
@@ -53,17 +52,18 @@ public class ComputeCostModelOLS implements ComputeCostModel {
 		double[] coe = regression.regress(x.toArray(xx), y.toArray());
 
 		if (canceller.isCancelled()) {
-			return null;
+			return;
 		}
 
 		if (coe == null) {
 			//something went wrong; get the error message
-			return Pair.of(null, regression.getMessage());
+			message = regression.getMessage();
+			return;
 		}
 
 		result.setParameters(coe);
 		result.setQualityMetrics(new ArrayList<>(regression.getQualityMetrics()));
-		return Pair.of((CostModel) result, null);
+		return;
 	}
 
 	public static int getNumberOfTraces(IvMLogFiltered log) {

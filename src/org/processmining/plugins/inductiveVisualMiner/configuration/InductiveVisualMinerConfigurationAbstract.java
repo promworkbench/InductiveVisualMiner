@@ -8,6 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -42,6 +43,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<PopupItemModelMove> popupItemsModelMove;
 	private final List<PopupItemLog> popupItemsLog;
 	private final List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> dataAnalyses;
+	private final List<CostModelFactory> costModelFactories;
 	private final List<PreMiningFilter> preMiningFilters;
 	private final List<HighlightingFilter> highlightingFilters;
 	private final List<IvMExporter> exporters;
@@ -60,6 +62,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		popupItemsModelMove = createPopupItemsModelMove();
 		popupItemsLog = createPopupItemsLog();
 		dataAnalyses = createDataAnalysisTables();
+		costModelFactories = createCostModelFactories();
 		virtualAttributeFactory = createVirtualAttributes();
 		exporters = createExporters();
 		decorator = createDecorator();
@@ -89,6 +92,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract List<PopupItemLog> createPopupItemsLog();
 
 	protected abstract List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables();
+
+	protected abstract List<CostModelFactory> createCostModelFactories();
 
 	protected abstract List<IvMExporter> createExporters();
 
@@ -177,6 +182,11 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	@Override
 	final public List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables() {
 		return dataAnalyses;
+	}
+
+	@Override
+	public List<CostModelFactory> getCostModelFactories() {
+		return costModelFactories;
 	}
 
 	@Override

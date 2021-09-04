@@ -56,6 +56,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnException;
 import org.processmining.plugins.inductiveVisualMiner.chain.OnStatus;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesController;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataTab;
@@ -377,55 +378,7 @@ public class InductiveVisualMinerController {
 		initGuiTraceView();
 
 		//set data analyses
-		{
-			initGuiDataAnalyses();
-
-			//link cohort data analysis view and cohort highlighting filter
-			panel.getHighlightingFiltersView()
-					.setHighlightingFilter2CohortAnalysisHandler(new HighlightingFilter2CohortAnalysisHandler() {
-						public void showCohortAnalysis() {
-							panel.getDataAnalysesView().enableAndShow();
-							panel.getDataAnalysesView().showAnalysis(CohortDataTab.name);
-						}
-
-						public void setEnabled(boolean enabled) {
-							//do nothing if the user disables the cohort
-						}
-					});
-			panel.getDataAnalysesView()
-					.setCohortAnalysis2HighlightingFilterHandler(new CohortAnalysis2HighlightingFilterHandler() {
-						public void setSelectedCohort(Cohort cohort, boolean highlightInCohort) {
-							panel.getHighlightingFiltersView().setHighlightingFilterSelectedCohort(cohort,
-									highlightInCohort);
-						}
-					});
-
-			//link cohort data analysis view switch and cohort computations
-			setObject(IvMObject.selected_cohort_analysis_enabled, false);
-			panel.getDataAnalysesView().addSwitcherListener(CohortDataTab.name, new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					boolean selected = ((AbstractButton) e.getSource()).getModel().isSelected();
-					if (selected) {
-						//start the computation
-						chain.setObject(IvMObject.selected_cohort_analysis_enabled, true);
-						panel.getDataAnalysesView().setSwitcherMessage(CohortDataTab.name,
-								"Compute " + CohortDataTab.name + " [computing..]");
-					} else {
-						//stop the computation
-						/*
-						 * It seems counter-intuitive, but we already have means
-						 * in place to stop running computations. That is, if we
-						 * start a new one [which will not compute anything due
-						 * the flag set], the old one will be stopped
-						 * automatically.
-						 */
-						chain.setObject(IvMObject.selected_cohort_analysis_enabled, false);
-						panel.getDataAnalysesView().setSwitcherMessage(CohortDataTab.name,
-								"Compute " + CohortDataTab.name);
-					}
-				}
-			});
-		}
+		initGuiDataAnalyses();
 
 		initGuiTraceColouring();
 
@@ -742,6 +695,67 @@ public class InductiveVisualMinerController {
 	}
 
 	protected void initGuiDataAnalyses() {
+		//link cohort data analysis view and cohort highlighting filter
+		panel.getHighlightingFiltersView()
+				.setHighlightingFilter2CohortAnalysisHandler(new HighlightingFilter2CohortAnalysisHandler() {
+					public void showCohortAnalysis() {
+						panel.getDataAnalysesView().enableAndShow();
+						panel.getDataAnalysesView().showAnalysis(CohortDataTab.name);
+					}
+
+					public void setEnabled(boolean enabled) {
+						//do nothing if the user disables the cohort
+					}
+				});
+		panel.getDataAnalysesView()
+				.setCohortAnalysis2HighlightingFilterHandler(new CohortAnalysis2HighlightingFilterHandler() {
+					public void setSelectedCohort(Cohort cohort, boolean highlightInCohort) {
+						panel.getHighlightingFiltersView().setHighlightingFilterSelectedCohort(cohort,
+								highlightInCohort);
+					}
+				});
+
+		//link cohort data analysis view switch and cohort computations
+		setObject(IvMObject.selected_cohort_analysis_enabled, false);
+		panel.getDataAnalysesView().addSwitcherListener(CohortDataTab.name, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean selected = ((AbstractButton) e.getSource()).getModel().isSelected();
+				if (selected) {
+					//start the computation
+					chain.setObject(IvMObject.selected_cohort_analysis_enabled, true);
+					panel.getDataAnalysesView().setSwitcherMessage(CohortDataTab.name,
+							"Compute " + CohortDataTab.name + " [computing..]");
+				} else {
+					//stop the computation
+					/*
+					 * It seems counter-intuitive, but we already have means in
+					 * place to stop running computations. That is, if we start
+					 * a new one [which will not compute anything due the flag
+					 * set], the old one will be stopped automatically.
+					 */
+					chain.setObject(IvMObject.selected_cohort_analysis_enabled, false);
+					panel.getDataAnalysesView().setSwitcherMessage(CohortDataTab.name, "Compute " + CohortDataTab.name);
+				}
+			}
+		});
+
+		//link cost data analysis view to chain
+		setObject(IvMObject.selected_cost_model_factory, configuration.getCostModelFactories().get(0));
+		panel.getDataAnalysesView().setCostAnalysisOnChangeCostModel(new Runnable() {
+			public void run() {
+				FutureImpl i = chain.getObjectValues(IvMObject.selected_cost_model_factory);
+				try {
+					CostModelFactory currentCostModel = i.get().get(IvMObject.selected_cost_model_factory);
+					int x = (configuration.getCostModelFactories().indexOf(currentCostModel) + 1)
+							% configuration.getCostModelFactories().size();
+					chain.setObject(IvMObject.selected_cost_model_factory,
+							configuration.getCostModelFactories().get(x));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
 		panel.getDataAnalysisViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.getDataAnalysesView().enableAndShow();

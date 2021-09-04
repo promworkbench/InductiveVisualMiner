@@ -25,7 +25,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  * @author sander
  *
  */
-public class CostModelWithTime extends CostModelAbstract {
+public class CostModelImplExecutions extends CostModelAbstract {
 
 	private final int numberOfParameters;
 	private final int[] node2index;
@@ -33,68 +33,20 @@ public class CostModelWithTime extends CostModelAbstract {
 
 	public static final String attribute = "cost";
 
-	private static final int ms2hr = 1000 * 60 * 60;
-
 	public static enum ParameterNodeType {
 		synchronousMove {
 			public String toString() {
 				return "step in log and model";
 			}
-
-			public double value2user(double value) {
-				return value;
-			};
 		},
 		modelMove {
 			public String toString() {
 				return "skip step in model";
 			}
-
-			public double value2user(double value) {
-				return value;
-			};
-		},
-		sojournTime {
-			public String toString() {
-				return "sojourn time (/hr)";
-			}
-
-			public double value2user(double value) {
-				return value * ms2hr;
-			};
-		},
-		waitingTime {
-			public String toString() {
-				return "waiting time (/hr)";
-			}
-
-			public double value2user(double value) {
-				return value * ms2hr;
-			};
-		},
-		queueingTime {
-			public String toString() {
-				return "queueing time (/hr)";
-			}
-
-			public double value2user(double value) {
-				return value * ms2hr;
-			};
-		},
-		serviceTime {
-			public String toString() {
-				return "service time (/hr)";
-			}
-
-			public double value2user(double value) {
-				return value * ms2hr;
-			};
-		};
-
-		public abstract double value2user(double value);
+		}
 	}
 
-	public CostModelWithTime(IvMModel model, IvMLogInfo logInfoFiltered) {
+	public CostModelImplExecutions(IvMModel model, IvMLogInfo logInfoFiltered) {
 		super(model);
 
 		int index = 0;
@@ -124,6 +76,11 @@ public class CostModelWithTime extends CostModelAbstract {
 	}
 
 	@Override
+	public String getName() {
+		return "executions";
+	}
+
+	@Override
 	public int getNumberOfParameters() {
 		return numberOfParameters;
 	}
@@ -149,37 +106,6 @@ public class CostModelWithTime extends CostModelAbstract {
 		} else {
 			//sync
 			result[node2index[node] + ParameterNodeType.synchronousMove.ordinal()]++;
-		}
-
-		//timing parameters
-		{
-			//sojourn time
-			if (initiate != null && complete != null && initiate.getLogTimestamp() != null
-					&& complete.getLogTimestamp() != null) {
-				result[node2index[node] + ParameterNodeType.sojournTime.ordinal()] += complete.getLogTimestamp()
-						- initiate.getLogTimestamp();
-			}
-
-			//service time
-			if (start != null && complete != null && start.getLogTimestamp() != null
-					&& complete.getLogTimestamp() != null) {
-				result[node2index[node] + ParameterNodeType.serviceTime.ordinal()] += complete.getLogTimestamp()
-						- start.getLogTimestamp();
-			}
-
-			//waiting time
-			if (initiate != null && start != null && initiate.getLogTimestamp() != null
-					&& start.getLogTimestamp() != null) {
-				result[node2index[node] + ParameterNodeType.waitingTime.ordinal()] += start.getLogTimestamp()
-						- initiate.getLogTimestamp();
-			}
-
-			//queueing time
-			if (enqueue != null && start != null && enqueue.getLogTimestamp() != null
-					&& start.getLogTimestamp() != null) {
-				result[node2index[node] + ParameterNodeType.queueingTime.ordinal()] += start.getLogTimestamp()
-						- enqueue.getLogTimestamp();
-			}
 		}
 
 		return result;
@@ -241,7 +167,7 @@ public class CostModelWithTime extends CostModelAbstract {
 		for (ParameterNodeType parameterType : ParameterNodeType.values()) {
 			if (getNodeParameter(node, parameterType) != 0) {
 				result.add(new String[] { "cost " + parameterType.toString(),
-						format(parameterType.value2user(getNodeParameter(node, parameterType))) });
+						format(getNodeParameter(node, parameterType)) });
 			}
 		}
 
@@ -264,7 +190,7 @@ public class CostModelWithTime extends CostModelAbstract {
 		for (int node = 0; node < node2index.length; node++) {
 			if (node2index[node] >= 0) {
 				for (ParameterNodeType parameterType : ParameterNodeType.values()) {
-					double value = parameterType.value2user(getNodeParameter(node, parameterType));
+					double value = getNodeParameter(node, parameterType);
 					result.add(new DataRow<Object>(DisplayType.numeric(value), "cost of " + parameterType.toString(),
 							model.getActivityName(node)));
 				}

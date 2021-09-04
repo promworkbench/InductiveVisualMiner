@@ -1,5 +1,12 @@
 package org.processmining.plugins.inductiveVisualMiner.cost;
 
+/**
+ * The result object of the cost models computation. Keeps track of two cost
+ * models.
+ * 
+ * @author sander
+ *
+ */
 public interface CostModels {
 
 	public boolean isBothModelsWereAttempted();

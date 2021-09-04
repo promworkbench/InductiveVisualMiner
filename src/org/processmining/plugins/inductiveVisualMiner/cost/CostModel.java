@@ -8,6 +8,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public interface CostModel {
 
+	public String getName();
+
 	/**
 	 * The representation to show this model on a node. Value (for colouring)
 	 * and string value.

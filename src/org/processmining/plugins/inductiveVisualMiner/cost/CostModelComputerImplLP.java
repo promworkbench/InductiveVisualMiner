@@ -16,19 +16,20 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import lpsolve.LpSolve;
 import lpsolve.LpSolveException;
 
-public class ComputeCostModelLP implements ComputeCostModel {
+public class CostModelComputerImplLP extends CostModelComputerAbstract {
 
 	static {
 		System.loadLibrary("lpsolve55");
 		System.loadLibrary("lpsolve55j");
 	}
 
-	public Pair<CostModel, String> compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfoFiltered,
-			IvMCanceller canceller) throws LpSolveException {
-		CostModelAbstract result = new CostModelWithTime(model, logInfoFiltered);
+	public String getName() {
+		return "linear programming";
+	}
 
+	public void compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfoFiltered, CostModelAbstract result,
+			IvMCanceller canceller) throws LpSolveException {
 		//set information about the cost model
-		result.getModelProperties().add(new DataRow<Object>(DisplayType.literal("linear programming"), "cost model", "type"));
 		result.getModelProperties()
 				.add(new DataRow<Object>(DisplayType.literal("all parameters ≥ 0"), "cost model", "assumption"));
 
@@ -39,7 +40,7 @@ public class ComputeCostModelLP implements ComputeCostModel {
 				IvMTrace trace = it.next();
 
 				if (canceller.isCancelled()) {
-					return null;
+					return;
 				}
 
 				Pair<double[], Double> p = result.getInputsAndCost(trace, canceller);
@@ -51,7 +52,7 @@ public class ComputeCostModelLP implements ComputeCostModel {
 		}
 
 		if (canceller.isCancelled()) {
-			return null;
+			return;
 		}
 
 		/**
@@ -85,7 +86,7 @@ public class ComputeCostModelLP implements ComputeCostModel {
 		}
 
 		if (canceller.isCancelled()) {
-			return null;
+			return;
 		}
 
 		//rows: all parameters > 0
@@ -99,7 +100,7 @@ public class ComputeCostModelLP implements ComputeCostModel {
 		}
 
 		if (canceller.isCancelled()) {
-			return null;
+			return;
 		}
 
 		//rows: one per trace
@@ -123,13 +124,13 @@ public class ComputeCostModelLP implements ComputeCostModel {
 		}
 
 		if (canceller.isCancelled()) {
-			return null;
+			return;
 		}
 
 		solver.setAddRowmode(false);
 
 		if (canceller.isCancelled()) {
-			return null;
+			return;
 		}
 
 		solver.solve();
@@ -152,8 +153,6 @@ public class ComputeCostModelLP implements ComputeCostModel {
 
 			result.setQualityMetrics(qualityMetrics);
 		}
-
-		return Pair.of((CostModel) result, null);
 	}
 
 	public static int getNumberOfTraces(IvMLogFiltered log) {
