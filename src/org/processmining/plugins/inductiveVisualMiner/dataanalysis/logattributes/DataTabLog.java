@@ -2,29 +2,29 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattribute
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTabAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 
-public class DataTabLog<C, P> implements DataAnalysisTab<Object, C, P> {
+public class DataTabLog<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
 	public static final String name = "Log attributes";
 	public static final String explanation = "Attributes at the log level.";
+
+	public DataTabLog(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
+			Callable<List<DataRowBlockComputer<Object, C, P>>> rowBlockComputersCreator) {
+		super(rowBlocksCreator, rowBlockComputersCreator);
+	}
 
 	@Override
 	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
 		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<>(name, dataAnalysesView);
 		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "Attribute", "value" } });
 		return table;
-	}
-
-	@Override
-	public List<DataRowBlock<Object, C, P>> createRowBlocks(DataAnalysisTable<Object, C, P> table) {
-		List<DataRowBlock<Object, C, P>> result = new ArrayList<>();
-		return result;
 	}
 
 	@Override

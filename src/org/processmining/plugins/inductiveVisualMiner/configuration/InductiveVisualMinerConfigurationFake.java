@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttri
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -111,7 +111,7 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return phantom.getAlignmentComputer();
 	}
 
-	public List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables() {
+	public List<DataAnalysisTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables() {
 		return phantom.getDataAnalysisTables();
 	}
 

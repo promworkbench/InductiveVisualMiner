@@ -8,7 +8,7 @@ public interface DataAnalysisTab<O, C, P> {
 	 * 
 	 * @param dataAnalysesView
 	 *            May be null.
-	 * @return
+	 * @return A new instance of a table to represent this data analysis tab.
 	 */
 	public DataAnalysisTable<O, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView);
 

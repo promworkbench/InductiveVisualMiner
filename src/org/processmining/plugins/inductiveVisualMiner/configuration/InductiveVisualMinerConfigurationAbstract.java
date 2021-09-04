@@ -9,7 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentCompute
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -42,7 +42,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<PopupItemLogMove> popupItemsLogMove;
 	private final List<PopupItemModelMove> popupItemsModelMove;
 	private final List<PopupItemLog> popupItemsLog;
-	private final List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> dataAnalyses;
+	private final List<DataAnalysisTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> dataAnalyses;
 	private final List<CostModelFactory> costModelFactories;
 	private final List<PreMiningFilter> preMiningFilters;
 	private final List<HighlightingFilter> highlightingFilters;
@@ -91,7 +91,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 
 	protected abstract List<PopupItemLog> createPopupItemsLog();
 
-	protected abstract List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables();
+	protected abstract List<DataAnalysisTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables();
 
 	protected abstract List<CostModelFactory> createCostModelFactories();
 
@@ -180,7 +180,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	}
 
 	@Override
-	final public List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables() {
+	final public List<DataAnalysisTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> getDataAnalysisTables() {
 		return dataAnalyses;
 	}
 

@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.configuration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 
 import javax.swing.JOptionPane;
@@ -42,10 +43,15 @@ import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplExecutionsLP;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplTimeLP;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostDataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventDataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogAttributes;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogAttributesHighlighted;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogEMSC;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataTabLog;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataTab;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
@@ -221,9 +227,27 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	}
 
 	@Override
-	protected List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables() {
-		List<DataTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> result = new ArrayList<>();
-		result.add(new DataTabLog<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+	protected List<DataAnalysisTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> createDataAnalysisTables() {
+		List<DataAnalysisTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> result = new ArrayList<>();
+
+		result.add(new DataTabLog<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(//
+				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						return new ArrayList<>();
+					}
+				}, //
+				new Callable<List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
+						r.add(new DataRowBlockLogAttributes<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockLogAttributesHighlighted<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockLogEMSC<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						return r;
+					}
+				}));
+
 		result.add(new TraceDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		result.add(new EventDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 		result.add(new CohortDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
