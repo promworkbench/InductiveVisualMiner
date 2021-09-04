@@ -24,7 +24,7 @@ public class DataAnalysesView<C, P> extends SideWindow {
 
 	private static final long serialVersionUID = -1113805892324898124L;
 
-	private final Map<String, DataTable<?, C, P>> tables = new THashMap<>();
+	private final Map<String, DataAnalysisTable<?, C, P>> tables = new THashMap<>();
 	private final Map<String, OnOffPanel<?>> onOffPanels = new THashMap<>();
 	private final JTabbedPane tabbedPane;
 
@@ -34,7 +34,7 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		tabbedPane = new JTabbedPane();
 
 		for (DataTab<?, C, P> factory : factories) {
-			DataTable<?, C, P> table = createAndFillTable(factory, this);
+			DataAnalysisTable<?, C, P> table = createAndFillTable(factory, this);
 
 			String analysisName = factory.getAnalysisName();
 			String explanation = factory.getExplanation();
@@ -52,9 +52,9 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		add(tabbedPane, BorderLayout.CENTER);
 	}
 
-	public static <O, C, P> DataTable<O, C, P> createAndFillTable(DataTab<O, C, P> factory,
+	public static <O, C, P> DataAnalysisTable<O, C, P> createAndFillTable(DataTab<O, C, P> factory,
 			DataAnalysesView<C, P> dataAnalysesView) {
-		DataTable<O, C, P> table = factory.createTable(dataAnalysesView);
+		DataAnalysisTable<O, C, P> table = factory.createTable(dataAnalysesView);
 		List<DataRowBlock<O, C, P>> blocks = factory.createRowBlocks(table);
 		for (DataRowBlockComputer<O, C, P> rowBlockComputer : factory.createRowBlockComputers()) {
 			blocks.add(rowBlockComputer.createDataRowBlock(table));
@@ -65,7 +65,7 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		return table;
 	}
 
-	private static OnOffPanel<DataAnalysisView> createView(IvMDecoratorI decorator, DataTable<?, ?, ?> table,
+	private static OnOffPanel<DataAnalysisView> createView(IvMDecoratorI decorator, DataAnalysisTable<?, ?, ?> table,
 			String analysisName, String explanation, boolean switchable) {
 		OnOffPanel<DataAnalysisView> result = new OnOffPanel<>(decorator,
 				new DataAnalysisView(decorator, table, explanation), switchable);
@@ -78,7 +78,7 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		return result;
 	}
 
-	public Collection<DataTable<?, C, P>> getAnalyses() {
+	public Collection<DataAnalysisTable<?, C, P>> getAnalyses() {
 		return tables.values();
 	}
 
@@ -96,7 +96,7 @@ public class DataAnalysesView<C, P> extends SideWindow {
 	@SuppressWarnings("rawtypes")
 	public void setCohortAnalysis2HighlightingFilterHandler(
 			CohortAnalysis2HighlightingFilterHandler showCohortHighlightingFilterHandler) {
-		DataTable<?, C, P> table = tables.get(CohortDataTab.name);
+		DataAnalysisTable<?, C, P> table = tables.get(CohortDataTab.name);
 		if (table != null && table instanceof CohortDataTab.DataTableCohort) {
 			((DataTableCohort) table).setCohortAnalysis2HighlightingFilterHandler(showCohortHighlightingFilterHandler);
 		}
@@ -104,7 +104,7 @@ public class DataAnalysesView<C, P> extends SideWindow {
 
 	@SuppressWarnings("rawtypes")
 	public void setCostAnalysisOnChangeCostModel(Runnable onChangeCostModel) {
-		DataTable<?, C, P> table = tables.get(CostDataTab.name);
+		DataAnalysisTable<?, C, P> table = tables.get(CostDataTab.name);
 		if (table != null && table instanceof CostDataTab.DataTableCost) {
 			((DataTableCost) table).setOnChangeCostModel(onChangeCostModel);
 		}

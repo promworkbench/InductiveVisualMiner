@@ -12,7 +12,7 @@ import javax.swing.table.TableRowSorter;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.CorrelationDensityPlot;
 
-public class DataTable<O, C, P> extends JTable {
+public class DataAnalysisTable<O, C, P> extends JTable {
 
 	private static final long serialVersionUID = -237386992048858811L;
 	public static final int rowHeight = 22;
@@ -20,7 +20,7 @@ public class DataTable<O, C, P> extends JTable {
 	public static final int rowMargin = 3;
 	public static final int columnMargin = 5;
 
-	public DataTable(String tabName, DataAnalysesView<C, P> dataAnalysesView) {
+	public DataAnalysisTable(String tabName, DataAnalysesView<C, P> dataAnalysesView) {
 		super(new DataTableModel<O, C, P>(tabName, dataAnalysesView));
 
 		setOpaque(false);

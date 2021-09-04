@@ -9,10 +9,10 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTable;
 
 public class CostDataTab<C, P> implements DataTab<Object, C, P> {
 
@@ -20,8 +20,8 @@ public class CostDataTab<C, P> implements DataTab<Object, C, P> {
 	public static final String explanation = "The parameters of the discovered cost model.\nIf traces are highlighted, two cost models will be computed: for highlighted and not-highlighted traces.\nPress ctrl+T to change the cost model (e.g. to include time).";
 
 	@Override
-	public DataTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
-		DataTable<Object, C, P> table = new DataTableCost<>(name, dataAnalysesView);
+	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
+		DataAnalysisTable<Object, C, P> table = new DataTableCost<>(name, dataAnalysesView);
 		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "cost" },
 				{ "", "", "cost highlighted traces", "cost not-highlighted traces" } });
 
@@ -29,7 +29,7 @@ public class CostDataTab<C, P> implements DataTab<Object, C, P> {
 	}
 
 	@Override
-	public List<DataRowBlock<Object, C, P>> createRowBlocks(DataTable<Object, C, P> table) {
+	public List<DataRowBlock<Object, C, P>> createRowBlocks(DataAnalysisTable<Object, C, P> table) {
 		List<DataRowBlock<Object, C, P>> result = new ArrayList<>();
 		result.add(new CostRowBlock<C, P>(table));
 		return result;
@@ -56,7 +56,7 @@ public class CostDataTab<C, P> implements DataTab<Object, C, P> {
 		return false;
 	}
 
-	public static class DataTableCost<C, P> extends DataTable<Object, C, P> {
+	public static class DataTableCost<C, P> extends DataAnalysisTable<Object, C, P> {
 
 		private static final long serialVersionUID = 8503524403860837088L;
 

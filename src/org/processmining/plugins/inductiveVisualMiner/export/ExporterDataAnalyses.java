@@ -18,10 +18,10 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTableModel;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 
@@ -72,7 +72,7 @@ public class ExporterDataAnalyses extends IvMExporter {
 	private <O, C, P> Set<IvMObject<?>> createNonTriggerObjectsForDataTab(DataTab<O, C, P> dataTab) {
 		Set<IvMObject<?>> result = new THashSet<>();
 
-		DataTable<O, C, P> table = dataTab.createTable(null);
+		DataAnalysisTable<O, C, P> table = dataTab.createTable(null);
 		for (DataRowBlock<O, C, P> rowBlock : dataTab.createRowBlocks(table)) {
 			result.addAll(Arrays.asList(rowBlock.getOptionalObjects()));
 			result.addAll(Arrays.asList(rowBlock.getRequiredObjects()));
@@ -86,7 +86,8 @@ public class ExporterDataAnalyses extends IvMExporter {
 
 	public <O> void createBlocks(Set<IvMObject<?>> result,
 			DataTab<O, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysis) {
-		DataTable<O, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> table = analysis.createTable(null);
+		DataAnalysisTable<O, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> table = analysis
+				.createTable(null);
 		for (DataRowBlock<O, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> block : analysis
 				.createRowBlocks(table)) {
 			result.addAll(Arrays.asList(block.getOptionalObjects()));
@@ -105,7 +106,7 @@ public class ExporterDataAnalyses extends IvMExporter {
 			WritableSheet sheet = workbook.createSheet(name, sheetIndex);
 
 			//initialise the table
-			DataTable<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysisTable = createTable(
+			DataAnalysisTable<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysisTable = createTable(
 					inputs, analysis);
 
 			DataTableModel<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> model = analysisTable
@@ -136,10 +137,10 @@ public class ExporterDataAnalyses extends IvMExporter {
 		workbook.close();
 	}
 
-	public <O> DataTable<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> createTable(
+	public <O> DataAnalysisTable<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> createTable(
 			IvMObjectValues inputs, DataTab<O, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysis)
 			throws Exception {
-		DataTable<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysisTable = DataAnalysesView
+		DataAnalysisTable<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> analysisTable = DataAnalysesView
 				.createAndFillTable(analysis, null);
 		for (DataRowBlock<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel> block : analysisTable
 				.getModel().getBlocks()) {

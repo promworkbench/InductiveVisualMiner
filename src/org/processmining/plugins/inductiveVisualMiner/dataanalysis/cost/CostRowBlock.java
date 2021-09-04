@@ -7,15 +7,15 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModels;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockAbstract;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
 
 public class CostRowBlock<C, P> extends DataRowBlockAbstract<Object, C, P> {
 
-	public CostRowBlock(DataTable<Object, C, P> table) {
+	public CostRowBlock(DataAnalysisTable<Object, C, P> table) {
 		super(table);
 	}
 

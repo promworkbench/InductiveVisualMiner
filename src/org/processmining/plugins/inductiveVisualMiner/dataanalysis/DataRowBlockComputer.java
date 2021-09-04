@@ -39,7 +39,7 @@ public abstract class DataRowBlockComputer<O, C, P> extends DataChainLinkComputa
 
 	public abstract class DataRowBlockComputerRowBlock extends DataRowBlockAbstract<O, C, P> {
 
-		public DataRowBlockComputerRowBlock(DataTable<O, C, P> table) {
+		public DataRowBlockComputerRowBlock(DataAnalysisTable<O, C, P> table) {
 			super(table);
 		}
 
@@ -49,7 +49,7 @@ public abstract class DataRowBlockComputer<O, C, P> extends DataChainLinkComputa
 
 	}
 
-	public DataRowBlockComputerRowBlock createDataRowBlock(DataTable<O, C, P> table) {
+	public DataRowBlockComputerRowBlock createDataRowBlock(DataAnalysisTable<O, C, P> table) {
 		return new DataRowBlockComputerRowBlock(table) {
 
 			public String getName() {

@@ -18,11 +18,11 @@ import javax.swing.table.TableRowSorter;
 
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableCellRenderer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTableModel;
 
 public class CohortDataTab<C, P> implements DataTab<Cohort, C, P> {
@@ -50,7 +50,7 @@ public class CohortDataTab<C, P> implements DataTab<Cohort, C, P> {
 	}
 
 	@Override
-	public List<DataRowBlock<Cohort, C, P>> createRowBlocks(DataTable<Cohort, C, P> table) {
+	public List<DataRowBlock<Cohort, C, P>> createRowBlocks(DataAnalysisTable<Cohort, C, P> table) {
 		List<DataRowBlock<Cohort, C, P>> result = new ArrayList<>();
 		result.add(new CohortRowBlock<C, P>(table));
 		return result;
@@ -86,7 +86,7 @@ public class CohortDataTab<C, P> implements DataTab<Cohort, C, P> {
 	 * @param <C>
 	 * @param <P>
 	 */
-	public static class DataTableCohort<C, P> extends DataTable<Cohort, C, P> {
+	public static class DataTableCohort<C, P> extends DataAnalysisTable<Cohort, C, P> {
 
 		private static final long serialVersionUID = 3288401833656702004L;
 
