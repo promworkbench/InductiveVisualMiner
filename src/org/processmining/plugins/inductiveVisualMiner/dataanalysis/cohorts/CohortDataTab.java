@@ -5,8 +5,8 @@ import java.awt.EventQueue;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
@@ -18,18 +18,24 @@ import javax.swing.table.TableRowSorter;
 
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTabAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableCellRenderer;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableModel;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableModel;
 
-public class CohortDataTab<C, P> implements DataAnalysisTab<Cohort, C, P> {
+public class CohortDataTab<C, P> extends DataAnalysisTabAbstract<Cohort, C, P> {
+
 	public static final String name = "Cohort analysis";
 	public static final String explanation = "Study influence of trace attributes on process behaviour.\n"
 			+ "Click: highlight cohort;\t" + "shift+click: highlight other traces;\t"
 			+ "ctrl+click: disable cohort highlighting.";
+
+	public CohortDataTab(Callable<List<DataRowBlock<Cohort, C, P>>> rowBlocksCreator,
+			Callable<List<DataRowBlockComputer<Cohort, C, P>>> rowBlockComputersCreator) {
+		super(rowBlocksCreator, rowBlockComputersCreator);
+	}
 
 	@Override
 	public DataTableCohort<C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
@@ -47,19 +53,6 @@ public class CohortDataTab<C, P> implements DataAnalysisTab<Cohort, C, P> {
 		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "" },
 				{ "Cohort attribute", "value range", "number of traces", "distance with rest of log" } });
 		return table;
-	}
-
-	@Override
-	public List<DataRowBlock<Cohort, C, P>> createRowBlocks(DataAnalysisTable<Cohort, C, P> table) {
-		List<DataRowBlock<Cohort, C, P>> result = new ArrayList<>();
-		result.add(new CohortRowBlock<C, P>(table));
-		return result;
-	}
-
-	@Override
-	public List<DataRowBlockComputer<Cohort, C, P>> createRowBlockComputers() {
-		List<DataRowBlockComputer<Cohort, C, P>> result = new ArrayList<>();
-		return result;
 	}
 
 	@Override

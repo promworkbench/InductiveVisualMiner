@@ -7,16 +7,11 @@ import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.cohortanalysis.cohort.Cohorts;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 
 public class CohortRowBlock<C, P> extends DataRowBlockAbstract<Cohort, C, P> {
-
-	public CohortRowBlock(DataAnalysisTable<Cohort, C, P> table) {
-		super(table);
-	}
 
 	public String getName() {
 		return "cohort-att";

@@ -1,23 +1,28 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTabAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 
-public class CostDataTab<C, P> implements DataAnalysisTab<Object, C, P> {
+public class CostDataTab<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
 	public static final String name = "Cost model";
 	public static final String explanation = "The parameters of the discovered cost model.\nIf traces are highlighted, two cost models will be computed: for highlighted and not-highlighted traces.\nPress ctrl+T to change the cost model (e.g. to include time).";
+
+	public CostDataTab(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
+			Callable<List<DataRowBlockComputer<Object, C, P>>> rowBlockComputersCreator) {
+		super(rowBlocksCreator, rowBlockComputersCreator);
+	}
 
 	@Override
 	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
@@ -26,19 +31,6 @@ public class CostDataTab<C, P> implements DataAnalysisTab<Object, C, P> {
 				{ "", "", "cost highlighted traces", "cost not-highlighted traces" } });
 
 		return table;
-	}
-
-	@Override
-	public List<DataRowBlock<Object, C, P>> createRowBlocks(DataAnalysisTable<Object, C, P> table) {
-		List<DataRowBlock<Object, C, P>> result = new ArrayList<>();
-		result.add(new CostRowBlock<C, P>(table));
-		return result;
-	}
-
-	@Override
-	public List<DataRowBlockComputer<Object, C, P>> createRowBlockComputers() {
-		List<DataRowBlockComputer<Object, C, P>> result = new ArrayList<>();
-		return result;
 	}
 
 	@Override

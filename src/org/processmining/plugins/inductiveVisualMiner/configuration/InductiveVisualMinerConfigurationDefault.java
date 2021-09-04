@@ -8,6 +8,7 @@ import java.util.concurrent.Executor;
 
 import javax.swing.JOptionPane;
 
+import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
@@ -47,12 +48,22 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostDataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventDataRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventDataRowBlockType;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventDataRowBlockTypeVirtual;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventDataRowBlockVirtual;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.EventDataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogAttributes;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogAttributesHighlighted;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogEMSC;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataTabLog;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockType;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockTypeVirtual;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockVirtual;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataTab;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterDataAnalyses;
@@ -248,10 +259,75 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					}
 				}));
 
-		result.add(new TraceDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-		result.add(new EventDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-		result.add(new CohortDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-		result.add(new CostDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+		result.add(new TraceDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(
+				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						return new ArrayList<>();
+					}
+				}, //
+				new Callable<List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
+						r.add(new TraceDataRowBlock<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new TraceDataRowBlockVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new TraceDataRowBlockType<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new TraceDataRowBlockTypeVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						return r;
+					}
+				}));
+
+		result.add(new EventDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(
+				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						return new ArrayList<>();
+					}
+				}, //
+				new Callable<List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
+						r.add(new EventDataRowBlock<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new EventDataRowBlockVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new EventDataRowBlockType<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new EventDataRowBlockTypeVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						return r;
+					}
+				}));
+
+		result.add(new CohortDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(
+				new Callable<List<DataRowBlock<Cohort, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlock<Cohort, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						List<DataRowBlock<Cohort, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
+						r.add(new CohortRowBlock<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						return r;
+					}
+				}, //
+				new Callable<List<DataRowBlockComputer<Cohort, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlockComputer<Cohort, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						return new ArrayList<>();
+					}
+				}));
+
+		result.add(new CostDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(
+				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
+						r.add(new CostRowBlock<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						return r;
+					}
+				}, //
+				new Callable<List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						return new ArrayList<>();
+					}
+				}));
 		return result;
 	}
 

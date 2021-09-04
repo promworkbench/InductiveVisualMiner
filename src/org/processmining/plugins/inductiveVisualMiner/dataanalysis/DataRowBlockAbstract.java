@@ -11,12 +11,16 @@ public abstract class DataRowBlockAbstract<O, C, P> extends DataChainLinkGuiAbst
 
 	private static final DisplayType computing = DisplayType.literal("[computing..]");
 
-	private final DataAnalysisTable<O, C, P> table;
+	private DataAnalysisTable<O, C, P> table;
 	private List<DataRow<O>> rows;
 
-	public DataRowBlockAbstract(DataAnalysisTable<O, C, P> table) {
-		this.table = table;
+	public DataRowBlockAbstract() {
 		rows = new ArrayList<>();
+	}
+
+	@Override
+	public void setTable(DataAnalysisTable<O, C, P> table) {
+		this.table = table;
 	}
 
 	/**

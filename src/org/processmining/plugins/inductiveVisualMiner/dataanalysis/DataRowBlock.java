@@ -18,6 +18,8 @@ import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkGui;
  */
 public interface DataRowBlock<O, C, P> extends DataChainLinkGui<C, P> {
 
+	public void setTable(DataAnalysisTable<O, C, P> table);
+
 	public boolean showsSomething();
 
 	public int getNumberOfRows();

@@ -39,10 +39,6 @@ public abstract class DataRowBlockComputer<O, C, P> extends DataChainLinkComputa
 
 	public abstract class DataRowBlockComputerRowBlock extends DataRowBlockAbstract<O, C, P> {
 
-		public DataRowBlockComputerRowBlock(DataAnalysisTable<O, C, P> table) {
-			super(table);
-		}
-
 		public DataRowBlockComputer<O, C, P> getComputer() {
 			return DataRowBlockComputer.this;
 		}
@@ -50,7 +46,7 @@ public abstract class DataRowBlockComputer<O, C, P> extends DataChainLinkComputa
 	}
 
 	public DataRowBlockComputerRowBlock createDataRowBlock(DataAnalysisTable<O, C, P> table) {
-		return new DataRowBlockComputerRowBlock(table) {
+		DataRowBlockComputer<O, C, P>.DataRowBlockComputerRowBlock result = new DataRowBlockComputerRowBlock() {
 
 			public String getName() {
 				return DataRowBlockComputer.this.getName() + "-vis";
@@ -65,5 +61,7 @@ public abstract class DataRowBlockComputer<O, C, P> extends DataChainLinkComputa
 				return new IvMObject<?>[] { outputObject };
 			}
 		};
+		result.setTable(table);
+		return result;
 	}
 }
