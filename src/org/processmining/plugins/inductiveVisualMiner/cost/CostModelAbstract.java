@@ -18,13 +18,14 @@ public abstract class CostModelAbstract implements CostModel {
 	protected double[] parameters;
 	protected final IvMModel model;
 	private List<Pair<String, Double>> qualityMetrics;
+	private List<DataRow<Object>> modelProperties = new ArrayList<>();
 
 	public CostModelAbstract(IvMModel model) {
 		this.model = model;
 	}
 
 	/**
-	 * No side effects allowed. Will only be called for non-silent activities. 
+	 * No side effects allowed. Will only be called for non-silent activities.
 	 * 
 	 * @param node
 	 * @param initiate
@@ -103,11 +104,19 @@ public abstract class CostModelAbstract implements CostModel {
 
 	public List<DataRow<Object>> getModelRepresentation() {
 		List<DataRow<Object>> result = new ArrayList<>();
+		result.addAll(getModelProperties());
 		for (Pair<String, Double> p : qualityMetrics) {
 			result.add(new DataRow<Object>("cost model", p.getA(), DisplayType.numeric(p.getB())));
 		}
-		result.add(
-				new DataRow<Object>("cost model", "number of parameters", DisplayType.numeric(parameters.length)));
+		result.add(new DataRow<Object>("cost model", "number of parameters", DisplayType.numeric(parameters.length)));
 		return result;
+	}
+
+	public List<DataRow<Object>> getModelProperties() {
+		return modelProperties;
+	}
+
+	public void setModelProperties(List<DataRow<Object>> modelProperties) {
+		this.modelProperties = modelProperties;
 	}
 }

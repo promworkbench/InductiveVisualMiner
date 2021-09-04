@@ -25,7 +25,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  * @author sander
  *
  */
-public class CostModelBasic extends CostModelAbstract {
+public class CostModelWithTime extends CostModelAbstract {
 
 	private final int numberOfParameters;
 	private final int[] node2index;
@@ -60,7 +60,7 @@ public class CostModelBasic extends CostModelAbstract {
 			}
 
 			public double value2user(double value) {
-				return value / ms2hr;
+				return value * ms2hr;
 			};
 		},
 		waitingTime {
@@ -69,7 +69,7 @@ public class CostModelBasic extends CostModelAbstract {
 			}
 
 			public double value2user(double value) {
-				return value / ms2hr;
+				return value * ms2hr;
 			};
 		},
 		queueingTime {
@@ -78,7 +78,7 @@ public class CostModelBasic extends CostModelAbstract {
 			}
 
 			public double value2user(double value) {
-				return value / ms2hr;
+				return value * ms2hr;
 			};
 		},
 		serviceTime {
@@ -87,14 +87,14 @@ public class CostModelBasic extends CostModelAbstract {
 			}
 
 			public double value2user(double value) {
-				return value / ms2hr;
+				return value * ms2hr;
 			};
 		};
 
 		public abstract double value2user(double value);
 	}
 
-	public CostModelBasic(IvMModel model, IvMLogInfo logInfoFiltered) {
+	public CostModelWithTime(IvMModel model, IvMLogInfo logInfoFiltered) {
 		super(model);
 
 		int index = 0;
@@ -271,8 +271,6 @@ public class CostModelBasic extends CostModelAbstract {
 			}
 
 		}
-
-		result.add(new DataRow<Object>(DisplayType.literal("OLS multiple linear regression"), "cost model", "type"));
 
 		return result;
 	}

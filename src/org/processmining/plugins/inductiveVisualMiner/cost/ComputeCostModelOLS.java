@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -14,10 +16,13 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
 
-public class ComputeCostModel {
-	public static Pair<CostModel, String> compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfoFiltered,
+public class ComputeCostModelOLS implements ComputeCostModel {
+	public Pair<CostModel, String> compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfoFiltered,
 			IvMCanceller canceller) {
-		CostModelAbstract result = new CostModelBasic(model, logInfoFiltered);
+		CostModelAbstract result = new CostModelWithTime(model, logInfoFiltered);
+
+		result.getModelProperties()
+				.add(new DataRow<Object>(DisplayType.literal("OLS multiple linear regression"), "cost model", "type"));
 
 		int numberOfTraces = getNumberOfTraces(log);
 
