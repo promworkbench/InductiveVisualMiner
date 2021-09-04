@@ -7,9 +7,9 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesV
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 
-public class DataTabLog<C, P> implements DataTab<Object, C, P> {
+public class DataTabLog<C, P> implements DataAnalysisTab<Object, C, P> {
 
 	public static final String name = "Log attributes";
 	public static final String explanation = "Attributes at the log level.";

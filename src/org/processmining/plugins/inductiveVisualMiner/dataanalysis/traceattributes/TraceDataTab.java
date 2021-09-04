@@ -7,9 +7,9 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesV
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 
-public class TraceDataTab<C, P> implements DataTab<Object, C, P> {
+public class TraceDataTab<C, P> implements DataAnalysisTab<Object, C, P> {
 
 	public static final String name = "Trace attributes";
 	public static final String explanation = "Attributes at the trace level.\nIf traces are highlighted, attributes will be shown for highlighted and non-highlighted traces.";

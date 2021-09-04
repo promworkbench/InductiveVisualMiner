@@ -12,9 +12,9 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesV
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 
-public class CostDataTab<C, P> implements DataTab<Object, C, P> {
+public class CostDataTab<C, P> implements DataAnalysisTab<Object, C, P> {
 
 	public static final String name = "Cost model";
 	public static final String explanation = "The parameters of the discovered cost model.\nIf traces are highlighted, two cost models will be computed: for highlighted and not-highlighted traces.\nPress ctrl+T to change the cost model (e.g. to include time).";

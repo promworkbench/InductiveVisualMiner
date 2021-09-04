@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-public class DataTableModel<O, C, P> extends AbstractTableModel {
+public class DataAnalysisTableModel<O, C, P> extends AbstractTableModel {
 
 	private static final long serialVersionUID = -2757978513910385049L;
 
@@ -13,7 +13,7 @@ public class DataTableModel<O, C, P> extends AbstractTableModel {
 	private final String tabName;
 	private final DataAnalysesView<C, P> dataAnalysesView;
 
-	public DataTableModel(String tabName, DataAnalysesView<C, P> dataAnalysesView) {
+	public DataAnalysisTableModel(String tabName, DataAnalysesView<C, P> dataAnalysesView) {
 		this.tabName = tabName;
 		this.dataAnalysesView = dataAnalysesView;
 	}

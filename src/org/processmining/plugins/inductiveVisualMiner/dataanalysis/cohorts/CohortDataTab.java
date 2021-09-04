@@ -22,10 +22,10 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableCellRenderer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTab;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataTableModel;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableModel;
 
-public class CohortDataTab<C, P> implements DataTab<Cohort, C, P> {
+public class CohortDataTab<C, P> implements DataAnalysisTab<Cohort, C, P> {
 	public static final String name = "Cohort analysis";
 	public static final String explanation = "Study influence of trace attributes on process behaviour.\n"
 			+ "Click: highlight cohort;\t" + "shift+click: highlight other traces;\t"
@@ -36,7 +36,7 @@ public class CohortDataTab<C, P> implements DataTab<Cohort, C, P> {
 		DataTableCohort<C, P> table = new DataTableCohort<C, P>(name, dataAnalysesView) {
 			private static final long serialVersionUID = -6838046929095568195L;
 
-			protected void setDefaultSorting(TableRowSorter<DataTableModel<Cohort, C, P>> sorter,
+			protected void setDefaultSorting(TableRowSorter<DataAnalysisTableModel<Cohort, C, P>> sorter,
 					List<SortKey> sortKeys) {
 				if (getColumnCount() >= 4) {
 					sortKeys.add(new RowSorter.SortKey(3, SortOrder.DESCENDING));

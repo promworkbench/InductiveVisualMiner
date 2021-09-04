@@ -2,7 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.util.List;
 
-public interface DataTab<O, C, P> {
+public interface DataAnalysisTab<O, C, P> {
 
 	/**
 	 * 

@@ -28,12 +28,12 @@ public class DataAnalysesView<C, P> extends SideWindow {
 	private final Map<String, OnOffPanel<?>> onOffPanels = new THashMap<>();
 	private final JTabbedPane tabbedPane;
 
-	public DataAnalysesView(Component parent, List<DataTab<?, C, P>> factories, IvMDecoratorI decorator) {
+	public DataAnalysesView(Component parent, List<DataAnalysisTab<?, C, P>> factories, IvMDecoratorI decorator) {
 		super(parent, "Data analysis - " + InductiveVisualMinerPanel.title);
 
 		tabbedPane = new JTabbedPane();
 
-		for (DataTab<?, C, P> factory : factories) {
+		for (DataAnalysisTab<?, C, P> factory : factories) {
 			DataAnalysisTable<?, C, P> table = createAndFillTable(factory, this);
 
 			String analysisName = factory.getAnalysisName();
@@ -52,7 +52,7 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		add(tabbedPane, BorderLayout.CENTER);
 	}
 
-	public static <O, C, P> DataAnalysisTable<O, C, P> createAndFillTable(DataTab<O, C, P> factory,
+	public static <O, C, P> DataAnalysisTable<O, C, P> createAndFillTable(DataAnalysisTab<O, C, P> factory,
 			DataAnalysesView<C, P> dataAnalysesView) {
 		DataAnalysisTable<O, C, P> table = factory.createTable(dataAnalysesView);
 		List<DataRowBlock<O, C, P>> blocks = factory.createRowBlocks(table);

@@ -21,7 +21,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 	public static final int columnMargin = 5;
 
 	public DataAnalysisTable(String tabName, DataAnalysesView<C, P> dataAnalysesView) {
-		super(new DataTableModel<O, C, P>(tabName, dataAnalysesView));
+		super(new DataAnalysisTableModel<O, C, P>(tabName, dataAnalysesView));
 
 		setOpaque(false);
 		setShowGrid(false);
@@ -55,7 +55,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 	}
 
 	protected void setSorting() {
-		TableRowSorter<DataTableModel<O, C, P>> sorter = new TableRowSorter<>(getModel());
+		TableRowSorter<DataAnalysisTableModel<O, C, P>> sorter = new TableRowSorter<>(getModel());
 		List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
 
 		for (int column = 0; column < getModel().getNumberOfNameColumns(); column++) {
@@ -100,7 +100,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 		setRowSorter(sorter);
 	}
 
-	protected void setDefaultSorting(TableRowSorter<DataTableModel<O, C, P>> sorter, List<RowSorter.SortKey> sortKeys) {
+	protected void setDefaultSorting(TableRowSorter<DataAnalysisTableModel<O, C, P>> sorter, List<RowSorter.SortKey> sortKeys) {
 		for (int column = 0; column < getModel().getNumberOfNameColumns(); column++) {
 			sortKeys.add(new RowSorter.SortKey(column, SortOrder.ASCENDING));
 		}
@@ -128,8 +128,8 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public DataTableModel<O, C, P> getModel() {
-		return (DataTableModel<O, C, P>) super.getModel();
+	public DataAnalysisTableModel<O, C, P> getModel() {
+		return (DataAnalysisTableModel<O, C, P>) super.getModel();
 	}
 
 }
