@@ -15,14 +15,14 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 
 import lpsolve.LpSolveException;
 
-public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
+public class Cl19DataAnalysisCost<C> extends DataChainLinkComputationAbstract<C> {
 
 	public String getName() {
 		return "Cl19 cost";
 	}
 
 	public String getStatusBusyMessage() {
-		return "Fitting cost model";
+		return "Fitting cost model..";
 	}
 
 	public IvMObject<?>[] createInputObjects() {
@@ -31,7 +31,7 @@ public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
 	}
 
 	public IvMObject<?>[] createOutputObjects() {
-		return new IvMObject<?>[] { IvMObject.cost_models };
+		return new IvMObject<?>[] { IvMObject.data_analysis_cost_models };
 	}
 
 	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
@@ -69,7 +69,7 @@ public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
 		result.setNegativeCostModelMessage(negativeCostModelMessage);
 
 		return new IvMObjectValues().//
-				s(IvMObject.cost_models, result);
+				s(IvMObject.data_analysis_cost_models, result);
 	}
 
 	private static Pair<CostModel, String> computeCostModel(CostModelFactory costModelFactory, IvMModel model,
@@ -79,12 +79,17 @@ public class Cl19Cost<C> extends DataChainLinkComputationAbstract<C> {
 		costModelComputer.compute(model, log, logInfo, costModel, canceller);
 
 		//set user info
-		String costModelMessage = costModelComputer.getErrorMessage();
 		costModel.getModelProperties()
 				.add(new DataRow<Object>(DisplayType.literal(costModelComputer.getName()), "cost model", "fitter"));
 		costModel.getModelProperties()
 				.add(new DataRow<Object>(DisplayType.literal(costModel.getName()), "cost model", "type"));
-		return Pair.of((CostModel) costModel, costModelMessage);
+
+		String costModelMessage = costModelComputer.getErrorMessage();
+		if (costModelMessage != null) {
+			return Pair.of(null, costModelMessage);
+		} else {
+			return Pair.of((CostModel) costModel, null);
+		}
 	}
 
 }

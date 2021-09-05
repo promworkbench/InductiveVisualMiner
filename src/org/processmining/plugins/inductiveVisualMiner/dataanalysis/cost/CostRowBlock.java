@@ -21,12 +21,12 @@ public class CostRowBlock<C, P> extends DataRowBlockAbstract<Object, C, P> {
 
 	@Override
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.cost_models };
+		return new IvMObject<?>[] { IvMObject.data_analysis_cost_models };
 	}
 
 	@Override
 	public List<DataRow<Object>> gather(IvMObjectValues inputs) {
-		CostModels costModels = inputs.get(IvMObject.cost_models);
+		CostModels costModels = inputs.get(IvMObject.data_analysis_cost_models);
 		if (!costModels.isBothModelsWereAttempted()) {
 			//one model
 			if (costModels.getCostModel() != null) {

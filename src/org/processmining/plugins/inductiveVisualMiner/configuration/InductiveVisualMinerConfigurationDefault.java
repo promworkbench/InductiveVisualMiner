@@ -37,7 +37,8 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelect
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Performance;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl19Cost;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisCost;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl20DataAnalysisAssociations;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
@@ -47,7 +48,9 @@ import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplT
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.DataAnalysisTabAssociations;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.RowBlockAssociations;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostDataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostRowBlock;
@@ -297,7 +300,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					}
 				}));
 
-		result.add(new CohortDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(
+		result.add(new CohortDataAnalysisTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(
 				new Callable<List<DataRowBlock<Cohort, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
 					public List<DataRowBlock<Cohort, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
@@ -328,6 +331,23 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 						return new ArrayList<>();
 					}
 				}));
+
+		result.add(new DataAnalysisTabAssociations<>(
+				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
+						r.add(new RowBlockAssociations<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						return r;
+					}
+				}, //
+				new Callable<List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						return new ArrayList<>();
+					}
+				}));
+
 		return result;
 	}
 
@@ -441,7 +461,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl14Performance<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl15Histogram<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl18DataAnalysisCohort<InductiveVisualMinerConfiguration>());
-		chain.register(new Cl19Cost<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl19DataAnalysisCost<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl20DataAnalysisAssociations<InductiveVisualMinerConfiguration>());
 
 		return chain;
 	}

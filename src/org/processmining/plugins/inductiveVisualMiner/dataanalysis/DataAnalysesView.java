@@ -11,8 +11,8 @@ import javax.swing.JTabbedPane;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataTab;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataTab.DataTableCohort;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab.DataTableCohort;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostDataTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostDataTab.DataTableCost;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
@@ -38,7 +38,7 @@ public class DataAnalysesView<C, P> extends SideWindow {
 
 			String analysisName = factory.getAnalysisName();
 			String explanation = factory.getExplanation();
-			boolean switchable = factory.isSwitchable();
+			boolean switchable = table.isSwitchable() != null;
 
 			OnOffPanel<?> onOffPanel = createView(decorator, table, analysisName, explanation, switchable);
 			onOffPanel.off();
@@ -96,8 +96,8 @@ public class DataAnalysesView<C, P> extends SideWindow {
 	@SuppressWarnings("rawtypes")
 	public void setCohortAnalysis2HighlightingFilterHandler(
 			CohortAnalysis2HighlightingFilterHandler showCohortHighlightingFilterHandler) {
-		DataAnalysisTable<?, C, P> table = tables.get(CohortDataTab.name);
-		if (table != null && table instanceof CohortDataTab.DataTableCohort) {
+		DataAnalysisTable<?, C, P> table = tables.get(CohortDataAnalysisTab.name);
+		if (table != null && table instanceof CohortDataAnalysisTab.DataTableCohort) {
 			((DataTableCohort) table).setCohortAnalysis2HighlightingFilterHandler(showCohortHighlightingFilterHandler);
 		}
 	}
@@ -124,7 +124,7 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		}
 	}
 
-	public void setSwitcherEnabled(String analysisName, boolean cohortAnalysisEnabled) {
+	public void setSwitcherEnabled2(String analysisName, boolean cohortAnalysisEnabled) {
 		if (onOffPanels.containsKey(analysisName)) {
 			OnOffPanel<?> onOffPanel = onOffPanels.get(analysisName);
 			onOffPanel.getSwitch().setSelected(cohortAnalysisEnabled);

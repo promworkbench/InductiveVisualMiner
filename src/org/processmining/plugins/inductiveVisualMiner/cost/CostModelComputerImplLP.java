@@ -50,6 +50,11 @@ public class CostModelComputerImplLP extends CostModelComputerAbstract {
 				}
 			}
 		}
+		
+		if (data.size() == 0) {
+			message = "no cost data available";
+			return;
+		}
 
 		if (canceller.isCancelled()) {
 			return;

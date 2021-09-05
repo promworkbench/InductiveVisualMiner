@@ -37,8 +37,4 @@ public class TraceDataTab<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 		return explanation;
 	}
 
-	@Override
-	public boolean isSwitchable() {
-		return false;
-	}
 }

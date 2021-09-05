@@ -12,16 +12,18 @@ import org.processmining.plugins.graphviz.colourMaps.ColourMapViridis;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 
 public class CorrelationDensityPlot {
-	private static final int sizeX1DPlot = 10;
-	private static final int marginX = 13;
-	private static final int sizeX2DPlot = 100;
+	public static final int sizeX1DPlot = 10;
+	public static final int marginX = 13;
+	public static final int sizeX2DPlot = 100;
 
-	private static final int sizeY1DPlot = 10;
-	private static final int marginY = 13;
-	private static final int sizeY2DPlot = 100;
+	public static final int sizeY1DPlot = 10;
+	public static final int marginY = 13;
+	public static final int sizeY2DPlot = 100;
 
-	private static final int alias = 5;
-	private static final ColourMap colourMap = new ColourMapViridis();
+	public static final int alias = 5;
+	public static final ColourMap colourMap = new ColourMapViridis();
+	public static final Color backgroundFigure = null;
+	public static final Color backgroundPlot = Color.black;
 
 	public static int getWidth() {
 		return sizeX1DPlot + marginX + sizeX2DPlot;
@@ -35,6 +37,13 @@ public class CorrelationDensityPlot {
 			double[] valuesY, double minY, double maxY) {
 
 		BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+
+		//set background
+		if (backgroundFigure != null) {
+			Graphics2D ig2 = image.createGraphics();
+			ig2.setBackground(backgroundFigure);
+			ig2.clearRect(0, 0, getWidth(), getHeight());
+		}
 
 		fillImage2DPlot(image, valuesX, minX, maxX, valuesY, minY, maxY, sizeX1DPlot + marginX, 0, sizeX2DPlot,
 				sizeY2DPlot);
@@ -144,7 +153,11 @@ public class CorrelationDensityPlot {
 		for (int x = 0; x < sizeX; x++) {
 			Color colour = colourMap.colour(counts[x], 0, max);
 			for (int y = 0; y < sizeY; y++) {
-				image.setRGB(x + offsetX, y + offsetY, colour.getRGB());
+				if (counts[x] > 0) {
+					image.setRGB(x + offsetX, y + offsetY, colour.getRGB());
+				} else {
+					image.setRGB(x + offsetX, y + offsetY, backgroundPlot.getRGB());
+				}
 			}
 		}
 	}
@@ -182,7 +195,11 @@ public class CorrelationDensityPlot {
 		for (int y = 0; y < sizeY; y++) {
 			Color colour = colourMap.colour(counts[y], 0, max);
 			for (int x = 0; x < sizeX; x++) {
-				image.setRGB(x + offsetX, (sizeY - y) + offsetY, colour.getRGB());
+				if (counts[y] > 0) {
+					image.setRGB(x + offsetX, (sizeY - y) + offsetY, colour.getRGB());
+				} else {
+					image.setRGB(x + offsetX, (sizeY - y) + offsetY, backgroundPlot.getRGB());
+				}
 			}
 		}
 	}
@@ -231,7 +248,11 @@ public class CorrelationDensityPlot {
 		for (int x = 0; x < sizeX; x++) {
 			for (int y = 0; y < sizeY; y++) {
 				Color colour = colourMap.colour(counts[x][y], 0, max);
-				image.setRGB(x + offsetX, (sizeY - y) + offsetY, colour.getRGB());
+				if (counts[x][y] > 0) {
+					image.setRGB(x + offsetX, (sizeY - y) + offsetY, colour.getRGB());
+				} else {
+					image.setRGB(x + offsetX, (sizeY - y) + offsetY, backgroundPlot.getRGB());
+				}
 			}
 		}
 	}

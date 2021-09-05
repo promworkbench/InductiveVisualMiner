@@ -9,6 +9,7 @@ import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.TableRowSorter;
 
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.CorrelationDensityPlot;
 
@@ -100,7 +101,8 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 		setRowSorter(sorter);
 	}
 
-	protected void setDefaultSorting(TableRowSorter<DataAnalysisTableModel<O, C, P>> sorter, List<RowSorter.SortKey> sortKeys) {
+	protected void setDefaultSorting(TableRowSorter<DataAnalysisTableModel<O, C, P>> sorter,
+			List<RowSorter.SortKey> sortKeys) {
 		for (int column = 0; column < getModel().getNumberOfNameColumns(); column++) {
 			sortKeys.add(new RowSorter.SortKey(column, SortOrder.ASCENDING));
 		}
@@ -132,4 +134,12 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 		return (DataAnalysisTableModel<O, C, P>) super.getModel();
 	}
 
+	/**
+	 * 
+	 * @return an object that will be set to true when the tab is switched on.
+	 *         If null is returned, the tab will not be switchable.
+	 */
+	public IvMObject<Boolean> isSwitchable() {
+		return null;
+	}
 }

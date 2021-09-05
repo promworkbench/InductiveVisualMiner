@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 
 import org.processmining.cohortanalysis.cohort.Cohort;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTabAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
@@ -25,14 +26,14 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 
-public class CohortDataTab<C, P> extends DataAnalysisTabAbstract<Cohort, C, P> {
+public class CohortDataAnalysisTab<C, P> extends DataAnalysisTabAbstract<Cohort, C, P> {
 
 	public static final String name = "Cohort analysis";
 	public static final String explanation = "Study influence of trace attributes on process behaviour.\n"
 			+ "Click: highlight cohort;\t" + "shift+click: highlight other traces;\t"
 			+ "ctrl+click: disable cohort highlighting.";
 
-	public CohortDataTab(Callable<List<DataRowBlock<Cohort, C, P>>> rowBlocksCreator,
+	public CohortDataAnalysisTab(Callable<List<DataRowBlock<Cohort, C, P>>> rowBlocksCreator,
 			Callable<List<DataRowBlockComputer<Cohort, C, P>>> rowBlockComputersCreator) {
 		super(rowBlocksCreator, rowBlockComputersCreator);
 	}
@@ -42,12 +43,18 @@ public class CohortDataTab<C, P> extends DataAnalysisTabAbstract<Cohort, C, P> {
 		DataTableCohort<C, P> table = new DataTableCohort<C, P>(name, dataAnalysesView) {
 			private static final long serialVersionUID = -6838046929095568195L;
 
+			@Override
 			protected void setDefaultSorting(TableRowSorter<DataAnalysisTableModel<Cohort, C, P>> sorter,
 					List<SortKey> sortKeys) {
 				if (getColumnCount() >= 4) {
 					sortKeys.add(new RowSorter.SortKey(3, SortOrder.DESCENDING));
 					sorter.setSortable(1, false);
 				}
+			}
+
+			@Override
+			public IvMObject<Boolean> isSwitchable() {
+				return IvMObject.selected_cohort_analysis_enabled;
 			}
 		};
 		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "" },
@@ -63,11 +70,6 @@ public class CohortDataTab<C, P> extends DataAnalysisTabAbstract<Cohort, C, P> {
 	@Override
 	public String getExplanation() {
 		return explanation;
-	}
-
-	@Override
-	public boolean isSwitchable() {
-		return true;
 	}
 
 	/**

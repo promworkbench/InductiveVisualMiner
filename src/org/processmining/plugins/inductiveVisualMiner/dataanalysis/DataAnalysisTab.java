@@ -20,6 +20,4 @@ public interface DataAnalysisTab<O, C, P> {
 
 	public String getExplanation();
 
-	public boolean isSwitchable();
-
 }

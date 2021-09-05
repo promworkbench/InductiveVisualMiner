@@ -33,6 +33,7 @@ import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColour
 import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualMinerWrapper;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
+import org.processmining.statisticaltests.association.Associations;
 
 import com.kitfox.svg.SVGDiagram;
 
@@ -88,6 +89,8 @@ public class IvMObject<C> {
 
 	//data analyses
 	public static final IvMObject<Cohorts> data_analysis_cohort = c("data analysis cohort", Cohorts.class);
+	public static final IvMObject<CostModels> data_analysis_cost_models = c("cost models", CostModels.class);
+	public static final IvMObject<Associations> data_analysis_associations = c("associations", Associations.class);
 
 	//graph objects
 	public static final IvMObject<Dot> graph_dot = c("graph dot", Dot.class);
@@ -119,9 +122,8 @@ public class IvMObject<C> {
 			AttributeClassifier[].class);
 	public static final IvMObject<Boolean> selected_cohort_analysis_enabled = c("selected cohort analysis enabled",
 			boolean.class);
-
-	//cost
-	public static final IvMObject<CostModels> cost_models = c("cost models", CostModels.class);
+	public static final IvMObject<Boolean> selected_associations_enabled = c("selected associations enabled",
+			boolean.class);
 	public static final IvMObject<CostModelFactory> selected_cost_model_factory = c("cost model factory",
 			CostModelFactory.class);
 

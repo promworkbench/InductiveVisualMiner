@@ -122,12 +122,12 @@ public class DataAnalysisTableModel<O, C, P> extends AbstractTableModel {
 		if (blocks != null && dataAnalysesView != null) {
 			for (DataRowBlock<?, C, P> block : getBlocks()) {
 				if (block.showsSomething()) {
-					dataAnalysesView.getOnOffPanel(tabName).on();
+					dataAnalysesView.getOnOffPanel(getTabName()).on();
 					return;
 				}
 			}
 
-			dataAnalysesView.getOnOffPanel(tabName).off();
+			dataAnalysesView.getOnOffPanel(getTabName()).off();
 		}
 	}
 
@@ -144,5 +144,9 @@ public class DataAnalysisTableModel<O, C, P> extends AbstractTableModel {
 	 */
 	public void setColumnNames(String[][] columnNames) {
 		this.columnNames = columnNames;
+	}
+
+	public String getTabName() {
+		return tabName;
 	}
 }

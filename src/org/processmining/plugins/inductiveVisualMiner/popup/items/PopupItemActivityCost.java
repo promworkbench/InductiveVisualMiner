@@ -10,11 +10,11 @@ import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInputActivi
 public class PopupItemActivityCost implements PopupItemActivity {
 
 	public IvMObject<?>[] inputObjects() {
-		return new IvMObject<?>[] { IvMObject.cost_models };
+		return new IvMObject<?>[] { IvMObject.data_analysis_cost_models };
 	}
 
 	public String[][] get(IvMObjectValues inputs, PopupItemInput<PopupItemInputActivity> input) {
-		CostModel model = inputs.get(IvMObject.cost_models).getCostModel();
+		CostModel model = inputs.get(IvMObject.data_analysis_cost_models).getCostModel();
 
 		if (model == null) {
 			return new String[0][0];

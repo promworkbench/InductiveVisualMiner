@@ -16,7 +16,7 @@ public class Cl18DataAnalysisCohort<C> extends DataChainLinkComputationAbstract<
 
 	@Override
 	public String getStatusBusyMessage() {
-		return "Performing cohort analysis";
+		return "Performing cohort analysis..";
 	}
 
 	@Override

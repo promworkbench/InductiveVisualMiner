@@ -36,11 +36,11 @@ public class ModeCost extends Mode {
 	}
 
 	public IvMObject<?>[] createOptionalObjects() {
-		return new IvMObject<?>[] { IvMObject.cost_models };
+		return new IvMObject<?>[] { IvMObject.data_analysis_cost_models };
 	}
 
 	public ProcessTreeVisualisationParameters getVisualisationParametersWithAlignments(IvMObjectValues inputs) {
-		if (!inputs.has(IvMObject.cost_models) || inputs.get(IvMObject.cost_models).getCostModel() == null) {
+		if (!inputs.has(IvMObject.data_analysis_cost_models) || inputs.get(IvMObject.data_analysis_cost_models).getCostModel() == null) {
 			return visualisationParametersBeforeCost;
 		}
 		return visualisationParameters;
@@ -58,7 +58,7 @@ public class ModeCost extends Mode {
 
 	@Override
 	protected IvMObject<?>[] createVisualisationDataOptionalObjects() {
-		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_info_filtered, IvMObject.cost_models };
+		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_info_filtered, IvMObject.data_analysis_cost_models };
 	}
 
 	@Override
@@ -66,8 +66,8 @@ public class ModeCost extends Mode {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
 
-		if (inputs.has(IvMObject.cost_models) && inputs.get(IvMObject.cost_models).getCostModel() != null) {
-			CostModel costModel = inputs.get(IvMObject.cost_models).getCostModel();
+		if (inputs.has(IvMObject.data_analysis_cost_models) && inputs.get(IvMObject.data_analysis_cost_models).getCostModel() != null) {
+			CostModel costModel = inputs.get(IvMObject.data_analysis_cost_models).getCostModel();
 
 			return new AlignedLogVisualisationDataImplCost(model, costModel, logInfo);
 		} else {

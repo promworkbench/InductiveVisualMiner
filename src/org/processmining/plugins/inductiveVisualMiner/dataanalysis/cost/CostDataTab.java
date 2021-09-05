@@ -43,11 +43,6 @@ public class CostDataTab<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 		return explanation;
 	}
 
-	@Override
-	public boolean isSwitchable() {
-		return false;
-	}
-
 	public static class DataTableCost<C, P> extends DataAnalysisTable<Object, C, P> {
 
 		private static final long serialVersionUID = 8503524403860837088L;
