@@ -69,6 +69,8 @@ public class CostModelImplExecutions extends CostModelAbstract {
 			if (model.isActivity(node)) {
 				node2index[node] = index;
 				index += ParameterNodeType.values().length;
+			} else {
+				node2index[node] = -1;
 			}
 		}
 
@@ -119,7 +121,11 @@ public class CostModelImplExecutions extends CostModelAbstract {
 	 * @return
 	 */
 	public double getNodeParameter(int node, ParameterNodeType parameterType) {
-		return parameters[node2index[node] + parameterType.ordinal()];
+		if (node2index[node] >= 0) {
+			return parameters[node2index[node] + parameterType.ordinal()];
+		} else {
+			return 0;
+		}
 	}
 
 	@Override
