@@ -13,8 +13,6 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 
-import lpsolve.LpSolveException;
-
 public class Cl19DataAnalysisCost<C> extends DataChainLinkComputationAbstract<C> {
 
 	public String getName() {
@@ -73,7 +71,7 @@ public class Cl19DataAnalysisCost<C> extends DataChainLinkComputationAbstract<C>
 	}
 
 	private static Pair<CostModel, String> computeCostModel(CostModelFactory costModelFactory, IvMModel model,
-			IvMLogInfo logInfo, IvMLogFiltered log, IvMCanceller canceller) throws LpSolveException {
+			IvMLogInfo logInfo, IvMLogFiltered log, IvMCanceller canceller) throws Exception {
 		CostModelComputer costModelComputer = costModelFactory.createComputer();
 		CostModelAbstract costModel = costModelFactory.createCostModel(model, logInfo);
 		costModelComputer.compute(model, log, logInfo, costModel, canceller);

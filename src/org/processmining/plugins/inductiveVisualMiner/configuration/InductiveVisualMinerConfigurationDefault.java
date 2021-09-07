@@ -43,8 +43,9 @@ import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
-import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplExecutionsLP;
-import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplTimeLP;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplModelDeviationsLP;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplModelDeviationsTimeLP;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplModelLP;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
@@ -354,8 +355,9 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 	@Override
 	protected List<CostModelFactory> createCostModelFactories() {
 		return new ArrayList<>(Arrays.asList(new CostModelFactory[] { //
-				new CostModelFactoryImplExecutionsLP(), //
-				new CostModelFactoryImplTimeLP(), //
+				new CostModelFactoryImplModelLP(), //
+				new CostModelFactoryImplModelDeviationsLP(), //
+				new CostModelFactoryImplModelDeviationsTimeLP(), //
 		}));
 	}
 

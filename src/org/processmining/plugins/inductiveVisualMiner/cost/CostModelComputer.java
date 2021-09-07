@@ -5,14 +5,12 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 
-import lpsolve.LpSolveException;
-
 public interface CostModelComputer {
 
 	public String getName();
 
 	public void compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfo, CostModelAbstract result,
-			IvMCanceller canceller) throws LpSolveException;
+			IvMCanceller canceller) throws Exception;
 
 	/**
 	 * 

@@ -28,7 +28,7 @@ public class CostDataTab<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
 		DataAnalysisTable<Object, C, P> table = new DataTableCost<>(name, dataAnalysesView);
 		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "cost" },
-				{ "", "", "cost highlighted traces", "cost not-highlighted traces" } });
+				{ "", "", "highlighted traces", "not-highlighted traces" } });
 
 		return table;
 	}

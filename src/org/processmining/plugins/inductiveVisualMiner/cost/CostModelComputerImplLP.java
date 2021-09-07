@@ -1,20 +1,14 @@
 package org.processmining.plugins.inductiveVisualMiner.cost;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 import lpsolve.LpSolve;
-import lpsolve.LpSolveException;
 
 public class CostModelComputerImplLP extends CostModelComputerAbstract {
 
@@ -27,52 +21,25 @@ public class CostModelComputerImplLP extends CostModelComputerAbstract {
 		return "linear programming";
 	}
 
-	public void compute(IvMModel model, IvMLogFiltered log, IvMLogInfo logInfoFiltered, CostModelAbstract result,
-			IvMCanceller canceller) throws LpSolveException {
-		//set information about the cost model
-		result.getModelProperties()
-				.add(new DataRow<Object>(DisplayType.literal("all parameters ≥ 0"), "cost model", "assumption"));
-
-		//gather trace data
-		List<Pair<double[], Double>> data = new ArrayList<>();
-		{
-			for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
-				IvMTrace trace = it.next();
-
-				if (canceller.isCancelled()) {
-					return;
-				}
-
-				Pair<double[], Double> p = result.getInputsAndCost(trace, canceller);
-
-				if (p != null) {
-					data.add(p);
-				}
-			}
-		}
-		
-		if (data.size() == 0) {
-			message = "no cost data available";
-			return;
-		}
-
-		if (canceller.isCancelled()) {
-			return;
-		}
-
+	public void compute(List<Pair<double[], Double>> data, CostModelAbstract result, IvMCanceller canceller)
+			throws Exception {
 		/**
-		 * Structure of the LP problem: columns [1-p] are the parameters, while
-		 * the columns [p+1-p+n] are the errors (where n is the number of traces
-		 * with data).
+		 * Structure of the LP problem: per cost model parameter: 1 variable;
+		 * per trace: 1 variable denoting the error & 1 variable denoting the
+		 * cumulative sum of absolute values of errors.
 		 * 
-		 * Objective function is the sum of the errors.
+		 * Objective function is the cumulative sum of absolute values of the
+		 * first trace.
 		 * 
 		 * Notice that the columns are 1-based.
 		 */
 
 		int numberOfParameters = result.getNumberOfParameters();
 		int numberOfTraces = data.size();
-		int numberOfColumns = numberOfParameters + numberOfTraces;
+		int numberOfColumns = numberOfParameters + numberOfTraces + numberOfTraces;
+		int startColumn_parameters = 1;
+		int startColumn_errors = startColumn_parameters + numberOfParameters;
+		int startColumn_cumulative = startColumn_errors + numberOfTraces;
 
 		LpSolve solver = LpSolve.makeLp(0, numberOfColumns);
 
@@ -81,46 +48,19 @@ public class CostModelComputerImplLP extends CostModelComputerAbstract {
 
 		solver.setAddRowmode(true);
 
-		//objective function: sum of the errors
-		{
-			double[] objectiveFunction = new double[numberOfColumns + 1];
-			for (int i = numberOfParameters + 1; i < objectiveFunction.length; i++) {
-				objectiveFunction[i] = 1;
-			}
-			solver.setObjFn(objectiveFunction);
-		}
-
-		if (canceller.isCancelled()) {
-			return;
-		}
-
-		//rows: all parameters > 0
-		{
-			for (int p = 0; p < numberOfParameters; p++) {
-				double[] constraint = new double[numberOfColumns + 1];
-				constraint[1 + p] = 1;
-
-				solver.addConstraint(constraint, LpSolve.GE, 0);
-			}
-		}
-
-		if (canceller.isCancelled()) {
-			return;
-		}
-
-		//rows: one per trace
+		//rows: for each trace, the sum of parameters and the errors is the given value
 		{
 			int traceNr = 0;
 			for (Pair<double[], Double> datum : data) {
 				double[] constraint = new double[numberOfColumns + 1];
 
-				//error variable
-				constraint[1 + numberOfParameters + traceNr] = 1;
-
 				//parameters
 				for (int p = 0; p < numberOfParameters; p++) {
-					constraint[1 + p] = datum.getA()[p];
+					constraint[startColumn_parameters + p] = datum.getA()[p];
 				}
+
+				//error variable
+				constraint[startColumn_errors + traceNr] = 1;
 
 				solver.addConstraint(constraint, LpSolve.EQ, datum.getB());
 
@@ -132,6 +72,50 @@ public class CostModelComputerImplLP extends CostModelComputerAbstract {
 			return;
 		}
 
+		//rows: errors can be negative
+		for (int traceNumber = 0; traceNumber < data.size(); traceNumber++) {
+			solver.setUnbounded(startColumn_errors + traceNumber);
+		}
+
+		//objective function: objective function variable (OFV)
+		{
+			double[] objectiveFunction = new double[numberOfColumns + 1];
+			objectiveFunction[startColumn_cumulative] = 1;
+			solver.setObjFn(objectiveFunction);
+		}
+
+		//row: for each trace, add two cumulative constraints
+		{
+			for (int traceNr = 0; traceNr < numberOfTraces; traceNr++) {
+				//positive sign absolute
+				{
+					double[] constraint = new double[numberOfColumns + 1];
+
+					constraint[startColumn_errors + traceNr] = 1;
+					constraint[startColumn_cumulative + traceNr] = -1;
+					if (traceNr < numberOfTraces - 1) {
+						constraint[startColumn_cumulative + traceNr + 1] = 1;
+					}
+
+					solver.addConstraint(constraint, LpSolve.LE, 0);
+				}
+
+				//negative sign absolute
+				{
+					double[] constraint = new double[numberOfColumns + 1];
+
+					constraint[startColumn_errors + traceNr] = -1;
+					constraint[startColumn_cumulative + traceNr] = -1;
+					if (traceNr < numberOfTraces - 1) {
+						constraint[startColumn_cumulative + traceNr + 1] = 1;
+					}
+
+					solver.addConstraint(constraint, LpSolve.LE, 0);
+				}
+
+			}
+		}
+
 		solver.setAddRowmode(false);
 
 		if (canceller.isCancelled()) {
@@ -141,31 +125,43 @@ public class CostModelComputerImplLP extends CostModelComputerAbstract {
 		solver.solve();
 
 		//copy parameters
+		double[] errors = new double[numberOfTraces];
 		{
 			double[] var = solver.getPtrVariables();
 			double[] parameterValues = new double[numberOfParameters];
-			System.arraycopy(var, 1, parameterValues, 0, numberOfParameters);
+			System.arraycopy(var, 0, parameterValues, 0, numberOfParameters);
 			result.setParameters(parameterValues);
+
+			System.arraycopy(var, numberOfParameters, errors, 0, numberOfTraces);
 		}
 
-		//get quality measures
+		//compute average absolute error
 		{
-			List<Pair<String, Double>> qualityMetrics = new ArrayList<>();
+			BigDecimal sum = BigDecimal.ZERO;
+			for (double error : errors) {
+				sum = sum.add(BigDecimal.valueOf(Math.abs(error)));
+			}
+			BigDecimal averageAbsoluteError = sum.divide(BigDecimal.valueOf(numberOfTraces), 10,
+					BigDecimal.ROUND_HALF_UP);
 
-			double valueObjectiveFunction = solver.getObjective();
-			qualityMetrics.add(Pair.of("total error", valueObjectiveFunction));
-			qualityMetrics.add(Pair.of("average error per trace", valueObjectiveFunction / data.size()));
-
-			result.setQualityMetrics(qualityMetrics);
+			result.getModelProperties().add(
+					new DataRow<Object>("cost model", "total absolute error", DisplayType.numeric(sum.doubleValue())));
+			result.getModelProperties().add(new DataRow<Object>("cost model", "average absolute error",
+					DisplayType.numeric(averageAbsoluteError.doubleValue())));
 		}
-	}
 
-	public static int getNumberOfTraces(IvMLogFiltered log) {
-		int numberOfTraces = 0;
-		for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
-			it.next();
-			numberOfTraces++;
+		/**
+		 * This call should probably be enabled to clean up, but the Java VM
+		 * crashes if we enable it...
+		 */
+		//solver.deleteAndRemoveLp();
+
+		//set assumptions
+		{
+			//set information about the cost model
+			result.getModelProperties()
+					.add(new DataRow<Object>(DisplayType.literal("all parameters ≥ 0"), "cost model", "assumption"));
+
 		}
-		return numberOfTraces;
 	}
 }

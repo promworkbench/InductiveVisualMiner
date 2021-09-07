@@ -1,5 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.cost;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +16,11 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.Activi
 
 public abstract class CostModelAbstract implements CostModel {
 
+	public static final String attribute = "cost";
+	public static final int ms2hr = 1000 * 60 * 60;
+
 	protected double[] parameters;
 	protected final IvMModel model;
-	private List<Pair<String, Double>> qualityMetrics;
 	private List<DataRow<Object>> modelProperties = new ArrayList<>();
 
 	public CostModelAbstract(IvMModel model) {
@@ -94,20 +97,9 @@ public abstract class CostModelAbstract implements CostModel {
 		this.parameters = parameters;
 	}
 
-	public void setQualityMetrics(List<Pair<String, Double>> qualityMetrics) {
-		this.qualityMetrics = qualityMetrics;
-	}
-
-	public List<Pair<String, Double>> getQualityMetrics() {
-		return qualityMetrics;
-	}
-
 	public List<DataRow<Object>> getModelRepresentation() {
 		List<DataRow<Object>> result = new ArrayList<>();
 		result.addAll(getModelProperties());
-		for (Pair<String, Double> p : qualityMetrics) {
-			result.add(new DataRow<Object>("cost model", p.getA(), DisplayType.numeric(p.getB())));
-		}
 		result.add(new DataRow<Object>("cost model", "number of parameters", DisplayType.numeric(parameters.length)));
 		return result;
 	}
@@ -118,5 +110,18 @@ public abstract class CostModelAbstract implements CostModel {
 
 	public void setModelProperties(List<DataRow<Object>> modelProperties) {
 		this.modelProperties = modelProperties;
+	}
+
+	public static final DecimalFormat formatE = new DecimalFormat("0.###E0");
+	public static final DecimalFormat format = new DecimalFormat("0.##");
+
+	public static final String format(double value) {
+		if (value == 0) {
+			return "0";
+		}
+		if (Math.abs(value) > 9999999 || Math.abs(value) < 0.01) {
+			return formatE.format(value);
+		}
+		return format.format(value);
 	}
 }
