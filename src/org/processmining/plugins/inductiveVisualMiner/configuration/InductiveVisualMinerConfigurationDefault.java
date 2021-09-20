@@ -64,6 +64,8 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogAttributesHighlighted;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogEMSC;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataTabLog;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.DataAnalysisTabModelTime;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.DataRowBlockComputerModelTime;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockTypeVirtual;
@@ -297,6 +299,22 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 						r.add(new EventDataRowBlockVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						r.add(new EventDataRowBlockType<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						r.add(new EventDataRowBlockTypeVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						return r;
+					}
+				}));
+
+		result.add(new DataAnalysisTabModelTime<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(
+				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						return new ArrayList<>();
+					}
+				}, //
+				new Callable<List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
+						r.add(new DataRowBlockComputerModelTime<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}));

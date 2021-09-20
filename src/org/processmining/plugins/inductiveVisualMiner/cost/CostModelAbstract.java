@@ -69,11 +69,7 @@ public abstract class CostModelAbstract implements CostModel {
 
 			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> a = it.next();
 
-			if (a == null) {
-				if (trace.size() <= 9) {
-					//System.out.println("stop");
-				}
-			} else {
+			if (a != null) {
 				double[] inputsA = getInputs(a.getA(), a.getC(), a.getD(), a.getE(), a.getF());
 
 				merge(inputs, inputsA);

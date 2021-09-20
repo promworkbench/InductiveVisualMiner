@@ -21,7 +21,7 @@ public class CostModelImplModel extends CostModelAbstract {
 	public static enum ParameterNodeType {
 		synchronousMove {
 			public String toString() {
-				return "step in log and model";
+				return "step in model";
 			}
 		},
 	}
