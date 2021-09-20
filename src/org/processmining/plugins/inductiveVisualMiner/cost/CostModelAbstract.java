@@ -70,7 +70,9 @@ public abstract class CostModelAbstract implements CostModel {
 		//capture log moves
 		for (IvMMove move : trace) {
 			if (move.isLogMove() && !move.isIgnoredLogMove()) {
-				double[] inputsA = getInputs(startTrace, Sextuple.of(-1, null, null, null, null, move), endTrace);
+				Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> x = Sextuple.of(-1, null, null, null,
+						null, move);
+				double[] inputsA = getInputs(startTrace, x, endTrace);
 
 				merge(inputs, inputsA);
 			}
