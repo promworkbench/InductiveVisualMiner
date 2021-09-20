@@ -6,12 +6,14 @@ import java.util.List;
 
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
+import org.processmining.plugins.inductiveVisualMiner.performance.DurationType;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 
 import gnu.trove.map.TObjectIntMap;
@@ -39,6 +41,10 @@ public class CostModelImplModelDeviationsTime extends CostModelAbstract {
 			public double value2user(double value) {
 				return value;
 			};
+
+			public DurationType durationType() {
+				return null;
+			}
 		},
 		modelMove {
 			public String toString() {
@@ -48,6 +54,10 @@ public class CostModelImplModelDeviationsTime extends CostModelAbstract {
 			public double value2user(double value) {
 				return value;
 			};
+
+			public DurationType durationType() {
+				return null;
+			}
 		},
 		sojournTime {
 			public String toString() {
@@ -57,6 +67,10 @@ public class CostModelImplModelDeviationsTime extends CostModelAbstract {
 			public double value2user(double value) {
 				return value * ms2hr;
 			};
+
+			public DurationType durationType() {
+				return DurationType.sojourn;
+			}
 		},
 		waitingTime {
 			public String toString() {
@@ -66,6 +80,10 @@ public class CostModelImplModelDeviationsTime extends CostModelAbstract {
 			public double value2user(double value) {
 				return value * ms2hr;
 			};
+
+			public DurationType durationType() {
+				return DurationType.waiting;
+			}
 		},
 		queueingTime {
 			public String toString() {
@@ -75,6 +93,10 @@ public class CostModelImplModelDeviationsTime extends CostModelAbstract {
 			public double value2user(double value) {
 				return value * ms2hr;
 			};
+
+			public DurationType durationType() {
+				return DurationType.queueing;
+			}
 		},
 		serviceTime {
 			public String toString() {
@@ -84,9 +106,15 @@ public class CostModelImplModelDeviationsTime extends CostModelAbstract {
 			public double value2user(double value) {
 				return value * ms2hr;
 			};
+
+			public DurationType durationType() {
+				return DurationType.service;
+			}
 		};
 
 		public abstract double value2user(double value);
+
+		public abstract DurationType durationType();
 	}
 
 	public CostModelImplModelDeviationsTime(IvMModel model, IvMLogInfo logInfoFiltered) {
@@ -131,7 +159,11 @@ public class CostModelImplModelDeviationsTime extends CostModelAbstract {
 	}
 
 	@Override
-	public double[] getInputs(int node, IvMMove initiate, IvMMove enqueue, IvMMove start, IvMMove complete) {
+	public double[] getInputs(IvMMove startTrace,
+			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> instance, IvMMove endTrace) {
+		int node = instance.getA();
+		IvMMove complete = instance.getF();
+
 		double[] result = new double[numberOfParameters];
 
 		if (complete != null && complete.isLogMove()) {
@@ -154,33 +186,10 @@ public class CostModelImplModelDeviationsTime extends CostModelAbstract {
 		}
 
 		//timing parameters
-		{
-			//sojourn time
-			if (initiate != null && complete != null && initiate.getLogTimestamp() != null
-					&& complete.getLogTimestamp() != null) {
-				result[node2index[node] + ParameterNodeType.sojournTime.ordinal()] += complete.getLogTimestamp()
-						- initiate.getLogTimestamp();
-			}
-
-			//service time
-			if (start != null && complete != null && start.getLogTimestamp() != null
-					&& complete.getLogTimestamp() != null) {
-				result[node2index[node] + ParameterNodeType.serviceTime.ordinal()] += complete.getLogTimestamp()
-						- start.getLogTimestamp();
-			}
-
-			//waiting time
-			if (initiate != null && start != null && initiate.getLogTimestamp() != null
-					&& start.getLogTimestamp() != null) {
-				result[node2index[node] + ParameterNodeType.waitingTime.ordinal()] += start.getLogTimestamp()
-						- initiate.getLogTimestamp();
-			}
-
-			//queueing time
-			if (enqueue != null && start != null && enqueue.getLogTimestamp() != null
-					&& start.getLogTimestamp() != null) {
-				result[node2index[node] + ParameterNodeType.queueingTime.ordinal()] += start.getLogTimestamp()
-						- enqueue.getLogTimestamp();
+		for (ParameterNodeType type : ParameterNodeType.values()) {
+			if (type.durationType() != null && type.durationType().applies(startTrace, instance, endTrace)) {
+				long value = type.durationType().getDistance(startTrace, instance, endTrace);
+				result[node2index[node] + type.ordinal()] += value;
 			}
 		}
 

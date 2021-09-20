@@ -6,7 +6,7 @@ import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
 
 public class Move implements Event {
 

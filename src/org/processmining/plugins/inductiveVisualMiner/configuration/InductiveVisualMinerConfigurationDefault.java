@@ -65,7 +65,8 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogEMSC;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataTabLog;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.DataAnalysisTabModelTime;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.DataRowBlockComputerModelTime;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelHistogram;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelPerformance;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockTypeVirtual;
@@ -307,14 +308,16 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
 					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
-						return new ArrayList<>();
+						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
+						r.add(new RowBlockModelPerformance<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						return r;
 					}
 				}, //
 				new Callable<List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
 					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new DataRowBlockComputerModelTime<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new RowBlockModelHistogram<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}));

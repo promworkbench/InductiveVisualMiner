@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.LogSplitter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ShortestPathGraph;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationInfo;

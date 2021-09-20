@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.sizeMaps.SizeMapFixed;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.ProcessTreeVisualisationParameters;
 
 public class ModePathsService extends Mode {
@@ -67,7 +67,7 @@ public class ModePathsService extends Mode {
 		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
 
 		if (!inputs.has(IvMObject.performance)) {
-			PerformanceWrapper performance = inputs.get(IvMObject.performance);
+			Performance performance = inputs.get(IvMObject.performance);
 
 			return new AlignedLogVisualisationDataImplService(model, performance, logInfo);
 		} else {

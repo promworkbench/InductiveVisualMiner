@@ -17,8 +17,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
 import org.processmining.plugins.petrinet.replayresult.StepTypes;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 
@@ -123,8 +123,8 @@ public class AcceptingPetriNetAlignmentCallbackImplEfficientTree implements Acce
 				assert node instanceof Transition;
 				performanceActivity = performanceEventClasses.getClassOf(trace.get(event));
 			}
-			activity = Performance.getActivity(performanceActivity, activityEventClasses);
-			lifeCycleTransition = Performance.getLifeCycleTransition(performanceActivity);
+			activity = PerformanceUtils.getActivity(performanceActivity, activityEventClasses);
+			lifeCycleTransition = PerformanceUtils.getLifeCycleTransition(performanceActivity);
 		}
 
 		//get model part of move
@@ -137,7 +137,7 @@ public class AcceptingPetriNetAlignmentCallbackImplEfficientTree implements Acce
 
 			performanceTransition = (Transition) node;
 			unode = performanceTransition2node.get(performanceTransition);
-			lifeCycleTransition = Performance.getLifeCycleTransition(performanceTransition);
+			lifeCycleTransition = PerformanceUtils.getLifeCycleTransition(performanceTransition);
 
 			if (!model.isTau(unode) && !model.isActivity(unode)) {
 				//we are only interested in activity and tau moves; not in other model elements

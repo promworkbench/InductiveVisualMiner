@@ -8,32 +8,32 @@ import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeExc
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
+import org.processmining.plugins.inductiveVisualMiner.performance.Aggregate;
+import org.processmining.plugins.inductiveVisualMiner.performance.DurationType;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeNode;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 
 public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisualisationData {
 
 	protected long minMeasure;
 	protected long maxMeasure;
 
-	protected PerformanceWrapper performance;
+	protected Performance performance;
 
 	protected AlignedLogVisualisationData dataForEdges;
 
-	public AlignedLogVisualisationDataImplSojourn(IvMModel model, PerformanceWrapper queueLengths, IvMLogInfo logInfo) {
+	public AlignedLogVisualisationDataImplSojourn(IvMModel model, Performance queueLengths, IvMLogInfo logInfo) {
 		this.performance = queueLengths;
 		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(model, logInfo);
 
 		computeExtremes(queueLengths);
 	}
 
-	protected void computeExtremes(PerformanceWrapper performance) {
+	protected void computeExtremes(Performance performance) {
 		//compute extreme sojourn times
 		minMeasure = Long.MAX_VALUE;
 		maxMeasure = Long.MIN_VALUE;
-		for (long d : performance.getNodeMeasures(TypeNode.sojourn, Gather.average)) {
+		for (long d : performance.getNodeMeasures(DurationType.sojourn, Aggregate.average)) {
 			if (d >= 0 && d > maxMeasure) {
 				maxMeasure = d;
 			}
@@ -52,9 +52,9 @@ public class AlignedLogVisualisationDataImplSojourn implements AlignedLogVisuali
 	}
 
 	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves) {
-		long length = performance.getNodeMeasure(TypeNode.sojourn, Gather.average, unode);
+		long length = performance.getNodeMeasure(DurationType.sojourn, Aggregate.average, unode);
 		if (length >= 0) {
-			return Triple.of(Performance.timeToString(length), length, length);
+			return Triple.of(PerformanceUtils.timeToString(length), length, length);
 		} else {
 			return Triple.of("-", -1l, -1l);
 		}

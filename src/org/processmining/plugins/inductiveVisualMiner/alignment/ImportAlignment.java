@@ -27,8 +27,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredIm
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -105,7 +105,7 @@ public class ImportAlignment {
 						type = Type.ignoredLogMove;
 						xEvent = xTrace.get(xEventIndex);
 						performanceEventClass = performanceEventClasses2.getClassOf(aEvent);
-						activityEventClass = Performance.getActivity(performanceEventClass, activityEventClasses2);
+						activityEventClass = PerformanceUtils.getActivity(performanceEventClass, activityEventClasses2);
 						xEventIndex++;
 						break;
 					}
@@ -122,7 +122,7 @@ public class ImportAlignment {
 						type = Type.logMove;
 						xEvent = xTrace.get(xEventIndex);
 						performanceEventClass = performanceEventClasses2.getClassOf(aEvent);
-						activityEventClass = Performance.getActivity(performanceEventClass, activityEventClasses2);
+						activityEventClass = PerformanceUtils.getActivity(performanceEventClass, activityEventClasses2);
 						xEventIndex++;
 						break;
 					}
@@ -144,7 +144,7 @@ public class ImportAlignment {
 						if (!model.isTau(node)) {
 							xEvent = xTrace.get(xEventIndex);
 							performanceEventClass = performanceEventClasses2.getClassOf(aEvent);
-							activityEventClass = Performance.getActivity(performanceEventClass, activityEventClasses2);
+							activityEventClass = PerformanceUtils.getActivity(performanceEventClass, activityEventClasses2);
 							xEventIndex++;
 						} else {
 							activityEventClass = null;
@@ -156,7 +156,7 @@ public class ImportAlignment {
 				}
 
 				//gather attributes for Move
-				PerformanceTransition lifeCycleTransition = Performance
+				PerformanceTransition lifeCycleTransition = PerformanceUtils
 						.getLifeCycleTransition("+" + XLifecycleExtension.instance().extractTransition(aEvent));
 
 				int sourceNode = alignmentExtension.extractMoveSourceNode(aEvent);

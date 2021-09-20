@@ -6,7 +6,7 @@ import java.text.DecimalFormat;
 import javax.swing.JLabel;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
 /**
@@ -237,7 +237,7 @@ public abstract class DisplayType {
 		}
 
 		public String toString() {
-			return Performance.timeToString(value);
+			return PerformanceUtils.timeToString(value);
 		}
 
 		public double getValue() {

@@ -3,23 +3,23 @@ package org.processmining.plugins.inductiveVisualMiner.alignedLogVisualisation.d
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
+import org.processmining.plugins.inductiveVisualMiner.performance.Aggregate;
+import org.processmining.plugins.inductiveVisualMiner.performance.DurationType;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeNode;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 
 public class AlignedLogVisualisationDataImplService extends AlignedLogVisualisationDataImplSojourn {
 
-	public AlignedLogVisualisationDataImplService(IvMModel model, PerformanceWrapper performance, IvMLogInfo logInfo) {
+	public AlignedLogVisualisationDataImplService(IvMModel model, Performance performance, IvMLogInfo logInfo) {
 		super(model, performance, logInfo);
 	}
 
 	@Override
-	protected void computeExtremes(PerformanceWrapper performance) {
+	protected void computeExtremes(Performance performance) {
 		//compute extreme average times
 		minMeasure = Long.MAX_VALUE;
 		maxMeasure = Long.MIN_VALUE;
-		for (long d : performance.getNodeMeasures(TypeNode.service, Gather.average)) {
+		for (long d : performance.getNodeMeasures(DurationType.service, Aggregate.average)) {
 			if (d >= 0 && d > maxMeasure) {
 				maxMeasure = d;
 			}
@@ -31,9 +31,9 @@ public class AlignedLogVisualisationDataImplService extends AlignedLogVisualisat
 
 	@Override
 	public Triple<String, Long, Long> getNodeLabel(int unode, boolean includeModelMoves) {
-		long length = performance.getNodeMeasure(TypeNode.service, Gather.average, unode);
+		long length = performance.getNodeMeasure(DurationType.service, Aggregate.average, unode);
 		if (length > -1) {
-			return Triple.of(Performance.timeToString(length), length, length);
+			return Triple.of(PerformanceUtils.timeToString(length), length, length);
 		} else {
 			return Triple.of("-", -1l, -1l);
 		}

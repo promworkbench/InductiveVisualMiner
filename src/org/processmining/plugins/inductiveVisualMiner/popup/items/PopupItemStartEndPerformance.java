@@ -2,10 +2,11 @@ package org.processmining.plugins.inductiveVisualMiner.popup.items;
 
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
+import org.processmining.plugins.inductiveVisualMiner.performance.Aggregate;
+import org.processmining.plugins.inductiveVisualMiner.performance.DurationType;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeGlobal;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceLevel.Level;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInput;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInputStartEnd;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemStartEnd;
@@ -16,18 +17,18 @@ public class PopupItemStartEndPerformance implements PopupItemStartEnd {
 	}
 
 	public String[][] get(IvMObjectValues inputs, PopupItemInput<PopupItemInputStartEnd> input) {
-		PerformanceWrapper performance = inputs.get(IvMObject.performance);
+		Performance performance = inputs.get(IvMObject.performance);
 
-		String[][] result = new String[TypeGlobal.size * (Gather.size + 1)][];
+		String[][] result = new String[DurationType.valuesAt(Level.process).length * (Aggregate.values().length + 1)][];
 
 		int i = 0;
-		for (TypeGlobal type : TypeGlobal.values()) {
-			for (Gather gather : Gather.values()) {
-				long m = performance.getGlobalMeasure(type, gather);
+		for (DurationType type : DurationType.valuesAt(Level.process)) {
+			for (Aggregate gather : Aggregate.values()) {
+				long m = performance.getProcessMeasure(type, gather);
 				if (m > -1) {
 					result[i] = new String[] { //
 							gather.toString() + " " + type.toString(), //
-							Performance.timeToString(m) //
+							PerformanceUtils.timeToString(m) //
 					};
 					i++;
 				}

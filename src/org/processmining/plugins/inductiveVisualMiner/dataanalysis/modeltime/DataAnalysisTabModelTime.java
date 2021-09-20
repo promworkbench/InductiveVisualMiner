@@ -23,8 +23,9 @@ public class DataAnalysisTabModelTime<C, P> extends DataAnalysisTabAbstract<Obje
 	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
 		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<Object, C, P>(name, dataAnalysesView);
 		table.getModel()
-				.setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "Model part", "time type", "histogram" },
-						{ "Model part", "time type", "highlighted traces", "not-highlighted traces" } });
+				.setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "" },
+						{ "Model part", "time type", "", "all traces" },
+						{ "Model part", "duration type", "", "highlighted traces", "not-highlighted traces" } });
 		return table;
 	}
 

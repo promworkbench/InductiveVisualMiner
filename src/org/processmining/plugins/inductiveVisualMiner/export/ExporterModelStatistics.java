@@ -15,10 +15,10 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
+import org.processmining.plugins.inductiveVisualMiner.performance.Aggregate;
+import org.processmining.plugins.inductiveVisualMiner.performance.DurationType;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.Gather;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper.TypeNode;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInput;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInputActivity;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInputLog;
@@ -57,7 +57,7 @@ public class ExporterModelStatistics extends IvMExporter {
 
 	@Override
 	public void export(IvMObjectValues inputs, InductiveVisualMinerAnimationPanel panel, File file) throws Exception {
-		PerformanceWrapper performance = inputs.get(IvMObject.performance);
+		Performance performance = inputs.get(IvMObject.performance);
 		ProcessTreeVisualisationInfo visualisationInfo = inputs.get(IvMObject.graph_visualisation_info_aligned);
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
@@ -78,12 +78,12 @@ public class ExporterModelStatistics extends IvMExporter {
 			w.print(sep + "occurrences" + sep + cardinality);
 			w.print(sep + "model moves" + sep + modelMoveCardinality);
 
-			for (TypeNode type : TypeNode.values()) {
-				for (Gather gather : Gather.values()) {
+			for (DurationType type : DurationType.values()) {
+				for (Aggregate gather : Aggregate.values()) {
 					long m = performance.getNodeMeasure(type, gather, node);
 					if (m > -1) {
 						w.print(sep + gather.toString() + " " + type.toString() + " time" + sep
-								+ Performance.timeToString(m));
+								+ PerformanceUtils.timeToString(m));
 					} else {
 						w.print(sep + gather.toString() + " " + type.toString() + " time" + sep);
 					}

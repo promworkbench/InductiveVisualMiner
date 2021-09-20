@@ -26,7 +26,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapSettings;
@@ -85,7 +85,7 @@ public class IvMObject<C> {
 			InductiveVisualMinerAlignment.class);
 
 	//performance
-	public static final IvMObject<PerformanceWrapper> performance = c("performance", PerformanceWrapper.class);
+	public static final IvMObject<Performance> performance = c("performance", Performance.class);
 
 	//data analyses
 	public static final IvMObject<Cohorts> data_analysis_cohort = c("data analysis cohort", Cohorts.class);

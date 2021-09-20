@@ -8,7 +8,7 @@ import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeExc
 import org.processmining.plugins.inductiveVisualMiner.alignment.LogMovePosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceWrapper;
+import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
 
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
@@ -20,11 +20,11 @@ public class AlignedLogVisualisationDataImplQueues implements AlignedLogVisualis
 	private TIntDoubleMap computedLengths;
 
 	private IvMModel model;
-	private PerformanceWrapper queueLengths;
+	private Performance queueLengths;
 
 	private AlignedLogVisualisationData dataForEdges;
 
-	public AlignedLogVisualisationDataImplQueues(IvMModel model, PerformanceWrapper queueLengths, IvMLogInfo logInfo) {
+	public AlignedLogVisualisationDataImplQueues(IvMModel model, Performance queueLengths, IvMLogInfo logInfo) {
 		this.model = model;
 		this.queueLengths = queueLengths;
 		dataForEdges = new AlignedLogVisualisationDataImplFrequencies(model, logInfo);

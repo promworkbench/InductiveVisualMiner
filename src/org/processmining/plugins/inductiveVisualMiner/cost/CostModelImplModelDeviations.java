@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.deckfour.xes.model.XAttribute;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -85,7 +86,11 @@ public class CostModelImplModelDeviations extends CostModelAbstract {
 	}
 
 	@Override
-	public double[] getInputs(int node, IvMMove initiate, IvMMove enqueue, IvMMove start, IvMMove complete) {
+	public double[] getInputs(IvMMove startTrace,
+			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> instance, IvMMove endTrace) {
+		int node = instance.getA();
+		IvMMove complete = instance.getF();
+
 		double[] result = new double[numberOfParameters];
 
 		if (complete != null && complete.isLogMove()) {

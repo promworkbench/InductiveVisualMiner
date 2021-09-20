@@ -18,8 +18,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
 import org.processmining.plugins.petrinet.replayresult.StepTypes;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 
@@ -125,8 +125,8 @@ public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetri
 		if (type == StepTypes.L) {
 			//a log-move happened
 			XEventClass performanceActivity = (XEventClass) node;
-			XEventClass activity = Performance.getActivity(performanceActivity, activityEventClasses);
-			PerformanceTransition lifeCycleTransition = Performance.getLifeCycleTransition(performanceActivity);
+			XEventClass activity = PerformanceUtils.getActivity(performanceActivity, activityEventClasses);
+			PerformanceTransition lifeCycleTransition = PerformanceUtils.getLifeCycleTransition(performanceActivity);
 
 			//log move
 			if (lifeCycleTransition == PerformanceTransition.complete) {
@@ -171,9 +171,9 @@ public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetri
 			//model move
 			assert (node instanceof Transition);
 			Transition performanceUnode = (Transition) node;
-			PerformanceTransition lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode.getLabel());
+			PerformanceTransition lifeCycleTransition = PerformanceUtils.getLifeCycleTransition(performanceUnode.getLabel());
 			XEventClass performanceActivity = performanceEventClasses.getByIdentity(((Transition) node).getLabel());
-			XEventClass activity = Performance.getActivity(performanceActivity, activityEventClasses);
+			XEventClass activity = PerformanceUtils.getActivity(performanceActivity, activityEventClasses);
 			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllNodeNames(), activity.getId());
 			assert (activity != null);
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete ? activityIndex
@@ -184,9 +184,9 @@ public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetri
 			assert (node instanceof Transition);
 			Transition performanceUnode = (Transition) node;
 			XEventClass performanceActivity = performanceEventClasses.getClassOf(trace.get(event));
-			XEventClass activity = Performance.getActivity(performanceActivity, activityEventClasses);
+			XEventClass activity = PerformanceUtils.getActivity(performanceActivity, activityEventClasses);
 			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllNodeNames(), activity.getId());
-			PerformanceTransition lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode.getLabel());
+			PerformanceTransition lifeCycleTransition = PerformanceUtils.getLifeCycleTransition(performanceUnode.getLabel());
 
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete ? activityIndex
 					: previousModelNode;

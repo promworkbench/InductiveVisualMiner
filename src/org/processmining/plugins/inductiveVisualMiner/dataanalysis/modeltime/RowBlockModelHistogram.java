@@ -20,16 +20,17 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.ActivityInstanceIterator;
+import org.processmining.plugins.inductiveVisualMiner.performance.DurationType;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
-public class DataRowBlockComputerModelTime<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
-		return "model-time";
+		return "model-time-hist";
 	}
 
 	public String getStatusBusyMessage() {
@@ -60,23 +61,27 @@ public class DataRowBlockComputerModelTime<C, P> extends DataRowBlockComputer<Ob
 			IvMCanceller canceller) {
 		List<DataRow<Object>> result = new ArrayList<>();
 
-		TIntObjectMap<TLongList> serviceTimes = getServiceTimes(model, log, canceller);
+		for (DurationType durationType : DurationType.values()) {
+			TIntObjectMap<TLongList> durations = getDurations(model, log, durationType, canceller);
 
-		if (canceller.isCancelled()) {
-			return null;
-		}
+			if (canceller.isCancelled()) {
+				return null;
+			}
 
-		for (int node : model.getAllNodes()) {
-			if (model.isActivity(node)) {
-				BufferedImage image = Histogram.create(100, serviceTimes.get(node).toArray());
-				result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node), "service time"));
+			for (int node : model.getAllNodes()) {
+				if (model.isActivity(node)) {
+					if (!durations.get(node).isEmpty()) {
+						BufferedImage image = Histogram.create(durations.get(node).toArray());
+						result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node),
+								durationType.toString()));
+					}
+				}
 			}
 		}
-
 		return result;
 	}
 
-	private static TIntObjectMap<TLongList> getServiceTimes(IvMModel model, IvMLogFiltered log,
+	private static TIntObjectMap<TLongList> getDurations(IvMModel model, IvMLogFiltered log, DurationType durationType,
 			IvMCanceller canceller) {
 		//init
 		TIntObjectMap<TLongList> result = new TIntObjectHashMap<>(10, 0.5f, -1);
@@ -102,15 +107,10 @@ public class DataRowBlockComputerModelTime<C, P> extends DataRowBlockComputer<Ob
 					return null;
 				}
 
-				Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> a = it.next();
+				Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> instance = it.next();
 
-				if (a != null) {
-					IvMMove start = a.getE();
-					IvMMove complete = a.getF();
-					if (start != null && start.getLogTimestamp() != null & complete != null
-							&& complete.getLogTimestamp() != null) {
-						result.get(a.getA()).add(complete.getLogTimestamp() - start.getLogTimestamp());
-					}
+				if (instance != null && durationType.applies(null, instance, null)) {
+					result.get(instance.getA()).add(durationType.getDistance(null, instance, null));
 				}
 			}
 		}

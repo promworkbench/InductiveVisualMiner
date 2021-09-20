@@ -20,8 +20,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredIm
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
-import org.processmining.plugins.inductiveVisualMiner.performance.Performance.PerformanceTransition;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
@@ -107,8 +107,8 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 		if (naryMove.getMovedEvent() >= 0) {
 			//an ETM-log-move happened
 			performanceActivity = performanceEventClasses.getByIndex(trace.get(naryMove.getMovedEvent()));
-			activity = Performance.getActivity(performanceActivity, activityEventClasses);
-			lifeCycleTransition = Performance.getLifeCycleTransition(performanceActivity);
+			activity = PerformanceUtils.getActivity(performanceActivity, activityEventClasses);
+			lifeCycleTransition = PerformanceUtils.getLifeCycleTransition(performanceActivity);
 		}
 
 		//get model part of move
@@ -118,7 +118,7 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 			//an ETM-model-move happened
 			performanceUnode = nodeId2performanceNode[naryMove.getModelMove()];
 			unode = performanceNodeMapping.get(performanceUnode);
-			lifeCycleTransition = Performance.getLifeCycleTransition(performanceUnode);
+			lifeCycleTransition = PerformanceUtils.getLifeCycleTransition(performanceUnode);
 
 			if (performanceUnode.getNode() instanceof Automatic && unode.getNode() instanceof Manual) {
 				//this is a tau that represents that the start/enqueue of an activity is skipped

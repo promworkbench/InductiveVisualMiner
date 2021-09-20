@@ -37,7 +37,8 @@ public abstract class CostModelAbstract implements CostModel {
 	 * @param complete
 	 * @return
 	 */
-	public abstract double[] getInputs(int node, IvMMove initiate, IvMMove enqueue, IvMMove start, IvMMove complete);
+	public abstract double[] getInputs(IvMMove startTrace,
+			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> instance, IvMMove endTrace);
 
 	public abstract int getNumberOfParameters();
 
@@ -50,29 +51,47 @@ public abstract class CostModelAbstract implements CostModel {
 			return null;
 		}
 
+		//find the start timestamp of the trace
+		IvMMove startTrace = null;
+		IvMMove endTrace = null;
+		{
+			for (IvMMove move : trace) {
+				if (move.getLogTimestamp() != null) {
+					if (startTrace == null || move.getLogTimestamp() < startTrace.getLogTimestamp()) {
+						startTrace = move;
+					}
+					if (endTrace == null || move.getLogTimestamp() > endTrace.getLogTimestamp()) {
+						endTrace = move;
+					}
+				}
+			}
+		}
+
 		//capture log moves
 		for (IvMMove move : trace) {
 			if (move.isLogMove() && !move.isIgnoredLogMove()) {
-				double[] inputsA = getInputs(move.getLogMoveUnode(), null, null, null, move);
+				double[] inputsA = getInputs(startTrace, Sextuple.of(-1, null, null, null, null, move), endTrace);
 
 				merge(inputs, inputsA);
 			}
 		}
 
 		//capture activity instances
-		ActivityInstanceIterator it = trace.activityInstanceIterator(model);
-		while (it.hasNext()) {
+		{
+			ActivityInstanceIterator it = trace.activityInstanceIterator(model);
+			while (it.hasNext()) {
 
-			if (canceller.isCancelled()) {
-				return null;
-			}
+				if (canceller.isCancelled()) {
+					return null;
+				}
 
-			Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> a = it.next();
+				Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> a = it.next();
 
-			if (a != null) {
-				double[] inputsA = getInputs(a.getA(), a.getC(), a.getD(), a.getE(), a.getF());
+				if (a != null) {
+					double[] inputsA = getInputs(startTrace, a, endTrace);
 
-				merge(inputs, inputsA);
+					merge(inputs, inputsA);
+				}
 			}
 		}
 
