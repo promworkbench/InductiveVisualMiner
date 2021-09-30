@@ -73,7 +73,7 @@ public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C
 					if (!durations.get(node).isEmpty()) {
 						BufferedImage image = Histogram.create(durations.get(node).toArray());
 						result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node),
-								durationType.toString()));
+								durationType.toString(), "histogram"));
 					}
 				}
 			}
