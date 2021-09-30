@@ -5,6 +5,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.performance.Aggregate;
 import org.processmining.plugins.inductiveVisualMiner.performance.DurationType;
 import org.processmining.plugins.inductiveVisualMiner.performance.Performance;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceLevel.Level;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemInput;
@@ -23,8 +24,8 @@ public class PopupItemActivityPerformance implements PopupItemActivity {
 		String[][] result = new String[DurationType.values().length * (Aggregate.values().length + 1)][];
 
 		int i = 0;
-		for (DurationType type : DurationType.values()) {
-			for (Aggregate gather : Aggregate.values()) {
+		for (DurationType type : DurationType.valuesAt(Level.activity)) {
+			for (Aggregate gather : Aggregate.valuesForPopups()) {
 				long m = performance.getNodeMeasure(type, gather, unode);
 				if (m > -1) {
 					result[i] = new String[] { //

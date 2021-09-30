@@ -67,6 +67,7 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExportModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.UserStatus;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
@@ -345,10 +346,10 @@ public class InductiveVisualMinerController {
 		});
 		panel.getSaveLogButton().setEnabled(false);
 
-		//listen to ctrl c to show the controller view
+		//listen to ctrl o to show the controller view
 		{
 			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-					.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), "showControllerView"); // - key
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK), "showControllerView"); // - key
 			panel.getActionMap().put("showControllerView", new AbstractAction() {
 				private static final long serialVersionUID = 1727407514105090094L;
 
@@ -384,6 +385,8 @@ public class InductiveVisualMinerController {
 		//set highlighting filters button
 		initGuiHighlightingFilters();
 
+		//copy keybinders to child windows
+		copyKeyBinders();
 	}
 
 	protected void initGuiTraceColouring() {
@@ -716,20 +719,28 @@ public class InductiveVisualMinerController {
 
 		//link cost data analysis view to chain
 		setObject(IvMObject.selected_cost_model_factory, configuration.getCostModelFactories().get(0));
-		panel.getDataAnalysesView().setCostAnalysisOnChangeCostModel(new Runnable() {
-			public void run() {
-				FutureImpl i = chain.getObjectValues(IvMObject.selected_cost_model_factory);
-				try {
-					CostModelFactory currentCostModel = i.get().get(IvMObject.selected_cost_model_factory);
-					int x = (configuration.getCostModelFactories().indexOf(currentCostModel) + 1)
-							% configuration.getCostModelFactories().size();
-					chain.setObject(IvMObject.selected_cost_model_factory,
-							configuration.getCostModelFactories().get(x));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+		//listen to ctrl c to change the cost model
+		{
+			panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+					.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), "changeCostModel");
+			panel.getActionMap().put("changeCostModel", new AbstractAction() {
+
+				private static final long serialVersionUID = -1746241597075039914L;
+
+				public void actionPerformed(ActionEvent arg0) {
+					FutureImpl i = chain.getObjectValues(IvMObject.selected_cost_model_factory);
+					try {
+						CostModelFactory currentCostModel = i.get().get(IvMObject.selected_cost_model_factory);
+						int x = (configuration.getCostModelFactories().indexOf(currentCostModel) + 1)
+								% configuration.getCostModelFactories().size();
+						chain.setObject(IvMObject.selected_cost_model_factory,
+								configuration.getCostModelFactories().get(x));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
-			}
-		});
+			});
+		}
 
 		panel.getDataAnalysisViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1293,6 +1304,23 @@ public class InductiveVisualMinerController {
 			panel.getVisualisationModeSelector().setSelectedItem(value);
 		} else if (object.equals(IvMObject.selected_animation_enabled)) {
 			panel.getGraph().setAnimationEnabled((Boolean) value);
+		}
+	}
+
+	/**
+	 * Copy the key binders to all child windows.
+	 */
+	private void copyKeyBinders() {
+		for (SideWindow sideWindow : panel.getSideWindows()) {
+			for (KeyStroke keyStroke : panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).allKeys()) {
+				sideWindow.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke,
+						panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).get(keyStroke));
+			}
+
+			
+			for (Object key : panel.getActionMap().allKeys()) {
+				sideWindow.getRootPane().getActionMap().put(key, panel.getActionMap().get(key));
+			}
 		}
 	}
 

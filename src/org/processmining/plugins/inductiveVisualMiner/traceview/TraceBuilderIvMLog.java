@@ -71,7 +71,7 @@ class TraceBuilderIvMLog extends TraceBuilderWrapper {
 		}
 
 		public String getInfo() {
-			String s = traceColourMap.getValue((trace));
+			String s = traceColourMap.getValue(trace);
 			if (s.length() > 9) {
 				return s.substring(0, 7) + "..";
 			}
@@ -82,7 +82,7 @@ class TraceBuilderIvMLog extends TraceBuilderWrapper {
 			if (traceColourMap == null) {
 				return null;
 			}
-			return traceColourMap.getColour((trace));
+			return traceColourMap.getColour(trace);
 		}
 	}
 }

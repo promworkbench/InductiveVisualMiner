@@ -7,12 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface PerformanceLevel {
-	Level[] value();
-
+public @interface AggregateLevel {
 	boolean showInPopup() default true;
-
-	public static enum Level {
-		activity, process
-	}
 }

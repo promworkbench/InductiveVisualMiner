@@ -94,14 +94,14 @@ public enum DurationType {
 
 		public boolean applies(IvMMove traceFirstTimestamp,
 				Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> instance, IvMMove traceLastTimestamp) {
-			IvMMove a = instance.getD();
+			IvMMove a = instance.getC();
 			IvMMove b = instance.getE();
 			return a != null && a.getLogTimestamp() != null & b != null && b.getLogTimestamp() != null;
 		}
 
 		public long getDistance(IvMMove traceFirstTimestamp,
 				Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> instance, IvMMove traceLastTimestamp) {
-			IvMMove a = instance.getD();
+			IvMMove a = instance.getC();
 			IvMMove b = instance.getE();
 			return b.getLogTimestamp() - a.getLogTimestamp();
 		}

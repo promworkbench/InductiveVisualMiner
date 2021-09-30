@@ -33,6 +33,7 @@ import org.processmining.plugins.inductiveVisualMiner.editModel.EditModelView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ControllerView;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.InputFunction;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMClassifierChooser;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
@@ -450,38 +451,22 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		//controller view
 		{
 			controllerView = new ControllerView<>(this);
-			graphPanel.getHelperControlsShortcuts().add("ctrl c");
+			graphPanel.getHelperControlsShortcuts().add("ctrl o");
 			graphPanel.getHelperControlsExplanations().add("show controller");
+		}
+
+		//cost model
+		{
+			graphPanel.getHelperControlsShortcuts().add("ctrl c");
+			graphPanel.getHelperControlsExplanations().add("change cost model");
 		}
 	}
 
-	//	@Override
-	//	protected void paintComponent(Graphics grphcs) {
-	//		Graphics2D g2d = (Graphics2D) grphcs;
-	//		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	//
-	//		//GradientPaint gp = new GradientPaint(0, 0, Color.white, 0, getHeight(), new Color(171,186,171));
-	//		//GradientPaint gp = new GradientPaint(0, 0, new Color(109, 213, 237), 0, getHeight(), new Color(33, 147, 176));
-	//		//GradientPaint gp = new GradientPaint(0, 0, new Color(75, 108, 183), 0, getHeight(), new Color(24, 40, 72));
-	//		GradientPaint gp = new GradientPaint(0, 0, new Color(161, 207, 243), 0, getHeight(), new Color(84, 141, 184));
-	//
-	//		//GradientPaint gp = new GradientPaint(0, 0, getBackground(), 0, getHeight(), getBackground().darker());
-	//
-	//		g2d.setPaint(gp);
-	//		g2d.fillRect(0, 0, getWidth(), getHeight());
-	//
-	//		super.paintComponent(grphcs);
-	//	}
-
 	public void removeNotify() {
 		super.removeNotify();
-		editModelView.setVisible(false);
-		preMiningFiltersView.setVisible(false);
-		traceView.setVisible(false);
-		dataAnalysisView.setVisible(false);
-		highlightingFiltersView.setVisible(false);
-		traceColourMapView.setVisible(false);
-		controllerView.setVisible(false);
+		for (SideWindow sideWindow : getSideWindows()) {
+			sideWindow.setVisible(false);
+		}
 		graphPanel.pause();
 	}
 
@@ -515,6 +500,11 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		if (select) {
 			graphPanel.select(dotEdge);
 		}
+	}
+
+	public SideWindow[] getSideWindows() {
+		return new SideWindow[] { editModelView, preMiningFiltersView, traceView, dataAnalysisView,
+				highlightingFiltersView, traceColourMapView, controllerView };
 	}
 
 	public InductiveVisualMinerAnimationPanel getGraph() {

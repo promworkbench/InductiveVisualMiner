@@ -23,7 +23,7 @@ public class PopupItemStartEndPerformance implements PopupItemStartEnd {
 
 		int i = 0;
 		for (DurationType type : DurationType.valuesAt(Level.process)) {
-			for (Aggregate gather : Aggregate.values()) {
+			for (Aggregate gather : Aggregate.valuesForPopups()) {
 				long m = performance.getProcessMeasure(type, gather);
 				if (m > -1) {
 					result[i] = new String[] { //

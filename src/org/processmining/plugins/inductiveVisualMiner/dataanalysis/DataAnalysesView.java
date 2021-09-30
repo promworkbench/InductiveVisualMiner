@@ -13,8 +13,6 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab.DataTableCohort;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostDataTab;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostDataTab.DataTableCost;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
@@ -99,14 +97,6 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		DataAnalysisTable<?, C, P> table = tables.get(CohortDataAnalysisTab.name);
 		if (table != null && table instanceof CohortDataAnalysisTab.DataTableCohort) {
 			((DataTableCohort) table).setCohortAnalysis2HighlightingFilterHandler(showCohortHighlightingFilterHandler);
-		}
-	}
-
-	@SuppressWarnings("rawtypes")
-	public void setCostAnalysisOnChangeCostModel(Runnable onChangeCostModel) {
-		DataAnalysisTable<?, C, P> table = tables.get(CostDataTab.name);
-		if (table != null && table instanceof CostDataTab.DataTableCost) {
-			((DataTableCost) table).setOnChangeCostModel(onChangeCostModel);
 		}
 	}
 
