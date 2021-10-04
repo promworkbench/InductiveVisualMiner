@@ -260,15 +260,15 @@ public class CostModelImplModelDeviationsTime extends CostModelAbstract {
 		for (String activity : logMove2index.keySet()) {
 			int index = logMove2index.get(activity);
 			result.add(
-					new DataRow<Object>(DisplayType.numeric(parameters[index]), "cost of extra step in log", activity));
+					new DataRow<Object>(DisplayType.numeric(parameters[index]), activity, "cost of extra step in log"));
 		}
 
 		for (int node = 0; node < node2index.length; node++) {
 			if (node2index[node] >= 0) {
 				for (ParameterNodeType parameterType : ParameterNodeType.values()) {
 					double value = parameterType.value2user(getNodeParameter(node, parameterType));
-					result.add(new DataRow<Object>(DisplayType.numeric(value), "cost of " + parameterType.toString(),
-							model.getActivityName(node)));
+					result.add(new DataRow<Object>(DisplayType.numeric(value), model.getActivityName(node),
+							"cost of " + parameterType.toString()));
 				}
 			}
 

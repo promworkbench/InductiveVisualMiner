@@ -31,13 +31,14 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 	public String getName() {
 		return "trace-att";
 	}
-	
+
 	public String getStatusBusyMessage() {
 		return "Gathering trace attributes..";
 	}
 
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.aligned_log_filtered };
+		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.aligned_log_filtered,
+				IvMObject.data_analyses_delay };
 	}
 
 	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)

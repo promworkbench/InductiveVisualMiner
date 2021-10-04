@@ -125,7 +125,7 @@ public class IvMAttributesInfo implements AttributesInfo {
 
 	@Override
 	public Collection<Attribute> getEventAttributes() {
-		return eventAttributes.values();
+		return new TreeSet<>(eventAttributes.values());
 	}
 
 	@Override

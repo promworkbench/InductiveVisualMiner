@@ -27,9 +27,9 @@ public class DataRowBlockLogEMSC<C, P> extends DataRowBlockComputer<Object, C, P
 	public String getStatusBusyMessage() {
 		return "Computing distance..";
 	}
-	
+
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.aligned_log_filtered, IvMObject.model };
+		return new IvMObject<?>[] { IvMObject.aligned_log_filtered, IvMObject.model, IvMObject.data_analyses_delay };
 	}
 
 	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)

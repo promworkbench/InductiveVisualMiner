@@ -39,6 +39,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisCost;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl20DataAnalysisAssociations;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl21AdvancedAnalysesDelay;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
@@ -66,7 +67,9 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataTabLog;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.DataAnalysisTabModelTime;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelHistogram;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelLogNormal;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelPerformance;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelWeibull;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockTypeVirtual;
@@ -318,6 +321,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 							throws Exception {
 						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
 						r.add(new RowBlockModelHistogram<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new RowBlockModelWeibull<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new RowBlockModelLogNormal<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}));
@@ -486,6 +491,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl18DataAnalysisCohort<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl19DataAnalysisCost<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl20DataAnalysisAssociations<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl21AdvancedAnalysesDelay<InductiveVisualMinerConfiguration>());
 
 		return chain;
 	}

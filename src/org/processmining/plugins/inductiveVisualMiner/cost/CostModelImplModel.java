@@ -140,16 +140,14 @@ public class CostModelImplModel extends CostModelAbstract {
 
 	@Override
 	public List<DataRow<Object>> getModelRepresentation() {
-		List<DataRow<Object>> result = new ArrayList<>();
-
-		result.addAll(super.getModelRepresentation());
+		List<DataRow<Object>> result = super.getModelRepresentation();
 
 		for (int node = 0; node < node2index.length; node++) {
 			if (node2index[node] >= 0) {
 				for (ParameterNodeType parameterType : ParameterNodeType.values()) {
 					double value = getNodeParameter(node, parameterType);
-					result.add(new DataRow<Object>(DisplayType.numeric(value), "cost of " + parameterType.toString(),
-							model.getActivityName(node)));
+					result.add(new DataRow<Object>(DisplayType.numeric(value), model.getActivityName(node),
+							"cost of " + parameterType.toString()));
 				}
 			}
 

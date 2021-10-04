@@ -25,7 +25,8 @@ public class Cl19DataAnalysisCost<C> extends DataChainLinkComputationAbstract<C>
 
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.log_timestamps_logical, IvMObject.selected_cost_model_factory,
-				IvMObject.model, IvMObject.aligned_log_filtered, IvMObject.aligned_log_info_filtered };
+				IvMObject.model, IvMObject.aligned_log_filtered, IvMObject.aligned_log_info_filtered,
+				IvMObject.data_analyses_delay };
 	}
 
 	public IvMObject<?>[] createOutputObjects() {

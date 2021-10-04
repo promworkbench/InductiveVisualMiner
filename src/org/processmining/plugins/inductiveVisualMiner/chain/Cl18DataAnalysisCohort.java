@@ -22,7 +22,7 @@ public class Cl18DataAnalysisCohort<C> extends DataChainLinkComputationAbstract<
 	@Override
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.sorted_log, IvMObject.selected_classifier,
-				IvMObject.selected_cohort_analysis_enabled };
+				IvMObject.selected_cohort_analysis_enabled, IvMObject.data_analyses_delay };
 	}
 
 	@Override

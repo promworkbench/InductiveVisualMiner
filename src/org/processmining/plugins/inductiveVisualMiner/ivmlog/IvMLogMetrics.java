@@ -151,7 +151,7 @@ public class IvMLogMetrics {
 		}
 		//empty traces
 		if (model.getDfg().isEmptyTraces()) {
-			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, -1, -1, true, logInfo);
+			long occurrences = IvMLogMetrics.getNumberOfTracesRepresented(model, -2, -2, true, logInfo);
 			min = Math.min(min, occurrences);
 			max = Math.max(max, occurrences);
 		}

@@ -22,7 +22,7 @@ public class Move implements Event {
 	 * 
 	 * For trees, modelNode is the node of the tree;
 	 * 
-	 * For dfgs, modelNode is the target of step in the dfg, and sourceNode is
+	 * For dfgs, modelNode is the target of the step in the dfg, and sourceNode is
 	 * the source;
 	 */
 	private final int modelNode;

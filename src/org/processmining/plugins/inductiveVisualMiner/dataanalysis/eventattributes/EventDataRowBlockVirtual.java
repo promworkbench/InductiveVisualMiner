@@ -19,13 +19,14 @@ public class EventDataRowBlockVirtual<C, P> extends DataRowBlockComputer<Object,
 	public String getName() {
 		return "event-att-virt";
 	}
-	
+
 	public String getStatusBusyMessage() {
 		return "Gathering virtual event attributes..";
 	}
 
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.ivm_attributes_info, IvMObject.aligned_log_filtered };
+		return new IvMObject<?>[] { IvMObject.ivm_attributes_info, IvMObject.aligned_log_filtered,
+				IvMObject.data_analyses_delay };
 	}
 
 	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)

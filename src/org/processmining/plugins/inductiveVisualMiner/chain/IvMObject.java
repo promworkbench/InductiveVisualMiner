@@ -88,6 +88,7 @@ public class IvMObject<C> {
 	public static final IvMObject<Performance> performance = c("performance", Performance.class);
 
 	//data analyses
+	public static final IvMObject<Object> data_analyses_delay = c("data analyses delay", Object.class);
 	public static final IvMObject<Cohorts> data_analysis_cohort = c("data analysis cohort", Cohorts.class);
 	public static final IvMObject<CostModels> data_analysis_cost_models = c("cost models", CostModels.class);
 	public static final IvMObject<Associations> data_analysis_associations = c("associations", Associations.class);

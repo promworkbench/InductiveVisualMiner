@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.deckfour.xes.extension.std.XCostExtension;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
@@ -16,7 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.Activi
 
 public abstract class CostModelAbstract implements CostModel {
 
-	public static final String attribute = "cost";
+	public static final String attribute = XCostExtension.KEY_TOTAL;
 	public static final int ms2hr = 1000 * 60 * 60;
 
 	protected double[] parameters;

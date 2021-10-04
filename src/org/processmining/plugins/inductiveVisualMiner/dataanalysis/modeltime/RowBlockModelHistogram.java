@@ -21,6 +21,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl.ActivityInstanceIterator;
 import org.processmining.plugins.inductiveVisualMiner.performance.DurationType;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceLevel.Level;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
@@ -38,7 +39,7 @@ public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C
 	}
 
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered };
+		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered, IvMObject.data_analyses_delay };
 	}
 
 	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
@@ -61,7 +62,7 @@ public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C
 			IvMCanceller canceller) {
 		List<DataRow<Object>> result = new ArrayList<>();
 
-		for (DurationType durationType : DurationType.values()) {
+		for (DurationType durationType : DurationType.valuesAt(Level.activity)) {
 			TIntObjectMap<TLongList> durations = getDurations(model, log, durationType, canceller);
 
 			if (canceller.isCancelled()) {
@@ -81,7 +82,7 @@ public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C
 		return result;
 	}
 
-	private static TIntObjectMap<TLongList> getDurations(IvMModel model, IvMLogFiltered log, DurationType durationType,
+	public static TIntObjectMap<TLongList> getDurations(IvMModel model, IvMLogFiltered log, DurationType durationType,
 			IvMCanceller canceller) {
 		//init
 		TIntObjectMap<TLongList> result = new TIntObjectHashMap<>(10, 0.5f, -1);
@@ -99,6 +100,22 @@ public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C
 				return null;
 			}
 
+			//find the start timestamp of the trace
+			IvMMove startTrace = null;
+			IvMMove endTrace = null;
+			{
+				for (IvMMove move : trace) {
+					if (move.getLogTimestamp() != null) {
+						if (startTrace == null || move.getLogTimestamp() < startTrace.getLogTimestamp()) {
+							startTrace = move;
+						}
+						if (endTrace == null || move.getLogTimestamp() > endTrace.getLogTimestamp()) {
+							endTrace = move;
+						}
+					}
+				}
+			}
+
 			//capture activity instances
 			ActivityInstanceIterator it = trace.activityInstanceIterator(model);
 			while (it.hasNext()) {
@@ -109,8 +126,8 @@ public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C
 
 				Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> instance = it.next();
 
-				if (instance != null && durationType.applies(null, instance, null)) {
-					result.get(instance.getA()).add(durationType.getDistance(null, instance, null));
+				if (instance != null && durationType.applies(startTrace, instance, endTrace)) {
+					result.get(instance.getA()).add(durationType.getDistance(startTrace, instance, endTrace));
 				}
 			}
 		}

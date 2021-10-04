@@ -18,8 +18,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.plugins.petrinet.replayresult.StepTypes;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 
