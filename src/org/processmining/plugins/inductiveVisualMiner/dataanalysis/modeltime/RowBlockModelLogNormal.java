@@ -1,10 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
@@ -69,14 +67,14 @@ public class RowBlockModelLogNormal<C, P> extends DataRowBlockComputer<Object, C
 						Pair<Double, Double> weibull = fit(durations.get(node).toArray());
 						if (!Double.isNaN(weibull.getA()) && !Double.isNaN(weibull.getB())) {
 							result.add(new DataRow<Object>(DisplayType.numeric(weibull.getA()),
-									model.getActivityName(node), durationType.toString(), "Weibull-shape (λ)"));
+									model.getActivityName(node), durationType.toString(), "lognormal X"));
 							result.add(new DataRow<Object>(DisplayType.numeric(weibull.getB()),
-									model.getActivityName(node), durationType.toString(), "Weibull-scale (k)"));
+									model.getActivityName(node), durationType.toString(), "lognormal Y"));
 						} else {
 							result.add(new DataRow<Object>(DisplayType.NA(), model.getActivityName(node),
-									durationType.toString(), "Weibull shape (λ)"));
+									durationType.toString(), "lognormal X"));
 							result.add(new DataRow<Object>(DisplayType.NA(), model.getActivityName(node),
-									durationType.toString(), "Weibull scale (k)"));
+									durationType.toString(), "lognormal Y"));
 						}
 					}
 				}
@@ -94,23 +92,6 @@ public class RowBlockModelLogNormal<C, P> extends DataRowBlockComputer<Object, C
 	 * @return pair of shape (k), scale (lambda)
 	 */
 	private Pair<Double, Double> fit(long[] array) {
-		Arrays.sort(array);
-
-		SimpleRegression regression = new SimpleRegression();
-
-		for (int i = 0; i < array.length; i++) {
-			double x = Math.log(array[i]);
-			double y = Math.log(-Math.log(1 - (i + 1 - 0.5) / array.length));
-
-			regression.addData(x, y);
-		}
-
-		double slope = regression.getSlope();
-		double intercept = regression.getIntercept();
-
-		double k = slope;
-		double lambda = Math.exp(-intercept / slope);
-
-		return Pair.of(lambda, k);
+		return Pair.of(Double.NaN, Double.NaN);
 	}
 }
