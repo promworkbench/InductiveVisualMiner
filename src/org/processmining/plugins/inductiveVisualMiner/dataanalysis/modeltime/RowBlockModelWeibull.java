@@ -1,9 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.math3.distribution.WeibullDistribution;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
@@ -13,6 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.Histogram;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -69,14 +72,19 @@ public class RowBlockModelWeibull<C, P> extends DataRowBlockComputer<Object, C, 
 						Pair<Double, Double> weibull = fit(durations.get(node).toArray());
 						if (!Double.isNaN(weibull.getA()) && !Double.isNaN(weibull.getB())) {
 							result.add(new DataRow<Object>(DisplayType.numeric(weibull.getA()),
-									model.getActivityName(node), durationType.toString(), "Weibull-shape (λ)"));
+									model.getActivityName(node), durationType.toString(), "Weibull λ"));
 							result.add(new DataRow<Object>(DisplayType.numeric(weibull.getB()),
-									model.getActivityName(node), durationType.toString(), "Weibull-scale (k)"));
+									model.getActivityName(node), durationType.toString(), "Weibull k"));
+
+							BufferedImage image = Histogram.create(durations.get(node).toArray(),
+									new WeibullDistribution(weibull.getB(), weibull.getA()));
+							result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node),
+									durationType.toString(), "Weibull model"));
 						} else {
 							result.add(new DataRow<Object>(DisplayType.NA(), model.getActivityName(node),
-									durationType.toString(), "Weibull shape (λ)"));
+									durationType.toString(), "Weibull λ"));
 							result.add(new DataRow<Object>(DisplayType.NA(), model.getActivityName(node),
-									durationType.toString(), "Weibull scale (k)"));
+									durationType.toString(), "Weibull k"));
 						}
 					}
 				}

@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 
+import org.apache.commons.math3.distribution.AbstractRealDistribution;
 import org.math.plot.utils.Array;
 
 /**
@@ -21,6 +22,10 @@ public class Histogram {
 	public static final int offsetY = 1;
 
 	public static BufferedImage create(long[] values) {
+		return create(values, null);
+	}
+
+	public static BufferedImage create(long[] values, AbstractRealDistribution distribution) {
 
 		//get extreme values
 		long minValue = Long.MAX_VALUE;
@@ -29,6 +34,8 @@ public class Histogram {
 			minValue = Math.min(minValue, value);
 			maxValue = Math.max(maxValue, value);
 		}
+
+		minValue = 0; //let the histogram start at 0 for clarity
 
 		//fill array
 		int[] counts = new int[histogramWidth];
@@ -92,6 +99,27 @@ public class Histogram {
 			g.drawLine(0, image.getHeight() - 1, image.getWidth(), image.getHeight() - 1);
 			g.drawLine(0, image.getHeight() - 1, 0, 0);
 			//g.drawRect(0, 0, image.getWidth() - 1, image.getHeight() - 1);
+		}
+
+		//distribution
+		if (distribution != null) {
+			GeneralPath pathOutline = new GeneralPath();
+			for (int pixel = 0; pixel < histogramWidth; pixel++) {
+				int x = offsetX + pixel;
+
+				double valueXMin = minValue + (pixel - 0.5) * (maxValue - minValue) / histogramWidth;
+				double valueXMax = minValue + (pixel + 0.5) * (maxValue - minValue) / histogramWidth;
+				double valueY = distribution.probability(valueXMin, valueXMax) * maxCount;
+
+				int y = (int) Math.round((offsetY + histogramHeight) - ((valueY * histogramHeight)));
+				if (pixel == 0) {
+					pathOutline.moveTo(x, y);
+				} else {
+					pathOutline.lineTo(x, y);
+				}
+			}
+			g.setColor(Color.blue);
+			g.draw(pathOutline);
 		}
 
 		g.dispose();
