@@ -86,6 +86,7 @@ public class IvMObject<C> {
 
 	//performance
 	public static final IvMObject<Performance> performance = c("performance", Performance.class);
+	public static final IvMObject<Performance> performance_negative = c("performance negative", Performance.class);
 
 	//data analyses
 	public static final IvMObject<Object> data_analyses_delay = c("data analyses delay", Object.class);

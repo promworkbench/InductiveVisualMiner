@@ -35,6 +35,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl11Animate;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl12TraceColouring;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl13FilterNodeSelection;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl14Performance;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl14PerformanceNegative;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl15Histogram;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCohort;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisCost;
@@ -487,6 +488,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl12TraceColouring<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl13FilterNodeSelection());
 		chain.register(new Cl14Performance<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl14PerformanceNegative<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl15Histogram<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl18DataAnalysisCohort<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl19DataAnalysisCost<InductiveVisualMinerConfiguration>());

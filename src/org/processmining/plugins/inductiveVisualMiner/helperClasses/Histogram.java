@@ -39,7 +39,7 @@ public class Histogram {
 
 		//fill array
 		int[] counts = new int[histogramWidth];
-		double maxCount = 1;
+		double yscale = 1;
 		if (values.length > 0) {
 
 			//fill array
@@ -49,13 +49,8 @@ public class Histogram {
 				counts[indexX]++;
 			}
 
-			//get count extrema
-			maxCount = 0;
-			{
-				for (int x = 0; x < histogramWidth; x++) {
-					maxCount = Math.max(maxCount, Array.max(counts[x]));
-				}
-			}
+			//scale the graph to have the highest peak reach the top of the image
+			yscale = 1.0 / (Array.max(counts) / (values.length * 1.0));
 		}
 
 		//draw
@@ -74,9 +69,10 @@ public class Histogram {
 			GeneralPath pathFill = new GeneralPath();
 			pathFill.moveTo(offsetX, offsetY + histogramHeight);
 			for (int pixel = 0; pixel < histogramWidth; pixel++) {
+				double probability = counts[pixel] / (values.length * 1.0);
+
 				int x = offsetX + pixel;
-				int y = (int) Math
-						.round((offsetY + histogramHeight) - ((counts[pixel] / (maxCount * 1.0) * histogramHeight)));
+				int y = (int) Math.round((offsetY + histogramHeight) - probability * yscale * histogramHeight);
 				if (pixel == 0) {
 					pathOutline.moveTo(x, y);
 				} else {
@@ -109,9 +105,9 @@ public class Histogram {
 
 				double valueXMin = minValue + (pixel - 0.5) * (maxValue - minValue) / histogramWidth;
 				double valueXMax = minValue + (pixel + 0.5) * (maxValue - minValue) / histogramWidth;
-				double valueY = distribution.probability(valueXMin, valueXMax) * maxCount;
+				double probability = distribution.probability(valueXMin, valueXMax);
 
-				int y = (int) Math.round((offsetY + histogramHeight) - ((valueY * histogramHeight)));
+				int y = (int) Math.round((offsetY + histogramHeight) - probability * yscale * histogramHeight);
 				if (pixel == 0) {
 					pathOutline.moveTo(x, y);
 				} else {
