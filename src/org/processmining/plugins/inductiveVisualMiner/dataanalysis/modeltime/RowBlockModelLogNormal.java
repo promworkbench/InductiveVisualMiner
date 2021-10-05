@@ -70,7 +70,7 @@ public class RowBlockModelLogNormal<C, P> extends DataRowBlockComputer<Object, C
 				if (model.isActivity(node)) {
 					if (!durations.get(node).isEmpty()) {
 						Pair<Double, Double> logNormal = fit(durations.get(node).toArray());
-						if (!Double.isNaN(logNormal.getA()) && !Double.isNaN(logNormal.getB())) {
+						if (logNormal != null) {
 							result.add(new DataRow<Object>(DisplayType.numeric(logNormal.getA()),
 									model.getActivityName(node), durationType.toString(), "lognormal μ"));
 							result.add(new DataRow<Object>(DisplayType.numeric(logNormal.getB()),
@@ -79,12 +79,10 @@ public class RowBlockModelLogNormal<C, P> extends DataRowBlockComputer<Object, C
 							BufferedImage image = Histogram.create(durations.get(node).toArray(),
 									new LogNormalDistribution(logNormal.getA(), logNormal.getB()));
 							result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node),
-									durationType.toString(), "lognormal model"));
+									durationType.toString(), "lognormal plot"));
 						} else {
 							result.add(new DataRow<Object>(DisplayType.NA(), model.getActivityName(node),
-									durationType.toString(), "lognormal μ"));
-							result.add(new DataRow<Object>(DisplayType.NA(), model.getActivityName(node),
-									durationType.toString(), "lognormal σ"));
+									durationType.toString(), "lognormal"));
 						}
 					}
 				}
@@ -105,13 +103,17 @@ public class RowBlockModelLogNormal<C, P> extends DataRowBlockComputer<Object, C
 		double[] logValues = new double[array.length];
 		for (int i = 0; i < array.length; i++) {
 			if (array[i] <= 0) {
-				return Pair.of(Double.NaN, Double.NaN);
+				return null;
 			}
 			logValues[i] = Math.log(array[i]);
 		}
 
 		BigDecimal mean = Correlation.mean(logValues);
 		double stdev = Correlation.standardDeviation(logValues, mean);
+
+		if (mean.compareTo(BigDecimal.ZERO) <= 0 || stdev <= 0) {
+			return null;
+		}
 
 		return Pair.of(mean.doubleValue(), stdev);
 	}

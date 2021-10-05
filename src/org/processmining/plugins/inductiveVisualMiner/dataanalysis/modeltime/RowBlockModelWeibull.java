@@ -79,12 +79,10 @@ public class RowBlockModelWeibull<C, P> extends DataRowBlockComputer<Object, C, 
 							BufferedImage image = Histogram.create(durations.get(node).toArray(),
 									new WeibullDistribution(weibull.getB(), weibull.getA()));
 							result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node),
-									durationType.toString(), "Weibull model"));
+									durationType.toString(), "Weibull plot"));
 						} else {
 							result.add(new DataRow<Object>(DisplayType.NA(), model.getActivityName(node),
-									durationType.toString(), "Weibull λ"));
-							result.add(new DataRow<Object>(DisplayType.NA(), model.getActivityName(node),
-									durationType.toString(), "Weibull k"));
+									durationType.toString(), "Weibull"));
 						}
 					}
 				}

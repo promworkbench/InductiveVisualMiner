@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockC
 public class DataAnalysisTabModelTime<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
 	public static final String name = "Model time";
-	public static final String explanation = "Study the time spent in model parts.";
+	public static final String explanation = "Analyse the time spent in model activities.";
 
 	public DataAnalysisTabModelTime(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
 			Callable<List<DataRowBlockComputer<Object, C, P>>> rowBlockComputersCreator) {
