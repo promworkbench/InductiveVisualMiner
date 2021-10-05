@@ -126,7 +126,8 @@ public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C
 
 				Sextuple<Integer, String, IvMMove, IvMMove, IvMMove, IvMMove> instance = it.next();
 
-				if (instance != null && durationType.applies(startTrace, instance, endTrace)) {
+				if (instance != null && model.isActivity(instance.getA())
+						&& durationType.applies(startTrace, instance, endTrace)) {
 					result.get(instance.getA()).add(durationType.getDistance(startTrace, instance, endTrace));
 				}
 			}

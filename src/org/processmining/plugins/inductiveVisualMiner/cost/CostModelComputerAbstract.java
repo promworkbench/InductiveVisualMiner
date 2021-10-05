@@ -32,7 +32,7 @@ public abstract class CostModelComputerAbstract implements CostModelComputer {
 		}
 
 		if (data.size() == 0) {
-			message = "no cost data available";
+			message = "no cost:total trace attribute available";
 			return;
 		}
 
