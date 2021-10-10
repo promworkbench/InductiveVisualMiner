@@ -66,7 +66,7 @@ public class ModePathsService extends Mode {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
 
-		if (!inputs.has(IvMObject.performance)) {
+		if (inputs.has(IvMObject.performance)) {
 			Performance performance = inputs.get(IvMObject.performance);
 
 			return new AlignedLogVisualisationDataImplService(model, performance, logInfo);
