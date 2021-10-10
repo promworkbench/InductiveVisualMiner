@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -314,11 +315,15 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 		g.setColor(new Color(255, 255, 255, 150));
 		g.setFont(helperControlsFont);
 		double casesPerMs = histogramData.getLocalMaximum() / histogramData.getLogTimeInMsPerLocalBucket();
-		g.drawString(ResourceTimeUtils.getTimePerUnitString(casesPerMs, "executions"), offsetX + 1,
+		g.drawString("🠕 " + ResourceTimeUtils.getTimePerUnitString(casesPerMs, "executions"), offsetX + 1,
 				offsetY + popupHistogramYPadding - 1);
 
 		//text bottom
-		g.drawString("0" + ResourceTimeUtils.getTimeUnitWithoutMeasure(casesPerMs, "executions"), offsetX + 1,
+		g.drawString("🠕 0" + ResourceTimeUtils.getTimeUnitWithoutMeasure(casesPerMs, "executions"), offsetX + 1,
+				offsetY + popupHistogramHeight);
+		String logTime = "log time 🠖";
+		FontMetrics fontMetrics = g.getFontMetrics();
+		g.drawString(logTime, offsetX + popupWidth - 1 - fontMetrics.stringWidth(logTime),
 				offsetY + popupHistogramHeight);
 
 		//histogram itself
