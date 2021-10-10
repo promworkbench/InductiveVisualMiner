@@ -153,7 +153,7 @@ public class InductiveVisualMinerSelectionColourer {
 		//recolour the polygon
 		Color fillColour;
 		Color fontColour = Color.black;
-		if (cardinality.getB() != 0) {
+		if (cardinality.getB() >= 0) {
 			fillColour = visualisationParameters.getColourNodes().colour(cardinality.getB(), minCardinality,
 					maxCardinality);
 			if (ColourMaps.getLuma(fillColour) < 128) {
