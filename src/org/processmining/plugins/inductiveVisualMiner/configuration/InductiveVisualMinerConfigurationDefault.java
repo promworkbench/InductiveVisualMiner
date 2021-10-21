@@ -46,6 +46,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBloc
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplModelDeviationsLP;
+import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplModelDeviationsServiceLP;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplModelDeviationsTimeLP;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplModelLP;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
@@ -384,6 +385,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		return new ArrayList<>(Arrays.asList(new CostModelFactory[] { //
 				new CostModelFactoryImplModelLP(), //
 				new CostModelFactoryImplModelDeviationsLP(), //
+				new CostModelFactoryImplModelDeviationsServiceLP(), //
 				new CostModelFactoryImplModelDeviationsTimeLP(), //
 		}));
 	}
