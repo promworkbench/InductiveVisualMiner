@@ -107,6 +107,9 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 	 * @return
 	 */
 	public static <O> List<DataRow<O>> merge(List<DataRow<O>> a, List<DataRow<O>> b, IvMCanceller canceller) {
+		if (a == null || b == null) {
+			return null;
+		}
 		for (DataRow<O> dataRowA : a) {
 
 			if (canceller != null && canceller.isCancelled()) {
