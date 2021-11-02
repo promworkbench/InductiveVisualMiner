@@ -12,6 +12,7 @@ import java.awt.Transparency;
 import java.awt.geom.Ellipse2D;
 import java.util.Calendar;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderedFrameManager.RenderedFrame;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.opengleventlistener.OpenGLEventListener;
@@ -47,8 +48,21 @@ public class RendererFactory {
 	public RendererFactory() {
 		OpenGLEventListener eventListener = new OpenGLEventListenerImplInstancedFully();
 		//OpenGLEventListener eventListener = new OpenGLEventListenerImplBasic();
-		rendererOpenGL = new RendererImplOpenGL(eventListener);
-		openGLgotError = false;
+
+		/*
+		 * Mac has deprecated support for OpenGL and it might be removed soon.
+		 * Furthermore, there've been reports of ProM crashes. So, if we are on
+		 * Mac os X, do not use OpenGL.
+		 * 
+		 */
+		if (!SystemUtils.IS_OS_MAC_OSX) {
+			rendererOpenGL = new RendererImplOpenGL(eventListener);
+			openGLgotError = false;
+		} else {
+			rendererOpenGL = null;
+			openGLgotError = true;
+		}
+
 	}
 
 	/**
@@ -60,7 +74,7 @@ public class RendererFactory {
 	 * @return
 	 */
 	public boolean render(ExternalSettings settings, RenderedFrame result, double time) {
-		if (!openGLgotError) {
+		if (!openGLgotError || rendererOpenGL == null) {
 			try {
 				return rendererOpenGL.render(settings, result, time);
 			} catch (Exception e) {
