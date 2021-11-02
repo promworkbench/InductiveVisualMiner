@@ -96,9 +96,9 @@ public class EfficientTree2CausalGraph {
 				}
 			}
 		} else if (tree.isLoop(node)) {
-			//for loop, we need to recurse on unfoldings up to a certain length k
+
+			//unfold and recurse the children's choices
 			for (int j = 0; j < k[node]; j++) {
-				//unfold anc recurse the children's choices
 				TIntArrayList childIds = new TIntArrayList(ids);
 				childIds.add(node);
 				childIds.add(j);
