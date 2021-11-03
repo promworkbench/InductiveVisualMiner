@@ -187,6 +187,7 @@ public class InductiveVisualMinerController {
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() instanceof IvMModel) {
 					chain.setObject(IvMObject.model, (IvMModel) e.getSource());
+					chain.setObject(IvMObject.selected_model_selection, new Selection());
 				}
 			}
 		});
@@ -1317,7 +1318,6 @@ public class InductiveVisualMinerController {
 						panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).get(keyStroke));
 			}
 
-			
 			for (Object key : panel.getActionMap().allKeys()) {
 				sideWindow.getRootPane().getActionMap().put(key, panel.getActionMap().get(key));
 			}

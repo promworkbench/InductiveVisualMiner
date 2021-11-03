@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
@@ -37,7 +38,9 @@ public class RowBlockCausal<C, P> extends DataRowBlockComputer<Object, C, P> {
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		if (model.isTree()) {
-			EfficientTree2CausalGraph.convert(model.getTree(), logInfo);
+			Dot dot = EfficientTree2CausalGraph.convert(model.getTree(), logInfo);
+			
+			System.out.println(dot);
 		} else {
 			result.add(new DataRow<>(DisplayType.literal("only trees supported")));
 		}

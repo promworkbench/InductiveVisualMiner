@@ -108,7 +108,7 @@ public class EfficientTree2CausalGraph {
 				}
 			}
 
-			//second, add all dependencies between the choices of children resulting from unfoldings
+			//second, add dependencies between unfoldings
 			{
 				//loop-loop
 				for (int jA = 0; jA < k[node] - 1; jA++) {
@@ -120,7 +120,7 @@ public class EfficientTree2CausalGraph {
 				}
 
 				//loop-node
-				for (int jA = 0; jA < k[node] - 1; jA++) {
+				for (int jA = 0; jA < k[node]; jA++) {
 					Choice choiceA = getLoopChoice(tree, node, ids, jA);
 					for (int jB = jA + 1; jB < k[node]; jB++) {
 						for (int childB : tree.getChildren(node)) {
@@ -137,7 +137,8 @@ public class EfficientTree2CausalGraph {
 
 				//node-loop
 				for (int jA = 0; jA < k[node] - 1; jA++) {
-					for (int childA : tree.getChildren(node)) {
+					for (int numberOfChild = 0; numberOfChild <= 1; numberOfChild++) {
+						int childA = tree.getChild(node, numberOfChild);
 						TIntArrayList childIdsA = new TIntArrayList(ids);
 						childIdsA.add(node);
 						childIdsA.add(jA);
@@ -155,7 +156,8 @@ public class EfficientTree2CausalGraph {
 
 				//node-node
 				for (int jA = 0; jA < k[node] - 1; jA++) {
-					for (int childA : tree.getChildren(node)) {
+					for (int numberOfChild = 0; numberOfChild <= 1; numberOfChild++) {
+						int childA = tree.getChild(node, numberOfChild);
 						TIntArrayList childIdsA = new TIntArrayList(ids);
 						childIdsA.add(node);
 						childIdsA.add(jA);
@@ -176,94 +178,94 @@ public class EfficientTree2CausalGraph {
 						}
 					}
 				}
+			}
 
-				//interal-internal
-				{
-					//body-choice
-					for (int j = 0; j < k[node]; j++) {
-						TIntArrayList childIdsA = new TIntArrayList(ids);
-						childIdsA.add(node);
-						childIdsA.add(j);
+			//interal-internal
+			{
+				//body-choice
+				for (int j = 0; j < k[node]; j++) {
+					TIntArrayList childIdsA = new TIntArrayList(ids);
+					childIdsA.add(node);
+					childIdsA.add(j);
 
-						int childA = tree.getChild(node, 0);
-						List<Choice> choicesChildA = getChoices(tree, childA, childIdsA, k);
+					int childA = tree.getChild(node, 0);
+					List<Choice> choicesChildA = getChoices(tree, childA, childIdsA, k);
 
-						Choice choiceB = getLoopChoice(tree, node, ids, j);
-						for (Choice choiceA : choicesChildA) {
-							dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
-						}
+					Choice choiceB = getLoopChoice(tree, node, ids, j);
+					for (Choice choiceA : choicesChildA) {
+						dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
 					}
+				}
 
-					//body-redo
-					for (int j = 0; j < k[node]; j++) {
-						TIntArrayList childIdsA = new TIntArrayList(ids);
-						childIdsA.add(node);
-						childIdsA.add(j);
-						int childA = tree.getChild(node, 0);
-						List<Choice> choicesChildA = getChoices(tree, childA, childIdsA, k);
+				//body-redo
+				for (int j = 0; j < k[node]; j++) {
+					TIntArrayList childIdsA = new TIntArrayList(ids);
+					childIdsA.add(node);
+					childIdsA.add(j);
+					int childA = tree.getChild(node, 0);
+					List<Choice> choicesChildA = getChoices(tree, childA, childIdsA, k);
 
-						TIntArrayList childIdsB = new TIntArrayList(ids);
-						childIdsB.add(node);
-						childIdsB.add(j);
-						int childB = tree.getChild(node, 1);
-						List<Choice> choicesChildB = getChoices(tree, childB, childIdsB, k);
+					TIntArrayList childIdsB = new TIntArrayList(ids);
+					childIdsB.add(node);
+					childIdsB.add(j);
+					int childB = tree.getChild(node, 1);
+					List<Choice> choicesChildB = getChoices(tree, childB, childIdsB, k);
 
-						for (Choice choiceA : choicesChildA) {
-							for (Choice choiceB : choicesChildB) {
-								dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
-							}
-						}
-					}
-
-					//body-exit
-					for (int j = 0; j < k[node]; j++) {
-						TIntArrayList childIdsA = new TIntArrayList(ids);
-						childIdsA.add(node);
-						childIdsA.add(j);
-						int childA = tree.getChild(node, 0);
-						List<Choice> choicesChildA = getChoices(tree, childA, childIdsA, k);
-
-						TIntArrayList childIdsB = new TIntArrayList(ids);
-						childIdsB.add(node);
-						childIdsB.add(j);
-						int childB = tree.getChild(node, 2);
-						List<Choice> choicesChildB = getChoices(tree, childB, childIdsB, k);
-
-						for (Choice choiceA : choicesChildA) {
-							for (Choice choiceB : choicesChildB) {
-								dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
-							}
-						}
-					}
-
-					//choice-redo
-					for (int j = 0; j < k[node]; j++) {
-						Choice choiceA = getLoopChoice(tree, node, ids, j);
-
-						TIntArrayList childIdsB = new TIntArrayList(ids);
-						childIdsB.add(node);
-						childIdsB.add(j);
-						int childB = tree.getChild(node, 1);
-						List<Choice> choicesChildB = getChoices(tree, childB, childIdsB, k);
-
+					for (Choice choiceA : choicesChildA) {
 						for (Choice choiceB : choicesChildB) {
 							dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
 						}
 					}
+				}
 
-					//choice-exit
-					for (int j = 0; j < k[node]; j++) {
-						Choice choiceA = getLoopChoice(tree, node, ids, j);
+				//body-exit
+				for (int j = 0; j < k[node]; j++) {
+					TIntArrayList childIdsA = new TIntArrayList(ids);
+					childIdsA.add(node);
+					childIdsA.add(j);
+					int childA = tree.getChild(node, 0);
+					List<Choice> choicesChildA = getChoices(tree, childA, childIdsA, k);
 
-						TIntArrayList childIdsB = new TIntArrayList(ids);
-						childIdsB.add(node);
-						childIdsB.add(j);
-						int childB = tree.getChild(node, 2);
-						List<Choice> choicesChildB = getChoices(tree, childB, childIdsB, k);
+					TIntArrayList childIdsB = new TIntArrayList(ids);
+					childIdsB.add(node);
+					childIdsB.add(j);
+					int childB = tree.getChild(node, 2);
+					List<Choice> choicesChildB = getChoices(tree, childB, childIdsB, k);
 
+					for (Choice choiceA : choicesChildA) {
 						for (Choice choiceB : choicesChildB) {
 							dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
 						}
+					}
+				}
+
+				//choice-redo
+				for (int j = 0; j < k[node]; j++) {
+					Choice choiceA = getLoopChoice(tree, node, ids, j);
+
+					TIntArrayList childIdsB = new TIntArrayList(ids);
+					childIdsB.add(node);
+					childIdsB.add(j);
+					int childB = tree.getChild(node, 1);
+					List<Choice> choicesChildB = getChoices(tree, childB, childIdsB, k);
+
+					for (Choice choiceB : choicesChildB) {
+						dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
+					}
+				}
+
+				//choice-exit
+				for (int j = 0; j < k[node]; j++) {
+					Choice choiceA = getLoopChoice(tree, node, ids, j);
+
+					TIntArrayList childIdsB = new TIntArrayList(ids);
+					childIdsB.add(node);
+					childIdsB.add(j);
+					int childB = tree.getChild(node, 2);
+					List<Choice> choicesChildB = getChoices(tree, childB, childIdsB, k);
+
+					for (Choice choiceB : choicesChildB) {
+						dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
 					}
 				}
 			}
