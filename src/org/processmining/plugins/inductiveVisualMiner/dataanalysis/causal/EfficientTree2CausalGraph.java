@@ -7,14 +7,14 @@ import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotNode;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
 
 public class EfficientTree2CausalGraph {
-	public static Dot convert(EfficientTree tree, IvMLogInfo logInfo) {
+	public static Dot convert(EfficientTree tree, IvMLogFiltered log) {
 		//first, figure out how often each node was maximally executed in a trace in the log
 		int[] k = new int[tree.getMaxNumberOfNodes()];
 		for (int node : EfficientTreeUtils.getAllNodes(tree)) {
@@ -33,6 +33,9 @@ public class EfficientTree2CausalGraph {
 
 		//create dot edges
 		getGraph(result, tree, tree.getRoot(), new TIntArrayList(), k, choice2dotNode);
+
+		//create table
+		CausalDataTable table = new CausalDataTable(tree, log, choices);
 
 		return result;
 	}
@@ -324,18 +327,22 @@ public class EfficientTree2CausalGraph {
 		return result;
 	}
 
-	private static Choice getLoopChoice(EfficientTree tree, int node, TIntList ids, int j) {
+	public static Choice getLoopChoice(EfficientTree tree, int node, TIntList ids, int j) {
 		TIntArrayList childIds = new TIntArrayList(ids);
 		childIds.add(node);
 		childIds.add(j);
+		return getLoopChoice(tree, node, childIds);
+	}
+
+	public static Choice getLoopChoice(EfficientTree tree, int node, TIntList ids) {
 		Choice choice = new Choice();
 		choice.nodes.add(tree.getChild(node, 1));
 		choice.nodes.add(tree.getChild(node, 2));
-		choice.ids.addAll(childIds);
+		choice.ids.addAll(ids);
 		return choice;
 	}
 
-	private static Choice getXorChoice(EfficientTree tree, int node, TIntList ids) {
+	public static Choice getXorChoice(EfficientTree tree, int node, TIntList ids) {
 		//an xor actually adds a choice
 		Choice choice = new Choice();
 		for (int child : tree.getChildren(node)) {

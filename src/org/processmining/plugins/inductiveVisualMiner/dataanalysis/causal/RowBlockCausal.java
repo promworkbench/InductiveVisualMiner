@@ -38,8 +38,8 @@ public class RowBlockCausal<C, P> extends DataRowBlockComputer<Object, C, P> {
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		if (model.isTree()) {
-			Dot dot = EfficientTree2CausalGraph.convert(model.getTree(), logInfo);
-			
+			Dot dot = EfficientTree2CausalGraph.convert(model.getTree(), logFiltered);
+
 			System.out.println(dot);
 		} else {
 			result.add(new DataRow<>(DisplayType.literal("only trees supported")));
