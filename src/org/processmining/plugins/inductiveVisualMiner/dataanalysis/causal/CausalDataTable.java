@@ -111,7 +111,7 @@ public class CausalDataTable {
 			Arrays.fill(currentRow, -1);
 
 			IvMTrace trace = it.next();
-			System.out.println(trace);
+			//			System.out.println(trace);
 			walker.walk(tree, trace);
 
 			rows.add(currentRow);
