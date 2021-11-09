@@ -328,8 +328,10 @@ public class EfficientTree2CausalGraph {
 				}
 			}
 
-			result.addAll(getOrChoices(tree, node, ids, true));
-			result.addAll(getOrChoices(tree, node, ids, false));
+			for (int child : tree.getChildren(node)) {
+				result.add(getOrChoice(tree, node, ids, true, child));
+				result.add(getOrChoice(tree, node, ids, false, child));
+			}
 		} else {
 			for (int child : tree.getChildren(node)) {
 				result.addAll(getChoices(tree, child, ids, k));
@@ -347,20 +349,14 @@ public class EfficientTree2CausalGraph {
 		return result;
 	}
 
-	public static List<Choice> getOrChoices(EfficientTree tree, int node, TIntList ids, boolean first) {
-		List<Choice> result = new ArrayList<>();
-		for (int child : tree.getChildren(node)) {
-			for (int j = 0; j < 2; j++) {
-				Choice choice = new Choice();
-				choice.nodes.add(child);
-				TIntArrayList childIds = new TIntArrayList(ids);
-				childIds.add(node);
-				childIds.add(first ? 0 : 1);
-				choice.ids.addAll(childIds);
-				result.add(choice);
-			}
-		}
-		return result;
+	public static Choice getOrChoice(EfficientTree tree, int node, TIntList ids, boolean first, int child) {
+		Choice choice = new Choice();
+		choice.nodes.add(child);
+		TIntArrayList childIds = new TIntArrayList(ids);
+		childIds.add(node);
+		childIds.add(first ? 0 : 1);
+		choice.ids.addAll(childIds);
+		return choice;
 	}
 
 	public static Choice getLoopChoice(EfficientTree tree, int node, TIntList ids, int j) {
