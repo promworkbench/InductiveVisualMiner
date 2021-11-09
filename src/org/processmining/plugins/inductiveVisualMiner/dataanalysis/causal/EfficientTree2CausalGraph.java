@@ -48,7 +48,7 @@ public class EfficientTree2CausalGraph {
 
 		assert tree.isOperator(node);
 
-		if (tree.isConcurrent(node) || tree.isInterleaved(node) || tree.isOr(node)) {
+		if (tree.isConcurrent(node) || tree.isInterleaved(node)) {
 			//simply recurse
 			for (int child : tree.getChildren(node)) {
 				getGraph(dot, tree, child, ids, k, choice2dotNode);
@@ -67,6 +67,7 @@ public class EfficientTree2CausalGraph {
 
 				for (Choice choiceB : choicesChildB) {
 					DotNode dotNodeB = choice2dotNode.get(choiceB);
+					assert dotNodeA != null && dotNodeB != null;
 					dot.addEdge(dotNodeA, dotNodeB);
 				}
 			}
@@ -92,12 +93,25 @@ public class EfficientTree2CausalGraph {
 							for (Choice choiceB : choicesChildB) {
 								DotNode dotNodeA = choice2dotNode.get(choiceA);
 								DotNode dotNodeB = choice2dotNode.get(choiceB);
+								assert dotNodeA != null && dotNodeB != null;
 								dot.addEdge(dotNodeA, dotNodeB);
 							}
 						}
 					}
 				}
 			}
+		} else if (tree.isOr(node)) {
+
+			//recurse on the children's choices (for both the first-child and non-first child)
+			for (int j = 0; j < 2; j++) {
+				for (int child : tree.getChildren(node)) {
+					TIntArrayList childIds = new TIntArrayList(ids);
+					childIds.add(node);
+					childIds.add(j);
+					getGraph(dot, tree, child, childIds, k, choice2dotNode);
+				}
+			}
+
 		} else if (tree.isLoop(node)) {
 
 			//unfold and recurse the children's choices
@@ -302,6 +316,20 @@ public class EfficientTree2CausalGraph {
 				Choice choice = getLoopChoice(tree, node, ids, j);
 				result.add(choice);
 			}
+		} else if (tree.isOr(node)) {
+			//for the or, there's an individual choice to do every child, for a first and non-first choice
+			for (int child : tree.getChildren(node)) {
+				//recurse on children
+				for (int j = 0; j < 2; j++) {
+					TIntArrayList childIds = new TIntArrayList(ids);
+					childIds.add(node);
+					childIds.add(j);
+					result.addAll(getChoices(tree, child, childIds, k));
+				}
+			}
+
+			result.addAll(getOrChoices(tree, node, ids, true));
+			result.addAll(getOrChoices(tree, node, ids, false));
 		} else {
 			for (int child : tree.getChildren(node)) {
 				result.addAll(getChoices(tree, child, ids, k));
@@ -310,20 +338,28 @@ public class EfficientTree2CausalGraph {
 			if (tree.isXor(node)) {
 				Choice choice = getXorChoice(tree, node, ids);
 				result.add(choice);
-			} else if (tree.isOr(node)) {
-				//for the or, there's an individual choice to do every child
-				for (int child : tree.getChildren(node)) {
-					Choice choice = new Choice();
-					choice.nodes.add(child);
-					choice.ids.addAll(ids);
-					result.add(choice);
-				}
 			} else {
 				//the other operators add no choices
 
 			}
 		}
 
+		return result;
+	}
+
+	public static List<Choice> getOrChoices(EfficientTree tree, int node, TIntList ids, boolean first) {
+		List<Choice> result = new ArrayList<>();
+		for (int child : tree.getChildren(node)) {
+			for (int j = 0; j < 2; j++) {
+				Choice choice = new Choice();
+				choice.nodes.add(child);
+				TIntArrayList childIds = new TIntArrayList(ids);
+				childIds.add(node);
+				childIds.add(first ? 0 : 1);
+				choice.ids.addAll(childIds);
+				result.add(choice);
+			}
+		}
 		return result;
 	}
 

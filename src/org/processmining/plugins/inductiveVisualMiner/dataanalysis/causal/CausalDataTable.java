@@ -26,7 +26,7 @@ public class CausalDataTable {
 	private EfficientTree tree;
 	private final EfficientTreeWalk walker;
 	private int[] currentRow;
-	private int[] j;
+	private int[] j; //for loop nodes: the number of unfoldings
 	private TObjectIntMap<Choice> choice2column;
 
 	public CausalDataTable(final EfficientTree tree, final IvMLogFiltered log, final List<Choice> choices) {
@@ -72,6 +72,8 @@ public class CausalDataTable {
 							Choice choice = EfficientTree2CausalGraph.getLoopChoice(tree, parent, createIds(node));
 							reportChoice(choice, node);
 						}
+					} else if (tree.isOr(node)) {
+						//TODO
 					}
 				}
 			}
@@ -96,7 +98,38 @@ public class CausalDataTable {
 						}
 					}
 				} else if (tree.isOr(node)) {
-					//TODO
+					/**
+					 * For or, find the first node executed, as well as all
+					 * children that have been executed.
+					 */
+					int firstChild = -1;
+					boolean[] childrenExecuted = new boolean[tree.getMaxNumberOfNodes()];
+					for (int eventIndex = startEventIndex; eventIndex <= lastEventIndex; eventIndex++) {
+						IvMMove move = trace.get(eventIndex);
+						if (move.isModelSync()) {
+							int child = EfficientTreeUtils.getChildWith(tree, node, move.getTreeNode());
+							if (child != -1) {
+								if (firstChild == -1) {
+									firstChild = child;
+								}
+
+								childrenExecuted[child] = true;
+							}
+						}
+					}
+
+					//second, report the appropriate choices
+					for (int child : tree.getChildren(node)) {
+						if (firstChild == child) {
+							//TODO
+//							Choice choice = EfficientTree2CausalGraph.getOrChoice(tree, node, createIds(node), true,
+//									child);
+//							reportChoice(choice, child);
+						} else {
+							//TODO
+						}
+					}
+
 				} else if (tree.isLoop(node)) {
 					//a loop node is done; reset the unfoldings
 					j[node] = -1;
@@ -139,9 +172,22 @@ public class CausalDataTable {
 		TIntArrayList result = new TIntArrayList();
 		int parent = tree.getRoot();
 		while (parent != -1) {
-			if (j[parent] >= 0) {
-				result.add(parent);
-				result.add(j[parent]);
+			if (tree.isLoop(parent)) {
+				if (j[parent] >= 0) {
+					result.add(parent);
+					result.add(j[parent]);
+				}
+			} else if (tree.isOr(parent)) {
+				int child = EfficientTreeUtils.getChildWith(tree, parent, node);
+				if (j[parent] >= 0) {
+					if (j[parent] == child) {
+						result.add(parent);
+						result.add(0);
+					} else {
+						result.add(parent);
+						result.add(1);
+					}
+				}
 			}
 			parent = EfficientTreeUtils.getChildWith(tree, parent, node);
 		}
