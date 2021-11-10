@@ -72,7 +72,7 @@ public class CausalDataTable {
 							Choice choice = EfficientTree2CausalGraph.getLoopChoice(tree, parent, createIds(node));
 							reportChoice(choice, node);
 						}
-					} else if (tree.isOr(node)) {
+					} else if (tree.isOr(parent)) {
 						//we entered an or node, so the child we're now executing is the first executed child 
 						int childNumber = EfficientTreeUtils.getChildNumberWith(tree, parent, node);
 						j[parent] = childNumber;
@@ -164,7 +164,7 @@ public class CausalDataTable {
 	}
 
 	private void reportChoice(Choice choice, int chosenNode) {
-		assert choice.nodes.contains(chosenNode);
+		assert choice.nodes.contains(chosenNode) || (choice.nodes.size() == 1 && chosenNode == 0);
 
 		int columnNumber = choice2column.get(choice);
 		if (columnNumber >= 0) {
@@ -207,8 +207,7 @@ public class CausalDataTable {
 		return result;
 	}
 
-	@Override
-	public String toString() {
+	public String toString(int limit) {
 		StringBuilder result = new StringBuilder();
 
 		//header
@@ -221,18 +220,25 @@ public class CausalDataTable {
 		result.append("\n");
 
 		//data
-		int count = 10;
-		for (int i = 0; i < count && i < rows.size(); i++) {
+		if (limit < 0) {
+			limit = Integer.MAX_VALUE;
+		}
+		for (int i = 0; i < limit && i < rows.size(); i++) {
 			for (int j = 0; j < columns.size(); j++) {
 				result.append(rows.get(i)[j]);
 				if (j < columns.size() - 1) {
 					result.append(",");
 				}
 			}
-			if (i < count - 1 && i < rows.size() - 1) {
+			if (i < limit - 1 && i < rows.size() - 1) {
 				result.append("\n");
 			}
 		}
 		return result.toString();
+	}
+
+	@Override
+	public String toString() {
+		return toString(10);
 	}
 }

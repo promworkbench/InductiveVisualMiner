@@ -1,8 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -21,26 +24,42 @@ public class EfficientTree2CausalGraph {
 			k[node] = 5;
 		}
 
-		Dot result = new Dot();
+		Dot dot = new Dot();
 
 		//create dot nodes
 		THashMap<Choice, DotNode> choice2dotNode = new THashMap<>();
 		List<Choice> choices = getChoices(tree, tree.getRoot(), new TIntArrayList(), k);
 		for (Choice choice : choices) {
-			DotNode dotNode = result.addNode(choice.getId());
+			DotNode dotNode = dot.addNode(choice.getId());
 			choice2dotNode.put(choice, dotNode);
 		}
 
 		//create dot edges
-		getGraph(result, tree, tree.getRoot(), new TIntArrayList(), k, choice2dotNode);
+		createEdges(dot, tree, tree.getRoot(), new TIntArrayList(), k, choice2dotNode);
+
+		try {
+			FileUtils.writeStringToFile(
+					new File("/home/sander/Documents/svn/49 - causality in process mining - niek/bpic12a.dot"),
+					dot.toString());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
 		//create table
 		CausalDataTable table = new CausalDataTable(tree, log, choices);
 
-		return result;
+		try {
+			FileUtils.writeStringToFile(
+					new File("/home/sander/Documents/svn/49 - causality in process mining - niek/bpic12a.csv"),
+					table.toString(-1));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return dot;
 	}
 
-	public static void getGraph(Dot dot, EfficientTree tree, int node, TIntList ids, int[] k,
+	public static void createEdges(Dot dot, EfficientTree tree, int node, TIntList ids, int[] k,
 			THashMap<Choice, DotNode> choice2dotNode) {
 		if (tree.isActivity(node) || tree.isTau(node)) {
 			return;
@@ -51,12 +70,12 @@ public class EfficientTree2CausalGraph {
 		if (tree.isConcurrent(node) || tree.isInterleaved(node)) {
 			//simply recurse
 			for (int child : tree.getChildren(node)) {
-				getGraph(dot, tree, child, ids, k, choice2dotNode);
+				createEdges(dot, tree, child, ids, k, choice2dotNode);
 			}
 		} else if (tree.isXor(node)) {
 			//first simply recurse
 			for (int child : tree.getChildren(node)) {
-				getGraph(dot, tree, child, ids, k, choice2dotNode);
+				createEdges(dot, tree, child, ids, k, choice2dotNode);
 			}
 
 			//for xor, the choices of the children depend on the choice made in the xor (with a 1 causality, but it is a causal relation)
@@ -75,7 +94,7 @@ public class EfficientTree2CausalGraph {
 		} else if (tree.isSequence(node)) {
 			//first simply recurse
 			for (int child : tree.getChildren(node)) {
-				getGraph(dot, tree, child, ids, k, choice2dotNode);
+				createEdges(dot, tree, child, ids, k, choice2dotNode);
 			}
 
 			//for sequence, every choice depends on all choices before it
@@ -108,11 +127,108 @@ public class EfficientTree2CausalGraph {
 					TIntArrayList childIds = new TIntArrayList(ids);
 					childIds.add(node);
 					childIds.add(j);
-					getGraph(dot, tree, child, childIds, k, choice2dotNode);
+					createEdges(dot, tree, child, childIds, k, choice2dotNode);
 				}
 			}
 
-		} else if (tree.isLoop(node)) {
+			//for or, the choices of the first child are mutually exclusive, so not connected.
+
+			//for or, the choices of the non-first children are independent, so not connected.
+
+			/**
+			 * The choice for the first child may influence the choices within
+			 * the first child.
+			 */
+			for (int childA : tree.getChildren(node)) {
+				TIntArrayList childIdsA = new TIntArrayList(ids);
+				childIdsA.add(node);
+				childIdsA.add(0);
+				List<Choice> choicesChildA = getChoices(tree, childA, childIdsA, k);
+
+				for (int childB : tree.getChildren(node)) {
+					if (childA != childB) {
+						TIntArrayList childIdsB = new TIntArrayList(ids);
+						childIdsB.add(node);
+						childIdsB.add(1);
+						List<Choice> choicesChildB = getChoices(tree, childA, childIdsB, k);
+
+						for (Choice choiceA : choicesChildA) {
+							for (Choice choiceB : choicesChildB) {
+								DotNode dotNodeA = choice2dotNode.get(choiceA);
+								DotNode dotNodeB = choice2dotNode.get(choiceB);
+								assert dotNodeA != null && dotNodeB != null;
+								dot.addEdge(dotNodeA, dotNodeB);
+							}
+						}
+					}
+				}
+			}
+
+			/**
+			 * The choice for a first child may influence the choices within all
+			 * first and non-first children (including itself).
+			 */
+			for (int childA : tree.getChildren(node)) {
+				Choice choiceA = getOrChoice(tree, node, ids, true, childA);
+				DotNode dotNodeA = choice2dotNode.get(choiceA);
+
+				for (int childB : tree.getChildren(node)) {
+
+					TIntArrayList childIdsB = new TIntArrayList(ids);
+					childIdsB.add(node);
+					childIdsB.add(1);
+					List<Choice> choicesChildB = getChoices(tree, childB, childIdsB, k);
+
+					for (Choice choiceB : choicesChildB) {
+						DotNode dotNodeB = choice2dotNode.get(choiceB);
+						assert dotNodeA != null && dotNodeB != null;
+						dot.addEdge(dotNodeA, dotNodeB);
+					}
+				}
+			}
+
+			/**
+			 * The choice for a first child may influence the choices for all
+			 * non-first children (excluding itself, as that's mutually
+			 * exclusive).
+			 */
+			for (int childA : tree.getChildren(node)) {
+				Choice choiceA = getOrChoice(tree, node, ids, true, childA);
+				DotNode dotNodeA = choice2dotNode.get(choiceA);
+
+				for (int childB : tree.getChildren(node)) {
+					if (childA != childB) {
+						Choice choiceB = getOrChoice(tree, node, ids, false, childB);
+						DotNode dotNodeB = choice2dotNode.get(choiceB);
+						assert dotNodeA != null && dotNodeB != null;
+						dot.addEdge(dotNodeA, dotNodeB);
+					}
+				}
+			}
+
+			/**
+			 * The choice for a non-first child may influence the choices within
+			 * that child.
+			 */
+			for (int childA : tree.getChildren(node)) {
+				Choice choiceA = getOrChoice(tree, node, ids, false, childA);
+				DotNode dotNodeA = choice2dotNode.get(choiceA);
+
+				TIntArrayList childIdsB = new TIntArrayList(ids);
+				childIdsB.add(node);
+				childIdsB.add(1);
+				List<Choice> choicesChildB = getChoices(tree, childA, childIdsB, k);
+
+				for (Choice choiceB : choicesChildB) {
+					DotNode dotNodeB = choice2dotNode.get(choiceB);
+					assert dotNodeA != null && dotNodeB != null;
+					dot.addEdge(dotNodeA, dotNodeB);
+				}
+			}
+
+		} else if (tree.isLoop(node))
+
+		{
 
 			//unfold and recurse the children's choices
 			for (int j = 0; j < k[node]; j++) {
@@ -121,7 +237,7 @@ public class EfficientTree2CausalGraph {
 				childIds.add(j);
 
 				for (int child : tree.getChildren(node)) {
-					getGraph(dot, tree, child, childIds, k, choice2dotNode);
+					createEdges(dot, tree, child, childIds, k, choice2dotNode);
 				}
 			}
 
