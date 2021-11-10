@@ -140,33 +140,24 @@ public class EfficientTree2CausalGraph {
 			 * the first child.
 			 */
 			for (int childA : tree.getChildren(node)) {
-				TIntArrayList childIdsA = new TIntArrayList(ids);
-				childIdsA.add(node);
-				childIdsA.add(0);
-				List<Choice> choicesChildA = getChoices(tree, childA, childIdsA, k);
+				Choice choiceA = getOrChoice(tree, node, ids, true, childA);
+				DotNode dotNodeA = choice2dotNode.get(choiceA);
 
-				for (int childB : tree.getChildren(node)) {
-					if (childA != childB) {
-						TIntArrayList childIdsB = new TIntArrayList(ids);
-						childIdsB.add(node);
-						childIdsB.add(1);
-						List<Choice> choicesChildB = getChoices(tree, childA, childIdsB, k);
+				TIntArrayList childIdsB = new TIntArrayList(ids);
+				childIdsB.add(node);
+				childIdsB.add(0);
+				List<Choice> choicesChildB = getChoices(tree, childA, childIdsB, k);
 
-						for (Choice choiceA : choicesChildA) {
-							for (Choice choiceB : choicesChildB) {
-								DotNode dotNodeA = choice2dotNode.get(choiceA);
-								DotNode dotNodeB = choice2dotNode.get(choiceB);
-								assert dotNodeA != null && dotNodeB != null;
-								dot.addEdge(dotNodeA, dotNodeB);
-							}
-						}
-					}
+				for (Choice choiceB : choicesChildB) {
+					DotNode dotNodeB = choice2dotNode.get(choiceB);
+					assert dotNodeA != null && dotNodeB != null;
+					dot.addEdge(dotNodeA, dotNodeB);
 				}
 			}
 
 			/**
-			 * The choice for a first child may influence the choices within all
-			 * first and non-first children (including itself).
+			 * The choice for a first child may influence the choices for
+			 * non-first children.
 			 */
 			for (int childA : tree.getChildren(node)) {
 				Choice choiceA = getOrChoice(tree, node, ids, true, childA);
