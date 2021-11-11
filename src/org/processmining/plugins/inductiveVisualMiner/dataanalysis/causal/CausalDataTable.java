@@ -26,7 +26,7 @@ public class CausalDataTable {
 	private EfficientTree tree;
 	private final EfficientTreeWalk walker;
 	private int[] currentRow;
-	private int[] j; //for loop nodes: the number of unfoldings; for or: the index of the first child executed
+	private int[] j; //for loop nodes: the number of unfoldings;
 	private TObjectIntMap<Choice> choice2column;
 
 	public CausalDataTable(final EfficientTree tree, final IvMLogFiltered log, final List<Choice> choices) {
@@ -65,17 +65,13 @@ public class CausalDataTable {
 							j[parent]++;
 						} else if (childNumber == 1) {
 							//if we entered the redo (=second) child of a loop, then we made a choice to do that redo
-							Choice choice = EfficientTree2CausalGraph.getLoopChoice(tree, parent, createIds(node));
+							Choice choice = EfficientTree2Choices.getLoopChoice(tree, parent, createIds(node));
 							reportChoice(choice, node);
 						} else if (childNumber == 2) {
 							//if we entered the exit (=third) child of a loop, then we made a choice to exit the loop
-							Choice choice = EfficientTree2CausalGraph.getLoopChoice(tree, parent, createIds(node));
+							Choice choice = EfficientTree2Choices.getLoopChoice(tree, parent, createIds(node));
 							reportChoice(choice, node);
 						}
-					} else if (tree.isOr(parent)) {
-						//we entered an or node, so the child we're now executing is the first executed child 
-						int childNumber = EfficientTreeUtils.getChildNumberWith(tree, parent, node);
-						j[parent] = childNumber;
 					}
 				}
 			}
@@ -93,7 +89,7 @@ public class CausalDataTable {
 							int child = EfficientTreeUtils.getChildWith(tree, node, move.getTreeNode());
 							if (child != -1) {
 								//we found which child was executed for this xor
-								Choice choice = EfficientTree2CausalGraph.getXorChoice(tree, node, createIds(node));
+								Choice choice = EfficientTree2Choices.getXorChoice(tree, node, createIds(node));
 								reportChoice(choice, child);
 								return;
 							}
@@ -101,44 +97,43 @@ public class CausalDataTable {
 					}
 				} else if (tree.isOr(node)) {
 					/**
-					 * For or, find the children that have been executed.
+					 * For or, find the children that have been executed and the
+					 * first child that was executed.
 					 */
 					boolean[] childrenExecuted = new boolean[tree.getMaxNumberOfNodes()];
+					int firstChild = -1;
 					for (int eventIndex = startEventIndex; eventIndex <= lastEventIndex; eventIndex++) {
 						IvMMove move = trace.get(eventIndex);
 						if (move.isModelSync()) {
 							int child = EfficientTreeUtils.getChildWith(tree, node, move.getTreeNode());
 							if (child != -1) {
 								childrenExecuted[child] = true;
+
+								if (firstChild == -1) {
+									firstChild = child;
+								}
 							}
 						}
 					}
 
-					/*
-					 * At entering the node, we already set what the first
-					 * executed child was. Fetch and reset as we have left the
-					 * node.
-					 */
-					int firstChild = j[node];
-					j[node] = -1;
+					//report the choice for the first child
+					{
+						assert firstChild != -1;
+						Choice firstChoice = EfficientTree2Choices.getOrChoiceFirst(tree, node, createIds(node));
+						reportChoice(firstChoice, firstChild);
+					}
 
 					//second, report the appropriate choices
 					for (int child : tree.getChildren(node)) {
-						if (firstChild == child) {
-							//report that we chose this as a first node (as a non-first node, this is not applicable)
-							Choice choice = EfficientTree2CausalGraph.getOrChoice(tree, node, createIds(node), true,
-									child);
-							reportChoice(choice, child);
-						} else if (childrenExecuted[child]) {
-							//report that this child was executed as a non-first node
-							Choice choice = EfficientTree2CausalGraph.getOrChoice(tree, node, createIds(node), false,
-									child);
-							reportChoice(choice, child);
-						} else {
-							//this child was not executed, which is also a choice
-							Choice choice = EfficientTree2CausalGraph.getOrChoice(tree, node, createIds(node), true,
-									child);
-							reportChoice(choice, 0);
+						if (firstChild != child) {
+							Choice choice = EfficientTree2Choices.getOrChoiceSecond(tree, node, createIds(node), child);
+							if (childrenExecuted[child]) {
+								//report that this child was executed as a non-first node
+								reportChoice(choice, child);
+							} else {
+								//this child was not executed, which is also a choice
+								reportChoice(choice, 0);
+							}
 						}
 					}
 
