@@ -1,10 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTreeUtils;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.EfficientTreeWalk;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -20,15 +25,6 @@ public class EfficientTree2Choices {
 	 */
 	public static List<Choice> getChoices(EfficientTree tree, int[] k) {
 		return getChoices(tree, tree.getRoot(), new TIntArrayList(), k);
-	}
-
-	public static int[] createFixedK(EfficientTree tree, int value) {
-		//first, figure out how often each node was maximally executed in a trace in the log
-		int[] k = new int[tree.getMaxNumberOfNodes()];
-		for (int node : EfficientTreeUtils.getAllNodes(tree)) {
-			k[node] = value;
-		}
-		return k;
 	}
 
 	public static List<Choice> getChoices(EfficientTree tree, int node, TIntList ids, int[] k) {
@@ -127,5 +123,47 @@ public class EfficientTree2Choices {
 		}
 		choice.ids.addAll(ids);
 		return choice;
+	}
+
+	public static int[] createFixedK(EfficientTree tree, int value) {
+		//first, figure out how often each node was maximally executed in a trace in the log
+		int[] k = new int[tree.getMaxNumberOfNodes()];
+		for (int node : EfficientTreeUtils.getAllNodes(tree)) {
+			k[node] = value;
+		}
+		return k;
+	}
+
+	public static int[] createK(EfficientTree tree, IvMLogFiltered log) {
+		final int[] k = new int[tree.getMaxNumberOfNodes()];
+		final int[] l = new int[tree.getMaxNumberOfNodes()];
+
+		EfficientTreeWalk walk = new EfficientTreeWalk() {
+			public void nodeExecuted(IvMTrace trace, int node, int startEventIndex, int lastEventIndex) {
+				//if this node is the body child of a loop, then the loop has been executed.
+				if (node != tree.getRoot()) {
+					int parent = EfficientTreeUtils.getParent(tree, node);
+					if (tree.isLoop(parent) && EfficientTreeUtils.getChildNumberWith(tree, parent, node) == 0) {
+						l[parent]++;
+					}
+				}
+			}
+
+			public void nodeEntered(IvMTrace trace, int node, int eventIndex) {
+
+			}
+		};
+
+		for (Iterator<IvMTrace> it = log.iterator(); it.hasNext();) {
+			Arrays.fill(l, 0);
+
+			walk.walk(tree, it.next());
+
+			for (int i = 0; i < k.length; i++) {
+				k[i] = Math.max(k[i], l[i]);
+			}
+		}
+
+		return k;
 	}
 }

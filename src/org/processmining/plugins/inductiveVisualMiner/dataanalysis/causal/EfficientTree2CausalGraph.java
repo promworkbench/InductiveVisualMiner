@@ -10,6 +10,7 @@ import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
+import cern.colt.Arrays;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
@@ -18,7 +19,8 @@ public class EfficientTree2CausalGraph {
 	public static Dot convert(EfficientTree tree, IvMLogFiltered log) {
 
 		//get choices
-		int[] k = EfficientTree2Choices.createFixedK(tree, 5);
+		int[] k = EfficientTree2Choices.createK(tree, log);
+		System.out.println(Arrays.toString(k));
 		List<Choice> choices = EfficientTree2Choices.getChoices(tree, k);
 
 		Dot dot = new Dot();
