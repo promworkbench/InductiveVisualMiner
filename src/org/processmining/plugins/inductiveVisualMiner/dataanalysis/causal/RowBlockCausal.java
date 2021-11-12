@@ -42,6 +42,7 @@ public class RowBlockCausal<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 			System.out.println(dot);
 		} else {
+			DirectlyFollowsModel2Choices.getChoices(model.getDfg(), logFiltered);
 			result.add(new DataRow<>(DisplayType.literal("only trees supported")));
 		}
 
