@@ -35,7 +35,7 @@ public abstract class DirectlyFollowsModelWalk {
 		int eventNode = trace.get(firstEventIndex).getTreeNode();
 		int eventNodeLastSeen = firstEventIndex;
 
-		for (int i = eventNode + 1; i < trace.size(); i++) {
+		for (int i = firstEventIndex + 1; i < trace.size(); i++) {
 			IvMMove move2 = trace.get(i);
 			if (move2.isModelSync()) {
 				if (move2.getTreeNode() != eventNode) {

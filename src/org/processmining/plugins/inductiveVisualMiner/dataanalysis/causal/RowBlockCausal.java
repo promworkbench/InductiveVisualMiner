@@ -12,7 +12,6 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockC
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 
 public class RowBlockCausal<C, P> extends DataRowBlockComputer<Object, C, P> {
 
@@ -25,15 +24,13 @@ public class RowBlockCausal<C, P> extends DataRowBlockComputer<Object, C, P> {
 	}
 
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_info_filtered,
-				IvMObject.aligned_log_filtered, IvMObject.data_analyses_delay };
+		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered, IvMObject.data_analyses_delay };
 	}
 
 	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
 			throws Exception {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
-		IvMLogInfo logInfo = inputs.get(IvMObject.aligned_log_info_filtered);
 
 		List<DataRow<Object>> result = new ArrayList<>();
 

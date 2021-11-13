@@ -134,7 +134,7 @@ public class EfficientTree2Choices {
 		return k;
 	}
 
-	public static int[] createK(EfficientTree tree, IvMLogFiltered log) {
+	public static int[] createK(final EfficientTree tree, IvMLogFiltered log) {
 		final int[] k = new int[tree.getMaxNumberOfNodes()];
 		final int[] l = new int[tree.getMaxNumberOfNodes()];
 

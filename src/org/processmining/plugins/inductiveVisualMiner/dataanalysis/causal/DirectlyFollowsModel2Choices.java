@@ -21,12 +21,14 @@ public class DirectlyFollowsModel2Choices {
 	private int unfolding;
 	private Set<TIntList> stepsSeen;
 
-	public Collection<Choice> getChoices(DirectlyFollowsModel dfm, IvMLogFiltered log) {
+	public Collection<Choice> getChoices(final DirectlyFollowsModel dfm, IvMLogFiltered log) {
 		final TIntObjectMap<TIntList> node2steps = getNode2StepsMap(dfm);
 
 		DirectlyFollowsModelWalk walk = new DirectlyFollowsModelWalk() {
 			public void nodeExecuted(IvMTrace trace, int node, int startEventIndex, int lastEventIndex) {
-				if (currentChoice.ids.contains(node)) {
+				System.out.println(
+						" execute " + node + " " + dfm.getNodeOfIndex(node) + " towards choice " + currentChoice);
+				if (currentChoice.nodes.contains(node)) {
 					//this event is in the current choice, so it's a new choice
 					TIntList steps = node2steps.get(node);
 					if (stepsSeen.contains(steps)) {
@@ -34,9 +36,12 @@ public class DirectlyFollowsModel2Choices {
 						 * This is the second time this unfolding that we
 						 * encounter this steps. Move to the next unfolding.
 						 */
-						//unfol
+						unfolding++;
+						stepsSeen.clear();
 					}
 					Choice newChoice = getChoice(node2steps, node, unfolding);
+
+					System.out.println("  choice decided " + currentChoice + ", next choice " + newChoice);
 
 					currentChoice = newChoice;
 				}
@@ -57,7 +62,9 @@ public class DirectlyFollowsModel2Choices {
 			//trace starts with initial choice
 			stepsSeen = new THashSet<>();
 			unfolding = 0;
-			currentChoice = getChoice(node2steps, -1, 1);
+			currentChoice = getChoice(node2steps, -1, unfolding);
+
+			System.out.println("start trace with " + currentChoice);
 
 			walk.walk(dfm, trace);
 		}
