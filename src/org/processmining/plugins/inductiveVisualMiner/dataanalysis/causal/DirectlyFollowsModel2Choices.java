@@ -1,10 +1,12 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.DirectlyFollowsModelWalk;
+import org.processmining.plugins.InductiveMiner.MultiSet;
+import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.graphviz.dot.Dot;
+import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -13,46 +15,55 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
 
 public class DirectlyFollowsModel2Choices {
-	private Choice currentChoice;
-	private int unfolding;
-	private Set<TIntList> stepsSeen;
 
-	public Collection<Choice> getChoices(final DirectlyFollowsModel dfm, IvMLogFiltered log) {
+	public static Dot getChoices(final DirectlyFollowsModel dfm, IvMLogFiltered log) {
 		final TIntObjectMap<TIntList> node2steps = getNode2StepsMap(dfm);
+		final THashMap<Choice, DotNode> choice2dotNode = new THashMap<>();
+		final Dot dot = new Dot();
+		final THashSet<Pair<Choice, Choice>> edges = new THashSet<>();
+		final AtomicInteger unfolding = new AtomicInteger(0);
 
-		DirectlyFollowsModelWalk walk = new DirectlyFollowsModelWalk() {
-			public void nodeExecuted(IvMTrace trace, int node, int startEventIndex, int lastEventIndex) {
-				System.out.println(
-						" execute " + node + " " + dfm.getNodeOfIndex(node) + " towards choice " + currentChoice);
-				if (currentChoice.nodes.contains(node)) {
-					//this event is in the current choice, so it's a new choice
-					TIntList steps = node2steps.get(node);
-					if (stepsSeen.contains(steps)) {
-						/**
-						 * This is the second time this unfolding that we
-						 * encounter this steps. Move to the next unfolding.
-						 */
-						unfolding++;
-						stepsSeen.clear();
-					}
-					Choice newChoice = getChoice(node2steps, node, unfolding);
+		final TObjectIntMap<TIntList> steps2rank = getRank(dfm, node2steps, log);
 
-					System.out.println("  choice decided " + currentChoice + ", next choice " + newChoice);
+		DirectlyFollowsModelStepsWalk walk = new DirectlyFollowsModelStepsWalk(dfm, node2steps) {
+			public void stepsEncountered(TIntList steps, int chosenNode, TIntList nextSteps) {
+				Choice currentChoice = getChoice(steps, unfolding.get());
 
-					currentChoice = newChoice;
+				if (steps2rank.get(steps) >= steps2rank.get(nextSteps)) {
+					/**
+					 * This moves back in the ranking of the steps. Move to the
+					 * next unfolding.
+					 */
+					unfolding.getAndIncrement();
 				}
-			}
+				Choice newChoice = getChoice(nextSteps, unfolding.get());
 
-			public void nodeEntered(IvMTrace trace, int node, int eventIndex) {
+				System.out.println("  choice decided " + currentChoice + ", next choice " + newChoice);
 
-			}
-
-			public void emptyTraceExecuted(IvMTrace trace) {
-
+				//add node and edge to graph
+				{
+					DotNode newDotNode = choice2dotNode.get(newChoice);
+					if (newDotNode == null) {
+						newDotNode = dot.addNode(newChoice.getId());
+						choice2dotNode.put(newChoice, newDotNode);
+					}
+					DotNode currentDotNode = choice2dotNode.get(currentChoice);
+					if (currentDotNode == null) {
+						currentDotNode = dot.addNode(currentChoice.getId());
+						choice2dotNode.put(currentChoice, currentDotNode);
+					}
+					assert newDotNode != null && currentDotNode != null;
+					if (edges.add(Pair.of(currentChoice, newChoice))) {
+						dot.addEdge(currentDotNode, newDotNode);
+					}
+				}
 			}
 		};
 
@@ -60,23 +71,69 @@ public class DirectlyFollowsModel2Choices {
 			IvMTrace trace = it.next();
 
 			//trace starts with initial choice
-			stepsSeen = new THashSet<>();
-			unfolding = 0;
-			currentChoice = getChoice(node2steps, -1, unfolding);
+			unfolding.set(0);
 
-			System.out.println("start trace with " + currentChoice);
-
-			walk.walk(dfm, trace);
+			walk.walk(trace);
 		}
 
-		Set<Choice> result = new THashSet<>();
-
-		return result;
+		System.out.println(dot.toString());
+		return dot;
 	}
 
-	public static Choice getChoice(TIntObjectMap<TIntList> node2steps, int node, int unfolding) {
+	public static TObjectIntMap<TIntList> getRank(DirectlyFollowsModel dfm, TIntObjectMap<TIntList> node2steps,
+			IvMLogFiltered log) {
+		TObjectIntMap<TIntList> steps2rank = new TObjectIntHashMap<>(10, 0.5f, -1);
+		int maxRank = 0;
+		THashSet<TIntList> coveredSteps = new THashSet<>();
+
+		//first, count how often each edge appears
+		final MultiSet<Pair<TIntList, TIntList>> edges = new MultiSet<>();
+		{
+			DirectlyFollowsModelStepsWalk walk = new DirectlyFollowsModelStepsWalk(dfm, node2steps) {
+				public void stepsEncountered(TIntList steps, int chosenNode, TIntList nextSteps) {
+					edges.add(Pair.of(steps, nextSteps));
+				}
+			};
+
+			for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
+				walk.walk(it.next());
+			}
+		}
+
+		//the initial choice must of course be the first ranked steps
+		{
+			TIntList initSteps = node2steps.get(-1);
+			maxRank++;
+			steps2rank.put(initSteps, maxRank);
+			coveredSteps.add(initSteps);
+		}
+
+		//second, find a minimum spanning tree
+		{
+			//sort by cardinality
+			for (Pair<TIntList, TIntList> p : edges.sortByCardinality()) {
+				TIntList stepsA = p.getA();
+				TIntList stepsB = p.getB();
+
+				if (!coveredSteps.contains(stepsA)) {
+					coveredSteps.add(stepsA);
+					maxRank++;
+					steps2rank.put(stepsA, maxRank);
+				}
+				if (!coveredSteps.contains(stepsB)) {
+					coveredSteps.add(stepsA);
+					maxRank++;
+					steps2rank.put(stepsA, maxRank);
+				}
+			}
+		}
+
+		return steps2rank;
+	}
+
+	public static Choice getChoice(TIntList steps, int unfolding) {
 		Choice result = new Choice();
-		result.nodes.addAll(node2steps.get(node));
+		result.nodes.addAll(steps);
 		result.ids.add(unfolding);
 		return result;
 	}

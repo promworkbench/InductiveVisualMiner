@@ -35,14 +35,6 @@ public class EfficientTree2CausalGraph {
 		//create dot edges
 		createEdges(dot, tree, tree.getRoot(), new TIntArrayList(), k, choice2dotNode);
 
-		try {
-			FileUtils.writeStringToFile(
-					new File("/home/sander/Documents/svn/49 - causality in process mining - niek/bpic12a.dot"),
-					dot.toString());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
 		//create table
 		CausalDataTable table = new CausalDataTable(tree, log, choices);
 

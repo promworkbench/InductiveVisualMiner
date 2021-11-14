@@ -1,8 +1,11 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
@@ -34,13 +37,21 @@ public class RowBlockCausal<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 		List<DataRow<Object>> result = new ArrayList<>();
 
+		Dot dot;
 		if (model.isTree()) {
-			Dot dot = EfficientTree2CausalGraph.convert(model.getTree(), logFiltered);
-
-			System.out.println(dot);
+			dot = EfficientTree2CausalGraph.convert(model.getTree(), logFiltered);
 		} else {
-			new DirectlyFollowsModel2Choices().getChoices(model.getDfg(), logFiltered);
+			dot = new DirectlyFollowsModel2Choices().getChoices(model.getDfg(), logFiltered);
 			result.add(new DataRow<>(DisplayType.literal("only trees supported")));
+		}
+		System.out.println(dot);
+		
+		try {
+			FileUtils.writeStringToFile(
+					new File("/home/sander/Documents/svn/49 - causality in process mining - niek/bpic12a.dot"),
+					dot.toString());
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 
 		return result;
