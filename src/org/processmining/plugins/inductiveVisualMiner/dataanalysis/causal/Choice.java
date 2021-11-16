@@ -1,8 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 
 import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 /**
  * A choice is a list of nodes (from which to choose one) or a single node (to
@@ -12,8 +12,8 @@ import gnu.trove.list.array.TIntArrayList;
  *
  */
 public class Choice {
-	TIntList nodes = new TIntArrayList();
-	TIntList ids = new TIntArrayList();
+	TIntSet nodes = new TIntHashSet(10, 0.5f, -1);
+	TIntSet ids = new TIntHashSet(10, 0.5f, -1);
 
 	@Override
 	public String toString() {

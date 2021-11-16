@@ -1,10 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.DotNode;
@@ -16,7 +14,7 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
 
 public class EfficientTree2CausalGraph {
-	public static Dot convert(EfficientTree tree, IvMLogFiltered log) {
+	public static Pair<Dot, CausalDataTable> convert(EfficientTree tree, IvMLogFiltered log) {
 
 		//get choices
 		int[] k = EfficientTree2Choices.createK(tree, log);
@@ -36,17 +34,9 @@ public class EfficientTree2CausalGraph {
 		createEdges(dot, tree, tree.getRoot(), new TIntArrayList(), k, choice2dotNode);
 
 		//create table
-		CausalDataTable table = new CausalDataTable(tree, log, choices);
+		CausalDataTable table = EfficientTree2CausalDataTable.create(tree, log, choices);
 
-		try {
-			FileUtils.writeStringToFile(
-					new File("/home/sander/Documents/svn/49 - causality in process mining - niek/bpic12a.csv"),
-					table.toString(-1));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return dot;
+		return Pair.of(dot, table);
 	}
 
 	public static void createEdges(Dot dot, EfficientTree tree, int node, TIntList ids, int[] k,

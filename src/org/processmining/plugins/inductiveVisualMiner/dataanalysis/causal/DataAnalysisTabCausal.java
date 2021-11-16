@@ -22,8 +22,8 @@ public class DataAnalysisTabCausal<C, P> extends DataAnalysisTabAbstract<Object,
 	@Override
 	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
 		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<Object, C, P>(name, dataAnalysesView);
-		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "" },
-				{ "Trace attribute", "attribute type", "association with process", "distance plot" } });
+		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "Unfolding", "choice between" }, { "", "", "" },
+				{ "Unfolding", "choice between", ".", "." } });
 		return table;
 	}
 

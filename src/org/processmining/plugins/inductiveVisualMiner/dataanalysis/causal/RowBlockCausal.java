@@ -1,11 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
@@ -15,6 +13,8 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockC
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
+
+import gnu.trove.iterator.TIntIterator;
 
 public class RowBlockCausal<C, P> extends DataRowBlockComputer<Object, C, P> {
 
@@ -35,23 +35,52 @@ public class RowBlockCausal<C, P> extends DataRowBlockComputer<Object, C, P> {
 		IvMModel model = inputs.get(IvMObject.model);
 		IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 
+		//compute causal objects
+		Pair<Dot, CausalDataTable> p;
+		if (model.isTree()) {
+			p = EfficientTree2CausalGraph.convert(model.getTree(), logFiltered);
+		} else {
+			p = DirectlyFollowsModel2CausalGraph.convert(model.getDfg(), logFiltered);
+		}
+
+		//		System.out.println(p);
+		//
+		//		try {
+		//			FileUtils.writeStringToFile(
+		//					new File("/home/sander/Documents/svn/49 - causality in process mining - niek/bpic12a.dot"),
+		//					p.getA().toString());
+		//			FileUtils.writeStringToFile(
+		//					new File("/home/sander/Documents/svn/49 - causality in process mining - niek/bpic12a.csv"),
+		//					p.getB().toString(-1));
+		//		} catch (IOException e1) {
+		//			e1.printStackTrace();
+		//		}
+
 		List<DataRow<Object>> result = new ArrayList<>();
 
-		Dot dot;
-		if (model.isTree()) {
-			dot = EfficientTree2CausalGraph.convert(model.getTree(), logFiltered);
-		} else {
-			dot = new DirectlyFollowsModel2Choices().getChoices(model.getDfg(), logFiltered);
-			result.add(new DataRow<>(DisplayType.literal("only trees supported")));
-		}
-		System.out.println(dot);
-		
-		try {
-			FileUtils.writeStringToFile(
-					new File("/home/sander/Documents/svn/49 - causality in process mining - niek/bpic12a.dot"),
-					dot.toString());
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		CausalDataTable table = p.getB();
+		for (Choice choice : table.getColumns()) {
+			StringBuilder s = new StringBuilder();
+
+			for (TIntIterator it = choice.nodes.iterator(); it.hasNext();) {
+				int node = it.next();
+
+				if (model.isActivity(node)) {
+					s.append(model.getActivityName(node));
+				} else if (model.isTau(node)) {
+					s.append("[skip]");
+				} else if (model.isTree()) {
+					s.append("[" + model.getTree().getNodeType(node) + "]");
+				} else {
+					s.append("[" + node + "]");
+				}
+
+				if (it.hasNext()) {
+					s.append(", ");
+				}
+			}
+
+			result.add(new DataRow<Object>(choice.ids.toString(), DisplayType.literal(s.toString())));
 		}
 
 		return result;
