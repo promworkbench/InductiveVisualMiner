@@ -126,6 +126,8 @@ public class IvMObject<C> {
 			boolean.class);
 	public static final IvMObject<Boolean> selected_associations_enabled = c("selected associations enabled",
 			boolean.class);
+	public static final IvMObject<Boolean> selected_causal_enabled = c("selected causal enabled",
+			boolean.class);
 	public static final IvMObject<CostModelFactory> selected_cost_model_factory = c("cost model factory",
 			CostModelFactory.class);
 

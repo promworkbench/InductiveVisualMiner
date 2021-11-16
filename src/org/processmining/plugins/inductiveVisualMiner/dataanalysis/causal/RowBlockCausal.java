@@ -53,11 +53,14 @@ public class RowBlockCausal<C, P> extends DataRowBlockComputer<Object, C, P> {
 		//			e1.printStackTrace();
 		//		}
 
-		List<DataRow<Object>> result = new ArrayList<>();
+		//perform the analysis
+		CausalAnalysisResult analysisResult = CausalAnalysis.analyse(p);
 
-		CausalDataTable table = p.getB();
-		for (Choice choice : table.getColumns()) {
-			result.add(new DataRow<Object>(choice.ids.toString(), DisplayType.literal(choice.toString(model))));
+		//display the results
+		List<DataRow<Object>> result = new ArrayList<>();
+		for (Pair<Pair<Choice, Choice>, Double> x : analysisResult.getResults()) {
+			result.add(new DataRow<Object>(x.getA().getA().toString(model), x.getA().getB().toString(model),
+					DisplayType.numeric(x.getB())));
 		}
 
 		return result;

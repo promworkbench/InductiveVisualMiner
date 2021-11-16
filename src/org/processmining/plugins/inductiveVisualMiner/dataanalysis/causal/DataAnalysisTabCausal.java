@@ -3,9 +3,16 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.swing.RowSorter;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.SortOrder;
+import javax.swing.table.TableRowSorter;
+
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTabAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableModel;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 
@@ -21,9 +28,24 @@ public class DataAnalysisTabCausal<C, P> extends DataAnalysisTabAbstract<Object,
 
 	@Override
 	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
-		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<Object, C, P>(name, dataAnalysesView);
-		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "Unfolding", "choice between" }, { "", "", "" },
-				{ "Unfolding", "choice between", ".", "." } });
+		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<Object, C, P>(name, dataAnalysesView) {
+			private static final long serialVersionUID = -8536485501677939027L;
+
+			@Override
+			protected void setDefaultSorting(TableRowSorter<DataAnalysisTableModel<Object, C, P>> sorter,
+					List<SortKey> sortKeys) {
+				if (getColumnCount() >= 3) {
+					sortKeys.add(new RowSorter.SortKey(2, SortOrder.DESCENDING));
+				}
+			}
+
+			@Override
+			public IvMObject<Boolean> isSwitchable() {
+				return IvMObject.selected_causal_enabled;
+			}
+		};
+		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" },
+				{ "From choice", "to choice", "causal dependency" }, { "", "", "", "" } });
 		return table;
 	}
 

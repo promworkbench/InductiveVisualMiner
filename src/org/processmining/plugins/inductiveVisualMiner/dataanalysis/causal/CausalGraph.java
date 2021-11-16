@@ -20,6 +20,10 @@ public class CausalGraph {
 		edges.add(Pair.of(sourceChoice, targetChoice));
 	}
 
+	public Set<Pair<Choice, Choice>> getEdges() {
+		return Collections.unmodifiableSet(edges);
+	}
+
 	public Set<Choice> getNodes() {
 		return Collections.unmodifiableSet(nodes);
 	}
@@ -35,7 +39,7 @@ public class CausalGraph {
 		}
 
 		//edges
-		for (Pair<Choice, Choice> p : edges) {
+		for (Pair<Choice, Choice> p : getEdges()) {
 			DotNode sourceDotNode = choice2dotNode.get(p.getA());
 			DotNode targetDotNode = choice2dotNode.get(p.getB());
 			assert targetDotNode != null && sourceDotNode != null;
