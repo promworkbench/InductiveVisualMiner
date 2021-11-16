@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -19,6 +21,35 @@ public class Choice {
 	public String toString() {
 		return getId();
 		//return nodes.toString() + "i" + ids.toString();
+	}
+
+	/**
+	 * Human-readable string.
+	 * 
+	 * @param model
+	 * @return
+	 */
+	public String toString(IvMModel model) {
+		StringBuilder s = new StringBuilder();
+
+		for (TIntIterator it = nodes.iterator(); it.hasNext();) {
+			int node = it.next();
+
+			if (model.isActivity(node)) {
+				s.append(model.getActivityName(node));
+			} else if (model.isTau(node)) {
+				s.append("[skip]");
+			} else if (model.isTree()) {
+				s.append("[" + model.getTree().getNodeType(node) + "]");
+			} else {
+				s.append("[" + node + "]");
+			}
+
+			if (it.hasNext()) {
+				s.append(", ");
+			}
+		}
+		return s.toString();
 	}
 
 	public String getId() {

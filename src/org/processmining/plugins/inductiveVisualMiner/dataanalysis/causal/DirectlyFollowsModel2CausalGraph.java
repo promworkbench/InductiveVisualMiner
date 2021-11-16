@@ -6,8 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.graphviz.dot.Dot;
-import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -15,10 +13,8 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 public class DirectlyFollowsModel2CausalGraph {
@@ -27,7 +23,7 @@ public class DirectlyFollowsModel2CausalGraph {
 	public static final int START_NODE = -2;
 	public static final int END_NODE = -3;
 
-	public static Pair<Dot, CausalDataTable> convert(final DirectlyFollowsModel dfm, IvMLogFiltered log) {
+	public static Pair<CausalGraph, CausalDataTable> convert(final DirectlyFollowsModel dfm, IvMLogFiltered log) {
 		final TIntObjectMap<TIntSet> node2steps = getNode2StepsMap(dfm);
 
 		StepsGraph stepsGraph = DirectlyFollowsModel2StepsGraph.create(dfm, log, node2steps);
@@ -36,9 +32,7 @@ public class DirectlyFollowsModel2CausalGraph {
 		final TObjectIntMap<TIntSet> steps2rank = StepsGraphRanking.getRanking(stepsGraph);
 		//		System.out.println(steps2rank);
 
-		final THashMap<Choice, DotNode> choice2dotNode = new THashMap<>();
-		final Dot dot = new Dot();
-		final THashSet<Pair<Choice, Choice>> edges = new THashSet<>();
+		final CausalGraph causalGraph = new CausalGraph();
 		final AtomicInteger unfolding = new AtomicInteger(0);
 		final List<Choice> traceHistory = new ArrayList<>();
 
@@ -58,25 +52,9 @@ public class DirectlyFollowsModel2CausalGraph {
 					Choice newChoice = getChoice(nextSteps, unfolding.get());
 
 					//System.out.println("  choice decided " + currentChoice + ", next choice " + newChoice);
-
 					for (Choice previousChoice : traceHistory) {
-						//add node and edge to graph
-						{
-							DotNode newDotNode = choice2dotNode.get(newChoice);
-							if (newDotNode == null) {
-								newDotNode = dot.addNode(newChoice.getId());
-								choice2dotNode.put(newChoice, newDotNode);
-							}
-							DotNode previousDotNode = choice2dotNode.get(previousChoice);
-							if (previousDotNode == null) {
-								previousDotNode = dot.addNode(previousChoice.getId());
-								choice2dotNode.put(previousChoice, previousDotNode);
-							}
-							assert newDotNode != null && previousDotNode != null;
-							if (edges.add(Pair.of(previousChoice, newChoice))) {
-								dot.addEdge(previousDotNode, newDotNode);
-							}
-						}
+						//add edge to graph
+						causalGraph.addEdge(previousChoice, newChoice);
 					}
 				}
 			}
@@ -93,9 +71,9 @@ public class DirectlyFollowsModel2CausalGraph {
 
 		//create table
 		CausalDataTable table = DirectlyFollowsModel2CausalDataTable.create(dfm, log,
-				new ArrayList<>(choice2dotNode.keySet()), node2steps, steps2rank);
+				new ArrayList<>(causalGraph.getNodes()), node2steps, steps2rank);
 
-		return Pair.of(dot, table);
+		return Pair.of(causalGraph, table);
 	}
 
 	public static Choice getChoice(TIntSet steps, int unfolding) {

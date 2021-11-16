@@ -4,43 +4,32 @@ import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
-import org.processmining.plugins.graphviz.dot.Dot;
-import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
-import cern.colt.Arrays;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.THashMap;
 
 public class EfficientTree2CausalGraph {
-	public static Pair<Dot, CausalDataTable> convert(EfficientTree tree, IvMLogFiltered log) {
+	public static Pair<CausalGraph, CausalDataTable> convert(EfficientTree tree, IvMLogFiltered log) {
+
+		//get index of maximum unfolding
+		int[] k = EfficientTree2Choices.createK(tree, log);
 
 		//get choices
-		int[] k = EfficientTree2Choices.createK(tree, log);
-		System.out.println(Arrays.toString(k));
 		List<Choice> choices = EfficientTree2Choices.getChoices(tree, k);
 
-		Dot dot = new Dot();
-
-		//create dot nodes
-		THashMap<Choice, DotNode> choice2dotNode = new THashMap<>();
-		for (Choice choice : choices) {
-			DotNode dotNode = dot.addNode(choice.getId());
-			choice2dotNode.put(choice, dotNode);
-		}
+		CausalGraph causalGraph = new CausalGraph();
 
 		//create dot edges
-		createEdges(dot, tree, tree.getRoot(), new TIntArrayList(), k, choice2dotNode);
+		createEdges(causalGraph, tree, tree.getRoot(), new TIntArrayList(), k);
 
 		//create table
 		CausalDataTable table = EfficientTree2CausalDataTable.create(tree, log, choices);
 
-		return Pair.of(dot, table);
+		return Pair.of(causalGraph, table);
 	}
 
-	public static void createEdges(Dot dot, EfficientTree tree, int node, TIntList ids, int[] k,
-			THashMap<Choice, DotNode> choice2dotNode) {
+	public static void createEdges(CausalGraph causalGraph, EfficientTree tree, int node, TIntList ids, int[] k) {
 		if (tree.isActivity(node) || tree.isTau(node)) {
 			return;
 		}
@@ -50,31 +39,28 @@ public class EfficientTree2CausalGraph {
 		if (tree.isConcurrent(node) || tree.isInterleaved(node)) {
 			//simply recurse
 			for (int child : tree.getChildren(node)) {
-				createEdges(dot, tree, child, ids, k, choice2dotNode);
+				createEdges(causalGraph, tree, child, ids, k);
 			}
 		} else if (tree.isXor(node)) {
 			//first simply recurse
 			for (int child : tree.getChildren(node)) {
-				createEdges(dot, tree, child, ids, k, choice2dotNode);
+				createEdges(causalGraph, tree, child, ids, k);
 			}
 
 			//for xor, the choices of the children depend on the choice made in the xor (with a 1 causality, but it is a causal relation)
 			Choice choiceA = EfficientTree2Choices.getXorChoice(tree, node, ids);
-			DotNode dotNodeA = choice2dotNode.get(choiceA);
 			for (int childB : tree.getChildren(node)) {
 				List<Choice> choicesChildB = EfficientTree2Choices.getChoices(tree, childB, ids, k);
 
 				for (Choice choiceB : choicesChildB) {
-					DotNode dotNodeB = choice2dotNode.get(choiceB);
-					assert dotNodeA != null && dotNodeB != null;
-					dot.addEdge(dotNodeA, dotNodeB);
+					causalGraph.addEdge(choiceA, choiceB);
 				}
 			}
 
 		} else if (tree.isSequence(node)) {
 			//first simply recurse
 			for (int child : tree.getChildren(node)) {
-				createEdges(dot, tree, child, ids, k, choice2dotNode);
+				createEdges(causalGraph, tree, child, ids, k);
 			}
 
 			//for sequence, every choice depends on all choices before it
@@ -90,10 +76,7 @@ public class EfficientTree2CausalGraph {
 
 						for (Choice choiceA : choicesChildA) {
 							for (Choice choiceB : choicesChildB) {
-								DotNode dotNodeA = choice2dotNode.get(choiceA);
-								DotNode dotNodeB = choice2dotNode.get(choiceB);
-								assert dotNodeA != null && dotNodeB != null;
-								dot.addEdge(dotNodeA, dotNodeB);
+								causalGraph.addEdge(choiceA, choiceB);
 							}
 						}
 					}
@@ -103,7 +86,7 @@ public class EfficientTree2CausalGraph {
 
 			//first simply recurse
 			for (int child : tree.getChildren(node)) {
-				createEdges(dot, tree, child, ids, k, choice2dotNode);
+				createEdges(causalGraph, tree, child, ids, k);
 			}
 
 			//for or, the choices of the first child are mutually exclusive, so not connected.
@@ -116,15 +99,12 @@ public class EfficientTree2CausalGraph {
 			 */
 			{
 				Choice choiceA = EfficientTree2Choices.getOrChoiceFirst(tree, node, ids);
-				DotNode dotNodeA = choice2dotNode.get(choiceA);
 
 				for (int childB : tree.getChildren(node)) {
 					List<Choice> choicesChildB = EfficientTree2Choices.getChoices(tree, childB, ids, k);
 
 					for (Choice choiceB : choicesChildB) {
-						DotNode dotNodeB = choice2dotNode.get(choiceB);
-						assert dotNodeA != null && dotNodeB != null;
-						dot.addEdge(dotNodeA, dotNodeB);
+						causalGraph.addEdge(choiceA, choiceB);
 					}
 				}
 			}
@@ -135,13 +115,10 @@ public class EfficientTree2CausalGraph {
 			 */
 			{
 				Choice choiceA = EfficientTree2Choices.getOrChoiceFirst(tree, node, ids);
-				DotNode dotNodeA = choice2dotNode.get(choiceA);
 
 				for (int childB : tree.getChildren(node)) {
 					Choice choiceB = EfficientTree2Choices.getOrChoiceSecond(tree, node, ids, childB);
-					DotNode dotNodeB = choice2dotNode.get(choiceB);
-					assert dotNodeA != null && dotNodeB != null;
-					dot.addEdge(dotNodeA, dotNodeB);
+					causalGraph.addEdge(choiceA, choiceB);
 				}
 			}
 
@@ -151,13 +128,10 @@ public class EfficientTree2CausalGraph {
 			 */
 			for (int childA : tree.getChildren(node)) {
 				Choice choiceA = EfficientTree2Choices.getOrChoiceSecond(tree, node, ids, childA);
-				DotNode dotNodeA = choice2dotNode.get(choiceA);
 
 				List<Choice> choicesB = EfficientTree2Choices.getChoices(tree, childA, ids, k);
 				for (Choice choiceB : choicesB) {
-					DotNode dotNodeB = choice2dotNode.get(choiceB);
-					assert dotNodeA != null && dotNodeB != null;
-					dot.addEdge(dotNodeA, dotNodeB);
+					causalGraph.addEdge(choiceA, choiceB);
 				}
 			}
 
@@ -172,7 +146,7 @@ public class EfficientTree2CausalGraph {
 				childIds.add(j);
 
 				for (int child : tree.getChildren(node)) {
-					createEdges(dot, tree, child, childIds, k, choice2dotNode);
+					createEdges(causalGraph, tree, child, childIds, k);
 				}
 			}
 
@@ -183,7 +157,7 @@ public class EfficientTree2CausalGraph {
 					Choice choiceA = EfficientTree2Choices.getLoopChoice(tree, node, ids, jA);
 					for (int jB = jA + 1; jB < k[node]; jB++) {
 						Choice choiceB = EfficientTree2Choices.getLoopChoice(tree, node, ids, jB);
-						dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
+						causalGraph.addEdge(choiceA, choiceB);
 					}
 				}
 
@@ -197,7 +171,7 @@ public class EfficientTree2CausalGraph {
 							childIdsB.add(jB);
 							List<Choice> choicesChildB = EfficientTree2Choices.getChoices(tree, childB, childIdsB, k);
 							for (Choice choiceB : choicesChildB) {
-								dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
+								causalGraph.addEdge(choiceA, choiceB);
 							}
 						}
 					}
@@ -216,7 +190,7 @@ public class EfficientTree2CausalGraph {
 							Choice choiceB = EfficientTree2Choices.getLoopChoice(tree, node, ids, jB);
 
 							for (Choice choiceA : choicesChildA) {
-								dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
+								causalGraph.addEdge(choiceA, choiceB);
 							}
 						}
 					}
@@ -240,7 +214,7 @@ public class EfficientTree2CausalGraph {
 										k);
 								for (Choice choiceA : choicesChildA) {
 									for (Choice choiceB : choicesChildB) {
-										dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
+										causalGraph.addEdge(choiceA, choiceB);
 									}
 								}
 							}
@@ -262,7 +236,7 @@ public class EfficientTree2CausalGraph {
 
 					Choice choiceB = EfficientTree2Choices.getLoopChoice(tree, node, ids, j);
 					for (Choice choiceA : choicesChildA) {
-						dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
+						causalGraph.addEdge(choiceA, choiceB);
 					}
 				}
 
@@ -282,7 +256,7 @@ public class EfficientTree2CausalGraph {
 
 					for (Choice choiceA : choicesChildA) {
 						for (Choice choiceB : choicesChildB) {
-							dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
+							causalGraph.addEdge(choiceA, choiceB);
 						}
 					}
 				}
@@ -303,7 +277,7 @@ public class EfficientTree2CausalGraph {
 
 					for (Choice choiceA : choicesChildA) {
 						for (Choice choiceB : choicesChildB) {
-							dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
+							causalGraph.addEdge(choiceA, choiceB);
 						}
 					}
 				}
@@ -319,7 +293,7 @@ public class EfficientTree2CausalGraph {
 					List<Choice> choicesChildB = EfficientTree2Choices.getChoices(tree, childB, childIdsB, k);
 
 					for (Choice choiceB : choicesChildB) {
-						dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
+						causalGraph.addEdge(choiceA, choiceB);
 					}
 				}
 
@@ -334,7 +308,7 @@ public class EfficientTree2CausalGraph {
 					List<Choice> choicesChildB = EfficientTree2Choices.getChoices(tree, childB, childIdsB, k);
 
 					for (Choice choiceB : choicesChildB) {
-						dot.addEdge(choice2dotNode.get(choiceA), choice2dotNode.get(choiceB));
+						causalGraph.addEdge(choiceA, choiceB);
 					}
 				}
 			}
