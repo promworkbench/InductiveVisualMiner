@@ -41,6 +41,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.Cl18DataAnalysisCoho
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl19DataAnalysisCost;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl20DataAnalysisAssociations;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl21AdvancedAnalysesDelay;
+import org.processmining.plugins.inductiveVisualMiner.chain.Cl22AdvancedAnalysisCausal;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainImplNonBlocking;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataState;
@@ -383,15 +384,16 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
 					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
-						return new ArrayList<>();
+						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
+						r.add(new RowBlockCausal<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						return r;
+
 					}
 				}, //
 				new Callable<List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
 					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
-						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new RowBlockCausal<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						return r;
+						return new ArrayList<>();
 					}
 				}));
 
@@ -514,6 +516,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 		chain.register(new Cl19DataAnalysisCost<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl20DataAnalysisAssociations<InductiveVisualMinerConfiguration>());
 		chain.register(new Cl21AdvancedAnalysesDelay<InductiveVisualMinerConfiguration>());
+		chain.register(new Cl22AdvancedAnalysisCausal<InductiveVisualMinerConfiguration>());
 
 		return chain;
 	}

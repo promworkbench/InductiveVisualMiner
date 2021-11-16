@@ -19,6 +19,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModels;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
@@ -93,6 +94,7 @@ public class IvMObject<C> {
 	public static final IvMObject<Cohorts> data_analysis_cohort = c("data analysis cohort", Cohorts.class);
 	public static final IvMObject<CostModels> data_analysis_cost_models = c("cost models", CostModels.class);
 	public static final IvMObject<Associations> data_analysis_associations = c("associations", Associations.class);
+	public static final IvMObject<CausalAnalysisResult> data_analysis_causal = c("causal", CausalAnalysisResult.class);
 
 	//graph objects
 	public static final IvMObject<Dot> graph_dot = c("graph dot", Dot.class);
