@@ -1,9 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult;
@@ -48,19 +44,19 @@ public class Cl22AdvancedAnalysisCausal<C> extends DataChainLinkComputationAbstr
 
 			//		System.out.println(p);
 			//
-			try {
-				String name = "bpic12-a-dfm";
-				FileUtils.writeStringToFile(
-						new File("/home/sander/Documents/svn/49 - causality in process mining - niek/experiments/"
-								+ name + ".dot"),
-						p.getA().toDot().toString());
-				FileUtils.writeStringToFile(
-						new File("/home/sander/Documents/svn/49 - causality in process mining - niek/experiments/"
-								+ name + ".csv"),
-						p.getB().toString(-1));
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+//			try {
+//				String name = "bpic12-a-dfm";
+//				FileUtils.writeStringToFile(
+//						new File("/home/sander/Documents/svn/49 - causality in process mining - niek/experiments/"
+//								+ name + ".dot"),
+//						p.getA().toDot().toString());
+//				FileUtils.writeStringToFile(
+//						new File("/home/sander/Documents/svn/49 - causality in process mining - niek/experiments/"
+//								+ name + ".csv"),
+//						p.getB().toString(-1));
+//			} catch (IOException e1) {
+//				e1.printStackTrace();
+//			}
 
 			//perform the analysis
 			CausalAnalysisResult analysisResult = CausalAnalysis.analyse(p);
