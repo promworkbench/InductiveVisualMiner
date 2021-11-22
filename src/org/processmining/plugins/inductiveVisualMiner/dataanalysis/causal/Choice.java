@@ -35,21 +35,35 @@ public class Choice {
 		for (TIntIterator it = nodes.iterator(); it.hasNext();) {
 			int node = it.next();
 
-			if (model.isActivity(node)) {
-				s.append(model.getActivityName(node));
-			} else if (model.isTau(node)) {
-				s.append("[skip]");
-			} else if (model.isTree()) {
-				s.append("[" + model.getTree().getNodeType(node) + "]");
-			} else {
-				s.append("[" + node + "]");
-			}
+			s.append(node2string(model, node));
 
 			if (it.hasNext()) {
 				s.append(", ");
 			}
 		}
+		if (!ids.isEmpty()) {
+			s.append(" i");
+			for (TIntIterator it = ids.iterator(); it.hasNext();) {
+				int id = it.next();
+				s.append(id);
+				if (it.hasNext()) {
+					s.append("-");
+				}
+			}
+		}
 		return s.toString();
+	}
+
+	public static String node2string(IvMModel model, int node) {
+		if (model.isActivity(node)) {
+			return model.getActivityName(node);
+		} else if (model.isTau(node)) {
+			return "[skip " + node + "]";
+		} else if (model.isTree()) {
+			return "[" + model.getTree().getNodeType(node) + " " + node + "]";
+		} else {
+			return "[" + node + "]";
+		}
 	}
 
 	public String getId() {

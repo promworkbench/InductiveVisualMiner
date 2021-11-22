@@ -1,8 +1,13 @@
 package org.processmining.plugins.inductiveVisualMiner.chain;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult2Correlation;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalDataTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalGraph;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DirectlyFollowsModel2CausalGraph;
@@ -34,32 +39,38 @@ public class Cl22AdvancedAnalysisCausal<C> extends DataChainLinkComputationAbstr
 			IvMModel model = inputs.get(IvMObject.model);
 			IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 
+			int maxUnfolding = 2;
+
 			//compute causal objects
 			Pair<CausalGraph, CausalDataTable> p;
 			if (model.isTree()) {
-				p = EfficientTree2CausalGraph.convert(model.getTree(), logFiltered);
+				p = EfficientTree2CausalGraph.convert(model.getTree(), logFiltered, maxUnfolding);
 			} else {
-				p = DirectlyFollowsModel2CausalGraph.convert(model.getDfg(), logFiltered);
+				p = DirectlyFollowsModel2CausalGraph.convert(model.getDfg(), logFiltered, maxUnfolding);
 			}
 
 			//		System.out.println(p);
 			//
-//			try {
-//				String name = "bpic12-a-dfm";
-//				FileUtils.writeStringToFile(
-//						new File("/home/sander/Documents/svn/49 - causality in process mining - niek/experiments/"
-//								+ name + ".dot"),
-//						p.getA().toDot().toString());
-//				FileUtils.writeStringToFile(
-//						new File("/home/sander/Documents/svn/49 - causality in process mining - niek/experiments/"
-//								+ name + ".csv"),
-//						p.getB().toString(-1));
-//			} catch (IOException e1) {
-//				e1.printStackTrace();
-//			}
+			if (true) {
+				try {
+					String name = "bpic12-o-dfm";
+					FileUtils.writeStringToFile(
+							new File("/home/sander/Documents/svn/49 - causality in process mining - niek/experiments/"
+									+ name + ".dot"),
+							p.getA().toDot().toString());
+					FileUtils.writeStringToFile(
+							new File("/home/sander/Documents/svn/49 - causality in process mining - niek/experiments/"
+									+ name + ".csv"),
+							p.getB().toString(-1));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
 
 			//perform the analysis
-			CausalAnalysisResult analysisResult = CausalAnalysis.analyse(p);
+			CausalAnalysisResult analysisResult = CausalAnalysis.analyse(p.getA(), p.getB());
+
+			CausalAnalysisResult2Correlation.convert(p.getA(), p.getB(), model);
 
 			return new IvMObjectValues().//
 					s(IvMObject.data_analysis_causal, analysisResult);

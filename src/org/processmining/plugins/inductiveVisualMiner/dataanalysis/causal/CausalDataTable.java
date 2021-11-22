@@ -19,6 +19,10 @@ public class CausalDataTable {
 	public void addRow(int[] currentRow) {
 		rows.add(currentRow);
 	}
+	
+	public List<int[]> getRows() {
+		return rows;
+	}
 
 	public List<Choice> getColumns() {
 		return Collections.unmodifiableList(columns);

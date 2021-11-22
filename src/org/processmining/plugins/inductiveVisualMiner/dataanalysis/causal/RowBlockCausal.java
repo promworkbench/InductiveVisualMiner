@@ -30,7 +30,7 @@ public class RowBlockCausal<C, P> extends DataRowBlockAbstract<Object, C, P> {
 
 		//display the results
 		List<DataRow<Object>> result = new ArrayList<>();
-		for (Pair<Pair<Choice, Choice>, Double> x : analysisResult.getResults()) {
+		for (Pair<Pair<Choice, Choice>, Double> x : analysisResult.getResultsCausal()) {
 			result.add(new DataRow<Object>(x.getA().getA().toString(model), x.getA().getB().toString(model),
 					DisplayType.numeric(x.getB())));
 		}

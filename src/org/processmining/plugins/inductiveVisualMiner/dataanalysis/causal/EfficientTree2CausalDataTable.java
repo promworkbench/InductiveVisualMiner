@@ -167,7 +167,6 @@ public class EfficientTree2CausalDataTable {
 			state.currentRow[columnNumber] = chosenNode;
 			return;
 		} else {
-			assert false;
 			/**
 			 * The choice was not a column, which means that a loop was not
 			 * unfolded far enough; do nothing.

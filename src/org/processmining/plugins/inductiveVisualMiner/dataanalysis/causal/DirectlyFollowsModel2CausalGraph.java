@@ -23,7 +23,8 @@ public class DirectlyFollowsModel2CausalGraph {
 	public static final int START_NODE = -2;
 	public static final int END_NODE = -3;
 
-	public static Pair<CausalGraph, CausalDataTable> convert(final DirectlyFollowsModel dfm, IvMLogFiltered log) {
+	public static Pair<CausalGraph, CausalDataTable> convert(final DirectlyFollowsModel dfm, IvMLogFiltered log,
+			final int maxUnfolding) {
 		final TIntObjectMap<TIntSet> node2steps = getNode2StepsMap(dfm);
 
 		StepsGraph stepsGraph = DirectlyFollowsModel2StepsGraph.create(dfm, log, node2steps);
@@ -49,12 +50,15 @@ public class DirectlyFollowsModel2CausalGraph {
 						 */
 						unfolding.getAndIncrement();
 					}
-					Choice newChoice = getChoice(nextSteps, unfolding.get());
 
-					//System.out.println("  choice decided " + currentChoice + ", next choice " + newChoice);
-					for (Choice previousChoice : traceHistory) {
-						//add edge to graph
-						causalGraph.addEdge(previousChoice, newChoice);
+					if (unfolding.get() < maxUnfolding) {
+						Choice newChoice = getChoice(nextSteps, unfolding.get());
+
+						//System.out.println("  choice decided " + currentChoice + ", next choice " + newChoice);
+						for (Choice previousChoice : traceHistory) {
+							//add edge to graph
+							causalGraph.addEdge(previousChoice, newChoice);
+						}
 					}
 				}
 			}
@@ -71,7 +75,7 @@ public class DirectlyFollowsModel2CausalGraph {
 
 		//create table
 		CausalDataTable table = DirectlyFollowsModel2CausalDataTable.create(dfm, log,
-				new ArrayList<>(causalGraph.getNodes()), node2steps, steps2rank);
+				new ArrayList<>(causalGraph.getNodes()), node2steps, steps2rank, maxUnfolding);
 
 		return Pair.of(causalGraph, table);
 	}

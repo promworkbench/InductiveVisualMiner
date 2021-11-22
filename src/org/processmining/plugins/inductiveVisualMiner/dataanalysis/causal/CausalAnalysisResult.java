@@ -9,17 +9,17 @@ import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 public class CausalAnalysisResult {
-	private final TObjectDoubleMap<Pair<Choice, Choice>> edges = new TObjectDoubleHashMap<Pair<Choice, Choice>>(10,
-			0.5f, 0);
+	private final TObjectDoubleMap<Pair<Choice, Choice>> edgesCausal = new TObjectDoubleHashMap<Pair<Choice, Choice>>(
+			10, 0.5f, -1);
 
-	public void addEdge(Pair<Choice, Choice> edge, double d) {
-		edges.put(edge, d);
+	public void addEdgeCausal(Pair<Choice, Choice> edge, double d) {
+		edgesCausal.put(edge, d);
 	}
 
-	public List<Pair<Pair<Choice, Choice>, Double>> getResults() {
+	public List<Pair<Pair<Choice, Choice>, Double>> getResultsCausal() {
 		List<Pair<Pair<Choice, Choice>, Double>> result = new ArrayList<>();
-		for (Pair<Choice, Choice> edge : edges.keySet()) {
-			result.add(Pair.of(edge, edges.get(edge)));
+		for (Pair<Choice, Choice> edge : edgesCausal.keySet()) {
+			result.add(Pair.of(edge, edgesCausal.get(edge)));
 		}
 		return result;
 	}

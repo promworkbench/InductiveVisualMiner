@@ -5,7 +5,7 @@ import java.util.Random;
 import org.processmining.plugins.InductiveMiner.Pair;
 
 public class CausalAnalysis {
-	public static CausalAnalysisResult analyse(Pair<CausalGraph, CausalDataTable> p) {
+	public static CausalAnalysisResult analyse(CausalGraph graph, CausalDataTable table) {
 		//TODO: perform the causal analysis
 
 		//TODO: for now, make up random values
@@ -13,8 +13,8 @@ public class CausalAnalysis {
 
 		CausalAnalysisResult analysisResult = new CausalAnalysisResult();
 
-		for (Pair<Choice, Choice> edge : p.getA().getEdges()) {
-			analysisResult.addEdge(edge, random.nextDouble());
+		for (Pair<Choice, Choice> edge : graph.getEdges()) {
+			analysisResult.addEdgeCausal(edge, random.nextDouble());
 		}
 
 		return analysisResult;

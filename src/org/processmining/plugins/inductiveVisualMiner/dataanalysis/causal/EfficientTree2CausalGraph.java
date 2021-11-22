@@ -10,10 +10,15 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 
 public class EfficientTree2CausalGraph {
-	public static Pair<CausalGraph, CausalDataTable> convert(EfficientTree tree, IvMLogFiltered log) {
+	public static Pair<CausalGraph, CausalDataTable> convert(EfficientTree tree, IvMLogFiltered log, int maxUnfolding) {
 
 		//get index of maximum unfolding
-		int[] k = EfficientTree2Choices.createK(tree, log);
+		int[] k;
+		if (maxUnfolding > 0) {
+			k = EfficientTree2Choices.createFixedK(tree, maxUnfolding);
+		} else {
+			k = EfficientTree2Choices.createK(tree, log);
+		}
 
 		//get choices
 		List<Choice> choices = EfficientTree2Choices.getChoices(tree, k);

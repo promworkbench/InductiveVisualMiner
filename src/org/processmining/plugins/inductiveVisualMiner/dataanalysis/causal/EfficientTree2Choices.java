@@ -126,11 +126,8 @@ public class EfficientTree2Choices {
 	}
 
 	public static int[] createFixedK(EfficientTree tree, int value) {
-		//first, figure out how often each node was maximally executed in a trace in the log
 		int[] k = new int[tree.getMaxNumberOfNodes()];
-		for (int node : EfficientTreeUtils.getAllNodes(tree)) {
-			k[node] = value;
-		}
+		Arrays.fill(k, value);
 		return k;
 	}
 

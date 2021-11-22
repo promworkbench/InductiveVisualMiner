@@ -25,7 +25,7 @@ public class DirectlyFollowsModel2CausalDataTable {
 	}
 
 	public static CausalDataTable create(DirectlyFollowsModel dfm, IvMLogFiltered log, List<Choice> choices,
-			final TIntObjectMap<TIntSet> node2steps, TObjectIntMap<TIntSet> steps2rank) {
+			final TIntObjectMap<TIntSet> node2steps, TObjectIntMap<TIntSet> steps2rank, final int maxUnfolding) {
 		CausalDataTable result = new CausalDataTable(choices);
 
 		//initialise intermediate state variables
@@ -45,7 +45,9 @@ public class DirectlyFollowsModel2CausalDataTable {
 		state.walker = new DirectlyFollowsModelStepsWalk(dfm, node2steps) {
 			public void stepsEncountered(TIntSet currentSteps, int chosenNode, TIntSet newSteps) {
 				Choice choice = DirectlyFollowsModel2CausalGraph.getChoice(currentSteps, state.unfolding);
-				reportChoice(state, choice, chosenNode);
+				if (state.unfolding < maxUnfolding) {
+					reportChoice(state, choice, chosenNode);
+				}
 
 				//update the unfolding if necessary
 				if (!newSteps.isEmpty() && state.steps2rank.get(currentSteps) >= state.steps2rank.get(newSteps)) {
@@ -96,7 +98,6 @@ public class DirectlyFollowsModel2CausalDataTable {
 
 			state.currentRow[columnNumber] = chosenNode;
 		} else {
-			assert false;
 			/**
 			 * The choice was not a column, which means that a loop was not
 			 * unfolded far enough; do nothing.
