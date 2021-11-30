@@ -47,6 +47,12 @@ public abstract class DirectlyFollowsModelStepsWalk {
 		currentSteps = node2steps.get(DirectlyFollowsModel2CausalGraph.START_NODE);
 
 		walk.walk(dfm, trace);
+
+		if (currentSteps.contains(DirectlyFollowsModel2CausalGraph.END_NODE)) {
+			//the last choice must also be reported
+			stepsEncountered(currentSteps, DirectlyFollowsModel2CausalGraph.END_NODE,
+					new TIntHashSet(0, 0.5f, DirectlyFollowsModel2CausalGraph.NO_NODE));
+		}
 	}
 
 	/**
