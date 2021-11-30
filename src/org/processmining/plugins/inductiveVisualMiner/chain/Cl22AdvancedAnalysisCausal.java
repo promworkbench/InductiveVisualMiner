@@ -7,7 +7,6 @@ import org.apache.commons.io.FileUtils;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysis;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult2Correlation;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalDataTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalGraph;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DirectlyFollowsModel2CausalGraph;
@@ -39,7 +38,7 @@ public class Cl22AdvancedAnalysisCausal<C> extends DataChainLinkComputationAbstr
 			IvMModel model = inputs.get(IvMObject.model);
 			IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 
-			int maxUnfolding = 2;
+			int maxUnfolding = -1;
 
 			//compute causal objects
 			Pair<CausalGraph, CausalDataTable> p;
@@ -51,7 +50,7 @@ public class Cl22AdvancedAnalysisCausal<C> extends DataChainLinkComputationAbstr
 
 			//		System.out.println(p);
 			//
-			if (true) {
+			if (false) {
 				try {
 					String name = "bpic12-o-dfm";
 					FileUtils.writeStringToFile(
@@ -67,10 +66,13 @@ public class Cl22AdvancedAnalysisCausal<C> extends DataChainLinkComputationAbstr
 				}
 			}
 
+			System.out.println("choices " + p.getB().getColumns().size());
+			System.out.println("UBCG edges " + p.getA().getEdges().size());
+
 			//perform the analysis
 			CausalAnalysisResult analysisResult = CausalAnalysis.analyse(p.getA(), p.getB());
 
-			CausalAnalysisResult2Correlation.convert(p.getA(), p.getB(), model);
+			//CausalAnalysisResult2Correlation.convert(p.getA(), p.getB(), model);
 
 			return new IvMObjectValues().//
 					s(IvMObject.data_analysis_causal, analysisResult);
