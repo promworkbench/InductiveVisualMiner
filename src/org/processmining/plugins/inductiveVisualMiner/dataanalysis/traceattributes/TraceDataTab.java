@@ -8,6 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 public class TraceDataTab<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
@@ -20,8 +21,9 @@ public class TraceDataTab<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 	}
 
 	@Override
-	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
-		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<>(name, dataAnalysesView);
+	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView,
+			IvMDecoratorI decorator) {
+		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<>(name, dataAnalysesView, decorator);
 		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "Attribute", "property", "value" },
 				{ "Attribute", "property", "highlighted traces", "not-highlighted traces" } });
 		return table;

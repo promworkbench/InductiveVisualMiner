@@ -25,6 +25,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableModel;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 public class CohortDataAnalysisTab<C, P> extends DataAnalysisTabAbstract<Cohort, C, P> {
 
@@ -39,8 +40,8 @@ public class CohortDataAnalysisTab<C, P> extends DataAnalysisTabAbstract<Cohort,
 	}
 
 	@Override
-	public DataTableCohort<C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
-		DataTableCohort<C, P> table = new DataTableCohort<C, P>(name, dataAnalysesView) {
+	public DataTableCohort<C, P> createTable(DataAnalysesView<C, P> dataAnalysesView, IvMDecoratorI decorator) {
+		DataTableCohort<C, P> table = new DataTableCohort<C, P>(name, dataAnalysesView, decorator) {
 			private static final long serialVersionUID = -6838046929095568195L;
 
 			@Override
@@ -85,8 +86,8 @@ public class CohortDataAnalysisTab<C, P> extends DataAnalysisTabAbstract<Cohort,
 
 		private static final long serialVersionUID = 3288401833656702004L;
 
-		public DataTableCohort(String tabName, DataAnalysesView<C, P> dataAnalysesView) {
-			super(tabName, dataAnalysesView);
+		public DataTableCohort(String tabName, DataAnalysesView<C, P> dataAnalysesView, IvMDecoratorI decorator) {
+			super(tabName, dataAnalysesView, decorator);
 
 			//enable and listen for selections, and pass the selection on to the trace attribute filter
 			setColumnSelectionAllowed(false);

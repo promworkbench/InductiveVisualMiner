@@ -38,7 +38,7 @@ public class Cl22AdvancedAnalysisCausal<C> extends DataChainLinkComputationAbstr
 			IvMModel model = inputs.get(IvMObject.model);
 			IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 
-			int maxUnfolding = -1;
+			int maxUnfolding = 2;
 
 			//compute causal objects
 			Pair<CausalGraph, CausalDataTable> p;
@@ -52,7 +52,7 @@ public class Cl22AdvancedAnalysisCausal<C> extends DataChainLinkComputationAbstr
 			//
 			if (false) {
 				try {
-					String name = "bpic12-o-dfm";
+					String name = "bpic17-o-dfm";
 					FileUtils.writeStringToFile(
 							new File("/home/sander/Documents/svn/49 - causality in process mining - niek/experiments/"
 									+ name + ".dot"),

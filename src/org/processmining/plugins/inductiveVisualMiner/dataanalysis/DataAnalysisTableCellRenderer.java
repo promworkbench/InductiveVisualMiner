@@ -137,11 +137,11 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 		return table.getModel().getValueAt(modelRow, modelColumn).toString();
 	}
 
-	private String getNextRowValue(JTable table, int row, int column) {
-		if (row >= table.getModel().getRowCount() - 1) {
+	private String getNextRowValue(JTable table, int viewRow, int column) {
+		if (viewRow >= table.getRowCount() - 1) {
 			return "";
 		}
-		int modelRow = table.convertRowIndexToModel(row + 1);
+		int modelRow = table.convertRowIndexToModel(viewRow + 1);
 		int modelColumn = table.convertColumnIndexToModel(column);
 
 		return table.getModel().getValueAt(modelRow, modelColumn).toString();

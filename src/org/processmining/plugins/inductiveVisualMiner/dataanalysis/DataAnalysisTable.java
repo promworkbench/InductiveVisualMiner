@@ -1,17 +1,32 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
+import javax.swing.Box;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.border.LineBorder;
 import javax.swing.table.TableRowSorter;
 
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableRowFilter.Item;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.CorrelationDensityPlot;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.MultiComboBox;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+
+import gnu.trove.map.hash.THashMap;
 
 public class DataAnalysisTable<O, C, P> extends JTable {
 
@@ -21,8 +36,14 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 	public static final int rowMargin = 3;
 	public static final int columnMargin = 5;
 
-	public DataAnalysisTable(String tabName, DataAnalysesView<C, P> dataAnalysesView) {
+	private DataAnalysisView dataAnalysisView;
+	private final IvMDecoratorI decorator;
+	private final Map<String, Item[]> selections;
+
+	public DataAnalysisTable(String tabName, DataAnalysesView<C, P> dataAnalysesView, IvMDecoratorI decorator) {
 		super(new DataAnalysisTableModel<O, C, P>(tabName, dataAnalysesView));
+		this.decorator = decorator;
+		this.selections = new THashMap<>();
 
 		setOpaque(false);
 		setShowGrid(false);
@@ -52,11 +73,12 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 		getModel().mightEnable();
 		getModel().fireTableStructureChanged();
 		setSorting();
+		setFiltering();
 		setRowHeights();
 	}
 
 	protected void setSorting() {
-		TableRowSorter<DataAnalysisTableModel<O, C, P>> sorter = new TableRowSorter<>(getModel());
+		DataAnalysisTableRowSorter<O, C, P> sorter = new DataAnalysisTableRowSorter<>(getModel());
 		List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
 
 		for (int column = 0; column < getModel().getNumberOfNameColumns(); column++) {
@@ -70,6 +92,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 		//set how value columns should be sorted
 		for (int column = getModel().getNumberOfNameColumns(); column < getModel().getColumnCount(); column++) {
 			sorter.setComparator(column, new Comparator<DisplayType>() {
+
 				public int compare(DisplayType o1, DisplayType o2) {
 					if (o1.getType() != o2.getType()) {
 						return o1.getType().compareTo(o2.getType());
@@ -90,6 +113,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 
 					return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
 				}
+
 			});
 		}
 
@@ -110,21 +134,87 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 
 	private void setRowHeights() {
 		for (int modelRow = 0; modelRow < getModel().getRowCount(); modelRow++) {
-			boolean hasImage = false;
-			for (int column = 0; column < getModel().getColumnCount(); column++) {
-				Object value = getModel().getValueAt(modelRow, column);
-				if (value instanceof DisplayType && ((DisplayType) value).getType() == Type.image
-						&& ((DisplayType.Image) value).getImage() != null) {
-					hasImage = true;
-					break;
+			int viewRow = convertRowIndexToView(modelRow);
+			if (viewRow >= 0) {
+				boolean hasImage = false;
+				for (int column = 0; column < getModel().getColumnCount(); column++) {
+					Object value = getModel().getValueAt(modelRow, column);
+					if (value instanceof DisplayType && ((DisplayType) value).getType() == Type.image
+							&& ((DisplayType.Image) value).getImage() != null) {
+						hasImage = true;
+						break;
+					}
+				}
+
+				if (hasImage) {
+					setRowHeight(convertRowIndexToView(modelRow), rowHeightImage);
+				} else {
+					setRowHeight(convertRowIndexToView(modelRow), rowHeight);
+				}
+			}
+		}
+	}
+
+	private void setFiltering() {
+		if (dataAnalysisView != null) {
+			//create the comboboxes
+			final List<MultiComboBox<Item>> comboBoxes = new ArrayList<>();
+			{
+				JPanel panel = dataAnalysisView.getFiltersPanel();
+				panel.removeAll();
+				{
+					JLabel label = new JLabel("Show: ");
+					decorator.decorate(label);
+					panel.add(label);
+				}
+
+				for (int column = 0; column < getModel().getNumberOfNameColumns(); column++) {
+					String columnName = getModel().getColumnName(column);
+
+					JLabel label = new JLabel(columnName);
+					decorator.decorate(label);
+					panel.add(label);
+					
+					panel.add(Box.createRigidArea(new Dimension(3, 0)));
+
+					Set<Item> values = new TreeSet<>();
+					values.add(Item.all());
+					for (int row = 0; row < getModel().getRowCount(); row++) {
+						values.add(new Item(getModel().getRow(row).getName(column)));
+					}
+					Item[] items = values.toArray(new Item[values.size()]);
+					MultiComboBox<Item> combobox = new MultiComboBox<Item>(Item.class, items);
+
+					if (selections.containsKey(columnName)) {
+						//restore cashed selected items
+						combobox.setSelectedItems(selections.get(columnName));
+					} else {
+						//select all
+						combobox.setSelectedItem(Item.all());
+					}
+
+					decorator.decorate(combobox);
+					combobox.setBorder(new LineBorder(decorator.backGroundColour2(), 5));
+					combobox.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							//cache the selected values
+							selections.put(columnName, combobox.getSelectedObjects());
+
+							//refresh the filter
+							getRowSorter().setRowFilter(getRowSorter().getRowFilter());
+						}
+					});
+					panel.add(combobox);
+
+					comboBoxes.add(combobox);
+
+					if (column < getModel().getNumberOfNameColumns() - 1) {
+						panel.add(Box.createRigidArea(new Dimension(5, 0)));
+					}
 				}
 			}
 
-			if (hasImage) {
-				setRowHeight(convertRowIndexToView(modelRow), rowHeightImage);
-			} else {
-				setRowHeight(convertRowIndexToView(modelRow), rowHeight);
-			}
+			getRowSorter().setRowFilter(new DataAnalysisTableRowFilter<O, C, P>(comboBoxes));
 		}
 	}
 
@@ -134,6 +224,12 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 		return (DataAnalysisTableModel<O, C, P>) super.getModel();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public DataAnalysisTableRowSorter<O, C, P> getRowSorter() {
+		return (DataAnalysisTableRowSorter<O, C, P>) super.getRowSorter();
+	}
+
 	/**
 	 * 
 	 * @return an object that will be set to true when the tab is switched on.
@@ -141,5 +237,9 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 	 */
 	public IvMObject<Boolean> isSwitchable() {
 		return null;
+	}
+
+	public void setDataAnalysisView(DataAnalysisView dataAnalysisView) {
+		this.dataAnalysisView = dataAnalysisView;
 	}
 }

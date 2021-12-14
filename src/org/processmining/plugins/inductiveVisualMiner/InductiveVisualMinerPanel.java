@@ -100,6 +100,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	public InductiveVisualMinerPanel(InductiveVisualMinerConfiguration configuration, ProMCanceller canceller) {
 		super(configuration.getDecorator());
 		IvMDecoratorI decorator = configuration.getDecorator();
+		
 		int gridy = 0;
 
 		setLayout(new BorderLayout());

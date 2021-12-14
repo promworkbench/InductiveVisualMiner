@@ -32,14 +32,16 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		tabbedPane = new JTabbedPane();
 
 		for (DataAnalysisTab<?, C, P> factory : factories) {
-			DataAnalysisTable<?, C, P> table = createAndFillTable(factory, this);
+			DataAnalysisTable<?, C, P> table = createAndFillTable(factory, this, decorator);
 
 			String analysisName = factory.getAnalysisName();
 			String explanation = factory.getExplanation();
 			boolean switchable = table.isSwitchable() != null;
 
-			OnOffPanel<?> onOffPanel = createView(decorator, table, analysisName, explanation, switchable);
+			OnOffPanel<DataAnalysisView> onOffPanel = createView(decorator, table, analysisName, explanation,
+					switchable);
 			onOffPanel.off();
+			table.setDataAnalysisView(onOffPanel.getOnPanel());
 			tabbedPane.addTab(analysisName, onOffPanel);
 
 			tables.put(analysisName, table);
@@ -51,8 +53,8 @@ public class DataAnalysesView<C, P> extends SideWindow {
 	}
 
 	public static <O, C, P> DataAnalysisTable<O, C, P> createAndFillTable(DataAnalysisTab<O, C, P> factory,
-			DataAnalysesView<C, P> dataAnalysesView) {
-		DataAnalysisTable<O, C, P> table = factory.createTable(dataAnalysesView);
+			DataAnalysesView<C, P> dataAnalysesView, IvMDecoratorI decorator) {
+		DataAnalysisTable<O, C, P> table = factory.createTable(dataAnalysesView, decorator);
 		List<DataRowBlock<O, C, P>> blocks = factory.createRowBlocks(table);
 		for (DataRowBlockComputer<O, C, P> rowBlockComputer : factory.createRowBlockComputers()) {
 			blocks.add(rowBlockComputer.createDataRowBlock(table));

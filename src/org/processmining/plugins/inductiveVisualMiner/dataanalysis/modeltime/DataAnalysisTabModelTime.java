@@ -8,6 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 public class DataAnalysisTabModelTime<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
@@ -20,12 +21,13 @@ public class DataAnalysisTabModelTime<C, P> extends DataAnalysisTabAbstract<Obje
 	}
 
 	@Override
-	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
-		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<Object, C, P>(name, dataAnalysesView);
+	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView,
+			IvMDecoratorI decorator) {
+		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<Object, C, P>(name, dataAnalysesView, decorator);
 		table.getModel()
 				.setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "" },
-						{ "Model part", "time type", "", "all traces" },
-						{ "Model part", "duration type", "", "highlighted traces", "not-highlighted traces" } });
+						{ "Model part", "time type", "property", "all traces" },
+						{ "Model part", "duration type", "property", "highlighted traces", "not-highlighted traces" } });
 		return table;
 	}
 

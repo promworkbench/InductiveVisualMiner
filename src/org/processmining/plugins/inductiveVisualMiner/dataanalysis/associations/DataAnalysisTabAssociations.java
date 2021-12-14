@@ -15,6 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableModel;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 public class DataAnalysisTabAssociations<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
@@ -27,8 +28,9 @@ public class DataAnalysisTabAssociations<C, P> extends DataAnalysisTabAbstract<O
 	}
 
 	@Override
-	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView) {
-		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<Object, C, P>(name, dataAnalysesView) {
+	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView,
+			IvMDecoratorI decorator) {
+		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<Object, C, P>(name, dataAnalysesView, decorator) {
 
 			private static final long serialVersionUID = 7015864214763696785L;
 

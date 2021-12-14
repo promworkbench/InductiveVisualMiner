@@ -157,7 +157,6 @@ public class MultiComboBox<E> extends JComboBox<E> {
 			for (int i = 0; i < model.getSize(); i++) {
 				if (ArrayUtils.contains(objects, model.getElementAt(i))) {
 					selected.set(i);
-					return;
 				}
 			}
 		}
@@ -167,7 +166,7 @@ public class MultiComboBox<E> extends JComboBox<E> {
 	protected JList<E> getList() {
 		Accessible a = getAccessibleContext().getAccessibleChild(0);
 		if (a instanceof BasicComboPopup) {
-			return (JList<E>) ((BasicComboPopup) a).getList();
+			return ((BasicComboPopup) a).getList();
 		} else {
 			return null;
 		}
