@@ -47,7 +47,7 @@ public class HighlightingFilterTraceEndsWithEvent extends HighlightingFilter {
 		}
 		for (int i = trace.size() - 1; i > 0; i--) {
 			IvMMove event = trace.get(i);
-			if (event.isComplete()) {
+			if (event.isComplete() && !event.isModelMove()) {
 				if (attribute.isLiteral()) {
 					String value = attribute.getLiteral(event);
 					if (value != null && panel.getSelectedLiterals().contains(value)) {
