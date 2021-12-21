@@ -201,6 +201,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 
 							//refresh the filter
 							getRowSorter().setRowFilter(new DataAnalysisTableRowFilter<O, C, P>(selections));
+							setRowHeights();
 						}
 					});
 					panel.add(combobox);
@@ -212,11 +213,10 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 					}
 				}
 			}
+			
+			//set the filter
+			getRowSorter().setRowFilter(new DataAnalysisTableRowFilter<O, C, P>(selections));
 		}
-	}
-
-	public void createSelections() {
-
 	}
 
 	@SuppressWarnings("unchecked")
