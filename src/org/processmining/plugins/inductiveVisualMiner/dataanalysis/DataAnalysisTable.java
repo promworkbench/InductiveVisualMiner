@@ -20,7 +20,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.TableRowSorter;
 
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTableRowFilter.Item;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.CorrelationDensityPlot;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.MultiComboBox;
@@ -38,7 +37,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 
 	private DataAnalysisView dataAnalysisView;
 	private final IvMDecoratorI decorator;
-	private final Map<String, Item[]> selections;
+	private final Map<String, DataAnalysisTableRowFilterItem[]> selections;
 
 	public DataAnalysisTable(String tabName, DataAnalysesView<C, P> dataAnalysesView, IvMDecoratorI decorator) {
 		super(new DataAnalysisTableModel<O, C, P>(tabName, dataAnalysesView));
@@ -158,7 +157,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 	private void setFiltering() {
 		if (dataAnalysisView != null) {
 			//create the comboboxes
-			final List<MultiComboBox<Item>> comboBoxes = new ArrayList<>();
+			final List<MultiComboBox<DataAnalysisTableRowFilterItem>> comboBoxes = new ArrayList<>();
 			{
 				JPanel panel = dataAnalysisView.getFiltersPanel();
 				panel.removeAll();
@@ -174,23 +173,23 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 					JLabel label = new JLabel(columnName);
 					decorator.decorate(label);
 					panel.add(label);
-					
+
 					panel.add(Box.createRigidArea(new Dimension(3, 0)));
 
-					Set<Item> values = new TreeSet<>();
-					values.add(Item.all());
+					Set<DataAnalysisTableRowFilterItem> values = new TreeSet<>();
+					values.add(DataAnalysisTableRowFilterItem.all());
 					for (int row = 0; row < getModel().getRowCount(); row++) {
-						values.add(new Item(getModel().getRow(row).getName(column)));
+						values.add(new DataAnalysisTableRowFilterItem(getModel().getRow(row).getName(column)));
 					}
-					Item[] items = values.toArray(new Item[values.size()]);
-					MultiComboBox<Item> combobox = new MultiComboBox<Item>(Item.class, items);
+					DataAnalysisTableRowFilterItem[] items = values.toArray(new DataAnalysisTableRowFilterItem[values.size()]);
+					MultiComboBox<DataAnalysisTableRowFilterItem> combobox = new MultiComboBox<DataAnalysisTableRowFilterItem>(DataAnalysisTableRowFilterItem.class, items);
 
 					if (selections.containsKey(columnName)) {
 						//restore cashed selected items
 						combobox.setSelectedItems(selections.get(columnName));
 					} else {
 						//select all
-						combobox.setSelectedItem(Item.all());
+						combobox.setSelectedItem(DataAnalysisTableRowFilterItem.all());
 					}
 
 					decorator.decorate(combobox);
@@ -201,7 +200,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 							selections.put(columnName, combobox.getSelectedObjects());
 
 							//refresh the filter
-							getRowSorter().setRowFilter(getRowSorter().getRowFilter());
+							getRowSorter().setRowFilter(new DataAnalysisTableRowFilter<O, C, P>(selections));
 						}
 					});
 					panel.add(combobox);
@@ -213,9 +212,11 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 					}
 				}
 			}
-
-			getRowSorter().setRowFilter(new DataAnalysisTableRowFilter<O, C, P>(comboBoxes));
 		}
+	}
+
+	public void createSelections() {
+
 	}
 
 	@SuppressWarnings("unchecked")
