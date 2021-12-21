@@ -80,6 +80,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 		DataAnalysisTableRowSorter<O, C, P> sorter = new DataAnalysisTableRowSorter<>(getModel());
 		List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
 
+		//set how name columns should be sorted
 		for (int column = 0; column < getModel().getNumberOfNameColumns(); column++) {
 			sorter.setComparator(column, new Comparator<String>() {
 				@Override
@@ -98,16 +99,16 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 					}
 
 					if (o1.getType() == Type.duration) {
-						Long.compare(((DisplayType.Duration) o1).getValueLong(),
+						return Long.compare(((DisplayType.Duration) o1).getValueLong(),
 								((DisplayType.Duration) o2).getValueLong());
 					}
 
 					if (o1.getType() == Type.time) {
-						Long.compare(((DisplayType.Time) o1).getValueLong(), ((DisplayType.Time) o2).getValueLong());
+						return Long.compare(((DisplayType.Time) o1).getValueLong(), ((DisplayType.Time) o2).getValueLong());
 					}
 
 					if (o1.getType() == Type.numeric) {
-						Double.compare(o1.getValue(), o2.getValue());
+						return Double.compare(o1.getValue(), o2.getValue());
 					}
 
 					return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
