@@ -169,7 +169,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 				}
 
 				for (int column = 0; column < getModel().getNumberOfNameColumns(); column++) {
-					String columnName = getModel().getColumnName(column);
+					final String columnName = getModel().getColumnName(column);
 
 					JLabel label = new JLabel(columnName);
 					decorator.decorate(label);
@@ -183,7 +183,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 						values.add(new DataAnalysisTableRowFilterItem(getModel().getRow(row).getName(column)));
 					}
 					DataAnalysisTableRowFilterItem[] items = values.toArray(new DataAnalysisTableRowFilterItem[values.size()]);
-					MultiComboBox<DataAnalysisTableRowFilterItem> combobox = new MultiComboBox<DataAnalysisTableRowFilterItem>(DataAnalysisTableRowFilterItem.class, items);
+					final MultiComboBox<DataAnalysisTableRowFilterItem> combobox = new MultiComboBox<DataAnalysisTableRowFilterItem>(DataAnalysisTableRowFilterItem.class, items);
 
 					if (selections.containsKey(columnName)) {
 						//restore cashed selected items
