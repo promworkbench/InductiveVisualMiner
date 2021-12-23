@@ -5,7 +5,6 @@ import java.nio.IntBuffer;
 
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.ExternalSettingsManager.ExternalSettings;
-import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RendererFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
 import org.processmining.visualisation3d.GraphicsPipeline;
@@ -58,13 +57,13 @@ public class OpenGLEventListenerImplInstancedFully implements OpenGLEventListene
 		//set up the shaderssome
 		String vertexShader;
 		String fragmentShader;
-		if (RendererFactory.christmas) {
-			vertexShader = "vaoOtherShaderVSinstancedFully";
-			fragmentShader = "vaoOtherShaderFSinstancedFullyChristmas";
-		} else {
-			vertexShader = "vaoOtherShaderVSinstancedFully";
-			fragmentShader = "vaoOtherShaderFSinstancedFully";
-		}
+		//		if (RendererFactory.christmas) {
+		//			vertexShader = "vaoOtherShaderVSinstancedFully";
+		//			fragmentShader = "vaoOtherShaderFSinstancedFullyChristmas";
+		//		} else {
+		vertexShader = "vaoOtherShaderVSinstancedFully";
+		fragmentShader = "vaoOtherShaderFSinstancedFully";
+		//		}
 
 		shader = new JoglShader(
 				"/org/processmining/plugins/inductiveVisualMiner/animation/renderingthread/opengleventlistener",
