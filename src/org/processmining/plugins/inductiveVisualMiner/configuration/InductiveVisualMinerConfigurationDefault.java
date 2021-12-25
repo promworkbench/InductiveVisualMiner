@@ -15,12 +15,14 @@ import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttributeFactory;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceDistinctEventAttribute;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceDuration;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceFitness;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceLength;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfCompleteEvents;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfLogMoves;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfModelMoves;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceSumEventAttribute;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl01GatherAttributes;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl02SortEvents;
 import org.processmining.plugins.inductiveVisualMiner.chain.Cl03MakeLog;
@@ -437,12 +439,19 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			public Iterable<AttributeVirtual> createVirtualIvMTraceAttributes(
 					THashMap<String, AttributeImpl> traceAttributesReal,
 					THashMap<String, AttributeImpl> eventAttributesReal) {
-				return new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
+				ArrayList<AttributeVirtual> result = new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
 						new VirtualAttributeTraceNumberOfCompleteEvents(), //
 						new VirtualAttributeTraceFitness(), //
 						new VirtualAttributeTraceNumberOfModelMoves(), //
 						new VirtualAttributeTraceNumberOfLogMoves(), //
 				}));
+				for (AttributeImpl eventAttribute : eventAttributesReal.values()) {
+					result.add(new VirtualAttributeTraceDistinctEventAttribute(eventAttribute));
+					if (eventAttribute.isNumeric()) {
+						result.add(new VirtualAttributeTraceSumEventAttribute(eventAttribute));
+					}
+				}
+				return result;
 			}
 
 			public Iterable<AttributeVirtual> createVirtualIvMEventAttributes(

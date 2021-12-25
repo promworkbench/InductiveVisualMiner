@@ -555,7 +555,7 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			public String toString() {
 				return "traces having event without attribute";
 			}
-		},
+		}
 	}
 
 }
