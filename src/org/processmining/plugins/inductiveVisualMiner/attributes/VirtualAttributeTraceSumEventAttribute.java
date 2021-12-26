@@ -18,7 +18,7 @@ public class VirtualAttributeTraceSumEventAttribute extends AttributeVirtualTrac
 
 	@Override
 	public String getName() {
-		return "trace sum of event attribute " + attribute.getName();
+		return "trace sum of " + attribute.getName();
 	}
 
 	@Override

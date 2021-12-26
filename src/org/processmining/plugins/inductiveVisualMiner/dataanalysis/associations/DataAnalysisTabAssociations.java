@@ -57,6 +57,7 @@ public class DataAnalysisTabAssociations<C, P> extends DataAnalysisTabAbstract<O
 				.setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "" },
 						{ "Attribute A", "attribute B", "property", "value" },
 						{ "Attribute A", "attribute B", "property", "highlighted traces", "not-highlighted traces" } });
+
 		return table;
 	}
 
