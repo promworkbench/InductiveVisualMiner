@@ -15,6 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.Configuratio
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Histogram;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -80,8 +81,8 @@ public class RowBlockModelWeibull<C extends ConfigurationWithDecorator, P> exten
 							result.add(new DataRow<Object>(DisplayType.numeric(weibull.getB()),
 									model.getActivityName(node), durationType.toString(), "Weibull k"));
 
-							BufferedImage image = Histogram.create(durations.get(node).toArray(),
-									new WeibullDistribution(weibull.getB(), weibull.getA()), decorator);
+							BufferedImage image = Histogram.create(durations.get(node).toArray(), Type.duration,
+									new WeibullDistribution(weibull.getB(), weibull.getA()), true, decorator);
 							result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node),
 									durationType.toString(), "Weibull plot"));
 						} else {

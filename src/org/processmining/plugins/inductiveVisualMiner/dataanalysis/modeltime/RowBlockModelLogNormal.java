@@ -14,6 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.Configuratio
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Histogram;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -81,8 +82,8 @@ public class RowBlockModelLogNormal<C extends ConfigurationWithDecorator, P>
 							result.add(new DataRow<Object>(DisplayType.numeric(logNormal.getB()),
 									model.getActivityName(node), durationType.toString(), "lognormal σ"));
 
-							BufferedImage image = Histogram.create(durations.get(node).toArray(),
-									new LogNormalDistribution(logNormal.getA(), logNormal.getB()), decorator);
+							BufferedImage image = Histogram.create(durations.get(node).toArray(), Type.duration,
+									new LogNormalDistribution(logNormal.getA(), logNormal.getB()), true, decorator);
 							result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node),
 									durationType.toString(), "lognormal plot"));
 						} else {

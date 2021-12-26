@@ -12,6 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.Configuratio
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Histogram;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
@@ -76,7 +77,8 @@ public class RowBlockModelHistogram<C extends ConfigurationWithDecorator, P>
 			for (int node : model.getAllNodes()) {
 				if (model.isActivity(node)) {
 					if (!durations.get(node).isEmpty()) {
-						BufferedImage image = Histogram.create(durations.get(node).toArray(), decorator);
+						BufferedImage image = Histogram.create(durations.get(node).toArray(), Type.duration, null,
+								false, decorator);
 						result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node),
 								durationType.toString(), "histogram"));
 					}

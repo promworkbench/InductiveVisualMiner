@@ -107,7 +107,8 @@ public class EventDataRowBlockHistogram<C extends ConfigurationWithDecorator, P>
 		}
 
 		//create histogram
-		BufferedImage image = Histogram.create(values.toArray(), false, decorator);
+		BufferedImage image = Histogram.create(values.toArray(), DisplayType.fromAttribute(attribute), null, false,
+				decorator);
 		result.add(new DataRow<Object>(DisplayType.image(image), attribute.getName(), "histogram"));
 
 		return result;
@@ -137,7 +138,8 @@ public class EventDataRowBlockHistogram<C extends ConfigurationWithDecorator, P>
 		}
 
 		//create histogram
-		BufferedImage image = Histogram.create(values.toArray(), false, decorator);
+		BufferedImage image = Histogram.create(values.toArray(), DisplayType.fromAttribute(attribute), null, false,
+				decorator);
 		result.add(new DataRow<Object>(DisplayType.image(image), attribute.getName(), "histogram"));
 
 		return result;
