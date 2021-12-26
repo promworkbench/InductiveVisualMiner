@@ -7,11 +7,13 @@ import java.util.List;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
+import org.processmining.plugins.inductiveVisualMiner.configuration.ConfigurationWithDecorator;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Histogram;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -23,7 +25,8 @@ import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TLongArrayList;
 
-public class TraceDataRowBlockHistogram<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class TraceDataRowBlockHistogram<C extends ConfigurationWithDecorator, P>
+		extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "trace-att-hist";
@@ -50,12 +53,14 @@ public class TraceDataRowBlockHistogram<C, P> extends DataRowBlockComputer<Objec
 			negativeLog.invert();
 
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				result.addAll(TraceDataRowBlock.merge(createAttributeData(logFiltered, attribute, canceller),
-						createAttributeData(negativeLog, attribute, canceller), canceller));
+				result.addAll(TraceDataRowBlock.merge(
+						createAttributeData(logFiltered, attribute, canceller, configuration.getDecorator()),
+						createAttributeData(negativeLog, attribute, canceller, configuration.getDecorator()),
+						canceller));
 			}
 		} else {
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				result.addAll(createAttributeData(logFiltered, attribute, canceller));
+				result.addAll(createAttributeData(logFiltered, attribute, canceller, configuration.getDecorator()));
 			}
 		}
 
@@ -63,21 +68,21 @@ public class TraceDataRowBlockHistogram<C, P> extends DataRowBlockComputer<Objec
 	}
 
 	public static List<DataRow<Object>> createAttributeData(IvMLogFiltered logFiltered, Attribute attribute,
-			IvMCanceller canceller) {
+			IvMCanceller canceller, IvMDecoratorI decorator) {
 		if (attribute.isNumeric()) {
-			return createAttributeDataNumeric(logFiltered, attribute, canceller);
+			return createAttributeDataNumeric(logFiltered, attribute, canceller, decorator);
 		} else if (attribute.isTime()) {
-			return createAttributeDataTime(logFiltered, attribute, canceller);
+			return createAttributeDataTime(logFiltered, attribute, canceller, decorator);
 		} else if (attribute.isLiteral()) {
 			//return createAttributeDataLiteral(logFiltered, attribute, canceller);
 		} else if (attribute.isDuration()) {
-			return createAttributeDataDuration(logFiltered, attribute, canceller);
+			return createAttributeDataDuration(logFiltered, attribute, canceller, decorator);
 		}
 		return new ArrayList<>();
 	}
 
 	public static List<DataRow<Object>> createAttributeDataNumeric(IvMLogFiltered log, Attribute attribute,
-			IvMCanceller canceller) {
+			IvMCanceller canceller, IvMDecoratorI decorator) {
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		//gather values
@@ -90,7 +95,7 @@ public class TraceDataRowBlockHistogram<C, P> extends DataRowBlockComputer<Objec
 				if (value != -Double.MAX_VALUE) {
 					values.add(value);
 				}
-				
+
 				if (canceller.isCancelled()) {
 					return result;
 				}
@@ -98,14 +103,14 @@ public class TraceDataRowBlockHistogram<C, P> extends DataRowBlockComputer<Objec
 		}
 
 		//create histogram
-		BufferedImage image = Histogram.create(values.toArray(), false);
+		BufferedImage image = Histogram.create(values.toArray(), false, decorator);
 		result.add(new DataRow<Object>(DisplayType.image(image), attribute.getName(), "histogram"));
 
 		return result;
 	}
 
 	public static List<DataRow<Object>> createAttributeDataTime(IvMLogFiltered log, Attribute attribute,
-			IvMCanceller canceller) {
+			IvMCanceller canceller, IvMDecoratorI decorator) {
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		//gather values
@@ -118,7 +123,7 @@ public class TraceDataRowBlockHistogram<C, P> extends DataRowBlockComputer<Objec
 				if (value != Long.MIN_VALUE) {
 					values.add(value);
 				}
-				
+
 				if (canceller.isCancelled()) {
 					return result;
 				}
@@ -126,14 +131,14 @@ public class TraceDataRowBlockHistogram<C, P> extends DataRowBlockComputer<Objec
 		}
 
 		//create histogram
-		BufferedImage image = Histogram.create(values.toArray(), false);
+		BufferedImage image = Histogram.create(values.toArray(), false, decorator);
 		result.add(new DataRow<Object>(DisplayType.image(image), attribute.getName(), "histogram"));
 
 		return result;
 	}
 
 	public static List<DataRow<Object>> createAttributeDataDuration(IvMLogFiltered log, Attribute attribute,
-			IvMCanceller canceller) {
+			IvMCanceller canceller, IvMDecoratorI decorator) {
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		//gather values
@@ -146,7 +151,7 @@ public class TraceDataRowBlockHistogram<C, P> extends DataRowBlockComputer<Objec
 				if (value != Long.MIN_VALUE) {
 					values.add(value);
 				}
-				
+
 				if (canceller.isCancelled()) {
 					return result;
 				}
@@ -154,7 +159,7 @@ public class TraceDataRowBlockHistogram<C, P> extends DataRowBlockComputer<Objec
 		}
 
 		//create histogram
-		BufferedImage image = Histogram.create(values.toArray(), false);
+		BufferedImage image = Histogram.create(values.toArray(), false, decorator);
 		result.add(new DataRow<Object>(DisplayType.image(image), attribute.getName(), "histogram"));
 
 		return result;

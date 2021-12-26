@@ -8,6 +8,7 @@ import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
+import org.processmining.plugins.inductiveVisualMiner.configuration.ConfigurationWithDecorator;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
@@ -15,6 +16,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattribut
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Histogram;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
@@ -28,7 +30,8 @@ import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
-public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class RowBlockModelHistogram<C extends ConfigurationWithDecorator, P>
+		extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "model-time-hist";
@@ -42,8 +45,8 @@ public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C
 		return new IvMObject<?>[] { IvMObject.model, IvMObject.aligned_log_filtered, IvMObject.data_analyses_delay };
 	}
 
-	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
-			throws Exception {
+	public List<DataRow<Object>> compute(ConfigurationWithDecorator configuration, IvMObjectValues inputs,
+			IvMCanceller canceller) throws Exception {
 		IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 		IvMModel model = inputs.get(IvMObject.model);
 
@@ -51,15 +54,16 @@ public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C
 			IvMLogFilteredImpl negativeLog = logFiltered.clone();
 			negativeLog.invert();
 
-			return TraceDataRowBlock.merge(createAttributeData(model, logFiltered, canceller),
-					createAttributeData(model, negativeLog, canceller), canceller);
+			return TraceDataRowBlock.merge(
+					createAttributeData(model, logFiltered, canceller, configuration.getDecorator()),
+					createAttributeData(model, negativeLog, canceller, configuration.getDecorator()), canceller);
 		} else {
-			return createAttributeData(model, logFiltered, canceller);
+			return createAttributeData(model, logFiltered, canceller, configuration.getDecorator());
 		}
 	}
 
-	public static List<DataRow<Object>> createAttributeData(IvMModel model, IvMLogFiltered log,
-			IvMCanceller canceller) {
+	public static List<DataRow<Object>> createAttributeData(IvMModel model, IvMLogFiltered log, IvMCanceller canceller,
+			IvMDecoratorI decorator) {
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		for (DurationType durationType : DurationType.valuesAt(Level.activity)) {
@@ -72,7 +76,7 @@ public class RowBlockModelHistogram<C, P> extends DataRowBlockComputer<Object, C
 			for (int node : model.getAllNodes()) {
 				if (model.isActivity(node)) {
 					if (!durations.get(node).isEmpty()) {
-						BufferedImage image = Histogram.create(durations.get(node).toArray());
+						BufferedImage image = Histogram.create(durations.get(node).toArray(), decorator);
 						result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node),
 								durationType.toString(), "histogram"));
 					}

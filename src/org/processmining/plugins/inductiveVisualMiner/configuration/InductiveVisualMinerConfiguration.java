@@ -9,7 +9,6 @@ import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -34,7 +33,7 @@ import org.processmining.plugins.inductiveVisualMiner.visualMinerWrapper.VisualM
  * @author sander
  *
  */
-public interface InductiveVisualMinerConfiguration {
+public interface InductiveVisualMinerConfiguration extends ConfigurationWithDecorator {
 
 	/**
 	 * The list of available discovery techniques.
@@ -119,6 +118,6 @@ public interface InductiveVisualMinerConfiguration {
 
 	public List<CostModelFactory> getCostModelFactories();
 
-	public IvMDecoratorI getDecorator();
+	
 
 }

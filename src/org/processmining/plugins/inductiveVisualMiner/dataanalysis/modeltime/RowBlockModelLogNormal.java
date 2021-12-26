@@ -10,12 +10,14 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
+import org.processmining.plugins.inductiveVisualMiner.configuration.ConfigurationWithDecorator;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Histogram;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.performance.DurationType;
@@ -25,7 +27,8 @@ import org.processmining.statisticaltests.helperclasses.Correlation;
 import gnu.trove.list.TLongList;
 import gnu.trove.map.TIntObjectMap;
 
-public class RowBlockModelLogNormal<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class RowBlockModelLogNormal<C extends ConfigurationWithDecorator, P>
+		extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "model-time-lognormal";
@@ -48,14 +51,16 @@ public class RowBlockModelLogNormal<C, P> extends DataRowBlockComputer<Object, C
 			IvMLogFilteredImpl negativeLog = logFiltered.clone();
 			negativeLog.invert();
 
-			return TraceDataRowBlock.merge(createAttributeData(model, logFiltered, canceller),
-					createAttributeData(model, negativeLog, canceller), canceller);
+			return TraceDataRowBlock.merge(
+					createAttributeData(model, logFiltered, canceller, configuration.getDecorator()),
+					createAttributeData(model, negativeLog, canceller, configuration.getDecorator()), canceller);
 		} else {
-			return createAttributeData(model, logFiltered, canceller);
+			return createAttributeData(model, logFiltered, canceller, configuration.getDecorator());
 		}
 	}
 
-	private List<DataRow<Object>> createAttributeData(IvMModel model, IvMLogFiltered log, IvMCanceller canceller) {
+	private List<DataRow<Object>> createAttributeData(IvMModel model, IvMLogFiltered log, IvMCanceller canceller,
+			IvMDecoratorI decorator) {
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		for (DurationType durationType : DurationType.valuesAt(Level.activity)) {
@@ -77,7 +82,7 @@ public class RowBlockModelLogNormal<C, P> extends DataRowBlockComputer<Object, C
 									model.getActivityName(node), durationType.toString(), "lognormal σ"));
 
 							BufferedImage image = Histogram.create(durations.get(node).toArray(),
-									new LogNormalDistribution(logNormal.getA(), logNormal.getB()));
+									new LogNormalDistribution(logNormal.getA(), logNormal.getB()), decorator);
 							result.add(new DataRow<Object>(DisplayType.image(image), model.getActivityName(node),
 									durationType.toString(), "lognormal plot"));
 						} else {
