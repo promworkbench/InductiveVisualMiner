@@ -20,7 +20,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 public class DataAnalysisTabAssociations<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
 	public static final String name = "Associations";
-	public static final String explanation = "Study influence of trace attributes on process behaviour.";
+	public static final String explanation = "Study influence of trace attributes on one another and on process behaviour.";
 
 	public DataAnalysisTabAssociations(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
 			Callable<List<DataRowBlockComputer<Object, C, P>>> rowBlockComputersCreator) {
@@ -37,8 +37,14 @@ public class DataAnalysisTabAssociations<C, P> extends DataAnalysisTabAbstract<O
 			@Override
 			protected void setDefaultSorting(TableRowSorter<DataAnalysisTableModel<Object, C, P>> sorter,
 					List<SortKey> sortKeys) {
-				if (getColumnCount() >= 4) {
-					sortKeys.add(new RowSorter.SortKey(3, SortOrder.DESCENDING));
+				if (getColumnCount() >= 1) {
+					sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+				}
+				if (getColumnCount() >= 2) {
+					sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+				}
+				if (getColumnCount() >= 3) {
+					sortKeys.add(new RowSorter.SortKey(2, SortOrder.ASCENDING));
 				}
 			}
 
@@ -47,8 +53,10 @@ public class DataAnalysisTabAssociations<C, P> extends DataAnalysisTabAbstract<O
 				return IvMObject.selected_associations_enabled;
 			}
 		};
-		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "" },
-				{ "Trace attribute", "attribute type", "association with process", "distance plot" } });
+		table.getModel()
+				.setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "" },
+						{ "Attribute A", "attribute B", "property", "value" },
+						{ "Attribute A", "attribute B", "property", "highlighted traces", "not-highlighted traces" } });
 		return table;
 	}
 

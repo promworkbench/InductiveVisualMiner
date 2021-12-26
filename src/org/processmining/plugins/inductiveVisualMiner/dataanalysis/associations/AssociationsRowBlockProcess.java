@@ -12,10 +12,9 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
-import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.statisticaltests.association.Associations;
 
-public class RowBlockAssociations<C, P> extends DataRowBlockAbstract<Object, C, P> {
+public class AssociationsRowBlockProcess<C, P> extends DataRowBlockAbstract<Object, C, P> {
 
 	@Override
 	public String getName() {
@@ -34,28 +33,17 @@ public class RowBlockAssociations<C, P> extends DataRowBlockAbstract<Object, C, 
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		for (int att = 0; att < associations.getNumberOfAttributes(); att++) {
-			DisplayType attributeType;
-			{
-				Attribute attribute = associations.getAttribute(att);
-				if (attribute.isNumeric()) {
-					attributeType = DisplayType.literal("numeric");
-				} else if (attribute.isLiteral()) {
-					attributeType = DisplayType.literal("literal");
-				} else if (attribute.isTime()) {
-					attributeType = DisplayType.literal("time");
-				} else {
-					attributeType = DisplayType.literal("other");
-				}
-			}
-
 			DisplayType associationValue;
 			if (associations.getAssociation(att) != -Double.MAX_VALUE) {
 				associationValue = DisplayType.numeric(associations.getAssociation(att));
 			} else {
 				associationValue = DisplayType.NA();
 			}
+			result.add(new DataRow<Object>(associationValue, associations.getAttribute(att).getName(), "process",
+					AssociationType.association.toString()));
+			result.add(new DataRow<Object>(associationValue, "process", associations.getAttribute(att).getName(),
+					AssociationType.association.toString()));
 
-			DisplayType[] values;
 			if (associations.getImage(att) != null) {
 				Icon icon = associations.getImage(att);
 				BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),
@@ -64,12 +52,17 @@ public class RowBlockAssociations<C, P> extends DataRowBlockAbstract<Object, C, 
 				icon.paintIcon(null, g, 0, 0);
 				g.dispose();
 
-				values = new DisplayType[] { attributeType, associationValue, DisplayType.image(bi) };
-			} else {
-				values = new DisplayType[] { attributeType, associationValue };
+				result.add(new DataRow<Object>(DisplayType.image(bi), associations.getAttribute(att).getName(),
+						"process", AssociationType.associationPlot.toString()));
+				result.add(new DataRow<Object>(DisplayType.image(bi), "process",
+						associations.getAttribute(att).getName(), AssociationType.associationPlot.toString()));
 			}
 
-			result.add(new DataRow<Object>(associations.getAttribute(att).getName(), values));
+			result.add(new DataRow<Object>(DisplayType.literal("P-NA association"),
+					associations.getAttribute(att).getName(), "process",
+					AssociationType.associationMeasure.toString()));
+			result.add(new DataRow<Object>(DisplayType.literal("P-NA association"), "process",
+					associations.getAttribute(att).getName(), AssociationType.associationMeasure.toString()));
 		}
 
 		return result;

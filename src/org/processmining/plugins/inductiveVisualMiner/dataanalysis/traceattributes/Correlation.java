@@ -10,6 +10,30 @@ import gnu.trove.list.array.TLongArrayList;
 
 public class Correlation {
 
+	public static double[] filterMissingValues(double[] valuesX) {
+		TDoubleArrayList newValuesX = new TDoubleArrayList();
+
+		for (int i = 0; i < valuesX.length; i++) {
+			if (valuesX[i] > -Double.MAX_VALUE) {
+				newValuesX.add(valuesX[i]);
+			}
+		}
+
+		return newValuesX.toArray();
+	}
+
+	public static long[] filterMissingValues(long[] valuesX) {
+		TLongArrayList newValuesX = new TLongArrayList();
+
+		for (int i = 0; i < valuesX.length; i++) {
+			if (valuesX[i] != Long.MIN_VALUE) {
+				newValuesX.add(valuesX[i]);
+			}
+		}
+
+		return newValuesX.toArray();
+	}
+
 	/**
 	 * Only keeps the elements of which both lists have a value.
 	 * 

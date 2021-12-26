@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes;
 
-import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +8,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.math.plot.utils.Array;
-import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Fitness;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
@@ -48,7 +46,6 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 
 		//count number of traces
 		int numberOfTraces = getNumberOfTraces(logFiltered);
-		double[] trace2fitness = getTrace2fitness(logFiltered, numberOfTraces);
 
 		List<DataRow<Object>> result = new ArrayList<>();
 
@@ -56,18 +53,14 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			IvMLogFilteredImpl negativeLog = logFiltered.clone();
 			negativeLog.invert();
 			int numberOfTracesNegative = getNumberOfTraces(negativeLog);
-			double[] trace2fitnessNegative = getTrace2fitness(negativeLog, numberOfTracesNegative);
 
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				result.addAll(
-						merge(createAttributeData(logFiltered, attribute, numberOfTraces, trace2fitness, canceller),
-								createAttributeData(negativeLog, attribute, numberOfTracesNegative,
-										trace2fitnessNegative, canceller),
-								canceller));
+				result.addAll(merge(createAttributeData(logFiltered, attribute, numberOfTraces, canceller),
+						createAttributeData(negativeLog, attribute, numberOfTracesNegative, canceller), canceller));
 			}
 		} else {
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				result.addAll(createAttributeData(logFiltered, attribute, numberOfTraces, trace2fitness, canceller));
+				result.addAll(createAttributeData(logFiltered, attribute, numberOfTraces, canceller));
 			}
 		}
 
@@ -134,15 +127,15 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 	}
 
 	public static List<DataRow<Object>> createAttributeData(IvMLogFiltered logFiltered, Attribute attribute,
-			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
+			int numberOfTraces, IvMCanceller canceller) {
 		if (attribute.isNumeric()) {
-			return createAttributeDataNumeric(logFiltered, attribute, numberOfTraces, trace2fitness, canceller);
+			return createAttributeDataNumeric(logFiltered, attribute, numberOfTraces, canceller);
 		} else if (attribute.isTime()) {
-			return createAttributeDataTime(logFiltered, attribute, numberOfTraces, trace2fitness, canceller);
+			return createAttributeDataTime(logFiltered, attribute, numberOfTraces, canceller);
 		} else if (attribute.isLiteral()) {
-			return createAttributeDataLiteral(logFiltered, attribute, numberOfTraces, trace2fitness, canceller);
+			return createAttributeDataLiteral(logFiltered, attribute, numberOfTraces, canceller);
 		} else if (attribute.isDuration()) {
-			return createAttributeDataDuration(logFiltered, attribute, numberOfTraces, trace2fitness, canceller);
+			return createAttributeDataDuration(logFiltered, attribute, numberOfTraces, canceller);
 		}
 
 		List<DataRow<Object>> result = new ArrayList<>();
@@ -151,13 +144,12 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 	}
 
 	private static List<DataRow<Object>> createAttributeDataNumeric(IvMLogFiltered logFiltered, Attribute attribute,
-			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
+			int numberOfTraces, IvMCanceller canceller) {
 		Type attributeType = DisplayType.fromAttribute(attribute);
 
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		//compute correlation and plots
-		double[] fitnessFiltered;
 		double[] valuesFiltered;
 		{
 			double[] values = new double[numberOfTraces];
@@ -177,9 +169,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			}
 
 			//filter missing values
-			Pair<double[], double[]> p = Correlation.filterMissingValues(trace2fitness, values);
-			fitnessFiltered = p.getA();
-			valuesFiltered = p.getB();
+			valuesFiltered = Correlation.filterMissingValues(values);
 		}
 
 		//we assume we always have a fitness value, so we can use the filtered lists
@@ -196,12 +186,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			result.add(c(attribute, Field.average, DisplayType.NA()));
 			result.add(c(attribute, Field.median, DisplayType.NA()));
 			result.add(c(attribute, Field.max, DisplayType.NA()));
-			result.add(c(attribute, Field.minFitness, DisplayType.NA()));
-			result.add(c(attribute, Field.averageFitness, DisplayType.NA()));
-			result.add(c(attribute, Field.maxFitness, DisplayType.NA()));
 			result.add(c(attribute, Field.standardDeviation, DisplayType.NA()));
-			result.add(c(attribute, Field.correlation, DisplayType.NA()));
-			result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
 		} else {
 			double min = Array.min(valuesFiltered);
 			result.add(c(attribute, Field.min, DisplayType.create(attributeType, min)));
@@ -232,61 +217,14 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 				return result;
 			}
 
-			double minFitness = Array.min(fitnessFiltered);
-			result.add(c(attribute, Field.minFitness, DisplayType.numeric(minFitness)));
-
-			if (canceller.isCancelled()) {
-				return result;
-			}
-
-			result.add(c(attribute, Field.averageFitness,
-					DisplayType.numeric(Correlation.mean(fitnessFiltered).doubleValue())));
-
-			if (canceller.isCancelled()) {
-				return result;
-			}
-
-			double maxFitness = Array.max(fitnessFiltered);
-			result.add(c(attribute, Field.maxFitness, DisplayType.numeric(maxFitness)));
-
-			if (canceller.isCancelled()) {
-				return result;
-			}
-
 			if (min == max) {
 				result.add(c(attribute, Field.standardDeviation, DisplayType.NA()));
-				result.add(c(attribute, Field.correlation, DisplayType.NA()));
-				result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
 			} else {
 				double standardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
 				result.add(c(attribute, Field.standardDeviation, DisplayType.create(attributeType, standardDeviation)));
 
 				if (canceller.isCancelled()) {
 					return result;
-				}
-
-				if (minFitness == maxFitness) {
-					result.add(c(attribute, Field.correlation, DisplayType.NA()));
-					result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
-				} else {
-					double correlation = Correlation
-							.correlation(fitnessFiltered, valuesFiltered, valuesAverage, standardDeviation)
-							.doubleValue();
-					if (correlation == -Double.MAX_VALUE) {
-						result.add(c(attribute, Field.correlation, DisplayType.NA()));
-						result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
-					} else {
-						result.add(c(attribute, Field.correlation, DisplayType.numeric(correlation)));
-
-						if (canceller.isCancelled()) {
-							return result;
-						}
-
-						BufferedImage plot = CorrelationDensityPlot.create(attribute.getName(), valuesFiltered,
-								getDoubleMin(attribute), getDoubleMax(attribute), "fitness", fitnessFiltered,
-								minFitness, maxFitness);
-						result.add(c(attribute, Field.correlationPlot, DisplayType.image(plot)));
-					}
 				}
 			}
 		}
@@ -295,13 +233,12 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 	}
 
 	private static List<DataRow<Object>> createAttributeDataTime(IvMLogFiltered logFiltered, Attribute attribute,
-			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
+			int numberOfTraces, IvMCanceller canceller) {
 		Type attributeType = Type.time;
 
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		//compute correlation and plots
-		double[] fitnessFiltered;
 		long[] valuesFiltered;
 		{
 			long[] values = new long[numberOfTraces];
@@ -321,9 +258,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			}
 
 			//filter missing values
-			Pair<long[], double[]> p = Correlation.filterMissingValues(values, trace2fitness);
-			valuesFiltered = p.getA();
-			fitnessFiltered = p.getB();
+			valuesFiltered = Correlation.filterMissingValues(values);
 		}
 
 		//we assume we always have a fitness value, so we can use the filtered lists
@@ -340,12 +275,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			result.add(c(attribute, Field.average, DisplayType.NA()));
 			result.add(c(attribute, Field.median, DisplayType.NA()));
 			result.add(c(attribute, Field.max, DisplayType.NA()));
-			result.add(c(attribute, Field.minFitness, DisplayType.NA()));
-			result.add(c(attribute, Field.averageFitness, DisplayType.NA()));
-			result.add(c(attribute, Field.maxFitness, DisplayType.NA()));
 			result.add(c(attribute, Field.standardDeviation, DisplayType.NA()));
-			result.add(c(attribute, Field.correlation, DisplayType.NA()));
-			result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
 		} else {
 			long min = NumberUtils.min(valuesFiltered);
 			result.add(c(attribute, Field.min, DisplayType.create(attributeType, min)));
@@ -375,31 +305,8 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 				return result;
 			}
 
-			double minFitness = Array.min(fitnessFiltered);
-			result.add(c(attribute, Field.minFitness, DisplayType.numeric(minFitness)));
-
-			if (canceller.isCancelled()) {
-				return result;
-			}
-
-			BigDecimal meanFitness = Correlation.mean(fitnessFiltered);
-			result.add(c(attribute, Field.averageFitness, DisplayType.numeric(meanFitness.doubleValue())));
-
-			if (canceller.isCancelled()) {
-				return result;
-			}
-
-			double maxFitness = Array.max(fitnessFiltered);
-			result.add(c(attribute, Field.maxFitness, DisplayType.numeric(maxFitness)));
-
-			if (canceller.isCancelled()) {
-				return result;
-			}
-
 			if (min == max) {
 				result.add(c(attribute, Field.standardDeviation, DisplayType.NA()));
-				result.add(c(attribute, Field.correlation, DisplayType.NA()));
-				result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
 			} else {
 				double standardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
 				result.add(c(attribute, Field.standardDeviation,
@@ -408,29 +315,6 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 				if (canceller.isCancelled()) {
 					return result;
 				}
-
-				if (minFitness == maxFitness) {
-					result.add(c(attribute, Field.correlation, DisplayType.NA()));
-					result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
-				} else {
-					double correlation = Correlation
-							.correlation(fitnessFiltered, valuesFiltered, valuesAverage, standardDeviation)
-							.doubleValue();
-					if (correlation == -Double.MAX_VALUE) {
-						result.add(c(attribute, Field.correlation, DisplayType.NA()));
-						result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
-					} else {
-						result.add(c(attribute, Field.correlation, DisplayType.numeric(correlation)));
-
-						if (canceller.isCancelled()) {
-							return result;
-						}
-
-						BufferedImage plot = CorrelationDensityPlot.create(attribute.getName(), valuesFiltered, min,
-								max, "fitness", fitnessFiltered, minFitness, maxFitness);
-						result.add(c(attribute, Field.correlationPlot, DisplayType.image(plot)));
-					}
-				}
 			}
 		}
 
@@ -438,7 +322,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 	}
 
 	private static List<DataRow<Object>> createAttributeDataLiteral(IvMLogFiltered logFiltered, Attribute attribute,
-			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
+			int numberOfTraces, IvMCanceller canceller) {
 		assert !attribute.isVirtual();
 
 		List<DataRow<Object>> result = new ArrayList<>();
@@ -484,13 +368,12 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 	}
 
 	private static List<DataRow<Object>> createAttributeDataDuration(IvMLogFiltered logFiltered, Attribute attribute,
-			int numberOfTraces, double[] trace2fitness, IvMCanceller canceller) {
+			int numberOfTraces, IvMCanceller canceller) {
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		Type attributeType = Type.duration;
 
 		//compute correlation and plots
-		double[] fitnessFiltered;
 		long[] valuesFiltered;
 		{
 			long[] values = new long[numberOfTraces];
@@ -510,9 +393,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			}
 
 			//filter missing values
-			Pair<long[], double[]> p = Correlation.filterMissingValues(values, trace2fitness);
-			valuesFiltered = p.getA();
-			fitnessFiltered = p.getB();
+			valuesFiltered = Correlation.filterMissingValues(values);
 		}
 
 		//we assume we always have a fitness value, so we can use the filtered lists
@@ -529,12 +410,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			result.add(c(attribute, Field.average, DisplayType.NA()));
 			result.add(c(attribute, Field.median, DisplayType.NA()));
 			result.add(c(attribute, Field.max, DisplayType.NA()));
-			result.add(c(attribute, Field.minFitness, DisplayType.NA()));
-			result.add(c(attribute, Field.averageFitness, DisplayType.NA()));
-			result.add(c(attribute, Field.maxFitness, DisplayType.NA()));
 			result.add(c(attribute, Field.standardDeviation, DisplayType.NA()));
-			result.add(c(attribute, Field.correlation, DisplayType.NA()));
-			result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
 		} else {
 			long min = NumberUtils.min(valuesFiltered);
 			result.add(c(attribute, Field.min, DisplayType.create(attributeType, min)));
@@ -564,63 +440,12 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 				return result;
 			}
 
-			double minFitness = Array.min(fitnessFiltered);
-			result.add(c(attribute, Field.minFitness, DisplayType.numeric(minFitness)));
-
-			if (canceller.isCancelled()) {
-				return result;
-			}
-
-			BigDecimal meanFitness = Correlation.mean(fitnessFiltered);
-			assert meanFitness != null;
-			result.add(c(attribute, Field.averageFitness, DisplayType.numeric(meanFitness.doubleValue())));
-
-			if (canceller.isCancelled()) {
-				return result;
-			}
-
-			double maxFitness = Array.max(fitnessFiltered);
-			result.add(c(attribute, Field.maxFitness, DisplayType.numeric(maxFitness)));
-
-			if (canceller.isCancelled()) {
-				return result;
-			}
-
 			if (min == max) {
 				result.add(c(attribute, Field.standardDeviation, DisplayType.NA()));
-				result.add(c(attribute, Field.correlation, DisplayType.NA()));
-				result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
 			} else {
 				double standardDeviation = Correlation.standardDeviation(valuesFiltered, valuesAverage);
 				result.add(c(attribute, Field.standardDeviation,
 						DisplayType.create(attributeType, Math.round(standardDeviation))));
-
-				if (canceller.isCancelled()) {
-					return result;
-				}
-
-				if (minFitness == maxFitness) {
-					result.add(c(attribute, Field.correlation, DisplayType.NA()));
-					result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
-				} else {
-					double correlation = Correlation
-							.correlation(fitnessFiltered, valuesFiltered, valuesAverage, standardDeviation)
-							.doubleValue();
-					if (correlation == -Double.MAX_VALUE) {
-						result.add(c(attribute, Field.correlation, DisplayType.NA()));
-						result.add(c(attribute, Field.correlationPlot, DisplayType.NA()));
-					} else {
-						result.add(c(attribute, Field.correlation, DisplayType.numeric(correlation)));
-
-						if (canceller.isCancelled()) {
-							return result;
-						}
-
-						BufferedImage plot = CorrelationDensityPlot.create(attribute.getName(), valuesFiltered, min,
-								max, "fitness", fitnessFiltered, minFitness, maxFitness);
-						result.add(c(attribute, Field.correlationPlot, DisplayType.image(plot)));
-					}
-				}
 			}
 		}
 
@@ -676,51 +501,6 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			public String toString() {
 				return "traces with attribute";
 			}
-		},
-		minFitness {
-			public String toString() {
-				return "minimum fitness";
-			}
-		},
-		averageFitness {
-			public String toString() {
-				return "average fitness of traces with attribute";
-			}
-		},
-		maxFitness {
-			public String toString() {
-				return "maximum fitness";
-			}
-		},
-		correlation {
-			public String toString() {
-				return "correlation with fitness";
-			}
-		},
-		correlationPlot {
-			public String toString() {
-				return "correlation with fitness plot";
-			}
-		};
-	}
-
-	private static double getDoubleMin(Attribute attribute) {
-		if (attribute.isNumeric()) {
-			return attribute.getNumericMin();
-		} else if (attribute.isDuration()) {
-			return attribute.getDurationMin();
-		} else {
-			return attribute.getTimeMin();
-		}
-	}
-
-	private static double getDoubleMax(Attribute attribute) {
-		if (attribute.isNumeric()) {
-			return attribute.getNumericMax();
-		} else if (attribute.isDuration()) {
-			return attribute.getDurationMax();
-		} else {
-			return attribute.getTimeMax();
 		}
 	}
 }

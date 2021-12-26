@@ -24,7 +24,7 @@ public class VirtualAttributeTraceDistinctEventAttribute extends AttributeVirtua
 
 	@Override
 	public String getName() {
-		return "distinct values per trace of event attribute " + attribute.getName();
+		return "distinct values per trace of " + attribute.getName();
 	}
 
 	@Override

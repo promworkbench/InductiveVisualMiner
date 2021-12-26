@@ -35,7 +35,6 @@ public class TraceDataRowBlockVirtual<C, P> extends DataRowBlockComputer<Object,
 
 		//count number of traces
 		int numberOfTraces = TraceDataRowBlock.getNumberOfTraces(logFiltered);
-		double[] trace2fitness = TraceDataRowBlock.getTrace2fitness(logFiltered, numberOfTraces);
 
 		List<DataRow<Object>> result = new ArrayList<>();
 
@@ -43,20 +42,17 @@ public class TraceDataRowBlockVirtual<C, P> extends DataRowBlockComputer<Object,
 			IvMLogFilteredImpl negativeLog = logFiltered.clone();
 			negativeLog.invert();
 			int numberOfTracesNegative = TraceDataRowBlock.getNumberOfTraces(negativeLog);
-			double[] trace2fitnessNegative = TraceDataRowBlock.getTrace2fitness(negativeLog, numberOfTracesNegative);
 
 			for (Attribute attribute : attributes.getTraceAttributes()) {
 				result.addAll(TraceDataRowBlock.merge(
-						TraceDataRowBlock.createAttributeData(logFiltered, attribute, numberOfTraces, trace2fitness,
-								canceller),
+						TraceDataRowBlock.createAttributeData(logFiltered, attribute, numberOfTraces, canceller),
 						TraceDataRowBlock.createAttributeData(negativeLog, attribute, numberOfTracesNegative,
-								trace2fitnessNegative, canceller),
+								canceller),
 						canceller));
 			}
 		} else {
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				result.addAll(TraceDataRowBlock.createAttributeData(logFiltered, attribute, numberOfTraces,
-						trace2fitness, canceller));
+				result.addAll(TraceDataRowBlock.createAttributeData(logFiltered, attribute, numberOfTraces, canceller));
 			}
 		}
 
