@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters;
 
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -18,13 +19,13 @@ public class HighlightingFilterWithoutEvent extends HighlightingFilter {
 	}
 
 	@Override
-	public IvMFilterGui createGui() {
+	public IvMFilterGui createGui(IvMDecoratorI decorator) {
 		panel = new AttributeFilterGui(getName(), new Runnable() {
 			public void run() {
 				updateExplanation();
 				update();
 			}
-		});
+		}, decorator);
 		return panel;
 	}
 

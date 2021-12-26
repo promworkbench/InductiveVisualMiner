@@ -72,7 +72,7 @@ public class ExporterDataAnalyses extends IvMExporter {
 	private <O, C, P> Set<IvMObject<?>> createNonTriggerObjectsForDataTab(DataAnalysisTab<O, C, P> dataTab) {
 		Set<IvMObject<?>> result = new THashSet<>();
 
-		DataAnalysisTable<O, C, P> table = dataTab.createTable(null, null);
+		DataAnalysisTable<O, C, P> table = dataTab.createTable(null, configuration.getDecorator());
 		for (DataRowBlock<O, C, P> rowBlock : dataTab.createRowBlocks(table)) {
 			result.addAll(Arrays.asList(rowBlock.getOptionalObjects()));
 			result.addAll(Arrays.asList(rowBlock.getRequiredObjects()));

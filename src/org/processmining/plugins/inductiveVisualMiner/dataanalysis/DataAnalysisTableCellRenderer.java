@@ -16,7 +16,7 @@ import javax.swing.table.TableCellRenderer;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRenderer {
 
@@ -30,8 +30,11 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 	private static Border emptyBorder = BorderFactory.createEmptyBorder();
 	private static Border firstRowOfGroupBorder = new MatteBorder(1, 0, 0, 0, Color.white);
 
-	public DataAnalysisTableCellRenderer() {
-		IvMDecorator.decorate(this);
+	private final IvMDecoratorI decorator;
+
+	public DataAnalysisTableCellRenderer(IvMDecoratorI decorator) {
+		this.decorator = decorator;
+		decorator.decorate(this);
 		setHorizontalTextPosition(SwingConstants.LEADING);
 		setVerticalAlignment(JLabel.TOP);
 	}
@@ -51,7 +54,7 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 
 		//default properties
 		setHorizontalAlignment(JLabel.LEFT);
-		setFont(IvMDecorator.fontLarger);
+		setFont(decorator.fontLarger());
 
 		if (object == null) {
 			setText("");
@@ -68,7 +71,7 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 				setIcon(null);
 			}
 			setHorizontalAlignment(((DisplayType) object).getHorizontalAlignment());
-			setFont(IvMDecorator.fontMonoSpace);
+			setFont(decorator.fontMonoSpace());
 		} else if (object instanceof ImageIcon) {
 			setText("");
 			setIcon((ImageIcon) object);
@@ -99,12 +102,12 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 			if (getSelectedBackgroundColour() != null) {
 				setBackground(getSelectedBackgroundColour());
 			} else {
-				setBackground(IvMDecorator.textColour);
+				setBackground(decorator.textColour());
 			}
 			if (getSelectedForegroundColour() != null) {
 				setForeground(getSelectedForegroundColour());
 			} else {
-				setForeground(IvMDecorator.backGroundColour1);
+				setForeground(decorator.backGroundColour1());
 			}
 			setOpaque(true);
 		} else {
@@ -112,7 +115,7 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 				//do not repeat values
 				setForeground(Color.white);
 			} else {
-				setForeground(IvMDecorator.textColour);
+				setForeground(decorator.textColour());
 			}
 			setOpaque(false);
 		}

@@ -9,7 +9,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.RangeSlider;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
@@ -21,16 +21,16 @@ public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 	private final RangeSlider inBetweenSelector;
 	private final AttributeFilterGui panelFollow;
 
-	public HighlightingFilterFollowsPanel(String title, final Runnable onUpdate) {
-		super(title);
-		panelBefore = new AttributeFilterGui(null, onUpdate);
+	public HighlightingFilterFollowsPanel(String title, final Runnable onUpdate, IvMDecoratorI decorator) {
+		super(title, decorator);
+		panelBefore = new AttributeFilterGui(null, onUpdate, decorator);
 		add(panelBefore);
 
 		add(Box.createVerticalStrut(10));
 
 		{
 			inBetweenSelectorExplanation = new JTextArea("Events in between");
-			IvMDecorator.decorate(inBetweenSelectorExplanation);
+			decorator.decorate(inBetweenSelectorExplanation);
 			inBetweenSelectorExplanation.setEditable(false);
 			inBetweenSelectorExplanation.setLineWrap(true);
 			inBetweenSelectorExplanation.setWrapStyleWord(true);
@@ -51,7 +51,7 @@ public class HighlightingFilterFollowsPanel extends IvMFilterGui {
 
 		add(Box.createVerticalStrut(10));
 
-		panelFollow = new AttributeFilterGui(null, onUpdate);
+		panelFollow = new AttributeFilterGui(null, onUpdate, decorator);
 		panelFollow.getExplanationLabel().setText("Followed by");
 		add(panelFollow);
 	}

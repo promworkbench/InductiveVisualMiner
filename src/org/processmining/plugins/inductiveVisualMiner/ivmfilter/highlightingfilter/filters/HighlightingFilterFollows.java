@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfil
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
@@ -24,13 +25,13 @@ public class HighlightingFilterFollows extends HighlightingFilter {
 	}
 
 	@Override
-	public IvMFilterGui createGui() throws Exception {
+	public IvMFilterGui createGui(IvMDecoratorI decorator) throws Exception {
 		panel = new HighlightingFilterFollowsPanel(getName(), new Runnable() {
 			public void run() {
 				updateExplanation();
 				update();
 			}
-		});
+		}, decorator);
 		return panel;
 	}
 

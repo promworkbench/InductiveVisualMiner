@@ -15,13 +15,14 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 import org.processmining.processtree.impl.AbstractTask.Automatic;
 import org.processmining.processtree.impl.AbstractTask.Manual;
@@ -46,14 +47,15 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 	private final Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping;
 	private final UnfoldedNode[] nodeId2performanceNode;
 	private final Set<UnfoldedNode> enqueueTaus;
+	private final IvMDecoratorI decorator;
 
 	//output
 	private final IvMLogNotFilteredImpl alignedLog;
 
 	public ETMAlignmentCallbackImpl(IvMModel model, IvMEfficientTree performanceTree, XLog xLog,
 			XEventClasses activityEventClasses, Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping,
-			XEventClasses performanceEventClasses, UnfoldedNode[] nodeId2performanceNode,
-			Set<UnfoldedNode> enqueueTaus) {
+			XEventClasses performanceEventClasses, UnfoldedNode[] nodeId2performanceNode, Set<UnfoldedNode> enqueueTaus,
+			IvMDecoratorI decorator) {
 		this.model = model;
 		this.performanceTree = performanceTree;
 		this.xLog = xLog;
@@ -62,6 +64,7 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 		this.performanceEventClasses = performanceEventClasses;
 		this.nodeId2performanceNode = nodeId2performanceNode;
 		this.enqueueTaus = enqueueTaus;
+		this.decorator = decorator;
 
 		alignedLog = new IvMLogNotFilteredImpl(xLog.size(), xLog.getAttributes());
 	}
@@ -147,26 +150,26 @@ public class ETMAlignmentCallbackImpl implements ETMAlignmentCallback {
 					&& unode.getNode() instanceof Manual) {
 				//tau-start
 				return new Move(model, Type.ignoredModelMove, -2, model.getTree().getIndex(unode), activity,
-						performanceActivity, lifeCycleTransition, moveIndex);
+						performanceActivity, lifeCycleTransition, moveIndex, decorator);
 			} else if ((performanceUnode != null && performanceActivity != null)
 					|| (performanceUnode != null && performanceUnode.getNode() instanceof Automatic)) {
 				//synchronous move
 				return new Move(model, Type.synchronousMove, -2, model.getTree().getIndex(unode), activity,
-						performanceActivity, lifeCycleTransition, moveIndex);
+						performanceActivity, lifeCycleTransition, moveIndex, decorator);
 			} else if (performanceUnode != null) {
 				//model move
 				return new Move(model, Type.modelMove, -2, model.getTree().getIndex(unode), activity,
-						performanceActivity, lifeCycleTransition, moveIndex);
+						performanceActivity, lifeCycleTransition, moveIndex, decorator);
 			} else {
 				//log move
 				if (lifeCycleTransition == PerformanceTransition.complete) {
 					//only log moves of complete events are interesting
 					return new Move(model, Type.logMove, -2, model.getTree().getIndex(unode), activity,
-							performanceActivity, lifeCycleTransition, moveIndex);
+							performanceActivity, lifeCycleTransition, moveIndex, decorator);
 				} else {
 					//log moves of other transitions are ignored
 					return new Move(model, Type.ignoredLogMove, -2, -1, activity, performanceActivity,
-							lifeCycleTransition, moveIndex);
+							lifeCycleTransition, moveIndex, decorator);
 				}
 			}
 		}

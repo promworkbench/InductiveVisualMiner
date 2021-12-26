@@ -49,7 +49,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 		setRowMargin(rowMargin);
 		setRowHeight(rowHeight);
 		getColumnModel().setColumnMargin(columnMargin);
-		setDefaultRenderer(Object.class, new DataAnalysisTableCellRenderer());
+		setDefaultRenderer(Object.class, new DataAnalysisTableCellRenderer(decorator));
 		setColumnSelectionAllowed(false);
 		setRowSelectionAllowed(false);
 
@@ -104,7 +104,8 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 					}
 
 					if (o1.getType() == Type.time) {
-						return Long.compare(((DisplayType.Time) o1).getValueLong(), ((DisplayType.Time) o2).getValueLong());
+						return Long.compare(((DisplayType.Time) o1).getValueLong(),
+								((DisplayType.Time) o2).getValueLong());
 					}
 
 					if (o1.getType() == Type.numeric) {
@@ -182,8 +183,10 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 					for (int row = 0; row < getModel().getRowCount(); row++) {
 						values.add(new DataAnalysisTableRowFilterItem(getModel().getRow(row).getName(column)));
 					}
-					DataAnalysisTableRowFilterItem[] items = values.toArray(new DataAnalysisTableRowFilterItem[values.size()]);
-					final MultiComboBox<DataAnalysisTableRowFilterItem> combobox = new MultiComboBox<DataAnalysisTableRowFilterItem>(DataAnalysisTableRowFilterItem.class, items);
+					DataAnalysisTableRowFilterItem[] items = values
+							.toArray(new DataAnalysisTableRowFilterItem[values.size()]);
+					final MultiComboBox<DataAnalysisTableRowFilterItem> combobox = new MultiComboBox<DataAnalysisTableRowFilterItem>(
+							DataAnalysisTableRowFilterItem.class, items);
 
 					if (selections.containsKey(columnName)) {
 						//restore cashed selected items
@@ -214,7 +217,7 @@ public class DataAnalysisTable<O, C, P> extends JTable {
 					}
 				}
 			}
-			
+
 			//set the filter
 			getRowSorter().setRowFilter(new DataAnalysisTableRowFilter<O, C, P>(selections));
 		}

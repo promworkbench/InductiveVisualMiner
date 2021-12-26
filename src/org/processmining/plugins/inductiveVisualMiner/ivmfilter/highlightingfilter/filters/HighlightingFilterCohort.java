@@ -11,6 +11,7 @@ import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.cohortanalysis.feature.Feature;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
@@ -58,8 +59,8 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 	}
 
 	@Override
-	public IvMFilterGui createGui() throws Exception {
-		panel = new HighlightingFilterCohortPanel(getName());
+	public IvMFilterGui createGui(IvMDecoratorI decorator) throws Exception {
+		panel = new HighlightingFilterCohortPanel(getName(), decorator);
 		updateExplanation();
 
 		panel.getExplanationLabel().addMouseListener(new MouseAdapter() {

@@ -21,6 +21,7 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualM
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorDefault;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
@@ -68,6 +69,6 @@ public class InductiveVisualMinerAlignmentComputation {
 		AlignmentComputer computer = new AlignmentComputerImpl();
 
 		return AlignmentPerformance.align(computer, new IvMModel(tree), performanceClassifier, log,
-				activityEventClasses, performanceEventClasses, canceller);
+				activityEventClasses, performanceEventClasses, canceller, new IvMDecoratorDefault());
 	}
 }

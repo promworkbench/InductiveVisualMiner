@@ -13,12 +13,13 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Transition
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.plugins.petrinet.replayresult.StepTypes;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 
@@ -33,18 +34,20 @@ public class AcceptingPetriNetAlignmentCallbackImplEfficientTree implements Acce
 
 	private final TObjectIntMap<Transition> performanceTransition2node;
 	private final Set<Transition> skipEnqueueTransitions;
+	private final IvMDecoratorI decorator;
 
 	//output
 	private final IvMLogNotFilteredImpl alignedLog;
 
 	public AcceptingPetriNetAlignmentCallbackImplEfficientTree(XLog xLog, IvMModel model,
 			IvMEventClasses activityEventClasses,
-			Triple<AcceptingPetriNet, TObjectIntMap<Transition>, Set<Transition>> p) {
+			Triple<AcceptingPetriNet, TObjectIntMap<Transition>, Set<Transition>> p, IvMDecoratorI decorator) {
 		assert model.isTree();
 
 		this.xLog = xLog;
 		this.model = model;
 		this.activityEventClasses = activityEventClasses;
+		this.decorator = decorator;
 
 		this.performanceTransition2node = p.getB();
 		this.skipEnqueueTransitions = p.getC();
@@ -167,26 +170,26 @@ public class AcceptingPetriNetAlignmentCallbackImplEfficientTree implements Acce
 			if (performanceTransition != null && performanceTransition.isInvisible() && model.isActivity(unode)) {
 				//tau-enqueue or tau-start
 				return new Move(model, Type.ignoredModelMove, -2, unode, activity, performanceActivity,
-						lifeCycleTransition, moveIndex);
+						lifeCycleTransition, moveIndex, decorator);
 			} else if ((performanceTransition != null && performanceActivity != null)
 					|| (performanceTransition != null && performanceTransition.isInvisible())) {
 				//synchronous move
 				return new Move(model, Type.synchronousMove, -2, unode, activity, performanceActivity,
-						lifeCycleTransition, moveIndex);
+						lifeCycleTransition, moveIndex, decorator);
 			} else if (performanceTransition != null) {
 				//model move
 				return new Move(model, Type.modelMove, -2, unode, activity, performanceActivity, lifeCycleTransition,
-						moveIndex);
+						moveIndex, decorator);
 			} else {
 				//log move
 				if (lifeCycleTransition == PerformanceTransition.complete) {
 					//only log moves of complete events are interesting
 					return new Move(model, Type.logMove, -2, unode, activity, performanceActivity, lifeCycleTransition,
-							moveIndex);
+							moveIndex, decorator);
 				} else {
 					//log moves of other transitions are ignored
 					return new Move(model, Type.ignoredLogMove, -2, -1, activity, performanceActivity,
-							lifeCycleTransition, moveIndex);
+							lifeCycleTransition, moveIndex, decorator);
 				}
 			}
 		}

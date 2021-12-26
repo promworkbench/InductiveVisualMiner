@@ -19,7 +19,8 @@ public class IvMMove extends Move implements XAttributable {
 
 	public IvMMove(IvMModel model, Move move, Long logTimestamp, String resource, XAttributeMap xAttributeMap) {
 		super(model, move.getType(), move.getSourceNode(), move.getTreeNode(), move.getActivityEventClass(),
-				move.getPerformanceEventClass(), move.getLifeCycleTransition(), move.getIndexInAlignedTrace());
+				move.getPerformanceEventClass(), move.getLifeCycleTransition(), move.getIndexInAlignedTrace(),
+				move.getDecorator());
 		setLogMovePosition(LogMovePosition.beforeChild(move.getLogMoveUnode(), move.getLogMoveBeforeChild()));
 		setLogMoveParallelBranchMappedTo(move.getLogMoveParallelBranchMappedTo());
 		this.logTimestamp = logTimestamp;

@@ -14,6 +14,7 @@ import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -38,14 +39,17 @@ public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetri
 	private final Set<Transition> endTransitions;
 	private final Set<Transition> interTransitions;
 	private final Transition emptyTraceTransition;
+	private final IvMDecoratorI decorator;
 
 	//output
 	private final IvMLogNotFilteredImpl alignedLog;
 
 	public AcceptingPetriNetAlignmentCallbackImplDfg(XLog xLog, IvMModel model, IvMEventClasses activityEventClasses,
-			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, Transition> p) {
+			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, Transition> p,
+			IvMDecoratorI decorator) {
+		this.decorator = decorator;
 		assert model.isDfg();
-		
+
 		this.xLog = xLog;
 		this.model = model;
 		this.activityEventClasses = activityEventClasses;
@@ -87,7 +91,7 @@ public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetri
 				StepTypes type = itType.next();
 				Object node = itNode.next();
 				Pair<Move, Integer> p = getMove(xTrace, type, node, performanceEventClasses, eventIndex,
-						previousModelNode, moveIndex);
+						previousModelNode, moveIndex, decorator);
 
 				if (p != null) {
 					Move move = p.getA();
@@ -119,7 +123,8 @@ public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetri
 	 * @return the move and the model move
 	 */
 	private Pair<Move, Integer> getMove(XTrace trace, StepTypes type, Object node,
-			IvMEventClasses performanceEventClasses, int event, int previousModelNode, int moveIndex) {
+			IvMEventClasses performanceEventClasses, int event, int previousModelNode, int moveIndex,
+			IvMDecoratorI decorator) {
 
 		//get log part of move
 		if (type == StepTypes.L) {
@@ -132,11 +137,11 @@ public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetri
 			if (lifeCycleTransition == PerformanceTransition.complete) {
 				//only log moves of complete events are interesting
 				return Pair.of(new Move(model, Type.logMove, -1, -1, activity, performanceActivity, lifeCycleTransition,
-						moveIndex), previousModelNode);
+						moveIndex, decorator), previousModelNode);
 			} else {
 				//log moves of other transitions are ignored
 				return Pair.of(new Move(model, Type.ignoredLogMove, -1, -1, activity, performanceActivity,
-						lifeCycleTransition, moveIndex), previousModelNode);
+						lifeCycleTransition, moveIndex, decorator), previousModelNode);
 			}
 		} else if (type == StepTypes.MINVI) {
 			//enqueue- or start-skip, or start-tau
@@ -153,7 +158,7 @@ public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetri
 				if (node.equals(emptyTraceTransition)) {
 					//empty trace
 					return Pair.of(new Move(model, Type.synchronousMove, -2, -2, null, null,
-							PerformanceTransition.complete, moveIndex), previousModelNode);
+							PerformanceTransition.complete, moveIndex, decorator), previousModelNode);
 				} else if (activity2skipEnqueue.containsKey(performanceUnode)) {
 					lifeCycleTransition = PerformanceTransition.enqueue;
 					activityIndex = activity2skipEnqueue.get(performanceUnode);
@@ -165,13 +170,14 @@ public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetri
 				XEventClass performanceActivity = performanceEventClasses
 						.getByIdentity(activity.getId() + "+" + lifeCycleTransition);
 				return Pair.of(new Move(model, Type.ignoredModelMove, previousModelNode, activityIndex, activity,
-						performanceActivity, lifeCycleTransition, moveIndex), previousModelNode);
+						performanceActivity, lifeCycleTransition, moveIndex, decorator), previousModelNode);
 			}
 		} else if (type == StepTypes.MREAL) {
 			//model move
 			assert (node instanceof Transition);
 			Transition performanceUnode = (Transition) node;
-			PerformanceTransition lifeCycleTransition = PerformanceUtils.getLifeCycleTransition(performanceUnode.getLabel());
+			PerformanceTransition lifeCycleTransition = PerformanceUtils
+					.getLifeCycleTransition(performanceUnode.getLabel());
 			XEventClass performanceActivity = performanceEventClasses.getByIdentity(((Transition) node).getLabel());
 			XEventClass activity = PerformanceUtils.getActivity(performanceActivity, activityEventClasses);
 			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllNodeNames(), activity.getId());
@@ -179,19 +185,20 @@ public class AcceptingPetriNetAlignmentCallbackImplDfg implements AcceptingPetri
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete ? activityIndex
 					: previousModelNode;
 			return Pair.of(new Move(model, Type.modelMove, previousModelNode, activityIndex, null, null,
-					lifeCycleTransition, moveIndex), newPreviousModelNode);
+					lifeCycleTransition, moveIndex, decorator), newPreviousModelNode);
 		} else if (type == StepTypes.LMGOOD) {
 			assert (node instanceof Transition);
 			Transition performanceUnode = (Transition) node;
 			XEventClass performanceActivity = performanceEventClasses.getClassOf(trace.get(event));
 			XEventClass activity = PerformanceUtils.getActivity(performanceActivity, activityEventClasses);
 			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllNodeNames(), activity.getId());
-			PerformanceTransition lifeCycleTransition = PerformanceUtils.getLifeCycleTransition(performanceUnode.getLabel());
+			PerformanceTransition lifeCycleTransition = PerformanceUtils
+					.getLifeCycleTransition(performanceUnode.getLabel());
 
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete ? activityIndex
 					: previousModelNode;
 			return Pair.of(new Move(model, Type.synchronousMove, previousModelNode, activityIndex, activity,
-					performanceActivity, lifeCycleTransition, moveIndex), newPreviousModelNode);
+					performanceActivity, lifeCycleTransition, moveIndex, decorator), newPreviousModelNode);
 		}
 		return null;
 	}

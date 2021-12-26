@@ -5,7 +5,7 @@ import java.awt.Color;
 import org.deckfour.xes.classification.XEventClass;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
 
 public class Move implements Event {
@@ -22,8 +22,8 @@ public class Move implements Event {
 	 * 
 	 * For trees, modelNode is the node of the tree;
 	 * 
-	 * For dfgs, modelNode is the target of the step in the dfg, and sourceNode is
-	 * the source;
+	 * For dfgs, modelNode is the target of the step in the dfg, and sourceNode
+	 * is the source;
 	 */
 	private final int modelNode;
 	private final int sourceNode;
@@ -32,6 +32,7 @@ public class Move implements Event {
 	private final XEventClass activityEventClass;
 	private final XEventClass performanceEventClass;
 	private final PerformanceTransition lifeCycleTransition;
+	private final IvMDecoratorI decorator;
 
 	private int logMoveNode = -1;
 	private int logMoveBeforeChildNode = -1;
@@ -51,7 +52,8 @@ public class Move implements Event {
 	 * @param indexInAlignedTrace
 	 */
 	public Move(IvMModel model, Type type, int sourceNode, int node, XEventClass activityEventClass,
-			XEventClass performanceEventClass, PerformanceTransition lifeCycle, int indexInAlignedTrace) {
+			XEventClass performanceEventClass, PerformanceTransition lifeCycle, int indexInAlignedTrace,
+			IvMDecoratorI decorator) {
 		this.model = model;
 		this.type = type;
 		this.modelNode = node;
@@ -60,6 +62,7 @@ public class Move implements Event {
 		this.performanceEventClass = performanceEventClass;
 		this.lifeCycleTransition = lifeCycle;
 		this.indexInAlignedTrace = indexInAlignedTrace;
+		this.decorator = decorator;
 	}
 
 	public String toString() {
@@ -243,19 +246,19 @@ public class Move implements Event {
 	}
 
 	public Color getBorderColor() {
-		return IvMDecorator.backGroundColour2;
+		return decorator.backGroundColour2();
 	}
 
 	public Color getLabelColor() {
-		return IvMDecorator.textColour;
+		return decorator.textColour();
 	}
 
 	public Color getTopLabelColor() {
-		return IvMDecorator.textColour;
+		return decorator.textColour();
 	}
 
 	public Color getBottomLabelColor() {
-		return IvMDecorator.textColour;
+		return decorator.textColour();
 	}
 
 	public Color getBottomLabel2Color() {
@@ -276,5 +279,9 @@ public class Move implements Event {
 
 	public int getIndexInAlignedTrace() {
 		return indexInAlignedTrace;
+	}
+
+	public IvMDecoratorI getDecorator() {
+		return decorator;
 	}
 }

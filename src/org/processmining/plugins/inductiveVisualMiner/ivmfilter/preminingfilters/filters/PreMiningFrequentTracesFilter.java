@@ -6,6 +6,7 @@ import javax.swing.event.ChangeListener;
 import org.deckfour.xes.model.XLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningTraceFilter;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
@@ -26,8 +27,8 @@ public class PreMiningFrequentTracesFilter extends PreMiningTraceFilter {
 	}
 
 	@Override
-	public IvMFilterGui createGui() {
-		panel = new SliderGui(getName());
+	public IvMFilterGui createGui(IvMDecoratorI decorator) {
+		panel = new SliderGui(getName(), decorator);
 
 		panel.getSlider().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {

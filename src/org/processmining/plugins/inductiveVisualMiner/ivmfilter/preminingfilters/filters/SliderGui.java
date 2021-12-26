@@ -6,7 +6,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 
 import com.fluxicon.slickerbox.factory.SlickerFactory;
@@ -17,15 +17,15 @@ public class SliderGui extends IvMFilterGui {
 	private final JTextArea explanation;
 	private final JSlider slider;
 
-	public SliderGui(String title) {
-		super(title);
+	public SliderGui(String title, IvMDecoratorI decorator) {
+		super(title, decorator);
 		usesVerticalSpace = false;
 
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		//explanation
 		{
 			explanation = new JTextArea("title");
-			IvMDecorator.decorate(explanation);
+			decorator.decorate(explanation);
 			add(explanation);
 		}
 

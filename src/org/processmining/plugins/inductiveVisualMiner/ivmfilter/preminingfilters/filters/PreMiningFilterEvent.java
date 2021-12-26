@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters;
 
 import org.deckfour.xes.model.XEvent;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningEventFilter;
@@ -17,13 +18,13 @@ public class PreMiningFilterEvent extends PreMiningEventFilter {
 	}
 
 	@Override
-	public IvMFilterGui createGui() throws Exception {
+	public IvMFilterGui createGui(IvMDecoratorI decorator) throws Exception {
 		panel = new AttributeFilterGui(getName(), new Runnable() {
 			public void run() {
 				update();
 				updateExplanation();
 			}
-		});
+		}, decorator);
 
 		return panel;
 	}

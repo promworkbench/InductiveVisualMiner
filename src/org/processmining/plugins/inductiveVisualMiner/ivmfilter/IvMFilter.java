@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+
 public abstract class IvMFilter implements Comparable<IvMFilter> {
 
 	/**
@@ -21,7 +23,7 @@ public abstract class IvMFilter implements Comparable<IvMFilter> {
 	 * 
 	 * @return
 	 */
-	protected abstract IvMFilterGui createGui() throws Exception;
+	protected abstract IvMFilterGui createGui(IvMDecoratorI decorator) throws Exception;
 
 	/**
 	 * Returns whether this filter is actually filtering something. If this
@@ -47,10 +49,10 @@ public abstract class IvMFilter implements Comparable<IvMFilter> {
 	private Runnable onUpdate = null;
 	private boolean enabledFilter = false;
 
-	public final void createFilterGui(Runnable onUpdate) {
+	public final void createFilterGui(Runnable onUpdate, IvMDecoratorI decorator) {
 		this.onUpdate = onUpdate;
 		try {
-			panel = createGui();
+			panel = createGui(decorator);
 		} catch (Exception e) {
 			panel = null;
 			e.printStackTrace();

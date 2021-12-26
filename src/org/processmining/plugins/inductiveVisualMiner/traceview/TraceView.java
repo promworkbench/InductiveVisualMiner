@@ -94,7 +94,8 @@ public class TraceView extends SideWindow {
 	 * @param selection
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public void set(IvMModel model, IvMLog tlog, Selection selection, TraceColourMap traceColourMap) {
+	public void set(IvMModel model, IvMLog tlog, Selection selection, TraceColourMap traceColourMap,
+			IvMDecoratorI decorator) {
 		if (tlog == null) {
 			traceView.clear();
 			return;
@@ -102,7 +103,7 @@ public class TraceView extends SideWindow {
 		if (!tlog.equals(showing)) {
 			showing = tlog;
 			traceView.clear();
-			traceView.setTraceBuilder(new TraceBuilderIvMLog(model, selection, traceColourMap));
+			traceView.setTraceBuilder(new TraceBuilderIvMLog(model, selection, traceColourMap, decorator));
 			traceView.addAll((Iterable<Object>) ((Iterable<? extends Object>) tlog));
 		}
 	}

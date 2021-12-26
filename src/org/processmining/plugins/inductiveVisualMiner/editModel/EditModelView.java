@@ -18,7 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficient
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel.Source;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 public class EditModelView extends SideWindow {
 
@@ -31,19 +31,19 @@ public class EditModelView extends SideWindow {
 	private final static String TREEPANEL = "tree panel";
 	private final static String DFGPANEL = "dfg panel";
 
-	public EditModelView(Component parent) {
+	public EditModelView(Component parent, IvMDecoratorI decorator) {
 		super(parent, "edit model - " + InductiveVisualMinerPanel.title);
 
-		getContentPane().setBackground(IvMDecorator.backGroundColour1);
+		getContentPane().setBackground(decorator.backGroundColour1());
 
 		panel = new JPanel();
 		add(panel, BorderLayout.CENTER);
 		panel.setLayout(new CardLayout());
 
-		treeEditor = new IvMEfficientTreeEditor(null, "Minnig tree...");
+		treeEditor = new IvMEfficientTreeEditor(null, "Minnig tree...", decorator);
 		panel.add(treeEditor, TREEPANEL);
 
-		dfgEditor = new IvMDfgEditor(null, "Mining directly follows graph...");
+		dfgEditor = new IvMDfgEditor(null, "Mining directly follows graph...", decorator);
 		panel.add(dfgEditor, DFGPANEL);
 	}
 
@@ -68,23 +68,23 @@ public class EditModelView extends SideWindow {
 	public static class IvMEfficientTreeEditor extends EfficientTreeEditor {
 		private static final long serialVersionUID = -3553121183719500176L;
 
-		public IvMEfficientTreeEditor(EfficientTree tree, String message) {
+		public IvMEfficientTreeEditor(EfficientTree tree, String message, IvMDecoratorI decorator) {
 			super(tree, message);
-			IvMDecorator.decorate(text);
-			IvMDecorator.decorate(errorMessage);
-			text.setBackground(IvMDecorator.buttonColour);
+			decorator.decorate(text);
+			decorator.decorate(errorMessage);
+			text.setBackground(decorator.buttonColour());
 			text.setAntiAliasingEnabled(true);
 
 			text.setBorder(new EmptyBorder(0, 2, 2, 2));
 
-			text.setForeground(IvMDecorator.textColour);
+			text.setForeground(decorator.textColour());
 			text.setFont(text.getFont().deriveFont(20));
 
-			text.setSelectionColor(IvMDecorator.backGroundColour2);
-			text.setSelectedTextColor(IvMDecorator.buttonColour);
+			text.setSelectionColor(decorator.backGroundColour2());
+			text.setSelectedTextColor(decorator.buttonColour());
 			text.setUseSelectedTextColor(true);
 
-			text.setCurrentLineHighlightColor(IvMDecorator.backGroundColour1);
+			text.setCurrentLineHighlightColor(decorator.backGroundColour1());
 			text.setFadeCurrentLineHighlight(true);
 
 			text.revalidate();
@@ -94,57 +94,57 @@ public class EditModelView extends SideWindow {
 	public static class IvMDfgEditor extends DfgEditor {
 		private static final long serialVersionUID = -3553121183719500176L;
 
-		public IvMDfgEditor(DirectlyFollowsModel dfg, String message) {
+		public IvMDfgEditor(DirectlyFollowsModel dfg, String message, IvMDecoratorI decorator) {
 			super(dfg, message);
 
-			IvMDecorator.decorate(labelStartActivities);
-			IvMDecorator.decorate(labelEdges);
-			IvMDecorator.decorate(labelEndActivities);
+			decorator.decorate(labelStartActivities);
+			decorator.decorate(labelEdges);
+			decorator.decorate(labelEndActivities);
 
-			IvMDecorator.decorate(textStartActivities);
-			textStartActivities.setBackground(IvMDecorator.buttonColour);
+			decorator.decorate(textStartActivities);
+			textStartActivities.setBackground(decorator.buttonColour());
 			textStartActivities.setAntiAliasingEnabled(true);
 			textStartActivities.setBorder(new EmptyBorder(0, 2, 2, 2));
-			textStartActivities.setForeground(IvMDecorator.textColour);
+			textStartActivities.setForeground(decorator.textColour());
 			textStartActivities.setFont(textStartActivities.getFont().deriveFont(20));
-			textStartActivities.setSelectionColor(IvMDecorator.backGroundColour2);
-			textStartActivities.setSelectedTextColor(IvMDecorator.buttonColour);
+			textStartActivities.setSelectionColor(decorator.backGroundColour2());
+			textStartActivities.setSelectedTextColor(decorator.buttonColour());
 			textStartActivities.setUseSelectedTextColor(true);
-			textStartActivities.setCurrentLineHighlightColor(IvMDecorator.backGroundColour1);
+			textStartActivities.setCurrentLineHighlightColor(decorator.backGroundColour1());
 			textStartActivities.setFadeCurrentLineHighlight(true);
 			textStartActivities.revalidate();
 
-			IvMDecorator.decorate(textEdges);
-			textEdges.setBackground(IvMDecorator.buttonColour);
+			decorator.decorate(textEdges);
+			textEdges.setBackground(decorator.buttonColour());
 			textEdges.setAntiAliasingEnabled(true);
 			textEdges.setBorder(new EmptyBorder(0, 2, 2, 2));
-			textEdges.setForeground(IvMDecorator.textColour);
+			textEdges.setForeground(decorator.textColour());
 			textEdges.setFont(textEdges.getFont().deriveFont(20));
-			textEdges.setSelectionColor(IvMDecorator.backGroundColour2);
-			textEdges.setSelectedTextColor(IvMDecorator.buttonColour);
+			textEdges.setSelectionColor(decorator.backGroundColour2());
+			textEdges.setSelectedTextColor(decorator.buttonColour());
 			textEdges.setUseSelectedTextColor(true);
-			textEdges.setCurrentLineHighlightColor(IvMDecorator.backGroundColour1);
+			textEdges.setCurrentLineHighlightColor(decorator.backGroundColour1());
 			textEdges.setFadeCurrentLineHighlight(true);
 			textEdges.revalidate();
 
-			IvMDecorator.decorate(textEndActivities);
-			textEndActivities.setBackground(IvMDecorator.buttonColour);
+			decorator.decorate(textEndActivities);
+			textEndActivities.setBackground(decorator.buttonColour());
 			textEndActivities.setAntiAliasingEnabled(true);
 			textEndActivities.setBorder(new EmptyBorder(0, 2, 2, 2));
-			textEndActivities.setForeground(IvMDecorator.textColour);
+			textEndActivities.setForeground(decorator.textColour());
 			textEndActivities.setFont(textEndActivities.getFont().deriveFont(20));
-			textEndActivities.setSelectionColor(IvMDecorator.backGroundColour2);
-			textEndActivities.setSelectedTextColor(IvMDecorator.buttonColour);
+			textEndActivities.setSelectionColor(decorator.backGroundColour2());
+			textEndActivities.setSelectedTextColor(decorator.buttonColour());
 			textEndActivities.setUseSelectedTextColor(true);
-			textEndActivities.setCurrentLineHighlightColor(IvMDecorator.backGroundColour1);
+			textEndActivities.setCurrentLineHighlightColor(decorator.backGroundColour1());
 			textEndActivities.setFadeCurrentLineHighlight(true);
 			textEndActivities.revalidate();
 
-			IvMDecorator.decorate(emptyTraces);
+			decorator.decorate(emptyTraces);
 
-			IvMDecorator.decorate(errorMessage);
+			decorator.decorate(errorMessage);
 
-			setBackground(IvMDecorator.backGroundColour1);
+			setBackground(decorator.backGroundColour1());
 			setOpaque(true);
 		}
 	}

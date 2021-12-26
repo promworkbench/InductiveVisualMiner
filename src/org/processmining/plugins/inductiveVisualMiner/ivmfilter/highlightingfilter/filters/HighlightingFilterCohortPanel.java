@@ -5,7 +5,7 @@ import java.awt.Color;
 import javax.swing.Box;
 import javax.swing.JTextArea;
 
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 
 public class HighlightingFilterCohortPanel extends IvMFilterGui {
@@ -14,14 +14,14 @@ public class HighlightingFilterCohortPanel extends IvMFilterGui {
 
 	private final JTextArea explanation;
 
-	public HighlightingFilterCohortPanel(String title) {
-		super(title);
+	public HighlightingFilterCohortPanel(String title, IvMDecoratorI decorator) {
+		super(title, decorator);
 		usesVerticalSpace = false;
 
 		//explanation
 		{
 			explanation = new JTextArea();
-			IvMDecorator.decorate(explanation);
+			decorator.decorate(explanation);
 			explanation.setEditable(false);
 			explanation.setLineWrap(true);
 			explanation.setWrapStyleWord(true);

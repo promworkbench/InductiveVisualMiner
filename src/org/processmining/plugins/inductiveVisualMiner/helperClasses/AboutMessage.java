@@ -15,11 +15,11 @@ import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 public class AboutMessage {
 
-	public static void show(JComponent parent) {
+	public static void show(JComponent parent, IvMDecoratorI decorator) {
 
 		String aboutMessage = "The visual Miner.<br>"//
 				+ "<a href=\"http://visualminer.org/\">http://visualminer.org</a>"//
@@ -36,7 +36,7 @@ public class AboutMessage {
 				+ "PNetReplayer (Arya Adriansyah, Boudewijn van Dongen)<br>"//
 				+ "Visualisation3D (Erik Poppe)";
 
-		Font font = IvMDecorator.fontLarger;
+		Font font = decorator.fontLarger();
 
 		// create some css from the label's font
 		StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
@@ -63,30 +63,30 @@ public class AboutMessage {
 			}
 		});
 		ep.setEditable(false);
-		ep.setBackground(IvMDecorator.backGroundColour1);
+		ep.setBackground(decorator.backGroundColour1());
 		//ep.setBackground(label.getBackground());
 
 		// show
 		JOptionPane pane = new JOptionPane(ep, JOptionPane.PLAIN_MESSAGE);
 		pane.setOpaque(true);
-		setBackgroundRecursively(pane);
-		pane.setBackground(IvMDecorator.backGroundColour1);
+		setBackgroundRecursively(pane, decorator);
+		pane.setBackground(decorator.backGroundColour1());
 		JDialog dialog = pane.createDialog(parent, "visual Miner - about");
 		dialog.setVisible(true);
 
 		//JOptionPane.showMessageDialog(parent, ep, "visual Miner - about", JOptionPane.PLAIN_MESSAGE);
 	}
 
-	private static void setBackgroundRecursively(Container c) {
+	private static void setBackgroundRecursively(Container c, IvMDecoratorI decorator) {
 		Component[] m = c.getComponents();
 		for (int i = 0; i < m.length; i++) {
 
 			if (m[i] instanceof JPanel) {
-				m[i].setBackground(IvMDecorator.backGroundColour1);
+				m[i].setBackground(decorator.backGroundColour1());
 			}
 
 			if (m[i] instanceof Container) {
-				setBackgroundRecursively((Container) m[i]);
+				setBackgroundRecursively((Container) m[i], decorator);
 			}
 		}
 	}

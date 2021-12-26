@@ -69,7 +69,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.UserStatus;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
@@ -164,7 +164,7 @@ public class InductiveVisualMinerController {
 		chain.setFixedObject(IvMObject.input_log, log);
 	}
 
-	protected void initGui(final ProMCanceller canceller, InductiveVisualMinerConfiguration configuration) {
+	protected void initGui(final ProMCanceller canceller, final InductiveVisualMinerConfiguration configuration) {
 
 		initGuiPopups();
 
@@ -221,7 +221,7 @@ public class InductiveVisualMinerController {
 				if (!animationEnabled) {
 					//animation gets disabled
 					panel.getGraph().setAnimationEnabled(false);
-					setAnimationStatus(panel, "animation disabled", true);
+					setAnimationStatus(panel, "animation disabled", true, configuration.getDecorator());
 					panel.repaint();
 				}
 				return animationEnabled;
@@ -376,7 +376,7 @@ public class InductiveVisualMinerController {
 		initGuiGraph();
 
 		//set trace view button
-		initGuiTraceView();
+		initGuiTraceView(configuration.getDecorator());
 
 		//set data analyses
 		initGuiDataAnalyses();
@@ -589,7 +589,7 @@ public class InductiveVisualMinerController {
 		});
 	}
 
-	protected void initGuiTraceView() {
+	protected void initGuiTraceView(final IvMDecoratorI decorator) {
 		//button => show trace view
 		panel.getTraceViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -638,7 +638,7 @@ public class InductiveVisualMinerController {
 				Selection selection = inputs.get(IvMObject.selected_model_selection);
 				TraceColourMap traceColourMap = inputs.get(IvMObject.trace_colour_map);
 
-				panel.getTraceView().set(model, aLog, selection, traceColourMap);
+				panel.getTraceView().set(model, aLog, selection, traceColourMap, decorator);
 				panel.getTraceView().repaint();
 			}
 
@@ -981,7 +981,8 @@ public class InductiveVisualMinerController {
 				boolean enabled = inputs.get(IvMObject.selected_animation_enabled);
 				if (!enabled) {
 					System.out.println("animation disabled");
-					InductiveVisualMinerController.setAnimationStatus(panel, "animation disabled", true);
+					InductiveVisualMinerController.setAnimationStatus(panel, "animation disabled", true,
+							configuration.getDecorator());
 					panel.getGraph().setAnimationEnabled(false);
 				} else {
 					//this is taken care of by the animation handler
@@ -1017,7 +1018,7 @@ public class InductiveVisualMinerController {
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
 				panel.getGraph().setAnimationEnabled(false);
-				InductiveVisualMinerController.setAnimationStatus(panel, " ", false);
+				InductiveVisualMinerController.setAnimationStatus(panel, " ", false, configuration.getDecorator());
 			}
 		});
 
@@ -1078,9 +1079,10 @@ public class InductiveVisualMinerController {
 					if (scaler != null) {
 						long logTime = Math.round(scaler.userTime2LogTime(userTime));
 						if (scaler.isCorrectTime()) {
-							setAnimationStatus(panel, ResourceTimeUtils.timeToString(logTime), true);
+							setAnimationStatus(panel, ResourceTimeUtils.timeToString(logTime), true,
+									configuration.getDecorator());
 						} else {
-							setAnimationStatus(panel, "random", true);
+							setAnimationStatus(panel, "random", true, configuration.getDecorator());
 						}
 
 						//draw modes that require an update with each time step
@@ -1272,9 +1274,10 @@ public class InductiveVisualMinerController {
 		panel.getStatusLabel().repaint();
 	}
 
-	public static void setAnimationStatus(InductiveVisualMinerPanel panel, String s, boolean isTime) {
+	public static void setAnimationStatus(InductiveVisualMinerPanel panel, String s, boolean isTime,
+			IvMDecoratorI decorator) {
 		if (isTime) {
-			panel.getAnimationTimeLabel().setFont(IvMDecorator.fontMonoSpace);
+			panel.getAnimationTimeLabel().setFont(decorator.fontMonoSpace());
 			panel.getAnimationTimeLabel().setText("time: " + s);
 		} else {
 			panel.getAnimationTimeLabel().setFont(panel.getStatusLabel().getFont());

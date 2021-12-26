@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters;
 
 import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
@@ -14,13 +15,13 @@ public class PreMiningFilterTrace extends PreMiningFilterTraceWithEvent {
 	}
 
 	@Override
-	public IvMFilterGui createGui() {
+	public IvMFilterGui createGui(IvMDecoratorI decorator) {
 		panel = new AttributeFilterGui(getName(), new Runnable() {
 			public void run() {
 				update();
 				updateExplanation();
 			}
-		});
+		}, decorator);
 
 		return panel;
 	}

@@ -153,12 +153,12 @@ public class AssociationsRowBlock<C extends ConfigurationWithDecorator, P> exten
 		{
 			//CorrelationPlot plot = new CorrelationPlot();
 			BufferedImage imageA = CorrelationDensityPlot.create(attributeA.getName(), vA, minA, maxA,
-					attributeB.getName(), vB, minB, maxB);
+					attributeB.getName(), vB, minB, maxB, decorator);
 			result.add(new DataRow<Object>(DisplayType.image(imageA), attributeA.getName(), attributeB.getName(),
 					AssociationType.associationPlot.toString()));
 
 			BufferedImage imageB = CorrelationDensityPlot.create(attributeB.getName(), vB, minB, maxB,
-					attributeA.getName(), vA, minA, maxA);
+					attributeA.getName(), vA, minA, maxA, decorator);
 			result.add(new DataRow<Object>(DisplayType.image(imageB), attributeB.getName(), attributeA.getName(),
 					AssociationType.associationPlot.toString()));
 		}

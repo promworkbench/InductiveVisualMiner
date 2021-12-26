@@ -39,6 +39,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.MultiComboBo
  * @author sander
  *
  */
+@Deprecated
 public class IvMDecorator {
 
 	public static final Color textColour = new Color(40, 78, 107);

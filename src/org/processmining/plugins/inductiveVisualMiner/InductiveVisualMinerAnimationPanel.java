@@ -40,6 +40,7 @@ import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.
 import org.processmining.plugins.inductiveVisualMiner.animation.renderingthread.RenderingThread;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.AboutMessage;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
 import org.processmining.plugins.inductiveVisualMiner.popup.LogPopupListener;
@@ -87,7 +88,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 	//exporters
 	private GetExporters getExporters = null;
 
-	public InductiveVisualMinerAnimationPanel(ProMCanceller canceller) {
+	public InductiveVisualMinerAnimationPanel(ProMCanceller canceller, final IvMDecoratorI decorator) {
 		super(getSplashScreen());
 
 		setOpaque(true);
@@ -131,7 +132,7 @@ public class InductiveVisualMinerAnimationPanel extends DotPanel {
 			private static final long serialVersionUID = -8518809641877095503L;
 
 			public void actionPerformed(ActionEvent e) {
-				AboutMessage.show(InductiveVisualMinerAnimationPanel.this);
+				AboutMessage.show(InductiveVisualMinerAnimationPanel.this, decorator);
 			}
 		};
 		helperControlsShortcuts.add("ctrl a");

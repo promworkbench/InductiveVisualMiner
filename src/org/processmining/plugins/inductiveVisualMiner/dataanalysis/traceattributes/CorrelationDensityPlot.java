@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import org.math.plot.utils.Array;
 import org.processmining.plugins.graphviz.colourMaps.ColourMap;
 import org.processmining.plugins.graphviz.colourMaps.ColourMapViridis;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 public class CorrelationDensityPlot {
 	public static final int sizeX1DPlot = 10;
@@ -34,7 +34,7 @@ public class CorrelationDensityPlot {
 	}
 
 	public static BufferedImage create(String nameX, double[] valuesX, double minX, double maxX, String nameY,
-			double[] valuesY, double minY, double maxY) {
+			double[] valuesY, double minY, double maxY, IvMDecoratorI decorator) {
 
 		BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 
@@ -50,15 +50,15 @@ public class CorrelationDensityPlot {
 
 		fillImage1DPlotHorizontal(image, valuesX, minX, maxX, sizeX1DPlot + marginX, sizeY2DPlot + marginY, sizeX2DPlot,
 				sizeY1DPlot);
-		drawTextHorizontal(image, nameX, sizeX1DPlot + marginX, sizeY2DPlot, sizeX2DPlot, marginY);
+		drawTextHorizontal(image, nameX, sizeX1DPlot + marginX, sizeY2DPlot, sizeX2DPlot, marginY, decorator);
 
 		fillImage1DPlotVertical(image, valuesY, minY, maxY, 0, 0, sizeX1DPlot, sizeY2DPlot);
-		drawTextVertical(image, nameY, sizeX1DPlot, 0, marginX, sizeY2DPlot);
+		drawTextVertical(image, nameY, sizeX1DPlot, 0, marginX, sizeY2DPlot, decorator);
 		return image;
 	}
 
 	public static BufferedImage create(String nameX, long[] valuesX, long minX, long maxX, String nameY,
-			double[] valuesY, double minY, double maxY) {
+			double[] valuesY, double minY, double maxY, IvMDecoratorI decorator) {
 		/*
 		 * here we do not need the precision of long anymore, so transform to
 		 * double and keep things maintainable around here..
@@ -69,14 +69,14 @@ public class CorrelationDensityPlot {
 			valuesXd[i] = valuesX[i];
 		}
 
-		return create(nameX, valuesXd, minX, maxX, nameY, valuesY, minY, maxY);
+		return create(nameX, valuesXd, minX, maxX, nameY, valuesY, minY, maxY, decorator);
 	}
 
 	public static void drawTextHorizontal(BufferedImage image, String name, int offsetX, int offsetY, int sizeX,
-			int sizeY) {
+			int sizeY, IvMDecoratorI decorator) {
 		Graphics2D g = (Graphics2D) image.getGraphics();
 
-		Font font = IvMDecorator.font;
+		Font font = decorator.font();
 		g.setFont(font);
 		FontMetrics metrics = g.getFontMetrics(font);
 
@@ -88,16 +88,16 @@ public class CorrelationDensityPlot {
 		offsetY += (sizeY / 2) + (height / 2);
 		offsetY += 2; //manual adjustment
 
-		g.setColor(IvMDecorator.textColour);
+		g.setColor(decorator.textColour());
 
 		g.drawString(name, offsetXp, offsetY);
 	}
 
 	public static void drawTextVertical(BufferedImage image, String name, int offsetX, int offsetY, int sizeX,
-			int sizeY) {
+			int sizeY, IvMDecoratorI decorator) {
 		Graphics2D g = (Graphics2D) image.getGraphics();
 
-		Font font = IvMDecorator.font;
+		Font font = decorator.font();
 		g.setFont(font);
 		FontMetrics metrics = g.getFontMetrics(font);
 
@@ -108,7 +108,7 @@ public class CorrelationDensityPlot {
 		offsetX += (sizeX / 2) + (height / 2);
 		offsetX += 1; //manual adjustment
 
-		g.setColor(IvMDecorator.textColour);
+		g.setColor(decorator.textColour());
 
 		g.rotate(-Math.PI / 2, offsetX, sizeY + offsetY);
 		g.drawString(name, offsetX, sizeY + offsetY);

@@ -100,7 +100,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	public InductiveVisualMinerPanel(InductiveVisualMinerConfiguration configuration, ProMCanceller canceller) {
 		super(configuration.getDecorator());
 		IvMDecoratorI decorator = configuration.getDecorator();
-		
+
 		int gridy = 0;
 
 		setLayout(new BorderLayout());
@@ -211,7 +211,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//edit model view
 			{
-				editModelView = new EditModelView(this);
+				editModelView = new EditModelView(this, decorator);
 				editModelButton = new JButton("edit model");
 				decorator.decorate(editModelButton);
 				GridBagConstraints cEditModelButton = new GridBagConstraints();
@@ -402,7 +402,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 		//graph panel
 		{
-			graphPanel = new InductiveVisualMinerAnimationPanel(canceller);
+			graphPanel = new InductiveVisualMinerAnimationPanel(canceller, decorator);
 			graphPanel.setFocusable(true);
 
 			//set the graph changed listener

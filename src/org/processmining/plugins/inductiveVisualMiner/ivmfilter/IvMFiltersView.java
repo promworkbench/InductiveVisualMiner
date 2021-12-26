@@ -135,7 +135,7 @@ public abstract class IvMFiltersView extends SideWindow {
 							onUpdate.run();
 						}
 					}
-				});
+				}, decorator);
 				subPanel.add(filter.getPanel(), BorderLayout.CENTER);
 				filter2panel.put(filter, filter.getPanel());
 

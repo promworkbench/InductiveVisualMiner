@@ -12,7 +12,6 @@ import org.apache.commons.math3.distribution.AbstractRealDistribution;
 import org.math.plot.utils.Array;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
 /**
@@ -135,7 +134,7 @@ public class Histogram {
 			g.fillRect(offsetX, 0, histogramWidth, histogramHeight);
 		}
 
-		drawText(g, counts, minX, maxX);
+		drawText(g, counts, minX, maxX, decorator);
 
 		//draw
 		{
@@ -196,13 +195,13 @@ public class Histogram {
 		return image;
 	}
 
-	public static void drawText(Graphics2D g, int[] counts, String minX, String maxX) {
+	public static void drawText(Graphics2D g, int[] counts, String minX, String maxX, IvMDecoratorI decorator) {
 		AffineTransform saveAT = g.getTransform();
 
-		Font font = IvMDecorator.font;
+		Font font = decorator.font();
 		g.setFont(font);
 		FontMetrics metrics = g.getFontMetrics(font);
-		g.setColor(IvMDecorator.textColour);
+		g.setColor(decorator.textColour());
 		int height = ((metrics.getAscent() + metrics.getDescent()) / 2);
 
 		//min X
@@ -245,7 +244,7 @@ public class Histogram {
 			String name = max(counts) + "";
 			int width = metrics.stringWidth(name);
 
-			g.setColor(IvMDecorator.textColour);
+			g.setColor(decorator.textColour());
 			//			g.drawRect(-2, -2, 4, 4);
 
 			g.rotate(-Math.PI / 2, 0, 0);

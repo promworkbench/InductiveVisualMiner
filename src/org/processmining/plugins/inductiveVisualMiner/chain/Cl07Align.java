@@ -71,7 +71,7 @@ public class Cl07Align extends DataChainLinkComputationAbstract<InductiveVisualM
 			//see whether the alignment was pre-mined
 			InductiveVisualMinerAlignment preMinedAlignment = inputs.get(IvMObject.imported_alignment);
 			IvMLogNotFiltered ivmLog = ImportAlignment.getIvMLog(preMinedAlignment, eventClasses,
-					eventClassesPerformance);
+					eventClassesPerformance, configuration.getDecorator());
 			if (ivmLog != null) {
 				System.out.println("Alignment imported");
 				return new IvMObjectValues().//
@@ -98,7 +98,8 @@ public class Cl07Align extends DataChainLinkComputationAbstract<InductiveVisualM
 		}
 
 		IvMLogNotFiltered aLog = AlignmentPerformance.align(configuration.getAlignmentComputer(), model,
-				performanceClassifier, log, eventClasses, eventClassesPerformance, canceller);
+				performanceClassifier, log, eventClasses, eventClassesPerformance, canceller,
+				configuration.getDecorator());
 		if (aLog == null && !canceller.isCancelled()) {
 			throw new Exception("alignment failed");
 		}

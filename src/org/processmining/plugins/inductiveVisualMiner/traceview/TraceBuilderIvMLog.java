@@ -8,7 +8,7 @@ import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMap;
@@ -20,11 +20,14 @@ class TraceBuilderIvMLog extends TraceBuilderWrapper {
 
 	private final Selection selection;
 	private final IvMModel model;
+	private final IvMDecoratorI decorator;
 
-	public TraceBuilderIvMLog(IvMModel model, Selection selection, TraceColourMap traceColourMap) {
+	public TraceBuilderIvMLog(IvMModel model, Selection selection, TraceColourMap traceColourMap,
+			IvMDecoratorI decorator) {
 		super(traceColourMap);
 		this.selection = selection;
 		this.model = model;
+		this.decorator = decorator;
 	}
 
 	public TraceBuilderIvMLogTrace build(final Object trace) {
@@ -67,7 +70,7 @@ class TraceBuilderIvMLog extends TraceBuilderWrapper {
 		}
 
 		public Color getNameColor() {
-			return IvMDecorator.textColour;
+			return decorator.textColour();
 		}
 
 		public String getInfo() {

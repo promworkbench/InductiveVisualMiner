@@ -27,7 +27,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.RangeSlider;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecorator;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
 public class AttributeFilterGui extends IvMFilterGui {
@@ -49,15 +49,15 @@ public class AttributeFilterGui extends IvMFilterGui {
 	private final Runnable onUpdate;
 	private boolean block = false;
 
-	public AttributeFilterGui(String title, Runnable onUpdate) {
-		super(title);
+	public AttributeFilterGui(String title, Runnable onUpdate, IvMDecoratorI decorator) {
+		super(title, decorator);
 		usesVerticalSpace = true;
 		this.onUpdate = onUpdate;
 
 		//explanation
 		{
 			explanation = new JTextArea("Only highlight traces of which the ");
-			IvMDecorator.decorate(explanation);
+			decorator.decorate(explanation);
 			explanation.setEditable(false);
 			explanation.setLineWrap(true);
 			explanation.setWrapStyleWord(true);
@@ -72,7 +72,7 @@ public class AttributeFilterGui extends IvMFilterGui {
 		{
 			keySelectorModel = new DefaultComboBoxModel<>();
 			keySelector = new JComboBox<>();
-			IvMDecorator.decorate(keySelector);
+			decorator.decorate(keySelector);
 			keySelector.setModel(keySelectorModel);
 			add(keySelector);
 		}

@@ -22,13 +22,14 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficient
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTimeUtils;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.TreeUtils;
+import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTraceImpl;
-import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceUtils;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.processtree.conversion.ProcessTree2Petrinet.UnfoldedNode;
 
@@ -37,7 +38,7 @@ import gnu.trove.map.TObjectIntMap;
 public class ImportAlignment {
 
 	public static IvMLogNotFiltered getIvMLog(InductiveVisualMinerAlignment alignment,
-			XEventClasses activityEventClasses, XEventClasses performanceEventClasses) {
+			XEventClasses activityEventClasses, XEventClasses performanceEventClasses, IvMDecoratorI decorator) {
 		XLog aLog = alignment.getAlignedLog();
 		XLog xLog = alignment.getXLog(); //make sure that the XLog is already made, such that we can link to its attributes
 		if (xLog == null) {
@@ -144,7 +145,8 @@ public class ImportAlignment {
 						if (!model.isTau(node)) {
 							xEvent = xTrace.get(xEventIndex);
 							performanceEventClass = performanceEventClasses2.getClassOf(aEvent);
-							activityEventClass = PerformanceUtils.getActivity(performanceEventClass, activityEventClasses2);
+							activityEventClass = PerformanceUtils.getActivity(performanceEventClass,
+									activityEventClasses2);
 							xEventIndex++;
 						} else {
 							activityEventClass = null;
@@ -169,7 +171,7 @@ public class ImportAlignment {
 				}
 
 				Move move = new Move(model, type, sourceNode, node, activityEventClass, performanceEventClass,
-						lifeCycleTransition, aEventIndex);
+						lifeCycleTransition, aEventIndex, decorator);
 
 				//gather attributes for IvMMove
 				Long timestamp = ResourceTimeUtils.getTimestamp(aEvent);
