@@ -54,7 +54,7 @@ public class HighlightingFilterCohort extends HighlightingFilter {
 		return true;
 	}
 
-	public String getName() throws Exception {
+	public String getName() {
 		return "Cohort filter";
 	}
 

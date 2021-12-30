@@ -20,7 +20,7 @@ public class HighlightingFilterFollows extends HighlightingFilter {
 		return isTraceIncluded(trace, panel);
 	}
 
-	public String getName() throws Exception {
+	public String getName() {
 		return "Event-followed-by filter";
 	}
 

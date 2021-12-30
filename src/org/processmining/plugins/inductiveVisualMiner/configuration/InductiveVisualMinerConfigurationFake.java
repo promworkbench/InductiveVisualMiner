@@ -17,6 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderFactory;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLog;
@@ -58,6 +59,10 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 
 	public List<HighlightingFilter> getHighlightingFilters() {
 		return phantom.getHighlightingFilters();
+	}
+	
+	public IvMFilterBuilderFactory getFilters() {
+		return phantom.getFilters();
 	}
 
 	public List<Mode> getModes() {

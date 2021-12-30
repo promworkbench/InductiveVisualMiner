@@ -11,6 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderFactory;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLog;
@@ -57,6 +58,13 @@ public interface InductiveVisualMinerConfiguration extends ConfigurationWithDeco
 	 * @return
 	 */
 	public List<HighlightingFilter> getHighlightingFilters();
+
+	/**
+	 * The list of available highlighting filters.
+	 * 
+	 * @return
+	 */
+	public IvMFilterBuilderFactory getFilters();
 
 	/**
 	 * The list of available modes (arc colouring, which numbers to show on the
@@ -117,7 +125,5 @@ public interface InductiveVisualMinerConfiguration extends ConfigurationWithDeco
 	public AlignmentComputer getAlignmentComputer();
 
 	public List<CostModelFactory> getCostModelFactories();
-
-	
 
 }

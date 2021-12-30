@@ -23,6 +23,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.Causal
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -109,6 +110,9 @@ public class IvMObject<C> {
 	//controllers & IvM-stuff
 	public static final IvMObject<IvMHighlightingFiltersController> controller_highlighting_filters = c(
 			"highlighting filters controller", IvMHighlightingFiltersController.class);
+	@SuppressWarnings("rawtypes")
+	public static final IvMObject<IvMFilterTreeController> controller_highlighting_filters_tree = c(
+			"highlighting filter tree controller", IvMFilterTreeController.class);
 	public static final IvMObject<IvMPreMiningFiltersController> controller_premining_filters = c(
 			"pre-mining filters controller", IvMPreMiningFiltersController.class);
 
@@ -128,8 +132,7 @@ public class IvMObject<C> {
 			boolean.class);
 	public static final IvMObject<Boolean> selected_associations_enabled = c("selected associations enabled",
 			boolean.class);
-	public static final IvMObject<Boolean> selected_causal_enabled = c("selected causal enabled",
-			boolean.class);
+	public static final IvMObject<Boolean> selected_causal_enabled = c("selected causal enabled", boolean.class);
 	public static final IvMObject<CostModelFactory> selected_cost_model_factory = c("cost model factory",
 			CostModelFactory.class);
 

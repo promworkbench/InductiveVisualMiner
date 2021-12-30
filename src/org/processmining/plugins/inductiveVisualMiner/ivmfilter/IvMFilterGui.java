@@ -36,6 +36,7 @@ public abstract class IvMFilterGui extends JPanel {
 	 * We're drastically changing colours. Make sure the gui is not-opaque and
 	 * recursively set the text colour.
 	 */
+	@Deprecated
 	protected abstract void setForegroundRecursively(Color colour);
 
 	@Override

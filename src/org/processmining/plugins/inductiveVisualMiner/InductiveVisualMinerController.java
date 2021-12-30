@@ -73,8 +73,10 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.mode.ModePaths;
 import org.processmining.plugins.inductiveVisualMiner.popup.HistogramData;
@@ -384,7 +386,7 @@ public class InductiveVisualMinerController {
 		initGuiTraceColouring();
 
 		//set highlighting filters button
-		initGuiHighlightingFilters();
+		initGuiHighlightingFilters(configuration.getDecorator());
 
 		//copy keybinders to child windows
 		copyKeyBinders();
@@ -897,7 +899,7 @@ public class InductiveVisualMinerController {
 		});
 	}
 
-	protected void initGuiHighlightingFilters() {
+	protected void initGuiHighlightingFilters(IvMDecoratorI decorator) {
 
 		panel.getHighlightingFiltersViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -911,6 +913,15 @@ public class InductiveVisualMinerController {
 		});
 		setObject(IvMObject.controller_highlighting_filters, new IvMHighlightingFiltersController(
 				configuration.getHighlightingFilters(), panel.getHighlightingFiltersView()));
+		IvMFilterTreeController<IvMTrace> filterTreeController = new IvMFilterTreeController<>(IvMTrace.class,
+				panel.getHighlightingFilterTreeView(), configuration.getFilters(), decorator);
+		setObject(IvMObject.controller_highlighting_filters_tree, filterTreeController);
+
+		filterTreeController.setOnUpdate(new Runnable() {
+			public void run() {
+				chain.executeLink(Cl13FilterNodeSelection.class);
+			}
+		});
 
 		//initialise filters
 		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {
@@ -921,14 +932,18 @@ public class InductiveVisualMinerController {
 
 			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.ivm_attributes_info_merged,
-						IvMObject.controller_highlighting_filters };
+						IvMObject.controller_highlighting_filters, IvMObject.controller_highlighting_filters_tree };
 			}
 
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
 				IvMAttributesInfo attributesInfo = inputs.get(IvMObject.ivm_attributes_info_merged);
 				IvMHighlightingFiltersController controller = inputs.get(IvMObject.controller_highlighting_filters);
+				@SuppressWarnings("unchecked")
+				IvMFilterTreeController<IvMTrace> controllerTree = inputs
+						.get(IvMObject.controller_highlighting_filters_tree);
 
 				controller.setAttributesInfo(attributesInfo);
+				controllerTree.setAttributesInfo(attributesInfo);
 
 				panel.getTraceColourMapView().setAttributes(attributesInfo);
 			}
