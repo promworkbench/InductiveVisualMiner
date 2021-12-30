@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -56,7 +55,7 @@ public class AttributeFilterGui extends IvMFilterGui {
 
 		//explanation
 		{
-			explanation = new JTextArea("Only highlight traces of which the ");
+			explanation = new JTextArea("explanation");
 			decorator.decorate(explanation);
 			explanation.setEditable(false);
 			explanation.setLineWrap(true);
@@ -107,7 +106,7 @@ public class AttributeFilterGui extends IvMFilterGui {
 			valueLiteralScrollPane.setOpaque(false);
 			//valueLiteralScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 			valueLiteralScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-			valueLiteralScrollPane.setPreferredSize(new Dimension(0, 50));
+			//valueLiteralScrollPane.setPreferredSize(new Dimension(0, 50));
 			add(valueLiteralScrollPane);
 		}
 
