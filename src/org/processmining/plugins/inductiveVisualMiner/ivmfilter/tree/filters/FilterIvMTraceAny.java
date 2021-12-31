@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
-import java.awt.Color;
-
 import org.apache.commons.lang3.StringUtils;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -9,40 +7,33 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeLeafAbstract;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class FilterIvMMoveNoop implements IvMFilterBuilder<IvMMove, Object, IvMFilterGui> {
+public class FilterIvMTraceAny implements IvMFilterBuilder<IvMTrace, Object, IvMFilterGui> {
 
 	public String toString() {
-		return "all events";
+		return "any trace";
 	}
 
 	@Override
 	public String toString(IvMFilterGui panel) {
-		return "all events";
+		return "any trace";
 	}
 
 	public IvMFilterGui createGui(Runnable onUpdate, IvMDecoratorI decorator) {
-		IvMFilterGui result = new IvMFilterGui(null, decorator) {
-			private static final long serialVersionUID = 110211772022409817L;
-
-			protected void setForegroundRecursively(Color colour) {
-
-			}
-		};
-		return result;
+		return new IvMFilterGui(null, decorator);
 	}
 
-	public IvMFilterTreeNode<IvMMove> buildFilter(IvMFilterGui panel) {
-		return new IvMFilterTreeNodeLeafAbstract<IvMMove>() {
+	public IvMFilterTreeNode<IvMTrace> buildFilter(IvMFilterGui panel) {
+		return new IvMFilterTreeNodeLeafAbstract<IvMTrace>() {
 
-			public boolean staysInLogA(IvMMove element) {
+			public boolean staysInLogA(IvMTrace element) {
 				return true;
 			}
 
 			public void getExplanation(StringBuilder result, int indent) {
 				result.append(StringUtils.repeat("\t", indent));
-				result.append("no filter");
+				result.append("any trace");
 			}
 
 			public boolean couldSomethingBeFiltered() {
@@ -55,8 +46,8 @@ public class FilterIvMMoveNoop implements IvMFilterBuilder<IvMMove, Object, IvMF
 		return false;
 	}
 
-	public Class<IvMMove> getTargetClass() {
-		return IvMMove.class;
+	public Class<IvMTrace> getTargetClass() {
+		return IvMTrace.class;
 	}
 
 	public Class<Object> getChildrenTargetClass() {

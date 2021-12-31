@@ -11,7 +11,7 @@ import javax.swing.border.TitledBorder;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
-public abstract class IvMFilterGui extends JPanel {
+public class IvMFilterGui extends JPanel {
 
 	private static final long serialVersionUID = -7693755022689210425L;
 
@@ -58,7 +58,9 @@ public abstract class IvMFilterGui extends JPanel {
 	 * recursively set the text colour.
 	 */
 	@Deprecated
-	protected abstract void setForegroundRecursively(Color colour);
+	protected void setForegroundRecursively(Color colour) {
+		
+	}
 
 	@Override
 	public void setForeground(Color colour) {

@@ -6,36 +6,45 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeCompositeAbstract;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class FilterIvMTraceAnd implements IvMFilterBuilder<IvMTrace, IvMTrace, IvMFilterGui> {
+public class FilterIvMTraceStartsWithEvent implements IvMFilterBuilder<IvMTrace, IvMMove, IvMFilterGui> {
 
 	@Override
 	public String toString() {
-		return "and";
+		return "trace starts with event";
 	}
 
 	@Override
 	public String toString(IvMFilterGui panel) {
-		return "and";
+		return "trace starts with event";
 	}
 
 	@Override
 	public IvMFilterGui createGui(Runnable onUpdate, IvMDecoratorI decorator) {
-		IvMFilterGui result = new IvMFilterGui(null, decorator);
-		result.add(result.createExplanation("Include traces that pass all of the sub-filters."));
+		IvMFilterGui result = new IvMFilterGui(toString(), decorator);
+		result.add(result.createExplanation("Include traces of which the first event passes all the sub-filters."));
 		return result;
 	}
 
 	@Override
-	public IvMFilterTreeNode<IvMTrace> buildFilter(IvMFilterGui panel) {
-		return new IvMFilterTreeNodeCompositeAbstract<IvMTrace, IvMTrace>() {
+	public IvMFilterTreeNode<IvMTrace> buildFilter(IvMFilterGui gui) {
+		return new IvMFilterTreeNodeCompositeAbstract<IvMTrace, IvMMove>() {
 
-			private static final long serialVersionUID = -2705606899973613204L;
+			private static final long serialVersionUID = 8213030059677606305L;
 
 			public boolean staysInLogA(IvMTrace x) {
-				for (IvMFilterTreeNode<IvMTrace> child : this) {
-					if (!child.staysInLog(x)) {
+				if (x.isEmpty()) {
+					return false;
+				}
+
+				return targets(x.get(0));
+			}
+
+			private boolean targets(IvMMove move) {
+				for (IvMFilterTreeNode<IvMMove> child : this) {
+					if (!child.staysInLog(move)) {
 						return false;
 					}
 				}
@@ -44,7 +53,7 @@ public class FilterIvMTraceAnd implements IvMFilterBuilder<IvMTrace, IvMTrace, I
 
 			@Override
 			public String getPrefix() {
-				return "both";
+				return "as first event ";
 			}
 
 			public String getDivider() {
@@ -52,12 +61,7 @@ public class FilterIvMTraceAnd implements IvMFilterBuilder<IvMTrace, IvMTrace, I
 			}
 
 			public boolean couldSomethingBeFiltered() {
-				for (IvMFilterTreeNode<IvMTrace> child : this) {
-					if (child.couldSomethingBeFiltered()) {
-						return true;
-					}
-				}
-				return false;
+				return true; //empty traces are always filtered
 			}
 		};
 	}
@@ -73,13 +77,12 @@ public class FilterIvMTraceAnd implements IvMFilterBuilder<IvMTrace, IvMTrace, I
 	}
 
 	@Override
-	public Class<IvMTrace> getChildrenTargetClass() {
-		return IvMTrace.class;
+	public Class<IvMMove> getChildrenTargetClass() {
+		return IvMMove.class;
 	}
 
 	@Override
 	public void setAttributesInfo(IvMAttributesInfo attributesInfo, IvMFilterGui gui) {
 
 	}
-
 }
