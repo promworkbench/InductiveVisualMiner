@@ -7,73 +7,57 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBu
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeCompositeAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class FilterIvMTraceEndsWithEvent implements IvMFilterBuilder<IvMTrace, IvMMove, IvMFilterGui> {
+public class FilterIvMMoveOr implements IvMFilterBuilder<IvMMove, IvMMove, IvMFilterGui> {
 
 	@Override
 	public String toString() {
-		return "trace ends with event";
+		return "or";
 	}
 
 	@Override
 	public String toString(IvMFilterGui panel) {
-		return "trace ends with event";
+		return "or";
 	}
 
 	@Override
 	public IvMFilterGui createGui(Runnable onUpdate, IvMDecoratorI decorator) {
-		IvMFilterGui result = new IvMFilterGui(toString(), decorator);
-		result.add(result.createExplanation("Include traces of which the last event passes all the sub-filters."));
+		IvMFilterGui result = new IvMFilterGui(null, decorator);
+		result.add(result.createExplanation("Include events that pass any of the sub-filters."));
 		return result;
 	}
 
 	@Override
-	public IvMFilterTreeNode<IvMTrace> buildFilter(IvMFilterGui gui) {
-		return new IvMFilterTreeNodeCompositeAbstract<IvMTrace, IvMMove>() {
+	public IvMFilterTreeNode<IvMMove> buildFilter(IvMFilterGui panel) {
+		return new IvMFilterTreeNodeCompositeAbstract<IvMMove, IvMMove>() {
 
-			private static final long serialVersionUID = 8213030059677606305L;
+			private static final long serialVersionUID = -2705606899973613204L;
 
-			public boolean staysInLogA(IvMTrace x) {
-				if (x.isEmpty()) {
-					return false;
-				}
-
-				//Try whether the last move can be matched
-				if (targets(x.get(x.size() - 1))) {
-					return true;
-				}
-
-				//Find the last log event move and match it
-				for (int i = x.size() - 1; i >= 0; i++) {
-					IvMMove move = x.get(i);
-					if (move.hasAttributes()) {
-						return targets(move);
+			public boolean staysInLogA(IvMMove x) {
+				for (IvMFilterTreeNode<IvMMove> child : this) {
+					if (child.staysInLog(x)) {
+						return true;
 					}
 				}
 				return false;
 			}
 
-			private boolean targets(IvMMove move) {
+			@Override
+			public String getPrefix() {
+				return "any of";
+			}
+
+			public String getDivider() {
+				return "or";
+			}
+
+			public boolean couldSomethingBeFiltered() {
 				for (IvMFilterTreeNode<IvMMove> child : this) {
-					if (!child.staysInLog(move)) {
+					if (!child.couldSomethingBeFiltered()) {
 						return false;
 					}
 				}
 				return true;
-			}
-
-			@Override
-			public String getPrefix() {
-				return "as last event ";
-			}
-
-			public String getDivider() {
-				return "and";
-			}
-
-			public boolean couldSomethingBeFiltered() {
-				return true; //empty traces are always filtered
 			}
 		};
 	}
@@ -84,8 +68,8 @@ public class FilterIvMTraceEndsWithEvent implements IvMFilterBuilder<IvMTrace, I
 	}
 
 	@Override
-	public Class<IvMTrace> getTargetClass() {
-		return IvMTrace.class;
+	public Class<IvMMove> getTargetClass() {
+		return IvMMove.class;
 	}
 
 	@Override
@@ -97,4 +81,5 @@ public class FilterIvMTraceEndsWithEvent implements IvMFilterBuilder<IvMTrace, I
 	public void setAttributesInfo(IvMAttributesInfo attributesInfo, IvMFilterGui gui) {
 
 	}
+
 }

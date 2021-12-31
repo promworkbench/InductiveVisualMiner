@@ -127,8 +127,12 @@ public class IvMFilterTreeController<X> {
 	}
 
 	public void filter(Iterator<X> it, IvMCanceller canceller) {
-		//avoid the current filter changing
+		//avoid the current filter changing during filtering
 		IvMFilterTree<X> currentFilter2 = currentFilter;
+
+		if (!currentFilter2.couldSomethingBeFiltered()) {
+			return;
+		}
 
 		while (it.hasNext()) {
 			X element = it.next();

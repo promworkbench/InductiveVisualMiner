@@ -110,9 +110,10 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderFactory;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMMoveAnd;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMMoveAny;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMMoveAttribute;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMMoveNo;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMMoveOr;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceAnd;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceAny;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceAttribute;
@@ -219,7 +220,8 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					List<IvMFilterBuilder<X, ?, ?>> filterBuilders = new ArrayList<>();
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveAny());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveAttribute());
-					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveNo());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveAnd());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveOr());
 					return filterBuilders;
 				}
 				return null;

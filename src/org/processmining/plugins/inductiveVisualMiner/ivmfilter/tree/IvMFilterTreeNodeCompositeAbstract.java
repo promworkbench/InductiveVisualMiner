@@ -15,7 +15,7 @@ public abstract class IvMFilterTreeNodeCompositeAbstract<X, Y> extends ArrayList
 	public abstract String getPrefix();
 
 	public String toString() {
-		return getDivider();
+		return this.getClass().toString();
 	}
 
 	@Override

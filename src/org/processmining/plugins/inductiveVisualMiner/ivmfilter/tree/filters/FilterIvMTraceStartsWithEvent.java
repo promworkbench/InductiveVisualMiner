@@ -39,7 +39,18 @@ public class FilterIvMTraceStartsWithEvent implements IvMFilterBuilder<IvMTrace,
 					return false;
 				}
 
-				return targets(x.get(0));
+				//Try whether the first move can be matched.
+				if (targets(x.iterator().next())) {
+					return true;
+				}
+
+				//If the first move doesn't match, then look for the first log event and try to match that.
+				for (IvMMove move : x) {
+					if (move.hasAttributes()) {
+						return targets(move);
+					}
+				}
+				return false;
 			}
 
 			private boolean targets(IvMMove move) {
