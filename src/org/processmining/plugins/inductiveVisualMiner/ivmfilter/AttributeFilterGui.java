@@ -1,5 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -9,12 +11,14 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListCellRenderer;
@@ -47,75 +51,92 @@ public class AttributeFilterGui extends IvMFilterGui {
 	private final JTextArea explanation;
 	private final Runnable onUpdate;
 	private boolean block = false;
+	private final JPanel valuesPanel;
+	private final CardLayout valuesPanelLayout;
 
 	public AttributeFilterGui(String title, Runnable onUpdate, IvMDecoratorI decorator) {
 		super(title, decorator);
 		usesVerticalSpace = true;
 		this.onUpdate = onUpdate;
+		setLayout(new BorderLayout());
 
-		//explanation
+		//header
 		{
-			explanation = new JTextArea("explanation");
-			decorator.decorate(explanation);
-			explanation.setEditable(false);
-			explanation.setLineWrap(true);
-			explanation.setWrapStyleWord(true);
-			explanation.setOpaque(false);
-			explanation.setHighlighter(null);
-			add(explanation);
+			JPanel header = new JPanel();
+			header.setOpaque(false);
+			header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+			add(header, BorderLayout.PAGE_START);
+			//explanation
+			{
+				explanation = createExplanation("explanation");
+				header.add(explanation);
+			}
+
+			header.add(Box.createVerticalStrut(10));
+
+			//key selector
+			{
+				keySelectorModel = new DefaultComboBoxModel<>();
+				keySelector = new JComboBox<>();
+				decorator.decorate(keySelector);
+				keySelector.setModel(keySelectorModel);
+				header.add(keySelector);
+			}
+			
+			header.add(Box.createVerticalStrut(10));
 		}
 
-		add(Box.createVerticalStrut(10));
-
-		//key selector
+		//values
 		{
-			keySelectorModel = new DefaultComboBoxModel<>();
-			keySelector = new JComboBox<>();
-			decorator.decorate(keySelector);
-			keySelector.setModel(keySelectorModel);
-			add(keySelector);
-		}
+			valuesPanel = new JPanel();
+			valuesPanelLayout = new CardLayout();
+			valuesPanel.setLayout(valuesPanelLayout);
+			valuesPanel.setOpaque(false);
+			add(valuesPanel, BorderLayout.CENTER);
 
-		add(Box.createVerticalStrut(10));
+			//literal values panel
+			{
+				valueLiteralSelectorListModel = new DefaultListModel<String>();
+				valueLiteralSelector = new JList<String>(valueLiteralSelectorListModel);
+				valueLiteralSelector.setCellRenderer(new ListCellRenderer<String>() {
+					protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
 
-		//literal values panel
-		{
-			valueLiteralSelectorListModel = new DefaultListModel<String>();
-			valueLiteralSelector = new JList<String>(valueLiteralSelectorListModel);
-			valueLiteralSelector.setCellRenderer(new ListCellRenderer<String>() {
-				protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
+					public Component getListCellRendererComponent(JList<? extends String> list, String value, int index,
+							boolean isSelected, boolean cellHasFocus) {
 
-				public Component getListCellRendererComponent(JList<? extends String> list, String value, int index,
-						boolean isSelected, boolean cellHasFocus) {
-
-					JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index,
-							isSelected, cellHasFocus);
-					if (!isSelected) {
-						renderer.setOpaque(false);
-					} else {
-						renderer.setOpaque(true);
+						JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index,
+								isSelected, cellHasFocus);
+						if (!isSelected) {
+							renderer.setOpaque(false);
+						} else {
+							renderer.setOpaque(true);
+						}
+						return renderer;
 					}
-					return renderer;
-				}
-			});
-			valueLiteralSelector.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-			valueLiteralScrollPane = new JScrollPane(valueLiteralSelector);
+				});
+				valueLiteralSelector.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+				valueLiteralScrollPane = new JScrollPane(valueLiteralSelector);
 
-			valueLiteralScrollPane.getViewport().setOpaque(false);
-			valueLiteralSelector.setOpaque(false);
-			valueLiteralScrollPane.setOpaque(false);
-			//valueLiteralScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-			valueLiteralScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-			//valueLiteralScrollPane.setPreferredSize(new Dimension(0, 50));
-			add(valueLiteralScrollPane);
-		}
+				valueLiteralScrollPane.getViewport().setOpaque(false);
+				valueLiteralSelector.setOpaque(false);
+				valueLiteralScrollPane.setOpaque(false);
+				//valueLiteralScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+				valueLiteralScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				//valueLiteralScrollPane.setPreferredSize(new Dimension(0, 50));
+				valuesPanel.add(valueLiteralScrollPane, "literal");
+			}
 
-		//numeric & times values panel
-		{
-			valueNumericSelector = new RangeSlider(0, valueNumericRange);
-			valueNumericSelector.setValue(0);
-			valueNumericSelector.setUpperValue(valueNumericRange);
-			add(valueNumericSelector);
+			//numeric & times values panel
+			{
+				valueNumericSelector = new RangeSlider(0, valueNumericRange);
+				valueNumericSelector.setValue(0);
+				valueNumericSelector.setUpperValue(valueNumericRange);
+				JPanel blup = new JPanel();
+				blup.setOpaque(false);
+				blup.setLayout(new BorderLayout());
+				blup.add(valueNumericSelector, BorderLayout.PAGE_START);
+				valuesPanel.add(blup, "numeric");
+			}
 		}
 
 		setController();
@@ -206,17 +227,13 @@ public class AttributeFilterGui extends IvMFilterGui {
 			for (String a : getSelectedAttribute().getStringValues()) {
 				valueLiteralSelectorListModel.addElement(a);
 			}
-			valueLiteralScrollPane.setVisible(true);
-			valueNumericSelector.setVisible(false);
+			valuesPanelLayout.show(valuesPanel, "literal");
 		} else if (attribute.isNumeric()) {
-			valueLiteralScrollPane.setVisible(false);
-			valueNumericSelector.setVisible(true);
+			valuesPanelLayout.show(valuesPanel, "numeric");
 		} else if (attribute.isTime()) {
-			valueLiteralScrollPane.setVisible(false);
-			valueNumericSelector.setVisible(true);
+			valuesPanelLayout.show(valuesPanel, "numeric");
 		} else if (attribute.isDuration()) {
-			valueLiteralScrollPane.setVisible(false);
-			valueNumericSelector.setVisible(true);
+			valuesPanelLayout.show(valuesPanel, "numeric");
 		}
 	}
 

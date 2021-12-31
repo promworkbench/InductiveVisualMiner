@@ -8,7 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeLeaf;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeLeafAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 
 public class FilterIvMMoveNoop implements IvMFilterBuilder<IvMMove, Object, IvMFilterGui> {
@@ -17,8 +17,13 @@ public class FilterIvMMoveNoop implements IvMFilterBuilder<IvMMove, Object, IvMF
 		return "all events";
 	}
 
+	@Override
+	public String toString(IvMFilterGui panel) {
+		return "all events";
+	}
+
 	public IvMFilterGui createGui(Runnable onUpdate, IvMDecoratorI decorator) {
-		IvMFilterGui result = new IvMFilterGui("no filter", decorator) {
+		IvMFilterGui result = new IvMFilterGui(null, decorator) {
 			private static final long serialVersionUID = 110211772022409817L;
 
 			protected void setForegroundRecursively(Color colour) {
@@ -29,9 +34,9 @@ public class FilterIvMMoveNoop implements IvMFilterBuilder<IvMMove, Object, IvMF
 	}
 
 	public IvMFilterTreeNode<IvMMove> buildFilter(IvMFilterGui panel) {
-		return new IvMFilterTreeNodeLeaf<IvMMove>() {
+		return new IvMFilterTreeNodeLeafAbstract<IvMMove>() {
 
-			public boolean staysInLog(IvMMove element) {
+			public boolean staysInLogA(IvMMove element) {
 				return true;
 			}
 

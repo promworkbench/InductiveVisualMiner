@@ -74,7 +74,7 @@ public class IvMFilterTreeNodeView<X> extends JPanel {
 					decorator.decorate(addChildLabel);
 					addChildLabel.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							onUpdate.addChild(IvMFilterTreeNodeView.this);
+							onUpdate.addChild(IvMFilterTreeNodeView.this, true);
 						}
 					});
 					childPanel.add(addChildLabel, BorderLayout.PAGE_END);
@@ -142,10 +142,17 @@ public class IvMFilterTreeNodeView<X> extends JPanel {
 
 	private <Y> void buildFilterChildren(IvMFilterTreeNodeComposite<X, Y> result) {
 		for (int index = 0; index < treeNode.getChildCount(); index++) {
+			IvMFilterTreeNodeView<?> childView = ((IvMFilterTreeNodeView<?>) ((DefaultMutableTreeNode) treeNode
+					.getChildAt(index)).getUserObject());
+
 			@SuppressWarnings("unchecked")
-			IvMFilterTreeNode<Y> childFilterTreeNode = ((IvMFilterTreeNodeView<Y>) ((DefaultMutableTreeNode) treeNode
-					.getChildAt(index)).getUserObject()).buildFilter();
-			result.add(childFilterTreeNode);
+			IvMFilterBuilder<X, ?, ?> filterBuilder = ((IvMFilterTreeNodeView<X>) treeNode.getUserObject())
+					.getSelectedFilterBuilder();
+			if (childView.getSelectedFilterBuilder().getTargetClass() == filterBuilder.getChildrenTargetClass()) {
+				@SuppressWarnings("unchecked")
+				IvMFilterTreeNode<Y> childFilterTreeNode = (IvMFilterTreeNode<Y>) childView.buildFilter();
+				result.add(childFilterTreeNode);
+			}
 		}
 	}
 
@@ -154,7 +161,13 @@ public class IvMFilterTreeNodeView<X> extends JPanel {
 	}
 
 	public String getCurrentName() {
-		return getSelectedFilterBuilder().toString();
+		return getCurrentName(getSelectedFilterBuilder());
+	}
+
+	private <Y, G extends IvMFilterGui> String getCurrentName(IvMFilterBuilder<X, Y, G> filterBuilder) {
+		@SuppressWarnings("unchecked")
+		G selectedGui = (G) guis.get(filterBuilderChooser.getSelectedIndex());
+		return filterBuilder.toString(selectedGui);
 	}
 
 	@SuppressWarnings("unchecked")

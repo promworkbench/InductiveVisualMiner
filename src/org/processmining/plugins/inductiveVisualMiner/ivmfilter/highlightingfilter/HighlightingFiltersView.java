@@ -8,7 +8,8 @@ import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersView;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeController;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 import gnu.trove.iterator.TIntIterator;
 
@@ -34,7 +35,7 @@ public class HighlightingFiltersView extends IvMFiltersView {
 	 * @param numberOfTraces
 	 */
 	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Selection selection,
-			IvMHighlightingFiltersController filters, IvMModel model) {
+			IvMFilterTreeController<IvMTrace> filters, IvMModel model) {
 		//show the user which traces are shown
 
 		if (selection == null) {
@@ -87,7 +88,7 @@ public class HighlightingFiltersView extends IvMFiltersView {
 
 		//colouring filters
 		{
-			if (filters.isAHighlightingFilterEnabled()) {
+			if (filters.isSomethingFiltered()) {
 				if (result.length() != 0) {
 					result.append("; and ");
 				}

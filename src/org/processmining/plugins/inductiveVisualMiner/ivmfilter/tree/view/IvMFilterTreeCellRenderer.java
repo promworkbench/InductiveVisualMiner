@@ -29,7 +29,6 @@ public class IvMFilterTreeCellRenderer extends JButton implements TreeCellRender
 		}
 
 		IvMFilterTreeNodeView<?> view = ((IvMFilterTreeNodeView<?>) ((DefaultMutableTreeNode) value).getUserObject());
-
 		decorator.decorate(this);
 
 		setEnabled(view.isOnValidPath());

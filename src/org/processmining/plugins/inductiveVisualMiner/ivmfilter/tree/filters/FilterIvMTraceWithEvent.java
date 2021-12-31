@@ -2,8 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
 import java.awt.Color;
 
-import javax.swing.JTextArea;
-
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
@@ -21,19 +19,20 @@ public class FilterIvMTraceWithEvent implements IvMFilterBuilder<IvMTrace, IvMMo
 	}
 
 	@Override
+	public String toString(IvMFilterGui panel) {
+		return "trace with event";
+	}
+
+	@Override
 	public IvMFilterGui createGui(Runnable onUpdate, IvMDecoratorI decorator) {
-		IvMFilterGui result = new IvMFilterGui("REMOVE", decorator) {
+		IvMFilterGui result = new IvMFilterGui(toString(), decorator) {
 			private static final long serialVersionUID = 110211772022409817L;
 
 			protected void setForegroundRecursively(Color colour) {
 
 			}
 		};
-		JTextArea label = new JTextArea("Include traces that have an event that passes all the sub-filters.");
-		label.setLineWrap(true);
-		label.setWrapStyleWord(true);
-		decorator.decorate(label);
-		result.add(label);
+		result.add(result.createExplanation("Include traces that have an event that passes all the sub-filters."));
 		return result;
 	}
 
@@ -43,21 +42,27 @@ public class FilterIvMTraceWithEvent implements IvMFilterBuilder<IvMTrace, IvMMo
 
 			private static final long serialVersionUID = 8213030059677606305L;
 
-			public boolean staysInLog(IvMTrace x) {
+			public boolean staysInLogA(IvMTrace x) {
 				for (IvMMove move : x) {
-					for (IvMFilterTreeNode<IvMMove> child : this) {
-						if (!child.staysInLog(move)) {
-							break;
-						}
+					if (targets(move)) {
+						return true;
 					}
-					return true;
 				}
 				return false;
 			}
 
+			private boolean targets(IvMMove move) {
+				for (IvMFilterTreeNode<IvMMove> child : this) {
+					if (!child.staysInLog(move)) {
+						return false;
+					}
+				}
+				return true;
+			}
+
 			@Override
 			public String getPrefix() {
-				return "having an event that";
+				return "an event ";
 			}
 
 			public String getDivider() {

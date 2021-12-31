@@ -7,7 +7,7 @@ import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -26,7 +26,7 @@ public class Cl13FilterNodeSelection extends DataChainLinkComputationAbstract<In
 
 	public IvMObject<?>[] createInputObjects() {
 		return new IvMObject<?>[] { IvMObject.aligned_log, IvMObject.selected_model_selection,
-				IvMObject.controller_highlighting_filters, IvMObject.aligned_log_info, IvMObject.model };
+				IvMObject.controller_highlighting_filters_tree, IvMObject.aligned_log_info, IvMObject.model };
 	}
 
 	public IvMObject<?>[] createOutputObjects() {
@@ -37,14 +37,16 @@ public class Cl13FilterNodeSelection extends DataChainLinkComputationAbstract<In
 			IvMCanceller canceller) throws Exception {
 		IvMLogNotFiltered logBase = inputs.get(IvMObject.aligned_log);
 		Selection selection = inputs.get(IvMObject.selected_model_selection);
-		IvMHighlightingFiltersController highLightingFilters = inputs.get(IvMObject.controller_highlighting_filters);
+		@SuppressWarnings("unchecked")
+		IvMFilterTreeController<IvMTrace> highLightingFilters = inputs
+				.get(IvMObject.controller_highlighting_filters_tree);
 		IvMLogInfo oldLogInfo = inputs.get(IvMObject.aligned_log_info);
 		IvMModel model = inputs.get(IvMObject.model);
 
 		IvMLogFilteredImpl logFiltered = new IvMLogFilteredImpl(logBase);
 
 		//apply the colouring filters
-		highLightingFilters.applyHighlightingFilters(logFiltered, canceller);
+		highLightingFilters.filter(logFiltered.iterator(), canceller);
 
 		//apply node/edge selection filters
 		if (selection.isSomethingSelected()) {

@@ -2,8 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
 import java.awt.Color;
 
-import javax.swing.JTextArea;
-
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
@@ -20,19 +18,20 @@ public class FilterIvMTraceOr implements IvMFilterBuilder<IvMTrace, IvMTrace, Iv
 	}
 
 	@Override
+	public String toString(IvMFilterGui panel) {
+		return "or";
+	}
+
+	@Override
 	public IvMFilterGui createGui(Runnable onUpdate, IvMDecoratorI decorator) {
-		IvMFilterGui result = new IvMFilterGui("REMOVE", decorator) {
+		IvMFilterGui result = new IvMFilterGui(null, decorator) {
 			private static final long serialVersionUID = 110211772022409817L;
 
 			protected void setForegroundRecursively(Color colour) {
 
 			}
 		};
-		JTextArea label = new JTextArea("Include traces that pass any of the sub-filters.");
-		label.setLineWrap(true);
-		label.setWrapStyleWord(true);
-		decorator.decorate(label);
-		result.add(label);
+		result.add(result.createExplanation("Include traces that pass any of the sub-filters."));
 		return result;
 	}
 
@@ -42,7 +41,7 @@ public class FilterIvMTraceOr implements IvMFilterBuilder<IvMTrace, IvMTrace, Iv
 
 			private static final long serialVersionUID = -2705606899973613204L;
 
-			public boolean staysInLog(IvMTrace x) {
+			public boolean staysInLogA(IvMTrace x) {
 				for (IvMFilterTreeNode<IvMTrace> child : this) {
 					if (child.staysInLog(x)) {
 						return true;
@@ -75,7 +74,7 @@ public class FilterIvMTraceOr implements IvMFilterBuilder<IvMTrace, IvMTrace, Iv
 	public boolean allowsChildren() {
 		return true;
 	}
-	
+
 	@Override
 	public Class<IvMTrace> getTargetClass() {
 		return IvMTrace.class;

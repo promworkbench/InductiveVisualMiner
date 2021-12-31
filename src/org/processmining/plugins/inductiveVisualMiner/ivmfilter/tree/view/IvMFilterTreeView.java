@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -38,8 +39,8 @@ public class IvMFilterTreeView<X> extends SideWindow {
 	private final JPanel nodeViews;
 	private final CardLayout nodeViewsLayout;
 
-	public IvMFilterTreeView(Component parent, final IvMDecoratorI decorator) {
-		super(parent, "filters - visual Miner");
+	public IvMFilterTreeView(Component parent, String title, final IvMDecoratorI decorator) {
+		super(parent, title + " - visual Miner");
 		setLayout(new BorderLayout());
 
 		JPanel panel = new JPanel();
@@ -56,9 +57,13 @@ public class IvMFilterTreeView<X> extends SideWindow {
 		//explanation
 		{
 			explanation = new JTextArea("explanation");
+			decorator.decorate(explanation);
 			explanation.setTabSize(tabSize);
 			explanation.setOpaque(false);
-			decorator.decorate(explanation);
+			explanation.setEditable(false);
+			explanation.setMargin(new Insets(5, 5, 15, 5));
+			explanation.setWrapStyleWord(true);
+			explanation.setLineWrap(true);
 			panel.add(explanation, BorderLayout.PAGE_START);
 		}
 

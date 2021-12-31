@@ -268,7 +268,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			{
 				highlightingFiltersView = new HighlightingFiltersView(this, configuration.getHighlightingFilters(),
 						configuration.getDecorator());
-				highlightingFilterTreeView = new IvMFilterTreeView<IvMTrace>(this, decorator);
+				highlightingFilterTreeView = new IvMFilterTreeView<IvMTrace>(this, "Highlighting filters", decorator);
 
 				highlightingFiltersViewButton = new JButton("highlighting filters");
 				decorator.decorate(highlightingFiltersViewButton);

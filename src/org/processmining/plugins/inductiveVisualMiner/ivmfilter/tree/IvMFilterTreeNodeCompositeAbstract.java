@@ -36,4 +36,14 @@ public abstract class IvMFilterTreeNodeCompositeAbstract<X, Y> extends ArrayList
 			}
 		}
 	}
+
+	protected abstract boolean staysInLogA(X element);
+
+	@Override
+	public boolean staysInLog(X element) {
+		if (!couldSomethingBeFiltered()) {
+			return true;
+		}
+		return staysInLogA(element);
+	}
 }

@@ -913,8 +913,8 @@ public class InductiveVisualMinerController {
 		});
 		setObject(IvMObject.controller_highlighting_filters, new IvMHighlightingFiltersController(
 				configuration.getHighlightingFilters(), panel.getHighlightingFiltersView()));
-		IvMFilterTreeController<IvMTrace> filterTreeController = new IvMFilterTreeController<>(IvMTrace.class,
-				panel.getHighlightingFilterTreeView(), configuration.getFilters(), decorator);
+		IvMFilterTreeController<IvMTrace> filterTreeController = new IvMFilterTreeController<>("Highlight",
+				IvMTrace.class, panel.getHighlightingFilterTreeView(), configuration.getFilters(), decorator);
 		setObject(IvMObject.controller_highlighting_filters_tree, filterTreeController);
 
 		filterTreeController.setOnUpdate(new Runnable() {
@@ -961,12 +961,14 @@ public class InductiveVisualMinerController {
 
 			public IvMObject<?>[] createInputObjects() {
 				return new IvMObject<?>[] { IvMObject.selected_model_selection,
-						IvMObject.controller_highlighting_filters, IvMObject.model };
+						IvMObject.controller_highlighting_filters_tree, IvMObject.model };
 			}
 
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
 				Selection selection = inputs.get(IvMObject.selected_model_selection);
-				IvMHighlightingFiltersController controller = inputs.get(IvMObject.controller_highlighting_filters);
+				@SuppressWarnings("unchecked")
+				IvMFilterTreeController<IvMTrace> controller = inputs
+						.get(IvMObject.controller_highlighting_filters_tree);
 				IvMModel model = inputs.get(IvMObject.model);
 
 				HighlightingFiltersView.updateSelectionDescription(panel, selection, controller, model);

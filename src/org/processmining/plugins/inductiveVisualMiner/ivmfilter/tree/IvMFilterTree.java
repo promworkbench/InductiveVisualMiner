@@ -2,29 +2,36 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree;
 
 public class IvMFilterTree<X> {
 
-	private IvMFilterTreeNode<X> root;
+	private final String prefix;
+	private final IvMFilterTreeNode<X> root;
 
-	public IvMFilterTree(IvMFilterTreeNode<X> root) {
+	public IvMFilterTree(IvMFilterTreeNode<X> root, String prefix) {
 		this.root = root;
+		this.prefix = prefix;
 	}
 
 	public IvMFilterTreeNode<X> getRoot() {
 		return root;
 	}
 
-	public void setRoot(IvMFilterTreeNode<X> root) {
-		this.root = root;
-	}
-
 	public String getExplanation() {
 		if (root.couldSomethingBeFiltered()) {
 			StringBuilder result = new StringBuilder();
-			result.append("Include traces ");
+			result.append(prefix);
+			result.append(" traces ");
 			root.getExplanation(result, 0);
 			result.append(".");
 			return result.toString();
 		} else {
-			return "Include all traces.";
+			return prefix + " all traces.";
 		}
+	}
+
+	public boolean couldSomethingBeFiltered() {
+		return root.couldSomethingBeFiltered();
+	}
+
+	public boolean staysInLog(X element) {
+		return root.staysInLog(element);
 	}
 }
