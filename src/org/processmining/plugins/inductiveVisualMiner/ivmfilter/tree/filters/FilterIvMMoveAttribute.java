@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 public class FilterIvMMoveAttribute implements IvMFilterBuilder<IvMMove, Object, AttributeFilterGui> {
 
 	public String toString() {
-		return "event attribute filter";
+		return "event attribute";
 	}
 
 	@Override

@@ -8,23 +8,25 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTr
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeCompositeAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
+import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
 
-public class FilterIvMTraceWithEvent implements IvMFilterBuilder<IvMTrace, IvMMove, IvMFilterGui> {
+public class FilterIvMTraceWithEventTwice implements IvMFilterBuilder<IvMTrace, IvMMove, IvMFilterGui> {
 
 	@Override
 	public String toString() {
-		return "trace with event";
+		return "trace with completion event twice";
 	}
 
 	@Override
 	public String toString(IvMFilterGui panel) {
-		return "trace with event";
+		return "trace with completion event twice";
 	}
 
 	@Override
 	public IvMFilterGui createGui(Runnable onUpdate, IvMDecoratorI decorator) {
 		IvMFilterGui result = new IvMFilterGui(toString(), decorator);
-		result.add(result.createExplanation("Include traces that have an event that passes all the sub-filters."));
+		result.add(result
+				.createExplanation("Include traces that have two completion events that pass all the sub-filters."));
 		return result;
 	}
 
@@ -35,15 +37,23 @@ public class FilterIvMTraceWithEvent implements IvMFilterBuilder<IvMTrace, IvMMo
 			private static final long serialVersionUID = 8213030059677606305L;
 
 			public boolean staysInLogA(IvMTrace x) {
+				boolean first = false;
 				for (IvMMove move : x) {
 					if (targets(move)) {
-						return true;
+						if (first) {
+							return true;
+						} else {
+							first = true;
+						}
 					}
 				}
 				return false;
 			}
 
 			private boolean targets(IvMMove move) {
+				if (move.getLifeCycleTransition() != PerformanceTransition.complete) {
+					return false;
+				}
 				for (IvMFilterTreeNode<IvMMove> child : this) {
 					if (!child.staysInLog(move)) {
 						return false;
@@ -54,7 +64,7 @@ public class FilterIvMTraceWithEvent implements IvMFilterBuilder<IvMTrace, IvMMo
 
 			@Override
 			public String getPrefix() {
-				return "an event ";
+				return "two completion events ";
 			}
 
 			public String getDivider() {
@@ -62,7 +72,7 @@ public class FilterIvMTraceWithEvent implements IvMFilterBuilder<IvMTrace, IvMMo
 			}
 
 			public boolean couldSomethingBeFiltered() {
-				return true; //the empty trace is always filtered
+				return true; //the empty trace and traces with a single event are always filtered
 			}
 		};
 	}

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -109,6 +110,8 @@ public class IvMFilterTreeNodeView<X> extends JPanel {
 			});
 			decorator.decorate(filterBuilderChooser);
 			header.add(filterBuilderChooser);
+			
+			header.add(Box.createVerticalStrut(35));
 		}
 		add(header, BorderLayout.PAGE_START);
 	}
