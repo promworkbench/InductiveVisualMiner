@@ -950,6 +950,16 @@ public class InductiveVisualMinerController {
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
 				panel.getTraceColourMapView().invalidateAttributes();
+
+				try {
+					@SuppressWarnings("unchecked")
+					IvMFilterTreeController<IvMTrace> controller = chain
+							.getObjectValues(IvMObject.controller_highlighting_filters_tree).get()
+							.get(IvMObject.controller_highlighting_filters_tree);
+					controller.setAttributesInfo(null);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 

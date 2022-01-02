@@ -88,6 +88,11 @@ public class IvMFilterTreeController<X> {
 	public void setAttributesInfo(IvMAttributesInfo attributesInfo) {
 		this.attributesInfo = attributesInfo;
 
+		if (attributesInfo == null) {
+			view.getOnOffPanel().set(false);
+			return;
+		}
+
 		//set the attributesInfo over all filter builders
 		@SuppressWarnings("unchecked")
 		Enumeration<DefaultMutableTreeNode> it = ((DefaultMutableTreeNode) view.getTreeView().getModel().getRoot())
@@ -98,7 +103,7 @@ public class IvMFilterTreeController<X> {
 		}
 
 		//enable access to the filters for the user
-		view.getOnOffPanel().set(attributesInfo != null);
+		view.getOnOffPanel().set(true);
 	}
 
 	public static <X> IvMFilterTreeNodeView<X> createFilterNodeView(Class<X> clazz, IvMFilterBuilderFactory factory,

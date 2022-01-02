@@ -15,6 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -82,7 +83,7 @@ public class AttributeFilterGui extends IvMFilterGui {
 				keySelector.setModel(keySelectorModel);
 				header.add(keySelector);
 			}
-			
+
 			header.add(Box.createVerticalStrut(10));
 		}
 
@@ -223,10 +224,22 @@ public class AttributeFilterGui extends IvMFilterGui {
 	private void updateValues() {
 		Attribute attribute = getSelectedAttribute();
 		if (attribute.isLiteral()) {
+			DefaultListSelectionModel selectionModel = (DefaultListSelectionModel) valueLiteralSelector
+					.getSelectionModel();
+			List<String> backupSelection = valueLiteralSelector.getSelectedValuesList();
+
 			valueLiteralSelectorListModel.clear();
 			for (String a : getSelectedAttribute().getStringValues()) {
 				valueLiteralSelectorListModel.addElement(a);
 			}
+
+			//reset selection
+			for (int i = 0, c = valueLiteralSelectorListModel.getSize(); i < c; i++) {
+				if (backupSelection.contains(valueLiteralSelectorListModel.getElementAt(i))) {
+					selectionModel.addSelectionInterval(i, i);
+				}
+			}
+
 			valuesPanelLayout.show(valuesPanel, "literal");
 		} else if (attribute.isNumeric()) {
 			valuesPanelLayout.show(valuesPanel, "numeric");
