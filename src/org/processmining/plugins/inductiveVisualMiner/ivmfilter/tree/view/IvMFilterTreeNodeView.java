@@ -20,6 +20,7 @@ import javax.swing.tree.TreeNode;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeComposite;
@@ -110,7 +111,7 @@ public class IvMFilterTreeNodeView<X> extends JPanel {
 			});
 			decorator.decorate(filterBuilderChooser);
 			header.add(filterBuilderChooser);
-			
+
 			header.add(Box.createVerticalStrut(35));
 		}
 		add(header, BorderLayout.PAGE_START);
@@ -178,6 +179,16 @@ public class IvMFilterTreeNodeView<X> extends JPanel {
 		return (IvMFilterBuilder<X, ?, ?>) filterBuilderChooser.getSelectedItem();
 	}
 
+	public void setSelectedFilterBuilder(String name) {
+		for (int i = 0; i < filterBuilders.size(); i++) {
+			String value = filterBuilders.get(i).toString();
+			if (value.equals(name)) {
+				filterBuilderChooser.setSelectedIndex(i);
+				return;
+			}
+		}
+	}
+
 	public DefaultMutableTreeNode getTreeNode() {
 		return treeNode;
 	}
@@ -216,5 +227,17 @@ public class IvMFilterTreeNodeView<X> extends JPanel {
 			}
 		}
 		return true;
+	}
+
+	public void setCommunicationChannel(FilterCommunicator<?, ?, ?, ?> channel) {
+		for (int i = 0; i < guis.size(); i++) {
+			setCommunicationChannel(channel, filterBuilders.get(i), guis.get(i));
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private <G extends IvMFilterGui, H extends IvMFilterGui> void setCommunicationChannel(
+			FilterCommunicator<?, ?, ?, ?> channel, IvMFilterBuilder<X, ?, G> filterBuilder, H gui) {
+		filterBuilder.setCommunicationChannel(channel, (G) gui);
 	}
 }

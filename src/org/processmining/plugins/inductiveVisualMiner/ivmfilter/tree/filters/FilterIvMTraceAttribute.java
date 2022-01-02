@@ -7,22 +7,22 @@ import org.deckfour.xes.model.XAttributable;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeLeafAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
-public class FilterIvMTraceAttribute implements IvMFilterBuilder<IvMTrace, Object, AttributeFilterGui> {
+public class FilterIvMTraceAttribute extends IvMFilterBuilderAbstract<IvMTrace, Object, AttributeFilterGui> {
 
 	public String toString() {
-		return "trace attribute";
+		return "attribute";
 	}
 
 	@Override
 	public String toString(AttributeFilterGui panel) {
 		Attribute attribute = panel.getSelectedAttribute();
-		return "trace attribute " + (attribute != null ? attribute.toString() : "filter");
+		return "attribute " + (attribute != null ? attribute.toString() : "filter");
 	}
 
 	@Override

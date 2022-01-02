@@ -4,7 +4,7 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesIn
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 
-public interface IvMFilterBuilder<X, Y, G extends IvMFilterGui> {
+public interface IvMFilterBuilder<X, Y, G extends IvMFilterGui> extends Comparable<IvMFilterBuilder<?, ?, ?>> {
 
 	/**
 	 * toString must be overridden with the name of the filter.
@@ -40,4 +40,17 @@ public interface IvMFilterBuilder<X, Y, G extends IvMFilterGui> {
 	public IvMFilterTreeNode<X> buildFilter(G gui);
 
 	public void setAttributesInfo(IvMAttributesInfo attributesInfo, G gui);
+
+	/**
+	 * Add a communication channel to/from a filter. The implementation may use
+	 * the gui, as this method will only be called on the gui thread.
+	 * 
+	 * @param <TI>
+	 * @param <TO>
+	 * @param <FI>
+	 * @param <FO>
+	 * @param channel
+	 * @param gui
+	 */
+	public <TI, TO, FI, FO> void setCommunicationChannel(FilterCommunicator<TI, TO, FI, FO> channel, G gui);
 }

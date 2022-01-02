@@ -20,13 +20,8 @@ public class HighlightingFilterCohortPanel extends IvMFilterGui {
 
 		//explanation
 		{
-			explanation = new JTextArea();
-			decorator.decorate(explanation);
-			explanation.setEditable(false);
-			explanation.setLineWrap(true);
-			explanation.setWrapStyleWord(true);
-			explanation.setOpaque(false);
-			explanation.setHighlighter(null);
+			explanation = createExplanation("Include only traces that are in the cohort selected in data analysis.\n"
+					+ "Click here to select a cohort in the data analysis window.");
 			add(explanation);
 		}
 

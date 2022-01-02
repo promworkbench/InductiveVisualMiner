@@ -3,22 +3,22 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeCompositeAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
-public class FilterIvMTraceStartsWithEvent implements IvMFilterBuilder<IvMTrace, IvMMove, IvMFilterGui> {
+public class FilterIvMTraceStartsWithEvent extends IvMFilterBuilderAbstract<IvMTrace, IvMMove, IvMFilterGui> {
 
 	@Override
 	public String toString() {
-		return "trace starts with event";
+		return "starts with event";
 	}
 
 	@Override
 	public String toString(IvMFilterGui panel) {
-		return "trace starts with event";
+		return "starts with event";
 	}
 
 	@Override

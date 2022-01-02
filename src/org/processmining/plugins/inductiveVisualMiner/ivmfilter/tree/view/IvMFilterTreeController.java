@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -11,6 +12,8 @@ import javax.swing.tree.TreePath;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator.toFilterController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTree;
@@ -21,10 +24,12 @@ public class IvMFilterTreeController<X> {
 	private Runnable globalOnUpdate;
 	private IvMAttributesInfo attributesInfo;
 	private IvMFilterTree<X> currentFilter;
+	private final CopyOnWriteArrayList<FilterCommunicator<?, ?, ?, ?>> channels;
 
 	public IvMFilterTreeController(final String prefix, Class<X> targetClass, final IvMFilterTreeView<X> view,
 			final IvMFilterBuilderFactory factory, final IvMDecoratorI decorator) {
 		this.view = view;
+		channels = new CopyOnWriteArrayList<FilterCommunicator<?, ?, ?, ?>>();
 
 		final IvMFilterTreeNodeView<X> rootView = createFilterNodeView(targetClass, factory, decorator);
 		view.setRootView(rootView);
@@ -58,6 +63,9 @@ public class IvMFilterTreeController<X> {
 				if (attributesInfo != null) {
 					newChild.setAttributesInfo(attributesInfo);
 				}
+				for (FilterCommunicator<?, ?, ?, ?> channel : channels) {
+					newChild.setCommunicationChannel(channel);
+				}
 
 				DefaultTreeModel model = (DefaultTreeModel) view.getTreeView().getModel();
 				DefaultMutableTreeNode parentNode = parent.getTreeNode();
@@ -76,8 +84,6 @@ public class IvMFilterTreeController<X> {
 
 		currentFilter = new IvMFilterTree<>(rootView.buildFilter(), prefix);
 		updateExplanation();
-
-		view.enableAndShow();
 	}
 
 	/**
@@ -149,6 +155,31 @@ public class IvMFilterTreeController<X> {
 			if (canceller.isCancelled()) {
 				return;
 			}
+		}
+	}
+
+	public void addCommunicationChannel(FilterCommunicator<?, ?, ?, ?> channel) {
+		channels.add(channel);
+
+		channel.setSetAndSelectRootFilter(new toFilterController() {
+			public void setAndSelectRootFilter(String name) {
+				//select the root
+				IvMFilterTreeNodeView<?> rootView = (IvMFilterTreeNodeView<?>) ((DefaultMutableTreeNode) view
+						.getTreeView().getModel().getRoot()).getUserObject();
+				view.getTreeView().getSelectionModel().setSelectionPath(new TreePath(rootView.getTreeNode().getPath()));
+
+				//change the selection
+				rootView.setSelectedFilterBuilder(name);
+			}
+		});
+
+		//set the attributesInfo over all filter builders
+		@SuppressWarnings("unchecked")
+		Enumeration<DefaultMutableTreeNode> it = ((DefaultMutableTreeNode) view.getTreeView().getModel().getRoot())
+				.breadthFirstEnumeration();
+		while (it.hasMoreElements()) {
+			DefaultMutableTreeNode treeNode = it.nextElement();
+			((IvMFilterTreeNodeView<?>) treeNode.getUserObject()).setCommunicationChannel(channel);
 		}
 	}
 }

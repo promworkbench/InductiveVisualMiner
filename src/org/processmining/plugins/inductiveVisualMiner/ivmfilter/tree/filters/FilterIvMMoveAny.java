@@ -4,12 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeLeafAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 
-public class FilterIvMMoveAny implements IvMFilterBuilder<IvMMove, Object, IvMFilterGui> {
+public class FilterIvMMoveAny extends IvMFilterBuilderAbstract<IvMMove, Object, IvMFilterGui> {
 
 	public String toString() {
 		return "any event";

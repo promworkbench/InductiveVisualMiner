@@ -29,6 +29,7 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers;
 import org.processmining.plugins.InductiveMiner.AttributeClassifiers.AttributeClassifier;
 import org.processmining.plugins.InductiveMiner.Function;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
 import org.processmining.plugins.graphviz.dot.Dot;
@@ -57,9 +58,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.OnStatus;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesController;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportController;
@@ -73,6 +72,8 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicatorImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeController;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -106,6 +107,7 @@ public class InductiveVisualMinerController {
 	private final UserStatus userStatus;
 
 	private PopupController popupController;
+	private IvMFilterTreeController<IvMTrace> highlightingFiltersController;
 
 	//the following fields are time critical and should not go via the state
 	private Scaler animationScaler = null;
@@ -380,13 +382,13 @@ public class InductiveVisualMinerController {
 		//set trace view button
 		initGuiTraceView(configuration.getDecorator());
 
+		//set highlighting filters button
+		initGuiHighlightingFilters(configuration.getDecorator());
+
 		//set data analyses
 		initGuiDataAnalyses();
 
 		initGuiTraceColouring();
-
-		//set highlighting filters button
-		initGuiHighlightingFilters(configuration.getDecorator());
 
 		//copy keybinders to child windows
 		copyKeyBinders();
@@ -701,24 +703,19 @@ public class InductiveVisualMinerController {
 
 	protected void initGuiDataAnalyses() {
 		//link cohort data analysis view and cohort highlighting filter
-		panel.getHighlightingFiltersView()
-				.setHighlightingFilter2CohortAnalysisHandler(new HighlightingFilter2CohortAnalysisHandler() {
-					public void showCohortAnalysis() {
-						panel.getDataAnalysesView().enableAndShow();
-						panel.getDataAnalysesView().showAnalysis(CohortDataAnalysisTab.name);
-					}
+		FilterCommunicator<Pair<Cohort, Boolean>, Void, Void, Void> channel = new FilterCommunicatorImpl<Pair<Cohort, Boolean>, Void, Void, Void>() {
+			public String getName() {
+				return "cohorts";
+			}
 
-					public void setEnabled(boolean enabled) {
-						//do nothing if the user disables the cohort
-					}
-				});
-		panel.getDataAnalysesView()
-				.setCohortAnalysis2HighlightingFilterHandler(new CohortAnalysis2HighlightingFilterHandler() {
-					public void setSelectedCohort(Cohort cohort, boolean highlightInCohort) {
-						panel.getHighlightingFiltersView().setHighlightingFilterSelectedCohort(cohort,
-								highlightInCohort);
-					}
-				});
+			public Void fromFilter(Void input) {
+				panel.getDataAnalysesView().enableAndShow();
+				panel.getDataAnalysesView().showAnalysis(CohortDataAnalysisTab.name);
+				return null;
+			}
+		};
+		highlightingFiltersController.addCommunicationChannel(channel);
+		panel.getDataAnalysesView().setChannel(channel);
 
 		//link cost data analysis view to chain
 		setObject(IvMObject.selected_cost_model_factory, configuration.getCostModelFactories().get(0));
@@ -904,6 +901,7 @@ public class InductiveVisualMinerController {
 		panel.getHighlightingFiltersViewButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				panel.getHighlightingFiltersView().enableAndShow();
+				panel.getHighlightingFilterTreeView().enableAndShow();
 			}
 		});
 		panel.getHighlightingFiltersView().setOnUpdate(new Runnable() {
@@ -913,15 +911,16 @@ public class InductiveVisualMinerController {
 		});
 		setObject(IvMObject.controller_highlighting_filters, new IvMHighlightingFiltersController(
 				configuration.getHighlightingFilters(), panel.getHighlightingFiltersView()));
-		IvMFilterTreeController<IvMTrace> filterTreeController = new IvMFilterTreeController<>("Highlight",
-				IvMTrace.class, panel.getHighlightingFilterTreeView(), configuration.getFilters(), decorator);
-		setObject(IvMObject.controller_highlighting_filters_tree, filterTreeController);
 
-		filterTreeController.setOnUpdate(new Runnable() {
+		highlightingFiltersController = new IvMFilterTreeController<>("Highlight", IvMTrace.class,
+				panel.getHighlightingFilterTreeView(), configuration.getFilters(), decorator);
+		highlightingFiltersController.setOnUpdate(new Runnable() {
 			public void run() {
 				chain.executeLink(Cl13FilterNodeSelection.class);
 			}
 		});
+
+		setObject(IvMObject.controller_highlighting_filters_tree, highlightingFiltersController);
 
 		//initialise filters
 		chain.register(new DataChainLinkGuiAbstract<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>() {

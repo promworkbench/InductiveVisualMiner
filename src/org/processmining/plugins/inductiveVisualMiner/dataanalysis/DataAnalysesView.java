@@ -9,12 +9,14 @@ import java.util.Map;
 
 import javax.swing.JTabbedPane;
 
+import org.processmining.cohortanalysis.cohort.Cohort;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortAnalysis2HighlightingFilterHandler;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab.DataTableCohort;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
 
 import gnu.trove.map.hash.THashMap;
 
@@ -93,12 +95,11 @@ public class DataAnalysesView<C, P> extends SideWindow {
 		return onOffPanels.get(name);
 	}
 
-	@SuppressWarnings("rawtypes")
-	public void setCohortAnalysis2HighlightingFilterHandler(
-			CohortAnalysis2HighlightingFilterHandler showCohortHighlightingFilterHandler) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void setChannel(FilterCommunicator<Pair<Cohort, Boolean>, Void, Void, Void> channel) {
 		DataAnalysisTable<?, C, P> table = tables.get(CohortDataAnalysisTab.name);
 		if (table != null && table instanceof CohortDataAnalysisTab.DataTableCohort) {
-			((DataTableCohort) table).setCohortAnalysis2HighlightingFilterHandler(showCohortHighlightingFilterHandler);
+			((DataTableCohort) table).setChannel(channel);
 		}
 	}
 

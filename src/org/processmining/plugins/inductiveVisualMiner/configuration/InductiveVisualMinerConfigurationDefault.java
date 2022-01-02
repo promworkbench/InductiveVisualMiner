@@ -2,6 +2,7 @@ package org.processmining.plugins.inductiveVisualMiner.configuration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -118,12 +119,14 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.Fil
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceAnd;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceAny;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceAttribute;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceCohort;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceEndsWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceFollows;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceOr;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceStartsWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceWithEventTwice;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceWithoutAttribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceWithoutEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -210,23 +213,27 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 			public <X> List<IvMFilterBuilder<X, ?, ?>> get(Class<X> clazz) {
 				if (clazz == IvMTrace.class) {
 					List<IvMFilterBuilder<X, ?, ?>> filterBuilders = new ArrayList<>();
-					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceAny());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceAttribute());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceCohort());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceWithEvent());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceStartsWithEvent());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceEndsWithEvent());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceWithEventTwice());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceFollows());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceWithoutEvent());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceWithoutAttribute());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceAnd());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceOr());
+					Collections.sort(filterBuilders);
+					filterBuilders.add(0, (IvMFilterBuilder<X, ?, ?>) new FilterIvMTraceAny());
 					return filterBuilders;
 				} else if (clazz == IvMMove.class) {
 					List<IvMFilterBuilder<X, ?, ?>> filterBuilders = new ArrayList<>();
-					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveAny());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveAttribute());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveAnd());
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveOr());
+					Collections.sort(filterBuilders);
+					filterBuilders.add(0, (IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveAny());
 					return filterBuilders;
 				}
 				return null;

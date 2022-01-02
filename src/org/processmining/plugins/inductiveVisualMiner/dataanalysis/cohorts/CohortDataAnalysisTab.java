@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 
 import org.processmining.cohortanalysis.cohort.Cohort;
+import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesView;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTabAbstract;
@@ -26,6 +27,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisT
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
 
 public class CohortDataAnalysisTab<C, P> extends DataAnalysisTabAbstract<Cohort, C, P> {
 
@@ -137,13 +139,12 @@ public class CohortDataAnalysisTab<C, P> extends DataAnalysisTabAbstract<Cohort,
 			});
 		}
 
-		private CohortAnalysis2HighlightingFilterHandler cohortAnalysis2HighlightingFilterHandler;
+		private FilterCommunicator<Pair<Cohort, Boolean>, Void, Void, Void> channel;
 		private boolean highlightInCohort = true;
 		private boolean isValueAdjusting = false;
 
-		public void setCohortAnalysis2HighlightingFilterHandler(
-				CohortAnalysis2HighlightingFilterHandler cohortAnalysis2HighlightingFilterHandler) {
-			this.cohortAnalysis2HighlightingFilterHandler = cohortAnalysis2HighlightingFilterHandler;
+		public void setChannel(FilterCommunicator<Pair<Cohort, Boolean>, Void, Void, Void> channel) {
+			this.channel = channel;
 		}
 
 		@Override
@@ -163,13 +164,14 @@ public class CohortDataAnalysisTab<C, P> extends DataAnalysisTabAbstract<Cohort,
 		private void selectionChanged() {
 			int selectedRow = getSelectedRow();
 			if (selectedRow == -1) {
-				cohortAnalysis2HighlightingFilterHandler.setSelectedCohort(null, true);
+				channel.toFilter(Pair.of((Cohort) null, true));
+
 				//System.out.println("set cohort none");
 			} else {
 				int selectedRowModel = convertRowIndexToModel(selectedRow);
 				//System.out.println("set cohort " + selectedRowModel + " " + highlightInCohort);
 				Cohort cohort = getModel().getRow(selectedRowModel).getPayload();
-				cohortAnalysis2HighlightingFilterHandler.setSelectedCohort(cohort, highlightInCohort);
+				channel.toFilter(Pair.of(cohort, highlightInCohort));
 			}
 		}
 	}

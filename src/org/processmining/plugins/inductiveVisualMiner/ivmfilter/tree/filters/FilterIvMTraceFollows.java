@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeComposite;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeCompositeAbstract;
@@ -17,7 +17,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 
-public class FilterIvMTraceFollows implements IvMFilterBuilder<IvMTrace, IvMMove, FilterIvMTraceFollowsPanel> {
+public class FilterIvMTraceFollows extends IvMFilterBuilderAbstract<IvMTrace, IvMMove, FilterIvMTraceFollowsPanel> {
 
 	public String toString() {
 		return "follows";
