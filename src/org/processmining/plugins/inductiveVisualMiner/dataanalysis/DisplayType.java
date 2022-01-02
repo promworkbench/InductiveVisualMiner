@@ -23,7 +23,7 @@ public abstract class DisplayType {
 	 */
 
 	public enum Type {
-		numeric, duration, time, literal, html, image, NA
+		numeric, bool, duration, time, literal, html, image, NA
 	}
 
 	public abstract Type getType();
@@ -31,6 +31,8 @@ public abstract class DisplayType {
 	public static Type fromAttribute(Attribute attribute) {
 		if (attribute.isNumeric()) {
 			return Type.numeric;
+		} else if (attribute.isBoolean()) {
+			return Type.bool;
 		} else if (attribute.isDuration()) {
 			return Type.duration;
 		} else if (attribute.isTime()) {
@@ -47,6 +49,19 @@ public abstract class DisplayType {
 		switch (type) {
 			case numeric :
 				return numeric(value);
+			default :
+				assert false; //a double cannot represent time or duration, as it is inaccurate
+				return null;
+		}
+	}
+
+	public static DisplayType create(Type type, Boolean value) {
+		if (value == null) {
+			return NA();
+		}
+		switch (type) {
+			case bool :
+				return bool(value);
 			default :
 				assert false; //a double cannot represent time or duration, as it is inaccurate
 				return null;
@@ -88,6 +103,10 @@ public abstract class DisplayType {
 
 	public static Numeric numeric(double value) {
 		return new Numeric(value);
+	}
+
+	public static Bool bool(boolean value) {
+		return new Bool(value);
 	}
 
 	public static NumericUnpadded numericUnpadded(long value) {
@@ -226,6 +245,26 @@ public abstract class DisplayType {
 
 		public Type getType() {
 			return Type.numeric;
+		}
+	}
+
+	public static class Bool extends DisplayType {
+		boolean value;
+
+		private Bool(boolean value) {
+			this.value = value;
+		}
+
+		public String toString() {
+			return Boolean.toString(value);
+		}
+
+		public double getValue() {
+			return -Double.MAX_VALUE;
+		}
+
+		public Type getType() {
+			return Type.bool;
 		}
 	}
 

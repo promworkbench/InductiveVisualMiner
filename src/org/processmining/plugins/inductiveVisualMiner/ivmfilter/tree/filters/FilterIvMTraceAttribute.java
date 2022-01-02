@@ -39,7 +39,7 @@ public class FilterIvMTraceAttribute implements IvMFilterBuilder<IvMTrace, Objec
 			return new IvMFilterTreeNodeLeafAbstract<X>() {
 				public boolean staysInLogA(X element) {
 					String value = attribute.getLiteral(element);
-					return value != null && selectedLiterals.contains(value);
+					return value != null && (selectedLiterals.contains(value) || selectedLiterals.isEmpty());
 				}
 
 				public void getExplanation(StringBuilder result, int indent) {
@@ -47,7 +47,7 @@ public class FilterIvMTraceAttribute implements IvMFilterBuilder<IvMTrace, Objec
 				}
 
 				public boolean couldSomethingBeFiltered() {
-					return !selectedLiterals.isEmpty();
+					return true;
 				}
 			};
 		} else if (attribute.isNumeric()) {
@@ -65,7 +65,26 @@ public class FilterIvMTraceAttribute implements IvMFilterBuilder<IvMTrace, Objec
 				}
 
 				public boolean couldSomethingBeFiltered() {
-					return numericMin != attribute.getNumericMin() || numericMax != attribute.getNumericMax();
+					return true;
+				}
+			};
+		} else if (attribute.isBoolean()) {
+			final boolean includeTrue = panel.getSelectedBooleanTrue();
+			final boolean includeFalse = panel.getSelectedBooleanFalse();
+
+			return new IvMFilterTreeNodeLeafAbstract<X>() {
+				public boolean staysInLogA(X element) {
+					Boolean value = attribute.getBoolean(element);
+					return value != null && (((value && includeTrue) || (!value && includeFalse))
+							|| (!includeTrue && !includeFalse));
+				}
+
+				public void getExplanation(StringBuilder result, int indent) {
+					FilterIvMMoveAttribute.getExplanation(panel, result, indent);
+				}
+
+				public boolean couldSomethingBeFiltered() {
+					return true;
 				}
 			};
 		} else if (attribute.isTime()) {
@@ -83,7 +102,7 @@ public class FilterIvMTraceAttribute implements IvMFilterBuilder<IvMTrace, Objec
 				}
 
 				public boolean couldSomethingBeFiltered() {
-					return timeMin != attribute.getTimeMin() || timeMax != attribute.getTimeMax();
+					return true;
 				}
 			};
 		} else if (attribute.isDuration()) {
@@ -101,7 +120,7 @@ public class FilterIvMTraceAttribute implements IvMFilterBuilder<IvMTrace, Objec
 				}
 
 				public boolean couldSomethingBeFiltered() {
-					return durationMin != attribute.getDurationMin() || durationMax != attribute.getDurationMax();
+					return true;
 				}
 			};
 		}

@@ -130,6 +130,8 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			int numberOfTraces, IvMCanceller canceller) {
 		if (attribute.isNumeric()) {
 			return createAttributeDataNumeric(logFiltered, attribute, numberOfTraces, canceller);
+		} else if (attribute.isBoolean()) {
+			return createAttributeDataBoolean(logFiltered, attribute, canceller);
 		} else if (attribute.isTime()) {
 			return createAttributeDataTime(logFiltered, attribute, numberOfTraces, canceller);
 		} else if (attribute.isLiteral()) {
@@ -228,6 +230,39 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 				}
 			}
 		}
+
+		return result;
+	}
+
+	private static List<DataRow<Object>> createAttributeDataBoolean(IvMLogFiltered logFiltered, Attribute attribute,
+			IvMCanceller canceller) {
+		List<DataRow<Object>> result = new ArrayList<>();
+
+		//compute correlation and plots
+		int countTrue = 0;
+		int countFalse = 0;
+		{
+			for (Iterator<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
+				IvMTrace trace = it.next();
+				Boolean value = AttributeUtils.valueBoolean(attribute, trace);
+
+				if (value != null) {
+					if (value) {
+						countTrue++;
+					} else {
+						countFalse++;
+					}
+				}
+			}
+
+			if (canceller.isCancelled()) {
+				return result;
+			}
+		}
+
+		result.add(c(attribute, Field.tracesWithAttribute, DisplayType.numeric(countTrue + countFalse)));
+		result.add(c(attribute, Field.tracesWithValueTrue, DisplayType.numeric(countTrue)));
+		result.add(c(attribute, Field.tracesWithValueFalse, DisplayType.numeric(countFalse)));
 
 		return result;
 	}
@@ -500,6 +535,16 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 		tracesWithAttribute {
 			public String toString() {
 				return "traces with attribute";
+			}
+		},
+		tracesWithValueTrue {
+			public String toString() {
+				return "traces with true attribute value";
+			}
+		},
+		tracesWithValueFalse {
+			public String toString() {
+				return "traces with false attribute value";
 			}
 		}
 	}

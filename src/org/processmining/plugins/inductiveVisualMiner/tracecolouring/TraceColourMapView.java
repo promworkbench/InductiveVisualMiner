@@ -270,18 +270,38 @@ public class TraceColourMapView extends SideWindow {
 				example.setText("");
 				getOnUpdate().call(TraceColourMapSettings.empty());
 			}
+
 		} else if (attribute.isNumeric()) {
 			//this is a numeric attribute
 			ColourMap colourMap = TraceColourMapSettings.getColourMap();
 			updateProperty(colourMap, attribute.getNumericMin(), attribute.getNumericMax(), false, false);
 			getOnUpdate().call(TraceColourMapSettings.number(attribute, colourMap, attribute.getNumericMin(),
 					attribute.getNumericMax()));
+
+		} else if (attribute.isBoolean()) {
+			Color[] colours = TraceColourMapSettings.getColours(2);
+
+			//create colours and map to values
+			{
+				StringBuilder s = new StringBuilder();
+				s.append(prefix + "true\n");
+				s.append(prefix + "false\n");
+				example.setText(s.toString());
+			}
+
+			//colour the values in the example
+			colourExample(colours);
+
+			status.setText("Currently colouring traces using 2 colours:");
+			getOnUpdate().call(TraceColourMapSettings.bool(attribute, colours));
+
 		} else if (attribute.isTime()) {
 			//this is a time attribute; divide it in 7 parts
 			ColourMap colourMap = TraceColourMapSettings.getColourMap();
 			updateProperty(colourMap, attribute.getTimeMin(), attribute.getTimeMax(), false, true);
 			getOnUpdate().call(
 					TraceColourMapSettings.time(attribute, colourMap, attribute.getTimeMin(), attribute.getTimeMax()));
+
 		} else if (attribute.isDuration()) {
 			//this is a time attribute; divide it in 7 parts
 			ColourMap colourMap = TraceColourMapSettings.getColourMap();

@@ -71,6 +71,8 @@ public class TraceDataRowBlockHistogram<C extends ConfigurationWithDecorator, P>
 			IvMCanceller canceller, IvMDecoratorI decorator) {
 		if (attribute.isNumeric()) {
 			return createAttributeDataNumeric(logFiltered, attribute, canceller, decorator);
+		} else if (attribute.isBoolean()) {
+			//return createAttributeDataBoolean(logFiltered, attribute, canceller);
 		} else if (attribute.isTime()) {
 			return createAttributeDataTime(logFiltered, attribute, canceller, decorator);
 		} else if (attribute.isLiteral()) {

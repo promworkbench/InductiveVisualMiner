@@ -17,7 +17,7 @@ public class EventDataRowBlockTypeVirtual<C, P> extends DataRowBlockComputer<Obj
 	public String getName() {
 		return "event-att-type-virt";
 	}
-	
+
 	public String getStatusBusyMessage() {
 		return "Gathering virtual event attribute types..";
 	}
@@ -36,6 +36,8 @@ public class EventDataRowBlockTypeVirtual<C, P> extends DataRowBlockComputer<Obj
 			String type = "";
 			if (attribute.isNumeric()) {
 				type += "numeric";
+			} else if (attribute.isBoolean()) {
+				type += "boolean";
 			} else if (attribute.isTime()) {
 				type += "time";
 			} else if (attribute.isLiteral()) {

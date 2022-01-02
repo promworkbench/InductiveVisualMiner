@@ -36,6 +36,8 @@ public class TraceDataRowBlockType<C, P> extends DataRowBlockComputer<Object, C,
 			String type = "";
 			if (attribute.isNumeric()) {
 				type += "numeric";
+			} else if (attribute.isBoolean()) {
+				type += "boolean";
 			} else if (attribute.isTime()) {
 				type += "time";
 			} else if (attribute.isLiteral()) {

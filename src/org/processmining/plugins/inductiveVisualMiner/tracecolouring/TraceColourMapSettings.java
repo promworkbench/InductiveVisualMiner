@@ -13,7 +13,7 @@ import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 public class TraceColourMapSettings {
 
 	private enum Type {
-		empty, attributeString, attributeNumber, attributeTime, attributeDuration
+		empty, attributeString, attributeNumber, attributeBoolean, attributeTime, attributeDuration
 	}
 
 	private final Type type;
@@ -22,38 +22,45 @@ public class TraceColourMapSettings {
 	private final Attribute attribute;
 	private final ColourMap colourMap;
 	private final Map<String, Color> value2colour;
+	private final Color[] value2colourB;
 
 	//number
 	private final double min;
 	private final double max;
 
 	public static TraceColourMapSettings empty() {
-		return new TraceColourMapSettings(Type.empty, null, null, null, -Double.MAX_VALUE, -Double.MAX_VALUE);
+		return new TraceColourMapSettings(Type.empty, null, null, null, null, -Double.MAX_VALUE, -Double.MAX_VALUE);
 	}
 
 	public static TraceColourMapSettings string(Attribute attribute, Map<String, Color> value2colour) {
-		return new TraceColourMapSettings(Type.attributeString, attribute, null, value2colour, -Double.MAX_VALUE,
+		return new TraceColourMapSettings(Type.attributeString, attribute, null, value2colour, null, -Double.MAX_VALUE,
 				-Double.MAX_VALUE);
 	}
 
 	public static TraceColourMapSettings number(Attribute attribute, ColourMap colourMap, double min, double max) {
-		return new TraceColourMapSettings(Type.attributeNumber, attribute, colourMap, null, min, max);
+		return new TraceColourMapSettings(Type.attributeNumber, attribute, colourMap, null, null, min, max);
+	}
+
+	public static TraceColourMapSettings bool(Attribute attribute, Color[] value2colour) {
+		return new TraceColourMapSettings(Type.attributeBoolean, attribute, null, null, value2colour, -Double.MAX_VALUE,
+				-Double.MAX_VALUE);
 	}
 
 	public static TraceColourMapSettings time(Attribute attribute, ColourMap colourMap, long min, long max) {
-		return new TraceColourMapSettings(Type.attributeTime, attribute, colourMap, null, min, max);
+		return new TraceColourMapSettings(Type.attributeTime, attribute, colourMap, null, null, min, max);
 	}
 
 	public static TraceColourMapSettings duration(Attribute attribute, ColourMap colourMap, long min, long max) {
-		return new TraceColourMapSettings(Type.attributeDuration, attribute, colourMap, null, min, max);
+		return new TraceColourMapSettings(Type.attributeDuration, attribute, colourMap, null, null, min, max);
 	}
 
 	private TraceColourMapSettings(Type type, Attribute attribute, ColourMap colourMap, Map<String, Color> value2colour,
-			double min, double max) {
+			Color[] value2colourB, double min, double max) {
 		this.type = type;
 		this.attribute = attribute;
 		this.colourMap = colourMap;
 		this.value2colour = value2colour;
+		this.value2colourB = value2colourB;
 		this.min = min;
 		this.max = max;
 	}
@@ -69,6 +76,8 @@ public class TraceColourMapSettings {
 		switch (type) {
 			case attributeNumber :
 				return new TraceColourMapAttributeNumber(log, attribute, colourMap, min, max);
+			case attributeBoolean :
+				return new TraceColourMapAttributeBoolean(log, attribute, value2colourB);
 			case attributeString :
 				return new TraceColourMapAttributeString(log, attribute, value2colour);
 			case attributeTime :

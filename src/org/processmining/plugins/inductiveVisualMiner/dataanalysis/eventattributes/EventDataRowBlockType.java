@@ -17,7 +17,7 @@ public class EventDataRowBlockType<C, P> extends DataRowBlockComputer<Object, C,
 	public String getName() {
 		return "event-att-type";
 	}
-	
+
 	public String getStatusBusyMessage() {
 		return "Gathering event attribute types..";
 	}
@@ -26,7 +26,8 @@ public class EventDataRowBlockType<C, P> extends DataRowBlockComputer<Object, C,
 		return new IvMObject<?>[] { IvMObject.attributes_info };
 	}
 
-	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
+	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
+			throws Exception {
 		AttributesInfo attributes = inputs.get(IvMObject.attributes_info);
 
 		List<DataRow<Object>> result = new ArrayList<>();
@@ -35,6 +36,8 @@ public class EventDataRowBlockType<C, P> extends DataRowBlockComputer<Object, C,
 			String type = "";
 			if (attribute.isNumeric()) {
 				type += "numeric";
+			} else if (attribute.isBoolean()) {
+				type += "boolean";
 			} else if (attribute.isTime()) {
 				type += "time";
 			} else if (attribute.isLiteral()) {

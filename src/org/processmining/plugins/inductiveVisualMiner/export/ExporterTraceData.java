@@ -71,6 +71,11 @@ public class ExporterTraceData extends IvMExporter {
 			if (value != -Double.MAX_VALUE) {
 				return value + "";
 			}
+		} else if (attribute.isBoolean()) {
+			Boolean value = attribute.getBoolean(trace);
+			if (value != null) {
+				return value + "";
+			}
 		} else if (attribute.isNumeric()) {
 			double value = attribute.getNumeric(trace);
 			if (value != -Double.MAX_VALUE) {

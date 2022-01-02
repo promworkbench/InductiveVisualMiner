@@ -70,6 +70,8 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			IvMCanceller canceller) {
 		if (attribute.isNumeric()) {
 			return createAttributeDataNumeric(logFiltered, attribute, canceller);
+		} else if (attribute.isBoolean()) {
+			return createAttributeDataBoolean(logFiltered, attribute, canceller);
 		} else if (attribute.isTime()) {
 			return createAttributeDataTime(logFiltered, attribute, canceller);
 		} else if (attribute.isLiteral()) {
@@ -189,6 +191,73 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 			} else {
 				result.add(c(attribute, Field.standardDeviation, DisplayType.NA()));
 			}
+		}
+
+		return result;
+	}
+
+	private static List<DataRow<Object>> createAttributeDataBoolean(IvMLogFiltered logFiltered, Attribute attribute,
+			IvMCanceller canceller) {
+		List<DataRow<Object>> result = new ArrayList<>();
+		int countTrue = 0;
+		int countFalse = 0;
+		int numberOfTracesWithEventWithAttribute = 0;
+		int numberOfEventsWithoutAttribute = 0;
+		int numberOfTracesWithoutEventWithAttribute = 0;
+		{
+			for (IteratorWithPosition<IvMTrace> it = logFiltered.iterator(); it.hasNext();) {
+				IvMTrace trace = it.next();
+
+				boolean traceHasEvent = false;
+				boolean traceHasEventWithout = false;
+
+				for (IvMMove move : trace) {
+					if (move.getAttributes() != null) {
+						Boolean value = AttributeUtils.valueBoolean(attribute, move);
+						if (value != null) {
+							traceHasEvent = true;
+							if (value) {
+								countTrue++;
+							} else {
+								countFalse++;
+							}
+						} else {
+							traceHasEventWithout = true;
+							numberOfEventsWithoutAttribute++;
+						}
+					}
+				}
+
+				if (traceHasEvent) {
+					numberOfTracesWithEventWithAttribute++;
+				}
+				if (traceHasEventWithout) {
+					numberOfTracesWithoutEventWithAttribute++;
+				}
+			}
+
+			if (canceller.isCancelled()) {
+				return result;
+			}
+
+			if (canceller.isCancelled()) {
+				return result;
+			}
+
+			result.add(c(attribute, Field.numberOfEventsWithAttribute, DisplayType.numeric(countTrue + countFalse)));
+
+			result.add(c(attribute, Field.numberOfTracesWithEventWithAttribute,
+					DisplayType.numeric(numberOfTracesWithEventWithAttribute)));
+
+			result.add(c(attribute, Field.numberOfEventsWithoutAttribute,
+					DisplayType.numeric(numberOfEventsWithoutAttribute)));
+
+			result.add(c(attribute, Field.numberOfTracesWithEventWithoutAttribute,
+					DisplayType.numeric(numberOfTracesWithoutEventWithAttribute)));
+
+			result.add(c(attribute, Field.numberOfEventsWithValueTrue, DisplayType.numeric(countTrue)));
+
+			result.add(c(attribute, Field.numberOfEventsWithValueFalse, DisplayType.numeric(countFalse)));
 		}
 
 		return result;
@@ -554,6 +623,16 @@ public class EventDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 		numberOfTracesWithEventWithoutAttribute {
 			public String toString() {
 				return "traces having event without attribute";
+			}
+		},
+		numberOfEventsWithValueTrue {
+			public String toString() {
+				return "events with true attribute value";
+			}
+		},
+		numberOfEventsWithValueFalse {
+			public String toString() {
+				return "events with false attribute value";
 			}
 		}
 	}

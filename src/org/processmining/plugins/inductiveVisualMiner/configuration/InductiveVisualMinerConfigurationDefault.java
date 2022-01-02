@@ -18,6 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.IvMVirtualAttri
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceDistinctEventAttribute;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceDuration;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceFitness;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceHasDeviations;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceLength;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfCompleteEvents;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfLogMoves;
@@ -118,11 +119,11 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.Fil
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceAny;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceAttribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceEndsWithEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceFollows;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceOr;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceStartsWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceWithEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceWithEventTwice;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceFollows;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceWithoutEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -495,6 +496,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					THashMap<String, AttributeImpl> eventAttributesReal) {
 				ArrayList<AttributeVirtual> result = new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
 						new VirtualAttributeTraceNumberOfCompleteEvents(), //
+						new VirtualAttributeTraceHasDeviations(), //
 						new VirtualAttributeTraceFitness(), //
 						new VirtualAttributeTraceNumberOfModelMoves(), //
 						new VirtualAttributeTraceNumberOfLogMoves(), //

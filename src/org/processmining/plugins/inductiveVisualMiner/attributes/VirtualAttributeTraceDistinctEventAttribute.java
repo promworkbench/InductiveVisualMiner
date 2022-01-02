@@ -31,6 +31,8 @@ public class VirtualAttributeTraceDistinctEventAttribute extends AttributeVirtua
 	public double getNumeric(XAttributable x) {
 		if (attribute.isNumeric()) {
 			return getNumericNumeric(x);
+		} else if (attribute.isBoolean()) {
+			return getNumericBoolean(x);
 		} else if (attribute.isDuration()) {
 			return getNumericDuration(x);
 		} else if (attribute.isLiteral()) {
@@ -61,6 +63,46 @@ public class VirtualAttributeTraceDistinctEventAttribute extends AttributeVirtua
 				}
 			}
 			return result.size();
+		}
+		return -Double.MAX_VALUE;
+	}
+
+	public double getNumericBoolean(XAttributable x) {
+		boolean seenTrue = false;
+		boolean seenFalse = false;
+		if (x instanceof IvMTrace) {
+			for (IvMMove move : (IvMTrace) x) {
+				Boolean value = attribute.getBoolean(move);
+				if (value != null) {
+					if (value) {
+						seenTrue = true;
+					} else {
+						seenFalse = true;
+					}
+
+					if (seenTrue && seenFalse) {
+						return 2;
+					}
+				}
+			}
+			return seenTrue || seenFalse ? 1 : 0;
+		}
+		if (x instanceof IMTrace) {
+			for (XEvent event : (IMTrace) x) {
+				Boolean value = attribute.getBoolean(event);
+				if (value != null) {
+					if (value) {
+						seenTrue = true;
+					} else {
+						seenFalse = true;
+					}
+
+					if (seenTrue && seenFalse) {
+						return 2;
+					}
+				}
+			}
+			return seenTrue || seenFalse ? 1 : 0;
 		}
 		return -Double.MAX_VALUE;
 	}

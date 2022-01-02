@@ -16,6 +16,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -48,6 +49,9 @@ public class AttributeFilterGui extends IvMFilterGui {
 
 	private final RangeSlider valueNumericSelector;
 	public final int valueNumericRange = 1000;
+
+	private final JCheckBox valueBooleanTrue;
+	private final JCheckBox valueBooleanFalse;
 
 	private final JTextArea explanation;
 	private final Runnable onUpdate;
@@ -138,6 +142,20 @@ public class AttributeFilterGui extends IvMFilterGui {
 				blup.add(valueNumericSelector, BorderLayout.PAGE_START);
 				valuesPanel.add(blup, "numeric");
 			}
+
+			//boolean values panel
+			{
+				valueBooleanTrue = new JCheckBox("include true values");
+				valueBooleanFalse = new JCheckBox("include false values");
+				decorator.decorate(valueBooleanTrue);
+				decorator.decorate(valueBooleanFalse);
+				JPanel blup = new JPanel();
+				blup.setOpaque(false);
+				blup.add(valueBooleanTrue);
+				blup.add(Box.createHorizontalGlue());
+				blup.add(valueBooleanFalse);
+				valuesPanel.add(blup, "boolean");
+			}
 		}
 
 		setController();
@@ -168,6 +186,21 @@ public class AttributeFilterGui extends IvMFilterGui {
 
 		// numeric value selector
 		valueNumericSelector.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (!block) {
+					onUpdate.run();
+				}
+			}
+		});
+
+		valueBooleanTrue.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (!block) {
+					onUpdate.run();
+				}
+			}
+		});
+		valueBooleanFalse.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (!block) {
 					onUpdate.run();
@@ -243,6 +276,8 @@ public class AttributeFilterGui extends IvMFilterGui {
 			valuesPanelLayout.show(valuesPanel, "literal");
 		} else if (attribute.isNumeric()) {
 			valuesPanelLayout.show(valuesPanel, "numeric");
+		} else if (attribute.isBoolean()) {
+			valuesPanelLayout.show(valuesPanel, "boolean");
 		} else if (attribute.isTime()) {
 			valuesPanelLayout.show(valuesPanel, "numeric");
 		} else if (attribute.isDuration()) {
@@ -290,6 +325,14 @@ public class AttributeFilterGui extends IvMFilterGui {
 		return getSelectedAttribute().getNumericMin()
 				+ (getSelectedAttribute().getNumericMax() - getSelectedAttribute().getNumericMin())
 						* (valueNumericSelector.getUpperValue() / (valueNumericRange * 1.0));
+	}
+
+	public boolean getSelectedBooleanTrue() {
+		return valueBooleanTrue.isSelected();
+	}
+
+	public boolean getSelectedBooleanFalse() {
+		return valueBooleanFalse.isSelected();
 	}
 
 	public long getSelectedTimeMin() {
@@ -346,23 +389,37 @@ public class AttributeFilterGui extends IvMFilterGui {
 			s.append(intro);
 			s.append("being ");
 			List<String> attributes = getSelectedLiterals();
-			if (attributes.size() > 1) {
-				s.append("either ");
-			}
-			for (int i = 0; i < attributes.size(); i++) {
-				s.append("`");
-				s.append(attributes.get(i));
-				s.append("'");
-				if (i == attributes.size() - 2) {
-					s.append(" or ");
-				} else if (i < attributes.size() - 1) {
-					s.append(", ");
+			if (attributes.size() == 0) {
+				s.append("any value");
+			} else {
+				if (attributes.size() > 1) {
+					s.append("either ");
+				}
+				for (int i = 0; i < attributes.size(); i++) {
+					s.append("`");
+					s.append(attributes.get(i));
+					s.append("'");
+					if (i == attributes.size() - 2) {
+						s.append(" or ");
+					} else if (i < attributes.size() - 1) {
+						s.append(", ");
+					}
 				}
 			}
 			return s.toString();
 		} else if (getSelectedAttribute().isNumeric()) {
 			return intro + "between " + numberFormat.format(getSelectedNumericMin()) + " and "
 					+ numberFormat.format(getSelectedNumericMax());
+		} else if (getSelectedAttribute().isBoolean()) {
+			if (getSelectedBooleanTrue() && getSelectedBooleanFalse()) {
+				return intro + "being either true or false";
+			} else if (getSelectedBooleanTrue()) {
+				return intro + "being true";
+			} else if (getSelectedBooleanFalse()) {
+				return intro + "being false";
+			} else {
+				return intro + "being any value";
+			}
 		} else if (getSelectedAttribute().isTime()) {
 			return intro + "between " + ResourceTimeUtils.timeToString(getSelectedTimeMin()) + " and "
 					+ ResourceTimeUtils.timeToString(getSelectedTimeMax());
@@ -375,6 +432,7 @@ public class AttributeFilterGui extends IvMFilterGui {
 	}
 
 	@Override
+	@Deprecated
 	public void setForegroundRecursively(Color colour) {
 		if (explanation != null && keySelector != null && valueLiteralSelector != null) {
 			explanation.setForeground(colour);
