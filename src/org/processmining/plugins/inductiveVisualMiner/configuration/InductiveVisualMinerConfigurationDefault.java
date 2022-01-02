@@ -94,17 +94,6 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExporterTraceData;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorDefault;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCohort;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCompleteEventTwice;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEvent;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterEventTwice;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterFollows;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterLogMove;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceAttribute;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceEndsWithEvent;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterTraceStartsWithEvent;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterWithoutEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTrace;
@@ -187,22 +176,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				new PreMiningFilterTraceWithEvent(), //
 				new PreMiningFilterTraceWithEventTwice(), //
 				//new PreMiningFrequentTracesFilter()//
-		}));
-	}
-
-	@Override
-	protected List<HighlightingFilter> createHighlightingFilters() {
-		return new ArrayList<>(Arrays.asList(new HighlightingFilter[] { //
-				new HighlightingFilterTraceAttribute(), //
-				new HighlightingFilterEvent(), //
-				new HighlightingFilterWithoutEvent(), //
-				new HighlightingFilterEventTwice(), // 
-				new HighlightingFilterCompleteEventTwice(), //
-				new HighlightingFilterFollows(), //
-				new HighlightingFilterLogMove(), //
-				new HighlightingFilterTraceStartsWithEvent(), //
-				new HighlightingFilterTraceEndsWithEvent(), //
-				new HighlightingFilterCohort() //
 		}));
 	}
 
@@ -544,8 +517,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 	@Override
 	public DataChain<InductiveVisualMinerConfiguration> createChain(final InductiveVisualMinerPanel panel,
-			final ProMCanceller canceller, final Executor executor, final List<PreMiningFilter> preMiningFilters,
-			final List<HighlightingFilter> highlightingFilters) {
+			final ProMCanceller canceller, final Executor executor, final List<PreMiningFilter> preMiningFilters) {
 		//set up the state
 		DataState state = new DataState();
 

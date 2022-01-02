@@ -1,5 +1,9 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree;
 
+import java.util.Iterator;
+
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
+
 public class IvMFilterTree<X> {
 
 	private final String prefix;
@@ -33,5 +37,23 @@ public class IvMFilterTree<X> {
 
 	public boolean staysInLog(X element) {
 		return root.staysInLog(element);
+	}
+
+	public void filter(Iterator<X> it, IvMCanceller canceller) {
+		if (!couldSomethingBeFiltered()) {
+			return;
+		}
+
+		while (it.hasNext()) {
+			X element = it.next();
+
+			if (!staysInLog(element)) {
+				it.remove();
+			}
+
+			if (canceller.isCancelled()) {
+				return;
+			}
+		}
 	}
 }

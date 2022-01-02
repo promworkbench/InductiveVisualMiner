@@ -12,7 +12,6 @@ import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
@@ -45,7 +44,6 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<DataAnalysisTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> dataAnalyses;
 	private final List<CostModelFactory> costModelFactories;
 	private final List<PreMiningFilter> preMiningFilters;
-	private final List<HighlightingFilter> highlightingFilters;
 	private final List<IvMExporter> exporters;
 	private final IvMVirtualAttributeFactory virtualAttributeFactory;
 	private final IvMDecoratorI decorator;
@@ -53,7 +51,6 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	public InductiveVisualMinerConfigurationAbstract(ProMCanceller canceller, Executor executor) {
 		discoveryTechniques = createDiscoveryTechniques();
 		preMiningFilters = createPreMiningFilters();
-		highlightingFilters = createHighlightingFilters();
 		alignmentComputer = createAlignmentComputer();
 		modes = createModes();
 		popupItemsActivity = createPopupItemsActivity();
@@ -68,12 +65,10 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		decorator = createDecorator();
 
 		panel = createPanel(canceller);
-		chain = createChain(panel, canceller, executor, preMiningFilters, highlightingFilters);
+		chain = createChain(panel, canceller, executor, preMiningFilters);
 	}
 
 	protected abstract List<PreMiningFilter> createPreMiningFilters();
-
-	protected abstract List<HighlightingFilter> createHighlightingFilters();
 
 	protected abstract List<VisualMinerWrapper> createDiscoveryTechniques();
 
@@ -102,8 +97,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract IvMDecoratorI createDecorator();
 
 	protected abstract DataChain<InductiveVisualMinerConfiguration> createChain(InductiveVisualMinerPanel panel,
-			ProMCanceller canceller, Executor executor, List<PreMiningFilter> preMiningFilters,
-			List<HighlightingFilter> highlightingFilters);
+			ProMCanceller canceller, Executor executor, List<PreMiningFilter> preMiningFilters);
 
 	protected abstract IvMVirtualAttributeFactory createVirtualAttributes();
 
@@ -147,11 +141,6 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	@Override
 	final public List<PreMiningFilter> getPreMiningFilters() {
 		return preMiningFilters;
-	}
-
-	@Override
-	final public List<HighlightingFilter> getHighlightingFilters() {
-		return highlightingFilters;
 	}
 
 	@Override

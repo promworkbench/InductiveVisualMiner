@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view;
 
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -10,7 +9,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
-import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator.toFilterController;
@@ -49,6 +47,8 @@ public class IvMFilterTreeController<X> {
 
 				currentFilter = new IvMFilterTree<>(rootView.buildFilter(), prefix);
 				updateExplanation();
+
+				//notify the IvM controller that the filter changed
 				if (globalOnUpdate != null) {
 					globalOnUpdate.run();
 				}
@@ -133,31 +133,6 @@ public class IvMFilterTreeController<X> {
 		this.globalOnUpdate = onUpdate;
 	}
 
-	public boolean isSomethingFiltered() {
-		return currentFilter.couldSomethingBeFiltered();
-	}
-
-	public void filter(Iterator<X> it, IvMCanceller canceller) {
-		//avoid the current filter changing during filtering
-		IvMFilterTree<X> currentFilter2 = currentFilter;
-
-		if (!currentFilter2.couldSomethingBeFiltered()) {
-			return;
-		}
-
-		while (it.hasNext()) {
-			X element = it.next();
-
-			if (!currentFilter2.staysInLog(element)) {
-				it.remove();
-			}
-
-			if (canceller.isCancelled()) {
-				return;
-			}
-		}
-	}
-
 	public void addCommunicationChannel(FilterCommunicator<?, ?, ?, ?> channel) {
 		channels.add(channel);
 
@@ -181,5 +156,9 @@ public class IvMFilterTreeController<X> {
 			DefaultMutableTreeNode treeNode = it.nextElement();
 			((IvMFilterTreeNodeView<?>) treeNode.getUserObject()).setCommunicationChannel(channel);
 		}
+	}
+
+	public IvMFilterTree<X> getCurrentFilter() {
+		return currentFilter;
 	}
 }

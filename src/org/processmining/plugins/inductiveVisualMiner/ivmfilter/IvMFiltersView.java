@@ -18,13 +18,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.Scrollable;
 
-import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.OnOffPanel;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.HighlightingFilter2CohortAnalysisHandler;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.SwitchPanel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.filters.HighlightingFilterCohort;
 
 import gnu.trove.map.hash.THashMap;
 
@@ -35,8 +32,6 @@ public abstract class IvMFiltersView extends SideWindow {
 	private final Map<IvMFilter, JPanel> filter2panel;
 	private final Map<IvMFilter, JCheckBox> filter2checkbox;
 	private Runnable onUpdate;
-
-	private HighlightingFilter2CohortAnalysisHandler highlightingFilter2CohortAnalysisHandler;
 
 	public class IvMFiltersViewPanel extends JPanel implements Scrollable {
 		private static final long serialVersionUID = 8311080909592746520L;
@@ -105,12 +100,6 @@ public abstract class IvMFiltersView extends SideWindow {
 
 				final IvMFilter filter = filter2;
 
-				//special case: cohorts filter needs a special handler to communicate with cohort tab
-				if (filter instanceof HighlightingFilterCohort) {
-					((HighlightingFilterCohort) filter)
-							.setShowCohortAnalysisHandler(highlightingFilter2CohortAnalysisHandler);
-				}
-
 				//filter sub-panel
 				final SwitchPanel subPanel;
 				{
@@ -154,36 +143,6 @@ public abstract class IvMFiltersView extends SideWindow {
 					});
 					filter2checkbox.put(filter, checkBox);
 				}
-			}
-		}
-	}
-
-	public HighlightingFilter2CohortAnalysisHandler getHighlightingFilter2CohortAnalysisHandler() {
-		return highlightingFilter2CohortAnalysisHandler;
-	}
-
-	public void setHighlightingFilter2CohortAnalysisHandler(
-			HighlightingFilter2CohortAnalysisHandler highlightingFilter2CohortAnalysisHandler) {
-		this.highlightingFilter2CohortAnalysisHandler = highlightingFilter2CohortAnalysisHandler;
-
-		for (IvMFilter filter : filter2panel.keySet()) {
-			if (filter instanceof HighlightingFilterCohort) {
-				((HighlightingFilterCohort) filter)
-						.setShowCohortAnalysisHandler(highlightingFilter2CohortAnalysisHandler);
-			}
-		}
-	}
-
-	public void setHighlightingFilterSelectedCohort(Cohort cohort, boolean highlightInCohort) {
-		for (IvMFilter filter : filter2panel.keySet()) {
-			if (filter instanceof HighlightingFilterCohort) {
-				((HighlightingFilterCohort) filter).setSelectedCohort(cohort, highlightInCohort);
-				boolean enabled = cohort != null;
-				filter2checkbox.get(filter).setSelected(enabled);
-				filter.setEnabledFilter(enabled);
-				onUpdate.run();
-				filter2panel.get(filter).setEnabled(enabled);
-				repaint();
 			}
 		}
 	}

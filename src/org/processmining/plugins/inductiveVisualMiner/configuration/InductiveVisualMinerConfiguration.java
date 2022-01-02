@@ -9,7 +9,6 @@ import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderFactory;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -53,14 +52,7 @@ public interface InductiveVisualMinerConfiguration extends ConfigurationWithDeco
 	public List<PreMiningFilter> getPreMiningFilters();
 
 	/**
-	 * The list of available highlighting filters.
-	 * 
-	 * @return
-	 */
-	public List<HighlightingFilter> getHighlightingFilters();
-
-	/**
-	 * The list of available highlighting filters.
+	 * The list of available filters.
 	 * 
 	 * @return
 	 */

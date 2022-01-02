@@ -21,9 +21,8 @@ import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModels;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMHighlightingFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
@@ -108,11 +107,9 @@ public class IvMObject<C> {
 	public static final IvMObject<GraphVizTokens> animation = c("animation", GraphVizTokens.class);
 
 	//controllers & IvM-stuff
-	public static final IvMObject<IvMHighlightingFiltersController> controller_highlighting_filters = c(
-			"highlighting filters controller", IvMHighlightingFiltersController.class);
 	@SuppressWarnings("rawtypes")
-	public static final IvMObject<IvMFilterTreeController> controller_highlighting_filters_tree = c(
-			"highlighting filter tree controller", IvMFilterTreeController.class);
+	public static final IvMObject<IvMFilterTree> highlighting_filter_tree = c("highlighting filter tree",
+			IvMFilterTree.class);
 	public static final IvMObject<IvMPreMiningFiltersController> controller_premining_filters = c(
 			"pre-mining filters controller", IvMPreMiningFiltersController.class);
 

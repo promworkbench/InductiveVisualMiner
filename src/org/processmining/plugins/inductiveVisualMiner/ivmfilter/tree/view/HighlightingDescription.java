@@ -1,28 +1,13 @@
-package org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter;
-
-import java.awt.Component;
-import java.util.List;
+package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view;
 
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.Selection;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFiltersView;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeController;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTree;
 
 import gnu.trove.iterator.TIntIterator;
 
-public class HighlightingFiltersView extends IvMFiltersView {
-
-	private static final long serialVersionUID = -3014513707228444822L;
-
-	public HighlightingFiltersView(Component parent, List<HighlightingFilter> highlightingFilters,
-			IvMDecoratorI decorator) {
-		super(parent, "highlighting filters - " + InductiveVisualMinerPanel.title,
-				"These filters alter the occurrence counts, performance measurements and animation.",
-				highlightingFilters, decorator);
-	}
+public class HighlightingDescription {
 
 	/**
 	 * Tell the user which traces are being coloured/selected
@@ -30,12 +15,12 @@ public class HighlightingFiltersView extends IvMFiltersView {
 	 * @param panel
 	 * @param selectedNodes
 	 * @param selectedLogMoves
-	 * @param filters
+	 * @param filter
 	 * @param maxAnimatedTraces
 	 * @param numberOfTraces
 	 */
 	public static void updateSelectionDescription(InductiveVisualMinerPanel panel, Selection selection,
-			IvMFilterTreeController<IvMTrace> filters, IvMModel model) {
+			IvMFilterTree<?> filter, IvMModel model) {
 		//show the user which traces are shown
 
 		if (selection == null) {
@@ -88,7 +73,7 @@ public class HighlightingFiltersView extends IvMFiltersView {
 
 		//colouring filters
 		{
-			if (filters.isSomethingFiltered()) {
+			if (filter.couldSomethingBeFiltered()) {
 				if (result.length() != 0) {
 					result.append("; and ");
 				}

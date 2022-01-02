@@ -36,7 +36,6 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMClassifie
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.highlightingfilter.HighlightingFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeView;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -87,7 +86,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final JButton traceColourMapViewButton;
 	private final TraceColourMapView traceColourMapView;
 	private final JButton highlightingFiltersViewButton;
-	private final HighlightingFiltersView highlightingFiltersView;
 	private final IvMFilterTreeView<IvMTrace> highlightingFilterTreeView;
 	private final ControllerView<DataState> controllerView;
 
@@ -266,8 +264,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//highlighting filters view
 			{
-				highlightingFiltersView = new HighlightingFiltersView(this, configuration.getHighlightingFilters(),
-						configuration.getDecorator());
 				highlightingFilterTreeView = new IvMFilterTreeView<IvMTrace>(this, "Highlighting filters", decorator);
 
 				highlightingFiltersViewButton = new JButton("highlighting filters");
@@ -510,7 +506,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	public SideWindow[] getSideWindows() {
 		return new SideWindow[] { editModelView, preMiningFiltersView, traceView, dataAnalysisView,
-				highlightingFiltersView, highlightingFilterTreeView, traceColourMapView, controllerView };
+				highlightingFilterTreeView, traceColourMapView, controllerView };
 	}
 
 	public InductiveVisualMinerAnimationPanel getGraph() {
@@ -607,10 +603,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	public JButton getEditModelButton() {
 		return editModelButton;
-	}
-
-	public HighlightingFiltersView getHighlightingFiltersView() {
-		return highlightingFiltersView;
 	}
 
 	public IvMFilterTreeView<IvMTrace> getHighlightingFilterTreeView() {

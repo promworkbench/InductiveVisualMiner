@@ -41,6 +41,7 @@ public class IvMFilterTreeView<X> extends SideWindow {
 
 	public IvMFilterTreeView(Component parent, String title, final IvMDecoratorI decorator) {
 		super(parent, title + " - visual Miner");
+		setSize(500, 600);
 		setLayout(new BorderLayout());
 
 		JPanel panel = new JPanel();
