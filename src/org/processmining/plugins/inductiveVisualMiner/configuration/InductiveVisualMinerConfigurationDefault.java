@@ -97,11 +97,6 @@ import org.processmining.plugins.inductiveVisualMiner.export.ExporterTraceData;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorDefault;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterEvent;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTrace;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEvent;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceAnd;
@@ -184,17 +179,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 	public InductiveVisualMinerConfigurationDefault(ProMCanceller canceller, Executor executor) {
 		super(canceller, executor);
-	}
-
-	@Override
-	protected List<PreMiningFilter> createPreMiningFilters() {
-		return new ArrayList<>(Arrays.asList(new PreMiningFilter[] { //
-				new PreMiningFilterEvent(), //
-				new PreMiningFilterTrace(), //
-				new PreMiningFilterTraceWithEvent(), //
-				new PreMiningFilterTraceWithEventTwice(), //
-				//new PreMiningFrequentTracesFilter()//
-		}));
 	}
 
 	@Override
@@ -559,7 +543,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 
 	@Override
 	public DataChain<InductiveVisualMinerConfiguration> createChain(final InductiveVisualMinerPanel panel,
-			final ProMCanceller canceller, final Executor executor, final List<PreMiningFilter> preMiningFilters) {
+			final ProMCanceller canceller, final Executor executor) {
 		//set up the state
 		DataState state = new DataState();
 

@@ -15,7 +15,6 @@ import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderFactory;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
@@ -52,10 +51,6 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 		return discoveryTechniques.toArray(result);
 	}
 
-	public List<PreMiningFilter> getPreMiningFilters() {
-		return phantom.getPreMiningFilters();
-	}
-
 	public IvMFilterBuilderFactory getFilters() {
 		return phantom.getFilters();
 	}
@@ -74,7 +69,7 @@ public class InductiveVisualMinerConfigurationFake implements InductiveVisualMin
 
 	public DataChain<InductiveVisualMinerConfiguration> getChain() {
 		if (chain == null) {
-			chain = phantom.createChain(panel, canceller, executor, getPreMiningFilters());
+			chain = phantom.createChain(panel, canceller, executor);
 		}
 		return chain;
 	}

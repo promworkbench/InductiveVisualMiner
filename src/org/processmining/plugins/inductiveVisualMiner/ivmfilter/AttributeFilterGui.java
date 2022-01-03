@@ -2,7 +2,6 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -432,16 +431,4 @@ public class AttributeFilterGui extends IvMFilterGui {
 			return "blaaaa";
 		}
 	}
-
-	@Override
-	@Deprecated
-	public void setForegroundRecursively(Color colour) {
-		if (explanation != null && keySelector != null && valueLiteralSelector != null) {
-			explanation.setForeground(colour);
-			keySelector.setForeground(colour);
-			valueLiteralSelector.setForeground(colour);
-			valueNumericSelector.setForeground(colour);
-		}
-	}
-
 }

@@ -36,7 +36,6 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMClassifie
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeViews;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -74,7 +73,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final JLabel classifierLabel;
 	private IvMClassifierChooser classifiersCombobox;
 	private final JButton preMiningFiltersButton;
-	private final PreMiningFiltersView preMiningFiltersView;
 	private final IvMFilterTreeViews preMiningFilterTreeView;
 	private final JButton editModelButton;
 	private final EditModelView editModelView;
@@ -176,9 +174,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//pre-mining filters
 			{
-				preMiningFiltersView = new PreMiningFiltersView(this, configuration.getPreMiningFilters(),
-						configuration.getDecorator());
-
 				IvMFilterTreeView<IMTrace> preMiningTraceFilterView = new IvMFilterTreeView<IMTrace>("trace filters",
 						decorator);
 				IvMFilterTreeView<IMEvent> preMiningEventFilterView = new IvMFilterTreeView<IMEvent>("event filters",
@@ -518,8 +513,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	}
 
 	public SideWindow[] getSideWindows() {
-		return new SideWindow[] { editModelView, preMiningFiltersView, traceView, dataAnalysisView,
-				highlightingFilterTreeView, traceColourMapView, controllerView };
+		return new SideWindow[] { editModelView, traceView, dataAnalysisView, highlightingFilterTreeView,
+				traceColourMapView, controllerView };
 	}
 
 	public InductiveVisualMinerAnimationPanel getGraph() {
@@ -548,10 +543,6 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 	public JButton getPreMiningFiltersButton() {
 		return preMiningFiltersButton;
-	}
-
-	public PreMiningFiltersView getPreMiningFiltersView() {
-		return preMiningFiltersView;
 	}
 
 	public IvMFilterTreeViews getPreMiningFilterTreeView() {

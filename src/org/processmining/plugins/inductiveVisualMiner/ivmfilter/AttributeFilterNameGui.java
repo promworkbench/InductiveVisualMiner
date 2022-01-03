@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
@@ -161,12 +160,6 @@ public class AttributeFilterNameGui extends IvMFilterGui {
 		}
 
 		return intro;
-	}
-
-	@Override
-	@Deprecated
-	public void setForegroundRecursively(Color colour) {
-
 	}
 
 }

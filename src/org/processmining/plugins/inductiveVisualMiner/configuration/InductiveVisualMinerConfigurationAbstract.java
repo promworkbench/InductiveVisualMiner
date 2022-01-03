@@ -12,7 +12,6 @@ import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.export.IvMExporter;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFilter;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemActivity;
 import org.processmining.plugins.inductiveVisualMiner.popup.PopupItemLog;
@@ -43,14 +42,12 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	private final List<PopupItemLog> popupItemsLog;
 	private final List<DataAnalysisTab<?, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> dataAnalyses;
 	private final List<CostModelFactory> costModelFactories;
-	private final List<PreMiningFilter> preMiningFilters;
 	private final List<IvMExporter> exporters;
 	private final IvMVirtualAttributeFactory virtualAttributeFactory;
 	private final IvMDecoratorI decorator;
 
 	public InductiveVisualMinerConfigurationAbstract(ProMCanceller canceller, Executor executor) {
 		discoveryTechniques = createDiscoveryTechniques();
-		preMiningFilters = createPreMiningFilters();
 		alignmentComputer = createAlignmentComputer();
 		modes = createModes();
 		popupItemsActivity = createPopupItemsActivity();
@@ -65,10 +62,8 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 		decorator = createDecorator();
 
 		panel = createPanel(canceller);
-		chain = createChain(panel, canceller, executor, preMiningFilters);
+		chain = createChain(panel, canceller, executor);
 	}
-
-	protected abstract List<PreMiningFilter> createPreMiningFilters();
 
 	protected abstract List<VisualMinerWrapper> createDiscoveryTechniques();
 
@@ -97,7 +92,7 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	protected abstract IvMDecoratorI createDecorator();
 
 	protected abstract DataChain<InductiveVisualMinerConfiguration> createChain(InductiveVisualMinerPanel panel,
-			ProMCanceller canceller, Executor executor, List<PreMiningFilter> preMiningFilters);
+			ProMCanceller canceller, Executor executor);
 
 	protected abstract IvMVirtualAttributeFactory createVirtualAttributes();
 
@@ -136,11 +131,6 @@ public abstract class InductiveVisualMinerConfigurationAbstract implements Induc
 	final public Mode[] getModesArray() {
 		Mode[] result = new Mode[modes.size()];
 		return modes.toArray(result);
-	}
-
-	@Override
-	final public List<PreMiningFilter> getPreMiningFilters() {
-		return preMiningFilters;
 	}
 
 	@Override

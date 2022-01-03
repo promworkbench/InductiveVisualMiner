@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter;
 
-import java.awt.Color;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -51,23 +49,5 @@ public class IvMFilterGui extends JPanel {
 		textArea.setHighlighter(null);
 		textArea.setBorder(explanationBorder);
 		return textArea;
-	}
-
-	/**
-	 * We're drastically changing colours. Make sure the gui is not-opaque and
-	 * recursively set the text colour.
-	 */
-	@Deprecated
-	protected void setForegroundRecursively(Color colour) {
-		
-	}
-
-	@Override
-	public void setForeground(Color colour) {
-		super.setForeground(colour);
-		setForegroundRecursively(colour);
-		if (getBorder() != null) {
-			((TitledBorder) getBorder()).setTitleColor(colour);
-		}
 	}
 }

@@ -45,7 +45,6 @@ import org.processmining.plugins.inductiveVisualMiner.animation.AnimationTimeCha
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
-import org.processmining.plugins.inductiveVisualMiner.chain.Cl04FilterLogOnActivities;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChain;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputation;
 import org.processmining.plugins.inductiveVisualMiner.chain.DataChainLinkComputationAbstract;
@@ -70,7 +69,6 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.ResourceTime
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.UserStatus;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicatorImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTree;
@@ -862,18 +860,9 @@ public class InductiveVisualMinerController {
 		setObject(IvMObject.pre_mining_filter_tree_trace, preMiningFiltersTraceController.getCurrentFilter());
 		setObject(IvMObject.pre_mining_filter_tree_event, preMiningFiltersEventController.getCurrentFilter());
 
-		setObject(IvMObject.controller_premining_filters, new IvMPreMiningFiltersController(
-				configuration.getPreMiningFilters(), panel.getPreMiningFiltersView()));
 		panel.getPreMiningFiltersButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panel.getPreMiningFiltersView().enableAndShow();
 				panel.getPreMiningFilterTreeView().enableAndShow();
-			}
-		});
-
-		panel.getPreMiningFiltersView().setOnUpdate(new Runnable() {
-			public void run() {
-				chain.executeLink(Cl04FilterLogOnActivities.class);
 			}
 		});
 

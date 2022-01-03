@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
-import java.awt.Color;
 import java.util.Iterator;
 
 import javax.swing.JTextArea;
@@ -54,14 +53,6 @@ public class FilterIvMTraceCohortPanel extends IvMFilterGui {
 			}
 		} else {
 			s.append("any trace");
-		}
-	}
-
-	@Override
-	@Deprecated
-	protected void setForegroundRecursively(Color colour) {
-		if (explanation != null) {
-			explanation.setForeground(colour);
 		}
 	}
 

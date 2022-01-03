@@ -21,7 +21,6 @@ import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModels;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
-import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMPreMiningFiltersController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogInfo;
@@ -116,8 +115,6 @@ public class IvMObject<C> {
 	@SuppressWarnings("rawtypes")
 	public static final IvMObject<IvMFilterTree> pre_mining_filter_tree_event = c("pre-mining filter tree event",
 			IvMFilterTree.class);
-	public static final IvMObject<IvMPreMiningFiltersController> controller_premining_filters = c(
-			"pre-mining filters controller", IvMPreMiningFiltersController.class);
 
 	//user selections
 	public static final IvMObject<Double> selected_activities_threshold = c("selected activities threshold",
