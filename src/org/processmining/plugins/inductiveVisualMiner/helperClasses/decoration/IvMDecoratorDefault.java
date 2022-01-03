@@ -8,7 +8,7 @@ public class IvMDecoratorDefault extends IvMDecoratorAbstract {
 
 	public static final Color textColour = new Color(40, 78, 107);
 	public static final Color buttonColour = new Color(161, 207, 243);
-	public static final Color backGroundColour1 = new Color(161, 207, 243);
+	public static final Color backGroundColour1 = new Color(132, 195, 244);
 	public static final Color backGroundColour2 = new Color(119, 175, 219);
 	//public static final Color backGroundColour2 = new Color(84, 141, 184);
 	public static final float fontSize = 11;

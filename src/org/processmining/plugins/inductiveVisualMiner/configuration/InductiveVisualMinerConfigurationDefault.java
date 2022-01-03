@@ -20,6 +20,7 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttribut
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceDuration;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceFitness;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceHasDeviations;
+import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceHasSynchronousMoves;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceLength;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfCompleteEvents;
 import org.processmining.plugins.inductiveVisualMiner.attributes.VirtualAttributeTraceNumberOfLogMoves;
@@ -477,6 +478,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 				ArrayList<AttributeVirtual> result = new ArrayList<>(Arrays.asList(new AttributeVirtual[] { //
 						new VirtualAttributeTraceNumberOfCompleteEvents(), //
 						new VirtualAttributeTraceHasDeviations(), //
+						new VirtualAttributeTraceHasSynchronousMoves(), //
 						new VirtualAttributeTraceFitness(), //
 						new VirtualAttributeTraceNumberOfModelMoves(), //
 						new VirtualAttributeTraceNumberOfLogMoves(), //
