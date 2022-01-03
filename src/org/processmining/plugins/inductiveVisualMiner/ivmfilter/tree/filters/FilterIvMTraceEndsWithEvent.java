@@ -45,7 +45,7 @@ public class FilterIvMTraceEndsWithEvent extends IvMFilterBuilderAbstract<IvMTra
 				}
 
 				//Find the last log event move and match it
-				for (int i = x.size() - 1; i >= 0; i++) {
+				for (int i = x.size() - 1; i >= 0; i--) {
 					IvMMove move = x.get(i);
 					if (move.hasAttributes()) {
 						return targets(move);
