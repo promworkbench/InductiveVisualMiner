@@ -2,16 +2,16 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
 import org.apache.commons.lang3.StringUtils;
 import org.deckfour.xes.model.XAttributable;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterNameGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeLeafAbstract;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class FilterIvMTraceWithoutAttribute extends IvMFilterBuilderAbstract<IvMTrace, Object, AttributeFilterNameGui> {
+public class FilterIMTraceWithoutAttribute extends IvMFilterBuilderAbstract<IMTrace, Object, AttributeFilterNameGui> {
 
 	public String toString() {
 		return "without attribute";
@@ -24,7 +24,7 @@ public class FilterIvMTraceWithoutAttribute extends IvMFilterBuilderAbstract<IvM
 	}
 
 	@Override
-	public IvMFilterTreeNode<IvMTrace> buildFilter(final AttributeFilterNameGui panel) {
+	public IvMFilterTreeNode<IMTrace> buildFilter(final AttributeFilterNameGui panel) {
 		return buildFilterA(panel);
 	}
 
@@ -78,8 +78,8 @@ public class FilterIvMTraceWithoutAttribute extends IvMFilterBuilderAbstract<IvM
 	}
 
 	@Override
-	public Class<IvMTrace> getTargetClass() {
-		return IvMTrace.class;
+	public Class<IMTrace> getTargetClass() {
+		return IMTrace.class;
 	}
 
 	@Override

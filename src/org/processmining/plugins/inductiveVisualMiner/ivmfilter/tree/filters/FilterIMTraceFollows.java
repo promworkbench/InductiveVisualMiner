@@ -2,22 +2,21 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Iterator;
 import java.util.List;
 
+import org.deckfour.xes.model.XEvent;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeComposite;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeCompositeAbstract;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 
-public class FilterIvMTraceFollows extends IvMFilterBuilderAbstract<IvMTrace, IvMMove, FilterIvMTraceFollowsPanel> {
+public class FilterIMTraceFollows extends IvMFilterBuilderAbstract<IMTrace, XEvent, FilterIvMTraceFollowsPanel> {
 
 	public String toString() {
 		return "follows";
@@ -31,12 +30,12 @@ public class FilterIvMTraceFollows extends IvMFilterBuilderAbstract<IvMTrace, Iv
 		return true;
 	}
 
-	public Class<IvMTrace> getTargetClass() {
-		return IvMTrace.class;
+	public Class<IMTrace> getTargetClass() {
+		return IMTrace.class;
 	}
 
-	public Class<IvMMove> getChildrenTargetClass() {
-		return IvMMove.class;
+	public Class<XEvent> getChildrenTargetClass() {
+		return XEvent.class;
 	}
 
 	public FilterIvMTraceFollowsPanel createGui(Runnable onUpdate, IvMDecoratorI decorator) {
@@ -49,10 +48,10 @@ public class FilterIvMTraceFollows extends IvMFilterBuilderAbstract<IvMTrace, Iv
 
 		private final int minDistance;
 		private final int maxDistance;
-		private final List<IvMMove> trace;
-		private final IvMFilterTreeNodeComposite<IvMTrace, IvMMove> filters;
+		private final List<XEvent> trace;
+		private final IvMFilterTreeNodeComposite<IMTrace, XEvent> filters;
 
-		public State(List<IvMMove> trace, IvMFilterTreeNodeComposite<IvMTrace, IvMMove> filters, int minDistance,
+		public State(List<XEvent> trace, IvMFilterTreeNodeComposite<IMTrace, XEvent> filters, int minDistance,
 				int maxDistance) {
 			this.minDistance = minDistance;
 			this.maxDistance = maxDistance;
@@ -123,8 +122,8 @@ public class FilterIvMTraceFollows extends IvMFilterBuilderAbstract<IvMTrace, Iv
 
 		public boolean matches(int childIndex, int moveIndex) {
 			if (!checked[childIndex].get(moveIndex)) {
-				IvMFilterTreeNode<IvMMove> childFilter = filters.get(childIndex);
-				IvMMove move = trace.get(moveIndex);
+				IvMFilterTreeNode<XEvent> childFilter = filters.get(childIndex);
+				XEvent move = trace.get(moveIndex);
 				matched[childIndex].set(moveIndex, childFilter.staysInLog(move));
 				checked[childIndex].set(moveIndex);
 			}
@@ -133,11 +132,11 @@ public class FilterIvMTraceFollows extends IvMFilterBuilderAbstract<IvMTrace, Iv
 		}
 	}
 
-	public IvMFilterTreeNode<IvMTrace> buildFilter(FilterIvMTraceFollowsPanel gui) {
+	public IvMFilterTreeNode<IMTrace> buildFilter(FilterIvMTraceFollowsPanel gui) {
 		final int minDistance = gui.getMinimumEventsInBetween();
 		final int maxDistance = gui.getMaximumEventsInBetween();
 
-		return new IvMFilterTreeNodeCompositeAbstract<IvMTrace, IvMMove>() {
+		return new IvMFilterTreeNodeCompositeAbstract<IMTrace, XEvent>() {
 			private static final long serialVersionUID = -5079650993335491999L;
 
 			public boolean couldSomethingBeFiltered() {
@@ -145,31 +144,27 @@ public class FilterIvMTraceFollows extends IvMFilterBuilderAbstract<IvMTrace, Iv
 			}
 
 			public String getDivider() {
-				return "followed after " + minDistance + "-" + maxDistance + " completion events by a completion event";
+				return "followed after " + minDistance + "-" + maxDistance + " events by an event";
 			}
 
 			public String getPrefix() {
-				return "a completion event";
+				return "an event";
 			}
 
-			protected boolean staysInLogA(IvMTrace element) {
-				ArrayList<IvMMove> completesTrace = new ArrayList<>(element);
-				Iterator<IvMMove> it = completesTrace.iterator();
-				while (it.hasNext()) {
-					if (!it.next().isComplete()) {
-						it.remove();
-					}
+			protected boolean staysInLogA(IMTrace element) {
+				List<XEvent> trace = new ArrayList<>();
+				for (XEvent event : element) {
+					trace.add(event);
 				}
 
-				State state = new State(completesTrace, this, minDistance, maxDistance);
+				State state = new State(trace, this, minDistance, maxDistance);
 				return state.tryAll();
 			}
 		};
 	}
 
 	public void setAttributesInfo(AttributesInfo attributesInfo, FilterIvMTraceFollowsPanel gui) {
-		int maxTraceLength = (int) attributesInfo.getTraceAttributeValues("number of completion events")
-				.getNumericMax();
+		int maxTraceLength = (int) attributesInfo.getTraceAttributeValues("number of events").getNumericMax();
 		gui.setMaxTraceLength(maxTraceLength);
 	}
 }

@@ -17,13 +17,13 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeComposite;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 /**
  * This class shows a single node, and the user can choose and configure the
@@ -117,14 +117,14 @@ public class IvMFilterTreeNodeView<X> extends JPanel {
 		add(header, BorderLayout.PAGE_START);
 	}
 
-	public void setAttributesInfo(IvMAttributesInfo attributesInfo) {
+	public void setAttributesInfo(AttributesInfo attributesInfo) {
 		for (int i = 0; i < guis.size(); i++) {
 			setAttributesInfo(attributesInfo, filterBuilders.get(i), guis.get(i));
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private <G extends IvMFilterGui, H extends IvMFilterGui> void setAttributesInfo(IvMAttributesInfo attributesInfo,
+	private <G extends IvMFilterGui, H extends IvMFilterGui> void setAttributesInfo(AttributesInfo attributesInfo,
 			IvMFilterBuilder<X, ?, G> filterBuilder, H gui) {
 		filterBuilder.setAttributesInfo(attributesInfo, (G) gui);
 	}

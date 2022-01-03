@@ -110,6 +110,12 @@ public class IvMObject<C> {
 	@SuppressWarnings("rawtypes")
 	public static final IvMObject<IvMFilterTree> highlighting_filter_tree = c("highlighting filter tree",
 			IvMFilterTree.class);
+	@SuppressWarnings("rawtypes")
+	public static final IvMObject<IvMFilterTree> pre_mining_filter_tree_trace = c("pre-mining filter tree trace",
+			IvMFilterTree.class);
+	@SuppressWarnings("rawtypes")
+	public static final IvMObject<IvMFilterTree> pre_mining_filter_tree_event = c("pre-mining filter tree event",
+			IvMFilterTree.class);
 	public static final IvMObject<IvMPreMiningFiltersController> controller_premining_filters = c(
 			"pre-mining filters controller", IvMPreMiningFiltersController.class);
 

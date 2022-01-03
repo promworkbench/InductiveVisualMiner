@@ -1,6 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
@@ -9,6 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTr
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.performance.PerformanceTransition;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class FilterIvMTraceWithEventTwice extends IvMFilterBuilderAbstract<IvMTrace, IvMMove, IvMFilterGui> {
 
@@ -93,7 +93,7 @@ public class FilterIvMTraceWithEventTwice extends IvMFilterBuilderAbstract<IvMTr
 	}
 
 	@Override
-	public void setAttributesInfo(IvMAttributesInfo attributesInfo, IvMFilterGui gui) {
+	public void setAttributesInfo(AttributesInfo attributesInfo, IvMFilterGui gui) {
 
 	}
 }

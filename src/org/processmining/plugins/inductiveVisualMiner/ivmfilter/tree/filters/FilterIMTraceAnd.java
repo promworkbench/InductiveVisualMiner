@@ -1,14 +1,14 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeCompositeAbstract;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class FilterIvMMoveAnd extends IvMFilterBuilderAbstract<IvMMove, IvMMove, IvMFilterGui> {
+public class FilterIMTraceAnd extends IvMFilterBuilderAbstract<IMTrace, IMTrace, IvMFilterGui> {
 
 	@Override
 	public String toString() {
@@ -23,18 +23,18 @@ public class FilterIvMMoveAnd extends IvMFilterBuilderAbstract<IvMMove, IvMMove,
 	@Override
 	public IvMFilterGui createGui(Runnable onUpdate, IvMDecoratorI decorator) {
 		IvMFilterGui result = new IvMFilterGui(null, decorator);
-		result.add(result.createExplanation("Include events that pass all of the sub-filters."));
+		result.add(result.createExplanation("Include traces that pass all of the sub-filters."));
 		return result;
 	}
 
 	@Override
-	public IvMFilterTreeNode<IvMMove> buildFilter(IvMFilterGui panel) {
-		return new IvMFilterTreeNodeCompositeAbstract<IvMMove, IvMMove>() {
+	public IvMFilterTreeNode<IMTrace> buildFilter(IvMFilterGui panel) {
+		return new IvMFilterTreeNodeCompositeAbstract<IMTrace, IMTrace>() {
 
 			private static final long serialVersionUID = -2705606899973613204L;
 
-			public boolean staysInLogA(IvMMove x) {
-				for (IvMFilterTreeNode<IvMMove> child : this) {
+			public boolean staysInLogA(IMTrace x) {
+				for (IvMFilterTreeNode<IMTrace> child : this) {
 					if (!child.staysInLog(x)) {
 						return false;
 					}
@@ -52,7 +52,7 @@ public class FilterIvMMoveAnd extends IvMFilterBuilderAbstract<IvMMove, IvMMove,
 			}
 
 			public boolean couldSomethingBeFiltered() {
-				for (IvMFilterTreeNode<IvMMove> child : this) {
+				for (IvMFilterTreeNode<IMTrace> child : this) {
 					if (child.couldSomethingBeFiltered()) {
 						return true;
 					}
@@ -68,13 +68,13 @@ public class FilterIvMMoveAnd extends IvMFilterBuilderAbstract<IvMMove, IvMMove,
 	}
 
 	@Override
-	public Class<IvMMove> getTargetClass() {
-		return IvMMove.class;
+	public Class<IMTrace> getTargetClass() {
+		return IMTrace.class;
 	}
 
 	@Override
-	public Class<IvMMove> getChildrenTargetClass() {
-		return IvMMove.class;
+	public Class<IMTrace> getChildrenTargetClass() {
+		return IMTrace.class;
 	}
 
 	@Override

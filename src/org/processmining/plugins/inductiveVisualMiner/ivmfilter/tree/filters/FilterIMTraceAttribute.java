@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.deckfour.xes.model.XAttributable;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeLeafAbstract;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class FilterIvMTraceAttribute extends IvMFilterBuilderAbstract<IvMTrace, Object, AttributeFilterGui> {
+public class FilterIMTraceAttribute extends IvMFilterBuilderAbstract<IMTrace, Object, AttributeFilterGui> {
 
 	public String toString() {
 		return "attribute";
@@ -26,7 +26,7 @@ public class FilterIvMTraceAttribute extends IvMFilterBuilderAbstract<IvMTrace, 
 	}
 
 	@Override
-	public IvMFilterTreeNode<IvMTrace> buildFilter(final AttributeFilterGui panel) {
+	public IvMFilterTreeNode<IMTrace> buildFilter(final AttributeFilterGui panel) {
 		return buildFilterA(panel);
 	}
 
@@ -142,8 +142,8 @@ public class FilterIvMTraceAttribute extends IvMFilterBuilderAbstract<IvMTrace, 
 	}
 
 	@Override
-	public Class<IvMTrace> getTargetClass() {
-		return IvMTrace.class;
+	public Class<IMTrace> getTargetClass() {
+		return IMTrace.class;
 	}
 
 	@Override

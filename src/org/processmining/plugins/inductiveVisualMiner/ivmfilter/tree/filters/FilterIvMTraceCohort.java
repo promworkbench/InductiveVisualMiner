@@ -10,7 +10,6 @@ import org.deckfour.xes.model.impl.XTraceImpl;
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.cohortanalysis.feature.Feature;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator.toFilterChannel;
@@ -19,6 +18,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTr
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeLeaf;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class FilterIvMTraceCohort extends IvMFilterBuilderAbstract<IvMTrace, Object, FilterIvMTraceCohortPanel> {
 
@@ -105,7 +105,7 @@ public class FilterIvMTraceCohort extends IvMFilterBuilderAbstract<IvMTrace, Obj
 		};
 	}
 
-	public void setAttributesInfo(IvMAttributesInfo attributesInfo, FilterIvMTraceCohortPanel gui) {
+	public void setAttributesInfo(AttributesInfo attributesInfo, FilterIvMTraceCohortPanel gui) {
 
 	}
 

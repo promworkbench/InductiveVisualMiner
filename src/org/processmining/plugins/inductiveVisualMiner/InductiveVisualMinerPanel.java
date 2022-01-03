@@ -38,12 +38,15 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMPanel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.PreMiningFiltersView;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeView;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeViews;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
 import org.processmining.plugins.inductiveVisualMiner.tracecolouring.TraceColourMapView;
 import org.processmining.plugins.inductiveVisualMiner.traceview.TraceView;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotEdge;
 import org.processmining.plugins.inductiveVisualMiner.visualisation.LocalDotNode;
+import org.processmining.plugins.inductiveminer2.logs.IMEvent;
+import org.processmining.plugins.inductiveminer2.logs.IMTrace;
 
 import com.fluxicon.slickerbox.components.NiceDoubleSlider;
 import com.fluxicon.slickerbox.components.NiceSlider.Orientation;
@@ -72,6 +75,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private IvMClassifierChooser classifiersCombobox;
 	private final JButton preMiningFiltersButton;
 	private final PreMiningFiltersView preMiningFiltersView;
+	private final IvMFilterTreeViews preMiningFilterTreeView;
 	private final JButton editModelButton;
 	private final EditModelView editModelView;
 	private final JLabel minerLabel;
@@ -86,7 +90,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 	private final JButton traceColourMapViewButton;
 	private final TraceColourMapView traceColourMapView;
 	private final JButton highlightingFiltersViewButton;
-	private final IvMFilterTreeView<IvMTrace> highlightingFilterTreeView;
+	private final IvMFilterTreeViews highlightingFilterTreeView;
 	private final ControllerView<DataState> controllerView;
 
 	private InputFunction<Selection> onSelectionChanged = null;
@@ -174,6 +178,14 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 			{
 				preMiningFiltersView = new PreMiningFiltersView(this, configuration.getPreMiningFilters(),
 						configuration.getDecorator());
+
+				IvMFilterTreeView<IMTrace> preMiningTraceFilterView = new IvMFilterTreeView<IMTrace>("trace filters",
+						decorator);
+				IvMFilterTreeView<IMEvent> preMiningEventFilterView = new IvMFilterTreeView<IMEvent>("event filters",
+						decorator);
+				preMiningFilterTreeView = new IvMFilterTreeViews(this, "Pre-mining filter", preMiningTraceFilterView,
+						preMiningEventFilterView);
+
 				preMiningFiltersButton = new JButton("pre-mining filters");
 				decorator.decorate(preMiningFiltersButton);
 				GridBagConstraints cTraceViewButton = new GridBagConstraints();
@@ -264,7 +276,8 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 
 			//highlighting filters view
 			{
-				highlightingFilterTreeView = new IvMFilterTreeView<IvMTrace>(this, "Highlighting filters", decorator);
+				IvMFilterTreeView<IvMTrace> view = new IvMFilterTreeView<IvMTrace>(null, decorator);
+				highlightingFilterTreeView = new IvMFilterTreeViews(this, "Highlighting filters", view);
 
 				highlightingFiltersViewButton = new JButton("highlighting filters");
 				decorator.decorate(highlightingFiltersViewButton);
@@ -541,6 +554,10 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return preMiningFiltersView;
 	}
 
+	public IvMFilterTreeViews getPreMiningFilterTreeView() {
+		return preMiningFilterTreeView;
+	}
+
 	public JTextArea getSelectionLabel() {
 		return selectionLabel;
 	}
@@ -605,7 +622,7 @@ public class InductiveVisualMinerPanel extends IvMPanel {
 		return editModelButton;
 	}
 
-	public IvMFilterTreeView<IvMTrace> getHighlightingFilterTreeView() {
+	public IvMFilterTreeViews getHighlightingFilterTreeView() {
 		return highlightingFilterTreeView;
 	}
 

@@ -246,8 +246,10 @@ public class AttributeFilterGui extends IvMFilterGui {
 				}
 			}
 			if (!found) {
+				block = true;
 				keySelector.setSelectedIndex(0);
 				selectedAttributeName = (String) keySelector.getSelectedItem();
+				block = false;
 			}
 		}
 

@@ -1,15 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
 import org.apache.commons.lang3.StringUtils;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeLeafAbstract;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class FilterIvMTraceAny extends IvMFilterBuilderAbstract<IvMTrace, Object, IvMFilterGui> {
+public class FilterIMTraceAny extends IvMFilterBuilderAbstract<IMTrace, Object, IvMFilterGui> {
 
 	public String toString() {
 		return "any trace";
@@ -24,10 +24,10 @@ public class FilterIvMTraceAny extends IvMFilterBuilderAbstract<IvMTrace, Object
 		return new IvMFilterGui(null, decorator);
 	}
 
-	public IvMFilterTreeNode<IvMTrace> buildFilter(IvMFilterGui panel) {
-		return new IvMFilterTreeNodeLeafAbstract<IvMTrace>() {
+	public IvMFilterTreeNode<IMTrace> buildFilter(IvMFilterGui panel) {
+		return new IvMFilterTreeNodeLeafAbstract<IMTrace>() {
 
-			public boolean staysInLogA(IvMTrace element) {
+			public boolean staysInLogA(IMTrace element) {
 				return true;
 			}
 
@@ -46,8 +46,8 @@ public class FilterIvMTraceAny extends IvMFilterBuilderAbstract<IvMTrace, Object
 		return false;
 	}
 
-	public Class<IvMTrace> getTargetClass() {
-		return IvMTrace.class;
+	public Class<IMTrace> getTargetClass() {
+		return IMTrace.class;
 	}
 
 	public Class<Object> getChildrenTargetClass() {
@@ -57,4 +57,5 @@ public class FilterIvMTraceAny extends IvMFilterBuilderAbstract<IvMTrace, Object
 	public void setAttributesInfo(AttributesInfo attributesInfo, IvMFilterGui gui) {
 
 	}
+
 }

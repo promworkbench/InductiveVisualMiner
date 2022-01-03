@@ -1,13 +1,13 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
 import org.apache.commons.lang3.StringUtils;
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeLeafAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class FilterIvMMoveNo extends IvMFilterBuilderAbstract<IvMMove, Object, IvMFilterGui> {
 
@@ -54,7 +54,7 @@ public class FilterIvMMoveNo extends IvMFilterBuilderAbstract<IvMMove, Object, I
 		return null;
 	}
 
-	public void setAttributesInfo(IvMAttributesInfo attributesInfo, IvMFilterGui gui) {
+	public void setAttributesInfo(AttributesInfo attributesInfo, IvMFilterGui gui) {
 
 	}
 }

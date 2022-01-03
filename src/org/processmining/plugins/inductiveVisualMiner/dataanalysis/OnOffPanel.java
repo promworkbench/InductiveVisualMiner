@@ -51,7 +51,7 @@ public class OnOffPanel<X extends JComponent> extends IvMPanel {
 				ImageIcon loading = new ImageIcon(
 						Toolkit.getDefaultToolkit().createImage(org.apache.commons.io.IOUtils.toByteArray(in)));
 				offMessage = new JLabel("off", loading, SwingConstants.CENTER);
-			} catch (IOException e) {
+			} catch (IOException | NullPointerException e) {
 				offMessage = new JLabel("off", SwingConstants.CENTER);
 			}
 			decorator.decorate(offMessage);

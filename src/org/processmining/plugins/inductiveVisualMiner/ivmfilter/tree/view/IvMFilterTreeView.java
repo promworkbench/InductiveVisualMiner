@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -24,36 +23,30 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.OnOffPanel;
-import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
-public class IvMFilterTreeView<X> extends SideWindow {
+public class IvMFilterTreeView<X> extends OnOffPanel<JPanel> {
 
 	private static final long serialVersionUID = 2689698523420921017L;
 
 	public static final int tabSize = 1;
 
-	private final OnOffPanel<JPanel> onOffPanel;
 	private final JTree treeView;
 	private final JTextArea explanation;
 	private final JPanel nodeViews;
 	private final CardLayout nodeViewsLayout;
 
-	public IvMFilterTreeView(Component parent, String title, final IvMDecoratorI decorator) {
-		super(parent, title + " - visual Miner");
-		setSize(500, 600);
-		setLayout(new BorderLayout());
+	private String title;
 
-		JPanel panel = new JPanel();
-		onOffPanel = new OnOffPanel<JPanel>(decorator, panel);
-		onOffPanel.off();
-		onOffPanel.setOffMessage("Waiting for attributes..");
+	public IvMFilterTreeView(String title, final IvMDecoratorI decorator) {
+		super(decorator, new JPanel());
+		this.setTitle(title);
+		off();
+		setOffMessage("Waiting for attributes..");
+
+		JPanel panel = getOnPanel();
 		panel.setOpaque(false);
-		add(onOffPanel, BorderLayout.CENTER);
-
 		panel.setLayout(new BorderLayout());
-
-		getContentPane().setBackground(decorator.backGroundColour2());
 
 		//explanation
 		{
@@ -174,7 +167,15 @@ public class IvMFilterTreeView<X> extends SideWindow {
 	}
 
 	public OnOffPanel<JPanel> getOnOffPanel() {
-		return onOffPanel;
+		return this;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public static class IvMTreeUI extends BasicTreeUI {

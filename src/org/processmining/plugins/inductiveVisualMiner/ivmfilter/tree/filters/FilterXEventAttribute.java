@@ -1,15 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
 import org.apache.commons.lang3.StringUtils;
+import org.deckfour.xes.model.XEvent;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.AttributeFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class FilterIvMMoveAttribute extends IvMFilterBuilderAbstract<IvMMove, Object, AttributeFilterGui> {
+public class FilterXEventAttribute extends IvMFilterBuilderAbstract<XEvent, Object, AttributeFilterGui> {
 
 	public String toString() {
 		return "event attribute";
@@ -27,7 +27,7 @@ public class FilterIvMMoveAttribute extends IvMFilterBuilderAbstract<IvMMove, Ob
 	}
 
 	@Override
-	public IvMFilterTreeNode<IvMMove> buildFilter(final AttributeFilterGui panel) {
+	public IvMFilterTreeNode<XEvent> buildFilter(final AttributeFilterGui panel) {
 		return FilterIvMTraceAttribute.buildFilterA(panel);
 	}
 
@@ -42,8 +42,8 @@ public class FilterIvMMoveAttribute extends IvMFilterBuilderAbstract<IvMMove, Ob
 	}
 
 	@Override
-	public Class<IvMMove> getTargetClass() {
-		return IvMMove.class;
+	public Class<XEvent> getTargetClass() {
+		return XEvent.class;
 	}
 
 	@Override

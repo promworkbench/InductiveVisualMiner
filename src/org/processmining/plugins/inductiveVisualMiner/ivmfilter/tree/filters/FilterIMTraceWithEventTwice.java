@@ -1,60 +1,55 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
+import org.deckfour.xes.model.XEvent;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeCompositeAbstract;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class FilterIvMTraceStartsWithEvent extends IvMFilterBuilderAbstract<IvMTrace, IvMMove, IvMFilterGui> {
+public class FilterIMTraceWithEventTwice extends IvMFilterBuilderAbstract<IMTrace, XEvent, IvMFilterGui> {
 
 	@Override
 	public String toString() {
-		return "starts with event";
+		return "with event twice";
 	}
 
 	@Override
 	public String toString(IvMFilterGui panel) {
-		return "starts with event";
+		return "with event twice";
 	}
 
 	@Override
 	public IvMFilterGui createGui(Runnable onUpdate, IvMDecoratorI decorator) {
 		IvMFilterGui result = new IvMFilterGui(toString(), decorator);
-		result.add(result.createExplanation("Include traces of which the first event passes all the sub-filters."));
+		result.add(result.createExplanation("Include traces that have two events that pass all the sub-filters."));
 		return result;
 	}
 
 	@Override
-	public IvMFilterTreeNode<IvMTrace> buildFilter(IvMFilterGui gui) {
-		return new IvMFilterTreeNodeCompositeAbstract<IvMTrace, IvMMove>() {
+	public IvMFilterTreeNode<IMTrace> buildFilter(IvMFilterGui gui) {
+		return new IvMFilterTreeNodeCompositeAbstract<IMTrace, XEvent>() {
 
 			private static final long serialVersionUID = 8213030059677606305L;
 
-			public boolean staysInLogA(IvMTrace x) {
-				if (x.isEmpty()) {
-					return false;
-				}
-
-				//Try whether the first move can be matched.
-				if (targets(x.iterator().next())) {
-					return true;
-				}
-
-				//If the first move doesn't match, then look for the first log event and try to match that.
-				for (IvMMove move : x) {
-					if (move.hasAttributes()) {
-						return targets(move);
+			public boolean staysInLogA(IMTrace x) {
+				boolean first = false;
+				for (XEvent move : x) {
+					if (targets(move)) {
+						if (first) {
+							return true;
+						} else {
+							first = true;
+						}
 					}
 				}
 				return false;
 			}
 
-			private boolean targets(IvMMove move) {
-				for (IvMFilterTreeNode<IvMMove> child : this) {
+			private boolean targets(XEvent move) {
+				for (IvMFilterTreeNode<XEvent> child : this) {
 					if (!child.staysInLog(move)) {
 						return false;
 					}
@@ -64,7 +59,7 @@ public class FilterIvMTraceStartsWithEvent extends IvMFilterBuilderAbstract<IvMT
 
 			@Override
 			public String getPrefix() {
-				return "as first event ";
+				return "two events ";
 			}
 
 			public String getDivider() {
@@ -72,7 +67,7 @@ public class FilterIvMTraceStartsWithEvent extends IvMFilterBuilderAbstract<IvMT
 			}
 
 			public boolean couldSomethingBeFiltered() {
-				return true; //empty traces are always filtered
+				return true; //the empty trace and traces with a single event are always filtered
 			}
 		};
 	}
@@ -83,13 +78,13 @@ public class FilterIvMTraceStartsWithEvent extends IvMFilterBuilderAbstract<IvMT
 	}
 
 	@Override
-	public Class<IvMTrace> getTargetClass() {
-		return IvMTrace.class;
+	public Class<IMTrace> getTargetClass() {
+		return IMTrace.class;
 	}
 
 	@Override
-	public Class<IvMMove> getChildrenTargetClass() {
-		return IvMMove.class;
+	public Class<XEvent> getChildrenTargetClass() {
+		return XEvent.class;
 	}
 
 	@Override

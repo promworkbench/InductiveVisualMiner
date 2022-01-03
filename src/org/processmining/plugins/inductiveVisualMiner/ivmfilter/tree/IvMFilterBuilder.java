@@ -1,8 +1,8 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree;
 
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public interface IvMFilterBuilder<X, Y, G extends IvMFilterGui> extends Comparable<IvMFilterBuilder<?, ?, ?>> {
 
@@ -39,7 +39,7 @@ public interface IvMFilterBuilder<X, Y, G extends IvMFilterGui> extends Comparab
 	 */
 	public IvMFilterTreeNode<X> buildFilter(G gui);
 
-	public void setAttributesInfo(IvMAttributesInfo attributesInfo, G gui);
+	public void setAttributesInfo(AttributesInfo attributesInfo, G gui);
 
 	/**
 	 * Add a communication channel to/from a filter. The implementation may use

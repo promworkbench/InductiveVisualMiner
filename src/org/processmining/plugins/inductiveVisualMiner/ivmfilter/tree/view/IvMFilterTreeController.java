@@ -8,19 +8,19 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator.toFilterController;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderFactory;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTree;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
 public class IvMFilterTreeController<X> {
 
 	private final IvMFilterTreeView<X> view;
 	private Runnable globalOnUpdate;
-	private IvMAttributesInfo attributesInfo;
+	private AttributesInfo attributesInfo;
 	private IvMFilterTree<X> currentFilter;
 	private final CopyOnWriteArrayList<FilterCommunicator<?, ?, ?, ?>> channels;
 
@@ -91,7 +91,7 @@ public class IvMFilterTreeController<X> {
 	 * 
 	 * @param attributesInfo
 	 */
-	public void setAttributesInfo(IvMAttributesInfo attributesInfo) {
+	public void setAttributesInfo(AttributesInfo attributesInfo) {
 		this.attributesInfo = attributesInfo;
 
 		if (attributesInfo == null) {

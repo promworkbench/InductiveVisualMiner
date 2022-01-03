@@ -1,14 +1,14 @@
 package org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters;
 
+import org.deckfour.xes.model.XEvent;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.IvMFilterGui;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderAbstract;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNode;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTreeNodeCompositeAbstract;
-import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class FilterIvMMoveAnd extends IvMFilterBuilderAbstract<IvMMove, IvMMove, IvMFilterGui> {
+public class FilterXEventAnd extends IvMFilterBuilderAbstract<XEvent, XEvent, IvMFilterGui> {
 
 	@Override
 	public String toString() {
@@ -28,13 +28,13 @@ public class FilterIvMMoveAnd extends IvMFilterBuilderAbstract<IvMMove, IvMMove,
 	}
 
 	@Override
-	public IvMFilterTreeNode<IvMMove> buildFilter(IvMFilterGui panel) {
-		return new IvMFilterTreeNodeCompositeAbstract<IvMMove, IvMMove>() {
+	public IvMFilterTreeNode<XEvent> buildFilter(IvMFilterGui panel) {
+		return new IvMFilterTreeNodeCompositeAbstract<XEvent, XEvent>() {
 
 			private static final long serialVersionUID = -2705606899973613204L;
 
-			public boolean staysInLogA(IvMMove x) {
-				for (IvMFilterTreeNode<IvMMove> child : this) {
+			public boolean staysInLogA(XEvent x) {
+				for (IvMFilterTreeNode<XEvent> child : this) {
 					if (!child.staysInLog(x)) {
 						return false;
 					}
@@ -52,7 +52,7 @@ public class FilterIvMMoveAnd extends IvMFilterBuilderAbstract<IvMMove, IvMMove,
 			}
 
 			public boolean couldSomethingBeFiltered() {
-				for (IvMFilterTreeNode<IvMMove> child : this) {
+				for (IvMFilterTreeNode<XEvent> child : this) {
 					if (child.couldSomethingBeFiltered()) {
 						return true;
 					}
@@ -68,13 +68,13 @@ public class FilterIvMMoveAnd extends IvMFilterBuilderAbstract<IvMMove, IvMMove,
 	}
 
 	@Override
-	public Class<IvMMove> getTargetClass() {
-		return IvMMove.class;
+	public Class<XEvent> getTargetClass() {
+		return XEvent.class;
 	}
 
 	@Override
-	public Class<IvMMove> getChildrenTargetClass() {
-		return IvMMove.class;
+	public Class<XEvent> getChildrenTargetClass() {
+		return XEvent.class;
 	}
 
 	@Override

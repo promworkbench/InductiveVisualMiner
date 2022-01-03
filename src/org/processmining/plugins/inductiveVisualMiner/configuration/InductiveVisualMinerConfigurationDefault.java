@@ -9,9 +9,11 @@ import java.util.concurrent.Executor;
 
 import javax.swing.JOptionPane;
 
+import org.deckfour.xes.model.XEvent;
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Function;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputer;
 import org.processmining.plugins.inductiveVisualMiner.alignment.AlignmentComputerImpl;
@@ -102,6 +104,17 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.preminingfilters.filters.PreMiningFilterTraceWithEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilder;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterBuilderFactory;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceAnd;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceAny;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceAttribute;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceEndsWithEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceFollows;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceOr;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceStartsWithEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceWithEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceWithEventTwice;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceWithoutAttribute;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIMTraceWithoutEvent;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMMoveAnd;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMMoveAny;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMMoveAttribute;
@@ -118,6 +131,10 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.Fil
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceWithEventTwice;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceWithoutAttribute;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterIvMTraceWithoutEvent;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterXEventAnd;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterXEventAny;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterXEventAttribute;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.filters.FilterXEventOr;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 import org.processmining.plugins.inductiveVisualMiner.mode.Mode;
@@ -208,6 +225,29 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveOr());
 					Collections.sort(filterBuilders);
 					filterBuilders.add(0, (IvMFilterBuilder<X, ?, ?>) new FilterIvMMoveAny());
+					return filterBuilders;
+				} else if (clazz == IMTrace.class) {
+					List<IvMFilterBuilder<X, ?, ?>> filterBuilders = new ArrayList<>();
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIMTraceAttribute());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIMTraceWithEvent());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIMTraceStartsWithEvent());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIMTraceEndsWithEvent());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIMTraceWithEventTwice());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIMTraceFollows());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIMTraceWithoutEvent());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIMTraceWithoutAttribute());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIMTraceAnd());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterIMTraceOr());
+					Collections.sort(filterBuilders);
+					filterBuilders.add(0, (IvMFilterBuilder<X, ?, ?>) new FilterIMTraceAny());
+					return filterBuilders;
+				} else if (clazz == XEvent.class) {
+					List<IvMFilterBuilder<X, ?, ?>> filterBuilders = new ArrayList<>();
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterXEventAttribute());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterXEventAnd());
+					filterBuilders.add((IvMFilterBuilder<X, ?, ?>) new FilterXEventOr());
+					Collections.sort(filterBuilders);
+					filterBuilders.add(0, (IvMFilterBuilder<X, ?, ?>) new FilterXEventAny());
 					return filterBuilders;
 				}
 				return null;

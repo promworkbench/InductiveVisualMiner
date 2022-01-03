@@ -21,6 +21,7 @@ import javax.swing.event.ChangeListener;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.std.XConceptExtension;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.contexts.uitopia.UIPluginContext;
@@ -32,6 +33,7 @@ import org.processmining.plugins.InductiveMiner.Function;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.efficienttree.UnknownTreeNodeException;
 import org.processmining.plugins.InductiveMiner.mining.logs.IMLog;
+import org.processmining.plugins.InductiveMiner.mining.logs.IMTrace;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
 import org.processmining.plugins.graphviz.dot.DotElement;
@@ -74,6 +76,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommu
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.HighlightingDescription;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeController;
+import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.view.IvMFilterTreeView;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -366,7 +369,7 @@ public class InductiveVisualMinerController {
 		}
 
 		//set pre-mining filters button
-		initGuiPreMiningFilters();
+		initGuiPreMiningFilters(configuration.getDecorator());
 
 		//set edit model button
 		panel.getEditModelButton().addActionListener(new ActionListener() {
@@ -823,7 +826,7 @@ public class InductiveVisualMinerController {
 		}
 	}
 
-	protected void initGuiPreMiningFilters() {
+	protected void initGuiPreMiningFilters(IvMDecoratorI decorator) {
 		setObject(IvMObject.selected_activities_threshold, 1.0);
 		panel.getActivitiesSlider().addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -833,12 +836,38 @@ public class InductiveVisualMinerController {
 			}
 		});
 
+		@SuppressWarnings("unchecked")
+		IvMFilterTreeView<IMTrace> traceView = (IvMFilterTreeView<IMTrace>) panel.getPreMiningFilterTreeView()
+				.getView(0);
+		@SuppressWarnings("unchecked")
+		IvMFilterTreeView<XEvent> eventView = (IvMFilterTreeView<XEvent>) panel.getPreMiningFilterTreeView().getView(1);
+		final IvMFilterTreeController<IMTrace> preMiningFiltersTraceController = new IvMFilterTreeController<IMTrace>(
+				"These filters alter the traces on which a model is discovered. "
+						+ "Deviations, animation and performance are computed on the full (unfiltered) log.",
+				IMTrace.class, traceView, configuration.getFilters(), decorator);
+		final IvMFilterTreeController<XEvent> preMiningFiltersEventController = new IvMFilterTreeController<XEvent>(
+				"These filters alter the events on which a model is discovered. "
+						+ "Deviations, animation and performance are computed on the full (unfiltered) log.",
+				XEvent.class, eventView, configuration.getFilters(), decorator);
+		preMiningFiltersTraceController.setOnUpdate(new Runnable() {
+			public void run() {
+				setObject(IvMObject.pre_mining_filter_tree_trace, preMiningFiltersTraceController.getCurrentFilter());
+			}
+		});
+		preMiningFiltersEventController.setOnUpdate(new Runnable() {
+			public void run() {
+				setObject(IvMObject.pre_mining_filter_tree_event, preMiningFiltersEventController.getCurrentFilter());
+			}
+		});
+		setObject(IvMObject.pre_mining_filter_tree_trace, preMiningFiltersTraceController.getCurrentFilter());
+		setObject(IvMObject.pre_mining_filter_tree_event, preMiningFiltersEventController.getCurrentFilter());
+
 		setObject(IvMObject.controller_premining_filters, new IvMPreMiningFiltersController(
 				configuration.getPreMiningFilters(), panel.getPreMiningFiltersView()));
-
 		panel.getPreMiningFiltersButton().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.getPreMiningFiltersView().enableAndShow();
+				panel.getPreMiningFilterTreeView().enableAndShow();
 			}
 		});
 
@@ -856,18 +885,19 @@ public class InductiveVisualMinerController {
 			}
 
 			public IvMObject<?>[] createInputObjects() {
-				return new IvMObject<?>[] { IvMObject.attributes_info, IvMObject.controller_premining_filters };
+				return new IvMObject<?>[] { IvMObject.attributes_info };
 			}
 
 			public void updateGui(InductiveVisualMinerPanel panel, IvMObjectValues inputs) throws Exception {
 				AttributesInfo attributesInfo = inputs.get(IvMObject.attributes_info);
-				IvMPreMiningFiltersController controller = inputs.get(IvMObject.controller_premining_filters);
 
-				controller.setAttributesInfo(attributesInfo);
+				preMiningFiltersTraceController.setAttributesInfo(attributesInfo);
+				preMiningFiltersEventController.setAttributesInfo(attributesInfo);
 			}
 
 			public void invalidate(InductiveVisualMinerPanel panel) {
-				//TODO: no action taken?
+				preMiningFiltersTraceController.setAttributesInfo(null);
+				preMiningFiltersEventController.setAttributesInfo(null);
 			}
 		});
 	}
@@ -903,10 +933,13 @@ public class InductiveVisualMinerController {
 			}
 		});
 
+		@SuppressWarnings("unchecked")
+		IvMFilterTreeView<IvMTrace> treeView = (IvMFilterTreeView<IvMTrace>) panel.getHighlightingFilterTreeView()
+				.getView(0);
 		highlightingFiltersController = new IvMFilterTreeController<>(
 				"These filters influence the traces accounted for in frequencies, performance and animation shown on the model, and in data analysis.\n\n"
 						+ "Highlighting",
-				IvMTrace.class, panel.getHighlightingFilterTreeView(), configuration.getFilters(), decorator);
+				IvMTrace.class, treeView, configuration.getFilters(), decorator);
 		highlightingFiltersController.setOnUpdate(new Runnable() {
 			public void run() {
 				setObject(IvMObject.highlighting_filter_tree, highlightingFiltersController.getCurrentFilter());
