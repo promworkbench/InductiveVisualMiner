@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -100,12 +101,11 @@ public class IvMFilterTreeController<X> {
 		}
 
 		//set the attributesInfo over all filter builders
-		@SuppressWarnings("unchecked")
-		Enumeration<DefaultMutableTreeNode> it = ((DefaultMutableTreeNode) view.getTreeView().getModel().getRoot())
+		Enumeration<TreeNode> it = ((DefaultMutableTreeNode) view.getTreeView().getModel().getRoot())
 				.breadthFirstEnumeration();
 		while (it.hasMoreElements()) {
-			DefaultMutableTreeNode treeNode = it.nextElement();
-			((IvMFilterTreeNodeView<?>) treeNode.getUserObject()).setAttributesInfo(attributesInfo);
+			TreeNode treeNode = it.nextElement();
+			((IvMFilterTreeNodeView<?>) treeNode).setAttributesInfo(attributesInfo);
 		}
 
 		//enable access to the filters for the user
@@ -149,12 +149,11 @@ public class IvMFilterTreeController<X> {
 		});
 
 		//set the attributesInfo over all filter builders
-		@SuppressWarnings("unchecked")
-		Enumeration<DefaultMutableTreeNode> it = ((DefaultMutableTreeNode) view.getTreeView().getModel().getRoot())
+		Enumeration<TreeNode> it = ((DefaultMutableTreeNode) view.getTreeView().getModel().getRoot())
 				.breadthFirstEnumeration();
 		while (it.hasMoreElements()) {
-			DefaultMutableTreeNode treeNode = it.nextElement();
-			((IvMFilterTreeNodeView<?>) treeNode.getUserObject()).setCommunicationChannel(channel);
+			TreeNode treeNode = it.nextElement();
+			((IvMFilterTreeNodeView<?>) treeNode).setCommunicationChannel(channel);
 		}
 	}
 

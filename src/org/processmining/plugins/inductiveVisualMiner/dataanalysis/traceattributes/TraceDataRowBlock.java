@@ -487,7 +487,7 @@ public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> 
 		return result;
 	}
 
-	private static DataRow<Object> c(Attribute attribute, Field field, DisplayType value) {
+	public static DataRow<Object> c(Attribute attribute, Field field, DisplayType value) {
 		return new DataRow<Object>(value, attribute.getName(), field.toString());
 	}
 
