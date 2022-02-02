@@ -2,6 +2,8 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 public class DataRow<O> {
 	private String[] names;
 	private DisplayType[] values;
@@ -26,6 +28,14 @@ public class DataRow<O> {
 		this.names = new String[] { name };
 		this.payload = payload;
 		this.values = values;
+	}
+
+	public DataRow(String prefixProperty, DataRow<O> copyFrom) {
+		this.names = new String[copyFrom.names.length + 1];
+		this.names[0] = prefixProperty;
+		System.arraycopy(copyFrom.names, 0, this.names, 1, copyFrom.names.length);
+		this.payload = copyFrom.payload;
+		this.values = ArrayUtils.clone(copyFrom.values);
 	}
 
 	public int getNumberOfNames() {
