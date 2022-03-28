@@ -34,7 +34,9 @@ public class DataAnalysisTableCellRenderer extends JLabel implements TableCellRe
 
 	public DataAnalysisTableCellRenderer(IvMDecoratorI decorator) {
 		this.decorator = decorator;
-		decorator.decorate(this);
+		if (decorator != null) {
+			decorator.decorate(this);
+		}
 		setHorizontalTextPosition(SwingConstants.LEADING);
 		setVerticalAlignment(JLabel.TOP);
 	}

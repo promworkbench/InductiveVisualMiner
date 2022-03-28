@@ -24,6 +24,13 @@ public class DataRow<O> {
 		this.values = values;
 	}
 
+	public DataRow(String property, DataRow<O> base) {
+		this.names = new String[base.names.length + 1];
+		System.arraycopy(base.names, 0, this.names, 1, base.names.length);
+		this.names[0] = property;
+		this.values = Arrays.copyOf(base.values, base.values.length);
+	}
+
 	public DataRow(String name, O payload, DisplayType... values) {
 		this.names = new String[] { name };
 		this.payload = payload;

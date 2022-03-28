@@ -34,9 +34,8 @@ public class DfgMiner extends VisualMinerWrapper {
 			}
 		};
 
-		IMLogImpl log2 = new org.processmining.plugins.inductiveminer2.logs.IMLogImpl(log.toXLog(), log.getClassifier(),
-				log.getLifeCycleClassifier());
-		DirectlyFollowsModel dfg = DFMMiner.mine(log2, miningParameters, canceller2);
+		IMLogImpl log2 = new IMLogImpl(log.toXLog(), log.getClassifier(), log.getLifeCycleClassifier());
+		DirectlyFollowsModel dfg = DFMMiner.mine(log2, miningParameters, canceller2).getA();
 
 		if (dfg != null) {
 			return new IvMModel(dfg);
