@@ -12,8 +12,8 @@ import javax.swing.JTabbedPane;
 import org.processmining.cohortanalysis.cohort.Cohort;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.inductiveVisualMiner.InductiveVisualMinerPanel;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab.DataTableCohort;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.DataAnalysisTabCohorts;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.DataAnalysisTabCohorts.DataTableCohort;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.SideWindow;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
@@ -97,8 +97,8 @@ public class DataAnalysesView<C, P> extends SideWindow {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void setChannel(FilterCommunicator<Pair<Cohort, Boolean>, Void, Void, Void> channel) {
-		DataAnalysisTable<?, C, P> table = tables.get(CohortDataAnalysisTab.name);
-		if (table != null && table instanceof CohortDataAnalysisTab.DataTableCohort) {
+		DataAnalysisTable<?, C, P> table = tables.get(DataAnalysisTabCohorts.name);
+		if (table != null && table instanceof DataAnalysisTabCohorts.DataTableCohort) {
 			((DataTableCohort) table).setChannel(channel);
 		}
 	}

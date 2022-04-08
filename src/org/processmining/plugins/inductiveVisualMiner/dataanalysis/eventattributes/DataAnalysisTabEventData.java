@@ -1,6 +1,5 @@
-package org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes;
+package org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -11,12 +10,12 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
-public class DataTabLog<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
+public class DataAnalysisTabEventData<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
-	public static final String name = "Log attributes";
-	public static final String explanation = "Attributes at the log level.";
+	public static final String name = "Event attributes";
+	public static final String explanation = "Attributes at the event level.\nIf traces are highlighted, attributes will be shown for highlighted and non-highlighted traces.";
 
-	public DataTabLog(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
+	public DataAnalysisTabEventData(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
 			Callable<List<DataRowBlockComputer<Object, C, P>>> rowBlockComputersCreator) {
 		super(rowBlocksCreator, rowBlockComputersCreator);
 	}
@@ -25,17 +24,9 @@ public class DataTabLog<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView,
 			IvMDecoratorI decorator) {
 		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<>(name, dataAnalysesView, decorator);
-		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "Attribute", "value" } });
+		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "Attribute", "property", "value" },
+				{ "Attribute", "property", "highlighted traces", "not-highlighted traces" } });
 		return table;
-	}
-
-	@Override
-	public List<DataRowBlockComputer<Object, C, P>> createRowBlockComputers() {
-		List<DataRowBlockComputer<Object, C, P>> result = new ArrayList<>();
-		result.add(new DataRowBlockLogAttributes<C, P>());
-		result.add(new DataRowBlockLogAttributesHighlighted<C, P>());
-		result.add(new DataRowBlockLogEMSC<C, P>());
-		return result;
 	}
 
 	@Override

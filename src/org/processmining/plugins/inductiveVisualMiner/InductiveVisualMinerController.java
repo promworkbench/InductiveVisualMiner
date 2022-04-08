@@ -58,7 +58,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.OnStatus;
 import org.processmining.plugins.inductiveVisualMiner.configuration.InductiveVisualMinerConfiguration;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysesController;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.DataAnalysisTabCohorts;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportAlignment.Type;
 import org.processmining.plugins.inductiveVisualMiner.export.ExportController;
@@ -710,7 +710,7 @@ public class InductiveVisualMinerController {
 
 			public Void fromFilter(Void input) {
 				panel.getDataAnalysesView().enableAndShow();
-				panel.getDataAnalysesView().showAnalysis(CohortDataAnalysisTab.name);
+				panel.getDataAnalysesView().showAnalysis(DataAnalysisTabCohorts.name);
 				return null;
 			}
 		};

@@ -7,6 +7,7 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesIn
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
+import org.processmining.plugins.inductiveVisualMiner.configuration.ConfigurationWithDecorator;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
@@ -14,14 +15,15 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
-public class EventDataRowBlockVirtual<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class RowBlockEventDataHistogramVirtual<C extends ConfigurationWithDecorator, P>
+		extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
-		return "event-att-virt";
+		return "event-att-hist-virt";
 	}
 
 	public String getStatusBusyMessage() {
-		return "Gathering virtual event attributes..";
+		return "Computing virtual event attribute histograms..";
 	}
 
 	public IvMObject<?>[] createInputObjects() {
@@ -42,12 +44,16 @@ public class EventDataRowBlockVirtual<C, P> extends DataRowBlockComputer<Object,
 
 			for (Attribute attribute : attributes.getEventAttributes()) {
 				result.addAll(TraceDataRowBlock.merge(
-						EventDataRowBlock.createAttributeData(logFiltered, attribute, canceller),
-						EventDataRowBlock.createAttributeData(negativeLog, attribute, canceller), canceller));
+						RowBlockEventDataHistogram.createAttributeData(logFiltered, attribute, canceller,
+								configuration.getDecorator()),
+						RowBlockEventDataHistogram.createAttributeData(negativeLog, attribute, canceller,
+								configuration.getDecorator()),
+						canceller));
 			}
 		} else {
 			for (Attribute attribute : attributes.getEventAttributes()) {
-				result.addAll(EventDataRowBlock.createAttributeData(logFiltered, attribute, canceller));
+				result.addAll(RowBlockEventDataHistogram.createAttributeData(logFiltered, attribute, canceller,
+						configuration.getDecorator()));
 			}
 		}
 

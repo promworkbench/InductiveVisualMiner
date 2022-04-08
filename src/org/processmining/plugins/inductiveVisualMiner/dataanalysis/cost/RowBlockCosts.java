@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockA
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
 
-public class CostRowBlock<C, P> extends DataRowBlockAbstract<Object, C, P> {
+public class RowBlockCosts<C, P> extends DataRowBlockAbstract<Object, C, P> {
 
 	@Override
 	public String getName() {

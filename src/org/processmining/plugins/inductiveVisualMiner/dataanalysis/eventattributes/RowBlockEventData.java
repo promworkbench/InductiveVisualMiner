@@ -27,7 +27,7 @@ import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TLongArrayList;
 
-public class EventDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class RowBlockEventData<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "event-att";

@@ -29,14 +29,14 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockC
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.FilterCommunicator;
 
-public class CohortDataAnalysisTab<C, P> extends DataAnalysisTabAbstract<Cohort, C, P> {
+public class DataAnalysisTabCohorts<C, P> extends DataAnalysisTabAbstract<Cohort, C, P> {
 
 	public static final String name = "Cohort analysis";
 	public static final String explanation = "Study influence of trace attributes on process behaviour.\n"
 			+ "Click: highlight cohort;\t" + "shift+click: highlight other traces;\t"
 			+ "ctrl+click: disable cohort highlighting.";
 
-	public CohortDataAnalysisTab(Callable<List<DataRowBlock<Cohort, C, P>>> rowBlocksCreator,
+	public DataAnalysisTabCohorts(Callable<List<DataRowBlock<Cohort, C, P>>> rowBlocksCreator,
 			Callable<List<DataRowBlockComputer<Cohort, C, P>>> rowBlockComputersCreator) {
 		super(rowBlocksCreator, rowBlockComputersCreator);
 	}

@@ -12,7 +12,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockC
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
-public class EventDataRowBlockTypeVirtual<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class RowBlockEventDataTypeVirtual<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "event-att-type-virt";

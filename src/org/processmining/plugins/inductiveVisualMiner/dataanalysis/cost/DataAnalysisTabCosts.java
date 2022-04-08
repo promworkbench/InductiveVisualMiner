@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes;
+package org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -10,12 +10,12 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
-public class EventDataTab<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
+public class DataAnalysisTabCosts<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
-	public static final String name = "Event attributes";
-	public static final String explanation = "Attributes at the event level.\nIf traces are highlighted, attributes will be shown for highlighted and non-highlighted traces.";
+	public static final String name = "Cost model";
+	public static final String explanation = "The parameters of the discovered cost model.\nIf traces are highlighted, two cost models will be computed: for highlighted and not-highlighted traces.\nPress ctrl+c to change the cost model (e.g. to include time).";
 
-	public EventDataTab(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
+	public DataAnalysisTabCosts(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
 			Callable<List<DataRowBlockComputer<Object, C, P>>> rowBlockComputersCreator) {
 		super(rowBlocksCreator, rowBlockComputersCreator);
 	}
@@ -24,8 +24,9 @@ public class EventDataTab<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView,
 			IvMDecoratorI decorator) {
 		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<>(name, dataAnalysesView, decorator);
-		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "Attribute", "property", "value" },
-				{ "Attribute", "property", "highlighted traces", "not-highlighted traces" } });
+		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "cost" },
+				{ "", "", "highlighted traces", "not-highlighted traces" } });
+
 		return table;
 	}
 
@@ -38,5 +39,4 @@ public class EventDataTab<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 	public String getExplanation() {
 		return explanation;
 	}
-
 }
