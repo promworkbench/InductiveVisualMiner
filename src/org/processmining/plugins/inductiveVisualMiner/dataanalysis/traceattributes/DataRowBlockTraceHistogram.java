@@ -25,7 +25,7 @@ import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TLongArrayList;
 
-public class TraceDataRowBlockHistogram<C extends ConfigurationWithDecorator, P>
+public class DataRowBlockTraceHistogram<C extends ConfigurationWithDecorator, P>
 		extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
@@ -53,7 +53,7 @@ public class TraceDataRowBlockHistogram<C extends ConfigurationWithDecorator, P>
 			negativeLog.invert();
 
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				result.addAll(TraceDataRowBlock.merge(
+				result.addAll(DataRowBlockTrace.merge(
 						createAttributeData(logFiltered, attribute, canceller, configuration.getDecorator()),
 						createAttributeData(negativeLog, attribute, canceller, configuration.getDecorator()),
 						canceller));

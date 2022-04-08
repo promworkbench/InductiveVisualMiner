@@ -10,12 +10,12 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 
-public class TraceDataTab<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
+public class DataAnalysisTabTrace<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
 	public static final String name = "Trace attributes";
 	public static final String explanation = "Attributes at the trace level.\nIf traces are highlighted, attributes will be shown for highlighted and non-highlighted traces.";
 
-	public TraceDataTab(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
+	public DataAnalysisTabTrace(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
 			Callable<List<DataRowBlockComputer<Object, C, P>>> rowBlockComputersCreator) {
 		super(rowBlocksCreator, rowBlockComputersCreator);
 	}

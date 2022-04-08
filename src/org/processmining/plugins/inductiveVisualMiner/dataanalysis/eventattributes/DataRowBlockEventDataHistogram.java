@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.configuration.Configuratio
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.Histogram;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -55,7 +55,7 @@ public class DataRowBlockEventDataHistogram<C extends ConfigurationWithDecorator
 			negativeLog.invert();
 
 			for (Attribute attribute : attributes.getEventAttributes()) {
-				result.addAll(TraceDataRowBlock.merge(
+				result.addAll(DataRowBlockTrace.merge(
 						createAttributeData(logFiltered, attribute, canceller, configuration.getDecorator()),
 						createAttributeData(negativeLog, attribute, canceller, configuration.getDecorator()),
 						canceller));

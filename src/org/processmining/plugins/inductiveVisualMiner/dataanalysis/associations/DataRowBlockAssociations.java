@@ -15,7 +15,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.CorrelationDensityPlot;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -60,7 +60,7 @@ public class DataRowBlockAssociations<C extends ConfigurationWithDecorator, P> e
 			for (Attribute attributeA : attributes.getTraceAttributes()) {
 				for (Attribute attributeB : attributes.getTraceAttributes()) {
 					if (attributeA.compareTo(attributeB) < 0) {
-						result.addAll(TraceDataRowBlock.merge(
+						result.addAll(DataRowBlockTrace.merge(
 								createAttributeData(logFiltered, attributeA, attributeB, canceller,
 										configuration.getDecorator()),
 								createAttributeData(negativeLog, attributeA, attributeB, canceller,

@@ -10,7 +10,7 @@ import org.processmining.plugins.inductiveVisualMiner.cost.CostModels;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTrace;
 
 public class DataRowBlockCosts<C, P> extends DataRowBlockAbstract<Object, C, P> {
 
@@ -69,7 +69,7 @@ public class DataRowBlockCosts<C, P> extends DataRowBlockAbstract<Object, C, P> 
 				b = new ArrayList<>();
 			}
 
-			List<DataRow<Object>> result = TraceDataRowBlock.merge(a, b, new IvMCanceller(null) {
+			List<DataRow<Object>> result = DataRowBlockTrace.merge(a, b, new IvMCanceller(null) {
 				@Override
 				public boolean isCancelled() {
 					return false;

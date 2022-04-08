@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockC
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType.Type;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.Correlation;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -54,7 +54,7 @@ public class DataRowBlockEventData<C, P> extends DataRowBlockComputer<Object, C,
 			negativeLog.invert();
 
 			for (Attribute attribute : attributes.getEventAttributes()) {
-				result.addAll(TraceDataRowBlock.merge(createAttributeData(logFiltered, attribute, canceller),
+				result.addAll(DataRowBlockTrace.merge(createAttributeData(logFiltered, attribute, canceller),
 						createAttributeData(negativeLog, attribute, canceller), canceller));
 			}
 		} else {

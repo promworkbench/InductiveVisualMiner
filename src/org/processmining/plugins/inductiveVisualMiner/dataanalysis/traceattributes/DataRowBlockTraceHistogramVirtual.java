@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
-public class TraceDataRowBlockHistogramVirtual<C extends ConfigurationWithDecorator, P>
+public class DataRowBlockTraceHistogramVirtual<C extends ConfigurationWithDecorator, P>
 		extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
@@ -42,16 +42,16 @@ public class TraceDataRowBlockHistogramVirtual<C extends ConfigurationWithDecora
 			negativeLog.invert();
 
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				result.addAll(TraceDataRowBlock.merge(
-						TraceDataRowBlockHistogram.createAttributeData(logFiltered, attribute, canceller,
+				result.addAll(DataRowBlockTrace.merge(
+						DataRowBlockTraceHistogram.createAttributeData(logFiltered, attribute, canceller,
 								configuration.getDecorator()),
-						TraceDataRowBlockHistogram.createAttributeData(negativeLog, attribute, canceller,
+						DataRowBlockTraceHistogram.createAttributeData(negativeLog, attribute, canceller,
 								configuration.getDecorator()),
 						canceller));
 			}
 		} else {
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				result.addAll(TraceDataRowBlockHistogram.createAttributeData(logFiltered, attribute, canceller,
+				result.addAll(DataRowBlockTraceHistogram.createAttributeData(logFiltered, attribute, canceller,
 						configuration.getDecorator()));
 			}
 		}

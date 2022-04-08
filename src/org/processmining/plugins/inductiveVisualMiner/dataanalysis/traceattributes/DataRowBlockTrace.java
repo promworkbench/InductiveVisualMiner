@@ -24,7 +24,7 @@ import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 import org.processmining.plugins.inductiveminer2.attributes.AttributeUtils;
 import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class TraceDataRowBlock<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class DataRowBlockTrace<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "trace-att";

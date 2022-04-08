@@ -13,7 +13,7 @@ import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
 
-public class TraceDataRowBlockVirtual<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class DataRowBlockTraceBlockVirtual<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "trace-att-virt";
@@ -34,25 +34,25 @@ public class TraceDataRowBlockVirtual<C, P> extends DataRowBlockComputer<Object,
 		IvMAttributesInfo attributes = inputs.get(IvMObject.ivm_attributes_info);
 
 		//count number of traces
-		int numberOfTraces = TraceDataRowBlock.getNumberOfTraces(logFiltered);
+		int numberOfTraces = DataRowBlockTrace.getNumberOfTraces(logFiltered);
 
 		List<DataRow<Object>> result = new ArrayList<>();
 
 		if (logFiltered.isSomethingFiltered()) {
 			IvMLogFilteredImpl negativeLog = logFiltered.clone();
 			negativeLog.invert();
-			int numberOfTracesNegative = TraceDataRowBlock.getNumberOfTraces(negativeLog);
+			int numberOfTracesNegative = DataRowBlockTrace.getNumberOfTraces(negativeLog);
 
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				result.addAll(TraceDataRowBlock.merge(
-						TraceDataRowBlock.createAttributeData(logFiltered, attribute, numberOfTraces, canceller),
-						TraceDataRowBlock.createAttributeData(negativeLog, attribute, numberOfTracesNegative,
+				result.addAll(DataRowBlockTrace.merge(
+						DataRowBlockTrace.createAttributeData(logFiltered, attribute, numberOfTraces, canceller),
+						DataRowBlockTrace.createAttributeData(negativeLog, attribute, numberOfTracesNegative,
 								canceller),
 						canceller));
 			}
 		} else {
 			for (Attribute attribute : attributes.getTraceAttributes()) {
-				result.addAll(TraceDataRowBlock.createAttributeData(logFiltered, attribute, numberOfTraces, canceller));
+				result.addAll(DataRowBlockTrace.createAttributeData(logFiltered, attribute, numberOfTraces, canceller));
 			}
 		}
 

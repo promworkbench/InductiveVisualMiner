@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattribu
 import java.util.ArrayList;
 import java.util.List;
 
+import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
@@ -10,25 +11,24 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
-import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class TraceDataRowBlockType<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class DataRowBlockTraceTypeVirtual<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
-		return "trace-att-type";
+		return "trace-att-type-virt";
 	}
 	
 	public String getStatusBusyMessage() {
-		return "Gathering trace attribute types..";
+		return "Gathering virtual trace attribute types..";
 	}
 
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.attributes_info };
+		return new IvMObject<?>[] { IvMObject.ivm_attributes_info };
 	}
 
 	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
 			throws Exception {
-		AttributesInfo attributes = inputs.get(IvMObject.attributes_info);
+		IvMAttributesInfo attributes = inputs.get(IvMObject.ivm_attributes_info);
 
 		List<DataRow<Object>> result = new ArrayList<>();
 

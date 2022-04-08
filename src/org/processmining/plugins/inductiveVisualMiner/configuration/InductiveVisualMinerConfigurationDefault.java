@@ -87,13 +87,13 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.Row
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelLogNormal;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelPerformance;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelWeibull;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockHistogram;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockHistogramVirtual;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockType;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockTypeVirtual;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlockVirtual;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataTab;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTrace;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceHistogram;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceHistogramVirtual;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceType;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceTypeVirtual;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceBlockVirtual;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataAnalysisTabTrace;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterDataAnalyses;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterModelStatistics;
@@ -338,7 +338,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					}
 				}));
 
-		result.add(new TraceDataTab<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(
+		result.add(new DataAnalysisTabTrace<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>(
 				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
 					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
@@ -349,12 +349,12 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new TraceDataRowBlock<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new TraceDataRowBlockVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new TraceDataRowBlockType<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new TraceDataRowBlockTypeVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new TraceDataRowBlockHistogram<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new TraceDataRowBlockHistogramVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockTrace<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockTraceBlockVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockTraceType<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockTraceTypeVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockTraceHistogram<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockTraceHistogramVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}));

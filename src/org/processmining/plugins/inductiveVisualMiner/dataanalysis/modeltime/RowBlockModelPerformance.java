@@ -8,7 +8,7 @@ import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.TraceDataRowBlock;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTrace;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
 import org.processmining.plugins.inductiveVisualMiner.performance.Aggregate;
@@ -36,7 +36,7 @@ public class RowBlockModelPerformance<C, P> extends DataRowBlockAbstract<Object,
 
 		if (log.isSomethingFiltered()) {
 			Performance performanceNegative = inputs.get(IvMObject.performance_negative);
-			return TraceDataRowBlock.merge(createAttributeData(model, performance),
+			return DataRowBlockTrace.merge(createAttributeData(model, performance),
 					createAttributeData(model, performanceNegative), null);
 		} else {
 			return createAttributeData(model, performance);
