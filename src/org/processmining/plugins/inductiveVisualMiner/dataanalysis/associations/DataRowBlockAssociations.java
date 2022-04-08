@@ -27,7 +27,7 @@ import org.processmining.statisticaltests.helperclasses.Correlation;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
 
-public class RowBlockAssociations<C extends ConfigurationWithDecorator, P> extends DataRowBlockComputer<Object, C, P> {
+public class DataRowBlockAssociations<C extends ConfigurationWithDecorator, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
 		return "assoc-att";

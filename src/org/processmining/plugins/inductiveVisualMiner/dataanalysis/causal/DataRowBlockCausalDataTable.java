@@ -9,7 +9,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 
-public class RowBlockCausalDataTable<C, P> extends DataRowBlockAbstract<Object, C, P> {
+public class DataRowBlockCausalDataTable<C, P> extends DataRowBlockAbstract<Object, C, P> {
 
 	@Override
 	public String getName() {

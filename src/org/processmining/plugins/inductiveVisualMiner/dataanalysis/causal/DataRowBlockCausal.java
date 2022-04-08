@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockA
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
-public class RowBlockCausal<C, P> extends DataRowBlockAbstract<Object, C, P> {
+public class DataRowBlockCausal<C, P> extends DataRowBlockAbstract<Object, C, P> {
 
 	@Override
 	public String getName() {

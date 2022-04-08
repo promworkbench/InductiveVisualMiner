@@ -11,7 +11,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockAbstract;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 
-public class RowBlockCohorts<C, P> extends DataRowBlockAbstract<Cohort, C, P> {
+public class DataRowBlockCohorts<C, P> extends DataRowBlockAbstract<Cohort, C, P> {
 
 	public String getName() {
 		return "cohort-att";

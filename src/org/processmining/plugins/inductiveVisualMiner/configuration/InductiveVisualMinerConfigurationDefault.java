@@ -60,17 +60,17 @@ import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplM
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.RowBlockAssociations;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.RowBlockAssociationsProcess;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.DataRowBlockAssociations;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.DataRowBlockAssociationsProcess;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.DataAnalysisTabAssociations;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DataAnalysisTabCausal;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.RowBlockCausal;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.RowBlockCausalDataTable;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.RowBlockCausalGraph;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DataRowBlockCausal;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DataRowBlockCausalDataTable;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DataRowBlockCausalGraph;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.DataAnalysisTabCohorts;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.RowBlockCohorts;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.DataRowBlockCohorts;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.DataAnalysisTabCosts;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.RowBlockCosts;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.DataRowBlockCosts;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventData;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataHistogram;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataHistogramVirtual;
@@ -405,7 +405,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					public List<DataRowBlock<Cohort, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlock<Cohort, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new RowBlockCohorts<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockCohorts<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}, //
@@ -421,7 +421,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new RowBlockCosts<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockCosts<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}, //
@@ -437,7 +437,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new RowBlockAssociationsProcess<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockAssociationsProcess<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}, //
@@ -445,7 +445,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new RowBlockAssociations<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockAssociations<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}));
@@ -455,9 +455,9 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new RowBlockCausalGraph<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new RowBlockCausalDataTable<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new RowBlockCausal<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockCausalGraph<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockCausalDataTable<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockCausal<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 
 					}
