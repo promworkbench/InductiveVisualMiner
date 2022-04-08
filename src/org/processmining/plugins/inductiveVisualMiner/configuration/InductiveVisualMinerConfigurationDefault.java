@@ -60,8 +60,8 @@ import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplM
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.AssociationsRowBlock;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.AssociationsRowBlockProcess;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.RowBlockAssociations;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.RowBlockAssociationsProcess;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.DataAnalysisTabAssociations;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DataAnalysisTabCausal;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.RowBlockCausal;
@@ -437,7 +437,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new AssociationsRowBlockProcess<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new RowBlockAssociationsProcess<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}, //
@@ -445,7 +445,7 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new AssociationsRowBlock<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new RowBlockAssociations<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}));

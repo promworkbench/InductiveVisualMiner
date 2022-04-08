@@ -14,7 +14,7 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockA
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.statisticaltests.association.Associations;
 
-public class AssociationsRowBlockProcess<C, P> extends DataRowBlockAbstract<Object, C, P> {
+public class RowBlockAssociationsProcess<C, P> extends DataRowBlockAbstract<Object, C, P> {
 
 	@Override
 	public String getName() {
