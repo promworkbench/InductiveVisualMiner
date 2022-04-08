@@ -27,7 +27,7 @@ import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TLongArrayList;
 
-public class RowBlockEventDataHistogram<C extends ConfigurationWithDecorator, P>
+public class DataRowBlockEventDataHistogram<C extends ConfigurationWithDecorator, P>
 		extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {

@@ -71,12 +71,12 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.DataA
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.RowBlockCohorts;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.DataAnalysisTabCosts;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.RowBlockCosts;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.RowBlockEventData;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.RowBlockEventDataHistogram;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.RowBlockEventDataHistogramVirtual;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.RowBlockEventDataType;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.RowBlockEventDataTypeVirtual;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.RowBlockEventDataVirtual;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventData;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataHistogram;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataHistogramVirtual;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataType;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataTypeVirtual;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataVirtual;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataAnalysisTabEventData;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogAttributes;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogAttributesHighlighted;
@@ -370,12 +370,12 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new RowBlockEventData<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new RowBlockEventDataVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new RowBlockEventDataType<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new RowBlockEventDataTypeVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new RowBlockEventDataHistogram<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new RowBlockEventDataHistogramVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockEventData<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockEventDataVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockEventDataType<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockEventDataTypeVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockEventDataHistogram<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new DataRowBlockEventDataHistogramVirtual<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 					}
 				}));

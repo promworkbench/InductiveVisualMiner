@@ -3,7 +3,6 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattribu
 import java.util.ArrayList;
 import java.util.List;
 
-import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
@@ -11,24 +10,25 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DisplayType;
 import org.processmining.plugins.inductiveminer2.attributes.Attribute;
+import org.processmining.plugins.inductiveminer2.attributes.AttributesInfo;
 
-public class RowBlockEventDataTypeVirtual<C, P> extends DataRowBlockComputer<Object, C, P> {
+public class DataRowBlockEventDataType<C, P> extends DataRowBlockComputer<Object, C, P> {
 
 	public String getName() {
-		return "event-att-type-virt";
+		return "event-att-type";
 	}
 
 	public String getStatusBusyMessage() {
-		return "Gathering virtual event attribute types..";
+		return "Gathering event attribute types..";
 	}
 
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.ivm_attributes_info };
+		return new IvMObject<?>[] { IvMObject.attributes_info };
 	}
 
 	public List<DataRow<Object>> compute(C configuration, IvMObjectValues inputs, IvMCanceller canceller)
 			throws Exception {
-		IvMAttributesInfo attributes = inputs.get(IvMObject.ivm_attributes_info);
+		AttributesInfo attributes = inputs.get(IvMObject.attributes_info);
 
 		List<DataRow<Object>> result = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public class RowBlockEventDataTypeVirtual<C, P> extends DataRowBlockComputer<Obj
 				type += "other";
 			}
 
-			result.add(new DataRow<>(attribute.getName(), "data type", DisplayType.literal(type)));
+			result.add(new DataRow<Object>(attribute.getName(), "data type", DisplayType.literal(type)));
 		}
 
 		return result;
