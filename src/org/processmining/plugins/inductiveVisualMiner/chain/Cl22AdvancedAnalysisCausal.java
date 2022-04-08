@@ -5,8 +5,6 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysis;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalDataTable;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalGraph;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DirectlyFollowsModel2CausalGraph;
@@ -30,7 +28,8 @@ public class Cl22AdvancedAnalysisCausal<C> extends DataChainLinkComputationAbstr
 	}
 
 	public IvMObject<?>[] createOutputObjects() {
-		return new IvMObject<?>[] { IvMObject.data_analysis_causal };
+		return new IvMObject<?>[] { IvMObject.data_analysis_causal_upper_bound_graph,
+				IvMObject.data_analysis_causal_data_table };
 	}
 
 	public IvMObjectValues execute(C configuration, IvMObjectValues inputs, IvMCanceller canceller) throws Exception {
@@ -66,16 +65,18 @@ public class Cl22AdvancedAnalysisCausal<C> extends DataChainLinkComputationAbstr
 				}
 			}
 
-			System.out.println("choices " + p.getB().getColumns().size());
-			System.out.println("UBCG edges " + p.getA().getEdges().size());
+			//			System.out.println("choices " + p.getB().getColumns().size());
+			//			System.out.println("UBCG edges " + p.getA().getEdges().size());
 
 			//perform the analysis
-			CausalAnalysisResult analysisResult = CausalAnalysis.analyse(p.getA(), p.getB());
+			//CausalAnalysisResult analysisResult = CausalAnalysis.analyse(p.getA(), p.getB());
 
 			//CausalAnalysisResult2Correlation.convert(p.getA(), p.getB(), model);
 
 			return new IvMObjectValues().//
-					s(IvMObject.data_analysis_causal, analysisResult);
+					s(IvMObject.data_analysis_causal_upper_bound_graph, p.getA()) //
+					.s(IvMObject.data_analysis_causal_data_table, p.getB());
+
 		} else {
 			return null;
 		}

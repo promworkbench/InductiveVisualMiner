@@ -63,6 +63,10 @@ import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockC
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.AssociationsRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.AssociationsRowBlockProcess;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.DataAnalysisTabAssociations;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DataAnalysisTabCausal;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.RowBlockCausal;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.RowBlockCausalDataTable;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.RowBlockCausalGraph;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortDataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.CohortRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.CostDataTab;
@@ -446,22 +450,24 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					}
 				}));
 
-		//		result.add(new DataAnalysisTabCausal<>(
-		//				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
-		//					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
-		//							throws Exception {
-		//						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-		//						r.add(new RowBlockCausal<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-		//						return r;
-		//
-		//					}
-		//				}, //
-		//				new Callable<List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
-		//					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
-		//							throws Exception {
-		//						return new ArrayList<>();
-		//					}
-		//				}));
+		result.add(new DataAnalysisTabCausal<>(
+				new Callable<List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
+						r.add(new RowBlockCausalGraph<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new RowBlockCausalDataTable<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						r.add(new RowBlockCausal<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
+						return r;
+
+					}
+				}, //
+				new Callable<List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>>>() {
+					public List<DataRowBlockComputer<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
+							throws Exception {
+						return new ArrayList<>();
+					}
+				}));
 
 		return result;
 	}

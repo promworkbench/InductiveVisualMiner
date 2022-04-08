@@ -20,6 +20,8 @@ import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesIn
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModels;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalDataTable;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;
@@ -94,6 +96,9 @@ public class IvMObject<C> {
 	public static final IvMObject<CostModels> data_analysis_cost_models = c("cost models", CostModels.class);
 	public static final IvMObject<Associations> data_analysis_associations = c("associations", Associations.class);
 	public static final IvMObject<CausalAnalysisResult> data_analysis_causal = c("causal", CausalAnalysisResult.class);
+	public static final IvMObject<CausalGraph> data_analysis_causal_upper_bound_graph = c("causal graph", CausalGraph.class);
+	public static final IvMObject<CausalDataTable> data_analysis_causal_data_table = c("causal data table",
+			CausalDataTable.class);
 
 	//graph objects
 	public static final IvMObject<Dot> graph_dot = c("graph dot", Dot.class);

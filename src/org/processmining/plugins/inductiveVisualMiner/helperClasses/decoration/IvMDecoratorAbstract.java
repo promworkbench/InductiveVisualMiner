@@ -7,7 +7,6 @@ import java.awt.GradientPaint;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.lang.reflect.Field;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -179,15 +178,15 @@ public abstract class IvMDecoratorAbstract implements IvMDecoratorI {
 						if (component instanceof BasicArrowButton) {
 							BasicArrowButton component2 = ((BasicArrowButton) component);
 							component2.setBackground(buttonColour());
-							try {
-								Field field = BasicArrowButton.class.getDeclaredField("darkShadow");
-								field.setAccessible(true);
-								field.set(component2, textColour());
-								field.setAccessible(false);
-							} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-									| IllegalAccessException e) {
-								e.printStackTrace();
-							}
+//							try {
+//								Field field = BasicArrowButton.class.getDeclaredField("darkShadow");
+//								field.setAccessible(true);
+//								field.set(component2, textColour());
+//								field.setAccessible(false);
+//							} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+//									| IllegalAccessException e) {
+//								e.printStackTrace();
+//							}
 						}
 					}
 				}
@@ -200,15 +199,15 @@ public abstract class IvMDecoratorAbstract implements IvMDecoratorI {
 						if (component instanceof BasicArrowButton) {
 							BasicArrowButton component2 = ((BasicArrowButton) component);
 							component2.setBackground(textColour());
-							try {
-								Field field = BasicArrowButton.class.getDeclaredField("darkShadow");
-								field.setAccessible(true);
-								field.set(component2, buttonColour());
-								field.setAccessible(false);
-							} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-									| IllegalAccessException e) {
-								e.printStackTrace();
-							}
+//							try {
+//								Field field = BasicArrowButton.class.getDeclaredField("darkShadow");
+//								field.setAccessible(true);
+//								field.set(component2, buttonColour());
+//								field.setAccessible(false);
+//							} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+//									| IllegalAccessException e) {
+//								e.printStackTrace();
+//							}
 						}
 					}
 				}

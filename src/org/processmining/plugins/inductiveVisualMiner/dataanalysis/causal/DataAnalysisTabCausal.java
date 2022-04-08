@@ -20,7 +20,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 public class DataAnalysisTabCausal<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
 	public static final String name = "Causal";
-	public static final String explanation = "Study influence of decisions in the model on one another.";
+	public static final String explanation = "Study influence of decisions in the model on one another. The values here can be provided to an external R script to derive causal relations.";
 
 	public DataAnalysisTabCausal(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
 			Callable<List<DataRowBlockComputer<Object, C, P>>> rowBlockComputersCreator) {
@@ -28,7 +28,8 @@ public class DataAnalysisTabCausal<C, P> extends DataAnalysisTabAbstract<Object,
 	}
 
 	@Override
-	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView, IvMDecoratorI decorator) {
+	public DataAnalysisTable<Object, C, P> createTable(DataAnalysesView<C, P> dataAnalysesView,
+			IvMDecoratorI decorator) {
 		DataAnalysisTable<Object, C, P> table = new DataAnalysisTable<Object, C, P>(name, dataAnalysesView, decorator) {
 			private static final long serialVersionUID = -8536485501677939027L;
 
@@ -45,8 +46,7 @@ public class DataAnalysisTabCausal<C, P> extends DataAnalysisTabAbstract<Object,
 				return IvMObject.selected_causal_enabled;
 			}
 		};
-		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" },
-				{ "From choice", "to choice", "causal dependency" }, { "", "", "", "" } });
+		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "", "", "" }, { "", "", "", "" } });
 		return table;
 	}
 
