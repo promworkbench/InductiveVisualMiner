@@ -1,4 +1,4 @@
-package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
+package org.processmining.plugins.inductiveVisualMiner.causal;
 
 import java.util.Arrays;
 import java.util.List;

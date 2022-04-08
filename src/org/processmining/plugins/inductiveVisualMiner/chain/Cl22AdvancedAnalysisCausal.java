@@ -5,10 +5,10 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalDataTable;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalGraph;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DirectlyFollowsModel2CausalGraph;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.EfficientTree2CausalGraph;
+import org.processmining.plugins.inductiveVisualMiner.causal.CausalDataTable;
+import org.processmining.plugins.inductiveVisualMiner.causal.CausalGraph;
+import org.processmining.plugins.inductiveVisualMiner.causal.DirectlyFollowsModel2CausalGraph;
+import org.processmining.plugins.inductiveVisualMiner.causal.EfficientTree2CausalGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 

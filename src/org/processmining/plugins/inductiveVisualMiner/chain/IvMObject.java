@@ -17,11 +17,11 @@ import org.processmining.plugins.inductiveVisualMiner.alignment.InductiveVisualM
 import org.processmining.plugins.inductiveVisualMiner.animation.GraphVizTokens;
 import org.processmining.plugins.inductiveVisualMiner.animation.Scaler;
 import org.processmining.plugins.inductiveVisualMiner.attributes.IvMAttributesInfo;
+import org.processmining.plugins.inductiveVisualMiner.causal.CausalAnalysisResult;
+import org.processmining.plugins.inductiveVisualMiner.causal.CausalDataTable;
+import org.processmining.plugins.inductiveVisualMiner.causal.CausalGraph;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactory;
 import org.processmining.plugins.inductiveVisualMiner.cost.CostModels;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalAnalysisResult;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalDataTable;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.CausalGraph;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmfilter.tree.IvMFilterTree;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFilteredImpl;

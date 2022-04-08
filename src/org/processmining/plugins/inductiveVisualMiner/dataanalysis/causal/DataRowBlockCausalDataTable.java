@@ -3,6 +3,7 @@ package org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.processmining.plugins.inductiveVisualMiner.causal.CausalDataTable;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObject;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMObjectValues;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRow;
