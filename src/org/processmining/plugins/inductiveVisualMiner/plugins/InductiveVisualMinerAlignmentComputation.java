@@ -61,6 +61,11 @@ public class InductiveVisualMinerAlignmentComputation {
 
 	public static IvMLog align(IvMEfficientTree tree, XLog log, XEventClassifier classifier, ProMCanceller canceller)
 			throws Exception {
+		return align(new IvMModel(tree), log, classifier, canceller);
+	}
+
+	public static IvMLog align(IvMModel model, XLog log, XEventClassifier classifier, ProMCanceller canceller)
+			throws Exception {
 		XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(classifier);
 
 		XEventClasses activityEventClasses = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
@@ -68,7 +73,7 @@ public class InductiveVisualMinerAlignmentComputation {
 				.getEventClasses();
 		AlignmentComputer computer = new AlignmentComputerImpl();
 
-		return AlignmentPerformance.align(computer, new IvMModel(tree), performanceClassifier, log,
-				activityEventClasses, performanceEventClasses, canceller, new IvMDecoratorDefault());
+		return AlignmentPerformance.align(computer, model, performanceClassifier, log, activityEventClasses,
+				performanceEventClasses, canceller, new IvMDecoratorDefault());
 	}
 }
