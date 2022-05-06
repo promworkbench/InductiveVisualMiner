@@ -23,6 +23,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficient
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorDefault;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLog;
+import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogNotFiltered;
 import org.processmining.plugins.inductiveVisualMiner.performance.XEventPerformanceClassifier;
 
 public class InductiveVisualMinerAlignmentComputation {
@@ -59,13 +60,13 @@ public class InductiveVisualMinerAlignmentComputation {
 		return ExportAlignment.exportAlignment(aLog, new IvMModel(ivmTree), dialog.getClassifier());
 	}
 
-	public static IvMLog align(IvMEfficientTree tree, XLog log, XEventClassifier classifier, ProMCanceller canceller)
-			throws Exception {
+	public static IvMLogNotFiltered align(IvMEfficientTree tree, XLog log, XEventClassifier classifier,
+			ProMCanceller canceller) throws Exception {
 		return align(new IvMModel(tree), log, classifier, canceller);
 	}
 
-	public static IvMLog align(IvMModel model, XLog log, XEventClassifier classifier, ProMCanceller canceller)
-			throws Exception {
+	public static IvMLogNotFiltered align(IvMModel model, XLog log, XEventClassifier classifier,
+			ProMCanceller canceller) throws Exception {
 		XEventPerformanceClassifier performanceClassifier = new XEventPerformanceClassifier(classifier);
 
 		XEventClasses activityEventClasses = XLogInfoFactory.createLogInfo(log, classifier).getEventClasses();
