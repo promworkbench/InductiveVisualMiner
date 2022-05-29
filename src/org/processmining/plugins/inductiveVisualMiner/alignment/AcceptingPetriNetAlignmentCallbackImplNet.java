@@ -4,14 +4,13 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.deckfour.xes.classification.XEventClass;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -33,6 +32,7 @@ public class AcceptingPetriNetAlignmentCallbackImplNet implements AcceptingPetri
 	private final IvMModel model;
 	private final IvMEventClasses activityEventClasses;
 
+	private final TObjectIntMap<Transition> activity2node;
 	private final TObjectIntMap<Transition> activity2skipEnqueue;
 	private final TObjectIntMap<Transition> activity2skipStart;
 	private final Set<Transition> startTransitions;
@@ -44,10 +44,10 @@ public class AcceptingPetriNetAlignmentCallbackImplNet implements AcceptingPetri
 	private final IvMLogNotFilteredImpl alignedLog;
 
 	public AcceptingPetriNetAlignmentCallbackImplNet(XLog xLog, IvMModel model, IvMEventClasses activityEventClasses,
-			Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p,
+			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, TObjectIntMap<Transition>> p,
 			IvMDecoratorI decorator) {
 		this.decorator = decorator;
-		assert model.isDfg();
+		assert model.isNet();
 
 		this.xLog = xLog;
 		this.model = model;
@@ -58,6 +58,7 @@ public class AcceptingPetriNetAlignmentCallbackImplNet implements AcceptingPetri
 		this.startTransitions = p.getD();
 		this.endTransitions = p.getE();
 		this.interTransitions = p.getF();
+		this.activity2node = p.getG();
 
 		alignedLog = new IvMLogNotFilteredImpl(xLog.size(), xLog.getAttributes());
 	}
@@ -160,7 +161,7 @@ public class AcceptingPetriNetAlignmentCallbackImplNet implements AcceptingPetri
 					lifeCycleTransition = PerformanceTransition.start;
 					activityIndex = activity2skipStart.get(performanceUnode);
 				}
-				XEventClass activity = activityEventClasses.getByIdentity(model.getDfg().getNodeOfIndex(activityIndex));
+				XEventClass activity = activityEventClasses.getByIdentity(model.getActivityName(activityIndex));
 				XEventClass performanceActivity = performanceEventClasses
 						.getByIdentity(activity.getId() + "+" + lifeCycleTransition);
 				return Pair.of(new Move(model, Type.ignoredModelMove, previousModelNode, activityIndex, activity,
@@ -174,7 +175,7 @@ public class AcceptingPetriNetAlignmentCallbackImplNet implements AcceptingPetri
 					.getLifeCycleTransition(performanceUnode.getLabel());
 			XEventClass performanceActivity = performanceEventClasses.getByIdentity(((Transition) node).getLabel());
 			XEventClass activity = PerformanceUtils.getActivity(performanceActivity, activityEventClasses);
-			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllNodeNames(), activity.getId());
+			int activityIndex = activity2node.get(performanceUnode);
 			assert (activity != null);
 			int newPreviousModelNode = lifeCycleTransition == PerformanceTransition.complete ? activityIndex
 					: previousModelNode;
@@ -185,7 +186,7 @@ public class AcceptingPetriNetAlignmentCallbackImplNet implements AcceptingPetri
 			Transition performanceUnode = (Transition) node;
 			XEventClass performanceActivity = performanceEventClasses.getClassOf(trace.get(event));
 			XEventClass activity = PerformanceUtils.getActivity(performanceActivity, activityEventClasses);
-			int activityIndex = ArrayUtils.indexOf(model.getDfg().getAllNodeNames(), activity.getId());
+			int activityIndex = activity2node.get(performanceUnode);
 			PerformanceTransition lifeCycleTransition = PerformanceUtils
 					.getLifeCycleTransition(performanceUnode.getLabel());
 

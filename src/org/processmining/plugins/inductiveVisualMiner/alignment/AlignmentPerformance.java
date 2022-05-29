@@ -10,7 +10,6 @@ import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.plugins.InductiveMiner.Septuple;
-import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -103,7 +102,7 @@ public class AlignmentPerformance {
 		IvMEventClasses performanceEventClasses2 = new IvMEventClasses(performanceEventClasses);
 
 		//make a Petri net to align
-		Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p = AcceptingPetriNet2AcceptingPetriNetPerformance
+		Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, TObjectIntMap<Transition>> p = AcceptingPetriNet2AcceptingPetriNetPerformance
 				.convertForPerformance(model);
 
 		AcceptingPetriNetAlignment.addAllLeavesAsEventClasses(activityEventClasses2, model.getNet());

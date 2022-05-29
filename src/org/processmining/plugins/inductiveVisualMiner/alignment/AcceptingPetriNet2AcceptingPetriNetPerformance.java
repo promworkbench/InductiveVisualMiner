@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.acceptingpetrinet.models.impl.AcceptingPetriNetFactory;
@@ -12,7 +11,7 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetImpl;
 import org.processmining.models.semantics.petrinet.Marking;
-import org.processmining.plugins.InductiveMiner.Sextuple;
+import org.processmining.plugins.InductiveMiner.Septuple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
 import gnu.trove.map.TObjectIntMap;
@@ -21,7 +20,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
 
 public class AcceptingPetriNet2AcceptingPetriNetPerformance {
-	public static Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> convertForPerformance(
+	public static Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, TObjectIntMap<Transition>> convertForPerformance(
 			IvMModel model) {
 		assert model.isNet();
 		AcceptingPetriNet oldNet = model.getNet();
@@ -31,6 +30,7 @@ public class AcceptingPetriNet2AcceptingPetriNetPerformance {
 		Set<Transition> startTransitions = new THashSet<>();
 		Set<Transition> endTransitions = new THashSet<>();
 		Set<Transition> interTransitions = new THashSet<>();
+		TObjectIntMap<Transition> activity2node = new TObjectIntHashMap<>(10, 0.5f, -1);
 
 		Petrinet newNet = new PetrinetImpl("converted from net");
 
@@ -41,7 +41,6 @@ public class AcceptingPetriNet2AcceptingPetriNetPerformance {
 			Place newPlace = newNet.addPlace(oldPlace.getLabel());
 			oldPlace2newPlace.put(oldPlace, newPlace);
 		}
-		AtomicInteger placeCounter = new AtomicInteger();
 
 		//transitions
 		for (int node = 0; node < model.getMaxNumberOfNodes(); node++) {
@@ -49,6 +48,7 @@ public class AcceptingPetriNet2AcceptingPetriNetPerformance {
 			if (model.isTau(node)) {
 				Transition newTransition = newNet.addTransition(oldTransition.getLabel());
 				newTransition.setInvisible(true);
+				activity2node.put(newTransition, node);
 
 				//edges
 				for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> oldEdge : oldNet.getNet()
@@ -68,8 +68,10 @@ public class AcceptingPetriNet2AcceptingPetriNetPerformance {
 				Place completePlace = newNet.addPlace(activity + " complete");
 
 				Transition enqueue = newNet.addTransition(activity + "+" + ExpandProcessTree.enqueue);
+				activity2node.put(enqueue, node);
 				Transition skipEnqueue = newNet.addTransition("tau");
 				activity2skipEnqueue.put(skipEnqueue, node);
+				activity2node.put(skipEnqueue, node);
 				skipEnqueue.setInvisible(true);
 				for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> oldEdge : oldNet.getNet()
 						.getInEdges(oldTransition)) {
@@ -81,7 +83,9 @@ public class AcceptingPetriNet2AcceptingPetriNetPerformance {
 				newNet.addArc(skipEnqueue, startPlace);
 
 				Transition start = newNet.addTransition(activity + "+" + ExpandProcessTree.start);
+				activity2node.put(start, node);
 				Transition skipStart = newNet.addTransition("tau");
+				activity2node.put(skipStart, node);
 				activity2skipStart.put(skipStart, node);
 				skipStart.setInvisible(true);
 				newNet.addArc(startPlace, start);
@@ -90,6 +94,7 @@ public class AcceptingPetriNet2AcceptingPetriNetPerformance {
 				newNet.addArc(skipStart, completePlace);
 
 				Transition complete = newNet.addTransition(activity + "+" + ExpandProcessTree.complete);
+				activity2node.put(complete, node);
 				newNet.addArc(completePlace, complete);
 				for (PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> oldEdge : oldNet.getNet()
 						.getOutEdges(oldTransition)) {
@@ -112,15 +117,16 @@ public class AcceptingPetriNet2AcceptingPetriNetPerformance {
 			for (Marking finalMarking : oldNet.getFinalMarkings()) {
 				Marking newFinalMarking = new Marking();
 				for (Place place : finalMarking) {
-					finalMarking.add(oldPlace2newPlace.get(place), finalMarking.occurrences(place));
+					newFinalMarking.add(oldPlace2newPlace.get(place), finalMarking.occurrences(place));
 				}
 				newFinalMarkings[i] = newFinalMarking;
 				i++;
 			}
 		}
 
-		return Sextuple.of(
+		return Septuple.of(
 				AcceptingPetriNetFactory.createAcceptingPetriNet(newNet, newInitialMarking, newFinalMarkings),
-				activity2skipEnqueue, activity2skipStart, startTransitions, endTransitions, interTransitions);
+				activity2skipEnqueue, activity2skipStart, startTransitions, endTransitions, interTransitions,
+				activity2node);
 	}
 }

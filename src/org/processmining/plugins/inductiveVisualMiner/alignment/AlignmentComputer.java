@@ -9,7 +9,6 @@ import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.plugins.InductiveMiner.Septuple;
-import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -34,7 +33,7 @@ public interface AlignmentComputer {
 
 	public IvMLogNotFiltered computeAcceptingPetriNet(IvMModel model, XLog xLog, ProMCanceller canceller,
 			IvMEventClasses activityEventClasses2, IvMEventClasses performanceEventClasses2,
-			Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p,
+			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, TObjectIntMap<Transition>> p,
 			IvMDecoratorI decorator) throws InterruptedException, ExecutionException, AStarException;
 
 	/**
