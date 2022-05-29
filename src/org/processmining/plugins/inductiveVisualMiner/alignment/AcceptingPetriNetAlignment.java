@@ -69,4 +69,13 @@ public class AcceptingPetriNetAlignment {
 		}
 		eventClasses.harmonizeIndices();
 	}
+
+	public static void addAllLeavesAsEventClasses(IvMEventClasses eventClasses, AcceptingPetriNet net) {
+		for (Transition transition : net.getNet().getTransitions()) {
+			if (!transition.isInvisible()) {
+				eventClasses.register(transition.getLabel());
+			}
+		}
+		eventClasses.harmonizeIndices();
+	}
 }

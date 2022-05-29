@@ -10,6 +10,7 @@ import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.plugins.InductiveMiner.Septuple;
+import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
@@ -30,33 +31,14 @@ public class AlignmentPerformance {
 		if (model.isTree()) {
 			return alignTree(computer, model, performanceClassifier, xLog, activityEventClasses,
 					performanceEventClasses, canceller, decorator);
-		} else {
+		} else if (model.isDfg()) {
 			return alignDfg(computer, model, performanceClassifier, xLog, activityEventClasses, performanceEventClasses,
 					canceller, decorator);
+		} else if (model.isNet()) {
+			return alignNet(computer, model, performanceClassifier, xLog, activityEventClasses, performanceEventClasses,
+					canceller, decorator);
 		}
-	}
-
-	public static IvMLogNotFiltered alignDfg(AlignmentComputer computer, IvMModel model,
-			XEventPerformanceClassifier performanceClassifier, XLog xLog, XEventClasses activityEventClasses,
-			XEventClasses performanceEventClasses, ProMCanceller canceller, IvMDecoratorI decorator) throws Exception {
-
-		//the event classes are not thread-safe; copy them
-		IvMEventClasses activityEventClasses2 = new IvMEventClasses(activityEventClasses);
-		IvMEventClasses performanceEventClasses2 = new IvMEventClasses(performanceEventClasses);
-
-		//make a Petri net to align
-		Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, Transition> p = Dfm2AcceptingPetriNet
-				.convertForPerformance(model.getDfg());
-
-		AcceptingPetriNetAlignment.addAllLeavesAsEventClasses(activityEventClasses2, model.getDfg());
-		AcceptingPetriNetAlignment.addAllLeavesAsPerformanceEventClasses(performanceEventClasses2, p.getA());
-
-		if (!canceller.isCancelled()) {
-			return computer.computeAcceptingPetriNet(model, xLog, canceller, activityEventClasses2,
-					performanceEventClasses2, p, decorator);
-		} else {
-			return null;
-		}
+		throw new RuntimeException("model not supported");
 	}
 
 	public static IvMLogNotFiltered alignTree(AlignmentComputer computer, IvMModel model,
@@ -85,6 +67,51 @@ public class AlignmentPerformance {
 		if (!canceller.isCancelled()) {
 			return computer.computeProcessTree(model, xLog, canceller, activityEventClasses2, performanceEventClasses2,
 					performanceTree, performanceNodeMapping, enqueueTaus, nodeId2performanceNode, decorator);
+		} else {
+			return null;
+		}
+	}
+
+	public static IvMLogNotFiltered alignDfg(AlignmentComputer computer, IvMModel model,
+			XEventPerformanceClassifier performanceClassifier, XLog xLog, XEventClasses activityEventClasses,
+			XEventClasses performanceEventClasses, ProMCanceller canceller, IvMDecoratorI decorator) throws Exception {
+
+		//the event classes are not thread-safe; copy them
+		IvMEventClasses activityEventClasses2 = new IvMEventClasses(activityEventClasses);
+		IvMEventClasses performanceEventClasses2 = new IvMEventClasses(performanceEventClasses);
+
+		//make a Petri net to align
+		Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, Transition> p = Dfm2AcceptingPetriNet
+				.convertForPerformance(model.getDfg());
+
+		AcceptingPetriNetAlignment.addAllLeavesAsEventClasses(activityEventClasses2, model.getDfg());
+		AcceptingPetriNetAlignment.addAllLeavesAsPerformanceEventClasses(performanceEventClasses2, p.getA());
+
+		if (!canceller.isCancelled()) {
+			return computer.computeDfgAcceptingPetriNet(model, xLog, canceller, activityEventClasses2,
+					performanceEventClasses2, p, decorator);
+		} else {
+			return null;
+		}
+	}
+
+	public static IvMLogNotFiltered alignNet(AlignmentComputer computer, IvMModel model,
+			XEventPerformanceClassifier performanceClassifier, XLog xLog, XEventClasses activityEventClasses,
+			XEventClasses performanceEventClasses, ProMCanceller canceller, IvMDecoratorI decorator) throws Exception {
+		//the event classes are not thread-safe; copy them
+		IvMEventClasses activityEventClasses2 = new IvMEventClasses(activityEventClasses);
+		IvMEventClasses performanceEventClasses2 = new IvMEventClasses(performanceEventClasses);
+
+		//make a Petri net to align
+		Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p = AcceptingPetriNet2AcceptingPetriNetPerformance
+				.convertForPerformance(model);
+
+		AcceptingPetriNetAlignment.addAllLeavesAsEventClasses(activityEventClasses2, model.getNet());
+		AcceptingPetriNetAlignment.addAllLeavesAsPerformanceEventClasses(performanceEventClasses2, p.getA());
+
+		if (!canceller.isCancelled()) {
+			return computer.computeAcceptingPetriNet(model, xLog, canceller, activityEventClasses2,
+					performanceEventClasses2, p, decorator);
 		} else {
 			return null;
 		}

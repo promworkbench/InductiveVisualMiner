@@ -9,6 +9,7 @@ import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.plugins.InductiveMiner.Septuple;
+import org.processmining.plugins.InductiveMiner.Sextuple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -20,16 +21,21 @@ import nl.tue.astar.AStarException;
 
 public interface AlignmentComputer {
 
-	public IvMLogNotFiltered computeAcceptingPetriNet(IvMModel model, XLog xLog, ProMCanceller canceller,
-			IvMEventClasses activityEventClasses2, IvMEventClasses performanceEventClasses2,
-			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, Transition> p,
-			IvMDecoratorI decorator) throws InterruptedException, ExecutionException, AStarException;
-
 	public IvMLogNotFiltered computeProcessTree(IvMModel model, XLog xLog, ProMCanceller canceller,
 			IvMEventClasses activityEventClasses2, IvMEventClasses performanceEventClasses2,
 			IvMEfficientTree performanceTree, Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping,
 			Set<UnfoldedNode> enqueueTaus, UnfoldedNode[] nodeId2performanceNode, IvMDecoratorI decorator)
 			throws Exception;
+
+	public IvMLogNotFiltered computeDfgAcceptingPetriNet(IvMModel model, XLog xLog, ProMCanceller canceller,
+			IvMEventClasses activityEventClasses2, IvMEventClasses performanceEventClasses2,
+			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, Transition> p,
+			IvMDecoratorI decorator) throws InterruptedException, ExecutionException, AStarException;
+
+	public IvMLogNotFiltered computeAcceptingPetriNet(IvMModel model, XLog xLog, ProMCanceller canceller,
+			IvMEventClasses activityEventClasses2, IvMEventClasses performanceEventClasses2,
+			Sextuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>> p,
+			IvMDecoratorI decorator) throws InterruptedException, ExecutionException, AStarException;
 
 	/**
 	 * 
