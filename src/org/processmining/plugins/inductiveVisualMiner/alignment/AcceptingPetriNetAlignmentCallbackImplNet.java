@@ -1,7 +1,6 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
 import java.util.Iterator;
-import java.util.Set;
 import java.util.SortedSet;
 
 import org.deckfour.xes.classification.XEventClass;
@@ -10,7 +9,7 @@ import org.deckfour.xes.model.XTrace;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.plugins.InductiveMiner.Septuple;
+import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.inductiveVisualMiner.alignment.Move.Type;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -32,19 +31,16 @@ public class AcceptingPetriNetAlignmentCallbackImplNet implements AcceptingPetri
 	private final IvMModel model;
 	private final IvMEventClasses activityEventClasses;
 
-	private final TObjectIntMap<Transition> activity2node;
 	private final TObjectIntMap<Transition> activity2skipEnqueue;
 	private final TObjectIntMap<Transition> activity2skipStart;
-	private final Set<Transition> startTransitions;
-	private final Set<Transition> endTransitions;
-	private final Set<Transition> interTransitions;
+	private final TObjectIntMap<Transition> activity2node;
 	private final IvMDecoratorI decorator;
 
 	//output
 	private final IvMLogNotFilteredImpl alignedLog;
 
 	public AcceptingPetriNetAlignmentCallbackImplNet(XLog xLog, IvMModel model, IvMEventClasses activityEventClasses,
-			Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, TObjectIntMap<Transition>> p,
+			Quadruple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, TObjectIntMap<Transition>> p,
 			IvMDecoratorI decorator) {
 		this.decorator = decorator;
 		assert model.isNet();
@@ -55,10 +51,7 @@ public class AcceptingPetriNetAlignmentCallbackImplNet implements AcceptingPetri
 
 		this.activity2skipEnqueue = p.getB();
 		this.activity2skipStart = p.getC();
-		this.startTransitions = p.getD();
-		this.endTransitions = p.getE();
-		this.interTransitions = p.getF();
-		this.activity2node = p.getG();
+		this.activity2node = p.getD();
 
 		alignedLog = new IvMLogNotFilteredImpl(xLog.size(), xLog.getAttributes());
 	}
@@ -125,7 +118,6 @@ public class AcceptingPetriNetAlignmentCallbackImplNet implements AcceptingPetri
 			IvMEventClasses performanceEventClasses, int event, int previousModelNode, int moveIndex,
 			IvMDecoratorI decorator) {
 
-		//get log part of move
 		if (type == StepTypes.L) {
 			//a log-move happened
 			XEventClass performanceActivity = (XEventClass) node;
@@ -143,23 +135,30 @@ public class AcceptingPetriNetAlignmentCallbackImplNet implements AcceptingPetri
 						lifeCycleTransition, moveIndex, decorator), previousModelNode);
 			}
 		} else if (type == StepTypes.MINVI) {
-			//enqueue- or start-skip, or start-tau
-			if (startTransitions.contains(node) || endTransitions.contains(node) || interTransitions.contains(node)) {
-				//start-tau
-				return null;
-			} else {
-				//enqueue- or start-skip
-				assert (node instanceof Transition);
-				Transition performanceUnode = (Transition) node;
+			//synchronous move on invisible transition
+			assert (node instanceof Transition);
+			Transition performanceUnode = (Transition) node;
+			int activityIndex = activity2node.get(performanceUnode);
 
+			if (!activity2node.containsKey(performanceUnode)) {
+				//we are only interested in nodes that have a link to the original model
+				return null;
+			}
+
+			if (model.isTau(activityIndex)) {
+				//model move on tau
+				PerformanceTransition lifeCycleTransition = PerformanceTransition.complete;
+				return Pair.of(new Move(model, Type.synchronousMove, -2, activityIndex, null, null, lifeCycleTransition,
+						moveIndex, decorator), previousModelNode);
+			} else {
+				//model move on activity: that is, on a transition that skips an enqueue or start
 				PerformanceTransition lifeCycleTransition;
-				int activityIndex;
 				if (activity2skipEnqueue.containsKey(performanceUnode)) {
 					lifeCycleTransition = PerformanceTransition.enqueue;
-					activityIndex = activity2skipEnqueue.get(performanceUnode);
-				} else {
+				} else if (activity2skipStart.containsKey(performanceUnode)) {
 					lifeCycleTransition = PerformanceTransition.start;
-					activityIndex = activity2skipStart.get(performanceUnode);
+				} else {
+					throw new RuntimeException("alignment result not supported");
 				}
 				XEventClass activity = activityEventClasses.getByIdentity(model.getActivityName(activityIndex));
 				XEventClass performanceActivity = performanceEventClasses

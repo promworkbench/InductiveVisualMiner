@@ -1,7 +1,5 @@
 package org.processmining.plugins.inductiveVisualMiner.alignment;
 
-import java.util.Set;
-
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.acceptingpetrinet.models.impl.AcceptingPetriNetFactory;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
@@ -11,27 +9,22 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetImpl;
 import org.processmining.models.semantics.petrinet.Marking;
-import org.processmining.plugins.InductiveMiner.Septuple;
+import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
 
 public class AcceptingPetriNet2AcceptingPetriNetPerformance {
-	public static Septuple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, Set<Transition>, Set<Transition>, Set<Transition>, TObjectIntMap<Transition>> convertForPerformance(
+	public static Quadruple<AcceptingPetriNet, TObjectIntMap<Transition>, TObjectIntMap<Transition>, TObjectIntMap<Transition>> convertForPerformance(
 			IvMModel model) {
 		assert model.isNet();
 		AcceptingPetriNet oldNet = model.getNet();
 
 		TObjectIntMap<Transition> activity2skipEnqueue = new TObjectIntHashMap<>(10, 0.5f, -1);
 		TObjectIntMap<Transition> activity2skipStart = new TObjectIntHashMap<>(10, 0.5f, -1);
-		Set<Transition> startTransitions = new THashSet<>();
-		Set<Transition> endTransitions = new THashSet<>();
-		Set<Transition> interTransitions = new THashSet<>();
 		TObjectIntMap<Transition> activity2node = new TObjectIntHashMap<>(10, 0.5f, -1);
-
 		Petrinet newNet = new PetrinetImpl("converted from net");
 
 		THashMap<Place, Place> oldPlace2newPlace = new THashMap<>();
@@ -124,9 +117,8 @@ public class AcceptingPetriNet2AcceptingPetriNetPerformance {
 			}
 		}
 
-		return Septuple.of(
+		return Quadruple.of(
 				AcceptingPetriNetFactory.createAcceptingPetriNet(newNet, newInitialMarking, newFinalMarkings),
-				activity2skipEnqueue, activity2skipStart, startTransitions, endTransitions, interTransitions,
-				activity2node);
+				activity2skipEnqueue, activity2skipStart, activity2node);
 	}
 }
