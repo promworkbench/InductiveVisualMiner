@@ -5,21 +5,33 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * In a row, a NO_VALUE means that the choice was not encountered. A negative
+ * value means that the ~corresponding choice was encountered, but the node was
+ * skipped.
+ * 
+ * @author sander
+ *
+ */
 public class CausalDataTable {
 	//result variables
 	private final List<Choice> columns;
 	private final List<int[]> rows = new ArrayList<>();
 
-	public static final int NO_VALUE = -1;
+	public static final int NO_VALUE = Integer.MIN_VALUE;
 
 	public CausalDataTable(List<Choice> columns) {
 		this.columns = columns;
 	}
 
+	public static int getSkipNode(int node) {
+		return ~node;
+	}
+
 	public void addRow(int[] currentRow) {
 		rows.add(currentRow);
 	}
-	
+
 	public List<int[]> getRows() {
 		return rows;
 	}

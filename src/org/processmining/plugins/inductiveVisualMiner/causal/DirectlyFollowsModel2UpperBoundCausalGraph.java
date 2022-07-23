@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -17,18 +18,18 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 
-public class DirectlyFollowsModel2CausalGraph {
+public class DirectlyFollowsModel2UpperBoundCausalGraph {
 
 	public static final int NO_NODE = -1;
 	public static final int START_NODE = -2;
 	public static final int END_NODE = -3;
 
 	public static Pair<CausalGraph, CausalDataTable> convert(final DirectlyFollowsModel dfm, IvMLogFiltered log,
-			final int maxUnfolding) {
+			final int maxUnfolding, IvMCanceller canceller) {
 		final TIntObjectMap<TIntSet> node2steps = getNode2StepsMap(dfm);
 		final int maxUnfolding2 = maxUnfolding > 0 ? maxUnfolding : Integer.MAX_VALUE;
 
-		StepsGraph stepsGraph = DirectlyFollowsModel2StepsGraph.create(dfm, log, node2steps);
+		StepsGraph stepsGraph = DirectlyFollowsModel2StepsGraph.create(dfm, log, node2steps, canceller);
 		//System.out.println(stepsGraph.toDot());
 
 		final TObjectIntMap<TIntSet> steps2rank = StepsGraphRanking.getRanking(stepsGraph);
@@ -38,8 +39,9 @@ public class DirectlyFollowsModel2CausalGraph {
 		final AtomicInteger unfolding = new AtomicInteger(0);
 		final List<Choice> traceHistory = new ArrayList<>();
 
-		DirectlyFollowsModelStepsWalk walk = new DirectlyFollowsModelStepsWalk(dfm, node2steps) {
+		DirectlyFollowsModelStepsWalk walk = new DirectlyFollowsModelStepsWalk(dfm, node2steps, canceller) {
 			public void stepsEncountered(TIntSet currentSteps, int chosenNode, TIntSet nextSteps) {
+
 				if (!nextSteps.isEmpty()) {
 					Choice currentChoice = getChoice(currentSteps, unfolding.get());
 					traceHistory.add(currentChoice);
@@ -76,7 +78,7 @@ public class DirectlyFollowsModel2CausalGraph {
 
 		//create table
 		CausalDataTable table = DirectlyFollowsModel2CausalDataTable.create(dfm, log,
-				new ArrayList<>(causalGraph.getNodes()), node2steps, steps2rank, maxUnfolding2);
+				new ArrayList<>(causalGraph.getNodes()), node2steps, steps2rank, maxUnfolding2, canceller);
 
 		return Pair.of(causalGraph, table);
 	}

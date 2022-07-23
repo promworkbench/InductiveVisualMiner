@@ -10,6 +10,7 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.InductiveMiner.Septuple;
+import org.processmining.plugins.InductiveMiner.Triple;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMEfficientTree;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.IvMDecoratorI;
@@ -27,19 +28,19 @@ public class AlignmentComputerImpl implements AlignmentComputer {
 			IvMEfficientTree performanceTree, Map<UnfoldedNode, UnfoldedNode> performanceNodeMapping,
 			Set<UnfoldedNode> enqueueTaus, UnfoldedNode[] nodeId2performanceNode, IvMDecoratorI decorator)
 			throws Exception {
-		ETMAlignmentCallbackImpl callback = new ETMAlignmentCallbackImpl(model, performanceTree, xLog,
-				activityEventClasses2, performanceNodeMapping, performanceEventClasses2, nodeId2performanceNode,
-				enqueueTaus, decorator);
-		ETMAlignment alignment = new ETMAlignment(performanceTree.getDTree(), xLog, performanceEventClasses2, callback,
-				canceller);
-		alignment.alignLog();
+//		ETMAlignmentCallbackImpl callback = new ETMAlignmentCallbackImpl(model, performanceTree, xLog,
+//				activityEventClasses2, performanceNodeMapping, performanceEventClasses2, nodeId2performanceNode,
+//				enqueueTaus, decorator);
+//		ETMAlignment alignment = new ETMAlignment(performanceTree.getDTree(), xLog, performanceEventClasses2, callback,
+//				canceller);
+//		alignment.alignLog();
 
-		//		//alternative: alignment via accepting Petri nets
-		//		Triple<AcceptingPetriNet, TObjectIntMap<Transition>, Set<Transition>> p = EfficientTree2AcceptingPetriNetPerformance
-		//				.convert(model.getTree());
-		//		AcceptingPetriNetAlignmentCallbackImplEfficientTree callback = new AcceptingPetriNetAlignmentCallbackImplEfficientTree(
-		//				xLog, model, activityEventClasses2, p);
-		//		AcceptingPetriNetAlignment.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
+		//alternative: alignment via accepting Petri nets
+		Triple<AcceptingPetriNet, TObjectIntMap<Transition>, Set<Transition>> p = EfficientTree2AcceptingPetriNetPerformance
+				.convert(model.getTree());
+		AcceptingPetriNetAlignmentCallbackImplEfficientTree callback = new AcceptingPetriNetAlignmentCallbackImplEfficientTree(
+				xLog, model, activityEventClasses2, p, decorator);
+		AcceptingPetriNetAlignment.align(p.getA(), xLog, performanceEventClasses2, callback, canceller);
 
 		if (!canceller.isCancelled()) {
 			return callback.getAlignedLog();

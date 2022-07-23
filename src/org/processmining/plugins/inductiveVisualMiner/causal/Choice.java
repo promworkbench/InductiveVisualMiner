@@ -3,6 +3,8 @@ package org.processmining.plugins.inductiveVisualMiner.causal;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 
 import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 
@@ -15,7 +17,7 @@ import gnu.trove.set.hash.TIntHashSet;
  */
 public class Choice {
 	TIntSet nodes = new TIntHashSet(10, 0.5f, -1);
-	TIntSet ids = new TIntHashSet(10, 0.5f, -1);
+	TIntList ids = new TIntArrayList();
 
 	@Override
 	public String toString() {

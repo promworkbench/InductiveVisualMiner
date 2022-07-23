@@ -9,7 +9,7 @@ import gnu.trove.set.hash.THashSet;
 
 public class StepsGraphRanking {
 	public static TObjectIntMap<TIntSet> getRanking(StepsGraph graph) {
-		TObjectIntMap<TIntSet> steps2rank = new TObjectIntHashMap<>(10, 0.5f, DirectlyFollowsModel2CausalGraph.NO_NODE);
+		TObjectIntMap<TIntSet> steps2rank = new TObjectIntHashMap<>(10, 0.5f, DirectlyFollowsModel2UpperBoundCausalGraph.NO_NODE);
 		int maxRank = 0;
 
 		THashSet<TIntSet> toAddSteps = new THashSet<>(graph.getNodes());

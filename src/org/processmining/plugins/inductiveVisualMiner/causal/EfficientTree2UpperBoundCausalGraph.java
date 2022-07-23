@@ -4,13 +4,15 @@ import java.util.List;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 
-public class EfficientTree2CausalGraph {
-	public static Pair<CausalGraph, CausalDataTable> convert(EfficientTree tree, IvMLogFiltered log, int maxUnfolding) {
+public class EfficientTree2UpperBoundCausalGraph {
+	public static Pair<CausalGraph, CausalDataTable> convert(EfficientTree tree, IvMLogFiltered log, int maxUnfolding,
+			IvMCanceller canceller) {
 
 		//get index of maximum unfolding
 		int[] k;
@@ -25,8 +27,16 @@ public class EfficientTree2CausalGraph {
 
 		CausalGraph causalGraph = new CausalGraph();
 
+		if (canceller.isCancelled()) {
+			return null;
+		}
+
 		//create dot edges
 		createEdges(causalGraph, tree, tree.getRoot(), new TIntArrayList(), k);
+
+		if (canceller.isCancelled()) {
+			return null;
+		}
 
 		//create table
 		CausalDataTable table = EfficientTree2CausalDataTable.create(tree, log, choices);

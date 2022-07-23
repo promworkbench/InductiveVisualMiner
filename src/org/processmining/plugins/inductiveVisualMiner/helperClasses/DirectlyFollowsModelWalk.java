@@ -1,10 +1,17 @@
 package org.processmining.plugins.inductiveVisualMiner.helperClasses;
 
 import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMMove;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
 public abstract class DirectlyFollowsModelWalk {
+	private final IvMCanceller canceller;
+
+	public DirectlyFollowsModelWalk(IvMCanceller canceller) {
+		this.canceller = canceller;
+	}
+
 	public void walk(DirectlyFollowsModel dfm, IvMTrace trace) {
 		boolean traceIsEmpty = true;
 		for (int eventIndex = 0; eventIndex < trace.size(); eventIndex++) {
@@ -23,6 +30,10 @@ public abstract class DirectlyFollowsModelWalk {
 				nodeExecuted(trace, move.getTreeNode(), firstEventIndex, lastEventIndex);
 
 				eventIndex = lastEventIndex;
+			}
+
+			if (canceller.isCancelled()) {
+				return;
 			}
 		}
 

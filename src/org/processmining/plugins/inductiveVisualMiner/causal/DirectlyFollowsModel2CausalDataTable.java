@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -25,7 +26,8 @@ public class DirectlyFollowsModel2CausalDataTable {
 	}
 
 	public static CausalDataTable create(DirectlyFollowsModel dfm, IvMLogFiltered log, List<Choice> choices,
-			final TIntObjectMap<TIntSet> node2steps, TObjectIntMap<TIntSet> steps2rank, final int maxUnfolding) {
+			final TIntObjectMap<TIntSet> node2steps, TObjectIntMap<TIntSet> steps2rank, final int maxUnfolding,
+			IvMCanceller canceller) {
 		CausalDataTable result = new CausalDataTable(choices);
 
 		//initialise intermediate state variables
@@ -34,7 +36,7 @@ public class DirectlyFollowsModel2CausalDataTable {
 			state.steps2rank = steps2rank;
 
 			//create map to find columns by choices
-			state.choice2column = new TObjectIntHashMap<>(10, 0.5f, DirectlyFollowsModel2CausalGraph.NO_NODE);
+			state.choice2column = new TObjectIntHashMap<>(10, 0.5f, DirectlyFollowsModel2UpperBoundCausalGraph.NO_NODE);
 			int i = 0;
 			for (Choice choice : choices) {
 				state.choice2column.put(choice, i);
@@ -42,9 +44,9 @@ public class DirectlyFollowsModel2CausalDataTable {
 			}
 		}
 
-		state.walker = new DirectlyFollowsModelStepsWalk(dfm, node2steps) {
+		state.walker = new DirectlyFollowsModelStepsWalk(dfm, node2steps, canceller) {
 			public void stepsEncountered(TIntSet currentSteps, int chosenNode, TIntSet newSteps) {
-				Choice choice = DirectlyFollowsModel2CausalGraph.getChoice(currentSteps, state.unfolding);
+				Choice choice = DirectlyFollowsModel2UpperBoundCausalGraph.getChoice(currentSteps, state.unfolding);
 				if (state.unfolding < maxUnfolding) {
 					reportChoice(state, choice, chosenNode);
 				}
@@ -69,14 +71,18 @@ public class DirectlyFollowsModel2CausalDataTable {
 			IvMTrace trace = it.next();
 
 			if (trace.isEmpty()) {
-				Choice choice = DirectlyFollowsModel2CausalGraph
-						.getChoice(node2steps.get(DirectlyFollowsModel2CausalGraph.START_NODE), 0);
-				reportChoice(state, choice, DirectlyFollowsModel2CausalGraph.END_NODE);
+				Choice choice = DirectlyFollowsModel2UpperBoundCausalGraph
+						.getChoice(node2steps.get(DirectlyFollowsModel2UpperBoundCausalGraph.START_NODE), 0);
+				reportChoice(state, choice, DirectlyFollowsModel2UpperBoundCausalGraph.END_NODE);
 			} else {
 				state.walker.walk(trace);
 			}
 
 			result.addRow(state.currentRow);
+
+			if (canceller.isCancelled()) {
+				return null;
+			}
 		}
 		return result;
 	}

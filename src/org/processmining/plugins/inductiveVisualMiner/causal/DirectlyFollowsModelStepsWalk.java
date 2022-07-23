@@ -1,6 +1,7 @@
 package org.processmining.plugins.inductiveVisualMiner.causal;
 
 import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.DirectlyFollowsModelWalk;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
 
@@ -15,11 +16,12 @@ public abstract class DirectlyFollowsModelStepsWalk {
 	private final DirectlyFollowsModelWalk walk;
 	private final DirectlyFollowsModel dfm;
 
-	public DirectlyFollowsModelStepsWalk(final DirectlyFollowsModel dfm, final TIntObjectMap<TIntSet> node2steps) {
+	public DirectlyFollowsModelStepsWalk(final DirectlyFollowsModel dfm, final TIntObjectMap<TIntSet> node2steps,
+			IvMCanceller canceller) {
 		this.dfm = dfm;
 		this.node2steps = node2steps;
 
-		walk = new DirectlyFollowsModelWalk() {
+		walk = new DirectlyFollowsModelWalk(canceller) {
 			public void nodeExecuted(IvMTrace trace, int node, int startEventIndex, int lastEventIndex) {
 				if (currentSteps != null && currentSteps.contains(node)) {
 					//this event is in the current choice, so it's a new choice
@@ -36,22 +38,22 @@ public abstract class DirectlyFollowsModelStepsWalk {
 			}
 
 			public void emptyTraceExecuted(IvMTrace trace) {
-				stepsEncountered(currentSteps, DirectlyFollowsModel2CausalGraph.END_NODE,
-						new TIntHashSet(0, 0.5f, DirectlyFollowsModel2CausalGraph.NO_NODE));
+				stepsEncountered(currentSteps, DirectlyFollowsModel2UpperBoundCausalGraph.END_NODE,
+						new TIntHashSet(0, 0.5f, DirectlyFollowsModel2UpperBoundCausalGraph.NO_NODE));
 			}
 		};
 	}
 
 	public void walk(IvMTrace trace) {
 		//trace starts with initial choice
-		currentSteps = node2steps.get(DirectlyFollowsModel2CausalGraph.START_NODE);
+		currentSteps = node2steps.get(DirectlyFollowsModel2UpperBoundCausalGraph.START_NODE);
 
 		walk.walk(dfm, trace);
 
-		if (currentSteps.contains(DirectlyFollowsModel2CausalGraph.END_NODE)) {
+		if (currentSteps.contains(DirectlyFollowsModel2UpperBoundCausalGraph.END_NODE)) {
 			//the last choice must also be reported
-			stepsEncountered(currentSteps, DirectlyFollowsModel2CausalGraph.END_NODE,
-					new TIntHashSet(0, 0.5f, DirectlyFollowsModel2CausalGraph.NO_NODE));
+			stepsEncountered(currentSteps, DirectlyFollowsModel2UpperBoundCausalGraph.END_NODE,
+					new TIntHashSet(0, 0.5f, DirectlyFollowsModel2UpperBoundCausalGraph.NO_NODE));
 		}
 	}
 

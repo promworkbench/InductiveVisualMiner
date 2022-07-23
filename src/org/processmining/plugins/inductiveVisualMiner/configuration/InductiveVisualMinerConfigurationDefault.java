@@ -60,40 +60,38 @@ import org.processmining.plugins.inductiveVisualMiner.cost.CostModelFactoryImplM
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataAnalysisTab;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlock;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.DataRowBlockComputer;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.DataAnalysisTabAssociations;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.DataRowBlockAssociations;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.DataRowBlockAssociationsProcess;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.associations.DataAnalysisTabAssociations;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DataAnalysisTabCausal;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DataRowBlockCausal;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DataRowBlockCausalDataTable;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.causal.DataRowBlockCausalGraph;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.DataAnalysisTabCohorts;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cohorts.DataRowBlockCohorts;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.DataAnalysisTabCosts;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.cost.DataRowBlockCosts;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataAnalysisTabEventData;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventData;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataHistogram;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataHistogramVirtual;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataTypeVirtual;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataRowBlockEventDataVirtual;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.eventattributes.DataAnalysisTabEventData;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataAnalysisTabLog;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogAttributes;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogAttributesHighlighted;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataRowBlockLogEMSC;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.logattributes.DataAnalysisTabLog;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.DataAnalysisTabModelTime;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelHistogram;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelLogNormal;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelPerformance;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.modeltime.RowBlockModelWeibull;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataAnalysisTabTrace;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTrace;
+import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceBlockVirtual;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceHistogram;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceHistogramVirtual;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceType;
 import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceTypeVirtual;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataRowBlockTraceBlockVirtual;
-import org.processmining.plugins.inductiveVisualMiner.dataanalysis.traceattributes.DataAnalysisTabTrace;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterAvi;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterDataAnalyses;
 import org.processmining.plugins.inductiveVisualMiner.export.ExporterModelStatistics;
@@ -455,8 +453,6 @@ public class InductiveVisualMinerConfigurationDefault extends InductiveVisualMin
 					public List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> call()
 							throws Exception {
 						List<DataRowBlock<Object, InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>> r = new ArrayList<>();
-						r.add(new DataRowBlockCausalGraph<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
-						r.add(new DataRowBlockCausalDataTable<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						r.add(new DataRowBlockCausal<InductiveVisualMinerConfiguration, InductiveVisualMinerPanel>());
 						return r;
 

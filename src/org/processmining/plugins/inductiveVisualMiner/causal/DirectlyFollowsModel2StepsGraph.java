@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.processmining.directlyfollowsmodelminer.model.DirectlyFollowsModel;
 import org.processmining.plugins.InductiveMiner.Pair;
+import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IteratorWithPosition;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMTrace;
@@ -13,12 +14,13 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.set.TIntSet;
 
 public class DirectlyFollowsModel2StepsGraph {
-	public static StepsGraph create(DirectlyFollowsModel dfm, IvMLogFiltered log, TIntObjectMap<TIntSet> node2steps) {
+	public static StepsGraph create(DirectlyFollowsModel dfm, IvMLogFiltered log, TIntObjectMap<TIntSet> node2steps,
+			IvMCanceller canceller) {
 		final StepsGraph result = new StepsGraph();
 
 		final List<TIntSet> traceHistory = new ArrayList<>();
 
-		DirectlyFollowsModelStepsWalk walk = new DirectlyFollowsModelStepsWalk(dfm, node2steps) {
+		DirectlyFollowsModelStepsWalk walk = new DirectlyFollowsModelStepsWalk(dfm, node2steps, canceller) {
 			public void stepsEncountered(TIntSet steps, int chosenNode, TIntSet nextSteps) {
 				if (nextSteps.size() > 0) {
 					traceHistory.add(steps);
