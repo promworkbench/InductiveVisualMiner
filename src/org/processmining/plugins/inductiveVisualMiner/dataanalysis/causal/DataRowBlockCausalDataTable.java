@@ -19,12 +19,12 @@ public class DataRowBlockCausalDataTable<C, P> extends DataRowBlockAbstract<Obje
 
 	@Override
 	public IvMObject<?>[] createInputObjects() {
-		return new IvMObject<?>[] { IvMObject.data_analysis_causal_data_table };
+		return new IvMObject<?>[] { IvMObject.data_analysis_causal };
 	}
 
 	@Override
 	public List<DataRow<Object>> gather(IvMObjectValues inputs) {
-		CausalDataTable causalTable = inputs.get(IvMObject.data_analysis_causal_data_table);
+		CausalDataTable causalTable = inputs.get(IvMObject.data_analysis_causal);
 
 		List<DataRow<Object>> result = new ArrayList<>();
 
