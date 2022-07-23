@@ -6,7 +6,7 @@ public class MVPC {
 
 	public static CausalGraph compute(CausalGraph binaryUpperBoundCausalGraph, CausalDataTable binaryChoiceData,
 			IvMCanceller canceller) {
-		return null;
+		return binaryUpperBoundCausalGraph;
 	}
 
 }

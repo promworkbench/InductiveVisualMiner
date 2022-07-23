@@ -53,12 +53,9 @@ public class CausalAnalysis {
 			return null;
 		}
 
-		//compute adjustement set
-		Set<Choice> adjustmentSet = CausalBackdoorCriterion.compute(binaryCausalGraph, binaryChoiceData);
-
 		//perform regression
 		CausalAnalysisResult causalAnalysisResult = CausalRegression.compute(binaryCausalGraph, binaryChoiceData,
-				adjustmentSet, canceller);
+				canceller);
 
 		if (canceller.isCancelled()) {
 			return null;
