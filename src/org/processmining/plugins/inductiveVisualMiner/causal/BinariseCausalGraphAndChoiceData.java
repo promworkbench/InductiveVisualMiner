@@ -10,6 +10,7 @@ import org.processmining.plugins.InductiveMiner.Quadruple;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 
 import gnu.trove.iterator.TIntIterator;
+import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
@@ -51,8 +52,6 @@ public class BinariseCausalGraphAndChoiceData {
 				oldChoice2newChoices.put(oldChoice, newChoices);
 			}
 		}
-		
-		System.out.println(oldChoice2newChoices);
 
 		//create graph
 		CausalGraph newGraph = new CausalGraph();
@@ -84,7 +83,11 @@ public class BinariseCausalGraphAndChoiceData {
 
 			newData = new CausalDataTable(newChoices);
 
-			for (int[] oldRow : oldData.getRows()) {
+			for (TObjectIntIterator<int[]> it = oldData.iterator(); it.hasNext();) {
+				it.advance();
+				int[] oldRow = it.key();
+				int cardinality = it.value();
+
 				int[] newRow = new int[newChoices.size()];
 				Arrays.fill(newRow, CausalDataTable.NO_VALUE);
 
@@ -113,7 +116,7 @@ public class BinariseCausalGraphAndChoiceData {
 					}
 				}
 
-				newData.addRow(newRow);
+				newData.addRow(newRow, cardinality);
 			}
 		}
 

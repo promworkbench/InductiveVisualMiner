@@ -20,7 +20,7 @@ import org.processmining.plugins.inductiveVisualMiner.helperClasses.decoration.I
 public class DataAnalysisTabCausal<C, P> extends DataAnalysisTabAbstract<Object, C, P> {
 
 	public static final String name = "Causal";
-	public static final String explanation = "Study influence of decisions in the model on one another. The values here can be provided to an external R script to derive causal relations.";
+	public static final String explanation = "DUMMY RESULTS FOR NOW. Study influence of decisions in the model on one another.";
 
 	public DataAnalysisTabCausal(Callable<List<DataRowBlock<Object, C, P>>> rowBlocksCreator,
 			Callable<List<DataRowBlockComputer<Object, C, P>>> rowBlockComputersCreator) {

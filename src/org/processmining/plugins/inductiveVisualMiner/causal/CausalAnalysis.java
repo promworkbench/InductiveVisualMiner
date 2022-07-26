@@ -31,8 +31,6 @@ public class CausalAnalysis {
 		CausalGraph upperBoundCausalGraph = p.getA();
 		CausalDataTable choiceData = p.getB();
 
-		System.out.println(upperBoundCausalGraph.toDot());
-
 		//binarise upper bound causal graph and choice data
 		Quadruple<CausalGraph, CausalDataTable, THashMap<Choice, Set<Choice>>, THashMap<Choice, Choice>> t = BinariseCausalGraphAndChoiceData
 				.binarise(upperBoundCausalGraph, choiceData, canceller);
@@ -43,8 +41,6 @@ public class CausalAnalysis {
 
 		CausalGraph binaryUpperBoundCausalGraph = t.getA();
 		CausalDataTable binaryChoiceData = t.getB();
-
-		System.out.println(binaryUpperBoundCausalGraph.toDot());
 
 		//compute causal graph
 		CausalGraph binaryCausalGraph = MVPC.compute(binaryUpperBoundCausalGraph, binaryChoiceData, canceller);

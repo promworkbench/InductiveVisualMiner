@@ -1,9 +1,15 @@
 package org.processmining.plugins.inductiveVisualMiner.causal;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.strategy.HashingStrategy;
 
 /**
  * In a row, a NO_VALUE means that the choice was not encountered. A negative
@@ -14,11 +20,25 @@ import java.util.List;
  *
  */
 public class CausalDataTable {
+
+	private final static HashingStrategy<int[]> hashingStrategy = new HashingStrategy<>() {
+		private static final long serialVersionUID = 1L;
+
+		public int computeHashCode(int[] object) {
+			return Arrays.hashCode(object);
+		}
+
+		public boolean equals(int[] o1, int[] o2) {
+			return Arrays.equals(o1, o2);
+		}
+	};
+
 	//result variables
 	private final List<Choice> columns;
-	private final List<int[]> rows = new ArrayList<>();
+	private final TObjectIntMap<int[]> rows = new TObjectIntCustomHashMap<>(hashingStrategy, 10, 0.5f, 0);
 
 	public static final int NO_VALUE = Integer.MIN_VALUE;
+	public static final String NO_VALUE_STRING = "x";
 
 	public CausalDataTable(List<Choice> columns) {
 		this.columns = columns;
@@ -29,11 +49,23 @@ public class CausalDataTable {
 	}
 
 	public void addRow(int[] currentRow) {
-		rows.add(currentRow);
+		addRow(currentRow, 1);
 	}
 
-	public List<int[]> getRows() {
-		return rows;
+	public void addRow(int[] currentRow, int cardinality) {
+		rows.adjustOrPutValue(currentRow, cardinality, cardinality);
+	}
+
+	public int getNumberOfUniqueRows() {
+		return rows.size();
+	}
+
+	public TObjectIntIterator<int[]> iterator() {
+		return rows.iterator();
+	}
+
+	public Set<int[]> getRows() {
+		return rows.keySet();
 	}
 
 	public List<Choice> getColumns() {
@@ -56,14 +88,24 @@ public class CausalDataTable {
 		if (limit < 0) {
 			limit = Integer.MAX_VALUE;
 		}
-		for (int i = 0; i < limit && i < rows.size(); i++) {
+		int i = 0;
+		TObjectIntIterator<int[]> it = rows.iterator();
+		while (i < limit && it.hasNext()) {
+			it.advance();
+			i++;
+
+			int[] row = it.key();
 			for (int j = 0; j < columns.size(); j++) {
-				result.append(rows.get(i)[j]);
+				if (row[j] == NO_VALUE) {
+					result.append(NO_VALUE_STRING);
+				} else {
+					result.append(row[j]);
+				}
 				if (j < columns.size() - 1) {
 					result.append(",");
 				}
 			}
-			if (i < limit - 1 && i < rows.size() - 1) {
+			if (i < limit && it.hasNext()) {
 				result.append("\n");
 			}
 		}
@@ -73,5 +115,9 @@ public class CausalDataTable {
 	@Override
 	public String toString() {
 		return toString(10);
+	}
+
+	public int getNumberOfColumns() {
+		return columns.size();
 	}
 }
