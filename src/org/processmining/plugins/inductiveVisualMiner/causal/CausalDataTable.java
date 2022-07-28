@@ -21,7 +21,7 @@ import gnu.trove.strategy.HashingStrategy;
  */
 public class CausalDataTable {
 
-	private final static HashingStrategy<int[]> hashingStrategy = new HashingStrategy<>() {
+	private final static HashingStrategy<int[]> hashingStrategy = new HashingStrategy<int[]>() {
 		private static final long serialVersionUID = 1L;
 
 		public int computeHashCode(int[] object) {

@@ -46,7 +46,7 @@ public class DataAnalysisTabCausal<C, P> extends DataAnalysisTabAbstract<Object,
 				return IvMObject.selected_causal_enabled;
 			}
 		};
-		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "", "" }, { "From choice", "to choice", "causal strength" }, { "", "", "", "" } });
+		table.getModel().setColumnNames(new String[][] { {}, { "" }, { "Result", "" }, { "From choice", "to choice", "causal strength" }, { "", "", "", "" } });
 		return table;
 	}
 

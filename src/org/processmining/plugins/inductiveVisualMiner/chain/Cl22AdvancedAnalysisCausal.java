@@ -30,6 +30,8 @@ public class Cl22AdvancedAnalysisCausal<C> extends DataChainLinkComputationAbstr
 			IvMLogFiltered logFiltered = inputs.get(IvMObject.aligned_log_filtered);
 
 			CausalAnalysisResult result = CausalAnalysis.analyse(model, logFiltered, canceller);
+			
+			System.out.println(result);
 
 			return new IvMObjectValues().//
 					s(IvMObject.data_analysis_causal, result);

@@ -32,9 +32,13 @@ public class DataRowBlockCausal<C, P> extends DataRowBlockAbstract<Object, C, P>
 
 		//display the results
 		List<DataRow<Object>> result = new ArrayList<>();
-		for (Pair<Pair<Choice, Choice>, Double> x : analysisResult.getResultsCausal()) {
-			result.add(new DataRow<Object>(x.getA().getA().toString(model), x.getA().getB().toString(model),
-					DisplayType.numeric(x.getB())));
+		if (analysisResult.getResultsCausal().isEmpty()) {
+			result.add(new DataRow<>(DisplayType.literal(""), "No causal relations found in highlighted traces"));
+		} else {
+			for (Pair<Pair<Choice, Choice>, Double> x : analysisResult.getResultsCausal()) {
+				result.add(new DataRow<Object>(x.getA().getA().toString(model), x.getA().getB().toString(model),
+						DisplayType.numeric(x.getB())));
+			}
 		}
 
 		return result;
