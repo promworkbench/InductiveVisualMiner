@@ -16,8 +16,8 @@ import gnu.trove.set.hash.TIntHashSet;
  *
  */
 public class Choice {
-	TIntSet nodes = new TIntHashSet(10, 0.5f, -1);
-	TIntList ids = new TIntArrayList();
+	public TIntSet nodes = new TIntHashSet(10, 0.5f, -1);
+	public TIntList ids = new TIntArrayList();
 
 	@Override
 	public String toString() {

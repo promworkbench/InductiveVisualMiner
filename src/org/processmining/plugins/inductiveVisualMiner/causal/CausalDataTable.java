@@ -120,4 +120,13 @@ public class CausalDataTable {
 	public int getNumberOfColumns() {
 		return columns.size();
 	}
+
+	public int getNumberOfRows() {
+		int result = 0;
+		for (TObjectIntIterator<int[]> it = rows.iterator(); it.hasNext();) {
+			it.advance();
+			result += it.value();
+		}
+		return result;
+	}
 }

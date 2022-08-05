@@ -4,6 +4,8 @@ import java.util.Set;
 
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.plugins.InductiveMiner.Quadruple;
+import org.processmining.plugins.inductiveVisualMiner.causal.mvpc.DiGraph;
+import org.processmining.plugins.inductiveVisualMiner.causal.mvpc.JavaMVPC;
 import org.processmining.plugins.inductiveVisualMiner.chain.IvMCanceller;
 import org.processmining.plugins.inductiveVisualMiner.helperClasses.IvMModel;
 import org.processmining.plugins.inductiveVisualMiner.ivmlog.IvMLogFiltered;
@@ -42,15 +44,19 @@ public class CausalAnalysis {
 		CausalGraph binaryUpperBoundCausalGraph = t.getA();
 		CausalDataTable binaryChoiceData = t.getB();
 
-		//compute causal graph
-		CausalGraph binaryCausalGraph = MVPC.compute(binaryUpperBoundCausalGraph, binaryChoiceData, canceller);
+		//discover causal graph
+		DiGraph discoveredCausalGraph = JavaMVPC.compute(binaryChoiceData, canceller);
 
 		if (canceller.isCancelled()) {
 			return null;
 		}
 
+		//compute conjunction of causal graphs
+		CausalGraph conjunctionCausalGraph = CausalGraphConjunction.conjunction(binaryUpperBoundCausalGraph,
+				discoveredCausalGraph);
+
 		//perform regression
-		CausalAnalysisResult causalAnalysisResult = CausalRegression.compute(binaryCausalGraph, binaryChoiceData,
+		CausalAnalysisResult causalAnalysisResult = CausalRegression.compute(conjunctionCausalGraph, binaryChoiceData,
 				canceller);
 
 		if (canceller.isCancelled()) {
