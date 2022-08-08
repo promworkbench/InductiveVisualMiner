@@ -45,15 +45,23 @@ public class CausalAnalysis {
 		CausalDataTable binaryChoiceData = t.getB();
 
 		//discover causal graph
-		DiGraph discoveredCausalGraph = JavaMVPC.compute(binaryChoiceData, canceller);
+
+		CausalGraph conjunctionCausalGraph = null;
+		try {
+			DiGraph discoveredCausalGraph = JavaMVPC.compute(binaryChoiceData, canceller);
+
+			//compute conjunction of causal graphs
+			conjunctionCausalGraph = CausalGraphConjunction.conjunction(binaryUpperBoundCausalGraph,
+					discoveredCausalGraph);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			conjunctionCausalGraph = binaryUpperBoundCausalGraph;
+		}
 
 		if (canceller.isCancelled()) {
 			return null;
 		}
-
-		//compute conjunction of causal graphs
-		CausalGraph conjunctionCausalGraph = CausalGraphConjunction.conjunction(binaryUpperBoundCausalGraph,
-				discoveredCausalGraph);
 
 		//perform regression
 		CausalAnalysisResult causalAnalysisResult = CausalRegression.compute(conjunctionCausalGraph, binaryChoiceData,

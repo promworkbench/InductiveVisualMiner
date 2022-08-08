@@ -74,7 +74,7 @@ public class RendererFactory {
 	 * @return
 	 */
 	public boolean render(ExternalSettings settings, RenderedFrame result, double time) {
-		if (!openGLgotError || rendererOpenGL == null) {
+		if (!openGLgotError && rendererOpenGL != null) {
 			try {
 				return rendererOpenGL.render(settings, result, time);
 			} catch (Exception e) {

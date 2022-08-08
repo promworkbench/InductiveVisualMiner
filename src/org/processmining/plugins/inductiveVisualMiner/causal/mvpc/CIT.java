@@ -246,7 +246,7 @@ public class CIT implements Cloneable {
 				.isEmpty() : "A test-wise deletion fisher-z test appears no overlapping data of involved variables. Please check the input data.";
 		CIT test_wise_deleted_cit = new CIT(JavaHelperClasses.select_rows(data, test_wise_deletion_XYcond_rows_index),
 				IndependenceTest.fisherz);
-		assert JavaHelperClasses.isAnyNan(data, test_wise_deletion_XYcond_rows_index, var);
+		assert !JavaHelperClasses.isAnyNan(data, test_wise_deletion_XYcond_rows_index, var);
 		return test_wise_deleted_cit.call(X, Y, condition_set);
 		//        # TODO: above is to be consistent with the original code; though below is more accurate (np.corrcoef issues)
 		//        # test_wise_deleted_data_var = self.data[test_wise_deletion_XYcond_rows_index][:, var]
