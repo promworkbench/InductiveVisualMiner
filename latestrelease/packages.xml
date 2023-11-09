@@ -1,0 +1,21 @@
+
+					<packages>
+						<package name="InductiveVisualMiner" version="6.14.2" os="all" url="InductiveVisualMiner/InductiveVisualMiner-6.14.2-all.zip" desc="Inductive visual Miner" org="Eindhoven University of Technology" license="L-GPL" author="SJJ Leemans" auto="false" hasPlugins="true" logo="http://leemans.ch/figures/logoInductiveMiner.png">
+				     	<dependency org="prom" name="ProM-Plugins" rev="latest" changing="true" transitive="true" />   
+    	<dependency org="prom" name="EvolutionaryTreeMiner" rev="latest" changing="true" transitive="true" />
+    	<dependency org="prom" name="AcceptingPetriNet" rev="latest" changing="true" transitive="true" />
+    	<dependency org="prom" name="InductiveMiner" rev="latest" changing="true" transitive="true" />
+    	<dependency org="prom" name="DirectlyFollowsModelMiner" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="GraphViz" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="Monte" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="Widgets" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="EfficientStorage" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="Visualisation3D" rev="latest" changing="true" transitive="true" /> 
+        <dependency org="prom" name="XESLite" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="EarthMoversStochasticConformanceChecking" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="CohortAnalysis" rev="latest" changing="true" transitive="true" />
+        <dependency org="prom" name="StatisticalTests" rev="latest" changing="true" transitive="true" />
+
+						</package>
+					</packages>
+				
