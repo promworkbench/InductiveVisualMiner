@@ -1,7 +1,7 @@
 <ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
     <info organisation="prom" module="InductiveVisualMiner" revision="latest">
     	<description>
-    		Version 6.14.2
+    		Version 6.14.3
     	</description>
     </info>
     <configurations>
