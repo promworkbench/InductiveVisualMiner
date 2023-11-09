@@ -155,9 +155,9 @@
 				<fileset dir="${release}" includes="${project}-*-${os}.zip" />
 			</delete>
 			<zip destfile="${release}/${project}-${version}-${os}.zip">
-				<!--zipfileset dir="${lib}" prefix="lib">
+				<zipfileset dir="${lib}" prefix="lib">
 					<include name="**" />
-				</zipfileset-->
+				</zipfileset>
 				<zipfileset dir="${dist}" prefix="">
 					<include name="${project}.jar" />
 				</zipfileset>
@@ -166,10 +166,10 @@
 			<delete includeEmptyDirs="true" quiet="true">
 				<fileset dir="${release}/lib" includes="**/*" />
 			</delete>
-			<!--mkdir dir="${release}/lib" />
+			<mkdir dir="${release}/lib" />
 			<copy todir="${release}/lib" overwrite="true">
 				<fileset dir="${lib}" />
-			</copy-->
+			</copy>
 			<exec executable="grep">
 				<redirector output="ivypack.xml" />
 				<arg value="&lt;dependency .*org=&quot;prom&quot; " />
