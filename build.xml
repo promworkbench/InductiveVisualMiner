@@ -7,11 +7,11 @@
 	<property name="lib" location="lib" />
 	<property name="dist" location="dist" />
 	<property name="release" location="latestrelease" />
-	<property name="version" value="${major_minor}.${env.BUILD_NUMBER}" />
+	<property name="version" value="${env.major_minor}.${env.GITHUB_RUN_NUMBER}" />
 	<property name="project" value="InductiveVisualMiner" />
 
 	<property name="ivy.lib.dir" value="ivy" />
-	<property name="ivy.cache.dir" value="/var/lib/hudson/.ivy2/cache/${env.EXECUTOR_NUMBER}" />
+	<!--property name="ivy.cache.dir" value="/var/lib/hudson/.ivy2/cache/${env.EXECUTOR_NUMBER}" /-->
 
 	<property name="author" value="SJJ Leemans" />
 	<property name="organization" value="Eindhoven University of Technology" />
@@ -22,6 +22,35 @@
 	<!-- Set the os to win32, win64, lin32, lin64, mac, or all -->
 	<property name="os" value="all" />
 
+	<property name="ivy.install.version" value="2.1.0-rc2" />
+	<condition property="ivy.home" value="${env.IVY_HOME}">
+	    <isset property="env.IVY_HOME" />
+	</condition>
+	<property name="ivy.home" value="${user.home}/.ant" />
+	<property name="ivy.jar.dir" value="${ivy.home}/lib" />
+	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+
+	<target name="download-ivy" unless="offline">
+
+	    <mkdir dir="${ivy.jar.dir}"/>
+	    <!-- download Ivy from web site so that it can be used even without any special installation -->
+	    <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" 
+	         dest="${ivy.jar.file}" usetimestamp="true"/>
+	</target>
+
+	<target name="init-ivy" depends="download-ivy">
+	    <!-- try to load ivy here from ivy home, in case the user has not already dropped
+	         it into ant's lib dir (note that the latter copy will always take precedence).
+	         We will not fail as long as local lib dir exists (it may be empty) and
+	         ivy is in at least one of ant's lib dir or the local lib dir. -->
+	    <path id="ivy.lib.path">
+	        <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+
+	    </path>
+	    <taskdef resource="org/apache/ivy/ant/antlib.xml"
+	             uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+	
 	<!-- Compilation macro
 		 This Macro compiles the sources is one ${src}-... folder.
 	 The sources are compiled into the ${build} folder.
@@ -33,15 +62,15 @@
 		<fileset dir=".">
 			<include name="ivy/**/*.jar" />
 			<include name="lib/**/*.jar" />
-			<include name="stdlib/**/*.jar" />
-			<include name="packagelib/**/*.jar" />
+			<!--include name="stdlib/**/*.jar" />
+			<include name="packagelib/**/*.jar" /-->
 		</fileset>
 	</path>
 
 	<macrodef name="compile">
 		<sequential>
 			<!-- Compile the java code from ${src}-@{module} into ${build} -->
-			<javac srcdir="${src}" classpathref="classpath" destdir="${build}" nowarn="false" verbose="no" debug="true" debuglevel="lines,vars,source" deprecation="yes" source="${bytecode_format}" target="${bytecode_format}">
+			<javac srcdir="${src}" classpathref="classpath" destdir="${build}" nowarn="false" verbose="no" debug="true" debuglevel="lines,vars,source" deprecation="yes" source="${env.bytecode_format}" target="${env.bytecode_format}">
 				<!-- Check for unsafe operations -->
 				<compilerarg value="-Xlint:unchecked" />
 			</javac>
@@ -90,10 +119,10 @@
 		<delete dir="${dist}" />
 	</target>
 	
-	<target name="resolve">
+	<target name="resolve" depends="init-ivy">
 		<ivy:retrieve type="jar,bundle" sync="true" />
 		<!-- HV: Removed sync="true" in the next entry, as the lib folder already contains dot binaries. -->
-		<ivy:retrieve pattern="lib/[artifact].[ext]" conf="lib" type="jar,bundle" />
+		<ivy:retrieve pattern="lib/[artifact]-[revision].[ext]" conf="lib" type="jar,bundle" />
 	</target>
 
 	<target name="javadoc">
@@ -126,9 +155,9 @@
 				<fileset dir="${release}" includes="${project}-*-${os}.zip" />
 			</delete>
 			<zip destfile="${release}/${project}-${version}-${os}.zip">
-				<zipfileset dir="${lib}" prefix="lib">
+				<!--zipfileset dir="${lib}" prefix="lib">
 					<include name="**" />
-				</zipfileset>
+				</zipfileset-->
 				<zipfileset dir="${dist}" prefix="">
 					<include name="${project}.jar" />
 				</zipfileset>
@@ -137,10 +166,10 @@
 			<delete includeEmptyDirs="true" quiet="true">
 				<fileset dir="${release}/lib" includes="**/*" />
 			</delete>
-			<mkdir dir="${release}/lib" />
+			<!--mkdir dir="${release}/lib" />
 			<copy todir="${release}/lib" overwrite="true">
 				<fileset dir="${lib}" />
-			</copy>
+			</copy-->
 			<exec executable="grep">
 				<redirector output="ivypack.xml" />
 				<arg value="&lt;dependency .*org=&quot;prom&quot; " />
