@@ -65,6 +65,9 @@ public class DataRowBlockLogAttributesHighlighted<C, P> extends DataRowBlockComp
 
 			DisplayType z = DisplayType.numeric(Fitness.compute(log));
 			result.add(new DataRow<Object>(z, "fitness"));
+
+			DisplayType aa = DisplayType.numeric(Fitness.getNumberOfFittingTraces(log));
+			result.add(new DataRow<Object>(aa, "number of fitting traces"));
 		}
 
 		if (logFiltered.isSomethingFiltered()) {
@@ -96,6 +99,9 @@ public class DataRowBlockLogAttributesHighlighted<C, P> extends DataRowBlockComp
 				//fitness (highlighted)
 				DisplayType z = DisplayType.numeric(Fitness.compute(logFiltered));
 				result.add(new DataRow<Object>(z, "fitness (highlighted traces)"));
+				
+				DisplayType aa = DisplayType.numeric(Fitness.getNumberOfFittingTraces(logFiltered));
+				result.add(new DataRow<Object>(aa, "number of fitting highlighted traces"));
 			}
 
 			//not-highlighted
@@ -128,6 +134,9 @@ public class DataRowBlockLogAttributesHighlighted<C, P> extends DataRowBlockComp
 
 				DisplayType z = DisplayType.numeric(Fitness.compute(negativeLog));
 				result.add(new DataRow<Object>(z, "fitness (not-highlighted traces)"));
+				
+				DisplayType aa = DisplayType.numeric(Fitness.getNumberOfFittingTraces(negativeLog));
+				result.add(new DataRow<Object>(aa, "number of fitting not-highlighted traces"));
 
 				if (canceller.isCancelled()) {
 					return null;

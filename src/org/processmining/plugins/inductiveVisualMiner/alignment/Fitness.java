@@ -25,6 +25,17 @@ public class Fitness {
 		return synchronousMoves / (moves * 1.0);
 	}
 
+	public static boolean traceFits(IvMTrace trace) {
+		for (IvMMove move : trace) {
+			if (move.isComplete() && !move.isIgnoredLogMove() && !move.isIgnoredModelMove()) {
+				if (move.getType() != Type.synchronousMove) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public static double compute(IvMLogNotFiltered log) {
 		double sum = 0;
 		int count = 0;
@@ -51,5 +62,27 @@ public class Fitness {
 			return 1;
 		}
 		return sum / count;
+	}
+
+	public static int getNumberOfFittingTraces(IvMLogFiltered log) {
+		int count = 0;
+		for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
+			IvMTrace trace = it.next();
+			if (traceFits(trace)) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	public static int getNumberOfFittingTraces(IvMLogNotFiltered log) {
+		int count = 0;
+		for (IteratorWithPosition<IvMTrace> it = log.iterator(); it.hasNext();) {
+			IvMTrace trace = it.next();
+			if (traceFits(trace)) {
+				count++;
+			}
+		}
+		return count;
 	}
 }
