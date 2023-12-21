@@ -1,6 +1,6 @@
 
 					<packages>
-						<package name="InductiveVisualMiner" version="6.14.3" os="all" url="InductiveVisualMiner/InductiveVisualMiner-6.14.3-all.zip" desc="Inductive visual Miner" org="Eindhoven University of Technology" license="L-GPL" author="SJJ Leemans" auto="false" hasPlugins="true" logo="http://leemans.ch/figures/logoInductiveMiner.png">
+						<package name="InductiveVisualMiner" version="6.14.4" os="all" url="InductiveVisualMiner/InductiveVisualMiner-6.14.4-all.zip" desc="Inductive visual Miner" org="Eindhoven University of Technology" license="L-GPL" author="SJJ Leemans" auto="false" hasPlugins="true" logo="http://leemans.ch/figures/logoInductiveMiner.png">
 				     	<dependency org="prom" name="ProM-Plugins" rev="latest" changing="true" transitive="true" />   
     	<dependency org="prom" name="EvolutionaryTreeMiner" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="AcceptingPetriNet" rev="latest" changing="true" transitive="true" />
