@@ -47,7 +47,7 @@ public class ETMAlignment {
 
 	public final static int maxStates = 1 << 24;
 	public final static double traceTimeOutInSec = -1;
-	public final static int numberOfThreads = Math.max(Runtime.getRuntime().availableProcessors() - 2, 1);
+	public final static int numberOfThreads = getNumberOfThreads();
 	private static final int modelCost = 1;
 	private static final Integer logCost = 1;
 
@@ -62,6 +62,24 @@ public class ETMAlignment {
 
 	private final AtomicInteger tracesStarted;
 
+	/*
+	 * HV; Gets the maximal number of threads the replayer can use.
+	 */
+	private static int getNumberOfThreads() {
+		int numThreads = 1;
+		try {
+			String numThreadsAsString = System.getenv("NUMTHREADS");
+			if (numThreadsAsString != null) {
+				numThreads = Integer.parseInt(numThreadsAsString);
+			}
+		} catch (Exception e) {
+			// Ignore. 
+		}
+		numThreads = Math.max(Runtime.getRuntime().availableProcessors() - 2, numThreads);
+		System.out.println("[ETMAlignment] Using " + numThreads + " thread(s) to compute alignment.");
+		return numThreads;
+	}
+	
 	/**
 	 * Make sure that all event classes of log AND MODEL are in eventclasses.
 	 * (use the static function addAllLeavesAsEventClasses to achieve that).
