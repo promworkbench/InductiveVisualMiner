@@ -41,11 +41,28 @@ public class AcceptingPetriNetAlignment {
 				aNet.getNet().getTransitions(), 1, 1);
 		replayParameters.setInitialMarking(aNet.getInitialMarking());
 		replayParameters.setMaxNumOfStates(Integer.MAX_VALUE);
-		IPNReplayAlgorithm algorithm = new PetrinetReplayerWithILP();
+		/*
+		 * HV: Use LPs instead of ILPs.
+		 */
+		//IPNReplayAlgorithm algorithm = new PetrinetReplayerWithILP();
+		IPNReplayAlgorithm algorithm = new PetrinetReplayerWithILP(false, true);
 		Marking[] finalMarkings = new Marking[aNet.getFinalMarkings().size()];
 		replayParameters.setFinalMarkings(aNet.getFinalMarkings().toArray(finalMarkings));
 		replayParameters.setCreateConn(false);
 		replayParameters.setGUIMode(false);
+
+		int numThreads = 1;
+		try {
+			String numThreadsAsString = System.getenv("NUMTHREADS");
+			if (numThreadsAsString != null) {
+				numThreads = Integer.parseInt(numThreadsAsString);
+			}
+		} catch (Exception e) {
+			// Ignore. 
+		}
+		numThreads = Math.max(Runtime.getRuntime().availableProcessors() - 2, numThreads);
+		System.out.println("[AcceptingPetriNetAlignment] Using " + numThreads + " thread(s) to compute alignment.");
+		replayParameters.setNumThreads(numThreads);
 
 		PNRepResult result = replayer.replayLog(null, aNet.getNet(), log, mapping, algorithm, replayParameters);
 
