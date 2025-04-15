@@ -53,9 +53,15 @@ public class AcceptingPetriNetAlignment {
 
 		int numThreads = 1;
 		try {
-			String numThreadsAsString = System.getenv("NUMTHREADS");
+			String numThreadsAsString = System.getProperty("org.processmining.plugins.inductiveVisualMiner.alignment.numthreads");
+			System.out.println("[AcceptingPetriNetAlignment] org.processmining.plugins.inductiveVisualMiner.alignment.numthreads=" + numThreadsAsString);
+			if (numThreadsAsString == null) {
+				numThreadsAsString = System.getenv("NUMTHREADS");
+				System.out.println("[AcceptingPetriNetAlignment] NUMTHREADS=" + numThreadsAsString);
+			}
 			if (numThreadsAsString != null) {
 				numThreads = Integer.parseInt(numThreadsAsString);
+				System.out.println("[AcceptingPetriNetAlignment] numThreads=" + numThreads);
 			}
 		} catch (Exception e) {
 			// Ignore. 
